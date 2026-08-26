@@ -1,0 +1,559 @@
+id: LLD-WhiteLabelService
+title: WhiteLabelService — 50 operations, 13 tables
+generatedBy: tools/derive-diagrams.py
+tier: platform
+index: diagrams/hld.yaml
+why: Branding, content, navigation and the tenant's own app configuration. Separate because **it is
+  the only service a tenant edits directly and publishes from** — its deploy cadence follows tenant
+  appetite, not the platform's.
+scale: Read-heavy and heavily cached. Published, not queried.
+ifDown: Down freezes the current published config. Guests see the last good version.
+coverage:
+  operations: 50
+  inAFlow: 22
+  percent: 44%
+  note: '**Flow coverage is how much of this service a journey has walked.** A service under 40% is
+    unwalked rather than under-documented.'
+schemas:
+- schema: whitelabel
+  tables: 13
+  storage: ''
+operationsByContract:
+- contract: white-label
+  count: 50
+  operations:
+  - operation: claimCustomDomain
+    verb: POST
+    path: /tenant-domains
+    scope: tenant
+    permission: TENANT_CONFIGURE
+    offline: false
+    reads: 3
+    writes: 2
+  - operation: createBanner
+    verb: POST
+    path: /tenant-config/banners
+    scope: tenant
+    permission: TENANT_CONFIGURE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: createContentBlock
+    verb: POST
+    path: /content-blocks
+    scope: tenant
+    permission: TENANT_CONFIGURE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: createContentPage
+    verb: POST
+    path: /tenant-config/pages
+    scope: tenant
+    permission: TENANT_CONFIGURE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: createPreview
+    verb: POST
+    path: /tenant-config/preview
+    scope: tenant
+    permission: TENANT_CONFIGURE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: createPromoBlock
+    verb: POST
+    path: /tenant-config/promo-blocks
+    scope: tenant
+    permission: TENANT_CONFIGURE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: deleteBanner
+    verb: DELETE
+    path: /tenant-config/banners/{bannerId}
+    scope: tenant
+    permission: TENANT_CONFIGURE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: deleteContentPage
+    verb: DELETE
+    path: /tenant-config/pages/{pageId}
+    scope: tenant
+    permission: TENANT_CONFIGURE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: deletePromoBlock
+    verb: DELETE
+    path: /tenant-config/promo-blocks/{promoBlockId}
+    scope: tenant
+    permission: TENANT_CONFIGURE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: diffConfigVersion
+    verb: GET
+    path: /tenant-config/versions/{version}/diff
+    scope: tenant
+    permission: TENANT_CONFIGURE
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: getAppIcons
+    verb: GET
+    path: /tenant-config/app-icons
+    scope: tenant
+    permission: TENANT_CONFIGURE
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: getBrandIdentity
+    verb: GET
+    path: /tenant-config/brand
+    scope: tenant
+    permission: TENANT_CONFIGURE
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: getFeatureToggles
+    verb: GET
+    path: /tenant-config/features
+    scope: tenant
+    permission: TENANT_CONFIGURE
+    offline: false
+    reads: 2
+    writes: 1
+  - operation: getFonts
+    verb: GET
+    path: /tenant-config/fonts
+    scope: tenant
+    permission: TENANT_CONFIGURE
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: getHomepageLayout
+    verb: GET
+    path: /tenant-config/homepage
+    scope: tenant
+    permission: TENANT_CONFIGURE
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: getModuleEnablement
+    verb: GET
+    path: /tenant-config/modules
+    scope: tenant
+    permission: TENANT_CONFIGURE
+    offline: false
+    reads: 2
+    writes: 1
+  - operation: getNavigation
+    verb: GET
+    path: /tenant-config/navigation
+    scope: tenant
+    permission: TENANT_CONFIGURE
+    offline: false
+    reads: 2
+    writes: 1
+  - operation: getTenantAppStatus
+    verb: GET
+    path: /tenant-config/status
+    scope: tenant
+    permission: null
+    offline: true
+    reads: 2
+    writes: 0
+  - operation: getTenantConfig
+    verb: GET
+    path: /tenant-config
+    scope: tenant
+    permission: TENANT_CONFIGURE
+    offline: false
+    reads: 6
+    writes: 1
+  - operation: getTheme
+    verb: GET
+    path: /tenant-config/theme
+    scope: tenant
+    permission: TENANT_CONFIGURE
+    offline: false
+    reads: 2
+    writes: 1
+  - operation: listBanners
+    verb: GET
+    path: /tenant-config/banners
+    scope: tenant
+    permission: TENANT_CONFIGURE
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listConfigVersions
+    verb: GET
+    path: /tenant-config/versions
+    scope: tenant
+    permission: TENANT_CONFIGURE
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listContentPages
+    verb: GET
+    path: /tenant-config/pages
+    scope: tenant
+    permission: TENANT_CONFIGURE
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listCustomDomains
+    verb: GET
+    path: /tenant-domains
+    scope: tenant
+    permission: TENANT_CONFIGURE
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listFaqs
+    verb: GET
+    path: /tenant-config/faqs
+    scope: tenant
+    permission: TENANT_CONFIGURE
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listPolicies
+    verb: GET
+    path: /tenant-config/policies
+    scope: tenant
+    permission: TENANT_CONFIGURE
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listPromoBlocks
+    verb: GET
+    path: /tenant-config/promo-blocks
+    scope: tenant
+    permission: TENANT_CONFIGURE
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: publishContentBlock
+    verb: POST
+    path: /content-blocks/{blockId}/publish
+    scope: tenant
+    permission: TENANT_PUBLISH
+    offline: false
+    reads: 3
+    writes: 3
+  - operation: publishTenantConfig
+    verb: POST
+    path: /tenant-config/publish
+    scope: tenant
+    permission: TENANT_PUBLISH
+    offline: false
+    reads: 2
+    writes: 3
+  - operation: releaseCustomDomain
+    verb: DELETE
+    path: /tenant-domains/{domainId}
+    scope: tenant
+    permission: TENANT_CONFIGURE
+    offline: false
+    reads: 3
+    writes: 3
+  - operation: restoreConfigVersion
+    verb: POST
+    path: /tenant-config/versions/{version}/restore
+    scope: tenant
+    permission: TENANT_PUBLISH
+    offline: false
+    reads: 6
+    writes: 7
+  - operation: setAppIcons
+    verb: PUT
+    path: /tenant-config/app-icons
+    scope: tenant
+    permission: TENANT_CONFIGURE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: setBrandIdentity
+    verb: PUT
+    path: /tenant-config/brand
+    scope: tenant
+    permission: TENANT_CONFIGURE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: setFaqs
+    verb: PUT
+    path: /tenant-config/faqs
+    scope: tenant
+    permission: TENANT_CONFIGURE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: setFeatureToggles
+    verb: PUT
+    path: /tenant-config/features
+    scope: tenant
+    permission: TENANT_CONFIGURE
+    offline: false
+    reads: 2
+    writes: 3
+  - operation: setFonts
+    verb: PUT
+    path: /tenant-config/fonts
+    scope: tenant
+    permission: TENANT_CONFIGURE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: setFooter
+    verb: PUT
+    path: /footer
+    scope: tenant
+    permission: TENANT_CONFIGURE
+    offline: false
+    reads: 2
+    writes: 3
+  - operation: setHeader
+    verb: PUT
+    path: /tenant-config/header
+    scope: tenant
+    permission: TENANT_CONFIGURE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: setHomepageLayout
+    verb: PUT
+    path: /tenant-config/homepage
+    scope: tenant
+    permission: TENANT_CONFIGURE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: setLanguages
+    verb: PUT
+    path: /tenant-config/languages
+    scope: tenant
+    permission: TENANT_CONFIGURE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: setMaintenanceMode
+    verb: PUT
+    path: /tenant-config/status
+    scope: tenant
+    permission: TENANT_CONFIGURE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: setModuleEnablement
+    verb: PUT
+    path: /tenant-config/modules
+    scope: tenant
+    permission: TENANT_CONFIGURE
+    offline: false
+    reads: 2
+    writes: 3
+  - operation: setNavigation
+    verb: PUT
+    path: /tenant-config/navigation
+    scope: tenant
+    permission: TENANT_CONFIGURE
+    offline: false
+    reads: 2
+    writes: 3
+  - operation: setPolicy
+    verb: PUT
+    path: /tenant-config/policies/{policyKind}
+    scope: tenant
+    permission: TENANT_CONFIGURE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: setTheme
+    verb: PUT
+    path: /tenant-config/theme
+    scope: tenant
+    permission: TENANT_CONFIGURE
+    offline: false
+    reads: 2
+    writes: 3
+  - operation: updateBanner
+    verb: PATCH
+    path: /tenant-config/banners/{bannerId}
+    scope: tenant
+    permission: TENANT_CONFIGURE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: updateContentPage
+    verb: PUT
+    path: /tenant-config/pages/{pageId}
+    scope: tenant
+    permission: TENANT_CONFIGURE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: updatePromoBlock
+    verb: PATCH
+    path: /tenant-config/promo-blocks/{promoBlockId}
+    scope: tenant
+    permission: TENANT_CONFIGURE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: validateTenantConfig
+    verb: POST
+    path: /tenant-config/validate
+    scope: tenant
+    permission: TENANT_CONFIGURE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: verifyCustomDomain
+    verb: POST
+    path: /tenant-domains/{domainId}/verify
+    scope: tenant
+    permission: TENANT_CONFIGURE
+    offline: false
+    reads: 2
+    writes: 2
+tables:
+- table: whitelabel.banner
+  columns: 12
+  store: postgres
+  parent: null
+  writtenBy:
+  - white-label
+  foreignWriters: null
+- table: whitelabel.config_version
+  columns: 9
+  store: postgres
+  parent: null
+  writtenBy:
+  - white-label
+  foreignWriters: null
+- table: whitelabel.content_page
+  columns: 10
+  store: postgres
+  parent: null
+  writtenBy:
+  - white-label
+  foreignWriters: null
+- table: whitelabel.custom_domain
+  columns: 10
+  store: postgres
+  parent: null
+  writtenBy:
+  - white-label
+  foreignWriters: null
+- table: whitelabel.faq_category
+  columns: 3
+  store: postgres
+  parent: null
+  writtenBy:
+  - white-label
+  foreignWriters: null
+- table: whitelabel.faq_entry
+  columns: 6
+  store: postgres
+  parent: whitelabel.faq_category
+  writtenBy: []
+  foreignWriters: null
+- table: whitelabel.feature_toggle
+  columns: 6
+  store: postgres
+  parent: null
+  writtenBy:
+  - white-label
+  foreignWriters: null
+- table: whitelabel.homepage_section
+  columns: 8
+  store: postgres
+  parent: null
+  writtenBy:
+  - white-label
+  foreignWriters: null
+- table: whitelabel.module_enablement
+  columns: 6
+  store: postgres
+  parent: null
+  writtenBy:
+  - white-label
+  foreignWriters: null
+- table: whitelabel.navigation_item
+  columns: 8
+  store: postgres
+  parent: null
+  writtenBy:
+  - white-label
+  foreignWriters: null
+- table: whitelabel.policy
+  columns: 7
+  store: postgres
+  parent: null
+  writtenBy:
+  - white-label
+  foreignWriters: null
+- table: whitelabel.promo_block
+  columns: 10
+  store: postgres
+  parent: null
+  writtenBy:
+  - white-label
+  foreignWriters: null
+- table: whitelabel.tenant_config
+  columns: 16
+  store: postgres
+  parent: platform.tenant
+  writtenBy:
+  - white-label
+  foreignWriters: null
+readsFrom:
+- service: ControlService
+  operations: 3
+- service: MarketingService
+  operations: 1
+- service: IdentityService
+  operations: 1
+writesOutside:
+- service: ControlService
+  operations: 3
+  why: '**The owner defines the row; this service may only append to it.**'
+screens:
+- P01:WEB-001 Home / Landing
+- P01:WEB-025 Help Centre / FAQ
+- P01:WEB-028 Contact & Venue Information
+- P01:WEB-029 Error / Sold Out / Maintenance
+- P02:GST-001 Home – Default
+- P02:GST-038 Digital Companion Mode
+- P02:GST-040 Help & Support
+- P02:GST-047 Maintenance / Upgrade Page
+- P02:GST-057 Accessibility Information
+- P05:KSK-002 Language Select
+- P09:ADM-016 White-Label Branding Management
+- P09:ADM-017 Domain & Certificate Management
+- P09:ADM-018 Localisation & Language Pack
+- P13:CMS-002 Brand Kit
+- P13:CMS-003 Typography
+- P13:CMS-005 Theme Editor
+- P13:CMS-006 Component Preview
+- P13:CMS-007 Page Builder
+- P13:CMS-008 Content Blocks
+- P13:CMS-011 Translations
+- P13:CMS-012 RTL Preview
+- P13:CMS-014 Publishing Workflow
+- P13:CMS-015 Version History
+- P13:CMS-016 Site Settings
+- P13:CMS-020 Change Log
+flows:
+- F01 Guest buys a ticket online
+- F07 Guest buys at a kiosk
+- F102 A brand is set, previewed, published and rolled back
+- F103 A tenant claims a domain and gets a certificate
+- F22 A tenant rebrands their app
+- F75 A kiosk serves itself and calls for help

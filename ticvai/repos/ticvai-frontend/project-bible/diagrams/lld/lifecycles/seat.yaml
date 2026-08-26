@@ -1,0 +1,85 @@
+id: LLD-Seat
+title: Seat — 12 transitions
+generatedBy: tools/derive-diagrams.py
+index: diagrams/hld/04-lifecycles.yaml
+source: states/seat.yaml
+entity: Seat
+contract: seating
+enum: SeatStatus
+enumKind: named
+enumSchema: SeatStatus
+owner: seating
+initial:
+- available
+terminal:
+- unavailable
+transitions:
+- from: available
+  to: held
+  operation: createSeatHold
+  trigger: operation
+  guard: Not already held or sold. The hold is the concurrency control
+- from: held
+  to: available
+  operation: releaseSeatHold
+  trigger: operation
+  guard: Released by the holder
+- from: held
+  to: available
+  trigger: timer
+  guard: Hold expired
+- from: held
+  to: sold
+  operation: createPayment
+  trigger: cascade
+  guard: Payment captured on the order carrying this hold
+  emits:
+  - seat.sold
+- from: available
+  to: blocked
+  operation: createSeatBlock
+  trigger: operation
+  guard: Held back from sale — house seats, production, accessibility companion
+- from: blocked
+  to: available
+  operation: releaseSeatBlock
+  trigger: operation
+  guard: Block released
+- from: blocked
+  to: sold
+  operation: allocateBlockedSeats
+  trigger: operation
+  guard: Allocated directly from the block without passing through available
+- from: available
+  to: buffered
+  trigger: job
+  guard: Social-distancing or sightline buffer applied by a rule, not a person
+- from: buffered
+  to: available
+  trigger: job
+  guard: Buffer rule lifted
+- from: sold
+  to: available
+  operation: createRefund
+  trigger: cascade
+  guard: Order refunded and the seat returns to sale
+  isReversal: true
+- from: available
+  to: unavailable
+  operation: updateSeats
+  trigger: operation
+  guard: Permanently removed — a seat taken out by a refit or a structural change. Distinct from blocked,
+    which is a seat held back and expected to return
+- from: blocked
+  to: unavailable
+  operation: updateSeats
+  trigger: operation
+  guard: A blocked seat removed permanently rather than released
+notes: 'No terminal state for the seat itself except removal. A seat outlives every sale of it — `sold`
+  is terminal for a performance, not for the seat.
+
+
+  `unavailable` was in the enum with nothing reaching it. Settled 14 August as **permanent removal**
+  — a refit, a structural change — and therefore terminal. `blocked` is a seat held back and expected
+  to return; `unavailable` is one that will not.'
+offlineReachable: []

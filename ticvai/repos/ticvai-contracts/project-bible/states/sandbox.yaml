@@ -1,0 +1,54 @@
+# Sandbox — state model
+# Contract: public-api.Sandbox.status
+
+entity: Sandbox
+contract: public-api
+enum: Sandbox.status
+enumKind: inline
+enumSchema: Sandbox
+enumProperty: status
+owner: public-api
+initial:
+- provisioning
+terminal:
+- deleted
+transitions:
+- from: provisioning
+  to: active
+  operation: createSandbox
+  trigger: operation
+  guard: '**Synthetic data generated** (D2). No production data was cloned, which is what removes the
+    PDPL exposure'
+- from: active
+  to: resetting
+  operation: resetSandbox
+  trigger: operation
+  guard: Back to a clean dataset. **Credentials survive** — an integrator re-onboarding after every
+    reset would stop resetting
+- from: resetting
+  to: active
+  operation: resetSandbox
+  trigger: operation
+  guard: Regenerated
+  isReversal: true
+- from: active
+  to: expired
+  trigger: timer
+  guard: '**13.2.18.** Past `expiresAt`. Data goes, the record stays'
+- from: expired
+  to: active
+  operation: createSandbox
+  trigger: operation
+  guard: Reprovisioned on request
+  isReversal: true
+- from: expired
+  to: deleted
+  trigger: timer
+  guard: Cleaned up
+notes: '**`containsProductionData` is always false and it is a field rather than an assumption** — the
+  entire PDPL and DESC argument for this contract rests on it, so a future reversal should be a visible
+  change.
+
+
+  **Expiry removes data and keeps the record**, because a developer whose sandbox vanished entirely
+  cannot tell it from one that never existed.'

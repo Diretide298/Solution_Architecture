@@ -1,0 +1,57 @@
+# Rollout to a cell — state model
+# Contract: platform-ops.RolloutCell.status
+# Checked by tools/check-states.py.
+
+entity: Rollout to a cell
+contract: platform-ops
+enum: RolloutCell.status
+enumKind: inline
+enumSchema: RolloutCell
+enumProperty: status
+owner: platform-ops
+initial:
+- pending
+terminal:
+- complete
+- failed
+- skipped
+- rolledBack
+transitions:
+- from: pending
+  to: running
+  operation: startRollout
+  trigger: operation
+  guard: This cell is being upgraded
+- from: pending
+  to: skipped
+  operation: skipRolloutCell
+  trigger: operation
+  guard: '**Deliberately excluded** — an on-premise cell, or one in a blackout window'
+- from: running
+  to: complete
+  trigger: job
+  guard: Upgraded and healthy
+- from: running
+  to: failed
+  trigger: job
+  guard: '**The rollout halts.** One cell failing stops the wave — continuing is how a bad release reaches
+    everyone'
+- from: failed
+  to: rolledBack
+  operation: rollbackRollout
+  trigger: operation
+  guard: Returned to the previous version
+- from: complete
+  to: rolledBack
+  operation: rollbackRollout
+  trigger: operation
+  guard: '**Healthy at deploy and wrong in use.** The case that matters, and the reason complete is
+    not terminal in practice'
+- from: failed
+  to: running
+  operation: startRollout
+  trigger: operation
+  guard: Retried after a fix
+  isReversal: true
+notes: A wave stops on the first failure. **A rollout that continues past a failed cell is a bad release
+  reaching every tenant**, and the whole point of waves is that the blast radius is one cell.

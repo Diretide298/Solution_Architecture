@@ -1,0 +1,46 @@
+id: LLD-Webhook delivery
+title: Webhook delivery — 6 transitions
+generatedBy: tools/derive-diagrams.py
+index: diagrams/hld/04-lifecycles.yaml
+source: states/webhook-delivery.yaml
+entity: Webhook delivery
+contract: public-api
+enum: WebhookDelivery.status
+enumKind: inline
+enumSchema: WebhookDelivery
+enumProperty: status
+owner: public-api
+initial:
+- pending
+terminal:
+- delivered
+- abandoned
+transitions:
+- from: pending
+  to: delivered
+  trigger: operation
+  guard: 2xx from the endpoint
+- from: pending
+  to: failed
+  trigger: operation
+  guard: Non-2xx, or no response
+- from: failed
+  to: retrying
+  trigger: timer
+  guard: '**Exponential backoff.** Retrying immediately against an endpoint under load makes it worse'
+- from: retrying
+  to: delivered
+  trigger: operation
+  guard: Recovered
+  isReversal: true
+- from: retrying
+  to: failed
+  trigger: operation
+  guard: Failed again
+- from: failed
+  to: abandoned
+  trigger: timer
+  guard: '**Retries exhausted.** Nothing is lost — `replayEvents` is the recovery path, which is why
+    abandoning is safe'
+notes: '**Abandoning is safe because replay exists.** Without a replay path this state would be data
+  loss; with one it is a queue declining to grow forever against a dead endpoint.'

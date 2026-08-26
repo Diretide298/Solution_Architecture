@@ -1,0 +1,256 @@
+id: LLD-queue
+title: queue — 21 operations
+generatedBy: tools/derive-diagrams.py
+index: diagrams/hld/03-contracts.yaml
+tier: satellite
+service: VenueOpsService
+operations:
+- operation: callNextParties
+  verb: POST
+  path: /queues/{queueId}/call-next
+  scope: venue
+  permission: QUEUE_MANAGE
+  audience: null
+  offline: false
+  reads:
+  - cache:idempotency
+  - queue.queue
+  writes:
+  - cache:idempotency
+  - queue.queue
+- operation: configureQueueFeed
+  verb: PUT
+  path: /queue-feeds
+  scope: venue
+  permission: QUEUE_MANAGE
+  audience: null
+  offline: false
+  reads:
+  - cache:idempotency
+  - queue.feed
+  writes:
+  - cache:idempotency
+  - queue.feed
+- operation: createQueue
+  verb: POST
+  path: /queues
+  scope: venue
+  permission: QUEUE_MANAGE
+  audience: null
+  offline: false
+  reads:
+  - cache:idempotency
+  - queue.queue
+  writes:
+  - cache:idempotency
+  - queue.queue
+- operation: getQueue
+  verb: GET
+  path: /queues/{queueId}
+  scope: venue
+  permission: QUEUE_VIEW
+  audience: null
+  offline: true
+  reads:
+  - queue.queue
+  writes: []
+- operation: getQueueEntry
+  verb: GET
+  path: /queue-entries/{entryId}
+  scope: venue
+  permission: null
+  audience: null
+  offline: false
+  reads:
+  - queue.entry
+  writes: []
+- operation: getQueueFeedHealth
+  verb: GET
+  path: /queue-feeds/{feedId}/health
+  scope: venue
+  permission: QUEUE_MANAGE
+  audience: null
+  offline: false
+  reads:
+  - queue.feed
+  writes: []
+- operation: getSignageQueueBoard
+  verb: GET
+  path: /signage/queue-board
+  scope: venue
+  permission: null
+  audience: null
+  offline: true
+  reads:
+  - queue.queue
+  - queue.reading
+  writes: []
+- operation: getSignageQueueCalls
+  verb: GET
+  path: /signage/queue-calls
+  scope: venue
+  permission: null
+  audience: null
+  offline: true
+  reads:
+  - queue.entry
+  writes: []
+- operation: getWaitTimes
+  verb: GET
+  path: /queues/wait-times
+  scope: venue
+  permission: null
+  audience: null
+  offline: true
+  reads:
+  - queue.entry
+  - queue.queue
+  - queue.reading
+  writes: []
+- operation: joinQueue
+  verb: POST
+  path: /queue-entries
+  scope: venue
+  permission: null
+  audience: null
+  offline: false
+  reads:
+  - cache:idempotency
+  - queue.entry
+  writes:
+  - cache:idempotency
+  - queue.entry
+- operation: leaveQueue
+  verb: DELETE
+  path: /queue-entries/{entryId}
+  scope: venue
+  permission: null
+  audience: null
+  offline: false
+  reads:
+  - cache:idempotency
+  - queue.entry
+  writes:
+  - cache:idempotency
+  - queue.entry
+- operation: listQueueEntries
+  verb: GET
+  path: /queues/{queueId}/entries
+  scope: venue
+  permission: QUEUE_VIEW
+  audience: null
+  offline: false
+  reads:
+  - queue.entry
+  writes: []
+- operation: listQueueFeeds
+  verb: GET
+  path: /queue-feeds
+  scope: venue
+  permission: QUEUE_MANAGE
+  audience: null
+  offline: false
+  reads:
+  - queue.feed
+  writes: []
+- operation: listQueues
+  verb: GET
+  path: /queues
+  scope: venue
+  permission: QUEUE_VIEW
+  audience: null
+  offline: true
+  reads:
+  - queue.queue
+  writes: []
+- operation: overrideQueueEntry
+  verb: POST
+  path: /queue-entries/{entryId}/override
+  scope: venue
+  permission: QUEUE_OVERRIDE
+  audience: null
+  offline: true
+  reads:
+  - cache:idempotency
+  - queue.entry
+  writes:
+  - cache:idempotency
+  - queue.entry
+- operation: redeemQueueEntry
+  verb: POST
+  path: /queue-entries/{entryId}/redeem
+  scope: workstation
+  permission: QUEUE_REDEEM
+  audience: null
+  offline: true
+  reads:
+  - cache:idempotency
+  - queue.entry
+  writes:
+  - cache:idempotency
+  - queue.entry
+- operation: setQueueStatus
+  verb: PUT
+  path: /queues/{queueId}/status
+  scope: venue
+  permission: QUEUE_MANAGE
+  audience: null
+  offline: true
+  reads:
+  - cache:idempotency
+  - queue.queue
+  writes:
+  - cache:idempotency
+  - queue.queue
+- operation: setWaitTime
+  verb: PUT
+  path: /queues/{queueId}/wait-time
+  scope: venue
+  permission: QUEUE_MANAGE
+  audience: null
+  offline: true
+  reads:
+  - cache:idempotency
+  - queue.queue
+  writes:
+  - cache:idempotency
+  - queue.queue
+- operation: submitQueueReading
+  verb: POST
+  path: /queue-feeds/readings
+  scope: venue
+  permission: null
+  audience: null
+  offline: false
+  reads:
+  - cache:idempotency
+  - queue.reading
+  writes:
+  - cache:idempotency
+  - queue.reading
+- operation: testQueueFeed
+  verb: POST
+  path: /queue-feeds/{feedId}/test
+  scope: venue
+  permission: QUEUE_MANAGE
+  audience: null
+  offline: false
+  reads:
+  - cache:idempotency
+  - queue.reading
+  writes:
+  - cache:idempotency
+  - queue.reading
+- operation: updateQueue
+  verb: PATCH
+  path: /queues/{queueId}
+  scope: venue
+  permission: QUEUE_MANAGE
+  audience: null
+  offline: false
+  reads:
+  - cache:idempotency
+  - queue.queue
+  writes:
+  - cache:idempotency
+  - queue.queue

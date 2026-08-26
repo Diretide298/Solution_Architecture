@@ -1,0 +1,285 @@
+# seating — derived from the API contracts, not hand-written
+# Migration: V0010
+#
+# Columns come from schema properties. Types are inferred: format uuid to uuid,
+# date-time to timestamptz, ULID patterns to char(26), Money to numeric(18,4).
+# What is NOT here: partitioning, RLS policies, indexes, the PII split. That is
+# storage design and lives in the migration scripts.
+
+module: seating
+migration: V0010
+tableCount: 9
+columnCount: 76
+tables:
+  seating.import_job:
+    derivedFrom: ImportJob
+    columns:
+    - name: id
+      type: uuid
+      required: true
+    - name: seat_map_id
+      type: uuid
+      required: true
+    - name: kind
+      type: text
+      required: true
+    - name: status
+      type: jsonb
+      required: true
+    - name: parsed_seat_count
+      type: integer
+      required: false
+    - name: matched_seat_count
+      type: integer
+      required: false
+      description: Geometry imports — seats successfully joined to the manifest.
+    - name: unmatched_seat_count
+      type: integer
+      required: false
+      description: Present in one source but not the other. A seat in the plan with no manifest entry
+        is a finding, not a seat.
+    - name: findings
+      type: jsonb
+      required: false
+    - name: created_at
+      type: timestamptz
+      required: true
+    - name: completed_at
+      type: timestamptz
+      required: false
+  seating.seat:
+    derivedFrom: Seat
+    columns:
+    - name: id
+      type: char(26)
+      required: true
+      description: '**Stable for the life of the seat.** Section, row and number are display labels that
+        change on a refit; this does not. A ticket sold today must still resolve after a renumbering.'
+    - name: section_code
+      type: text
+      required: true
+    - name: row_label
+      type: text
+      required: true
+    - name: seat_number
+      type: text
+      required: true
+    - name: display_label
+      type: text
+      required: false
+      description: What the guest sees, e.g. `A2-7-11`.
+    - name: position
+      type: jsonb
+      required: false
+    - name: category_id
+      type: uuid
+      required: false
+    - name: attribute
+      type: jsonb
+      required: true
+    - name: companion_seat_ids
+      type: jsonb
+      required: false
+      description: Present on accessible seats. Sold together, released together.
+    - name: is_active
+      type: boolean
+      required: false
+  seating.seat_block:
+    derivedFrom: SeatBlock
+    columns:
+    - name: id
+      type: uuid
+      required: true
+    - name: performance_id
+      type: uuid
+      required: true
+    - name: seat_ids
+      type: jsonb
+      required: true
+    - name: reason
+      type: jsonb
+      required: true
+    - name: note
+      type: text
+      required: false
+    - name: created_by_principal_id
+      type: uuid
+      required: false
+    - name: created_at
+      type: timestamptz
+      required: true
+    - name: release_at
+      type: timestamptz
+      required: false
+    - name: released_at
+      type: timestamptz
+      required: false
+  seating.seat_category:
+    derivedFrom: SeatCategory
+    columns:
+    - name: id
+      type: uuid
+      required: true
+    - name: code
+      type: text
+      required: true
+    - name: name
+      type: text
+      required: true
+    - name: venue_id
+      type: uuid
+      required: true
+    - name: display_colour
+      type: text
+      required: false
+    - name: rank
+      type: integer
+      required: true
+      description: Ordering for best-seat assignment. Lower is better.
+    - name: seat_count
+      type: integer
+      required: false
+  seating.seat_hold:
+    derivedFrom: SeatHold
+    columns:
+    - name: id
+      type: text
+      required: true
+    - name: performance_id
+      type: uuid
+      required: true
+    - name: seat_ids
+      type: jsonb
+      required: true
+    - name: buffered_seat_ids
+      type: jsonb
+      required: false
+      description: Neighbours implicitly held by a seating rule.
+    - name: status
+      type: text
+      required: true
+    - name: total_price
+      type: numeric(18,4)
+      required: false
+    - name: held_by_principal_id
+      type: uuid
+      required: false
+    - name: subject_id
+      type: uuid
+      required: false
+    - name: extension_count
+      type: integer
+      required: false
+    - name: created_at
+      type: timestamptz
+      required: true
+    - name: expires_at
+      type: timestamptz
+      required: true
+  seating.seat_map:
+    derivedFrom: SeatMapSummary
+    columns:
+    - name: id
+      type: uuid
+      required: true
+    - name: name
+      type: text
+      required: true
+    - name: venue_id
+      type: uuid
+      required: true
+    - name: status
+      type: jsonb
+      required: true
+    - name: seat_count
+      type: integer
+      required: true
+    - name: section_count
+      type: integer
+      required: false
+    - name: has_geometry
+      type: boolean
+      required: false
+      description: False when only a manifest has been imported. Such a map can be sold from a list but
+        not rendered.
+    - name: published_at
+      type: timestamptz
+      required: false
+  seating.seat_map_template:
+    derivedFrom: SeatMapTemplate
+    columns:
+    - name: id
+      type: uuid
+      required: true
+    - name: name
+      type: text
+      required: true
+    - name: description
+      type: text
+      required: false
+    - name: seat_count
+      type: integer
+      required: true
+    - name: section_count
+      type: integer
+      required: true
+    - name: has_geometry
+      type: boolean
+      required: false
+    - name: created_at
+      type: timestamptz
+      required: false
+  seating.seating_rules:
+    derivedFrom: SeatingRules
+    columns:
+    - name: seat_map_id
+      type: uuid
+      required: true
+    - name: buffer_seats
+      type: integer
+      required: false
+      description: Seats kept empty either side of a sold party.
+    - name: buffer_rows
+      type: integer
+      required: false
+    - name: prevent_orphan_seats
+      type: boolean
+      required: false
+      description: Refuse a selection that would leave a single unsellable seat between parties. Operators
+        want this and rarely ask for it by name.
+    - name: max_party_size
+      type: integer
+      required: false
+    - name: require_contiguous
+      type: boolean
+      required: false
+      description: A party must sit together or the selection is refused.
+    - name: accessible_companion_count
+      type: integer
+      required: false
+      description: Companion seats sold alongside each accessible space.
+    - name: allow_split_across_rows
+      type: boolean
+      required: false
+  seating.section:
+    derivedFrom: Section
+    columns:
+    - name: code
+      type: text
+      required: true
+    - name: name
+      type: text
+      required: true
+    - name: row_count
+      type: integer
+      required: true
+    - name: seat_count
+      type: integer
+      required: true
+    - name: boundary
+      type: jsonb
+      required: false
+      description: Polygon for rendering. Absent without geometry.
+    - name: rows
+      type: jsonb
+      required: false

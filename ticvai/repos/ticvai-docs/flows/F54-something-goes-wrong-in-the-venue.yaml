@@ -1,0 +1,88 @@
+$schema: ./_schema.yaml
+id: F54
+name: Something goes wrong in the venue
+actor: guest
+capability: Guest support and lost property
+wave: 3
+frequency: Routine.
+criticality: operational
+primaryContract: marketing-crm
+contracts:
+- marketing-crm
+- fnb
+- workforce
+platforms:
+- P02
+- P01
+trigger:
+  description: A guest has a problem — something lost, something wrong with an order, a question nobody
+    answered.
+offlineBehaviour: '**FAQs cache; cases do not.** A guest with no signal can read help and cannot raise
+  a case, which is the right way round.'
+steps:
+- step: 1
+  screen: GST-040
+  action: They look for an answer first.
+  operations:
+  - listMyCases
+  - raiseMyCase
+  - replyToMyCase
+  outcome: '**Self-serve before a case.** A support queue full of questions the FAQ answers is a support
+    queue nobody can staff.'
+- step: 2
+  screen: GST-040
+  action: It does not answer, so they raise a case.
+  operations:
+  - listMyCases
+  - raiseMyCase
+  - replyToMyCase
+  outcome: '**One case mechanism** — a lost item, a bad meal and a refund query are the same object
+    with a different subject.'
+- step: 3
+  screen: WEB-034
+  action: They report something lost.
+  operations:
+  - listMyCases
+  - raiseMyCase
+  - replyToMyCase
+  outcome: '**Lost and found is a case.** F70 is the staff side of the same object — the guest who lost
+    it and the steward who found it are in one conversation.'
+  crossesDevice: true
+- step: 4
+  screen: GST-034
+  action: They track it.
+  operations:
+  - listMyCases
+  - raiseMyCase
+  - replyToMyCase
+  outcome: '**The guest can see the state without asking again.** A case with no visible status is a
+    case somebody phones about.'
+  crossesDevice: true
+  note: '**Corrected 24 August.** This step called  from  — **order tracking on a lost-property screen**,
+    and it was the only operation the screen declared. A guest reporting a lost bag could raise nothing.
+    Rebuilt on the case model: **lost and found, a complaint and a query are one object**, which is
+    what lets a single queue serve all three.'
+branches:
+- at: 2
+  condition: It is urgent — a child, a medical issue.
+  behaviour: '**Not a case.** The app surfaces how to reach staff physically, and `reportIncident` on
+    the staff side (F69) is what actually happens. **A queue is the wrong response to an emergency.**'
+  severity: high
+  resolvedBy: reportIncident
+- at: 4
+  condition: The guest has left the venue.
+  behaviour: '**The case follows them by the channel they consented to** — and if they consented to
+    none, the case says so rather than silently failing.'
+  severity: medium
+  resolvedBy: addCaseMessage
+exitStates:
+- state: selfServed
+  description: The FAQ answered it. **The cheapest outcome and the one to measure.**
+- state: caseResolved
+  description: Raised, answered, closed.
+- state: escalatedToStaff
+  description: A person was needed.
+notes: '**Written 24 August.** `GST-040` and `WEB-034` both create cases and **the FAQ-first ordering
+  is the thing this flow makes explicit** — a reviewer reading the screens alone sees two ways to create
+  a case and no order between them.'
+openQuestions: null

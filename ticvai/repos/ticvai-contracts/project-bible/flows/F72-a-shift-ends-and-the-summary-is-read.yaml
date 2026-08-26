@@ -1,0 +1,64 @@
+$schema: ./_schema.yaml
+id: F72
+name: A shift ends and the summary is read
+actor: supervisor
+capability: Shift close on the staff app
+wave: 2
+frequency: Routine.
+criticality: financial
+primaryContract: shift
+contracts:
+- shift
+- orders
+- workforce
+platforms:
+- P06
+trigger:
+  description: A shift is ending. **The person who worked it and the person who reviews it want different
+    things from the same screen.**
+offlineBehaviour: '**Reading works offline; closing does not.** A shift closed against an unsynced journal
+  is a variance that is not a variance.'
+steps:
+- step: 1
+  screen: EMP-008
+  action: The steward reads their shift summary.
+  operations:
+  - getCurrentShift
+  - getShift
+  - listShifts
+  outcome: '**Read-only.** This screen could close the shift and accept a variance until 24 August —
+    **the person being reviewed could sign off their own review.**'
+- step: 2
+  screen: EMP-017
+  action: Anything unsynced is pushed first.
+  operations:
+  - syncScans
+  - syncOrders
+  - listSyncRejections
+  outcome: '**Sync before close, always.** F33 exits at `openWithUnsynced` for exactly this.'
+  crossesDevice: true
+- step: 3
+  screen: EMP-009
+  action: The supervisor closes it.
+  operations:
+  - closeShift
+  - acceptShiftVariance
+  - listCashMovements
+  outcome: '**Closing and accepting a variance are supervisor acts** and now live only here.'
+  crossesDevice: true
+branches:
+- at: 2
+  condition: Transactions are still rejected after sync.
+  behaviour: '**The shift stays open.** F33 step 8 resolves them, and a shift closed over rejections
+    has settled against a number that will change.'
+  severity: high
+  resolvedBy: listSyncRejections
+exitStates:
+- state: closed
+  description: Synced, reviewed, closed.
+- state: heldOpen
+  description: '**Unresolved rejections. Settlement waits.**'
+notes: '**Written 24 August.** `EMP-008` — a shift *summary* — declared `closeShift`, `approveShiftOpen`,
+  `acceptShiftVariance` and `createCashMovement`. **The reviewed could review themselves.** Removed;
+  those acts sit on `EMP-009`.'
+openQuestions: null

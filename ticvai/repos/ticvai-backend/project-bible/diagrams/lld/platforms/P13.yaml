@@ -1,0 +1,592 @@
+id: LLD-P13
+title: P13 Venue CMS — White Label — 20 screens
+generatedBy: tools/derive-diagrams.py
+index: diagrams/hld/00-platform.yaml
+audience: staff
+operator: venue
+app: venue-management-web
+formFactor: web
+runtime: reactWeb
+offlineCapable: false
+deployment:
+  target: browser, desktop
+  distribution: served from the cell
+  bundleUpdate: immediate on deploy
+  hosting: in-cell
+  storeReview: false
+  deviceOwnership: tenant workstation
+  networkAssumption: public internet
+  releaseCadence: weekly
+why: null
+modulesUsed:
+- module: core
+  screens: 15
+- module: membership
+  screens: 1
+- module: maintenance
+  screens: 1
+- module: fnb
+  screens: 1
+- module: ticketing
+  screens: 1
+- module: marketing
+  screens: 1
+servicesCalled:
+- service: WhiteLabelService
+  operationCalls: 28
+- service: ControlService
+  operationCalls: 19
+- service: VenueOpsService
+  operationCalls: 19
+- service: MarketingService
+  operationCalls: 11
+- service: FnbService
+  operationCalls: 5
+- service: IdentityService
+  operationCalls: 4
+- service: OrderService
+  operationCalls: 2
+coverage:
+  screens: 20
+  inAFlow: 9
+  drawn: 20
+  note: '**A screen in no flow has been specified and never walked.** Every flow written in this package
+    has found a defect.'
+screens:
+- screen: CMS-001
+  name: Tenant Workspace
+  module: White Label
+  requiresModule: membership
+  wave: 2
+  density: compact
+  operations:
+  - addLicenceAddOn
+  - createTenant
+  - generateInvoice
+  - getEntitlementUsage
+  - getSsoConfig
+  - getSubscription
+  - getTenant
+  - getTenantLicences
+  - getUsageMetering
+  - listSubscriptionInvoices
+  - listTenantCells
+  - listTenants
+  - previewSubscriptionChange
+  - provisionCell
+  - reactivateTenant
+  - removeLicenceAddOn
+  - setSsoConfig
+  - setSubscription
+  - suspendTenant
+  - terminateTenant
+  - updateTenant
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - tenantId<-session
+  goesTo:
+  - CMS-002
+  - CMS-003
+  - CMS-004
+  boardFrames: null
+  wireframe: wireframes/P13 Venue CMS.dc.html#cms-001
+  inFlows:
+  - F102 A brand is set, previewed, published and rolled back
+- screen: CMS-002
+  name: Brand Kit
+  module: White Label
+  requiresModule: core
+  wave: 2
+  density: compact
+  operations:
+  - completeUpload
+  - createUpload
+  - getBrandIdentity
+  - setBrandIdentity
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - uploadId<-deepLink
+  goesTo:
+  - CMS-001
+  - CMS-003
+  - CMS-004
+  - CMS-005
+  boardFrames: null
+  wireframe: wireframes/P13 Venue CMS.dc.html#cms-002
+  inFlows:
+  - F22 A tenant rebrands their app
+- screen: CMS-003
+  name: Typography
+  module: White Label
+  requiresModule: core
+  wave: 2
+  density: compact
+  operations:
+  - getFonts
+  - getTheme
+  - setFonts
+  - setTheme
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - bannerId<-deepLink
+  - pageId<-deepLink
+  - policyKind<-deepLink
+  - version<-deepLink
+  goesTo:
+  - CMS-001
+  - CMS-002
+  - CMS-004
+  boardFrames: null
+  wireframe: wireframes/P13 Venue CMS.dc.html#cms-003
+  inFlows:
+  - F102 A brand is set, previewed, published and rolled back
+- screen: CMS-004
+  name: Logo & Assets
+  module: White Label
+  requiresModule: maintenance
+  wave: 2
+  density: compact
+  operations:
+  - createAsset
+  - getAsset
+  - getAssetHistory
+  - listAssets
+  - lookupAsset
+  - setAssetStatus
+  - updateAsset
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - assetId<-deepLink
+  goesTo:
+  - CMS-001
+  - CMS-002
+  - CMS-003
+  boardFrames: null
+  wireframe: wireframes/P13 Venue CMS.dc.html#cms-004
+  inFlows: null
+- screen: CMS-005
+  name: Theme Editor
+  module: White Label
+  requiresModule: core
+  wave: 2
+  density: compact
+  operations:
+  - getTheme
+  - setTheme
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - CMS-001
+  - CMS-002
+  - CMS-003
+  - CMS-007
+  boardFrames: null
+  wireframe: wireframes/P13 Venue CMS.dc.html#cms-005
+  inFlows:
+  - F22 A tenant rebrands their app
+- screen: CMS-006
+  name: Component Preview
+  module: White Label
+  requiresModule: core
+  wave: 2
+  density: compact
+  operations:
+  - createPreview
+  - diffConfigVersion
+  - listConfigVersions
+  - publishTenantConfig
+  - restoreConfigVersion
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - bannerId<-deepLink
+  - pageId<-deepLink
+  - policyKind<-deepLink
+  - version<-deepLink
+  goesTo:
+  - CMS-001
+  - CMS-002
+  - CMS-003
+  boardFrames: null
+  wireframe: wireframes/P13 Venue CMS.dc.html#cms-006
+  inFlows:
+  - F102 A brand is set, previewed, published and rolled back
+- screen: CMS-007
+  name: Page Builder
+  module: White Label
+  requiresModule: core
+  wave: 2
+  density: compact
+  operations:
+  - getHomepageLayout
+  - setHomepageLayout
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - CMS-001
+  - CMS-002
+  - CMS-003
+  - CMS-012
+  boardFrames: null
+  wireframe: wireframes/P13 Venue CMS.dc.html#cms-007
+  inFlows:
+  - F22 A tenant rebrands their app
+- screen: CMS-008
+  name: Content Blocks
+  module: White Label
+  requiresModule: core
+  wave: 2
+  density: compact
+  operations:
+  - listBanners
+  - listPromoBlocks
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - CMS-001
+  - CMS-002
+  - CMS-003
+  boardFrames: null
+  wireframe: wireframes/P13 Venue CMS.dc.html#cms-008
+  inFlows: null
+- screen: CMS-009
+  name: Navigation & Menus
+  module: White Label
+  requiresModule: fnb
+  wave: 2
+  density: compact
+  operations:
+  - createMenu
+  - getMenu
+  - listMenus
+  - setMenuSections
+  - updateMenu
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - menuId<-deepLink
+  goesTo:
+  - CMS-001
+  - CMS-002
+  - CMS-003
+  boardFrames: null
+  wireframe: wireframes/P13 Venue CMS.dc.html#cms-009
+  inFlows: null
+- screen: CMS-010
+  name: Media Library
+  module: White Label
+  requiresModule: ticketing
+  wave: 2
+  density: compact
+  operations:
+  - appendEntitlementToMedia
+  - completeUpload
+  - createCollection
+  - createUpload
+  - deleteMediaAsset
+  - getExpiringRights
+  - getMediaAsset
+  - getMediaEntitlements
+  - listCollections
+  - replaceMediaAsset
+  - searchMedia
+  - updateMediaAsset
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - mediaCode<-deepLink
+  - mediaId<-deepLink
+  - uploadId<-deepLink
+  goesTo:
+  - CMS-001
+  - CMS-002
+  - CMS-003
+  boardFrames: null
+  wireframe: wireframes/P13 Venue CMS.dc.html#cms-010
+  inFlows: null
+- screen: CMS-013
+  name: SEO & Metadata
+  module: White Label
+  requiresModule: core
+  wave: 2
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - CMS-001
+  - CMS-002
+  - CMS-003
+  boardFrames: null
+  wireframe: wireframes/P13 Venue CMS.dc.html#cms-013
+  inFlows: null
+- screen: CMS-011
+  name: Translations
+  module: White Label
+  requiresModule: core
+  wave: 2
+  density: compact
+  operations:
+  - setLanguages
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - CMS-001
+  - CMS-002
+  - CMS-003
+  boardFrames: null
+  wireframe: wireframes/P13 Venue CMS.dc.html#cms-011
+  inFlows: null
+- screen: CMS-012
+  name: RTL Preview
+  module: White Label
+  requiresModule: core
+  wave: 2
+  density: compact
+  operations:
+  - getTenantConfig
+  - validateTenantConfig
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - CMS-001
+  - CMS-002
+  - CMS-003
+  - CMS-014
+  boardFrames: null
+  wireframe: wireframes/P13 Venue CMS.dc.html#cms-012
+  inFlows:
+  - F22 A tenant rebrands their app
+- screen: CMS-014
+  name: Publishing Workflow
+  module: White Label
+  requiresModule: core
+  wave: 2
+  density: compact
+  operations:
+  - getTenantAppStatus
+  - publishTenantConfig
+  - validateTenantConfig
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - CMS-001
+  - CMS-002
+  - CMS-003
+  - CMS-015
+  boardFrames: null
+  wireframe: wireframes/P13 Venue CMS.dc.html#cms-014
+  inFlows:
+  - F22 A tenant rebrands their app
+- screen: CMS-015
+  name: Version History
+  module: White Label
+  requiresModule: core
+  wave: 2
+  density: compact
+  operations:
+  - diffConfigVersion
+  - listConfigVersions
+  - restoreConfigVersion
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - version<-deepLink
+  goesTo:
+  - CMS-001
+  - CMS-002
+  - CMS-003
+  boardFrames: null
+  wireframe: wireframes/P13 Venue CMS.dc.html#cms-015
+  inFlows:
+  - F22 A tenant rebrands their app
+- screen: CMS-016
+  name: Site Settings
+  module: White Label
+  requiresModule: core
+  wave: 2
+  density: compact
+  operations:
+  - getTenantConfig
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - CMS-001
+  - CMS-002
+  - CMS-003
+  boardFrames: null
+  wireframe: wireframes/P13 Venue CMS.dc.html#cms-016
+  inFlows: null
+- screen: CMS-017
+  name: Domain & Certificate
+  module: White Label
+  requiresModule: core
+  wave: 2
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - CMS-001
+  - CMS-002
+  - CMS-003
+  boardFrames: null
+  wireframe: wireframes/P13 Venue CMS.dc.html#cms-017
+  inFlows: null
+- screen: CMS-018
+  name: Consent & Legal
+  module: White Label
+  requiresModule: marketing
+  wave: 2
+  density: compact
+  operations:
+  - adjustLoyaltyPoints
+  - getConsentHistory
+  - getGuestConsents
+  - getGuestLoyalty
+  - getGuestProfile
+  - getWishlist
+  - listGuestDevices
+  - mergeGuestProfiles
+  - recordConsent
+  - searchGuests
+  - updateGuestProfile
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - subjectId<-session
+  goesTo:
+  - CMS-001
+  - CMS-002
+  - CMS-003
+  boardFrames: null
+  wireframe: wireframes/P13 Venue CMS.dc.html#cms-018
+  inFlows: null
+- screen: CMS-019
+  name: User Access
+  module: White Label
+  requiresModule: core
+  wave: 2
+  density: compact
+  operations:
+  - listPrincipals
+  - listRoles
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - CMS-001
+  - CMS-002
+  - CMS-003
+  boardFrames: null
+  wireframe: wireframes/P13 Venue CMS.dc.html#cms-019
+  inFlows: null
+- screen: CMS-020
+  name: Change Log
+  module: White Label
+  requiresModule: core
+  wave: 2
+  density: compact
+  operations:
+  - listConfigVersions
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - CMS-001
+  - CMS-002
+  - CMS-003
+  boardFrames: null
+  wireframe: wireframes/P13 Venue CMS.dc.html#cms-020
+  inFlows: null

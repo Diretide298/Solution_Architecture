@@ -1,0 +1,153 @@
+$schema: ./_schema.yaml
+id: F58
+name: A ticket is sold at a till, added to, and refunded
+actor: cashier
+capability: Point-of-sale ticket selling end to end
+wave: 1
+frequency: >
+  **The most-repeated journey in the platform.** Every ticket sold at a window, every day, in every
+  venue.
+criticality: revenue
+primaryContract: orders
+contracts: [orders, catalogue, access, promotions, identity, approvals]
+platforms: [P04]
+
+trigger:
+  description: >
+    A guest arrives at a window and wants to come in. **The cashier is already signed in and the
+    shift is open** — F32 covers that, and this begins where it ends.
+  operations: [getLatestBundle]
+
+offlineBehaviour: >
+  **The whole flow works offline** (ADR-0013 local-first). The catalogue is on the device, the sale
+  journals locally, and the entitlement is issued against a locally-held template.
+
+  **Two exceptions, and both are the same reason.** A refund cannot be given offline because the
+  original sale cannot be verified. A manager override cannot be approved offline because the
+  approver is not on the device.
+
+steps:
+  - step: 1
+    screen: POS-002
+    action: The cashier browses the catalogue and adds a ticket to the cart.
+    operations: [listProducts, getProduct, addCartLine]
+    outcome: >
+      A cart on the workstation. **`POS-002` declares 41 operations and it is the busiest screen in
+      the platform** — until this flow, not one of them had been walked.
+
+  - step: 2
+    screen: POS-003
+    action: The ticket is timed entry, so a slot is taken.
+    operations: [getAvailability, acquireLease, renewLease]
+    outcome: >
+      A lease on the slot. **Contended inventory is leased, not reserved** (CF-115): a slot held
+      without a lease is a slot two tills can sell, and the lease expires if the sale stalls.
+
+  - step: 3
+    screen: POS-002
+    action: The guest mentions they are a member. The cashier identifies them.
+    operations: [identifyGuest, getLoyaltyPosition, listMyEntitlements]
+    outcome: >
+      Member pricing and any entitlement they already hold. **Identification is optional and late** —
+      a queue does not wait while somebody finds their card.
+
+  - step: 4
+    screen: POS-002
+    action: Promotions are evaluated against the cart.
+    operations: [evaluatePromotions, analysePromotionConflicts]
+    outcome: >
+      **Conflicts are surfaced rather than silently resolved.** Two promotions that both apply is a
+      commercial decision the venue made when it created them, and a till that picks one quietly is
+      a till nobody can audit.
+
+  - step: 5
+    screen: POS-002
+    action: The cashier applies a manual discount above their limit.
+    operations: [applyManualDiscount, evaluateApprovalRequirement, createApprovalRequest]
+    outcome: >
+      **Held for approval rather than refused.** ADR-0002 makes authorisation user-driven — the
+      cashier's own permissions decide, not the workstation's, and the request names who can clear
+      it.
+
+  - step: 6
+    screen: POS-005
+    action: The guest pays.
+    operations: [createOrder, createPayment]
+    outcome: >
+      **The lease converts to an entitlement server-side on payment success**, never client-side.
+      A till that issues before the payment settles has given away a ticket.
+
+  - step: 7
+    screen: POS-010
+    action: The guest asks to add a locker to the ticket they just bought.
+    operations: [getMediaEntitlements, appendEntitlementToMedia]
+    outcome: >
+      **Appended to the existing media rather than issued as a second ticket.** A guest carrying two
+      cards for one visit is a guest who will present the wrong one at a gate.
+
+  - step: 8
+    screen: POS-011
+    action: They change their mind about the locker. It is refunded.
+    operations: [lookupRetailSale, getReturnPolicy, createRefund]
+    outcome: >
+      **The policy is read before the refund is offered**, not after — a cashier told *no* having
+      already promised *yes* is a service failure the screen can prevent.
+
+branches:
+  - at: 2
+    condition: The slot sells out while the guest is deciding.
+    behaviour: >
+      `acquireLease` fails and the alternatives are offered. **A lease that cannot be acquired is a
+      slot genuinely gone**, which is the difference between leasing and optimistic reservation.
+    severity: medium
+    resolvedBy: acquireLease
+
+  - at: 5
+    condition: The till is offline when the override is needed.
+    behaviour: >
+      **Refused, and this is correct.** The approver is not on the device, and an override approved
+      locally is an override nobody granted. `setOfflinePolicy` lists what may happen offline and
+      approval is not on it.
+    severity: high
+    resolvedBy: setOfflinePolicy
+
+  - at: 6
+    condition: The payment fails after the lease was taken.
+    behaviour: >
+      `releaseLease` returns the slot immediately rather than waiting for expiry. **A failed payment
+      holding inventory for fifteen minutes is a slot the venue could have sold.**
+    severity: high
+    resolvedBy: releaseLease
+
+  - at: 8
+    condition: The till is offline.
+    behaviour: >
+      **A refund is refused offline.** The original sale cannot be verified, and a refund against a
+      sale that never synced is money given away against nothing. The guest is directed to a
+      connected till or the back office.
+    severity: high
+    resolvedBy: setOfflinePolicy
+
+exitStates:
+  - state: sold
+    description: Ticket paid, entitlement issued, media handed over. **The ordinary case.**
+  - state: soldWithOverride
+    description: >
+      A discount above the cashier's limit, approved and recorded. **A separate exit because the
+      override rate is the number that catches a manager comping every fourth sale.**
+  - state: partiallyRefunded
+    description: One line returned, the rest of the visit intact.
+  - state: abandoned
+    description: >
+      Cart left, lease released. **Recorded** — an abandonment rate at a window is a pricing or
+      queue signal, and a cart silently discarded tells the venue nothing.
+
+notes: >
+  **Written 24 August. `POS-002` is the busiest screen in the platform and nothing had walked it.**
+
+  **Writing this flow found twelve operations that should not have been on a till**: `createProduct`,
+  `createPromotion`, `endPromotion`, `updateProduct`, `transitionProductLifecycle` and seven more.
+  **A till sells the catalogue; it does not author it.** They arrived in the 18 August bulk attach —
+  the same defect that put 21 of 39 review rows in one bucket — and only a journey surfaced them.
+
+openQuestions: null

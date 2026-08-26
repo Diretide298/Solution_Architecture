@@ -1,0 +1,114 @@
+# F19 — A membership works in another country
+#
+# The `cross-cell` contract had sixteen operations and no flow. This is the journey the
+# whole cell architecture exists for, and it had never been walked through.
+#
+# Validated by tools/check-flows.py.
+
+id: F19
+name: A membership works in another country
+actor: guest
+wave: 2
+frequency: weekly
+criticality: revenue
+platforms:
+- P02 Guest App
+- P07 Venue Scanner
+- P09 TICVAI Web
+offlineBehaviour: '**The gate half is offline and the cross-cell half cannot be.** A redemption right
+  propagated from another cell is in the local bundle if it arrived before the last sync, and is not
+  if it did not — which is the whole risk.'
+trigger:
+  description: A guest bought an annual pass in Dubai and arrives at a venue in Abu Dhabi, in a different
+    cell because data residency put it there.
+  entryScreen: GST-015
+  entryPoints:
+  - Membership purchased in another region
+  - Guest travels
+  - Multi-region pass sold as one product
+steps:
+- step: 1
+  screen: GST-015
+  action: Guest sees the pass and where it is valid
+  operations:
+  - listProducts
+  - getGuestLink
+  outcome: '**Valid here is not the same as bought here**'
+- step: 2
+  screen: ADM-003
+  action: The right is propagated to the other cell
+  operations:
+  - propagateRedemptionRight
+  - getRedemptionRight
+  outcome: A copy of the entitlement to redeem against, not the entitlement itself
+- step: 3
+  screen: SCN-003
+  action: Guest scans at the other venue
+  operations:
+  - validateAccess
+  - consumeRedemptionRight
+  outcome: Validated against the propagated right in the local bundle
+- step: 4
+  screen: SCN-014
+  action: The redemption syncs back
+  operations:
+  - syncScans
+  outcome: '**Both cells must agree the pass was used**'
+- step: 5
+  screen: ADM-003
+  action: Reconciliation confirms it
+  operations:
+  - reconcileRedemptions
+  outcome: Or names the difference
+branches:
+- at: 2
+  condition: The target cell is unreachable when the right is propagated
+  behaviour: Queued and retried. **The guest may arrive before it lands**, which is why propagation
+    happens at purchase rather than at travel.
+  severity: recoverable
+  resolvedBy: Automatic
+- at: 3
+  condition: The right is not in the bundle at the gate
+  behaviour: '**The guest is at a barrier with a pass they paid for.** Manual override, recorded, and
+    reconciled after — refusing a valid membership because a sync was late is the worst outcome here.'
+  severity: requiresStaff
+  resolvedBy: Steward
+- at: 4
+  condition: Both cells think the pass was used once, at the same time
+  behaviour: A single-entry pass redeemed in two countries in one day is either fraud or a clock. **The
+    scan timestamps decide**, and both are retained with recordedAt and syncedAt for exactly this.
+  severity: requiresStaff
+  resolvedBy: Platform admin
+- at: 5
+  condition: The two cells disagree on the remaining entitlement
+  behaviour: '**The owning cell wins.** The pass was sold somewhere, and that cell holds the truth —
+    a copy that drifts is reconciled to the original, never the other way.'
+  severity: requiresStaff
+  resolvedBy: Platform admin
+- at: 1
+  condition: The guest asks for a refund of a pass used in two regions
+  behaviour: Refund policy applies in the selling cell, and the usage evidence is in another. **Nobody
+    has decided who refunds** — CF-31 named the mechanism and not the money.
+  severity: requiresStaff
+  resolvedBy: Finance
+- at: 3
+  condition: Residency forbids propagating the guest identity
+  behaviour: '**The right propagates; the guest does not.** A redemption right carries an entitlement
+    reference and no personal data, which is what makes cross-border validation lawful.'
+  severity: recoverable
+  resolvedBy: Automatic
+exitStates:
+- state: completed
+  description: Admitted in the other region and reconciled
+- state: deferred
+  description: Admitted on override, reconciliation pending
+- state: escalated
+  description: Cells disagree
+openQuestions:
+- Who refunds a pass used in two regions, and out of whose revenue. CF-31 named the mechanism and not
+  the money.
+primaryContract: cross-cell
+contracts:
+- cross-cell
+- access
+- catalogue

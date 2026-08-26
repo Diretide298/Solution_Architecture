@@ -1,0 +1,48 @@
+id: LLD-Report execution
+title: Report execution — 6 transitions
+generatedBy: tools/derive-diagrams.py
+index: diagrams/hld/04-lifecycles.yaml
+source: states/report-execution.yaml
+entity: Report execution
+contract: reporting
+enum: ExecutionStatus
+enumKind: named
+enumSchema: ExecutionStatus
+owner: reporting
+initial:
+- queued
+terminal:
+- completed
+- failed
+- cancelled
+- expired
+transitions:
+- from: queued
+  to: running
+  trigger: job
+  guard: Picked up by a worker
+- from: running
+  to: completed
+  trigger: job
+  guard: Result written to storage
+- from: running
+  to: failed
+  trigger: job
+  guard: Query error, timeout, or the replica was too far behind
+- from: queued
+  to: cancelled
+  operation: cancelReportExecution
+  trigger: operation
+  guard: Cancelled before it started
+- from: running
+  to: cancelled
+  operation: cancelReportExecution
+  trigger: operation
+  guard: '**Killed mid-query.** A report nobody is waiting for still holds a connection on the analytical
+    replica'
+- from: completed
+  to: expired
+  trigger: timer
+  guard: Result retention passed. **The result expires, not the definition** — rerunning is always possible
+notes: Runs on the analytical replica (ADR-0016). A failure here must never be able to affect a gate
+  scan, which is the whole reason the routing exists.

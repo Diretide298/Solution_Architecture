@@ -1,0 +1,40 @@
+# Inter-entity obligation — state model
+# Contract: finance.InterEntityObligation.status
+# Checked by tools/check-states.py.
+
+entity: Inter-entity obligation
+contract: finance
+enum: InterEntityObligation.status
+enumKind: inline
+enumSchema: InterEntityObligation
+enumProperty: status
+owner: finance
+initial:
+- outstanding
+terminal:
+- settled
+transitions:
+- from: outstanding
+  to: settled
+  operation: recordSettlement
+  trigger: operation
+  guard: Paid between entities. **Base currency at the rate on the obligation, not today’s** (CF-37)
+- from: outstanding
+  to: disputed
+  operation: disputeObligation
+  trigger: operation
+  guard: One entity disagrees with the amount
+- from: disputed
+  to: outstanding
+  operation: resolveObligationDispute
+  trigger: operation
+  guard: Resolved, possibly at a different figure
+  isReversal: true
+- from: disputed
+  to: settled
+  operation: recordSettlement
+  trigger: operation
+  guard: Settled at the disputed amount by agreement
+notes: Arises where a guest redeems at one entity what they bought from another. **`disputed` is not
+  terminal** — an obligation nobody resolves is still owed, and letting it end in dispute would let
+  one party walk away from it.

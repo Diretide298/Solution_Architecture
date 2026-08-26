@@ -1,0 +1,483 @@
+{
+ "code": "P12",
+ "name": "Venue Support \u2014 Agent Console",
+ "shortName": "Venue Support",
+ "app": "venue-support-web",
+ "operator": "venue",
+ "audience": "staff",
+ "formFactor": "web",
+ "offlineCapable": false,
+ "generated": "2026-08-26",
+ "note": "Derived by tools/derive-platform.py. **The gaps section is the point** \u2014 a page listing what exists is a directory; one listing what is missing is a worklist.",
+ "counts": {
+  "screens": 8,
+  "operations": 33,
+  "contracts": 4,
+  "modules": 1,
+  "undrawn": 0,
+  "operationsWithNoScreen": 57
+ },
+ "waves": {
+  "wave2": 2,
+  "wave3": 6
+ },
+ "modules": [
+  {
+   "module": "TODO",
+   "screens": 8,
+   "waves": [
+    2,
+    3
+   ]
+  }
+ ],
+ "contracts": [
+  {
+   "contract": "marketing-crm",
+   "operations": 16
+  },
+  {
+   "contract": "reporting",
+   "operations": 8
+  },
+  {
+   "contract": "identity",
+   "operations": 8
+  },
+  {
+   "contract": "finance",
+   "operations": 1
+  }
+ ],
+ "screens": [
+  {
+   "id": "SUP-001",
+   "name": "Agent Login",
+   "module": "TODO",
+   "wave": 3,
+   "route": "/general/agent-login",
+   "operations": 8,
+   "drawn": true
+  },
+  {
+   "id": "SUP-002",
+   "name": "Agent Dashboard",
+   "module": "TODO",
+   "wave": 3,
+   "route": "/general/agent-dashboard",
+   "operations": 9,
+   "drawn": true
+  },
+  {
+   "id": "SUP-003",
+   "name": "Availability & Routing Settings",
+   "module": "TODO",
+   "wave": 3,
+   "route": "/general/availability-and-routing-settings",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "SUP-004",
+   "name": "Conversation Queue",
+   "module": "TODO",
+   "wave": 2,
+   "route": "/general/conversation-queue",
+   "operations": 10,
+   "drawn": true
+  },
+  {
+   "id": "SUP-005",
+   "name": "Live Chat Workspace",
+   "module": "TODO",
+   "wave": 2,
+   "route": "/general/live-chat-workspace",
+   "operations": 11,
+   "drawn": true
+  },
+  {
+   "id": "SUP-006",
+   "name": "Knowledge Base Search",
+   "module": "TODO",
+   "wave": 3,
+   "route": "/general/knowledge-base-search",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "SUP-007",
+   "name": "Canned Response Management",
+   "module": "TODO",
+   "wave": 3,
+   "route": "/general/canned-response-management",
+   "operations": 2,
+   "drawn": true
+  },
+  {
+   "id": "SUP-008",
+   "name": "Agent Performance & SLA View",
+   "module": "TODO",
+   "wave": 3,
+   "route": "/general/agent-performance-and-sla-view",
+   "operations": 10,
+   "drawn": true
+  }
+ ],
+ "gaps": {
+  "operationsWithNoScreen": [
+   {
+    "operation": "calculateTax",
+    "contract": "finance",
+    "verb": "POST",
+    "summary": "Compute tax for a set of lines"
+   },
+   {
+    "operation": "disputeObligation",
+    "contract": "finance",
+    "verb": "POST",
+    "summary": "One entity disagrees with the amount"
+   },
+   {
+    "operation": "getForeignTenderReport",
+    "contract": "finance",
+    "verb": "GET",
+    "summary": "What was taken in which currency"
+   },
+   {
+    "operation": "getUnifiedReconciliation",
+    "contract": "finance",
+    "verb": "GET",
+    "summary": "Every money source against the ledger, in one view"
+   },
+   {
+    "operation": "listInterEntityObligations",
+    "contract": "finance",
+    "verb": "GET",
+    "summary": "What one entity owes another"
+   },
+   {
+    "operation": "recordDeposit",
+    "contract": "finance",
+    "verb": "POST",
+    "summary": "Money taken before the sale is complete"
+   },
+   {
+    "operation": "recordSettlement",
+    "contract": "finance",
+    "verb": "POST",
+    "summary": "One entity paid another"
+   },
+   {
+    "operation": "recordWriteOff",
+    "contract": "finance",
+    "verb": "POST",
+    "summary": "Write off an uncollectable balance"
+   },
+   {
+    "operation": "resolveObligationDispute",
+    "contract": "finance",
+    "verb": "POST",
+    "summary": "Agree what is actually owed"
+   },
+   {
+    "operation": "runFxRevaluation",
+    "contract": "finance",
+    "verb": "POST",
+    "summary": "Revalue monetary balances at close"
+   },
+   {
+    "operation": "validateRecognitionSchedules",
+    "contract": "finance",
+    "verb": "POST",
+    "summary": "Find product kinds claimed by more than one schedule"
+   },
+   {
+    "operation": "createMfaChallenge",
+    "contract": "identity",
+    "verb": "POST",
+    "summary": "Step-up authentication for a sensitive action"
+   },
+   {
+    "operation": "exportSubjectData",
+    "contract": "identity",
+    "verb": "POST",
+    "summary": "Everything the platform holds about one guest"
+   },
+   {
+    "operation": "setPasswordPolicy",
+    "contract": "identity",
+    "verb": "PUT",
+    "summary": "Length, breach check, lockout and step-up"
+   },
+   {
+    "operation": "setSegregationRules",
+    "contract": "identity",
+    "verb": "PUT",
+    "summary": "Which permissions may not be held together"
+   },
+   {
+    "operation": "activateJourney",
+    "contract": "marketing-crm",
+    "verb": "POST",
+    "summary": "Start it, or stop it"
+   },
+   {
+    "operation": "addGuestNote",
+    "contract": "marketing-crm",
+    "verb": "POST",
+    "summary": "What the floor needs to know about this table"
+   },
+   {
+    "operation": "addSuppression",
+    "contract": "marketing-crm",
+    "verb": "POST",
+    "summary": "Suppress an address"
+   },
+   {
+    "operation": "createChallenge",
+    "contract": "marketing-crm",
+    "verb": "POST",
+    "summary": "Define a challenge, mission or streak"
+   },
+   {
+    "operation": "createForm",
+    "contract": "marketing-crm",
+    "verb": "POST",
+    "summary": "Define a waiver, survey or capture form"
+   },
+   {
+    "operation": "createInvitationCampaign",
+    "contract": "marketing-crm",
+    "verb": "POST",
+    "summary": "A quota-bounded, addressed invitation"
+   },
+   {
+    "operation": "createLoyaltyProgramme",
+    "contract": "marketing-crm",
+    "verb": "POST",
+    "summary": "Create a loyalty programme"
+   },
+   {
+    "operation": "createReferral",
+    "contract": "marketing-crm",
+    "verb": "POST",
+    "summary": "Issue a referral code"
+   },
+   {
+    "operation": "createUrlRedirect",
+    "contract": "marketing-crm",
+    "verb": "POST",
+    "summary": "301, 302 and custom redirects"
+   },
+   {
+    "operation": "getJourneyPerformance",
+    "contract": "marketing-crm",
+    "verb": "GET",
+    "summary": "Entrants, completions, goals reached"
+   },
+   {
+    "operation": "getLostItemMatches",
+    "contract": "marketing-crm",
+    "verb": "GET",
+    "summary": "Candidate matches, scored"
+   },
+   {
+    "operation": "getMyChallenges",
+    "contract": "marketing-crm",
+    "verb": "GET",
+    "summary": "Active challenges and how far along I am"
+   },
+   {
+    "operation": "getSuppressionList",
+    "contract": "marketing-crm",
+    "verb": "GET",
+    "summary": "Addresses suppressed from all sending"
+   },
+   {
+    "operation": "getWaiverStatus",
+    "contract": "marketing-crm",
+    "verb": "GET",
+    "summary": "Whether this guest may be issued a ticket that requires a waiver"
+   },
+   {
+    "operation": "listMessageTriggers",
+    "contract": "marketing-crm",
+    "verb": "GET",
+    "summary": "What fires a message, and when"
+   },
+   {
+    "operation": "listReviews",
+    "contract": "marketing-crm",
+    "verb": "GET",
+    "summary": "List guest reviews and ratings"
+   },
+   {
+    "operation": "listSegmentMembers",
+    "contract": "marketing-crm",
+    "verb": "GET",
+    "summary": "List guests currently matching a segment"
+   },
+   {
+    "operation": "matchGuest",
+    "contract": "marketing-crm",
+    "verb": "POST",
+    "summary": "Is this the same person we already have?"
+   },
+   {
+    "operation": "mergeGuests",
+    "contract": "marketing-crm",
+    "verb": "POST",
+    "summary": "Two records, one person"
+   },
+   {
+    "operation": "recordLostItem",
+    "contract": "marketing-crm",
+    "verb": "POST",
+    "summary": "Report something lost, or hand something in"
+   },
+   {
+    "operation": "recordPrivacyIncident",
+    "contract": "marketing-crm",
+    "verb": "POST",
+    "summary": "Log a personal-data breach and start the clock"
+   },
+   {
+    "operation": "respondToReview",
+    "contract": "marketing-crm",
+    "verb": "POST",
+    "summary": "Respond to a review"
+   },
+   {
+    "operation": "retryMessageDispatch",
+    "contract": "marketing-crm",
+    "verb": "POST",
+    "summary": "Send it again, or by another channel"
+   },
+   {
+    "operation": "setCallDisposition",
+    "contract": "marketing-crm",
+    "verb": "POST",
+    "summary": "Why the conversation ended, and any callback"
+   },
+   {
+    "operation": "setConsentPurposes",
+    "contract": "marketing-crm",
+    "verb": "PUT",
+    "summary": "Configure consent purposes"
+   },
+   {
+    "operation": "setMessageTrigger",
+    "contract": "marketing-crm",
+    "verb": "POST",
+    "summary": "Fire a message from a platform event"
+   },
+   {
+    "operation": "setSeoMetadata",
+    "contract": "marketing-crm",
+    "verb": "PUT",
+    "summary": "Titles, descriptions, canonicals and hreflang"
+   },
+   {
+    "operation": "startKioskAssist",
+    "contract": "marketing-crm",
+    "verb": "POST",
+    "summary": "A staff member helps a guest at a kiosk, remotely"
+   },
+   {
+    "operation": "submitForm",
+    "contract": "marketing-crm",
+    "verb": "POST",
+    "summary": "Sign a waiver, answer a survey, capture details"
+   },
+   {
+    "operation": "updateGuestPreferences",
+    "contract": "marketing-crm",
+    "verb": "PUT",
+    "summary": "The things a regular should not have to say twice"
+   },
+   {
+    "operation": "uploadGuestDocument",
+    "contract": "marketing-crm",
+    "verb": "POST",
+    "summary": "Store a guest photo, ID or signed document"
+   },
+   {
+    "operation": "cancelReportExecution",
+    "contract": "reporting",
+    "verb": "DELETE",
+    "summary": "Cancel a running execution"
+   },
+   {
+    "operation": "deleteReportSchedule",
+    "contract": "reporting",
+    "verb": "DELETE",
+    "summary": "Delete a schedule"
+   },
+   {
+    "operation": "exportReportResult",
+    "contract": "reporting",
+    "verb": "POST",
+    "summary": "Export a completed result"
+   },
+   {
+    "operation": "getReportExecution",
+    "contract": "reporting",
+    "verb": "GET",
+    "summary": "Execution status and result"
+   },
+   {
+    "operation": "getReportExport",
+    "contract": "reporting",
+    "verb": "GET",
+    "summary": "Export status and download link"
+   },
+   {
+    "operation": "getReportResult",
+    "contract": "reporting",
+    "verb": "GET",
+    "summary": "Paged result rows"
+   },
+   {
+    "operation": "listAlertRules",
+    "contract": "reporting",
+    "verb": "GET",
+    "summary": "What raises an alert, and when"
+   },
+   {
+    "operation": "listReportFields",
+    "contract": "reporting",
+    "verb": "GET",
+    "summary": "Fields available for a data source"
+   },
+   {
+    "operation": "listReportSchedules",
+    "contract": "reporting",
+    "verb": "GET",
+    "summary": "List scheduled reports"
+   },
+   {
+    "operation": "listSeededReports",
+    "contract": "reporting",
+    "verb": "GET",
+    "summary": ""
+   },
+   {
+    "operation": "updateReportSchedule",
+    "contract": "reporting",
+    "verb": "PATCH",
+    "summary": "Amend, pause or resume a schedule"
+   }
+  ],
+  "modulesSplitAcrossWaves": [
+   {
+    "module": "TODO",
+    "waves": [
+     2,
+     3
+    ]
+   }
+  ],
+  "screensNotDrawn": [],
+  "flowsNamingAMissingScreen": []
+ }
+}

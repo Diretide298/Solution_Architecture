@@ -1,0 +1,113 @@
+# Order — state model
+# Contract: orders.OrderStatus
+# Checked by tools/check-states.py against the contract enum and the event catalogue.
+
+entity: Order
+contract: orders
+enum: OrderStatus
+enumKind: named
+enumSchema: OrderStatus
+owner: orders
+initial:
+- pending
+terminal:
+- completed
+- voided
+- refunded
+- failed
+transitions:
+- from: pending
+  to: held
+  operation: holdOrder
+  trigger: operation
+  guard: Not yet paid. Holds no inventory — a parked sale that reserved capacity would let a queue of
+    parked sales exhaust a session
+- from: held
+  to: pending
+  operation: resumeOrder
+  trigger: operation
+  guard: Hold not expired. Prices re-evaluated; any change is surfaced rather than applied silently
+- from: held
+  to: voided
+  trigger: timer
+  guard: Hold expired. A till that accumulates parked sales cannot be closed
+- from: pending
+  to: paid
+  operation: createPayment
+  trigger: operation
+  guard: Payment captured in full
+  emits:
+  - order.paid
+- from: pending
+  to: partiallyPaid
+  operation: createPayment
+  trigger: operation
+  guard: Split payment, balance outstanding
+- from: partiallyPaid
+  to: paid
+  operation: createPayment
+  trigger: operation
+  guard: Balance settled
+  emits:
+  - order.paid
+- from: pending
+  to: failed
+  operation: createPayment
+  trigger: operation
+  guard: Declined and not retried
+- from: paid
+  to: completed
+  trigger: job
+  guard: Entitlements issued and fulfilment recorded
+  emits:
+  - order.completed
+- from: pending
+  to: voided
+  operation: voidOrder
+  trigger: operation
+  guard: Nothing captured. A void before payment is not a refund and must not post one
+- from: paid
+  to: refunded
+  operation: createRefund
+  trigger: operation
+  guard: Full value returned
+  isReversal: true
+  requiresApproval: true
+  emits:
+  - order.refunded
+- from: completed
+  to: refunded
+  operation: createRefund
+  trigger: operation
+  guard: Full value returned after fulfilment
+  isReversal: true
+  requiresApproval: true
+  emits:
+  - order.refunded
+- from: paid
+  to: partiallyRefunded
+  operation: createRefund
+  trigger: operation
+  guard: Partial value returned
+  isReversal: true
+  requiresApproval: true
+- from: completed
+  to: partiallyRefunded
+  operation: createRefund
+  trigger: operation
+  guard: Partial value returned after fulfilment
+  isReversal: true
+  requiresApproval: true
+- from: partiallyRefunded
+  to: refunded
+  operation: createRefund
+  trigger: operation
+  guard: Remaining value returned
+  isReversal: true
+  requiresApproval: true
+notes: '**held → refunded is not a transition.** A parked sale was never paid, so there is nothing to
+  return. The enum permits it and the business does not, which is the defect this file exists to catch.'
+offlineReachable:
+- pending
+- held
+- paid

@@ -1,0 +1,714 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>P10 Partner Web — wireframe board</title>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+/* **The Claude Design system, applied to the generated boards on 24 August.**
+   Three client packs render at 1280x700 in this system and 385 screens rendered as
+   dashed-box wireframes — and **a client reviewing both reads the difference as *those screens
+   are not done*.** The information is identical either way; the fidelity is what was being
+   judged.
+
+   Tokens are the packs': #0B1324 rail, #0D6EFD primary, #00B8FF accent, Manrope for UI,
+   IBM Plex Mono for figures and codes. */
+:root{--ink:#0B1324;--mut:#5A6577;--dim:#9AA5B6;--line:#E8ECF3;--edge:#E3E8F0;
+--brand:#0D6EFD;--accent:#00B8FF;--rail:#0B1324;--paper:#FFF;--wash:#F7F9FC;
+--ok:#0E9F6E;--okbg:#E8F6F0;--okline:#BFE3D2;--warn:#8A6D00;--warnbg:#FFF7E6;
+--bad:#A81E1E;--badbg:#FDECEC}
+*{box-sizing:border-box}
+body{margin:0;background:#F2F5F9;color:var(--ink);
+font-family:Manrope,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:13px;line-height:1.55}
+a{color:inherit}
+.wrap{max-width:1420px;margin:0 auto;padding:22px 34px 90px}
+.home{font-size:11.5px;color:var(--mut);text-decoration:none;letter-spacing:.02em}
+.head{display:flex;align-items:baseline;justify-content:space-between;gap:20px;
+margin:14px 0 6px;padding-bottom:16px;border-bottom:2px solid var(--ink)}
+.mark{font-size:13px;font-weight:800;letter-spacing:.16em;
+background:linear-gradient(90deg,var(--brand),var(--accent));-webkit-background-clip:text;
+background-clip:text;color:transparent}
+h1{font-size:19px;font-weight:800;letter-spacing:-.015em;margin:0}
+.meta{font-size:11px;color:var(--mut);font-family:'IBM Plex Mono',ui-monospace,monospace;line-height:1.7}
+.lede{font-size:12.5px;color:var(--mut);max-width:82ch;margin:16px 0 0;line-height:1.65}
+.grp{font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:11px;font-weight:600;
+letter-spacing:.14em;color:var(--dim);text-transform:uppercase;margin:52px 0 18px;
+padding-bottom:9px;border-bottom:1px solid var(--line)}
+.stack{display:flex;flex-direction:column;gap:52px}
+.scr{display:flex;flex-direction:column;gap:13px;scroll-margin-top:24px}
+.hdr{display:flex;align-items:baseline;gap:9px;flex-wrap:wrap}
+.code{font-family:'IBM Plex Mono',monospace;font-size:12px;color:#8494A8}
+.ttl{font-size:16.5px;font-weight:800;letter-spacing:-.015em}
+.pur{font-size:12px;color:#6B7280;margin-top:3px;max-width:96ch}
+.pill{font-size:9px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;
+padding:2px 7px;border-radius:5px;background:#EEF3FA;color:#4A5A70}
+.pill.named{background:var(--warnbg);color:var(--warn)}
+.pill.off{background:var(--okbg);color:var(--ok)}
+
+/* the frame — 1280x700, the packs' dimension */
+.frame{width:1280px;height:700px;display:flex;background:var(--wash);border:1px solid var(--edge);
+border-radius:14px;overflow:hidden;box-shadow:0 16px 38px rgba(12,35,64,.09)}
+.rail{flex:none;width:180px;background:var(--rail);display:flex;flex-direction:column;position:relative}
+.rail::before{content:'';position:absolute;inset:0;
+background:radial-gradient(300px 200px at 0% 4%,rgba(0,184,255,.20),transparent 70%);pointer-events:none}
+.brand{position:relative;padding:15px 14px 13px;border-bottom:1px solid rgba(255,255,255,.08)}
+.brand b{display:block;font-size:14px;font-weight:800;letter-spacing:.1em;
+background:linear-gradient(90deg,#4DA3FF,var(--accent));-webkit-background-clip:text;
+background-clip:text;color:transparent}
+.brand span{display:block;font-size:9.5px;color:#7FA3C9;margin-top:5px}
+.nav{position:relative;display:flex;flex-direction:column;gap:2px;padding:11px 9px}
+.nav i{display:block;padding:8px 10px;border-radius:9px;font-size:11.5px;font-style:normal;color:#8FA8C4}
+.nav i.on{background:linear-gradient(90deg,rgba(13,110,253,.30),rgba(0,184,255,.10));
+color:#fff;font-weight:700}
+.body{flex:1;display:flex;flex-direction:column;min-width:0}
+.top{flex:none;height:54px;display:flex;align-items:center;gap:12px;padding:0 18px;
+background:var(--paper);border-bottom:1px solid var(--line)}
+.top h2{font-size:13.5px;font-weight:800;letter-spacing:-.01em;margin:0}
+.top small{display:block;font-size:10px;color:var(--dim);font-weight:500}
+.acts{margin-left:auto;display:flex;gap:6px}
+.chip{height:32px;display:flex;align-items:center;gap:6px;padding:0 11px;border:1px solid var(--edge);
+border-radius:8px;font-size:11px;font-weight:700;color:var(--mut);background:var(--paper)}
+.chip.live{background:var(--okbg);border-color:var(--okline);color:var(--ok)}
+.chip.live::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--ok)}
+.chip.cta{background:var(--brand);border-color:var(--brand);color:#fff}
+.canvas{flex:1;display:flex;flex-direction:column;gap:12px;padding:14px 16px;min-height:0;overflow:hidden}
+.kpis{flex:none;display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.kpi{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:11px 13px;
+display:flex;flex-direction:column;gap:4px}
+.kpi b{font-size:9.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--dim)}
+.kpi span{font-family:'IBM Plex Mono',monospace;font-size:19px;font-weight:600;letter-spacing:-.02em}
+.panel{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:12px 14px;
+display:flex;flex-direction:column;gap:8px;min-height:0}
+.panel > b{font-size:11px;font-weight:800;letter-spacing:-.005em}
+.panel .why{font-size:10px;color:#7C8899;font-style:italic;line-height:1.5}
+.kind{font-family:'IBM Plex Mono',monospace;font-size:9px;color:var(--dim);
+letter-spacing:.06em;text-transform:uppercase}
+.rows{display:flex;flex-direction:column;gap:6px}
+.row{display:grid;grid-template-columns:1.6fr 1fr 1fr .7fr;gap:10px;align-items:center;
+padding:7px 0;border-top:1px solid #F0F3F8}
+.row:first-child{border-top:0;font-size:9.5px;font-weight:700;letter-spacing:.06em;
+text-transform:uppercase;color:var(--dim)}
+.bar{height:7px;border-radius:4px;background:#EDF1F7}
+.bar i{display:block;height:100%;border-radius:4px;
+background:linear-gradient(90deg,var(--brand),var(--accent))}
+.side{flex:none;width:250px;display:flex;flex-direction:column;gap:10px}
+.two{flex:1;display:flex;gap:12px;min-height:0}
+.grow{flex:1;min-width:0}
+.strip{flex:none;height:26px;display:flex;align-items:center;gap:8px;padding:0 18px;
+background:var(--warnbg);color:var(--warn);font-size:10px;font-weight:700;
+letter-spacing:.05em;text-transform:uppercase;border-bottom:1px solid #F0E0B8}
+.dark .frame{background:#0A1524}
+.dark .top{background:#0E2A4C;border-color:#1E3A5F;color:#E6F0FA}
+.dark .top small{color:#7FA3C9}
+.dark .canvas{background:#0A1524}
+.dark .kpi,.dark .panel{background:#0E2A4C;border-color:#1E3A5F;color:#E6F0FA}
+.dark .row{border-color:#193353}
+.dark .chip{background:#0E2A4C;border-color:#1E3A5F;color:#9FC0E0}
+
+.foot{font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:10px;line-height:1.85;color:#7C8899}
+.foot b{color:#4A5566;font-weight:600}
+.foot .warn{color:var(--warn)}
+.bottom{margin-top:64px;padding-top:16px;border-top:1px solid var(--line);
+display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
+</style></head><body>
+<div class="wrap">
+  <a class="home" href="TICVAI%20Wireframe%20Boards.dc.html">&larr; All boards</a>
+  <div class="head">
+    <div><span class="mark">TICVAI</span>
+      <h1>P10 · Partner Web — Reseller Portal <span style="font-weight:600;color:#6B7280">(21 screens)</span></h1></div>
+    <div class="meta">partner · web · partner-web</div>
+  </div>
+  <p class="lede"></p>
+  <div class="grp">01 — TODO · 21 screens</div><div class="stack">
+      <div id="ptr-001" class="scr">
+        <div>
+          <div class="hdr"><span class="code">PTR-001</span>
+            <span class="ttl">Partner Login / MFA</span></div>
+          <div class="pur">Get someone into the app, fast, on a device that may be shared.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>TICVAI Partner</b><span>TODO</span></div><nav class="nav"><i class="">Allocations</i><i class="on">Bookings</i><i class="">Statements</i><i class="">Support</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Partner Login / MFA</h2>
+                <small>Partner Web · wave 2 · compact</small></div>
+              <div class="acts"><div class="chip">This account</div><div class="chip cta">New booking</div></div>
+            </div>
+            
+            <div class="canvas">
+              <div class="kpis"><div class="kpi"><b>Allocation</b><span>2,400</span></div><div class="kpi"><b>Sold</b><span>1,860</span></div><div class="kpi"><b>Credit</b><span>AED 84k</span></div><div class="kpi"><b>Due</b><span>AED 12k</span></div></div>
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">searchField</span><div class="chip">Search</div></div><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; login · getB2bCredit · forceLogout · getCurrentSession +8</div>
+          <div><b>STATES</b> &middot; <span class="">loading · emptyFirstRun · emptyNoResults · emptyNoAccess · error</span></div>
+          <div><b>ARRIVES WITH</b> &middot; accountId&larr;deepLink, sessionId&larr;session</div>
+          <div><b>GOES TO</b> &middot; entry point · PTR-002 · PTR-003 · PTR-004 · PTR-005</div>
+        </div>
+      </div>
+      <div id="ptr-002" class="scr">
+        <div>
+          <div class="hdr"><span class="code">PTR-002</span>
+            <span class="ttl">Partner Dashboard</span></div>
+          <div class="pur">The screen this app sits on. Everything else is entered from here and returns to it.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>TICVAI Partner</b><span>TODO</span></div><nav class="nav"><i class="">Allocations</i><i class="on">Bookings</i><i class="">Statements</i><i class="">Support</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Partner Dashboard</h2>
+                <small>Partner Web · wave 2 · compact</small></div>
+              <div class="acts"><div class="chip">This account</div><div class="chip cta">New booking</div></div>
+            </div>
+            
+            <div class="canvas">
+              <div class="kpis"><div class="kpi"><b>Allocation</b><span>2,400</span></div><div class="kpi"><b>Sold</b><span>1,860</span></div><div class="kpi"><b>Credit</b><span>AED 84k</span></div><div class="kpi"><b>Due</b><span>AED 12k</span></div></div>
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">metricTile</span><div class="rows"><div class="bar"><i style="width:78%"></i></div><div class="bar"><i style="width:54%"></i></div><div class="bar"><i style="width:92%"></i></div><div class="bar"><i style="width:36%"></i></div><div class="bar"><i style="width:61%"></i></div></div></div><div class="panel"><span class="kind">chart</span><div class="rows"><div class="bar"><i style="width:78%"></i></div><div class="bar"><i style="width:54%"></i></div><div class="bar"><i style="width:92%"></i></div><div class="bar"><i style="width:36%"></i></div><div class="bar"><i style="width:61%"></i></div></div></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; listOrders · getB2bCredit · applyManualDiscount · createOrder +12</div>
+          <div><b>STATES</b> &middot; <span class="">loading · emptyFirstRun · emptyNoAccess · error</span></div>
+          <div><b>ARRIVES WITH</b> &middot; accountId&larr;PTR-001, orderId&larr;deepLink</div>
+          <div><b>GOES TO</b> &middot; PTR-001 · PTR-003 · PTR-004 · PTR-007</div>
+        </div>
+      </div>
+      <div id="ptr-003" class="scr">
+        <div>
+          <div class="hdr"><span class="code">PTR-003</span>
+            <span class="ttl">Profile &amp; Company Details</span></div>
+          <div class="pur">What we hold about staff, and what they can change.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>TICVAI Partner</b><span>TODO</span></div><nav class="nav"><i class="">Allocations</i><i class="on">Bookings</i><i class="">Statements</i><i class="">Support</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Profile &amp; Company Details</h2>
+                <small>Partner Web · wave 2 · compact</small></div>
+              <div class="acts"><div class="chip">This account</div><div class="chip cta">New booking</div></div>
+            </div>
+            
+            <div class="canvas">
+              <div class="kpis"><div class="kpi"><b>Allocation</b><span>2,400</span></div><div class="kpi"><b>Sold</b><span>1,860</span></div><div class="kpi"><b>Credit</b><span>AED 84k</span></div><div class="kpi"><b>Due</b><span>AED 12k</span></div></div>
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">detailPanel</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">Implied by the detail template — not declared on the screen.</span></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; getPrincipal · createPrincipal · listPrincipals · updatePrincipal</div>
+          <div><b>STATES</b> &middot; <span class="">loading · emptyFirstRun · emptyNoAccess · error</span></div>
+          <div><b>ARRIVES WITH</b> &middot; principalId&larr;session</div>
+          <div><b>GOES TO</b> &middot; PTR-001 · PTR-002 · PTR-004</div>
+        </div>
+      </div>
+      <div id="ptr-004" class="scr">
+        <div>
+          <div class="hdr"><span class="code">PTR-004</span>
+            <span class="ttl">Notifications</span></div>
+          <div class="pur">Work with notifications for this venue.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>TICVAI Partner</b><span>TODO</span></div><nav class="nav"><i class="">Allocations</i><i class="on">Bookings</i><i class="">Statements</i><i class="">Support</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Notifications</h2>
+                <small>Partner Web · wave 3 · compact</small></div>
+              <div class="acts"><div class="chip">This account</div><div class="chip cta">New booking</div></div>
+            </div>
+            
+            <div class="canvas">
+              <div class="kpis"><div class="kpi"><b>Allocation</b><span>2,400</span></div><div class="kpi"><b>Sold</b><span>1,860</span></div><div class="kpi"><b>Credit</b><span>AED 84k</span></div><div class="kpi"><b>Due</b><span>AED 12k</span></div></div>
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">detailPanel</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">Implied by the detail template — not declared on the screen.</span></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; sendTransactionalMessage · getMessageStatus</div>
+          <div><b>STATES</b> &middot; <span class="">loading · emptyFirstRun · emptyNoAccess · error</span></div>
+          <div><b>ARRIVES WITH</b> &middot; messageId&larr;deepLink</div>
+          <div><b>GOES TO</b> &middot; PTR-001 · PTR-002 · PTR-003</div>
+        </div>
+      </div>
+      <div id="ptr-005" class="scr">
+        <div>
+          <div class="hdr"><span class="code">PTR-005</span>
+            <span class="ttl">Inventory &amp; Allocation View</span></div>
+          <div class="pur">See inventory &amp; allocation view for this venue.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>TICVAI Partner</b><span>TODO</span></div><nav class="nav"><i class="">Allocations</i><i class="on">Bookings</i><i class="">Statements</i><i class="">Support</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Inventory &amp; Allocation View</h2>
+                <small>Partner Web · wave 2 · compact</small></div>
+              <div class="acts"><div class="chip">This account</div><div class="chip cta">New booking</div></div>
+            </div>
+            
+            <div class="canvas">
+              <div class="kpis"><div class="kpi"><b>Allocation</b><span>2,400</span></div><div class="kpi"><b>Sold</b><span>1,860</span></div><div class="kpi"><b>Credit</b><span>AED 84k</span></div><div class="kpi"><b>Due</b><span>AED 12k</span></div></div>
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">detailPanel</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">Implied by the detail template — not declared on the screen.</span></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; getChannelAllocations · createOrder · applyManualDiscount · createEnvelope +15</div>
+          <div><b>STATES</b> &middot; <span class="">loading · emptyFirstRun · emptyNoAccess · error</span></div>
+          <div><b>ARRIVES WITH</b> &middot; envelopeId&larr;deepLink, orderId&larr;deepLink</div>
+          <div><b>GOES TO</b> &middot; PTR-001 · PTR-002 · PTR-003 · PTR-008</div>
+        </div>
+      </div>
+      <div id="ptr-006" class="scr">
+        <div>
+          <div class="hdr"><span class="code">PTR-006</span>
+            <span class="ttl">Product Catalog (B2B Pricing)</span></div>
+          <div class="pur">Find product catalog (b2b pricing) for this venue.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>TICVAI Partner</b><span>TODO</span></div><nav class="nav"><i class="">Allocations</i><i class="on">Bookings</i><i class="">Statements</i><i class="">Support</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Product Catalog (B2B Pricing)</h2>
+                <small>Partner Web · wave 2 · compact</small></div>
+              <div class="acts"><div class="chip">This account</div><div class="chip cta">New booking</div></div>
+            </div>
+            
+            <div class="canvas">
+              <div class="kpis"><div class="kpi"><b>Allocation</b><span>2,400</span></div><div class="kpi"><b>Sold</b><span>1,860</span></div><div class="kpi"><b>Credit</b><span>AED 84k</span></div><div class="kpi"><b>Due</b><span>AED 12k</span></div></div>
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">searchField</span><div class="chip">Search</div></div><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; listProducts · getPriceList · copyPriceList · createPriceList +13</div>
+          <div><b>STATES</b> &middot; <span class="">loading · emptyFirstRun · emptyNoResults · emptyNoAccess · error</span></div>
+          <div><b>ARRIVES WITH</b> &middot; priceListId&larr;deepLink, productId&larr;deepLink</div>
+          <div><b>GOES TO</b> &middot; PTR-001 · PTR-002 · PTR-003</div>
+        </div>
+      </div>
+      <div id="ptr-007" class="scr">
+        <div>
+          <div class="hdr"><span class="code">PTR-007</span>
+            <span class="ttl">Availability Search</span></div>
+          <div class="pur">Find something when the guest does not know what it is called.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>TICVAI Partner</b><span>TODO</span></div><nav class="nav"><i class="">Allocations</i><i class="on">Bookings</i><i class="">Statements</i><i class="">Support</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Availability Search</h2>
+                <small>Partner Web · wave 2 · compact</small></div>
+              <div class="acts"><div class="chip">This account</div><div class="chip cta">New booking</div></div>
+            </div>
+            
+            <div class="canvas">
+              <div class="kpis"><div class="kpi"><b>Allocation</b><span>2,400</span></div><div class="kpi"><b>Sold</b><span>1,860</span></div><div class="kpi"><b>Credit</b><span>AED 84k</span></div><div class="kpi"><b>Due</b><span>AED 12k</span></div></div>
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">searchField</span><div class="chip">Search</div></div><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; getAvailability</div>
+          <div><b>STATES</b> &middot; <span class="">loading · emptyFirstRun · emptyNoResults · emptyNoAccess · error</span></div>
+          
+          <div><b>GOES TO</b> &middot; PTR-001 · PTR-002 · PTR-003 · PTR-008</div>
+        </div>
+      </div>
+      <div id="ptr-008" class="scr">
+        <div>
+          <div class="hdr"><span class="code">PTR-008</span>
+            <span class="ttl">Booking Creation</span></div>
+          <div class="pur">Add booking creation for this venue.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>TICVAI Partner</b><span>TODO</span></div><nav class="nav"><i class="">Allocations</i><i class="on">Bookings</i><i class="">Statements</i><i class="">Support</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Booking Creation</h2>
+                <small>Partner Web · wave 2 · compact</small></div>
+              <div class="acts"><div class="chip">This account</div><div class="chip cta">New booking</div></div>
+            </div>
+            
+            <div class="canvas">
+              <div class="kpis"><div class="kpi"><b>Allocation</b><span>2,400</span></div><div class="kpi"><b>Sold</b><span>1,860</span></div><div class="kpi"><b>Credit</b><span>AED 84k</span></div><div class="kpi"><b>Due</b><span>AED 12k</span></div></div>
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">textField</span><div class="chip">Search</div></div><div class="panel"><span class="kind">primaryButton</span><div class="chip cta">primaryButton</div></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; createOrder · listOrders · applyManualDiscount · createRefund +10</div>
+          <div><b>STATES</b> &middot; <span class="">loading · emptyFirstRun · emptyNoAccess · error</span></div>
+          <div><b>ARRIVES WITH</b> &middot; orderId&larr;deepLink</div>
+          <div><b>GOES TO</b> &middot; PTR-001 · PTR-002 · PTR-003 · PTR-016</div>
+        </div>
+      </div>
+      <div id="ptr-009" class="scr">
+        <div>
+          <div class="hdr"><span class="code">PTR-009</span>
+            <span class="ttl">Group / Bulk Booking</span></div>
+          <div class="pur">Work with group / bulk booking for this venue.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>TICVAI Partner</b><span>TODO</span></div><nav class="nav"><i class="">Allocations</i><i class="on">Bookings</i><i class="">Statements</i><i class="">Support</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Group / Bulk Booking</h2>
+                <small>Partner Web · wave 3 · compact</small></div>
+              <div class="acts"><div class="chip">This account</div><div class="chip cta">New booking</div></div>
+            </div>
+            
+            <div class="canvas">
+              <div class="kpis"><div class="kpi"><b>Allocation</b><span>2,400</span></div><div class="kpi"><b>Sold</b><span>1,860</span></div><div class="kpi"><b>Credit</b><span>AED 84k</span></div><div class="kpi"><b>Due</b><span>AED 12k</span></div></div>
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">detailPanel</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">Implied by the detail template — not declared on the screen.</span></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; allocateBlockedSeats · createSeatBlock · listSeatBlocks · releaseSeatBlock</div>
+          <div><b>STATES</b> &middot; <span class="">loading · emptyFirstRun · emptyNoAccess · error</span></div>
+          <div><b>ARRIVES WITH</b> &middot; blockId&larr;deepLink</div>
+          <div><b>GOES TO</b> &middot; PTR-001 · PTR-002 · PTR-003</div>
+        </div>
+      </div>
+      <div id="ptr-010" class="scr">
+        <div>
+          <div class="hdr"><span class="code">PTR-010</span>
+            <span class="ttl">Cart &amp; Quote</span></div>
+          <div class="pur">Work with cart &amp; quote for this venue.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>TICVAI Partner</b><span>TODO</span></div><nav class="nav"><i class="">Allocations</i><i class="on">Bookings</i><i class="">Statements</i><i class="">Support</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Cart &amp; Quote</h2>
+                <small>Partner Web · wave 3 · compact</small></div>
+              <div class="acts"><div class="chip">This account</div><div class="chip cta">New booking</div></div>
+            </div>
+            
+            <div class="canvas">
+              <div class="kpis"><div class="kpi"><b>Allocation</b><span>2,400</span></div><div class="kpi"><b>Sold</b><span>1,860</span></div><div class="kpi"><b>Credit</b><span>AED 84k</span></div><div class="kpi"><b>Due</b><span>AED 12k</span></div></div>
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">detailPanel</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">Implied by the detail template — not declared on the screen.</span></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; evaluatePromotions · analysePromotionConflicts · createPromotion · endPromotion +12</div>
+          <div><b>STATES</b> &middot; <span class="">loading · emptyFirstRun · emptyNoAccess · error</span></div>
+          <div><b>ARRIVES WITH</b> &middot; cartId&larr;session, lineId&larr;deepLink, promotionId&larr;deepLink</div>
+          <div><b>GOES TO</b> &middot; PTR-001 · PTR-002 · PTR-003</div>
+        </div>
+      </div>
+      <div id="ptr-011" class="scr">
+        <div>
+          <div class="hdr"><span class="code">PTR-011</span>
+            <span class="ttl">Quote Management</span></div>
+          <div class="pur">Find quote management for this venue.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>TICVAI Partner</b><span>TODO</span></div><nav class="nav"><i class="">Allocations</i><i class="on">Bookings</i><i class="">Statements</i><i class="">Support</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Quote Management</h2>
+                <small>Partner Web · wave 3 · compact</small></div>
+              <div class="acts"><div class="chip">This account</div><div class="chip cta">New booking</div></div>
+            </div>
+            
+            <div class="canvas">
+              <div class="kpis"><div class="kpi"><b>Allocation</b><span>2,400</span></div><div class="kpi"><b>Sold</b><span>1,860</span></div><div class="kpi"><b>Credit</b><span>AED 84k</span></div><div class="kpi"><b>Due</b><span>AED 12k</span></div></div>
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">textField</span><div class="chip">Search</div></div><div class="panel"><span class="kind">primaryButton</span><div class="chip cta">primaryButton</div></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; listPartnerAgreements · getCommissionStatement</div>
+          <div><b>STATES</b> &middot; <span class="">loading · emptyFirstRun · emptyNoAccess · error</span></div>
+          <div><b>ARRIVES WITH</b> &middot; agreementId&larr;deepLink</div>
+          <div><b>GOES TO</b> &middot; PTR-001 · PTR-002 · PTR-003</div>
+        </div>
+      </div>
+      <div id="ptr-012" class="scr">
+        <div>
+          <div class="hdr"><span class="code">PTR-012</span>
+            <span class="ttl">Checkout / Credit Purchase</span></div>
+          <div class="pur">Take the money, and be unambiguous about whether it worked.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>TICVAI Partner</b><span>TODO</span></div><nav class="nav"><i class="">Allocations</i><i class="on">Bookings</i><i class="">Statements</i><i class="">Support</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Checkout / Credit Purchase</h2>
+                <small>Partner Web · wave 2 · compact</small></div>
+              <div class="acts"><div class="chip">This account</div><div class="chip cta">New booking</div></div>
+            </div>
+            
+            <div class="canvas">
+              <div class="kpis"><div class="kpi"><b>Allocation</b><span>2,400</span></div><div class="kpi"><b>Sold</b><span>1,860</span></div><div class="kpi"><b>Credit</b><span>AED 84k</span></div><div class="kpi"><b>Due</b><span>AED 12k</span></div></div>
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">detailPanel</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><span class="kind">primaryButton</span><div class="chip cta">primaryButton</div></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; createPayment · addTip · capturePayment · inquirePaymentStatus</div>
+          <div><b>STATES</b> &middot; <span class="">loading · emptyFirstRun · emptyNoAccess · error</span></div>
+          <div><b>ARRIVES WITH</b> &middot; paymentId&larr;deepLink</div>
+          <div><b>GOES TO</b> &middot; PTR-001 · PTR-002 · PTR-003</div>
+        </div>
+      </div>
+      <div id="ptr-013" class="scr">
+        <div>
+          <div class="hdr"><span class="code">PTR-013</span>
+            <span class="ttl">Credit Limit &amp; Balance</span></div>
+          <div class="pur">See credit limit &amp; balance for this venue.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>TICVAI Partner</b><span>TODO</span></div><nav class="nav"><i class="">Allocations</i><i class="on">Bookings</i><i class="">Statements</i><i class="">Support</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Credit Limit &amp; Balance</h2>
+                <small>Partner Web · wave 2 · compact</small></div>
+              <div class="acts"><div class="chip">This account</div><div class="chip cta">New booking</div></div>
+            </div>
+            
+            <div class="canvas">
+              <div class="kpis"><div class="kpi"><b>Allocation</b><span>2,400</span></div><div class="kpi"><b>Sold</b><span>1,860</span></div><div class="kpi"><b>Credit</b><span>AED 84k</span></div><div class="kpi"><b>Due</b><span>AED 12k</span></div></div>
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">detailPanel</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">Implied by the detail template — not declared on the screen.</span></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; getB2bCredit · overrideCreditLimit · setB2bCreditLimit</div>
+          <div><b>STATES</b> &middot; <span class="">loading · emptyFirstRun · emptyNoAccess · error</span></div>
+          <div><b>ARRIVES WITH</b> &middot; accountId&larr;PTR-001</div>
+          <div><b>GOES TO</b> &middot; PTR-001 · PTR-002 · PTR-003</div>
+        </div>
+      </div>
+      <div id="ptr-014" class="scr">
+        <div>
+          <div class="hdr"><span class="code">PTR-014</span>
+            <span class="ttl">Settlement &amp; Payment History</span></div>
+          <div class="pur">Take the money, and be unambiguous about whether it worked.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>TICVAI Partner</b><span>TODO</span></div><nav class="nav"><i class="">Allocations</i><i class="on">Bookings</i><i class="">Statements</i><i class="">Support</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Settlement &amp; Payment History</h2>
+                <small>Partner Web · wave 3 · compact</small></div>
+              <div class="acts"><div class="chip">This account</div><div class="chip cta">New booking</div></div>
+            </div>
+            
+            <div class="canvas">
+              <div class="kpis"><div class="kpi"><b>Allocation</b><span>2,400</span></div><div class="kpi"><b>Sold</b><span>1,860</span></div><div class="kpi"><b>Credit</b><span>AED 84k</span></div><div class="kpi"><b>Due</b><span>AED 12k</span></div></div>
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">searchField</span><div class="chip">Search</div></div><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; listSettlements · getSettlement · ingestSettlementFile · listSettlementExceptions +1</div>
+          <div><b>STATES</b> &middot; <span class="">loading · emptyFirstRun · emptyNoResults · emptyNoAccess · error</span></div>
+          <div><b>ARRIVES WITH</b> &middot; settlementId&larr;deepLink</div>
+          <div><b>GOES TO</b> &middot; PTR-001 · PTR-002 · PTR-003</div>
+        </div>
+      </div>
+      <div id="ptr-015" class="scr">
+        <div>
+          <div class="hdr"><span class="code">PTR-015</span>
+            <span class="ttl">Order History</span></div>
+          <div class="pur">Find order history for this venue.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>TICVAI Partner</b><span>TODO</span></div><nav class="nav"><i class="">Allocations</i><i class="on">Bookings</i><i class="">Statements</i><i class="">Support</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Order History</h2>
+                <small>Partner Web · wave 2 · compact</small></div>
+              <div class="acts"><div class="chip">This account</div><div class="chip cta">New booking</div></div>
+            </div>
+            
+            <div class="canvas">
+              <div class="kpis"><div class="kpi"><b>Allocation</b><span>2,400</span></div><div class="kpi"><b>Sold</b><span>1,860</span></div><div class="kpi"><b>Credit</b><span>AED 84k</span></div><div class="kpi"><b>Due</b><span>AED 12k</span></div></div>
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">searchField</span><div class="chip">Search</div></div><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; listOrders · getOrderStatement · applyManualDiscount · createOrder +10</div>
+          <div><b>STATES</b> &middot; <span class="">loading · emptyFirstRun · emptyNoResults · emptyNoAccess · error</span></div>
+          <div><b>ARRIVES WITH</b> &middot; orderId&larr;deepLink</div>
+          <div><b>GOES TO</b> &middot; PTR-001 · PTR-002 · PTR-003</div>
+        </div>
+      </div>
+      <div id="ptr-016" class="scr">
+        <div>
+          <div class="hdr"><span class="code">PTR-016</span>
+            <span class="ttl">Voucher / Ticket Download</span></div>
+          <div class="pur">Work with voucher / ticket download for this venue.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>TICVAI Partner</b><span>TODO</span></div><nav class="nav"><i class="">Allocations</i><i class="on">Bookings</i><i class="">Statements</i><i class="">Support</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Voucher / Ticket Download</h2>
+                <small>Partner Web · wave 2 · compact</small></div>
+              <div class="acts"><div class="chip">This account</div><div class="chip cta">New booking</div></div>
+            </div>
+            
+            <div class="canvas">
+              <div class="kpis"><div class="kpi"><b>Allocation</b><span>2,400</span></div><div class="kpi"><b>Sold</b><span>1,860</span></div><div class="kpi"><b>Credit</b><span>AED 84k</span></div><div class="kpi"><b>Due</b><span>AED 12k</span></div></div>
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">detailPanel</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">Implied by the detail template — not declared on the screen.</span></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; reprintOrder · applyManualDiscount · createOrder · exchangeOrderLines +9</div>
+          <div><b>STATES</b> &middot; <span class="">loading · emptyFirstRun · emptyNoAccess · error</span></div>
+          <div><b>ARRIVES WITH</b> &middot; orderId&larr;PTR-008</div>
+          <div><b>GOES TO</b> &middot; PTR-001 · PTR-002 · PTR-003</div>
+        </div>
+      </div>
+      <div id="ptr-017" class="scr">
+        <div>
+          <div class="hdr"><span class="code">PTR-017</span>
+            <span class="ttl">Commission Statement</span></div>
+          <div class="pur">Answer a question about commission with numbers someone can check.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>TICVAI Partner</b><span>TODO</span></div><nav class="nav"><i class="">Allocations</i><i class="on">Bookings</i><i class="">Statements</i><i class="">Support</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Commission Statement</h2>
+                <small>Partner Web · wave 3 · compact</small></div>
+              <div class="acts"><div class="chip">This account</div><div class="chip cta">New booking</div></div>
+            </div>
+            
+            <div class="canvas">
+              <div class="kpis"><div class="kpi"><b>Allocation</b><span>2,400</span></div><div class="kpi"><b>Sold</b><span>1,860</span></div><div class="kpi"><b>Credit</b><span>AED 84k</span></div><div class="kpi"><b>Due</b><span>AED 12k</span></div></div>
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">detailPanel</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">Implied by the detail template — not declared on the screen.</span></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; getCommissionStatement · listPartnerAgreements</div>
+          <div><b>STATES</b> &middot; <span class="">loading · emptyFirstRun · emptyNoAccess · error</span></div>
+          <div><b>ARRIVES WITH</b> &middot; agreementId&larr;deepLink</div>
+          <div><b>GOES TO</b> &middot; PTR-001 · PTR-002 · PTR-003</div>
+        </div>
+      </div>
+      <div id="ptr-018" class="scr">
+        <div>
+          <div class="hdr"><span class="code">PTR-018</span>
+            <span class="ttl">Reports &amp; Sales Performance</span></div>
+          <div class="pur">Answer a question about reports with numbers someone can check.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>TICVAI Partner</b><span>TODO</span></div><nav class="nav"><i class="">Allocations</i><i class="on">Bookings</i><i class="">Statements</i><i class="">Support</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Reports &amp; Sales Performance</h2>
+                <small>Partner Web · wave 3 · compact</small></div>
+              <div class="acts"><div class="chip">This account</div><div class="chip cta">New booking</div></div>
+            </div>
+            
+            <div class="canvas">
+              <div class="kpis"><div class="kpi"><b>Allocation</b><span>2,400</span></div><div class="kpi"><b>Sold</b><span>1,860</span></div><div class="kpi"><b>Credit</b><span>AED 84k</span></div><div class="kpi"><b>Due</b><span>AED 12k</span></div></div>
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">metricTile</span><div class="rows"><div class="bar"><i style="width:78%"></i></div><div class="bar"><i style="width:54%"></i></div><div class="bar"><i style="width:92%"></i></div><div class="bar"><i style="width:36%"></i></div><div class="bar"><i style="width:61%"></i></div></div></div><div class="panel"><span class="kind">chart</span><div class="rows"><div class="bar"><i style="width:78%"></i></div><div class="bar"><i style="width:54%"></i></div><div class="bar"><i style="width:92%"></i></div><div class="bar"><i style="width:36%"></i></div><div class="bar"><i style="width:61%"></i></div></div></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; runReport · askReportingQuestion · createReport · deleteReport +5</div>
+          <div><b>STATES</b> &middot; <span class="">loading · emptyFirstRun · emptyNoAccess · error</span></div>
+          <div><b>ARRIVES WITH</b> &middot; conversationId&larr;deepLink, reportId&larr;deepLink</div>
+          <div><b>GOES TO</b> &middot; PTR-001 · PTR-002 · PTR-003</div>
+        </div>
+      </div>
+      <div id="ptr-019" class="scr">
+        <div>
+          <div class="hdr"><span class="code">PTR-019</span>
+            <span class="ttl">API Credentials &amp; Integration</span></div>
+          <div class="pur">API Credentials &amp; Integration — the screen a person opens when they need to deal with api credentials &amp; integration.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>TICVAI Partner</b><span>TODO</span></div><nav class="nav"><i class="">Allocations</i><i class="on">Bookings</i><i class="">Statements</i><i class="">Support</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>API Credentials &amp; Integration</h2>
+                <small>Partner Web · wave 3 · compact</small></div>
+              <div class="acts"><div class="chip">This account</div><div class="chip cta">New booking</div></div>
+            </div>
+            
+            <div class="canvas">
+              <div class="kpis"><div class="kpi"><b>Allocation</b><span>2,400</span></div><div class="kpi"><b>Sold</b><span>1,860</span></div><div class="kpi"><b>Credit</b><span>AED 84k</span></div><div class="kpi"><b>Due</b><span>AED 12k</span></div></div>
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">detailPanel</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">Implied by the detail template — not declared on the screen.</span></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; none declared</div>
+          <div><b>STATES</b> &middot; <span class="">loading · emptyFirstRun · error</span></div>
+          
+          <div><b>GOES TO</b> &middot; PTR-001 · PTR-002 · PTR-003</div>
+        </div>
+      </div>
+      <div id="ptr-020" class="scr">
+        <div>
+          <div class="hdr"><span class="code">PTR-020</span>
+            <span class="ttl">Sub-Agent Management</span></div>
+          <div class="pur">Add sub-agent management for this venue.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>TICVAI Partner</b><span>TODO</span></div><nav class="nav"><i class="">Allocations</i><i class="on">Bookings</i><i class="">Statements</i><i class="">Support</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Sub-Agent Management</h2>
+                <small>Partner Web · wave 3 · compact</small></div>
+              <div class="acts"><div class="chip">This account</div><div class="chip cta">New booking</div></div>
+            </div>
+            
+            <div class="canvas">
+              <div class="kpis"><div class="kpi"><b>Allocation</b><span>2,400</span></div><div class="kpi"><b>Sold</b><span>1,860</span></div><div class="kpi"><b>Credit</b><span>AED 84k</span></div><div class="kpi"><b>Due</b><span>AED 12k</span></div></div>
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">textField</span><div class="chip">Search</div></div><div class="panel"><span class="kind">primaryButton</span><div class="chip cta">primaryButton</div></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; createGrant · deleteGrant · listGrants</div>
+          <div><b>STATES</b> &middot; <span class="">loading · emptyFirstRun · emptyNoAccess · error</span></div>
+          <div><b>ARRIVES WITH</b> &middot; grantId&larr;deepLink</div>
+          <div><b>GOES TO</b> &middot; PTR-001 · PTR-002 · PTR-003</div>
+        </div>
+      </div>
+      <div id="ptr-021" class="scr">
+        <div>
+          <div class="hdr"><span class="code">PTR-021</span>
+            <span class="ttl">Support &amp; Contact</span></div>
+          <div class="pur">Answer a question without needing a person.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>TICVAI Partner</b><span>TODO</span></div><nav class="nav"><i class="">Allocations</i><i class="on">Bookings</i><i class="">Statements</i><i class="">Support</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Support &amp; Contact</h2>
+                <small>Partner Web · wave 3 · compact</small></div>
+              <div class="acts"><div class="chip">This account</div><div class="chip cta">New booking</div></div>
+            </div>
+            
+            <div class="canvas">
+              <div class="kpis"><div class="kpi"><b>Allocation</b><span>2,400</span></div><div class="kpi"><b>Sold</b><span>1,860</span></div><div class="kpi"><b>Credit</b><span>AED 84k</span></div><div class="kpi"><b>Due</b><span>AED 12k</span></div></div>
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">detailPanel</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">Implied by the detail template — not declared on the screen.</span></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; createCase · addCaseMessage · escalateCase · getCase +3</div>
+          <div><b>STATES</b> &middot; <span class="">loading · emptyFirstRun · emptyNoAccess · error</span></div>
+          <div><b>ARRIVES WITH</b> &middot; caseId&larr;deepLink</div>
+          <div><b>GOES TO</b> &middot; PTR-001 · PTR-002 · PTR-003</div>
+        </div>
+      </div></div>
+  <div class="bottom">
+    <span>Generated by tools/derive-wireframes.py from screens/P10-partner-reseller-portal.yaml — do not hand-edit</span>
+    <span>P10 · 21 screens · 1 groups</span>
+  </div>
+</div></body></html>

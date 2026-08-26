@@ -1,0 +1,62 @@
+# Queue entry — state model
+# Contract: queue.QueueEntryStatus
+# Checked by tools/check-states.py.
+
+entity: Queue entry
+contract: queue
+enum: QueueEntryStatus
+enumKind: named
+enumSchema: QueueEntryStatus
+owner: queue
+initial:
+- waiting
+terminal:
+- redeemed
+- expired
+- noShow
+- cancelled
+- released
+transitions:
+- from: waiting
+  to: called
+  operation: callNextParties
+  trigger: operation
+  guard: Called forward. The redemption window opens here
+- from: waiting
+  to: cancelled
+  operation: leaveQueue
+  trigger: operation
+  guard: Guest left the queue
+- from: waiting
+  to: released
+  operation: setQueueStatus
+  trigger: cascade
+  guard: Queue closed or the attraction went out of service
+- from: called
+  to: redeemed
+  operation: redeemQueueEntry
+  trigger: operation
+  guard: Guest presented within the window
+- from: called
+  to: expired
+  trigger: timer
+  guard: Window passed. **Distinct from noShow** — expired is the clock, noShow is an operator saying
+    they were called and did not come
+- from: called
+  to: noShow
+  operation: overrideQueueEntry
+  trigger: operation
+  guard: Operator recorded a no-show
+- from: called
+  to: waiting
+  operation: overrideQueueEntry
+  trigger: operation
+  guard: Returned to the queue — called in error, or the guest asked for more time
+  isReversal: true
+notes: 'A guest in a virtual queue. **`called` expires rather than restoring their place** — unlike
+  a waitlist, where being asleep is not declining, a called queue place lapses because the ride is running
+  and the next party is waiting.
+
+
+  `abandoned` and `expired` are distinct: one is a guest leaving, one is the queue closing under them,
+  and only the second deserves an apology.'

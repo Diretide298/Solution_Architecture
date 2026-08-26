@@ -1,0 +1,406 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>P16 Venue Analytics — wireframe board</title>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+/* **The Claude Design system, applied to the generated boards on 24 August.**
+   Three client packs render at 1280x700 in this system and 385 screens rendered as
+   dashed-box wireframes — and **a client reviewing both reads the difference as *those screens
+   are not done*.** The information is identical either way; the fidelity is what was being
+   judged.
+
+   Tokens are the packs': #0B1324 rail, #0D6EFD primary, #00B8FF accent, Manrope for UI,
+   IBM Plex Mono for figures and codes. */
+:root{--ink:#0B1324;--mut:#5A6577;--dim:#9AA5B6;--line:#E8ECF3;--edge:#E3E8F0;
+--brand:#0D6EFD;--accent:#00B8FF;--rail:#0B1324;--paper:#FFF;--wash:#F7F9FC;
+--ok:#0E9F6E;--okbg:#E8F6F0;--okline:#BFE3D2;--warn:#8A6D00;--warnbg:#FFF7E6;
+--bad:#A81E1E;--badbg:#FDECEC}
+*{box-sizing:border-box}
+body{margin:0;background:#F2F5F9;color:var(--ink);
+font-family:Manrope,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:13px;line-height:1.55}
+a{color:inherit}
+.wrap{max-width:1420px;margin:0 auto;padding:22px 34px 90px}
+.home{font-size:11.5px;color:var(--mut);text-decoration:none;letter-spacing:.02em}
+.head{display:flex;align-items:baseline;justify-content:space-between;gap:20px;
+margin:14px 0 6px;padding-bottom:16px;border-bottom:2px solid var(--ink)}
+.mark{font-size:13px;font-weight:800;letter-spacing:.16em;
+background:linear-gradient(90deg,var(--brand),var(--accent));-webkit-background-clip:text;
+background-clip:text;color:transparent}
+h1{font-size:19px;font-weight:800;letter-spacing:-.015em;margin:0}
+.meta{font-size:11px;color:var(--mut);font-family:'IBM Plex Mono',ui-monospace,monospace;line-height:1.7}
+.lede{font-size:12.5px;color:var(--mut);max-width:82ch;margin:16px 0 0;line-height:1.65}
+.grp{font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:11px;font-weight:600;
+letter-spacing:.14em;color:var(--dim);text-transform:uppercase;margin:52px 0 18px;
+padding-bottom:9px;border-bottom:1px solid var(--line)}
+.stack{display:flex;flex-direction:column;gap:52px}
+.scr{display:flex;flex-direction:column;gap:13px;scroll-margin-top:24px}
+.hdr{display:flex;align-items:baseline;gap:9px;flex-wrap:wrap}
+.code{font-family:'IBM Plex Mono',monospace;font-size:12px;color:#8494A8}
+.ttl{font-size:16.5px;font-weight:800;letter-spacing:-.015em}
+.pur{font-size:12px;color:#6B7280;margin-top:3px;max-width:96ch}
+.pill{font-size:9px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;
+padding:2px 7px;border-radius:5px;background:#EEF3FA;color:#4A5A70}
+.pill.named{background:var(--warnbg);color:var(--warn)}
+.pill.off{background:var(--okbg);color:var(--ok)}
+
+/* the frame — 1280x700, the packs' dimension */
+.frame{width:1280px;height:700px;display:flex;background:var(--wash);border:1px solid var(--edge);
+border-radius:14px;overflow:hidden;box-shadow:0 16px 38px rgba(12,35,64,.09)}
+.rail{flex:none;width:180px;background:var(--rail);display:flex;flex-direction:column;position:relative}
+.rail::before{content:'';position:absolute;inset:0;
+background:radial-gradient(300px 200px at 0% 4%,rgba(0,184,255,.20),transparent 70%);pointer-events:none}
+.brand{position:relative;padding:15px 14px 13px;border-bottom:1px solid rgba(255,255,255,.08)}
+.brand b{display:block;font-size:14px;font-weight:800;letter-spacing:.1em;
+background:linear-gradient(90deg,#4DA3FF,var(--accent));-webkit-background-clip:text;
+background-clip:text;color:transparent}
+.brand span{display:block;font-size:9.5px;color:#7FA3C9;margin-top:5px}
+.nav{position:relative;display:flex;flex-direction:column;gap:2px;padding:11px 9px}
+.nav i{display:block;padding:8px 10px;border-radius:9px;font-size:11.5px;font-style:normal;color:#8FA8C4}
+.nav i.on{background:linear-gradient(90deg,rgba(13,110,253,.30),rgba(0,184,255,.10));
+color:#fff;font-weight:700}
+.body{flex:1;display:flex;flex-direction:column;min-width:0}
+.top{flex:none;height:54px;display:flex;align-items:center;gap:12px;padding:0 18px;
+background:var(--paper);border-bottom:1px solid var(--line)}
+.top h2{font-size:13.5px;font-weight:800;letter-spacing:-.01em;margin:0}
+.top small{display:block;font-size:10px;color:var(--dim);font-weight:500}
+.acts{margin-left:auto;display:flex;gap:6px}
+.chip{height:32px;display:flex;align-items:center;gap:6px;padding:0 11px;border:1px solid var(--edge);
+border-radius:8px;font-size:11px;font-weight:700;color:var(--mut);background:var(--paper)}
+.chip.live{background:var(--okbg);border-color:var(--okline);color:var(--ok)}
+.chip.live::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--ok)}
+.chip.cta{background:var(--brand);border-color:var(--brand);color:#fff}
+.canvas{flex:1;display:flex;flex-direction:column;gap:12px;padding:14px 16px;min-height:0;overflow:hidden}
+.kpis{flex:none;display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.kpi{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:11px 13px;
+display:flex;flex-direction:column;gap:4px}
+.kpi b{font-size:9.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--dim)}
+.kpi span{font-family:'IBM Plex Mono',monospace;font-size:19px;font-weight:600;letter-spacing:-.02em}
+.panel{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:12px 14px;
+display:flex;flex-direction:column;gap:8px;min-height:0}
+.panel > b{font-size:11px;font-weight:800;letter-spacing:-.005em}
+.panel .why{font-size:10px;color:#7C8899;font-style:italic;line-height:1.5}
+.kind{font-family:'IBM Plex Mono',monospace;font-size:9px;color:var(--dim);
+letter-spacing:.06em;text-transform:uppercase}
+.rows{display:flex;flex-direction:column;gap:6px}
+.row{display:grid;grid-template-columns:1.6fr 1fr 1fr .7fr;gap:10px;align-items:center;
+padding:7px 0;border-top:1px solid #F0F3F8}
+.row:first-child{border-top:0;font-size:9.5px;font-weight:700;letter-spacing:.06em;
+text-transform:uppercase;color:var(--dim)}
+.bar{height:7px;border-radius:4px;background:#EDF1F7}
+.bar i{display:block;height:100%;border-radius:4px;
+background:linear-gradient(90deg,var(--brand),var(--accent))}
+.side{flex:none;width:250px;display:flex;flex-direction:column;gap:10px}
+.two{flex:1;display:flex;gap:12px;min-height:0}
+.grow{flex:1;min-width:0}
+.strip{flex:none;height:26px;display:flex;align-items:center;gap:8px;padding:0 18px;
+background:var(--warnbg);color:var(--warn);font-size:10px;font-weight:700;
+letter-spacing:.05em;text-transform:uppercase;border-bottom:1px solid #F0E0B8}
+.dark .frame{background:#0A1524}
+.dark .top{background:#0E2A4C;border-color:#1E3A5F;color:#E6F0FA}
+.dark .top small{color:#7FA3C9}
+.dark .canvas{background:#0A1524}
+.dark .kpi,.dark .panel{background:#0E2A4C;border-color:#1E3A5F;color:#E6F0FA}
+.dark .row{border-color:#193353}
+.dark .chip{background:#0E2A4C;border-color:#1E3A5F;color:#9FC0E0}
+
+.foot{font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:10px;line-height:1.85;color:#7C8899}
+.foot b{color:#4A5566;font-weight:600}
+.foot .warn{color:var(--warn)}
+.bottom{margin-top:64px;padding-top:16px;border-top:1px solid var(--line);
+display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
+</style></head><body>
+<div class="wrap">
+  <a class="home" href="TICVAI%20Wireframe%20Boards.dc.html">&larr; All boards</a>
+  <div class="head">
+    <div><span class="mark">TICVAI</span>
+      <h1>P16 · Venue Analytics — Cross-Domain Reporting <span style="font-weight:600;color:#6B7280">(10 screens)</span></h1></div>
+    <div class="meta">staff · web · venue-management-web</div>
+  </div>
+  <p class="lede">**26 board screens collapsed to nine.** F&amp;B, Retail and POS each ended their set with an executive command centre, a sales and revenue view, a performance view, a forecasting view and an AI centre — and **two of them are word-for-word identical across domains.**</p>
+  <div class="grp">01 — Analytics · 10 screens</div><div class="stack">
+      <div id="anl-001" class="scr">
+        <div>
+          <div class="hdr"><span class="code">ANL-001</span>
+            <span class="ttl">Executive Command Center</span><span class="pill">client board</span><span class="pill">FNB-6A, POS-6A, RET-6A</span></div>
+          <div class="pur">Executive Command Center — across F&amp;B, retail, ticketing and frontline, filtered by domain.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>TICVAI</b><span>Analytics</span></div><nav class="nav"><i class="">Dashboard</i><i class="on">Analytics</i><i class="">Settings</i><i class="">Reports</i><i class="">People</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Executive Command Center</h2>
+                <small>Venue Analytics · wave 3 · compact</small></div>
+              <div class="acts"><div class="chip">This venue &#9662;</div><div class="chip live">Live</div><div class="chip cta">Primary action</div></div>
+            </div>
+            
+            <div class="canvas">
+              <div class="kpis"><div class="kpi"><b>Revenue MTD</b><span>AED 4.86M</span></div><div class="kpi"><b>vs budget</b><span>+3.1%</span></div><div class="kpi"><b>Margin</b><span>38.4%</span></div><div class="kpi"><b>Alerts</b><span>6</span></div></div>
+              <div class="two"><div class="grow"><div class="panel"><b>Domain</b><div class="chip">Domain</div><span class="why">**The selector that collapses 26 board screens into nine.** A domain is a filter on an analytics screen, not a copy of it — building three sets means maintaining one scre</span></div><div class="panel"><span class="kind">metricTile</span><div class="rows"><div class="bar"><i style="width:78%"></i></div><div class="bar"><i style="width:54%"></i></div><div class="bar"><i style="width:92%"></i></div><div class="bar"><i style="width:36%"></i></div><div class="bar"><i style="width:61%"></i></div></div></div><div class="panel"><span class="kind">chart</span><div class="rows"><div class="bar"><i style="width:78%"></i></div><div class="bar"><i style="width:54%"></i></div><div class="bar"><i style="width:92%"></i></div><div class="bar"><i style="width:36%"></i></div><div class="bar"><i style="width:61%"></i></div></div><span class="why">**Comparison against the previous period by default.** A number with nothing beside it is a number nobody can act on.</span></div></div><div class="side"><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; getDashboard · listAlerts · requestSuggestion · runReport</div>
+          <div><b>STATES</b> &middot; <span class="">loading · emptyFirstRun · emptyNoResults · emptyNoAccess · error · partial</span></div>
+          <div><b>ARRIVES WITH</b> &middot; venueId&larr;session, domain&larr;session, dashboardId&larr;deepLink</div>
+          <div><b>GOES TO</b> &middot; entry point · ANL-002 · ANL-003 · ANL-004 · ANL-005 · ANL-006</div>
+        </div>
+      </div>
+      <div id="anl-002" class="scr">
+        <div>
+          <div class="hdr"><span class="code">ANL-002</span>
+            <span class="ttl">Sales, Revenue &amp; Channel</span><span class="pill">client board</span><span class="pill">FNB-6B, RET-6L</span></div>
+          <div class="pur">Sales, Revenue &amp; Channel — across F&amp;B, retail, ticketing and frontline, filtered by domain.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>TICVAI</b><span>Analytics</span></div><nav class="nav"><i class="">Dashboard</i><i class="on">Analytics</i><i class="">Settings</i><i class="">Reports</i><i class="">People</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Sales, Revenue &amp; Channel</h2>
+                <small>Venue Analytics · wave 3 · compact</small></div>
+              <div class="acts"><div class="chip">This venue &#9662;</div><div class="chip live">Live</div><div class="chip cta">Primary action</div></div>
+            </div>
+            
+            <div class="canvas">
+              <div class="kpis"><div class="kpi"><b>Revenue MTD</b><span>AED 4.86M</span></div><div class="kpi"><b>vs budget</b><span>+3.1%</span></div><div class="kpi"><b>Margin</b><span>38.4%</span></div><div class="kpi"><b>Alerts</b><span>6</span></div></div>
+              <div class="two"><div class="grow"><div class="panel"><b>Domain</b><div class="chip">Domain</div><span class="why">**The selector that collapses 26 board screens into nine.** A domain is a filter on an analytics screen, not a copy of it — building three sets means maintaining one scre</span></div><div class="panel"><span class="kind">metricTile</span><div class="rows"><div class="bar"><i style="width:78%"></i></div><div class="bar"><i style="width:54%"></i></div><div class="bar"><i style="width:92%"></i></div><div class="bar"><i style="width:36%"></i></div><div class="bar"><i style="width:61%"></i></div></div></div><div class="panel"><span class="kind">chart</span><div class="rows"><div class="bar"><i style="width:78%"></i></div><div class="bar"><i style="width:54%"></i></div><div class="bar"><i style="width:92%"></i></div><div class="bar"><i style="width:36%"></i></div><div class="bar"><i style="width:61%"></i></div></div><span class="why">**Comparison against the previous period by default.** A number with nothing beside it is a number nobody can act on.</span></div></div><div class="side"><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; getDashboard · runReport</div>
+          <div><b>STATES</b> &middot; <span class="">loading · emptyFirstRun · emptyNoResults · emptyNoAccess · error · partial</span></div>
+          <div><b>ARRIVES WITH</b> &middot; venueId&larr;session, domain&larr;session, dashboardId&larr;deepLink</div>
+          <div><b>GOES TO</b> &middot; nothing declared</div>
+        </div>
+      </div>
+      <div id="anl-003" class="scr">
+        <div>
+          <div class="hdr"><span class="code">ANL-003</span>
+            <span class="ttl">Operational Performance</span><span class="pill">client board</span><span class="pill">FNB-4K, FNB-6C, FNB-6G, POS-6B, POS-6C, POS-6D, RET-6B</span></div>
+          <div class="pur">Operational Performance — across F&amp;B, retail, ticketing and frontline, filtered by domain.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>TICVAI</b><span>Analytics</span></div><nav class="nav"><i class="">Dashboard</i><i class="on">Analytics</i><i class="">Settings</i><i class="">Reports</i><i class="">People</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Operational Performance</h2>
+                <small>Venue Analytics · wave 3 · compact</small></div>
+              <div class="acts"><div class="chip">This venue &#9662;</div><div class="chip live">Live</div><div class="chip cta">Primary action</div></div>
+            </div>
+            
+            <div class="canvas">
+              <div class="kpis"><div class="kpi"><b>Revenue MTD</b><span>AED 4.86M</span></div><div class="kpi"><b>vs budget</b><span>+3.1%</span></div><div class="kpi"><b>Margin</b><span>38.4%</span></div><div class="kpi"><b>Alerts</b><span>6</span></div></div>
+              <div class="two"><div class="grow"><div class="panel"><b>Domain</b><div class="chip">Domain</div><span class="why">**The selector that collapses 26 board screens into nine.** A domain is a filter on an analytics screen, not a copy of it — building three sets means maintaining one scre</span></div><div class="panel"><span class="kind">metricTile</span><div class="rows"><div class="bar"><i style="width:78%"></i></div><div class="bar"><i style="width:54%"></i></div><div class="bar"><i style="width:92%"></i></div><div class="bar"><i style="width:36%"></i></div><div class="bar"><i style="width:61%"></i></div></div></div><div class="panel"><span class="kind">chart</span><div class="rows"><div class="bar"><i style="width:78%"></i></div><div class="bar"><i style="width:54%"></i></div><div class="bar"><i style="width:92%"></i></div><div class="bar"><i style="width:36%"></i></div><div class="bar"><i style="width:61%"></i></div></div><span class="why">**Comparison against the previous period by default.** A number with nothing beside it is a number nobody can act on.</span></div></div><div class="side"><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; getDashboard · runReport · listAlerts · listDevices +1</div>
+          <div><b>STATES</b> &middot; <span class="">loading · emptyFirstRun · emptyNoResults · emptyNoAccess · error · partial</span></div>
+          <div><b>ARRIVES WITH</b> &middot; venueId&larr;session, domain&larr;session, dashboardId&larr;deepLink</div>
+          <div><b>GOES TO</b> &middot; nothing declared</div>
+        </div>
+      </div>
+      <div id="anl-004" class="scr">
+        <div>
+          <div class="hdr"><span class="code">ANL-004</span>
+            <span class="ttl">Product Performance</span><span class="pill">client board</span><span class="pill">FNB-6D, RET-6C</span></div>
+          <div class="pur">Product Performance — across F&amp;B, retail, ticketing and frontline, filtered by domain.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>TICVAI</b><span>Analytics</span></div><nav class="nav"><i class="">Dashboard</i><i class="on">Analytics</i><i class="">Settings</i><i class="">Reports</i><i class="">People</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Product Performance</h2>
+                <small>Venue Analytics · wave 3 · compact</small></div>
+              <div class="acts"><div class="chip">This venue &#9662;</div><div class="chip live">Live</div><div class="chip cta">Primary action</div></div>
+            </div>
+            
+            <div class="canvas">
+              <div class="kpis"><div class="kpi"><b>Revenue MTD</b><span>AED 4.86M</span></div><div class="kpi"><b>vs budget</b><span>+3.1%</span></div><div class="kpi"><b>Margin</b><span>38.4%</span></div><div class="kpi"><b>Alerts</b><span>6</span></div></div>
+              <div class="two"><div class="grow"><div class="panel"><b>Domain</b><div class="chip">Domain</div><span class="why">**The selector that collapses 26 board screens into nine.** A domain is a filter on an analytics screen, not a copy of it — building three sets means maintaining one scre</span></div><div class="panel"><span class="kind">metricTile</span><div class="rows"><div class="bar"><i style="width:78%"></i></div><div class="bar"><i style="width:54%"></i></div><div class="bar"><i style="width:92%"></i></div><div class="bar"><i style="width:36%"></i></div><div class="bar"><i style="width:61%"></i></div></div></div><div class="panel"><span class="kind">chart</span><div class="rows"><div class="bar"><i style="width:78%"></i></div><div class="bar"><i style="width:54%"></i></div><div class="bar"><i style="width:92%"></i></div><div class="bar"><i style="width:36%"></i></div><div class="bar"><i style="width:61%"></i></div></div><span class="why">**Comparison against the previous period by default.** A number with nothing beside it is a number nobody can act on.</span></div></div><div class="side"><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; getDashboard · runReport · listProducts</div>
+          <div><b>STATES</b> &middot; <span class="">loading · emptyFirstRun · emptyNoResults · emptyNoAccess · error · partial</span></div>
+          <div><b>ARRIVES WITH</b> &middot; venueId&larr;session, domain&larr;session, dashboardId&larr;deepLink</div>
+          <div><b>GOES TO</b> &middot; nothing declared</div>
+        </div>
+      </div>
+      <div id="anl-005" class="scr">
+        <div>
+          <div class="hdr"><span class="code">ANL-005</span>
+            <span class="ttl">Cost, Margin &amp; Profitability</span><span class="pill">client board</span><span class="pill">FNB-6E, RET-6F</span></div>
+          <div class="pur">Cost, Margin &amp; Profitability — across F&amp;B, retail, ticketing and frontline, filtered by domain.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>TICVAI</b><span>Analytics</span></div><nav class="nav"><i class="">Dashboard</i><i class="on">Analytics</i><i class="">Settings</i><i class="">Reports</i><i class="">People</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Cost, Margin &amp; Profitability</h2>
+                <small>Venue Analytics · wave 3 · compact</small></div>
+              <div class="acts"><div class="chip">This venue &#9662;</div><div class="chip live">Live</div><div class="chip cta">Primary action</div></div>
+            </div>
+            
+            <div class="canvas">
+              <div class="kpis"><div class="kpi"><b>Revenue MTD</b><span>AED 4.86M</span></div><div class="kpi"><b>vs budget</b><span>+3.1%</span></div><div class="kpi"><b>Margin</b><span>38.4%</span></div><div class="kpi"><b>Alerts</b><span>6</span></div></div>
+              <div class="two"><div class="grow"><div class="panel"><b>Domain</b><div class="chip">Domain</div><span class="why">**The selector that collapses 26 board screens into nine.** A domain is a filter on an analytics screen, not a copy of it — building three sets means maintaining one scre</span></div><div class="panel"><span class="kind">metricTile</span><div class="rows"><div class="bar"><i style="width:78%"></i></div><div class="bar"><i style="width:54%"></i></div><div class="bar"><i style="width:92%"></i></div><div class="bar"><i style="width:36%"></i></div><div class="bar"><i style="width:61%"></i></div></div></div><div class="panel"><span class="kind">chart</span><div class="rows"><div class="bar"><i style="width:78%"></i></div><div class="bar"><i style="width:54%"></i></div><div class="bar"><i style="width:92%"></i></div><div class="bar"><i style="width:36%"></i></div><div class="bar"><i style="width:61%"></i></div></div><span class="why">**Comparison against the previous period by default.** A number with nothing beside it is a number nobody can act on.</span></div></div><div class="side"><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; getDashboard · runReport · getStockValuation</div>
+          <div><b>STATES</b> &middot; <span class="">loading · emptyFirstRun · emptyNoResults · emptyNoAccess · error · partial</span></div>
+          <div><b>ARRIVES WITH</b> &middot; venueId&larr;session, domain&larr;session, dashboardId&larr;deepLink</div>
+          <div><b>GOES TO</b> &middot; nothing declared</div>
+        </div>
+      </div>
+      <div id="anl-006" class="scr">
+        <div>
+          <div class="hdr"><span class="code">ANL-006</span>
+            <span class="ttl">Inventory &amp; Waste Intelligence</span><span class="pill">client board</span><span class="pill">FNB-6F, RET-6D</span></div>
+          <div class="pur">Inventory &amp; Waste Intelligence — across F&amp;B, retail, ticketing and frontline, filtered by domain.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>TICVAI</b><span>Analytics</span></div><nav class="nav"><i class="">Dashboard</i><i class="on">Analytics</i><i class="">Settings</i><i class="">Reports</i><i class="">People</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Inventory &amp; Waste Intelligence</h2>
+                <small>Venue Analytics · wave 3 · compact</small></div>
+              <div class="acts"><div class="chip">This venue &#9662;</div><div class="chip live">Live</div><div class="chip cta">Primary action</div></div>
+            </div>
+            
+            <div class="canvas">
+              <div class="kpis"><div class="kpi"><b>Revenue MTD</b><span>AED 4.86M</span></div><div class="kpi"><b>vs budget</b><span>+3.1%</span></div><div class="kpi"><b>Margin</b><span>38.4%</span></div><div class="kpi"><b>Alerts</b><span>6</span></div></div>
+              <div class="two"><div class="grow"><div class="panel"><b>Domain</b><div class="chip">Domain</div><span class="why">**The selector that collapses 26 board screens into nine.** A domain is a filter on an analytics screen, not a copy of it — building three sets means maintaining one scre</span></div><div class="panel"><span class="kind">metricTile</span><div class="rows"><div class="bar"><i style="width:78%"></i></div><div class="bar"><i style="width:54%"></i></div><div class="bar"><i style="width:92%"></i></div><div class="bar"><i style="width:36%"></i></div><div class="bar"><i style="width:61%"></i></div></div></div><div class="panel"><span class="kind">chart</span><div class="rows"><div class="bar"><i style="width:78%"></i></div><div class="bar"><i style="width:54%"></i></div><div class="bar"><i style="width:92%"></i></div><div class="bar"><i style="width:36%"></i></div><div class="bar"><i style="width:61%"></i></div></div><span class="why">**Comparison against the previous period by default.** A number with nothing beside it is a number nobody can act on.</span></div></div><div class="side"><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; getDashboard · runReport · getCountVariance · listExpiringBatches</div>
+          <div><b>STATES</b> &middot; <span class="">loading · emptyFirstRun · emptyNoResults · emptyNoAccess · error · partial</span></div>
+          <div><b>ARRIVES WITH</b> &middot; venueId&larr;session, domain&larr;session, countId&larr;deepLink</div>
+          <div><b>GOES TO</b> &middot; nothing declared</div>
+        </div>
+      </div>
+      <div id="anl-007" class="scr">
+        <div>
+          <div class="hdr"><span class="code">ANL-007</span>
+            <span class="ttl">Guest &amp; Conversion Intelligence</span><span class="pill">client board</span><span class="pill">RET-6E</span></div>
+          <div class="pur">Guest &amp; Conversion Intelligence — across F&amp;B, retail, ticketing and frontline, filtered by domain.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>TICVAI</b><span>Analytics</span></div><nav class="nav"><i class="">Dashboard</i><i class="on">Analytics</i><i class="">Settings</i><i class="">Reports</i><i class="">People</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Guest &amp; Conversion Intelligence</h2>
+                <small>Venue Analytics · wave 3 · compact</small></div>
+              <div class="acts"><div class="chip">This venue &#9662;</div><div class="chip live">Live</div><div class="chip cta">Primary action</div></div>
+            </div>
+            
+            <div class="canvas">
+              <div class="kpis"><div class="kpi"><b>Revenue MTD</b><span>AED 4.86M</span></div><div class="kpi"><b>vs budget</b><span>+3.1%</span></div><div class="kpi"><b>Margin</b><span>38.4%</span></div><div class="kpi"><b>Alerts</b><span>6</span></div></div>
+              <div class="two"><div class="grow"><div class="panel"><b>Domain</b><div class="chip">Domain</div><span class="why">**The selector that collapses 26 board screens into nine.** A domain is a filter on an analytics screen, not a copy of it — building three sets means maintaining one scre</span></div><div class="panel"><span class="kind">metricTile</span><div class="rows"><div class="bar"><i style="width:78%"></i></div><div class="bar"><i style="width:54%"></i></div><div class="bar"><i style="width:92%"></i></div><div class="bar"><i style="width:36%"></i></div><div class="bar"><i style="width:61%"></i></div></div></div><div class="panel"><span class="kind">chart</span><div class="rows"><div class="bar"><i style="width:78%"></i></div><div class="bar"><i style="width:54%"></i></div><div class="bar"><i style="width:92%"></i></div><div class="bar"><i style="width:36%"></i></div><div class="bar"><i style="width:61%"></i></div></div><span class="why">**Comparison against the previous period by default.** A number with nothing beside it is a number nobody can act on.</span></div></div><div class="side"><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; getDashboard · runReport · listSegments · createSegment +1</div>
+          <div><b>STATES</b> &middot; <span class="">loading · emptyFirstRun · emptyNoResults · emptyNoAccess · error · partial</span></div>
+          <div><b>ARRIVES WITH</b> &middot; venueId&larr;session, domain&larr;session, dashboardId&larr;deepLink</div>
+          <div><b>GOES TO</b> &middot; nothing declared</div>
+        </div>
+      </div>
+      <div id="anl-008" class="scr">
+        <div>
+          <div class="hdr"><span class="code">ANL-008</span>
+            <span class="ttl">Demand Forecasting</span><span class="pill">client board</span><span class="pill">FNB-6H, RET-6G</span></div>
+          <div class="pur">Demand Forecasting — across F&amp;B, retail, ticketing and frontline, filtered by domain.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>TICVAI</b><span>Analytics</span></div><nav class="nav"><i class="">Dashboard</i><i class="on">Analytics</i><i class="">Settings</i><i class="">Reports</i><i class="">People</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Demand Forecasting</h2>
+                <small>Venue Analytics · wave 3 · compact</small></div>
+              <div class="acts"><div class="chip">This venue &#9662;</div><div class="chip live">Live</div><div class="chip cta">Primary action</div></div>
+            </div>
+            
+            <div class="canvas">
+              <div class="kpis"><div class="kpi"><b>Revenue MTD</b><span>AED 4.86M</span></div><div class="kpi"><b>vs budget</b><span>+3.1%</span></div><div class="kpi"><b>Margin</b><span>38.4%</span></div><div class="kpi"><b>Alerts</b><span>6</span></div></div>
+              <div class="two"><div class="grow"><div class="panel"><b>Domain</b><div class="chip">Domain</div><span class="why">**The selector that collapses 26 board screens into nine.** A domain is a filter on an analytics screen, not a copy of it — building three sets means maintaining one scre</span></div><div class="panel"><span class="kind">metricTile</span><div class="rows"><div class="bar"><i style="width:78%"></i></div><div class="bar"><i style="width:54%"></i></div><div class="bar"><i style="width:92%"></i></div><div class="bar"><i style="width:36%"></i></div><div class="bar"><i style="width:61%"></i></div></div></div><div class="panel"><span class="kind">chart</span><div class="rows"><div class="bar"><i style="width:78%"></i></div><div class="bar"><i style="width:54%"></i></div><div class="bar"><i style="width:92%"></i></div><div class="bar"><i style="width:36%"></i></div><div class="bar"><i style="width:61%"></i></div></div><span class="why">**Comparison against the previous period by default.** A number with nothing beside it is a number nobody can act on.</span></div></div><div class="side"><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; askReportingQuestion · getDashboard</div>
+          <div><b>STATES</b> &middot; <span class="">loading · emptyFirstRun · emptyNoResults · emptyNoAccess · error · partial</span></div>
+          <div><b>ARRIVES WITH</b> &middot; venueId&larr;session, domain&larr;session, dashboardId&larr;deepLink</div>
+          <div><b>GOES TO</b> &middot; nothing declared</div>
+        </div>
+      </div>
+      <div id="anl-009" class="scr">
+        <div>
+          <div class="hdr"><span class="code">ANL-009</span>
+            <span class="ttl">AI Assistant &amp; Action Center</span><span class="pill">client board</span><span class="pill">FNB-5K, FNB-6J, FNB-6K, POS-6E, RET-5K, RET-6K</span></div>
+          <div class="pur">AI Assistant &amp; Action Center — across F&amp;B, retail, ticketing and frontline, filtered by domain.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>TICVAI</b><span>Analytics</span></div><nav class="nav"><i class="">Dashboard</i><i class="on">Analytics</i><i class="">Settings</i><i class="">Reports</i><i class="">People</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>AI Assistant &amp; Action Center</h2>
+                <small>Venue Analytics · wave 3 · compact</small></div>
+              <div class="acts"><div class="chip">This venue &#9662;</div><div class="chip live">Live</div><div class="chip cta">Primary action</div></div>
+            </div>
+            
+            <div class="canvas">
+              <div class="kpis"><div class="kpi"><b>Revenue MTD</b><span>AED 4.86M</span></div><div class="kpi"><b>vs budget</b><span>+3.1%</span></div><div class="kpi"><b>Margin</b><span>38.4%</span></div><div class="kpi"><b>Alerts</b><span>6</span></div></div>
+              <div class="two"><div class="grow"><div class="panel"><b>Domain</b><div class="chip">Domain</div><span class="why">**The selector that collapses 26 board screens into nine.** A domain is a filter on an analytics screen, not a copy of it — building three sets means maintaining one scre</span></div><div class="panel"><span class="kind">metricTile</span><div class="rows"><div class="bar"><i style="width:78%"></i></div><div class="bar"><i style="width:54%"></i></div><div class="bar"><i style="width:92%"></i></div><div class="bar"><i style="width:36%"></i></div><div class="bar"><i style="width:61%"></i></div></div></div><div class="panel"><span class="kind">chart</span><div class="rows"><div class="bar"><i style="width:78%"></i></div><div class="bar"><i style="width:54%"></i></div><div class="bar"><i style="width:92%"></i></div><div class="bar"><i style="width:36%"></i></div><div class="bar"><i style="width:61%"></i></div></div><span class="why">**Comparison against the previous period by default.** A number with nothing beside it is a number nobody can act on.</span></div></div><div class="side"><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; askReportingQuestion · listAlerts · acknowledgeAlert · listOrders +4</div>
+          <div><b>STATES</b> &middot; <span class="">loading · emptyFirstRun · emptyNoResults · emptyNoAccess · error · partial</span></div>
+          <div><b>ARRIVES WITH</b> &middot; venueId&larr;session, domain&larr;session, alertId&larr;deepLink</div>
+          <div><b>GOES TO</b> &middot; nothing declared</div>
+        </div>
+      </div>
+      <div id="anl-010" class="scr">
+        <div>
+          <div class="hdr"><span class="code">ANL-010</span>
+            <span class="ttl">Suggestions &amp; Advice</span><span class="pill">client board</span><span class="pill">POS-6F</span></div>
+          <div class="pur">Every open suggestion, what it is based on, and whether the venue took it.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>TICVAI</b><span>Analytics</span></div><nav class="nav"><i class="">Dashboard</i><i class="on">Analytics</i><i class="">Settings</i><i class="">Reports</i><i class="">People</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Suggestions &amp; Advice</h2>
+                <small>Venue Analytics · wave 3 · compact</small></div>
+              <div class="acts"><div class="chip">This venue &#9662;</div><div class="chip live">Live</div><div class="chip cta">Primary action</div></div>
+            </div>
+            
+            <div class="canvas">
+              <div class="kpis"><div class="kpi"><b>Revenue MTD</b><span>AED 4.86M</span></div><div class="kpi"><b>vs budget</b><span>+3.1%</span></div><div class="kpi"><b>Margin</b><span>38.4%</span></div><div class="kpi"><b>Alerts</b><span>6</span></div></div>
+              <div class="two"><div class="grow"><div class="panel"><b>Kind</b><div class="chip">Kind</div></div><div class="panel"><span class="kind">cardList</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">**The basis is on the card, not behind a tap.** A manager must see that today’s answer is a margin rule and next quarter’s is a model — the same screen, a different basis</span></div><div class="panel"><span class="kind">detailPanel</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">The explanation in plain words and the inputs it used. **Advice computed from data the manager cannot see is advice they will not trust.**</span></div></div><div class="side"><div class="panel"><b>Take it</b><div class="chip cta">Take it</div></div><div class="panel"><b>Do something else</b><div class="chip">Do something else</div><span class="why">**Records the outcome either way.** A rejected suggestion is the case the current rule got wrong, which is exactly what a model is trained to beat.</span></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; requestSuggestion · recordSuggestionOutcome</div>
+          <div><b>STATES</b> &middot; <span class="">loading · emptyFirstRun · emptyNoResults · emptyNoAccess · error · shadowRunning</span></div>
+          <div><b>ARRIVES WITH</b> &middot; venueId&larr;session, suggestionId&larr;deepLink</div>
+          <div><b>GOES TO</b> &middot; nothing declared</div>
+        </div>
+      </div></div>
+  <div class="bottom">
+    <span>Generated by tools/derive-wireframes.py from screens/P16-venue-analytics.yaml — do not hand-edit</span>
+    <span>P16 · 10 screens · 1 groups</span>
+  </div>
+</div></body></html>

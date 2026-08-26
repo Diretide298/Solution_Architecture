@@ -1,0 +1,66 @@
+$schema: ./_schema.yaml
+id: F90
+name: An audience is built, offered to, and the result is judged
+actor: marketer
+capability: An audience is built, offered to, and the result is judged
+wave: 3
+frequency: As the venue needs it.
+criticality: revenue
+primaryContract: marketing-crm
+contracts:
+- marketing-crm
+- promotions
+- ai
+platforms:
+- P08
+- P16
+trigger:
+  description: A venue wants to reach a particular kind of guest with a particular offer.
+offlineBehaviour: None of it offline. A segment computed on stale data is a campaign sent to the wrong
+  people.
+steps:
+- step: 1
+  screen: BO-119
+  action: Cross-Sell, Upsell & Recommendation Rules.
+  operations:
+  - getRecommendations
+  - getUpsellSuggestions
+  outcome: '**Drawn by the client as RET-5D.**'
+- step: 2
+  screen: BO-010
+  action: Promotions & Coupons.
+  operations:
+  - getPromotionUsage
+  - listCouponCampaigns
+  - listCouponCodes
+  - pausePromotion
+  - publishPromotion
+  - simulatePromotion
+  outcome: '**Drawn by the client as RET-5E.**'
+  crossesDevice: true
+- step: 3
+  screen: ANL-009
+  action: AI Assistant & Action Center.
+  operations:
+  - acknowledgeAlert
+  - askReportingQuestion
+  - decideProposedAction
+  - listAlerts
+  outcome: '**Drawn by the client as RET-5C.**'
+  crossesDevice: true
+branches:
+- at: 1
+  condition: A step is not licensed for this tenant.
+  behaviour: '**The chain stops at the module boundary.** `requiresModule` decides — the journey is
+    shorter, not broken.'
+  severity: medium
+  resolvedBy: getModuleEnablement
+exitStates:
+- state: completed
+  description: The chain ran as the client drew it.
+- state: stoppedAtModule
+  description: '**A licence boundary, not a failure.**'
+notes: '**Retail board 5, the audience half.** `BO-119` was the one screen in sixty unbuilt chains that
+  no flow touched at all — **segmentation had never been walked**, and MarketingService is the largest
+  domain in the package. **Derived from the client''s declared `GOES TO` edges.**'
+openQuestions: null

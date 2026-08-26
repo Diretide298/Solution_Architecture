@@ -1,0 +1,37 @@
+id: LLD-Seat hold
+title: Seat hold — 3 transitions
+generatedBy: tools/derive-diagrams.py
+index: diagrams/hld/04-lifecycles.yaml
+source: states/seat-hold.yaml
+entity: Seat hold
+contract: seating
+enum: SeatHold.status
+enumKind: inline
+enumSchema: SeatHold
+enumProperty: status
+owner: seating
+initial:
+- held
+terminal:
+- converted
+- released
+- expired
+transitions:
+- from: held
+  to: converted
+  operation: createOrder
+  trigger: operation
+  guard: '**Became an order. The hold transfers rather than releasing** — releasing first lets another
+    guest take the seat between the calls'
+- from: held
+  to: released
+  operation: releaseSeatHold
+  trigger: operation
+  guard: Given up deliberately
+- from: held
+  to: expired
+  trigger: timer
+  guard: '**Seats return to the map.** A hold nobody converts is a seat nobody can buy, and on a popular
+    performance that is the difference between selling out and not'
+notes: The narrowest and most contended hold in the platform. **Every second of expiry is a seat off
+  sale**, and every second too short is a guest losing seats mid-checkout.

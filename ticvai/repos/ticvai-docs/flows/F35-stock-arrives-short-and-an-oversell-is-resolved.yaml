@@ -1,0 +1,161 @@
+$schema: ./_schema.yaml
+id: F35
+name: Stock arrives short and an oversell is resolved
+actor: storekeeper
+capability: Retail transfer, receiving and oversell recovery
+wave: 2
+frequency: >
+  A transfer most days; a short delivery weekly; an oversell a few times a season. **The chain is
+  the point** — each step is common and the sequence is what hurts.
+criticality: revenue
+primaryContract: inventory
+contracts: [inventory, retail, orders, approvals]
+platforms: [P06, P08]
+
+trigger:
+  description: >
+    A store is low on a line and another store has it. **The client's own pack threads this** — the
+    transit damage on one transfer causes the oversell, the recount flags and the claim, across four
+    frames of Board 4.
+  operations: [getStockPositions, createStockTransfer]
+
+offlineBehaviour: >
+  **Receiving works offline** — a loading bay is where coverage is worst and a delivery does not
+  wait. Lines journal and post on sync.
+
+  **The claim and the approval do not.** Both are commercial acts against a counterparty, and one
+  raised offline against a transfer that never synced is a claim about nothing.
+
+steps:
+  - step: 1
+    screen: BO-049
+    action: The store is short. A transfer is raised against a store that has it.
+    operations: [getStockPositions, createStockTransfer]
+    outcome: >
+      **`findNearbyStock` was the board's word and `listStockLocations` is the operation.** A
+      transfer moves stock between locations; a requisition asks a supplier.
+
+  - step: 2
+    screen: EMP-065
+    action: The delivery arrives. The receiver opens the manifest before touching it.
+    operations: [getStockTransfer]
+    outcome: >
+      **Built 24 August because nothing read a transfer** — `createStockTransfer`,
+      `receiveStockTransfer` and `closeTransferShort` all existed, and **the receiving store could
+      accept a delivery it could not open first.**
+
+  - step: 3
+    screen: EMP-065
+    action: Two cases are damaged in transit. They are rejected at the door.
+    operations: [rejectReceivedGoods, logColdChain]
+    outcome: >
+      **Rejected before the receipt is posted.** Once stock is received it has entered the store,
+      and a claim against the sender needs the reading that refused it.
+
+  - step: 4
+    screen: BO-052
+    action: The rest is received and the transfer closes short.
+    operations: [createGoodsReceipt, closeTransferShort]
+    outcome: >
+      **Closing short records that the balance will not arrive** — which is the claim. The board
+      called it `raiseTransferClaim`; the contract calls it what it is.
+
+  - step: 5
+    screen: BO-049
+    action: The website has already sold four of the damaged units.
+    operations: [getStockPositions]
+    outcome: >
+      **An oversell, and it is nobody's mistake.** The stock was committed against a delivery that
+      was in transit and arrived broken — **allocation against expected stock is what makes online
+      selling possible and what makes this happen.**
+
+  - step: 6
+    screen: BO-049
+    action: The stock goes negative and stays negative.
+    operations: [createStockMovement]
+    outcome: >
+      **A movement is written either way.** A stock level that refuses to go negative is a stock
+      level that hides what happened — the same rule F33 applies to an offline oversell.
+
+  - step: 7
+    screen: BO-082
+    action: The four orders are sourced from another store instead.
+    operations: [createStockTransfer, listOrders]
+    outcome: >
+      **Sourced rather than cancelled.** A guest who ordered and paid does not care which store it
+      came from, and **cancelling is the outcome a venue reaches when it cannot see the alternative.**
+
+  - step: 8
+    screen: BO-079
+    action: A cycle count on that line is triggered to confirm the position.
+    operations: [startStockCount, enterCountLine, getCountVariance]
+    outcome: >
+      **The count closes the loop.** Theoretical against actual after a damaged delivery, a
+      negative position and two transfers — **and if it still disagrees, the problem was never the
+      delivery.**
+
+branches:
+  - at: 3
+    condition: The damage is not visible until the cases are opened.
+    behaviour: >
+      **Received, then adjusted.** `createStockMovement` with a damage reason rather than a
+      rejection — **the transfer is closed and the claim is a separate conversation with the sending
+      store**, which is a worse position and the honest one.
+    severity: medium
+    resolvedBy: createStockMovement
+
+  - at: 5
+    condition: No other store has the line.
+    behaviour: >
+      **The orders are refunded, and the reason is recorded as an oversell rather than a
+      cancellation.** A venue that logs both the same way cannot tell a supply failure from a
+      change of mind.
+    severity: high
+    resolvedBy: createRefund
+
+  - at: 6
+    condition: The negative position crosses the venue's write-off threshold.
+    behaviour: >
+      Routes through `createApprovalRequest`. **One approval mechanism, different subjects** — the
+      same path a stock write-off, a menu repricing and a till variance all take.
+    severity: high
+    resolvedBy: createApprovalRequest
+
+  - at: 8
+    condition: The count agrees with the adjusted position.
+    behaviour: >
+      **The loop closes and nothing else happens.** Worth stating as an outcome, because a chain
+      this long with a clean ending is the case a venue needs to be able to reach.
+    severity: low
+    resolvedBy: getCountVariance
+
+exitStates:
+  - state: resolved
+    description: >
+      Short receipt claimed, oversell sourced from another store, position confirmed by count.
+      **The chain ran and the guest never knew.**
+  - state: resolvedWithRefund
+    description: >
+      No alternative stock. Orders refunded as an oversell. **A separate exit because the reason
+      matters** — this is a supply failure, and a venue that cannot count them cannot fix them.
+  - state: heldForApproval
+    description: The write-off crossed the threshold and waits on a signature.
+  - state: varianceUnexplained
+    description: >
+      The count still disagrees after everything was adjusted. **The problem was never the
+      delivery** — and this exit is where a shrinkage investigation starts.
+
+notes: >
+  **Written 24 August from the client Retail pack, Board 4.** The pack's own README says the figures
+  thread: *the transit damage on TRF-2412 causes the oversell in RET-4H, the recount flags in
+  RET-4F and the claim in RET-4G.* **This flow is that thread walked.**
+
+  **Step 2 exists because of what mapping the pack found.** Nothing read a transfer — three
+  operations wrote one and none returned it, so a receiving store could accept a delivery it could
+  not open. **`getStockTransfer` was built the same day.**
+
+  **Step 6 is a rule this package has now applied three times.** A movement is written even when it
+  takes the position negative: in F33 for an offline oversell, in F30 for a count variance, and here
+  for a damaged delivery. **A stock level that cannot go negative is a stock level that lies.**
+
+openQuestions: null

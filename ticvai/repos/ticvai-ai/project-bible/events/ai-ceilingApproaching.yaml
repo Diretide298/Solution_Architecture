@@ -1,0 +1,70 @@
+# ai.ceilingApproaching v1 — published by ai
+# Checked by tools/check-states.py.
+
+name: ai.ceilingApproaching
+version: 1
+publisher: ai
+description: AI spend has reached the configured warning threshold for a scope.
+aggregate: aiPolicy
+emittedWhen: Metered spend crosses ceilingWarningPercent, and again at 100%
+payload:
+- field: scopePath
+  type: string
+- field: tenantId
+  type: uuid
+- field: venueId
+  type: uuid
+  notes: Where the policy is venue-scoped
+- field: percentOfCeiling
+  type: integer
+  notes: 80 on the first warning, 100 on the second
+- field: tokensUsed
+  type: integer
+- field: ceiling
+  type: integer
+- field: spend
+  type: Money
+  notes: '**What it has cost, not what it will cost.** A projection would be a guess a manager acts
+    on'
+- field: audience
+  type: string
+  notes: staff or guest. **Guest spend is the one a venue cannot control**, so it is separated
+- field: daysRemainingInPeriod
+  type: integer
+- field: behaviour
+  type: string
+  notes: warn, warnThenDisable or block — so the notification can say what happens next
+consumers:
+- context: marketing
+  purpose: Notify the venue manager. **The critical consumer** — a ceiling nobody is told about is not
+    a control, it is a surprise on an invoice
+  idempotencyKey: scopePath+percentOfCeiling+period
+  onFailure: retryThenDeadLetter
+  isCritical: true
+- context: subscription
+  purpose: Flag the period for billing review
+  idempotencyKey: scopePath+percentOfCeiling+period
+  onFailure: retry
+  isCritical: false
+- context: reporting
+  purpose: Spend against ceiling by tenant and audience
+  idempotencyKey: scopePath+percentOfCeiling+period
+  onFailure: retry
+  isCritical: false
+retention: Two years, alongside the billing period it belongs to
+notes: '**Fires at the warning threshold and again at the ceiling, not once.** A manager told at 80%
+  can decide with a week left; one told at 100% has already spent it.
+
+
+  **The assistant keeps answering** unless `ceilingBehaviour` says otherwise (decided 17 August). A
+  cap that stops mid-visit turns a cost control into a guest-facing outage the venue had no warning
+  of — the same principle as CF-61''s "degrade, never stop".
+
+
+  Guest and staff spend are separated in the payload because **a venue can manage staff usage and cannot
+  stop guests asking questions.**
+
+
+  No state model emits this: **a ceiling is a threshold crossing on a running total, not a transition
+  on an object.** The metering job evaluates spend against `AiPolicy.monthlyTokenCeiling` and fires
+  — the same shape as `entitlement.issued`, which is created rather than transitioned into.'

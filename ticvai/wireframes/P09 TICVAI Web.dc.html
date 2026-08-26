@@ -1,0 +1,1162 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>P09 TICVAI Web — wireframe board</title>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+/* **The Claude Design system, applied to the generated boards on 24 August.**
+   Three client packs render at 1280x700 in this system and 385 screens rendered as
+   dashed-box wireframes — and **a client reviewing both reads the difference as *those screens
+   are not done*.** The information is identical either way; the fidelity is what was being
+   judged.
+
+   Tokens are the packs': #0B1324 rail, #0D6EFD primary, #00B8FF accent, Manrope for UI,
+   IBM Plex Mono for figures and codes. */
+:root{--ink:#0B1324;--mut:#5A6577;--dim:#9AA5B6;--line:#E8ECF3;--edge:#E3E8F0;
+--brand:#0D6EFD;--accent:#00B8FF;--rail:#0B1324;--paper:#FFF;--wash:#F7F9FC;
+--ok:#0E9F6E;--okbg:#E8F6F0;--okline:#BFE3D2;--warn:#8A6D00;--warnbg:#FFF7E6;
+--bad:#A81E1E;--badbg:#FDECEC}
+*{box-sizing:border-box}
+body{margin:0;background:#F2F5F9;color:var(--ink);
+font-family:Manrope,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:13px;line-height:1.55}
+a{color:inherit}
+.wrap{max-width:1420px;margin:0 auto;padding:22px 34px 90px}
+.home{font-size:11.5px;color:var(--mut);text-decoration:none;letter-spacing:.02em}
+.head{display:flex;align-items:baseline;justify-content:space-between;gap:20px;
+margin:14px 0 6px;padding-bottom:16px;border-bottom:2px solid var(--ink)}
+.mark{font-size:13px;font-weight:800;letter-spacing:.16em;
+background:linear-gradient(90deg,var(--brand),var(--accent));-webkit-background-clip:text;
+background-clip:text;color:transparent}
+h1{font-size:19px;font-weight:800;letter-spacing:-.015em;margin:0}
+.meta{font-size:11px;color:var(--mut);font-family:'IBM Plex Mono',ui-monospace,monospace;line-height:1.7}
+.lede{font-size:12.5px;color:var(--mut);max-width:82ch;margin:16px 0 0;line-height:1.65}
+.grp{font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:11px;font-weight:600;
+letter-spacing:.14em;color:var(--dim);text-transform:uppercase;margin:52px 0 18px;
+padding-bottom:9px;border-bottom:1px solid var(--line)}
+.stack{display:flex;flex-direction:column;gap:52px}
+.scr{display:flex;flex-direction:column;gap:13px;scroll-margin-top:24px}
+.hdr{display:flex;align-items:baseline;gap:9px;flex-wrap:wrap}
+.code{font-family:'IBM Plex Mono',monospace;font-size:12px;color:#8494A8}
+.ttl{font-size:16.5px;font-weight:800;letter-spacing:-.015em}
+.pur{font-size:12px;color:#6B7280;margin-top:3px;max-width:96ch}
+.pill{font-size:9px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;
+padding:2px 7px;border-radius:5px;background:#EEF3FA;color:#4A5A70}
+.pill.named{background:var(--warnbg);color:var(--warn)}
+.pill.off{background:var(--okbg);color:var(--ok)}
+
+/* the frame — 1280x700, the packs' dimension */
+.frame{width:1280px;height:700px;display:flex;background:var(--wash);border:1px solid var(--edge);
+border-radius:14px;overflow:hidden;box-shadow:0 16px 38px rgba(12,35,64,.09)}
+.rail{flex:none;width:180px;background:var(--rail);display:flex;flex-direction:column;position:relative}
+.rail::before{content:'';position:absolute;inset:0;
+background:radial-gradient(300px 200px at 0% 4%,rgba(0,184,255,.20),transparent 70%);pointer-events:none}
+.brand{position:relative;padding:15px 14px 13px;border-bottom:1px solid rgba(255,255,255,.08)}
+.brand b{display:block;font-size:14px;font-weight:800;letter-spacing:.1em;
+background:linear-gradient(90deg,#4DA3FF,var(--accent));-webkit-background-clip:text;
+background-clip:text;color:transparent}
+.brand span{display:block;font-size:9.5px;color:#7FA3C9;margin-top:5px}
+.nav{position:relative;display:flex;flex-direction:column;gap:2px;padding:11px 9px}
+.nav i{display:block;padding:8px 10px;border-radius:9px;font-size:11.5px;font-style:normal;color:#8FA8C4}
+.nav i.on{background:linear-gradient(90deg,rgba(13,110,253,.30),rgba(0,184,255,.10));
+color:#fff;font-weight:700}
+.body{flex:1;display:flex;flex-direction:column;min-width:0}
+.top{flex:none;height:54px;display:flex;align-items:center;gap:12px;padding:0 18px;
+background:var(--paper);border-bottom:1px solid var(--line)}
+.top h2{font-size:13.5px;font-weight:800;letter-spacing:-.01em;margin:0}
+.top small{display:block;font-size:10px;color:var(--dim);font-weight:500}
+.acts{margin-left:auto;display:flex;gap:6px}
+.chip{height:32px;display:flex;align-items:center;gap:6px;padding:0 11px;border:1px solid var(--edge);
+border-radius:8px;font-size:11px;font-weight:700;color:var(--mut);background:var(--paper)}
+.chip.live{background:var(--okbg);border-color:var(--okline);color:var(--ok)}
+.chip.live::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--ok)}
+.chip.cta{background:var(--brand);border-color:var(--brand);color:#fff}
+.canvas{flex:1;display:flex;flex-direction:column;gap:12px;padding:14px 16px;min-height:0;overflow:hidden}
+.kpis{flex:none;display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.kpi{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:11px 13px;
+display:flex;flex-direction:column;gap:4px}
+.kpi b{font-size:9.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--dim)}
+.kpi span{font-family:'IBM Plex Mono',monospace;font-size:19px;font-weight:600;letter-spacing:-.02em}
+.panel{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:12px 14px;
+display:flex;flex-direction:column;gap:8px;min-height:0}
+.panel > b{font-size:11px;font-weight:800;letter-spacing:-.005em}
+.panel .why{font-size:10px;color:#7C8899;font-style:italic;line-height:1.5}
+.kind{font-family:'IBM Plex Mono',monospace;font-size:9px;color:var(--dim);
+letter-spacing:.06em;text-transform:uppercase}
+.rows{display:flex;flex-direction:column;gap:6px}
+.row{display:grid;grid-template-columns:1.6fr 1fr 1fr .7fr;gap:10px;align-items:center;
+padding:7px 0;border-top:1px solid #F0F3F8}
+.row:first-child{border-top:0;font-size:9.5px;font-weight:700;letter-spacing:.06em;
+text-transform:uppercase;color:var(--dim)}
+.bar{height:7px;border-radius:4px;background:#EDF1F7}
+.bar i{display:block;height:100%;border-radius:4px;
+background:linear-gradient(90deg,var(--brand),var(--accent))}
+.side{flex:none;width:250px;display:flex;flex-direction:column;gap:10px}
+.two{flex:1;display:flex;gap:12px;min-height:0}
+.grow{flex:1;min-width:0}
+.strip{flex:none;height:26px;display:flex;align-items:center;gap:8px;padding:0 18px;
+background:var(--warnbg);color:var(--warn);font-size:10px;font-weight:700;
+letter-spacing:.05em;text-transform:uppercase;border-bottom:1px solid #F0E0B8}
+.dark .frame{background:#0A1524}
+.dark .top{background:#0E2A4C;border-color:#1E3A5F;color:#E6F0FA}
+.dark .top small{color:#7FA3C9}
+.dark .canvas{background:#0A1524}
+.dark .kpi,.dark .panel{background:#0E2A4C;border-color:#1E3A5F;color:#E6F0FA}
+.dark .row{border-color:#193353}
+.dark .chip{background:#0E2A4C;border-color:#1E3A5F;color:#9FC0E0}
+
+.foot{font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:10px;line-height:1.85;color:#7C8899}
+.foot b{color:#4A5566;font-weight:600}
+.foot .warn{color:var(--warn)}
+.bottom{margin-top:64px;padding-top:16px;border-top:1px solid var(--line);
+display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
+</style></head><body>
+<div class="wrap">
+  <a class="home" href="TICVAI%20Wireframe%20Boards.dc.html">&larr; All boards</a>
+  <div class="head">
+    <div><span class="mark">TICVAI</span>
+      <h1>P09 · TICVAI Web — Platform Console <span style="font-weight:600;color:#6B7280">(37 screens)</span></h1></div>
+    <div class="meta">platformAdmin · web · ticvai-web</div>
+  </div>
+  <p class="lede"></p>
+  <div class="grp">01 — TODO · 36 screens</div><div class="stack">
+      <div id="adm-001" class="scr">
+        <div>
+          <div class="hdr"><span class="code">ADM-001</span>
+            <span class="ttl">Platform Login / MFA</span></div>
+          <div class="pur">Get someone into the app, fast, on a device that may be shared.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>TICVAI</b><span>TODO</span></div><nav class="nav"><i class="">Dashboard</i><i class="on">TODO</i><i class="">Settings</i><i class="">Reports</i><i class="">People</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Platform Login / MFA</h2>
+                <small>TICVAI Web · wave 1 · compact</small></div>
+              <div class="acts"><div class="chip">This venue &#9662;</div><div class="chip live">Live</div><div class="chip cta">Primary action</div></div>
+            </div>
+            
+            <div class="canvas">
+              <div class="kpis"><div class="kpi"><b>Total</b><span>1,248</span></div><div class="kpi"><b>Active</b><span>978</span></div><div class="kpi"><b>Attention</b><span>142</span></div><div class="kpi"><b>Offline</b><span>12</span></div></div>
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">searchField</span><div class="chip">Search</div></div><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; login · forceLogout · getCurrentSession · getGuestSession +4</div>
+          <div><b>STATES</b> &middot; <span class="">loading · emptyFirstRun · emptyNoResults · emptyNoAccess · error</span></div>
+          <div><b>ARRIVES WITH</b> &middot; sessionId&larr;session</div>
+          <div><b>GOES TO</b> &middot; ADM-002 · ADM-003 · ADM-004</div>
+        </div>
+      </div>
+      <div id="adm-002" class="scr">
+        <div>
+          <div class="hdr"><span class="code">ADM-002</span>
+            <span class="ttl">Platform Dashboard</span></div>
+          <div class="pur">The screen this app sits on. Everything else is entered from here and returns to it.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>TICVAI</b><span>TODO</span></div><nav class="nav"><i class="">Dashboard</i><i class="on">TODO</i><i class="">Settings</i><i class="">Reports</i><i class="">People</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Platform Dashboard</h2>
+                <small>TICVAI Web · wave 1 · compact</small></div>
+              <div class="acts"><div class="chip">This venue &#9662;</div><div class="chip live">Live</div><div class="chip cta">Primary action</div></div>
+            </div>
+            
+            <div class="canvas">
+              <div class="kpis"><div class="kpi"><b>Total</b><span>1,248</span></div><div class="kpi"><b>Active</b><span>978</span></div><div class="kpi"><b>Attention</b><span>142</span></div><div class="kpi"><b>Offline</b><span>12</span></div></div>
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">metricTile</span><div class="rows"><div class="bar"><i style="width:78%"></i></div><div class="bar"><i style="width:54%"></i></div><div class="bar"><i style="width:92%"></i></div><div class="bar"><i style="width:36%"></i></div><div class="bar"><i style="width:61%"></i></div></div></div><div class="panel"><span class="kind">chart</span><div class="rows"><div class="bar"><i style="width:78%"></i></div><div class="bar"><i style="width:54%"></i></div><div class="bar"><i style="width:92%"></i></div><div class="bar"><i style="width:36%"></i></div><div class="bar"><i style="width:61%"></i></div></div></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; listTenants · getEntitlementUsage · getSsoConfig · getTenant +2</div>
+          <div><b>STATES</b> &middot; <span class="">loading · emptyFirstRun · emptyNoAccess · error</span></div>
+          <div><b>ARRIVES WITH</b> &middot; tenantId&larr;session</div>
+          <div><b>GOES TO</b> &middot; entry point · ADM-001 · ADM-003 · ADM-004 · ADM-005 · ADM-006</div>
+        </div>
+      </div>
+      <div id="adm-003" class="scr">
+        <div>
+          <div class="hdr"><span class="code">ADM-003</span>
+            <span class="ttl">Cross-Tenant Health Dashboard</span></div>
+          <div class="pur">The screen this app sits on. Everything else is entered from here and returns to it.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>TICVAI</b><span>TODO</span></div><nav class="nav"><i class="">Dashboard</i><i class="on">TODO</i><i class="">Settings</i><i class="">Reports</i><i class="">People</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Cross-Tenant Health Dashboard</h2>
+                <small>TICVAI Web · wave 2 · compact</small></div>
+              <div class="acts"><div class="chip">This venue &#9662;</div><div class="chip live">Live</div><div class="chip cta">Primary action</div></div>
+            </div>
+            
+            <div class="canvas">
+              <div class="kpis"><div class="kpi"><b>Total</b><span>1,248</span></div><div class="kpi"><b>Active</b><span>978</span></div><div class="kpi"><b>Attention</b><span>142</span></div><div class="kpi"><b>Offline</b><span>12</span></div></div>
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">metricTile</span><div class="rows"><div class="bar"><i style="width:78%"></i></div><div class="bar"><i style="width:54%"></i></div><div class="bar"><i style="width:92%"></i></div><div class="bar"><i style="width:36%"></i></div><div class="bar"><i style="width:61%"></i></div></div></div><div class="panel"><span class="kind">chart</span><div class="rows"><div class="bar"><i style="width:78%"></i></div><div class="bar"><i style="width:54%"></i></div><div class="bar"><i style="width:92%"></i></div><div class="bar"><i style="width:36%"></i></div><div class="bar"><i style="width:61%"></i></div></div></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; getCellHealth · cancelDecommission · decommissionCell · getCell +6</div>
+          <div><b>STATES</b> &middot; <span class="">loading · emptyFirstRun · emptyNoAccess · error</span></div>
+          <div><b>ARRIVES WITH</b> &middot; cellId&larr;deepLink, rightId&larr;deepLink</div>
+          <div><b>GOES TO</b> &middot; ADM-001 · ADM-002 · ADM-004</div>
+        </div>
+      </div>
+      <div id="adm-004" class="scr">
+        <div>
+          <div class="hdr"><span class="code">ADM-004</span>
+            <span class="ttl">Platform Audit Log</span></div>
+          <div class="pur">Find platform audit log for this venue.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>TICVAI</b><span>TODO</span></div><nav class="nav"><i class="">Dashboard</i><i class="on">TODO</i><i class="">Settings</i><i class="">Reports</i><i class="">People</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Platform Audit Log</h2>
+                <small>TICVAI Web · wave 2 · compact</small></div>
+              <div class="acts"><div class="chip">This venue &#9662;</div><div class="chip live">Live</div><div class="chip cta">Primary action</div></div>
+            </div>
+            
+            <div class="canvas">
+              <div class="kpis"><div class="kpi"><b>Total</b><span>1,248</span></div><div class="kpi"><b>Active</b><span>978</span></div><div class="kpi"><b>Attention</b><span>142</span></div><div class="kpi"><b>Offline</b><span>12</span></div></div>
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">searchField</span><div class="chip">Search</div></div><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; listAiInteractions</div>
+          <div><b>STATES</b> &middot; <span class="">loading · emptyFirstRun · emptyNoResults · emptyNoAccess · error</span></div>
+          
+          <div><b>GOES TO</b> &middot; ADM-001 · ADM-002 · ADM-003</div>
+        </div>
+      </div>
+      <div id="adm-005" class="scr">
+        <div>
+          <div class="hdr"><span class="code">ADM-005</span>
+            <span class="ttl">Tenant Directory</span></div>
+          <div class="pur">Find the right one quickly, and act on it without opening it.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>TICVAI</b><span>TODO</span></div><nav class="nav"><i class="">Dashboard</i><i class="on">TODO</i><i class="">Settings</i><i class="">Reports</i><i class="">People</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Tenant Directory</h2>
+                <small>TICVAI Web · wave 1 · compact</small></div>
+              <div class="acts"><div class="chip">This venue &#9662;</div><div class="chip live">Live</div><div class="chip cta">Primary action</div></div>
+            </div>
+            
+            <div class="canvas">
+              <div class="kpis"><div class="kpi"><b>Total</b><span>1,248</span></div><div class="kpi"><b>Active</b><span>978</span></div><div class="kpi"><b>Attention</b><span>142</span></div><div class="kpi"><b>Offline</b><span>12</span></div></div>
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">searchField</span><div class="chip">Search</div></div><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; listTenants · addLicenceAddOn · createTenant · getEntitlementUsage +11</div>
+          <div><b>STATES</b> &middot; <span class="">loading · emptyFirstRun · emptyNoResults · emptyNoAccess · error</span></div>
+          <div><b>ARRIVES WITH</b> &middot; tenantId&larr;ADM-002</div>
+          <div><b>GOES TO</b> &middot; ADM-001 · ADM-002 · ADM-003 · ADM-012</div>
+        </div>
+      </div>
+      <div id="adm-006" class="scr">
+        <div>
+          <div class="hdr"><span class="code">ADM-006</span>
+            <span class="ttl">Tenant Hierarchy Explorer</span></div>
+          <div class="pur">See tenant hierarchy explorer for this venue.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>TICVAI</b><span>TODO</span></div><nav class="nav"><i class="">Dashboard</i><i class="on">TODO</i><i class="">Settings</i><i class="">Reports</i><i class="">People</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Tenant Hierarchy Explorer</h2>
+                <small>TICVAI Web · wave 1 · compact</small></div>
+              <div class="acts"><div class="chip">This venue &#9662;</div><div class="chip live">Live</div><div class="chip cta">Primary action</div></div>
+            </div>
+            
+            <div class="canvas">
+              <div class="kpis"><div class="kpi"><b>Total</b><span>1,248</span></div><div class="kpi"><b>Active</b><span>978</span></div><div class="kpi"><b>Attention</b><span>142</span></div><div class="kpi"><b>Offline</b><span>12</span></div></div>
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">searchField</span><div class="chip">Search</div></div><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; getSsoConfig · listTenants · getEntitlementUsage · getTenant +5</div>
+          <div><b>STATES</b> &middot; <span class="">loading · emptyFirstRun · emptyNoResults · emptyNoAccess · error</span></div>
+          <div><b>ARRIVES WITH</b> &middot; tenantId&larr;ADM-002</div>
+          <div><b>GOES TO</b> &middot; ADM-001 · ADM-002 · ADM-003 · ADM-007</div>
+        </div>
+      </div>
+      <div id="adm-007" class="scr">
+        <div>
+          <div class="hdr"><span class="code">ADM-007</span>
+            <span class="ttl">Module &amp; Feature Entitlement</span></div>
+          <div class="pur">See module &amp; feature entitlement for this venue.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>TICVAI</b><span>TODO</span></div><nav class="nav"><i class="">Dashboard</i><i class="on">TODO</i><i class="">Settings</i><i class="">Reports</i><i class="">People</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Module &amp; Feature Entitlement</h2>
+                <small>TICVAI Web · wave 1 · compact</small></div>
+              <div class="acts"><div class="chip">This venue &#9662;</div><div class="chip live">Live</div><div class="chip cta">Primary action</div></div>
+            </div>
+            
+            <div class="canvas">
+              <div class="kpis"><div class="kpi"><b>Total</b><span>1,248</span></div><div class="kpi"><b>Active</b><span>978</span></div><div class="kpi"><b>Attention</b><span>142</span></div><div class="kpi"><b>Offline</b><span>12</span></div></div>
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">detailPanel</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">Implied by the detail template — not declared on the screen.</span></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; getTenantLicences · addLicenceAddOn · getEntitlementUsage · getSsoConfig +5</div>
+          <div><b>STATES</b> &middot; <span class="">loading · emptyFirstRun · emptyNoAccess · error</span></div>
+          <div><b>ARRIVES WITH</b> &middot; tenantId&larr;ADM-002</div>
+          <div><b>GOES TO</b> &middot; ADM-001 · ADM-002 · ADM-003</div>
+        </div>
+      </div>
+      <div id="adm-008" class="scr">
+        <div>
+          <div class="hdr"><span class="code">ADM-008</span>
+            <span class="ttl">Subscription &amp; Plan Management</span></div>
+          <div class="pur">Find subscription &amp; plan management for this venue.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>TICVAI</b><span>TODO</span></div><nav class="nav"><i class="">Dashboard</i><i class="on">TODO</i><i class="">Settings</i><i class="">Reports</i><i class="">People</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Subscription &amp; Plan Management</h2>
+                <small>TICVAI Web · wave 1 · compact</small></div>
+              <div class="acts"><div class="chip">This venue &#9662;</div><div class="chip live">Live</div><div class="chip cta">Primary action</div></div>
+            </div>
+            
+            <div class="canvas">
+              <div class="kpis"><div class="kpi"><b>Total</b><span>1,248</span></div><div class="kpi"><b>Active</b><span>978</span></div><div class="kpi"><b>Attention</b><span>142</span></div><div class="kpi"><b>Offline</b><span>12</span></div></div>
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">textField</span><div class="chip">Search</div></div><div class="panel"><span class="kind">primaryButton</span><div class="chip cta">primaryButton</div></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; listPlans · setSubscription · createPlan · createPlanVersion +15</div>
+          <div><b>STATES</b> &middot; <span class="">loading · emptyFirstRun · emptyNoAccess · error</span></div>
+          <div><b>ARRIVES WITH</b> &middot; agreementId&larr;deepLink, planId&larr;deepLink, tenantId&larr;ADM-002</div>
+          <div><b>GOES TO</b> &middot; ADM-001 · ADM-002 · ADM-003</div>
+        </div>
+      </div>
+      <div id="adm-009" class="scr">
+        <div>
+          <div class="hdr"><span class="code">ADM-009</span>
+            <span class="ttl">Tenant Billing &amp; Invoicing</span></div>
+          <div class="pur">Find tenant billing &amp; invoicing for this venue.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>TICVAI</b><span>TODO</span></div><nav class="nav"><i class="">Dashboard</i><i class="on">TODO</i><i class="">Settings</i><i class="">Reports</i><i class="">People</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Tenant Billing &amp; Invoicing</h2>
+                <small>TICVAI Web · wave 2 · compact</small></div>
+              <div class="acts"><div class="chip">This venue &#9662;</div><div class="chip live">Live</div><div class="chip cta">Primary action</div></div>
+            </div>
+            
+            <div class="canvas">
+              <div class="kpis"><div class="kpi"><b>Total</b><span>1,248</span></div><div class="kpi"><b>Active</b><span>978</span></div><div class="kpi"><b>Attention</b><span>142</span></div><div class="kpi"><b>Offline</b><span>12</span></div></div>
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">detailPanel</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">Implied by the detail template — not declared on the screen.</span></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; listSubscriptionInvoices · generateInvoice · getEntitlementUsage · getSsoConfig +5</div>
+          <div><b>STATES</b> &middot; <span class="">loading · emptyFirstRun · emptyNoAccess · error</span></div>
+          <div><b>ARRIVES WITH</b> &middot; tenantId&larr;ADM-002</div>
+          <div><b>GOES TO</b> &middot; ADM-001 · ADM-002 · ADM-003</div>
+        </div>
+      </div>
+      <div id="adm-010" class="scr">
+        <div>
+          <div class="hdr"><span class="code">ADM-010</span>
+            <span class="ttl">Usage Metering</span></div>
+          <div class="pur">See usage metering for this venue.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>TICVAI</b><span>TODO</span></div><nav class="nav"><i class="">Dashboard</i><i class="on">TODO</i><i class="">Settings</i><i class="">Reports</i><i class="">People</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Usage Metering</h2>
+                <small>TICVAI Web · wave 2 · compact</small></div>
+              <div class="acts"><div class="chip">This venue &#9662;</div><div class="chip live">Live</div><div class="chip cta">Primary action</div></div>
+            </div>
+            
+            <div class="canvas">
+              <div class="kpis"><div class="kpi"><b>Total</b><span>1,248</span></div><div class="kpi"><b>Active</b><span>978</span></div><div class="kpi"><b>Attention</b><span>142</span></div><div class="kpi"><b>Offline</b><span>12</span></div></div>
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">detailPanel</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">Implied by the detail template — not declared on the screen.</span></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; getUsageMetering · getEntitlementUsage · getSsoConfig · getTenant +3</div>
+          <div><b>STATES</b> &middot; <span class="">loading · emptyFirstRun · emptyNoAccess · error</span></div>
+          <div><b>ARRIVES WITH</b> &middot; tenantId&larr;ADM-002</div>
+          <div><b>GOES TO</b> &middot; ADM-001 · ADM-002 · ADM-003</div>
+        </div>
+      </div>
+      <div id="adm-011" class="scr">
+        <div>
+          <div class="hdr"><span class="code">ADM-011</span>
+            <span class="ttl">Licence &amp; Seat Management</span></div>
+          <div class="pur">See licence &amp; seat management for this venue.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>TICVAI</b><span>TODO</span></div><nav class="nav"><i class="">Dashboard</i><i class="on">TODO</i><i class="">Settings</i><i class="">Reports</i><i class="">People</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Licence &amp; Seat Management</h2>
+                <small>TICVAI Web · wave 2 · compact</small></div>
+              <div class="acts"><div class="chip">This venue &#9662;</div><div class="chip live">Live</div><div class="chip cta">Primary action</div></div>
+            </div>
+            
+            <div class="canvas">
+              <div class="kpis"><div class="kpi"><b>Total</b><span>1,248</span></div><div class="kpi"><b>Active</b><span>978</span></div><div class="kpi"><b>Attention</b><span>142</span></div><div class="kpi"><b>Offline</b><span>12</span></div></div>
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">textField</span><div class="chip">Search</div></div><div class="panel"><span class="kind">primaryButton</span><div class="chip cta">primaryButton</div></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; getEntitlementUsage · addLicenceAddOn · getSsoConfig · getSubscription +7</div>
+          <div><b>STATES</b> &middot; <span class="">loading · emptyFirstRun · emptyNoAccess · error</span></div>
+          <div><b>ARRIVES WITH</b> &middot; tenantId&larr;ADM-002</div>
+          <div><b>GOES TO</b> &middot; ADM-001 · ADM-002 · ADM-003</div>
+        </div>
+      </div>
+      <div id="adm-012" class="scr">
+        <div>
+          <div class="hdr"><span class="code">ADM-012</span>
+            <span class="ttl">Tenant Isolation &amp; Resource Pool</span></div>
+          <div class="pur">Work with tenant isolation &amp; resource pool for this venue.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>TICVAI</b><span>TODO</span></div><nav class="nav"><i class="">Dashboard</i><i class="on">TODO</i><i class="">Settings</i><i class="">Reports</i><i class="">People</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Tenant Isolation &amp; Resource Pool</h2>
+                <small>TICVAI Web · wave 1 · compact</small></div>
+              <div class="acts"><div class="chip">This venue &#9662;</div><div class="chip live">Live</div><div class="chip cta">Primary action</div></div>
+            </div>
+            
+            <div class="canvas">
+              <div class="kpis"><div class="kpi"><b>Total</b><span>1,248</span></div><div class="kpi"><b>Active</b><span>978</span></div><div class="kpi"><b>Attention</b><span>142</span></div><div class="kpi"><b>Offline</b><span>12</span></div></div>
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">detailPanel</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">Implied by the detail template — not declared on the screen.</span></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; provisionCell · getEntitlementUsage · getSsoConfig · getTenant +4</div>
+          <div><b>STATES</b> &middot; <span class="">loading · emptyFirstRun · emptyNoAccess · error</span></div>
+          <div><b>ARRIVES WITH</b> &middot; cellId&larr;deepLink, tenantId&larr;ADM-002</div>
+          <div><b>GOES TO</b> &middot; ADM-001 · ADM-002 · ADM-003 · ADM-006</div>
+        </div>
+      </div>
+      <div id="adm-013" class="scr">
+        <div>
+          <div class="hdr"><span class="code">ADM-013</span>
+            <span class="ttl">Tenant Performance Monitor</span></div>
+          <div class="pur">See tenant performance monitor for this venue.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>TICVAI</b><span>TODO</span></div><nav class="nav"><i class="">Dashboard</i><i class="on">TODO</i><i class="">Settings</i><i class="">Reports</i><i class="">People</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Tenant Performance Monitor</h2>
+                <small>TICVAI Web · wave 2 · compact</small></div>
+              <div class="acts"><div class="chip">This venue &#9662;</div><div class="chip live">Live</div><div class="chip cta">Primary action</div></div>
+            </div>
+            
+            <div class="canvas">
+              <div class="kpis"><div class="kpi"><b>Total</b><span>1,248</span></div><div class="kpi"><b>Active</b><span>978</span></div><div class="kpi"><b>Attention</b><span>142</span></div><div class="kpi"><b>Offline</b><span>12</span></div></div>
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">metricTile</span><div class="rows"><div class="bar"><i style="width:78%"></i></div><div class="bar"><i style="width:54%"></i></div><div class="bar"><i style="width:92%"></i></div><div class="bar"><i style="width:36%"></i></div><div class="bar"><i style="width:61%"></i></div></div></div><div class="panel"><span class="kind">chart</span><div class="rows"><div class="bar"><i style="width:78%"></i></div><div class="bar"><i style="width:54%"></i></div><div class="bar"><i style="width:92%"></i></div><div class="bar"><i style="width:36%"></i></div><div class="bar"><i style="width:61%"></i></div></div></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; getCellHealth · cancelDecommission · decommissionCell · getCell +3</div>
+          <div><b>STATES</b> &middot; <span class="">loading · emptyFirstRun · emptyNoAccess · error</span></div>
+          <div><b>ARRIVES WITH</b> &middot; cellId&larr;deepLink</div>
+          <div><b>GOES TO</b> &middot; ADM-001 · ADM-002 · ADM-003</div>
+        </div>
+      </div>
+      <div id="adm-014" class="scr">
+        <div>
+          <div class="hdr"><span class="code">ADM-014</span>
+            <span class="ttl">Auto-Scaling Configuration</span></div>
+          <div class="pur">Change how auto-scaling behaves here, and see which level the current value came from.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>TICVAI</b><span>TODO</span></div><nav class="nav"><i class="">Dashboard</i><i class="on">TODO</i><i class="">Settings</i><i class="">Reports</i><i class="">People</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Auto-Scaling Configuration</h2>
+                <small>TICVAI Web · wave 3 · compact</small></div>
+              <div class="acts"><div class="chip">This venue &#9662;</div><div class="chip live">Live</div><div class="chip cta">Primary action</div></div>
+            </div>
+            
+            <div class="canvas">
+              <div class="kpis"><div class="kpi"><b>Total</b><span>1,248</span></div><div class="kpi"><b>Active</b><span>978</span></div><div class="kpi"><b>Attention</b><span>142</span></div><div class="kpi"><b>Offline</b><span>12</span></div></div>
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">textField</span><div class="chip">Search</div></div><div class="panel"><span class="kind">primaryButton</span><div class="chip cta">primaryButton</div></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; getCellCapacity · cancelDecommission · decommissionCell · getCell +3</div>
+          <div><b>STATES</b> &middot; <span class="">loading · emptyFirstRun · emptyNoAccess · error</span></div>
+          <div><b>ARRIVES WITH</b> &middot; cellId&larr;deepLink</div>
+          <div><b>GOES TO</b> &middot; ADM-001 · ADM-002 · ADM-003</div>
+        </div>
+      </div>
+      <div id="adm-015" class="scr">
+        <div>
+          <div class="hdr"><span class="code">ADM-015</span>
+            <span class="ttl">API Rate Limit &amp; Quota Management</span></div>
+          <div class="pur">See api rate limit &amp; quota management for this venue.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>TICVAI</b><span>TODO</span></div><nav class="nav"><i class="">Dashboard</i><i class="on">TODO</i><i class="">Settings</i><i class="">Reports</i><i class="">People</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>API Rate Limit &amp; Quota Management</h2>
+                <small>TICVAI Web · wave 3 · compact</small></div>
+              <div class="acts"><div class="chip">This venue &#9662;</div><div class="chip live">Live</div><div class="chip cta">Primary action</div></div>
+            </div>
+            
+            <div class="canvas">
+              <div class="kpis"><div class="kpi"><b>Total</b><span>1,248</span></div><div class="kpi"><b>Active</b><span>978</span></div><div class="kpi"><b>Attention</b><span>142</span></div><div class="kpi"><b>Offline</b><span>12</span></div></div>
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">textField</span><div class="chip">Search</div></div><div class="panel"><span class="kind">primaryButton</span><div class="chip cta">primaryButton</div></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; getTenantLicences · getEntitlementUsage · getSsoConfig · getTenant +5</div>
+          <div><b>STATES</b> &middot; <span class="">loading · emptyFirstRun · emptyNoAccess · error</span></div>
+          <div><b>ARRIVES WITH</b> &middot; tenantId&larr;ADM-002</div>
+          <div><b>GOES TO</b> &middot; ADM-001 · ADM-002 · ADM-003</div>
+        </div>
+      </div>
+      <div id="adm-016" class="scr">
+        <div>
+          <div class="hdr"><span class="code">ADM-016</span>
+            <span class="ttl">White-Label Branding Management</span></div>
+          <div class="pur">See white-label branding management for this venue.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>TICVAI</b><span>TODO</span></div><nav class="nav"><i class="">Dashboard</i><i class="on">TODO</i><i class="">Settings</i><i class="">Reports</i><i class="">People</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>White-Label Branding Management</h2>
+                <small>TICVAI Web · wave 2 · compact</small></div>
+              <div class="acts"><div class="chip">This venue &#9662;</div><div class="chip live">Live</div><div class="chip cta">Primary action</div></div>
+            </div>
+            
+            <div class="canvas">
+              <div class="kpis"><div class="kpi"><b>Total</b><span>1,248</span></div><div class="kpi"><b>Active</b><span>978</span></div><div class="kpi"><b>Attention</b><span>142</span></div><div class="kpi"><b>Offline</b><span>12</span></div></div>
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">textField</span><div class="chip">Search</div></div><div class="panel"><span class="kind">primaryButton</span><div class="chip cta">primaryButton</div></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; createPreview · diffConfigVersion · getAppIcons · getBrandIdentity +7</div>
+          <div><b>STATES</b> &middot; <span class="">loading · emptyFirstRun · emptyNoAccess · error</span></div>
+          <div><b>ARRIVES WITH</b> &middot; bannerId&larr;deepLink, pageId&larr;deepLink, policyKind&larr;deepLink</div>
+          <div><b>GOES TO</b> &middot; ADM-001 · ADM-002 · ADM-003</div>
+        </div>
+      </div>
+      <div id="adm-017" class="scr">
+        <div>
+          <div class="hdr"><span class="code">ADM-017</span>
+            <span class="ttl">Domain &amp; Certificate Management</span></div>
+          <div class="pur">See domain &amp; certificate management for this venue.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>TICVAI</b><span>TODO</span></div><nav class="nav"><i class="">Dashboard</i><i class="on">TODO</i><i class="">Settings</i><i class="">Reports</i><i class="">People</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Domain &amp; Certificate Management</h2>
+                <small>TICVAI Web · wave 2 · compact</small></div>
+              <div class="acts"><div class="chip">This venue &#9662;</div><div class="chip live">Live</div><div class="chip cta">Primary action</div></div>
+            </div>
+            
+            <div class="canvas">
+              <div class="kpis"><div class="kpi"><b>Total</b><span>1,248</span></div><div class="kpi"><b>Active</b><span>978</span></div><div class="kpi"><b>Attention</b><span>142</span></div><div class="kpi"><b>Offline</b><span>12</span></div></div>
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">textField</span><div class="chip">Search</div></div><div class="panel"><span class="kind">primaryButton</span><div class="chip cta">primaryButton</div></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; listCustomDomains · claimCustomDomain · verifyCustomDomain · releaseCustomDomain</div>
+          <div><b>STATES</b> &middot; <span class="">loading · emptyFirstRun · emptyNoAccess · error</span></div>
+          <div><b>ARRIVES WITH</b> &middot; bannerId&larr;deepLink, pageId&larr;deepLink, policyKind&larr;deepLink</div>
+          <div><b>GOES TO</b> &middot; ADM-001 · ADM-002 · ADM-003</div>
+        </div>
+      </div>
+      <div id="adm-018" class="scr">
+        <div>
+          <div class="hdr"><span class="code">ADM-018</span>
+            <span class="ttl">Localisation &amp; Language Pack</span></div>
+          <div class="pur">Configure localisation &amp; language pack for this venue.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>TICVAI</b><span>TODO</span></div><nav class="nav"><i class="">Dashboard</i><i class="on">TODO</i><i class="">Settings</i><i class="">Reports</i><i class="">People</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Localisation &amp; Language Pack</h2>
+                <small>TICVAI Web · wave 2 · compact</small></div>
+              <div class="acts"><div class="chip">This venue &#9662;</div><div class="chip live">Live</div><div class="chip cta">Primary action</div></div>
+            </div>
+            
+            <div class="canvas">
+              <div class="kpis"><div class="kpi"><b>Total</b><span>1,248</span></div><div class="kpi"><b>Active</b><span>978</span></div><div class="kpi"><b>Attention</b><span>142</span></div><div class="kpi"><b>Offline</b><span>12</span></div></div>
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">detailPanel</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">Implied by the detail template — not declared on the screen.</span></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; setLanguages · listFaqs · listPolicies · setFaqs +1</div>
+          <div><b>STATES</b> &middot; <span class="">loading · emptyFirstRun · emptyNoAccess · error</span></div>
+          <div><b>ARRIVES WITH</b> &middot; bannerId&larr;deepLink, pageId&larr;deepLink, policyKind&larr;deepLink</div>
+          <div><b>GOES TO</b> &middot; ADM-001 · ADM-002 · ADM-003</div>
+        </div>
+      </div>
+      <div id="adm-019" class="scr">
+        <div>
+          <div class="hdr"><span class="code">ADM-019</span>
+            <span class="ttl">Global Configuration &amp; Defaults</span></div>
+          <div class="pur">Change how global behaves here, and see which level the current value came from.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>TICVAI</b><span>TODO</span></div><nav class="nav"><i class="">Dashboard</i><i class="on">TODO</i><i class="">Settings</i><i class="">Reports</i><i class="">People</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Global Configuration &amp; Defaults</h2>
+                <small>TICVAI Web · wave 2 · compact</small></div>
+              <div class="acts"><div class="chip">This venue &#9662;</div><div class="chip live">Live</div><div class="chip cta">Primary action</div></div>
+            </div>
+            
+            <div class="canvas">
+              <div class="kpis"><div class="kpi"><b>Total</b><span>1,248</span></div><div class="kpi"><b>Active</b><span>978</span></div><div class="kpi"><b>Attention</b><span>142</span></div><div class="kpi"><b>Offline</b><span>12</span></div></div>
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">textField</span><div class="chip">Search</div></div><div class="panel"><span class="kind">primaryButton</span><div class="chip cta">primaryButton</div></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; listPlans · createPlan · createPlanVersion · getPlan</div>
+          <div><b>STATES</b> &middot; <span class="">loading · emptyFirstRun · emptyNoAccess · error</span></div>
+          <div><b>ARRIVES WITH</b> &middot; planId&larr;deepLink</div>
+          <div><b>GOES TO</b> &middot; ADM-001 · ADM-002 · ADM-003</div>
+        </div>
+      </div>
+      <div id="adm-020" class="scr">
+        <div>
+          <div class="hdr"><span class="code">ADM-020</span>
+            <span class="ttl">Platform User Directory</span></div>
+          <div class="pur">Find the right one quickly, and act on it without opening it.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>TICVAI</b><span>TODO</span></div><nav class="nav"><i class="">Dashboard</i><i class="on">TODO</i><i class="">Settings</i><i class="">Reports</i><i class="">People</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Platform User Directory</h2>
+                <small>TICVAI Web · wave 1 · compact</small></div>
+              <div class="acts"><div class="chip">This venue &#9662;</div><div class="chip live">Live</div><div class="chip cta">Primary action</div></div>
+            </div>
+            
+            <div class="canvas">
+              <div class="kpis"><div class="kpi"><b>Total</b><span>1,248</span></div><div class="kpi"><b>Active</b><span>978</span></div><div class="kpi"><b>Attention</b><span>142</span></div><div class="kpi"><b>Offline</b><span>12</span></div></div>
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">searchField</span><div class="chip">Search</div></div><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; listPrincipals · createPrincipal · getPrincipal · updatePrincipal</div>
+          <div><b>STATES</b> &middot; <span class="">loading · emptyFirstRun · emptyNoResults · emptyNoAccess · error</span></div>
+          <div><b>ARRIVES WITH</b> &middot; principalId&larr;session</div>
+          <div><b>GOES TO</b> &middot; ADM-001 · ADM-002 · ADM-003</div>
+        </div>
+      </div>
+      <div id="adm-021" class="scr">
+        <div>
+          <div class="hdr"><span class="code">ADM-021</span>
+            <span class="ttl">Platform Role Management</span></div>
+          <div class="pur">Find platform role management for this venue.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>TICVAI</b><span>TODO</span></div><nav class="nav"><i class="">Dashboard</i><i class="on">TODO</i><i class="">Settings</i><i class="">Reports</i><i class="">People</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Platform Role Management</h2>
+                <small>TICVAI Web · wave 1 · compact</small></div>
+              <div class="acts"><div class="chip">This venue &#9662;</div><div class="chip live">Live</div><div class="chip cta">Primary action</div></div>
+            </div>
+            
+            <div class="canvas">
+              <div class="kpis"><div class="kpi"><b>Total</b><span>1,248</span></div><div class="kpi"><b>Active</b><span>978</span></div><div class="kpi"><b>Attention</b><span>142</span></div><div class="kpi"><b>Offline</b><span>12</span></div></div>
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">textField</span><div class="chip">Search</div></div><div class="panel"><span class="kind">primaryButton</span><div class="chip cta">primaryButton</div></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; listRoles · createRole</div>
+          <div><b>STATES</b> &middot; <span class="">loading · emptyFirstRun · emptyNoAccess · error</span></div>
+          
+          <div><b>GOES TO</b> &middot; ADM-001 · ADM-002 · ADM-003</div>
+        </div>
+      </div>
+      <div id="adm-022" class="scr">
+        <div>
+          <div class="hdr"><span class="code">ADM-022</span>
+            <span class="ttl">Release &amp; Version Management</span></div>
+          <div class="pur">Find release &amp; version management for this venue.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>TICVAI</b><span>TODO</span></div><nav class="nav"><i class="">Dashboard</i><i class="on">TODO</i><i class="">Settings</i><i class="">Reports</i><i class="">People</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Release &amp; Version Management</h2>
+                <small>TICVAI Web · wave 2 · compact</small></div>
+              <div class="acts"><div class="chip">This venue &#9662;</div><div class="chip live">Live</div><div class="chip cta">Primary action</div></div>
+            </div>
+            
+            <div class="canvas">
+              <div class="kpis"><div class="kpi"><b>Total</b><span>1,248</span></div><div class="kpi"><b>Active</b><span>978</span></div><div class="kpi"><b>Attention</b><span>142</span></div><div class="kpi"><b>Offline</b><span>12</span></div></div>
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">textField</span><div class="chip">Search</div></div><div class="panel"><span class="kind">primaryButton</span><div class="chip cta">primaryButton</div></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; listReleases · getRelease · getReleaseReadiness · createRelease +3</div>
+          <div><b>STATES</b> &middot; <span class="">loading · emptyFirstRun · emptyNoAccess · error</span></div>
+          <div><b>ARRIVES WITH</b> &middot; releaseId&larr;deepLink</div>
+          <div><b>GOES TO</b> &middot; ADM-001 · ADM-002 · ADM-003 · ADM-027</div>
+        </div>
+      </div>
+      <div id="adm-023" class="scr">
+        <div>
+          <div class="hdr"><span class="code">ADM-023</span>
+            <span class="ttl">Staging Promotion &amp; Approval</span></div>
+          <div class="pur">Work with staging promotion &amp; approval for this venue.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>TICVAI</b><span>TODO</span></div><nav class="nav"><i class="">Dashboard</i><i class="on">TODO</i><i class="">Settings</i><i class="">Reports</i><i class="">People</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Staging Promotion &amp; Approval</h2>
+                <small>TICVAI Web · wave 2 · compact</small></div>
+              <div class="acts"><div class="chip">This venue &#9662;</div><div class="chip live">Live</div><div class="chip cta">Primary action</div></div>
+            </div>
+            
+            <div class="canvas">
+              <div class="kpis"><div class="kpi"><b>Total</b><span>1,248</span></div><div class="kpi"><b>Active</b><span>978</span></div><div class="kpi"><b>Attention</b><span>142</span></div><div class="kpi"><b>Offline</b><span>12</span></div></div>
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">detailPanel</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><span class="kind">primaryButton</span><div class="chip cta">primaryButton</div></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; promoteRelease · getReleaseReadiness · createRelease · getRelease +3</div>
+          <div><b>STATES</b> &middot; <span class="">loading · emptyFirstRun · emptyNoAccess · error</span></div>
+          <div><b>ARRIVES WITH</b> &middot; releaseId&larr;deepLink</div>
+          <div><b>GOES TO</b> &middot; ADM-001 · ADM-002 · ADM-003 · ADM-029</div>
+        </div>
+      </div>
+      <div id="adm-024" class="scr">
+        <div>
+          <div class="hdr"><span class="code">ADM-024</span>
+            <span class="ttl">Release Notification Composer</span></div>
+          <div class="pur">Push live release notification composer for this venue.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>TICVAI</b><span>TODO</span></div><nav class="nav"><i class="">Dashboard</i><i class="on">TODO</i><i class="">Settings</i><i class="">Reports</i><i class="">People</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Release Notification Composer</h2>
+                <small>TICVAI Web · wave 3 · compact</small></div>
+              <div class="acts"><div class="chip">This venue &#9662;</div><div class="chip live">Live</div><div class="chip cta">Primary action</div></div>
+            </div>
+            
+            <div class="canvas">
+              <div class="kpis"><div class="kpi"><b>Total</b><span>1,248</span></div><div class="kpi"><b>Active</b><span>978</span></div><div class="kpi"><b>Attention</b><span>142</span></div><div class="kpi"><b>Offline</b><span>12</span></div></div>
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">textField</span><div class="chip">Search</div></div><div class="panel"><span class="kind">primaryButton</span><div class="chip cta">primaryButton</div></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; publishSupportNotice · listSupportNotices</div>
+          <div><b>STATES</b> &middot; <span class="">loading · emptyFirstRun · emptyNoAccess · error</span></div>
+          
+          <div><b>GOES TO</b> &middot; ADM-001 · ADM-002 · ADM-003</div>
+        </div>
+      </div>
+      <div id="adm-025" class="scr">
+        <div>
+          <div class="hdr"><span class="code">ADM-025</span>
+            <span class="ttl">Tenant Upgrade Scheduler</span></div>
+          <div class="pur">Find tenant upgrade scheduler for this venue.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>TICVAI</b><span>TODO</span></div><nav class="nav"><i class="">Dashboard</i><i class="on">TODO</i><i class="">Settings</i><i class="">Reports</i><i class="">People</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Tenant Upgrade Scheduler</h2>
+                <small>TICVAI Web · wave 2 · compact</small></div>
+              <div class="acts"><div class="chip">This venue &#9662;</div><div class="chip live">Live</div><div class="chip cta">Primary action</div></div>
+            </div>
+            
+            <div class="canvas">
+              <div class="kpis"><div class="kpi"><b>Total</b><span>1,248</span></div><div class="kpi"><b>Active</b><span>978</span></div><div class="kpi"><b>Attention</b><span>142</span></div><div class="kpi"><b>Offline</b><span>12</span></div></div>
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">textField</span><div class="chip">Search</div></div><div class="panel"><span class="kind">primaryButton</span><div class="chip cta">primaryButton</div></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; listUpgradeSchedules · scheduleTenantUpgrade</div>
+          <div><b>STATES</b> &middot; <span class="">loading · emptyFirstRun · emptyNoAccess · error</span></div>
+          
+          <div><b>GOES TO</b> &middot; ADM-001 · ADM-002 · ADM-003</div>
+        </div>
+      </div>
+      <div id="adm-026" class="scr">
+        <div>
+          <div class="hdr"><span class="code">ADM-026</span>
+            <span class="ttl">End-of-Support Notice Management</span></div>
+          <div class="pur">Answer a question without needing a person.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>TICVAI</b><span>TODO</span></div><nav class="nav"><i class="">Dashboard</i><i class="on">TODO</i><i class="">Settings</i><i class="">Reports</i><i class="">People</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>End-of-Support Notice Management</h2>
+                <small>TICVAI Web · wave 3 · compact</small></div>
+              <div class="acts"><div class="chip">This venue &#9662;</div><div class="chip live">Live</div><div class="chip cta">Primary action</div></div>
+            </div>
+            
+            <div class="canvas">
+              <div class="kpis"><div class="kpi"><b>Total</b><span>1,248</span></div><div class="kpi"><b>Active</b><span>978</span></div><div class="kpi"><b>Attention</b><span>142</span></div><div class="kpi"><b>Offline</b><span>12</span></div></div>
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">textField</span><div class="chip">Search</div></div><div class="panel"><span class="kind">primaryButton</span><div class="chip cta">primaryButton</div></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; listSupportNotices · publishSupportNotice</div>
+          <div><b>STATES</b> &middot; <span class="">loading · emptyFirstRun · emptyNoAccess · error</span></div>
+          
+          <div><b>GOES TO</b> &middot; ADM-001 · ADM-002 · ADM-003</div>
+        </div>
+      </div>
+      <div id="adm-027" class="scr">
+        <div>
+          <div class="hdr"><span class="code">ADM-027</span>
+            <span class="ttl">Database Migration Console</span></div>
+          <div class="pur">Find database migration console for this venue.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>TICVAI</b><span>TODO</span></div><nav class="nav"><i class="">Dashboard</i><i class="on">TODO</i><i class="">Settings</i><i class="">Reports</i><i class="">People</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Database Migration Console</h2>
+                <small>TICVAI Web · wave 1 · compact</small></div>
+              <div class="acts"><div class="chip">This venue &#9662;</div><div class="chip live">Live</div><div class="chip cta">Primary action</div></div>
+            </div>
+            
+            <div class="canvas">
+              <div class="kpis"><div class="kpi"><b>Total</b><span>1,248</span></div><div class="kpi"><b>Active</b><span>978</span></div><div class="kpi"><b>Attention</b><span>142</span></div><div class="kpi"><b>Offline</b><span>12</span></div></div>
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">detailPanel</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">Implied by the detail template — not declared on the screen.</span></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; listMigrations · planMigration · applyMigration · getVersionSkew +2</div>
+          <div><b>STATES</b> &middot; <span class="">loading · emptyFirstRun · emptyNoAccess · error</span></div>
+          <div><b>ARRIVES WITH</b> &middot; runId&larr;deepLink</div>
+          <div><b>GOES TO</b> &middot; ADM-001 · ADM-002 · ADM-003 · ADM-023</div>
+        </div>
+      </div>
+      <div id="adm-028" class="scr">
+        <div>
+          <div class="hdr"><span class="code">ADM-028</span>
+            <span class="ttl">Environment Registry</span></div>
+          <div class="pur">Find environment registry for this venue.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>TICVAI</b><span>TODO</span></div><nav class="nav"><i class="">Dashboard</i><i class="on">TODO</i><i class="">Settings</i><i class="">Reports</i><i class="">People</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Environment Registry</h2>
+                <small>TICVAI Web · wave 2 · compact</small></div>
+              <div class="acts"><div class="chip">This venue &#9662;</div><div class="chip live">Live</div><div class="chip cta">Primary action</div></div>
+            </div>
+            
+            <div class="canvas">
+              <div class="kpis"><div class="kpi"><b>Total</b><span>1,248</span></div><div class="kpi"><b>Active</b><span>978</span></div><div class="kpi"><b>Attention</b><span>142</span></div><div class="kpi"><b>Offline</b><span>12</span></div></div>
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">detailPanel</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">Implied by the detail template — not declared on the screen.</span></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; listEnvironments · registerEnvironment</div>
+          <div><b>STATES</b> &middot; <span class="">loading · emptyFirstRun · emptyNoAccess · error</span></div>
+          
+          <div><b>GOES TO</b> &middot; ADM-001 · ADM-002 · ADM-003</div>
+        </div>
+      </div>
+      <div id="adm-029" class="scr">
+        <div>
+          <div class="hdr"><span class="code">ADM-029</span>
+            <span class="ttl">Deployment Monitor</span></div>
+          <div class="pur">Find deployment monitor for this venue.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>TICVAI</b><span>TODO</span></div><nav class="nav"><i class="">Dashboard</i><i class="on">TODO</i><i class="">Settings</i><i class="">Reports</i><i class="">People</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Deployment Monitor</h2>
+                <small>TICVAI Web · wave 2 · compact</small></div>
+              <div class="acts"><div class="chip">This venue &#9662;</div><div class="chip live">Live</div><div class="chip cta">Primary action</div></div>
+            </div>
+            
+            <div class="canvas">
+              <div class="kpis"><div class="kpi"><b>Total</b><span>1,248</span></div><div class="kpi"><b>Active</b><span>978</span></div><div class="kpi"><b>Attention</b><span>142</span></div><div class="kpi"><b>Offline</b><span>12</span></div></div>
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">metricTile</span><div class="rows"><div class="bar"><i style="width:78%"></i></div><div class="bar"><i style="width:54%"></i></div><div class="bar"><i style="width:92%"></i></div><div class="bar"><i style="width:36%"></i></div><div class="bar"><i style="width:61%"></i></div></div></div><div class="panel"><span class="kind">chart</span><div class="rows"><div class="bar"><i style="width:78%"></i></div><div class="bar"><i style="width:54%"></i></div><div class="bar"><i style="width:92%"></i></div><div class="bar"><i style="width:36%"></i></div><div class="bar"><i style="width:61%"></i></div></div></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; listCellJobs · listRollouts · getRollout · pauseRollout +8</div>
+          <div><b>STATES</b> &middot; <span class="">loading · emptyFirstRun · emptyNoAccess · error</span></div>
+          <div><b>ARRIVES WITH</b> &middot; cellId&larr;deepLink, rolloutId&larr;deepLink</div>
+          <div><b>GOES TO</b> &middot; ADM-001 · ADM-002 · ADM-003</div>
+        </div>
+      </div>
+      <div id="adm-030" class="scr">
+        <div>
+          <div class="hdr"><span class="code">ADM-030</span>
+            <span class="ttl">Infrastructure Sizing &amp; Scaling Policy</span></div>
+          <div class="pur">See infrastructure sizing &amp; scaling policy for this venue.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>TICVAI</b><span>TODO</span></div><nav class="nav"><i class="">Dashboard</i><i class="on">TODO</i><i class="">Settings</i><i class="">Reports</i><i class="">People</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Infrastructure Sizing &amp; Scaling Policy</h2>
+                <small>TICVAI Web · wave 3 · compact</small></div>
+              <div class="acts"><div class="chip">This venue &#9662;</div><div class="chip live">Live</div><div class="chip cta">Primary action</div></div>
+            </div>
+            
+            <div class="canvas">
+              <div class="kpis"><div class="kpi"><b>Total</b><span>1,248</span></div><div class="kpi"><b>Active</b><span>978</span></div><div class="kpi"><b>Attention</b><span>142</span></div><div class="kpi"><b>Offline</b><span>12</span></div></div>
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">textField</span><div class="chip">Search</div></div><div class="panel"><span class="kind">primaryButton</span><div class="chip cta">primaryButton</div></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; getCellCapacity · cancelDecommission · decommissionCell · getCell +3</div>
+          <div><b>STATES</b> &middot; <span class="">loading · emptyFirstRun · emptyNoAccess · error</span></div>
+          <div><b>ARRIVES WITH</b> &middot; cellId&larr;deepLink</div>
+          <div><b>GOES TO</b> &middot; ADM-001 · ADM-002 · ADM-003</div>
+        </div>
+      </div>
+      <div id="adm-031" class="scr">
+        <div>
+          <div class="hdr"><span class="code">ADM-031</span>
+            <span class="ttl">Security &amp; Compliance Dashboard</span></div>
+          <div class="pur">The screen this app sits on. Everything else is entered from here and returns to it.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>TICVAI</b><span>TODO</span></div><nav class="nav"><i class="">Dashboard</i><i class="on">TODO</i><i class="">Settings</i><i class="">Reports</i><i class="">People</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Security &amp; Compliance Dashboard</h2>
+                <small>TICVAI Web · wave 3 · compact</small></div>
+              <div class="acts"><div class="chip">This venue &#9662;</div><div class="chip live">Live</div><div class="chip cta">Primary action</div></div>
+            </div>
+            
+            <div class="canvas">
+              <div class="kpis"><div class="kpi"><b>Total</b><span>1,248</span></div><div class="kpi"><b>Active</b><span>978</span></div><div class="kpi"><b>Attention</b><span>142</span></div><div class="kpi"><b>Offline</b><span>12</span></div></div>
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">metricTile</span><div class="rows"><div class="bar"><i style="width:78%"></i></div><div class="bar"><i style="width:54%"></i></div><div class="bar"><i style="width:92%"></i></div><div class="bar"><i style="width:36%"></i></div><div class="bar"><i style="width:61%"></i></div></div></div><div class="panel"><span class="kind">chart</span><div class="rows"><div class="bar"><i style="width:78%"></i></div><div class="bar"><i style="width:54%"></i></div><div class="bar"><i style="width:92%"></i></div><div class="bar"><i style="width:36%"></i></div><div class="bar"><i style="width:61%"></i></div></div></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; listDashboards · getDashboard · createDashboard · updateDashboard</div>
+          <div><b>STATES</b> &middot; <span class="">loading · emptyFirstRun · emptyNoAccess · error</span></div>
+          <div><b>ARRIVES WITH</b> &middot; dashboardId&larr;deepLink</div>
+          <div><b>GOES TO</b> &middot; ADM-001 · ADM-002 · ADM-003</div>
+        </div>
+      </div>
+      <div id="adm-032" class="scr">
+        <div>
+          <div class="hdr"><span class="code">ADM-032</span>
+            <span class="ttl">WAF &amp; Security Policy View</span></div>
+          <div class="pur">See waf &amp; security policy view for this venue.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>TICVAI</b><span>TODO</span></div><nav class="nav"><i class="">Dashboard</i><i class="on">TODO</i><i class="">Settings</i><i class="">Reports</i><i class="">People</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>WAF &amp; Security Policy View</h2>
+                <small>TICVAI Web · wave 3 · compact</small></div>
+              <div class="acts"><div class="chip">This venue &#9662;</div><div class="chip live">Live</div><div class="chip cta">Primary action</div></div>
+            </div>
+            
+            <div class="canvas">
+              <div class="kpis"><div class="kpi"><b>Total</b><span>1,248</span></div><div class="kpi"><b>Active</b><span>978</span></div><div class="kpi"><b>Attention</b><span>142</span></div><div class="kpi"><b>Offline</b><span>12</span></div></div>
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">textField</span><div class="chip">Search</div></div><div class="panel"><span class="kind">primaryButton</span><div class="chip cta">primaryButton</div></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; getCellHealth · cancelDecommission · decommissionCell · getCell +3</div>
+          <div><b>STATES</b> &middot; <span class="">loading · emptyFirstRun · emptyNoAccess · error</span></div>
+          <div><b>ARRIVES WITH</b> &middot; cellId&larr;deepLink</div>
+          <div><b>GOES TO</b> &middot; ADM-001 · ADM-002 · ADM-003</div>
+        </div>
+      </div>
+      <div id="adm-033" class="scr">
+        <div>
+          <div class="hdr"><span class="code">ADM-033</span>
+            <span class="ttl">Backup &amp; DR Status</span></div>
+          <div class="pur">See backup &amp; dr status for this venue.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>TICVAI</b><span>TODO</span></div><nav class="nav"><i class="">Dashboard</i><i class="on">TODO</i><i class="">Settings</i><i class="">Reports</i><i class="">People</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Backup &amp; DR Status</h2>
+                <small>TICVAI Web · wave 2 · compact</small></div>
+              <div class="acts"><div class="chip">This venue &#9662;</div><div class="chip live">Live</div><div class="chip cta">Primary action</div></div>
+            </div>
+            
+            <div class="canvas">
+              <div class="kpis"><div class="kpi"><b>Total</b><span>1,248</span></div><div class="kpi"><b>Active</b><span>978</span></div><div class="kpi"><b>Attention</b><span>142</span></div><div class="kpi"><b>Offline</b><span>12</span></div></div>
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">metricTile</span><div class="rows"><div class="bar"><i style="width:78%"></i></div><div class="bar"><i style="width:54%"></i></div><div class="bar"><i style="width:92%"></i></div><div class="bar"><i style="width:36%"></i></div><div class="bar"><i style="width:61%"></i></div></div></div><div class="panel"><span class="kind">chart</span><div class="rows"><div class="bar"><i style="width:78%"></i></div><div class="bar"><i style="width:54%"></i></div><div class="bar"><i style="width:92%"></i></div><div class="bar"><i style="width:36%"></i></div><div class="bar"><i style="width:61%"></i></div></div></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; getCellHealth · cancelDecommission · decommissionCell · getCell +3</div>
+          <div><b>STATES</b> &middot; <span class="">loading · emptyFirstRun · emptyNoAccess · error</span></div>
+          <div><b>ARRIVES WITH</b> &middot; cellId&larr;deepLink</div>
+          <div><b>GOES TO</b> &middot; ADM-001 · ADM-002 · ADM-003</div>
+        </div>
+      </div>
+      <div id="adm-034" class="scr">
+        <div>
+          <div class="hdr"><span class="code">ADM-034</span>
+            <span class="ttl">Archival Job Monitor</span></div>
+          <div class="pur">Find archival job monitor for this venue.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>TICVAI</b><span>TODO</span></div><nav class="nav"><i class="">Dashboard</i><i class="on">TODO</i><i class="">Settings</i><i class="">Reports</i><i class="">People</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Archival Job Monitor</h2>
+                <small>TICVAI Web · wave 3 · compact</small></div>
+              <div class="acts"><div class="chip">This venue &#9662;</div><div class="chip live">Live</div><div class="chip cta">Primary action</div></div>
+            </div>
+            
+            <div class="canvas">
+              <div class="kpis"><div class="kpi"><b>Total</b><span>1,248</span></div><div class="kpi"><b>Active</b><span>978</span></div><div class="kpi"><b>Attention</b><span>142</span></div><div class="kpi"><b>Offline</b><span>12</span></div></div>
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">metricTile</span><div class="rows"><div class="bar"><i style="width:78%"></i></div><div class="bar"><i style="width:54%"></i></div><div class="bar"><i style="width:92%"></i></div><div class="bar"><i style="width:36%"></i></div><div class="bar"><i style="width:61%"></i></div></div></div><div class="panel"><span class="kind">chart</span><div class="rows"><div class="bar"><i style="width:78%"></i></div><div class="bar"><i style="width:54%"></i></div><div class="bar"><i style="width:92%"></i></div><div class="bar"><i style="width:36%"></i></div><div class="bar"><i style="width:61%"></i></div></div></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; listCellJobs · cancelDecommission · decommissionCell · getCell +3</div>
+          <div><b>STATES</b> &middot; <span class="">loading · emptyFirstRun · emptyNoAccess · error</span></div>
+          <div><b>ARRIVES WITH</b> &middot; cellId&larr;deepLink</div>
+          <div><b>GOES TO</b> &middot; ADM-001 · ADM-002 · ADM-003</div>
+        </div>
+      </div>
+      <div id="adm-035" class="scr">
+        <div>
+          <div class="hdr"><span class="code">ADM-035</span>
+            <span class="ttl">Support &amp; Escalation Console</span></div>
+          <div class="pur">Answer a question without needing a person.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>TICVAI</b><span>TODO</span></div><nav class="nav"><i class="">Dashboard</i><i class="on">TODO</i><i class="">Settings</i><i class="">Reports</i><i class="">People</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Support &amp; Escalation Console</h2>
+                <small>TICVAI Web · wave 3 · compact</small></div>
+              <div class="acts"><div class="chip">This venue &#9662;</div><div class="chip live">Live</div><div class="chip cta">Primary action</div></div>
+            </div>
+            
+            <div class="canvas">
+              <div class="kpis"><div class="kpi"><b>Total</b><span>1,248</span></div><div class="kpi"><b>Active</b><span>978</span></div><div class="kpi"><b>Attention</b><span>142</span></div><div class="kpi"><b>Offline</b><span>12</span></div></div>
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">detailPanel</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">Implied by the detail template — not declared on the screen.</span></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; listSupportNotices · publishSupportNotice</div>
+          <div><b>STATES</b> &middot; <span class="">loading · emptyFirstRun · emptyNoAccess · error</span></div>
+          
+          <div><b>GOES TO</b> &middot; ADM-001 · ADM-002 · ADM-003</div>
+        </div>
+      </div>
+      <div id="adm-036" class="scr">
+        <div>
+          <div class="hdr"><span class="code">ADM-036</span>
+            <span class="ttl">Platform Notification Broadcast</span></div>
+          <div class="pur">Push live platform notification broadcast for this venue.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>TICVAI</b><span>TODO</span></div><nav class="nav"><i class="">Dashboard</i><i class="on">TODO</i><i class="">Settings</i><i class="">Reports</i><i class="">People</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Platform Notification Broadcast</h2>
+                <small>TICVAI Web · wave 3 · compact</small></div>
+              <div class="acts"><div class="chip">This venue &#9662;</div><div class="chip live">Live</div><div class="chip cta">Primary action</div></div>
+            </div>
+            
+            <div class="canvas">
+              <div class="kpis"><div class="kpi"><b>Total</b><span>1,248</span></div><div class="kpi"><b>Active</b><span>978</span></div><div class="kpi"><b>Attention</b><span>142</span></div><div class="kpi"><b>Offline</b><span>12</span></div></div>
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">textField</span><div class="chip">Search</div></div><div class="panel"><span class="kind">primaryButton</span><div class="chip cta">primaryButton</div></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; publishSupportNotice · listSupportNotices</div>
+          <div><b>STATES</b> &middot; <span class="">loading · emptyFirstRun · emptyNoAccess · error</span></div>
+          
+          <div><b>GOES TO</b> &middot; ADM-001 · ADM-002 · ADM-003</div>
+        </div>
+      </div></div><div class="grp">02 — AI · 1 screens</div><div class="stack">
+      <div id="adm-037" class="scr">
+        <div>
+          <div class="hdr"><span class="code">ADM-037</span>
+            <span class="ttl">AI Provider &amp; Credentials</span></div>
+          <div class="pur">Configure which model a tenant uses, hold the key, and prove it works before anyone relies on it.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>TICVAI</b><span>AI</span></div><nav class="nav"><i class="">Dashboard</i><i class="on">AI</i><i class="">Settings</i><i class="">Reports</i><i class="">People</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>AI Provider &amp; Credentials</h2>
+                <small>TICVAI Web · wave 1 · compact</small></div>
+              <div class="acts"><div class="chip">This venue &#9662;</div><div class="chip live">Live</div><div class="chip cta">Primary action</div></div>
+            </div>
+            
+            <div class="canvas">
+              <div class="kpis"><div class="kpi"><b>Total</b><span>1,248</span></div><div class="kpi"><b>Active</b><span>978</span></div><div class="kpi"><b>Attention</b><span>142</span></div><div class="kpi"><b>Offline</b><span>12</span></div></div>
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">detailPanel</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">Implied by the detail template — not declared on the screen.</span></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; listAiProviders · setAiProvider · setAiCredential · testAiProvider</div>
+          <div><b>STATES</b> &middot; <span class="">loading · emptyFirstRun · emptyNoAccess · error</span></div>
+          <div><b>ARRIVES WITH</b> &middot; providerId&larr;deepLink</div>
+          <div><b>GOES TO</b> &middot; ADM-001</div>
+        </div>
+      </div></div>
+  <div class="bottom">
+    <span>Generated by tools/derive-wireframes.py from screens/P09-platform-admin-console.yaml — do not hand-edit</span>
+    <span>P09 · 37 screens · 2 groups</span>
+  </div>
+</div></body></html>

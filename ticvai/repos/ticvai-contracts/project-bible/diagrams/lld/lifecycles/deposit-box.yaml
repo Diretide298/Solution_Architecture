@@ -1,0 +1,67 @@
+id: LLD-Deposit box
+title: Deposit box — 8 transitions
+generatedBy: tools/derive-diagrams.py
+index: diagrams/hld/04-lifecycles.yaml
+source: states/deposit-box.yaml
+entity: Deposit box
+contract: shift
+enum: DepositBoxStatus
+enumKind: named
+enumSchema: DepositBoxStatus
+owner: shift
+initial:
+- allocated
+terminal:
+- reconciled
+transitions:
+- from: allocated
+  to: open
+  operation: openShift
+  trigger: operation
+  guard: '**The cashier started trading.** Allocation and opening are separate because a box can be
+    prepared before a shift begins'
+- from: open
+  to: suspended
+  operation: suspendShift
+  trigger: operation
+  guard: A break, or a till stepped away from. **The float is not counted**
+- from: suspended
+  to: open
+  operation: resumeShift
+  trigger: operation
+  guard: Back on
+  isReversal: true
+- from: open
+  to: closing
+  operation: closeDepositBoxes
+  trigger: operation
+  guard: '**Counting has begun and the till takes no more.** A sale during a count is a variance nobody
+    can explain'
+- from: closing
+  to: closed
+  operation: closeDepositBoxes
+  trigger: operation
+  guard: Counted, with a variance recorded
+- from: closed
+  to: reconciled
+  operation: acceptShiftVariance
+  trigger: operation
+  guard: '**A supervisor accepted the variance.** Closed is counted; reconciled is agreed, and only
+    the second ends it'
+- from: closed
+  to: closing
+  operation: recountStockCount
+  trigger: operation
+  guard: Recounted before acceptance
+  isReversal: true
+- from: allocated
+  to: closed
+  operation: closeDepositBoxes
+  trigger: operation
+  guard: Allocated and never traded. Closes at the opening float
+notes: '**`closed` and `reconciled` are different and the gap between them is the control.** A cashier
+  counts; a supervisor accepts. A box that closes itself is a box nobody checked.
+
+
+  **`closing` stops trading.** A sale rung during a count produces a variance that cannot be attributed
+  to anything, and the cashier will be asked about it.'

@@ -1,0 +1,53 @@
+$schema: ./_schema.yaml
+id: F107
+name: A report is defined, scheduled and delivered
+actor: venueManager
+capability: A report is defined, scheduled and delivered
+wave: 3
+frequency: As needed.
+criticality: operational
+primaryContract: reporting
+contracts:
+- reporting
+platforms:
+- P08
+trigger:
+  description: Somebody wants the same numbers every Monday without asking for them.
+offlineBehaviour: Analytical.
+steps:
+- step: 1
+  screen: BO-058
+  action: Reporting Home.
+  operations:
+  - updateReport
+  outcome: 1 operations, 1 of them previously unwalked.
+- step: 2
+  screen: BO-061
+  action: Scheduled Reports.
+  operations:
+  - updateReport
+  outcome: 1 operations, 1 of them previously unwalked.
+  crossesDevice: true
+- step: 3
+  screen: BO-060
+  action: Attendance & Footfall.
+  operations:
+  - overrideAccess
+  - updateReport
+  outcome: 2 operations, 2 of them previously unwalked.
+  crossesDevice: true
+branches:
+- at: 1
+  condition: The acting principal lacks the permission at this scope.
+  behaviour: '**Refused at the first step, not the last.** ADR-0002 makes authorisation user-driven
+    — a person who gets three steps in and then cannot finish has been told the wrong thing.'
+  severity: medium
+  resolvedBy: resolvePermissions
+exitStates:
+- state: completed
+  description: The journey ran end to end.
+- state: refused
+  description: '**Stopped at a permission or a licence boundary**, with the reason named.'
+notes: '**ReportingService at 48% and scheduling uncovered.** A report nobody has to remember to run
+  is the difference between a dashboard and a habit.'
+openQuestions: null

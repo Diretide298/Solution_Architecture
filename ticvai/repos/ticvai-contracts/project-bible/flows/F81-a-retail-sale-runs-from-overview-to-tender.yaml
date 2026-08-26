@@ -1,0 +1,67 @@
+$schema: ./_schema.yaml
+id: F81
+name: A retail sale runs from overview to tender
+actor: cashier
+capability: A retail sale runs from overview to tender
+wave: 1
+frequency: As the venue needs it.
+criticality: revenue
+primaryContract: retail
+contracts:
+- retail
+- orders
+- promotions
+- subscription
+platforms:
+- P04
+- P08
+trigger:
+  description: A guest buys merchandise at a counter.
+offlineBehaviour: '**Works offline** — the retail till is local-first like the ticket till.'
+steps:
+- step: 1
+  screen: BO-021
+  action: Order Search.
+  operations:
+  - getGuestOrderStatus
+  - recordOrderHandover
+  outcome: '**Drawn by the client as RET-3A.** 2 operations on this step.'
+- step: 2
+  screen: POS-002
+  action: Sell — Ticket Catalogue.
+  operations:
+  - exchangeOrderLines
+  - getOrderStatement
+  - holdOrder
+  - listOrderRefunds
+  - modifyOrder
+  - rescheduleOrder
+  outcome: '**Drawn by the client as RET-3B.** 8 operations on this step.'
+  crossesDevice: true
+- step: 3
+  screen: POS-005
+  action: Payment.
+  operations:
+  - addTip
+  - getRetailSale
+  - listRetailSales
+  - reprintReceipt
+  outcome: '**Drawn by the client as RET-3C.** 4 operations on this step.'
+branches:
+- at: 1
+  condition: A step in the chain is not licensed for this tenant.
+  behaviour: '**The chain stops at the module boundary.** `requiresModule` on each screen decides —
+    a tenant without the retail licence does not see the retail half, and the journey is shorter rather
+    than broken.'
+  severity: medium
+  resolvedBy: getModuleEnablement
+exitStates:
+- state: completed
+  description: The chain ran as the client drew it.
+- state: stoppedAtModule
+  description: '**A licence boundary, not a failure.**'
+notes: '**Retail board 3, the selling chain.** F34 walks the sale; this walks the operator arriving
+  at it from the store overview. **Derived from the client''s own `GOES TO` edges**, not from an inferred
+  path — a pair of frames the client linked is evidence; a chain assembled from unrelated pairs is a
+  guess.'
+openQuestions: null

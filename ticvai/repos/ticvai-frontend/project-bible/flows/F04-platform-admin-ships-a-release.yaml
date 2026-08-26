@@ -1,0 +1,77 @@
+# F04 — Platform admin ships a release
+#
+# Validated against _schema.yaml by tools/check-flows.py.
+
+id: F04
+name: Platform admin ships a release
+actor: platformAdmin
+wave: 2
+frequency: weekly
+criticality: operational
+platforms:
+- P09 TICVAI Web
+offlineBehaviour: Not applicable. Control Plane only.
+trigger:
+  description: A release is ready to move from staging to production across every cell.
+  entryScreen: ADM-022
+steps:
+- step: 1
+  screen: ADM-022
+  action: Reviews the release and its readiness
+  operations:
+  - getRelease
+  - getReleaseReadiness
+  outcome: Sees which gates pass and which block, before attempting anything
+- step: 2
+  screen: ADM-027
+  action: Plans the migrations the release requires
+  operations:
+  - planMigration
+  outcome: Sees per-cell migrations, estimated lock duration, and whether every one is reversible
+- step: 3
+  screen: ADM-023
+  action: Requests promotion with an approver
+  operations:
+  - promoteRelease
+  outcome: Approval recorded against the release. The approver may not be the requester
+- step: 4
+  screen: ADM-029
+  action: Watches the rollout per cell
+  operations:
+  - getRollout
+  outcome: Canary first, then waves. Per-cell state, because a percentage says nothing useful
+branches:
+- at: 2
+  condition: A migration in the release is irreversible
+  severity: requiresStaff
+  behaviour: Named in the plan, not merely counted. A one-way door should be identified before it is
+    walked through — promotion may still proceed, but knowingly.
+  resolvedBy: Duty manager
+- at: 2
+  condition: The plan predicts a long lock on a partitioned table
+  severity: recoverable
+  behaviour: Surfaced as a warning with the affected cells. This is the output the plan step exists
+    to produce.
+  resolvedBy: Automatic
+- at: 3
+  condition: The plan has gone stale
+  severity: recoverable
+  behaviour: Apply is refused. Cell state changed since the plan was computed, and applying it would
+    run against a different world than the one reviewed.
+  resolvedBy: planMigration
+- at: 4
+  condition: The canary cell fails
+  severity: requiresStaff
+  behaviour: The wave halts rather than continuing into it. Cells already updated stay updated — pause
+    is not rollback, and the console keeps the distinction visible.
+  resolvedBy: rollbackRollout
+exitStates:
+- state: completed
+  description: Every cell on the new version
+- state: deferred
+  description: Rollout paused mid-wave, cells at mixed versions with a stated reason
+- state: failed
+  description: Rolled back. Only possible where every migration in the release is reversible
+primaryContract: platform-ops
+contracts:
+- platform-ops

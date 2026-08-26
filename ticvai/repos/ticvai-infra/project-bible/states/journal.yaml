@@ -1,0 +1,50 @@
+# Journal entry — state model
+# Contract: finance.JournalStatus
+# Checked by tools/check-states.py.
+
+entity: Journal entry
+contract: finance
+enum: JournalStatus
+enumKind: named
+enumSchema: JournalStatus
+owner: ledger
+initial:
+- draft
+terminal:
+- posted
+- reversed
+transitions:
+- from: draft
+  to: pendingApproval
+  operation: createJournalEntry
+  trigger: operation
+  guard: Above the venue threshold
+- from: draft
+  to: posted
+  operation: approveJournalEntry
+  trigger: operation
+  guard: Below threshold, balanced
+  emits:
+  - ledger.journalPosted
+- from: pendingApproval
+  to: posted
+  operation: approveJournalEntry
+  trigger: operation
+  guard: Approver is not the preparer
+  requiresApproval: true
+  emits:
+  - ledger.journalPosted
+- from: pendingApproval
+  to: draft
+  operation: rejectJournal
+  trigger: operation
+  guard: Returned with comments
+- from: posted
+  to: reversed
+  operation: reverseJournalEntry
+  trigger: operation
+  guard: '**A posted entry is never edited.** Reversal posts an opposite entry; the original stands'
+  isReversal: true
+  requiresApproval: true
+notes: No transition out of `posted` except reversal, and no transition back to `draft`. That is what
+  append-only means, and it is the reason a correction is two entries rather than one edit.

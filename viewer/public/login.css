@@ -1,0 +1,352 @@
+/* ── the sign-in page ───────────────────────────────────────────────
+ *
+ * From `ui-design/AUTH.md`. The palette, the fields, the button and the
+ * powered-by strip are shared with the invite page and live in `auth.css`.
+ * What is here is the second column, which the invite page has no equivalent
+ * of: an editor typing its way through the delivery package.
+ *
+ * The demonstration is the argument. "A context layer for AI-assisted
+ * development" is a sentence nobody can picture; a file being read and a
+ * finding falling out of it is the same claim in a form you can watch. It is
+ * decorative in the accessibility sense — the page is complete without it, and
+ * it is hidden from assistive technology — but every string in it is a real
+ * fact about the package, because a fake number on the door is a promise the
+ * product then has to keep.
+ */
+
+.signin-page {
+  /* Offset to 22%, not centred: the wash has to be thickest behind the form,
+     where 14px text sits over a moving lattice, and thinnest on the right,
+     where the lattice is the only thing between the copy and the edge. */
+  --scrim: radial-gradient(
+    ellipse at 22% 45%,
+    rgba(8, 11, 12, 0.15) 0%,
+    rgba(8, 11, 12, 0.62) 55%,
+    rgba(8, 11, 12, 0.92) 100%
+  );
+
+  --win-fill: rgba(14, 19, 20, 0.86);
+  --win-line: #1e2a2a;
+  --win-rule: #1e2a2a;
+  --win-bar: rgba(255, 255, 255, 0.03);
+  --win-dot: #3a4546;
+  --win-shadow: 0 24px 70px rgba(0, 0, 0, 0.55);
+  --gutter: #3e4a4b;
+  --accent-ink: #48cfcb;
+
+  /* The five tokens the scenes are authored against. Both themes carry the
+     same scene data and differ only here, which is the whole reason a line is
+     a [text, token] pair rather than markup. */
+  --code-com: #8a9899;
+  --code-key: #8fb6b7;
+  --code-val: #c8d4d4;
+  --code-acc: #48cfcb;
+  --code-warn: #d9a143;
+
+  --ok-fill: rgba(43, 179, 176, 0.12);
+  --ok-line: rgba(43, 179, 176, 0.3);
+  --ok-ink: #8fe5e2;
+  --ok-dot: #48cfcb;
+  --warn-fill: rgba(217, 161, 67, 0.11);
+  --warn-line: rgba(217, 161, 67, 0.28);
+  --warn-ink: #e7c384;
+  --warn-dot: #d9a143;
+}
+
+:root:not([data-theme="dark"]) .signin-page {
+  --scrim: radial-gradient(
+    ellipse at 22% 45%,
+    rgba(230, 241, 246, 0.2) 0%,
+    rgba(230, 241, 246, 0.66) 55%,
+    rgba(230, 241, 246, 0.93) 100%
+  );
+
+  --win-fill: rgba(255, 255, 255, 0.9);
+  --win-line: #dfe6e7;
+  --win-rule: #e6ecec;
+  --win-bar: #f4f7f7;
+  --win-dot: #cbd5d5;
+  --win-shadow: 0 22px 60px rgba(21, 43, 49, 0.14);
+  --gutter: #a9b5b6;
+  --accent-ink: #1f8f91;
+
+  --code-com: #8a9899;
+  --code-key: #3e7c7e;
+  --code-val: #31474c;
+  --code-acc: #12878a;
+  --code-warn: #9a6b18;
+
+  --ok-fill: rgba(31, 143, 145, 0.1);
+  --ok-line: rgba(31, 143, 145, 0.28);
+  --ok-ink: #146d6f;
+  --ok-dot: #1f8f91;
+  --warn-fill: rgba(154, 107, 24, 0.09);
+  --warn-line: rgba(154, 107, 24, 0.26);
+  --warn-ink: #8a6218;
+  --warn-dot: #b98526;
+}
+
+/* styles.css puts `overflow: hidden` on html and body, which is right for the
+   viewer and wrong for a page somebody has to reach the bottom of. Body is
+   already `height: 100%` from that rule, so handing it `overflow-y: auto`
+   makes it the scroll container — the same fix `.auth-page` carries in
+   layers.css. That is also why the two layers below are fixed rather than
+   absolute: pinned to a scrolling body they would cover the scroll height
+   rather than the viewport, and the lattice would slide away under a stacked
+   phone layout. */
+.signin-page {
+  display: grid;
+  grid-template-columns: minmax(420px, 7fr) 9fr;
+  height: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+.signin-page .auth-field,
+.signin-page .auth-scrim { position: fixed; }
+
+/* ── the form ──────────────────────────────────────────────────────── */
+.signin-form {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 40px;
+}
+.signin-stack {
+  width: 100%;
+  max-width: 396px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.signin-page .auth-lockup { height: 58px; align-self: flex-start; }
+.signin-page .auth-title { font-size: 26px; }
+.signin-page .auth-state { gap: 24px; }
+/* The offline state is short paragraphs and two shell snippets rather than a
+   form, and 24px between them reads as several unrelated notices. */
+.signin-page #offline { gap: 14px; }
+
+/* layers.css gives .auth-label and .auth-button margins of their own, for the
+   app's dialogs where each stands alone in a panel. Here the stack's gap is
+   the entire spacing story and a second source of it only fights. */
+.signin-page .auth-label,
+.signin-page .auth-button { margin: 0; }
+
+.signin-head { display: flex; flex-direction: column; gap: 8px; }
+.signin-fields { display: flex; flex-direction: column; gap: 14px; }
+
+/* The label and the link share one row and one baseline: a Forgot? link parked
+   above the field it belongs to is unmistakably about that field. */
+.signin-label-row { display: flex; align-items: baseline; gap: 10px; }
+.signin-forgot {
+  margin-left: auto;
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  color: var(--accent-ink);
+  cursor: pointer;
+}
+.signin-forgot:hover { text-decoration: underline; }
+.signin-forgot-note { margin: 0; font-size: 12px; line-height: 1.55; color: var(--ink-faint); }
+
+.signin-page .auth-pre {
+  margin: 0;
+  padding: 10px 12px;
+  border-radius: 9px;
+  background: var(--field-fill);
+  border: 1px solid var(--field-line);
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--ink-strong);
+  overflow-x: auto;
+}
+
+/* ── the demonstration ─────────────────────────────────────────────── */
+.signin-demo {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 20px;
+  padding: 48px 56px 48px 20px;
+  min-width: 0;
+}
+.signin-pitch { display: flex; flex-direction: column; gap: 7px; max-width: 520px; }
+.signin-eyebrow {
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--accent-ink);
+}
+.signin-lede {
+  margin: 0;
+  font-size: 19px;
+  font-weight: 600;
+  line-height: 1.5;
+  letter-spacing: -0.01em;
+  color: var(--ink-strong);
+  text-wrap: pretty;
+}
+
+.signin-window {
+  width: 100%;
+  max-width: 640px;
+  border-radius: 16px;
+  overflow: hidden;
+  background: var(--win-fill);
+  border: 1px solid var(--win-line);
+  box-shadow: var(--win-shadow);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.signin-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 16px;
+  background: var(--win-bar);
+  border-bottom: 1px solid var(--win-rule);
+}
+.signin-dots { display: flex; gap: 6px; flex: none; }
+.signin-dots i { display: block; width: 9px; height: 9px; border-radius: 50%; background: var(--win-dot); }
+.signin-file { font-family: var(--mono); font-size: 11.5px; color: var(--ink-label); }
+.signin-lang {
+  font-family: var(--mono);
+  font-size: 9.5px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--code-com);
+}
+.signin-status {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-family: var(--mono);
+  font-size: 10.5px;
+  color: var(--accent-ink);
+}
+.signin-status i { display: block; width: 6px; height: 6px; border-radius: 50%; background: var(--accent-ink); }
+
+/* Fixed height, all nine rows present from the first frame, and the tray held
+   open at 56px. The window is 640px of glass in the middle of the page; if it
+   grew a line at a time the whole right column would walk up and down for as
+   long as anybody watched it. */
+.signin-code {
+  display: grid;
+  grid-template-columns: 30px minmax(0, 1fr);
+  gap: 0 14px;
+  align-content: start;
+  min-height: 238px;
+  padding: 16px 18px 18px;
+  font-family: var(--mono);
+  font-size: 12.5px;
+  line-height: 1.85;
+}
+.signin-n { color: var(--gutter); text-align: right; user-select: none; }
+.signin-line {
+  white-space: pre;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: var(--code-val);
+}
+.signin-line.tok-com { color: var(--code-com); }
+.signin-line.tok-key { color: var(--code-key); }
+.signin-line.tok-val { color: var(--code-val); }
+.signin-line.tok-acc { color: var(--code-acc); }
+.signin-line.tok-warn { color: var(--code-warn); }
+
+/* On the active line only, and drawn by the line rather than inserted into it:
+   a caret element rebuilt every 46ms would restart its own blink and never
+   finish one. */
+.signin-line.is-typing::after {
+  content: '';
+  display: inline-block;
+  width: 7px;
+  height: 14px;
+  vertical-align: -2px;
+  background: var(--accent-ink);
+  animation: atlas-caret 1s steps(1) infinite;
+}
+@keyframes atlas-caret { 0%, 45% { opacity: 1; } 55%, 100% { opacity: 0; } }
+
+.signin-findings {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  min-height: 56px;
+  padding: 13px 18px;
+  border-top: 1px solid var(--win-rule);
+}
+.signin-finding {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 11px;
+  border-radius: 9px;
+  font-family: var(--mono);
+  font-size: 11px;
+  background: var(--chip-fill);
+  border: 1px solid var(--chip-line);
+  color: var(--chip-ink);
+  animation: atlas-rise 0.35s ease both;
+}
+.signin-finding i {
+  display: block;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--chip-dot);
+  flex: none;
+}
+.signin-finding.ok {
+  --chip-fill: var(--ok-fill);
+  --chip-line: var(--ok-line);
+  --chip-ink: var(--ok-ink);
+  --chip-dot: var(--ok-dot);
+}
+.signin-finding.warn {
+  --chip-fill: var(--warn-fill);
+  --chip-line: var(--warn-line);
+  --chip-ink: var(--warn-ink);
+  --chip-dot: var(--warn-dot);
+}
+@keyframes atlas-rise { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+
+.signin-stats { display: flex; flex-wrap: wrap; gap: 22px; max-width: 640px; }
+.signin-stat { display: flex; flex-direction: column; gap: 3px; }
+.signin-stat b {
+  font-family: var(--mono);
+  font-size: 19px;
+  font-weight: 500;
+  color: var(--ink-title);
+}
+.signin-stat span {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .signin-line.is-typing::after,
+  .signin-finding { animation: none; }
+}
+
+/* Below this the second column stops being a demonstration and becomes a
+   640px window in a 400px hole. It is decoration; the door is not. */
+@media (max-width: 940px) {
+  .signin-page { grid-template-columns: 1fr; }
+  .signin-demo { display: none; }
+  .signin-form { align-items: flex-start; padding: 40px 20px; }
+}

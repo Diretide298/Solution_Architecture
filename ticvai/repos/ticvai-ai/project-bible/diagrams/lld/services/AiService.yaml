@@ -1,0 +1,426 @@
+id: LLD-AiService
+title: AiService — 30 operations, 15 tables
+generatedBy: tools/derive-diagrams.py
+tier: engagement
+index: diagrams/hld/02-services.yaml
+why: '**Separate at any size, and not because of size.** ADR-0020 makes it a hard boundary: only this
+  service writes AI tables, and it is read-only against the transactional core. **That boundary caught
+  four wrongly-placed writes in one week** — it survives because it is enforced, and enforcing it across
+  a shared deployment is harder than across a network.'
+scale: Latency-tolerant, cost-sensitive, token-metered. Different hardware from everything else.
+ifDown: Down degrades suggestions and the concierge. **Nothing that takes money depends on it.**
+coverage:
+  operations: 30
+  inAFlow: 17
+  percent: 57%
+  note: '**Flow coverage is how much of this service a journey has walked.** A service under 40% is
+    unwalked rather than under-documented.'
+schemas:
+- schema: ai
+  tables: 15
+  stores:
+  - postgres
+  - postgres-analytical
+  largestTable: ai.interaction
+- schema: qdrant
+  tables: 0
+  stores: []
+  largestTable: —
+operationsByContract:
+- contract: ai
+  count: 30
+  operations:
+  - operation: createAiConversation
+    verb: POST
+    path: /conversations
+    scope: venue
+    permission: AI_USE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: createKnowledgeCollection
+    verb: POST
+    path: /collections
+    scope: tenant
+    permission: AI_CONFIGURE
+    offline: false
+    reads: 4
+    writes: 3
+  - operation: decideProposedAction
+    verb: POST
+    path: /proposed-actions/{actionId}/decide
+    scope: venue
+    permission: AI_APPROVE
+    offline: false
+    reads: 2
+    writes: 3
+  - operation: generateConfiguration
+    verb: POST
+    path: /generate/configuration
+    scope: venue
+    permission: AI_USE
+    offline: false
+    reads: 22
+    writes: 4
+  - operation: generateVenueLayout
+    verb: POST
+    path: /generate/venue-layout
+    scope: venue
+    permission: CAPACITY_CONFIGURE
+    offline: false
+    reads: 3
+    writes: 3
+  - operation: getAiPolicy
+    verb: GET
+    path: /policy
+    scope: tenant
+    permission: AI_CONFIGURE
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: getAiUsage
+    verb: GET
+    path: /usage
+    scope: tenant
+    permission: AI_AUDIT_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: ingestKnowledgeDocument
+    verb: POST
+    path: /collections/{collectionId}/documents
+    scope: tenant
+    permission: AI_CONFIGURE
+    offline: false
+    reads: 5
+    writes: 4
+  - operation: listAiConversations
+    verb: GET
+    path: /conversations
+    scope: venue
+    permission: AI_USE
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listAiInteractions
+    verb: GET
+    path: /interactions
+    scope: tenant
+    permission: AI_AUDIT_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listAiProviders
+    verb: GET
+    path: /providers
+    scope: region
+    permission: AI_CONFIGURE
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listIndexJobs
+    verb: GET
+    path: /index-jobs
+    scope: tenant
+    permission: AI_CONFIGURE
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listIndexSources
+    verb: GET
+    path: /index-sources
+    scope: tenant
+    permission: AI_CONFIGURE
+    offline: false
+    reads: 2
+    writes: 0
+  - operation: listKnowledgeCollections
+    verb: GET
+    path: /collections
+    scope: tenant
+    permission: AI_CONFIGURE
+    offline: false
+    reads: 3
+    writes: 0
+  - operation: listProposedActions
+    verb: GET
+    path: /proposed-actions
+    scope: venue
+    permission: AI_APPROVE
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: proposeTranslations
+    verb: POST
+    path: /ai/translate
+    scope: tenant
+    permission: TENANT_CONFIGURE
+    offline: false
+    reads: 4
+    writes: 3
+  - operation: proposeVenueLabels
+    verb: POST
+    path: /ai/venue-map/{mapId}/propose-labels
+    scope: venue
+    permission: VENUE_MAP_MANAGE
+    offline: false
+    reads: 6
+    writes: 3
+  - operation: proposeWalkways
+    verb: POST
+    path: /ai/venue-map/{mapId}/propose-walkways
+    scope: venue
+    permission: VENUE_MAP_MANAGE
+    offline: false
+    reads: 6
+    writes: 3
+  - operation: recordSuggestionOutcome
+    verb: POST
+    path: /ai/suggestions/{suggestionId}/outcome
+    scope: venue
+    permission: AI_USE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: reindexSource
+    verb: POST
+    path: /index-sources/{sourceId}/reindex
+    scope: tenant
+    permission: AI_CONFIGURE
+    offline: false
+    reads: 14
+    writes: 5
+  - operation: removeIndexEntry
+    verb: DELETE
+    path: /index-sources/{sourceId}/entries/{entryId}
+    scope: tenant
+    permission: AI_CONFIGURE
+    offline: false
+    reads: 3
+    writes: 4
+  - operation: requestSuggestion
+    verb: POST
+    path: /ai/suggestions
+    scope: venue
+    permission: AI_USE
+    offline: false
+    reads: 4
+    writes: 3
+  - operation: semanticSearch
+    verb: POST
+    path: /search
+    scope: venue
+    permission: AI_USE
+    offline: false
+    reads: 7
+    writes: 4
+  - operation: sendAiMessage
+    verb: POST
+    path: /conversations/{conversationId}/messages
+    scope: venue
+    permission: AI_USE
+    offline: false
+    reads: 10
+    writes: 6
+  - operation: setAiCredential
+    verb: PUT
+    path: /ai-providers/{providerId}/credential
+    scope: tenant
+    permission: AI_CONFIGURE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: setAiPolicy
+    verb: PUT
+    path: /policy
+    scope: tenant
+    permission: AI_CONFIGURE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: setAiProvider
+    verb: PUT
+    path: /providers
+    scope: region
+    permission: AI_CONFIGURE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: setIndexSource
+    verb: PUT
+    path: /index-sources
+    scope: tenant
+    permission: AI_CONFIGURE
+    offline: false
+    reads: 3
+    writes: 2
+  - operation: setSuggestionProvider
+    verb: PUT
+    path: /ai/suggestion-providers
+    scope: tenant
+    permission: AI_CONFIGURE
+    offline: false
+    reads: 3
+    writes: 3
+  - operation: testAiProvider
+    verb: POST
+    path: /ai-providers/{providerId}/test
+    scope: tenant
+    permission: AI_CONFIGURE
+    offline: false
+    reads: 2
+    writes: 3
+tables:
+- table: ai.chunk_ref
+  columns: 1
+  store: postgres
+  parent: null
+  writtenBy: []
+  foreignWriters: null
+- table: ai.conversation
+  columns: 8
+  store: postgres-analytical
+  parent: null
+  writtenBy:
+  - ai
+  foreignWriters: null
+- table: ai.index_entry
+  columns: 1
+  store: postgres
+  parent: null
+  writtenBy:
+  - ai
+  foreignWriters: null
+- table: ai.index_job
+  columns: 14
+  store: postgres
+  parent: null
+  writtenBy:
+  - ai
+  foreignWriters: null
+- table: ai.index_source
+  columns: 15
+  store: postgres
+  parent: null
+  writtenBy:
+  - ai
+  foreignWriters: null
+- table: ai.interaction
+  columns: 21
+  store: postgres-analytical
+  parent: null
+  writtenBy:
+  - ai
+  - reporting
+  foreignWriters:
+  - reporting
+- table: ai.knowledge_collection
+  columns: 12
+  store: postgres
+  parent: null
+  writtenBy:
+  - ai
+  foreignWriters: null
+- table: ai.knowledge_document
+  columns: 9
+  store: postgres
+  parent: null
+  writtenBy:
+  - ai
+  foreignWriters: null
+- table: ai.layout_draft
+  columns: 9
+  store: postgres
+  parent: null
+  writtenBy:
+  - ai
+  foreignWriters: null
+- table: ai.message
+  columns: 14
+  store: postgres-analytical
+  parent: null
+  writtenBy:
+  - ai
+  foreignWriters: null
+- table: ai.policy
+  columns: 16
+  store: postgres
+  parent: null
+  writtenBy:
+  - ai
+  foreignWriters: null
+- table: ai.proposed_action
+  columns: 13
+  store: postgres
+  parent: null
+  writtenBy:
+  - ai
+  foreignWriters: null
+- table: ai.provider
+  columns: 19
+  store: postgres
+  parent: null
+  writtenBy:
+  - ai
+  foreignWriters: null
+- table: ai.suggestion
+  columns: 12
+  store: postgres-analytical
+  parent: null
+  writtenBy:
+  - ai
+  foreignWriters: null
+- table: ai.suggestion_outcome
+  columns: 8
+  store: postgres-analytical
+  parent: ai.suggestion
+  writtenBy:
+  - ai
+  foreignWriters: null
+readsFrom:
+- service: CatalogueService
+  operations: 17
+- service: VenueOpsService
+  operations: 8
+- service: WhiteLabelService
+  operations: 3
+- service: MarketingService
+  operations: 2
+- service: TenancyService
+  operations: 2
+- service: FnbService
+  operations: 1
+writesOutside: []
+screens:
+- P02:GST-031 AI Concierge – Home
+- P02:GST-032 AI Concierge – Chat
+- P02:GST-033 AI Concierge – Contextual Help
+- P02:GST-052 Suggested Itineraries
+- P02:GST-054 AI Optimized Itinerary
+- P02:GST-059 Plan My Day – In Progress
+- P05:KSK-015 Assistant
+- P06:EMP-019 AI assistant — home
+- P06:EMP-020 AI assistant — answer
+- P06:EMP-040 Knowledge base
+- P06:EMP-041 Training
+- P08:BO-088 Approval Analytics
+- P08:BO-091 AI Policy & Spend
+- P08:BO-093 Map Import & Labelling
+- P08:BO-115 Category, Brand & Merchandise Hierarchy
+- P08:BO-117 Product Import, Governance & AI Configuration Assistant
+- P09:ADM-004 Platform Audit Log
+- P09:ADM-037 AI Provider & Credentials
+- P16:ANL-001 Executive Command Center
+- P16:ANL-009 AI Assistant & Action Center
+- P16:ANL-010 Suggestions & Advice
+flows:
+- F100 An AI provider is configured, budgeted and audited
+- F101 A staff member asks the assistant and it answers from the venue
+- F106 A security dashboard surfaces something and it is investigated
+- F20 A manager asks a question and gets an answer
+- F24 A guest asks the assistant and ends up with a person
+- F26 A venue maps its site
+- F49 A guest plans a day and follows it
+- F77 A promotion is built, bundled, published and measured
+- F86 A POS layout is designed, previewed and deployed
+- F90 An audience is built, offered to, and the result is judged

@@ -1,0 +1,1727 @@
+id: LLD-P02
+title: P02 Guest App — Mobile — 63 screens
+generatedBy: tools/derive-diagrams.py
+index: diagrams/hld/00-platform.yaml
+audience: guest
+operator: guest
+app: guest-app
+formFactor: mobileApp
+runtime: reactNative
+offlineCapable: true
+deployment:
+  target: iOS / Android native
+  distribution: App Store + Play, tenant developer account
+  bundleUpdate: over-the-air for JS; store release for native
+  hosting: n/a — installed
+  storeReview: true
+  deviceOwnership: guest device
+  networkAssumption: mobile data, intermittent
+  releaseCadence: fortnightly, gated by review
+why: null
+modulesUsed:
+- module: ticketing
+  screens: 27
+- module: marketing
+  screens: 7
+- module: fnb
+  screens: 7
+- module: queue
+  screens: 5
+- module: access
+  screens: 4
+- module: ai
+  screens: 4
+- module: core
+  screens: 4
+- module: retail
+  screens: 2
+- module: seating
+  screens: 2
+- module: games
+  screens: 1
+servicesCalled:
+- service: CatalogueService
+  operationCalls: 36
+- service: OrderService
+  operationCalls: 35
+- service: IdentityService
+  operationCalls: 23
+- service: MarketingService
+  operationCalls: 19
+- service: VenueOpsService
+  operationCalls: 16
+- service: FnbService
+  operationCalls: 16
+- service: AccessService
+  operationCalls: 10
+- service: AiService
+  operationCalls: 7
+- service: WhiteLabelService
+  operationCalls: 6
+- service: RetailService
+  operationCalls: 4
+- service: CrossCellService
+  operationCalls: 1
+- service: LedgerService
+  operationCalls: 1
+coverage:
+  screens: 63
+  inAFlow: 35
+  drawn: 63
+  note: '**A screen in no flow has been specified and never walked.** Every flow written in this package
+    has found a defect.'
+screens:
+- screen: GST-001
+  name: Home – Default
+  module: TODO
+  requiresModule: marketing
+  wave: 1
+  density: comfortable
+  operations:
+  - getGuestProfile
+  - getTenantAppStatus
+  - listMyEntitlements
+  - searchCatalogue
+  states:
+  - emptyFirstRun
+  - emptyNoResults
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams:
+  - subjectId<-session
+  goesTo:
+  - GST-002
+  - GST-003
+  - GST-004
+  boardFrames: null
+  wireframe: wireframes/P02 Guest App.dc.html#gst-001
+  inFlows: null
+- screen: GST-002
+  name: Explore Categories
+  module: TODO
+  requiresModule: ticketing
+  wave: 1
+  density: comfortable
+  operations:
+  - listProducts
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams: []
+  goesTo:
+  - GST-001
+  - GST-003
+  - GST-004
+  boardFrames: null
+  wireframe: wireframes/P02 Guest App.dc.html#gst-002
+  inFlows: null
+- screen: GST-003
+  name: Attractions List
+  module: TODO
+  requiresModule: ticketing
+  wave: 1
+  density: comfortable
+  operations:
+  - getWaitTimes
+  - listProducts
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams: []
+  goesTo:
+  - GST-001
+  - GST-002
+  - GST-004
+  boardFrames: null
+  wireframe: wireframes/P02 Guest App.dc.html#gst-003
+  inFlows:
+  - F21 A ride queue fills and a guest is redirected
+- screen: GST-004
+  name: Attraction Details
+  module: TODO
+  requiresModule: ticketing
+  wave: 1
+  density: comfortable
+  operations:
+  - getAvailability
+  - getProduct
+  - getWaitTimes
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams:
+  - productId<-deepLink
+  goesTo:
+  - GST-001
+  - GST-002
+  - GST-003
+  boardFrames: null
+  wireframe: wireframes/P02 Guest App.dc.html#gst-004
+  inFlows: null
+- screen: GST-005
+  name: What's On
+  module: TODO
+  requiresModule: ticketing
+  wave: 1
+  density: comfortable
+  operations:
+  - listPerformances
+  - listProducts
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams:
+  - eventId<-deepLink
+  goesTo:
+  - GST-001
+  - GST-002
+  - GST-003
+  boardFrames: null
+  wireframe: wireframes/P02 Guest App.dc.html#gst-005
+  inFlows: null
+- screen: GST-006
+  name: Event / Exhibition Details
+  module: TODO
+  requiresModule: ticketing
+  wave: 1
+  density: comfortable
+  operations:
+  - getPerformance
+  - getProduct
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams:
+  - performanceId<-deepLink
+  - productId<-deepLink
+  goesTo:
+  - GST-001
+  - GST-002
+  - GST-003
+  boardFrames: null
+  wireframe: wireframes/P02 Guest App.dc.html#gst-006
+  inFlows: null
+- screen: GST-007
+  name: Select Date & Time
+  module: TODO
+  requiresModule: ticketing
+  wave: 1
+  density: comfortable
+  operations:
+  - getAvailability
+  - listPerformances
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams:
+  - eventId<-deepLink
+  goesTo:
+  - GST-001
+  - GST-002
+  - GST-003
+  boardFrames: null
+  wireframe: wireframes/P02 Guest App.dc.html#gst-007
+  inFlows: null
+- screen: GST-008
+  name: Tickets & Add-ons
+  module: TODO
+  requiresModule: ticketing
+  wave: 1
+  density: comfortable
+  operations:
+  - transferOrderTickets
+  states:
+  - emptyFirstRun
+  - emptyNoResults
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams:
+  - orderId<-deepLink
+  goesTo:
+  - GST-001
+  - GST-002
+  - GST-003
+  boardFrames: null
+  wireframe: wireframes/P02 Guest App.dc.html#gst-008
+  inFlows: null
+- screen: GST-009
+  name: Review & Payment
+  module: TODO
+  requiresModule: ticketing
+  wave: 1
+  density: comfortable
+  operations:
+  - checkoutCart
+  - createPayment
+  - getCart
+  - inquirePaymentStatus
+  - transferOrderTickets
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams:
+  - cartId<-session
+  - orderId<-deepLink
+  - paymentId<-deepLink
+  goesTo:
+  - GST-001
+  - GST-002
+  - GST-003
+  boardFrames: null
+  wireframe: wireframes/P02 Guest App.dc.html#gst-009
+  inFlows:
+  - F11 Guest orders food to a lounger
+- screen: GST-010
+  name: Booking Confirmation
+  module: TODO
+  requiresModule: ticketing
+  wave: 1
+  density: comfortable
+  operations:
+  - getOrder
+  - transferOrderTickets
+  states:
+  - emptyFirstRun
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams:
+  - orderId<-deepLink
+  goesTo:
+  - GST-001
+  - GST-002
+  - GST-003
+  boardFrames: null
+  wireframe: wireframes/P02 Guest App.dc.html#gst-010
+  inFlows: null
+- screen: GST-011
+  name: Wallet Overview
+  module: TODO
+  requiresModule: retail
+  wave: 2
+  density: comfortable
+  operations:
+  - getWallet
+  - listWalletTransactions
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams:
+  - subjectId<-GST-001
+  goesTo:
+  - GST-001
+  - GST-002
+  - GST-003
+  boardFrames: null
+  wireframe: wireframes/P02 Guest App.dc.html#gst-011
+  inFlows:
+  - F53 A guest earns, sees and spends loyalty
+- screen: GST-012
+  name: My Tickets
+  module: TODO
+  requiresModule: access
+  wave: 1
+  density: comfortable
+  operations:
+  - getEntitlement
+  - listMyEntitlements
+  - transferOrderTickets
+  states:
+  - emptyFirstRun
+  - emptyNoResults
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams:
+  - entitlementId<-deepLink
+  - orderId<-deepLink
+  goesTo:
+  - GST-001
+  - GST-002
+  - GST-003
+  boardFrames: null
+  wireframe: wireframes/P02 Guest App.dc.html#gst-012
+  inFlows:
+  - F50 A guest arrives, parks, and gets in
+- screen: GST-013
+  name: Ticket Details
+  module: TODO
+  requiresModule: access
+  wave: 1
+  density: comfortable
+  operations:
+  - getEntitlement
+  - getEntitlementCredential
+  - getEntitlementHistory
+  - transferOrderTickets
+  states:
+  - emptyFirstRun
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams:
+  - entitlementId<-deepLink
+  - orderId<-deepLink
+  goesTo:
+  - GST-001
+  - GST-002
+  - GST-003
+  boardFrames: null
+  wireframe: wireframes/P02 Guest App.dc.html#gst-013
+  inFlows:
+  - F50 A guest arrives, parks, and gets in
+- screen: GST-014
+  name: Ticket Transfer
+  module: TODO
+  requiresModule: ticketing
+  wave: 2
+  density: comfortable
+  operations:
+  - claimTicketTransfer
+  - transferOrderTickets
+  states:
+  - emptyFirstRun
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams:
+  - orderId<-deepLink
+  - transferId<-deepLink
+  goesTo:
+  - GST-001
+  - GST-002
+  - GST-003
+  boardFrames: null
+  wireframe: wireframes/P02 Guest App.dc.html#gst-014
+  inFlows:
+  - F55 A guest buys on the web and transfers to a friend
+- screen: GST-015
+  name: Memberships
+  module: TODO
+  requiresModule: ticketing
+  wave: 2
+  density: comfortable
+  operations:
+  - getGuestLink
+  - getMyMemberships
+  - grantDelegation
+  - listDelegations
+  - listProducts
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams:
+  - guestLinkId<-deepLink
+  - subjectId<-GST-001
+  goesTo:
+  - GST-001
+  - GST-002
+  - GST-003
+  boardFrames: null
+  wireframe: wireframes/P02 Guest App.dc.html#gst-015
+  inFlows:
+  - F19 A membership works in another country
+- screen: GST-016
+  name: My Reservations
+  module: TODO
+  requiresModule: ticketing
+  wave: 2
+  density: comfortable
+  operations:
+  - cancelReservation
+  - getReservation
+  - listReservations
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams:
+  - reservationId<-deepLink
+  goesTo:
+  - GST-001
+  - GST-002
+  - GST-003
+  boardFrames: null
+  wireframe: wireframes/P02 Guest App.dc.html#gst-016
+  inFlows:
+  - F52 A guest books a cabana and uses it
+- screen: GST-017
+  name: Reservation Details
+  module: TODO
+  requiresModule: ticketing
+  wave: 2
+  density: comfortable
+  operations:
+  - cancelReservation
+  - getReservation
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams:
+  - reservationId<-deepLink
+  goesTo:
+  - GST-001
+  - GST-002
+  - GST-003
+  boardFrames: null
+  wireframe: wireframes/P02 Guest App.dc.html#gst-017
+  inFlows:
+  - F52 A guest books a cabana and uses it
+- screen: GST-018
+  name: Add to Calendar / Reminders
+  module: TODO
+  requiresModule: ticketing
+  wave: 3
+  density: comfortable
+  operations:
+  - getOrder
+  - issueWalletPass
+  - listOrders
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams:
+  - orderId<-deepLink
+  goesTo:
+  - GST-001
+  - GST-002
+  - GST-003
+  boardFrames: null
+  wireframe: wireframes/P02 Guest App.dc.html#gst-018
+  inFlows: null
+- screen: GST-019
+  name: Order History (Wallet)
+  module: TODO
+  requiresModule: ticketing
+  wave: 2
+  density: comfortable
+  operations:
+  - getOrder
+  - listMyOrders
+  - listOrders
+  states:
+  - emptyFirstRun
+  - emptyNoResults
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams:
+  - orderId<-deepLink
+  goesTo:
+  - GST-001
+  - GST-002
+  - GST-003
+  boardFrames: null
+  wireframe: wireframes/P02 Guest App.dc.html#gst-019
+  inFlows: null
+- screen: GST-020
+  name: Saved Items / Wishlist
+  module: TODO
+  requiresModule: marketing
+  wave: 3
+  density: comfortable
+  operations:
+  - addToWishlist
+  - getWishlist
+  - removeFromWishlist
+  states:
+  - emptyFirstRun
+  - emptyNoResults
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams:
+  - itemId<-deepLink
+  - subjectId<-GST-001
+  goesTo:
+  - GST-001
+  - GST-002
+  - GST-003
+  boardFrames: null
+  wireframe: wireframes/P02 Guest App.dc.html#gst-020
+  inFlows:
+  - F53 A guest earns, sees and spends loyalty
+- screen: GST-021
+  name: Interactive Map
+  module: TODO
+  requiresModule: seating
+  wave: 2
+  density: comfortable
+  operations:
+  - getVenueMap
+  - getVenueMapGraph
+  - getWaitTimes
+  - listProducts
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams:
+  - mapId<-deepLink
+  goesTo:
+  - GST-001
+  - GST-002
+  - GST-003
+  boardFrames: null
+  wireframe: wireframes/P02 Guest App.dc.html#gst-021
+  inFlows:
+  - F25 A guest rents a cabana
+  - F26 A venue maps its site
+  - F48 A guest finds it, queues for it, and eats
+- screen: GST-022
+  name: Attraction Wait Times
+  module: TODO
+  requiresModule: queue
+  wave: 2
+  density: comfortable
+  operations:
+  - getWaitTimes
+  states:
+  - emptyFirstRun
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams: []
+  goesTo:
+  - GST-001
+  - GST-002
+  - GST-003
+  - GST-059
+  boardFrames: null
+  wireframe: wireframes/P02 Guest App.dc.html#gst-022
+  inFlows:
+  - F21 A ride queue fills and a guest is redirected
+  - F48 A guest finds it, queues for it, and eats
+- screen: GST-023
+  name: Virtual Queue / Join Queue
+  module: TODO
+  requiresModule: queue
+  wave: 3
+  density: comfortable
+  operations:
+  - getQueueEntry
+  - joinQueue
+  - leaveQueue
+  states:
+  - emptyFirstRun
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams:
+  - entryId<-deepLink
+  goesTo:
+  - GST-001
+  - GST-002
+  - GST-003
+  boardFrames: null
+  wireframe: wireframes/P02 Guest App.dc.html#gst-023
+  inFlows:
+  - F48 A guest finds it, queues for it, and eats
+- screen: GST-024
+  name: F&B – Browse & Order
+  module: TODO
+  requiresModule: fnb
+  wave: 2
+  density: comfortable
+  operations:
+  - claimLocationSession
+  - createGuestFnbOrder
+  - getGuestMenu
+  - getGuestOrderStatus
+  - listDeliveryLocations
+  - listDiningOutlets
+  states:
+  - emptyFirstRun
+  - emptyNoResults
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams:
+  - orderId<-deepLink
+  - outletId<-deepLink
+  - venueId<-session
+  goesTo:
+  - GST-001
+  - GST-002
+  - GST-003
+  - GST-009
+  boardFrames: null
+  wireframe: wireframes/P02 Guest App.dc.html#gst-024
+  inFlows:
+  - F11 Guest orders food to a lounger
+  - F48 A guest finds it, queues for it, and eats
+- screen: GST-025
+  name: F&B – Order Tracking
+  module: TODO
+  requiresModule: fnb
+  wave: 2
+  density: comfortable
+  operations:
+  - claimTableSession
+  - getGuestBill
+  - getGuestOrderStatus
+  states:
+  - emptyFirstRun
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams:
+  - orderId<-deepLink
+  - sessionId<-session
+  goesTo:
+  - GST-001
+  - GST-002
+  - GST-003
+  boardFrames: null
+  wireframe: wireframes/P02 Guest App.dc.html#gst-025
+  inFlows:
+  - F11 Guest orders food to a lounger
+  - F48 A guest finds it, queues for it, and eats
+- screen: GST-026
+  name: Retail / Merchandise
+  module: TODO
+  requiresModule: games
+  wave: 2
+  density: comfortable
+  operations:
+  - getGameCard
+  - listMerchandise
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams:
+  - cardCode<-deepLink
+  goesTo:
+  - GST-001
+  - GST-002
+  - GST-003
+  boardFrames: null
+  wireframe: wireframes/P02 Guest App.dc.html#gst-026
+  inFlows:
+  - F17 A guest buys merchandise and collects later
+  - F18 A guest plays an arcade game
+- screen: GST-027
+  name: Parking – Reserve & Pay
+  module: TODO
+  requiresModule: access
+  wave: 3
+  density: comfortable
+  operations:
+  - createParkingEntitlement
+  - updateParkingEntitlement
+  states:
+  - emptyFirstRun
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams:
+  - entitlementId<-deepLink
+  goesTo:
+  - GST-001
+  - GST-002
+  - GST-003
+  boardFrames: null
+  wireframe: wireframes/P02 Guest App.dc.html#gst-027
+  inFlows:
+  - F50 A guest arrives, parks, and gets in
+- screen: GST-028
+  name: Parking – Reservation Confirmed
+  module: TODO
+  requiresModule: access
+  wave: 3
+  density: comfortable
+  operations:
+  - createParkingEntitlement
+  - listParkingFacilities
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams: []
+  goesTo:
+  - GST-001
+  - GST-002
+  - GST-003
+  boardFrames: null
+  wireframe: wireframes/P02 Guest App.dc.html#gst-028
+  inFlows:
+  - F50 A guest arrives, parks, and gets in
+- screen: GST-029
+  name: Venue Info & Services
+  module: TODO
+  requiresModule: fnb
+  wave: 2
+  density: comfortable
+  operations:
+  - listDeliveryLocations
+  - listDiningOutlets
+  states:
+  - emptyFirstRun
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams:
+  - venueId<-session
+  goesTo:
+  - GST-001
+  - GST-002
+  - GST-003
+  boardFrames: null
+  wireframe: wireframes/P02 Guest App.dc.html#gst-029
+  inFlows: null
+- screen: GST-030
+  name: In-Venue Notifications
+  module: TODO
+  requiresModule: fnb
+  wave: 2
+  density: comfortable
+  operations:
+  - claimLocationSession
+  states:
+  - emptyFirstRun
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams: []
+  goesTo:
+  - GST-001
+  - GST-002
+  - GST-003
+  - GST-031
+  boardFrames: null
+  wireframe: wireframes/P02 Guest App.dc.html#gst-030
+  inFlows:
+  - F48 A guest finds it, queues for it, and eats
+- screen: GST-031
+  name: AI Concierge – Home
+  module: TODO
+  requiresModule: fnb
+  wave: 2
+  density: comfortable
+  operations:
+  - getGuestMenu
+  - sendAiMessage
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams:
+  - conversationId<-deepLink
+  - outletId<-deepLink
+  goesTo:
+  - GST-001
+  - GST-002
+  - GST-003
+  - GST-032
+  boardFrames: null
+  wireframe: wireframes/P02 Guest App.dc.html#gst-031
+  inFlows: null
+- screen: GST-032
+  name: AI Concierge – Chat
+  module: TODO
+  requiresModule: ticketing
+  wave: 2
+  density: comfortable
+  operations:
+  - addCartLine
+  - checkoutCart
+  - createGuestFnbOrder
+  - getCart
+  - getGuestOrderStatus
+  - handoverToAgent
+  - sendAiMessage
+  - sendConversationMessage
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams:
+  - cartId<-session
+  - conversationId<-deepLink
+  - orderId<-deepLink
+  goesTo:
+  - GST-001
+  - GST-002
+  - GST-003
+  - GST-033
+  boardFrames: null
+  wireframe: wireframes/P02 Guest App.dc.html#gst-032
+  inFlows: null
+- screen: GST-033
+  name: AI Concierge – Contextual Help
+  module: TODO
+  requiresModule: ai
+  wave: 2
+  density: comfortable
+  operations:
+  - sendAiMessage
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams:
+  - conversationId<-deepLink
+  goesTo:
+  - GST-001
+  - GST-002
+  - GST-003
+  boardFrames: null
+  wireframe: wireframes/P02 Guest App.dc.html#gst-033
+  inFlows: null
+- screen: GST-034
+  name: Lost & Found
+  module: TODO
+  requiresModule: fnb
+  wave: 2
+  density: comfortable
+  operations:
+  - listMyCases
+  - raiseMyCase
+  - replyToMyCase
+  states:
+  - emptyFirstRun
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams:
+  - orderId<-deepLink
+  - caseId<-deepLink
+  goesTo:
+  - GST-001
+  - GST-002
+  - GST-003
+  boardFrames: null
+  wireframe: wireframes/P02 Guest App.dc.html#gst-034
+  inFlows:
+  - F54 Something goes wrong in the venue
+- screen: GST-035
+  name: Feedback & Ratings
+  module: TODO
+  requiresModule: marketing
+  wave: 3
+  density: comfortable
+  operations:
+  - raiseMyCase
+  - submitReview
+  states:
+  - emptyFirstRun
+  - emptyNoResults
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams: []
+  goesTo:
+  - GST-001
+  - GST-002
+  - GST-003
+  boardFrames: null
+  wireframe: wireframes/P02 Guest App.dc.html#gst-035
+  inFlows: null
+- screen: GST-036
+  name: Loyalty & Rewards
+  module: TODO
+  requiresModule: marketing
+  wave: 2
+  density: comfortable
+  operations:
+  - getLoyaltyPosition
+  - listLoyaltyProgrammes
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams: []
+  goesTo:
+  - GST-001
+  - GST-002
+  - GST-003
+  boardFrames: null
+  wireframe: wireframes/P02 Guest App.dc.html#gst-036
+  inFlows:
+  - F53 A guest earns, sees and spends loyalty
+- screen: GST-037
+  name: Offers & Promotions
+  module: TODO
+  requiresModule: ticketing
+  wave: 2
+  density: comfortable
+  operations:
+  - evaluatePromotions
+  - getPromotion
+  - listPromotions
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams:
+  - promotionId<-deepLink
+  goesTo:
+  - GST-001
+  - GST-002
+  - GST-003
+  boardFrames: null
+  wireframe: wireframes/P02 Guest App.dc.html#gst-037
+  inFlows:
+  - F53 A guest earns, sees and spends loyalty
+- screen: GST-038
+  name: Digital Companion Mode
+  module: TODO
+  requiresModule: queue
+  wave: 3
+  density: comfortable
+  operations:
+  - getTenantAppStatus
+  - getWaitTimes
+  - listProducts
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams: []
+  goesTo:
+  - GST-001
+  - GST-002
+  - GST-003
+  boardFrames: null
+  wireframe: wireframes/P02 Guest App.dc.html#gst-038
+  inFlows: null
+- screen: GST-039
+  name: Profile
+  module: TODO
+  requiresModule: marketing
+  wave: 1
+  density: comfortable
+  operations:
+  - recordConsent
+  states:
+  - emptyFirstRun
+  - emptyNoResults
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams:
+  - subjectId<-GST-001
+  goesTo:
+  - GST-001
+  - GST-002
+  - GST-003
+  boardFrames: null
+  wireframe: wireframes/P02 Guest App.dc.html#gst-039
+  inFlows:
+  - F56 A guest registers, verifies and sets preferences
+- screen: GST-040
+  name: Help & Support
+  module: TODO
+  requiresModule: marketing
+  wave: 2
+  density: comfortable
+  operations:
+  - listContentPages
+  - listFaqs
+  - listMyCases
+  - raiseMyCase
+  - replyToMyCase
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams:
+  - caseId<-deepLink
+  goesTo:
+  - GST-001
+  - GST-002
+  - GST-003
+  boardFrames: null
+  wireframe: wireframes/P02 Guest App.dc.html#gst-040
+  inFlows:
+  - F54 Something goes wrong in the venue
+- screen: GST-041
+  name: Checkout Entry
+  module: TODO
+  requiresModule: ticketing
+  wave: 1
+  density: comfortable
+  operations:
+  - checkoutCart
+  - getCart
+  states:
+  - emptyFirstRun
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams:
+  - cartId<-session
+  goesTo:
+  - GST-001
+  - GST-002
+  - GST-003
+  boardFrames: null
+  wireframe: wireframes/P02 Guest App.dc.html#gst-041
+  inFlows: null
+- screen: GST-042
+  name: Simple Registration & OTP
+  module: TODO
+  requiresModule: core
+  wave: 1
+  density: comfortable
+  operations:
+  - completeSsoAuthorization
+  - enrolMfaMethod
+  - getCurrentSession
+  - getGuestSession
+  - guestLogout
+  - guestSocialLogin
+  - guestUaePassLogin
+  - linkGuestCheckout
+  - listMfaMethods
+  - listSsoProviders
+  - login
+  - logout
+  - refreshToken
+  - registerGuest
+  - removeMfaMethod
+  - requestGuestOtp
+  - selectRole
+  - startSsoAuthorization
+  - verifyGuestOtp
+  - verifyMfaChallenge
+  - verifyMfaEnrolment
+  states:
+  - emptyFirstRun
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams:
+  - challengeId<-deepLink
+  - methodId<-deepLink
+  - providerId<-deepLink
+  goesTo:
+  - GST-001
+  - GST-002
+  - GST-003
+  boardFrames: null
+  wireframe: wireframes/P02 Guest App.dc.html#gst-042
+  inFlows:
+  - F56 A guest registers, verifies and sets preferences
+- screen: GST-043
+  name: Arabic / RTL Experience
+  module: TODO
+  requiresModule: core
+  wave: 1
+  density: comfortable
+  operations: []
+  states:
+  - emptyFirstRun
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams: []
+  goesTo:
+  - GST-001
+  - GST-002
+  - GST-003
+  boardFrames: null
+  wireframe: wireframes/P02 Guest App.dc.html#gst-043
+  inFlows: null
+- screen: GST-044
+  name: Multi-Currency & Pricing
+  module: TODO
+  requiresModule: ticketing
+  wave: 2
+  density: comfortable
+  operations:
+  - listFxRates
+  - listProducts
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams: []
+  goesTo:
+  - GST-001
+  - GST-002
+  - GST-003
+  boardFrames: null
+  wireframe: wireframes/P02 Guest App.dc.html#gst-044
+  inFlows: null
+- screen: GST-045
+  name: Ticket Delivery & Sharing
+  module: TODO
+  requiresModule: ticketing
+  wave: 2
+  density: comfortable
+  operations:
+  - transferOrderTickets
+  states:
+  - emptyFirstRun
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams:
+  - orderId<-deepLink
+  goesTo:
+  - GST-001
+  - GST-002
+  - GST-003
+  boardFrames: null
+  wireframe: wireframes/P02 Guest App.dc.html#gst-045
+  inFlows: null
+- screen: GST-046
+  name: Branded Queue / Waiting Room
+  module: TODO
+  requiresModule: queue
+  wave: 1
+  density: comfortable
+  operations:
+  - getWaitTimes
+  states:
+  - emptyFirstRun
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams: []
+  goesTo:
+  - GST-001
+  - GST-002
+  - GST-003
+  boardFrames: null
+  wireframe: wireframes/P02 Guest App.dc.html#gst-046
+  inFlows: null
+- screen: GST-047
+  name: Maintenance / Upgrade Page
+  module: TODO
+  requiresModule: core
+  wave: 1
+  density: comfortable
+  operations:
+  - getTenantAppStatus
+  states:
+  - emptyFirstRun
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams: []
+  goesTo:
+  - GST-001
+  - GST-002
+  - GST-003
+  boardFrames: null
+  wireframe: wireframes/P02 Guest App.dc.html#gst-047
+  inFlows: null
+- screen: GST-048
+  name: Upsell / Cross-Sell
+  module: TODO
+  requiresModule: ticketing
+  wave: 2
+  density: comfortable
+  operations:
+  - addCartLine
+  - getUpsellSuggestions
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams:
+  - cartId<-session
+  goesTo:
+  - GST-001
+  - GST-002
+  - GST-003
+  boardFrames: null
+  wireframe: wireframes/P02 Guest App.dc.html#gst-048
+  inFlows: null
+- screen: GST-049
+  name: Interactive Seat Selection
+  module: TODO
+  requiresModule: seating
+  wave: 2
+  density: comfortable
+  operations:
+  - createSeatHold
+  - getSeatAvailability
+  - recommendSeats
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams:
+  - performanceId<-deepLink
+  goesTo:
+  - GST-001
+  - GST-002
+  - GST-003
+  boardFrames: null
+  wireframe: wireframes/P02 Guest App.dc.html#gst-049
+  inFlows: null
+- screen: GST-050
+  name: Resource Booking – Cabana
+  module: TODO
+  requiresModule: ticketing
+  wave: 3
+  density: comfortable
+  operations:
+  - addCartLine
+  - getAvailability
+  - listProducts
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams:
+  - cartId<-session
+  goesTo:
+  - GST-001
+  - GST-002
+  - GST-003
+  boardFrames: null
+  wireframe: wireframes/P02 Guest App.dc.html#gst-050
+  inFlows:
+  - F52 A guest books a cabana and uses it
+- screen: GST-051
+  name: Plan Your Adventure – Start
+  module: TODO
+  requiresModule: queue
+  wave: 3
+  density: comfortable
+  operations:
+  - getWaitTimes
+  - listProducts
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams: []
+  goesTo:
+  - GST-001
+  - GST-002
+  - GST-003
+  boardFrames: null
+  wireframe: wireframes/P02 Guest App.dc.html#gst-051
+  inFlows:
+  - F49 A guest plans a day and follows it
+- screen: GST-052
+  name: Suggested Itineraries
+  module: TODO
+  requiresModule: ai
+  wave: 3
+  density: comfortable
+  operations:
+  - listCatalogueBundles
+  - listProducts
+  - requestSuggestion
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams:
+  - suggestionId<-deepLink
+  goesTo:
+  - GST-001
+  - GST-002
+  - GST-003
+  boardFrames: null
+  wireframe: wireframes/P02 Guest App.dc.html#gst-052
+  inFlows:
+  - F49 A guest plans a day and follows it
+- screen: GST-053
+  name: Build Your Own Itinerary
+  module: TODO
+  requiresModule: ticketing
+  wave: 3
+  density: comfortable
+  operations:
+  - addCartLine
+  - getCart
+  - getWaitTimes
+  - listProducts
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams:
+  - cartId<-session
+  goesTo:
+  - GST-001
+  - GST-002
+  - GST-003
+  boardFrames: null
+  wireframe: wireframes/P02 Guest App.dc.html#gst-053
+  inFlows:
+  - F49 A guest plans a day and follows it
+- screen: GST-054
+  name: AI Optimized Itinerary
+  module: TODO
+  requiresModule: ai
+  wave: 3
+  density: comfortable
+  operations:
+  - getWaitTimes
+  - listProducts
+  - requestSuggestion
+  - sendAiMessage
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams:
+  - conversationId<-deepLink
+  - suggestionId<-deepLink
+  goesTo:
+  - GST-001
+  - GST-002
+  - GST-003
+  boardFrames: null
+  wireframe: wireframes/P02 Guest App.dc.html#gst-054
+  inFlows:
+  - F49 A guest plans a day and follows it
+- screen: GST-055
+  name: Dynamic QR Ticket
+  module: TODO
+  requiresModule: ticketing
+  wave: 1
+  density: comfortable
+  operations:
+  - transferOrderTickets
+  states:
+  - emptyFirstRun
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams:
+  - orderId<-deepLink
+  goesTo:
+  - GST-001
+  - GST-002
+  - GST-003
+  boardFrames: null
+  wireframe: wireframes/P02 Guest App.dc.html#gst-055
+  inFlows:
+  - F50 A guest arrives, parks, and gets in
+- screen: GST-056
+  name: Bundle Package
+  module: TODO
+  requiresModule: ticketing
+  wave: 2
+  density: comfortable
+  operations:
+  - addCartLine
+  - getBundle
+  - listCatalogueBundles
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams:
+  - bundleId<-deepLink
+  - cartId<-session
+  goesTo:
+  - GST-001
+  - GST-002
+  - GST-003
+  boardFrames: null
+  wireframe: wireframes/P02 Guest App.dc.html#gst-056
+  inFlows: null
+- screen: GST-057
+  name: Accessibility Information
+  module: TODO
+  requiresModule: core
+  wave: 2
+  density: comfortable
+  operations:
+  - listContentPages
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams: []
+  goesTo:
+  - GST-001
+  - GST-002
+  - GST-003
+  boardFrames: null
+  wireframe: wireframes/P02 Guest App.dc.html#gst-057
+  inFlows: null
+- screen: GST-058
+  name: Resource Availability (Cabana)
+  module: TODO
+  requiresModule: ticketing
+  wave: 3
+  density: comfortable
+  operations:
+  - getAvailability
+  - listProducts
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams: []
+  goesTo:
+  - GST-001
+  - GST-002
+  - GST-003
+  boardFrames: null
+  wireframe: wireframes/P02 Guest App.dc.html#gst-058
+  inFlows:
+  - F52 A guest books a cabana and uses it
+- screen: GST-059
+  name: Plan My Day – In Progress
+  module: TODO
+  requiresModule: ai
+  wave: 3
+  density: comfortable
+  operations:
+  - getWaitTimes
+  - listProducts
+  - requestSuggestion
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams:
+  - suggestionId<-deepLink
+  goesTo:
+  - GST-001
+  - GST-002
+  - GST-003
+  boardFrames: null
+  wireframe: wireframes/P02 Guest App.dc.html#gst-059
+  inFlows:
+  - F49 A guest plans a day and follows it
+- screen: GST-061
+  name: Menu Item Detail
+  module: In-Venue Experience
+  requiresModule: fnb
+  wave: 2
+  density: comfortable
+  operations:
+  - getGuestMenu
+  states:
+  - emptyFirstRun
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams:
+  - outletId<-deepLink
+  goesTo:
+  - GST-001
+  - GST-062
+  boardFrames: null
+  wireframe: wireframes/P02 Guest App.dc.html#gst-061
+  inFlows: null
+- screen: GST-062
+  name: Shop & Drop Collection
+  module: In-Venue Experience
+  requiresModule: retail
+  wave: 3
+  density: comfortable
+  operations:
+  - lookupShopAndDrop
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams: []
+  goesTo:
+  - GST-001
+  - GST-061
+  boardFrames: null
+  wireframe: wireframes/P02 Guest App.dc.html#gst-062
+  inFlows:
+  - F51 A guest shops in the venue and collects on the way out
+- screen: GST-063
+  name: Search
+  module: Discovery
+  requiresModule: ticketing
+  wave: 1
+  density: comfortable
+  operations:
+  - searchCatalogue
+  states:
+  - emptyFirstRun
+  - emptyNoResults
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams: []
+  goesTo:
+  - GST-001
+  boardFrames: null
+  wireframe: wireframes/P02 Guest App.dc.html#gst-063
+  inFlows: null
+- screen: GST-065
+  name: Newsletter & Preferences
+  module: Marketing
+  requiresModule: marketing
+  wave: 3
+  density: comfortable
+  operations:
+  - listConsentPurposes
+  - recordConsent
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams:
+  - subjectId<-session
+  goesTo:
+  - GST-001
+  boardFrames: null
+  wireframe: wireframes/P02 Guest App.dc.html#gst-065
+  inFlows:
+  - F56 A guest registers, verifies and sets preferences

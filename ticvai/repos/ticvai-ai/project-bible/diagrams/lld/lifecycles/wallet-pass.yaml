@@ -1,0 +1,45 @@
+id: LLD-Wallet pass
+title: Wallet pass — 6 transitions
+generatedBy: tools/derive-diagrams.py
+index: diagrams/hld/04-lifecycles.yaml
+source: states/wallet-pass.yaml
+entity: Wallet pass
+contract: orders
+enum: WalletPass.status
+enumKind: inline
+enumSchema: WalletPass
+enumProperty: status
+owner: orders
+initial:
+- issued
+terminal:
+- voided
+- expired
+transitions:
+- from: issued
+  to: updated
+  trigger: operation
+  guard: '**Pushed to every registered device.** A gate change reaching one of two is worse than reaching
+    neither — the guest will trust the stale one'
+- from: updated
+  to: updated
+  trigger: operation
+  guard: Changed again
+- from: issued
+  to: voided
+  trigger: operation
+  guard: The entitlement was cancelled, transferred or refunded
+- from: updated
+  to: voided
+  trigger: operation
+  guard: Same
+- from: issued
+  to: expired
+  trigger: timer
+  guard: The entitlement lapsed
+- from: updated
+  to: expired
+  trigger: timer
+  guard: Same
+notes: '**`voided` is pushed, not just recorded.** A voided pass still sitting in a wallet looking valid
+  is a guest arriving at a gate confident and being turned away.'

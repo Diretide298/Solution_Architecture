@@ -1,0 +1,59 @@
+id: LLD-Stock batch
+title: Stock batch — 8 transitions
+generatedBy: tools/derive-diagrams.py
+index: diagrams/hld/04-lifecycles.yaml
+source: states/stock-batch.yaml
+entity: Stock batch
+contract: inventory
+enum: StockBatch.status
+enumKind: inline
+enumSchema: StockBatch
+enumProperty: status
+owner: inventory
+initial:
+- available
+terminal:
+- consumed
+- written-off
+transitions:
+- from: available
+  to: quarantined
+  trigger: operation
+  guard: Held pending inspection. **Not consumed and not available** — a third state, because a batch
+    under suspicion still exists
+- from: quarantined
+  to: available
+  trigger: operation
+  guard: Released after inspection
+  isReversal: true
+- from: available
+  to: expired
+  trigger: timer
+  guard: '**Past `expiresAt`.** Removed from availability automatically — a batch that expires and stays
+    sellable is how a guest is served bad food'
+- from: available
+  to: recalled
+  trigger: operation
+  guard: '**A supplier recall names a lot number**, and every batch with it goes at once'
+- from: quarantined
+  to: recalled
+  trigger: operation
+  guard: Recall arrived during inspection
+- from: available
+  to: consumed
+  trigger: operation
+  guard: Used
+- from: expired
+  to: written-off
+  trigger: operation
+  guard: Disposed and costed
+- from: recalled
+  to: written-off
+  trigger: operation
+  guard: Returned or destroyed, and the cost is the supplier
+notes: '**`quarantined` is the state that matters operationally.** A batch under suspicion is neither
+  available nor gone, and without it a kitchen either serves it or throws it away.
+
+
+  **Expiry is automatic and recall is not** — one is a date the platform knows, the other is a message
+  from outside.'

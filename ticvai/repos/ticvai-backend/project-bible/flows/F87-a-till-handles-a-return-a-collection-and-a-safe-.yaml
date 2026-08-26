@@ -1,0 +1,72 @@
+$schema: ./_schema.yaml
+id: F87
+name: A till handles a return, a collection and a safe drop
+actor: cashier
+capability: A till handles a return, a collection and a safe drop
+wave: 1
+frequency: As the venue needs it.
+criticality: financial
+primaryContract: orders
+contracts:
+- orders
+- retail
+- shift
+platforms:
+- P04
+trigger:
+  description: The things that happen at a till that are not a sale.
+offlineBehaviour: Returns need the network; collections and safe drops do not.
+steps:
+- step: 1
+  screen: POS-011
+  action: Returns, Refunds & Exchanges.
+  operations:
+  - listSerialisedItems
+  outcome: '**Drawn by the client as POS-2B.** 1 operations on this step.'
+- step: 2
+  screen: POS-012
+  action: Omnichannel Order & Fulfilment Center.
+  operations:
+  - adjustDepositBoxFloat
+  - getCurrentShift
+  - listDenominations
+  - listOrders
+  outcome: '**Drawn by the client as POS-2C.** 4 operations on this step.'
+  crossesDevice: true
+- step: 3
+  screen: POS-013
+  action: Mobile POS, Event Sales & Offline Operations.
+  operations:
+  - adjustDepositBoxFloat
+  - createCashMovement
+  - createOrder
+  - getOfflinePackage
+  outcome: '**Drawn by the client as POS-2D.** 4 operations on this step.'
+  crossesDevice: true
+- step: 4
+  screen: POS-007
+  action: Close Shift.
+  operations:
+  - approveShiftOpen
+  - reopenShift
+  - resumeShift
+  - suspendShift
+  outcome: '**Drawn by the client as POS-2E.** 4 operations on this step.'
+  crossesDevice: true
+branches:
+- at: 1
+  condition: A step in the chain is not licensed for this tenant.
+  behaviour: '**The chain stops at the module boundary.** `requiresModule` on each screen decides —
+    a tenant without the retail licence does not see the retail half, and the journey is shorter rather
+    than broken.'
+  severity: medium
+  resolvedBy: getModuleEnablement
+exitStates:
+- state: completed
+  description: The chain ran as the client drew it.
+- state: stoppedAtModule
+  description: '**A licence boundary, not a failure.**'
+notes: '**POS board 2, the non-selling half of a till day.** F32 walks the shift; this walks what happens
+  inside it. **Derived from the client''s own `GOES TO` edges**, not from an inferred path — a pair
+  of frames the client linked is evidence; a chain assembled from unrelated pairs is a guess.'
+openQuestions: null

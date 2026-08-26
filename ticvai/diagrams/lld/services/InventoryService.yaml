@@ -1,0 +1,628 @@
+id: LLD-InventoryService
+title: InventoryService — 50 operations, 19 tables
+generatedBy: tools/derive-diagrams.py
+tier: operations
+index: diagrams/hld/02-services.yaml
+why: '**Stock, counting and procurement.** Its own service because `inventory.stock_level` is derived
+  from movements — a rule four operations broke on 20 August — and that derivation is expensive enough
+  to want its own read path.'
+scale: Mixed. Counting is bursty; procurement is not.
+ifDown: Down blocks receiving and counting; selling continues from the till's cache.
+coverage:
+  operations: 50
+  inAFlow: 48
+  percent: 96%
+  note: '**Flow coverage is how much of this service a journey has walked.** A service under 40% is
+    unwalked rather than under-documented.'
+schemas:
+- schema: inventory
+  tables: 19
+  stores:
+  - derived
+  - postgres
+  largestTable: inventory.item
+operationsByContract:
+- contract: inventory
+  count: 50
+  operations:
+  - operation: acknowledgePurchaseOrder
+    verb: POST
+    path: /purchase-orders/{purchaseOrderId}/acknowledge
+    scope: venue
+    permission: PRODUCT_CONFIGURE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: approveRequisition
+    verb: POST
+    path: /requisitions/{requisitionId}/approve
+    scope: venue
+    permission: APPROVAL_ACT
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: bulkUpdateProducts
+    verb: POST
+    path: /products/bulk
+    scope: venue
+    permission: PRODUCT_CONFIGURE
+    offline: false
+    reads: 4
+    writes: 5
+  - operation: cancelPurchaseOrder
+    verb: POST
+    path: /purchase-orders/{purchaseOrderId}/cancel
+    scope: venue
+    permission: ORDER_CANCEL
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: cancelRequisition
+    verb: POST
+    path: /requisitions/{requisitionId}/cancel
+    scope: venue
+    permission: PRODUCT_CONFIGURE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: cancelStockCount
+    verb: POST
+    path: /stock-counts/{countId}/cancel
+    scope: venue
+    permission: PRODUCT_CONFIGURE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: closePurchaseOrderShort
+    verb: POST
+    path: /purchase-orders/{purchaseOrderId}/close-short
+    scope: venue
+    permission: LEDGER_APPROVE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: closeTransferShort
+    verb: POST
+    path: /stock-transfers/{transferId}/close-short
+    scope: venue
+    permission: LEDGER_APPROVE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: compareQuotations
+    verb: GET
+    path: /requisitions/{requisitionId}/quotations
+    scope: venue
+    permission: PRODUCT_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: createGoodsReceipt
+    verb: POST
+    path: /goods-receipts
+    scope: venue
+    permission: PRODUCT_CONFIGURE
+    offline: true
+    reads: 2
+    writes: 2
+  - operation: createInventoryItem
+    verb: POST
+    path: /inventory-items
+    scope: venue
+    permission: PRODUCT_CONFIGURE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: createPurchaseOrder
+    verb: POST
+    path: /purchase-orders
+    scope: venue
+    permission: ORDER_CREATE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: createRequisition
+    verb: POST
+    path: /requisitions
+    scope: venue
+    permission: ORDER_CREATE
+    offline: true
+    reads: 2
+    writes: 2
+  - operation: createStockLocation
+    verb: POST
+    path: /stock-locations
+    scope: venue
+    permission: PRODUCT_CONFIGURE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: createStockMovement
+    verb: POST
+    path: /stock-movements
+    scope: venue
+    permission: PRODUCT_CONFIGURE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: createStockTransfer
+    verb: POST
+    path: /stock-transfers
+    scope: venue
+    permission: PRODUCT_CONFIGURE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: createSupplier
+    verb: POST
+    path: /suppliers
+    scope: region
+    permission: PRODUCT_CONFIGURE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: getCountVariance
+    verb: GET
+    path: /stock-counts/{countId}/variance
+    scope: venue
+    permission: PRODUCT_VIEW
+    offline: true
+    reads: 1
+    writes: 0
+  - operation: getInventoryItem
+    verb: GET
+    path: /inventory-items/{itemId}
+    scope: venue
+    permission: PRODUCT_VIEW
+    offline: true
+    reads: 1
+    writes: 0
+  - operation: getPurchaseOrder
+    verb: GET
+    path: /purchase-orders/{purchaseOrderId}
+    scope: venue
+    permission: PRODUCT_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: getStockPositions
+    verb: GET
+    path: /stock
+    scope: venue
+    permission: PRODUCT_VIEW
+    offline: true
+    reads: 3
+    writes: 0
+  - operation: getStockTransfer
+    verb: GET
+    path: /stock-transfers/{transferId}
+    scope: venue
+    permission: PRODUCT_VIEW
+    offline: true
+    reads: 2
+    writes: 0
+  - operation: getStockValuation
+    verb: GET
+    path: /stock/valuation
+    scope: venue
+    permission: LEDGER_VIEW
+    offline: false
+    reads: 3
+    writes: 0
+  - operation: getSuggestedRequisitions
+    verb: GET
+    path: /requisitions/suggested
+    scope: venue
+    permission: PRODUCT_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listExpiringBatches
+    verb: GET
+    path: /stock-batches/expiring
+    scope: venue
+    permission: INVENTORY_VIEW
+    offline: true
+    reads: 2
+    writes: 0
+  - operation: listGoodsReceipts
+    verb: GET
+    path: /goods-receipts
+    scope: venue
+    permission: PRODUCT_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listInventoryItems
+    verb: GET
+    path: /inventory-items
+    scope: venue
+    permission: PRODUCT_VIEW
+    offline: true
+    reads: 1
+    writes: 0
+  - operation: listPurchaseOrders
+    verb: GET
+    path: /purchase-orders
+    scope: venue
+    permission: PRODUCT_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listRequisitions
+    verb: GET
+    path: /requisitions
+    scope: venue
+    permission: PRODUCT_VIEW
+    offline: true
+    reads: 1
+    writes: 0
+  - operation: listSerialisedItems
+    verb: GET
+    path: /serialised-items
+    scope: venue
+    permission: PRODUCT_VIEW
+    offline: true
+    reads: 3
+    writes: 0
+  - operation: listStockCounts
+    verb: GET
+    path: /stock-counts
+    scope: venue
+    permission: PRODUCT_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listStockLocations
+    verb: GET
+    path: /stock-locations
+    scope: venue
+    permission: PRODUCT_VIEW
+    offline: true
+    reads: 1
+    writes: 0
+  - operation: listStockMovements
+    verb: GET
+    path: /stock-movements
+    scope: venue
+    permission: PRODUCT_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listStockTransfers
+    verb: GET
+    path: /stock-transfers
+    scope: venue
+    permission: PRODUCT_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listSuppliers
+    verb: GET
+    path: /suppliers
+    scope: region
+    permission: PRODUCT_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: lookupInventoryItem
+    verb: GET
+    path: /inventory-items/lookup
+    scope: venue
+    permission: PRODUCT_VIEW
+    offline: true
+    reads: 1
+    writes: 0
+  - operation: postStockCount
+    verb: POST
+    path: /stock-counts/{countId}/post
+    scope: venue
+    permission: LEDGER_POST
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: receiveStockTransfer
+    verb: POST
+    path: /stock-transfers/{transferId}/receive
+    scope: venue
+    permission: PRODUCT_CONFIGURE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: recordQuotation
+    verb: POST
+    path: /suppliers/{supplierId}/quotations
+    scope: venue
+    permission: PRODUCT_CONFIGURE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: recountStockCount
+    verb: POST
+    path: /stock-counts/{countId}/recount
+    scope: venue
+    permission: LEDGER_APPROVE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: rejectReceivedGoods
+    verb: POST
+    path: /goods-receipts/{receiptId}/reject
+    scope: venue
+    permission: PRODUCT_CONFIGURE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: rejectRequisition
+    verb: POST
+    path: /requisitions/{requisitionId}/reject
+    scope: venue
+    permission: LEDGER_APPROVE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: returnRequisition
+    verb: POST
+    path: /requisitions/{requisitionId}/return
+    scope: venue
+    permission: LEDGER_APPROVE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: sendPurchaseOrder
+    verb: POST
+    path: /purchase-orders/{purchaseOrderId}/send
+    scope: venue
+    permission: PRODUCT_CONFIGURE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: setDailyCount
+    verb: PUT
+    path: /stock-counts/daily
+    scope: venue
+    permission: PRODUCT_CONFIGURE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: startStockCount
+    verb: POST
+    path: /stock-counts
+    scope: venue
+    permission: PRODUCT_CONFIGURE
+    offline: true
+    reads: 2
+    writes: 2
+  - operation: submitCountLines
+    verb: POST
+    path: /stock-counts/{countId}/lines
+    scope: venue
+    permission: PRODUCT_CONFIGURE
+    offline: true
+    reads: 2
+    writes: 2
+  - operation: updateInventoryItem
+    verb: PATCH
+    path: /inventory-items/{itemId}
+    scope: venue
+    permission: PRODUCT_CONFIGURE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: updateRequisitionLines
+    verb: PUT
+    path: /requisitions/{requisitionId}/lines
+    scope: venue
+    permission: PRODUCT_CONFIGURE
+    offline: true
+    reads: 3
+    writes: 2
+  - operation: updateSupplier
+    verb: PUT
+    path: /suppliers/{supplierId}
+    scope: tenant
+    permission: PRODUCT_CONFIGURE
+    offline: false
+    reads: 2
+    writes: 4
+tables:
+- store: cache:idempotency
+  kind: cache
+  columns: 5
+  backing: redis
+  owned: false
+  why: '**Not a table and not owned by a service.** Derived from something already read, invalidated
+    by an event already consumed, losable without consequence — no migration, no backup, no owner.'
+- store: cache:resolution
+  kind: cache
+  columns: 4
+  backing: redis
+  owned: false
+  why: '**Not a table and not owned by a service.** Derived from something already read, invalidated
+    by an event already consumed, losable without consequence — no migration, no backup, no owner.'
+- table: inventory.count
+  columns: 16
+  store: postgres
+  parent: null
+  writtenBy:
+  - inventory
+  foreignWriters: null
+- table: inventory.count_line
+  columns: 14
+  store: postgres
+  parent: inventory.count
+  writtenBy: []
+  foreignWriters: null
+- table: inventory.goods_receipt
+  columns: 11
+  store: postgres
+  parent: null
+  writtenBy:
+  - inventory
+  foreignWriters: null
+- table: inventory.goods_receipt_line
+  columns: 9
+  store: postgres
+  parent: inventory.goods_receipt
+  writtenBy: []
+  foreignWriters: null
+- table: inventory.item
+  columns: 26
+  store: postgres
+  parent: null
+  writtenBy:
+  - inventory
+  foreignWriters: null
+- table: inventory.location
+  columns: 7
+  store: postgres
+  parent: null
+  writtenBy:
+  - inventory
+  foreignWriters: null
+- table: inventory.movement
+  columns: 17
+  store: postgres
+  parent: null
+  writtenBy:
+  - fnb
+  - inventory
+  - retail
+  foreignWriters:
+  - fnb
+  - retail
+- table: inventory.purchase_order
+  columns: 20
+  store: postgres
+  parent: null
+  writtenBy:
+  - inventory
+  foreignWriters: null
+- table: inventory.purchase_order_line
+  columns: 9
+  store: postgres
+  parent: inventory.purchase_order
+  writtenBy: []
+  foreignWriters: null
+- table: inventory.quotation
+  columns: 11
+  store: postgres
+  parent: inventory.requisition
+  writtenBy:
+  - inventory
+  foreignWriters: null
+- table: inventory.quotation_line
+  columns: 5
+  store: postgres
+  parent: inventory.quotation
+  writtenBy: []
+  foreignWriters: null
+- table: inventory.requisition
+  columns: 12
+  store: postgres
+  parent: null
+  writtenBy:
+  - inventory
+  - maintenance
+  foreignWriters:
+  - maintenance
+- table: inventory.requisition_line
+  columns: 9
+  store: postgres
+  parent: inventory.requisition
+  writtenBy: []
+  foreignWriters: null
+- table: inventory.serialised_item
+  columns: 9
+  store: postgres
+  parent: null
+  writtenBy: []
+  foreignWriters: null
+- table: inventory.stock_batch
+  columns: 10
+  store: postgres
+  parent: null
+  writtenBy: []
+  foreignWriters: null
+- table: inventory.stock_level
+  columns: 1
+  store: derived
+  parent: inventory.item
+  writtenBy: []
+  foreignWriters: null
+- table: inventory.supplier
+  columns: 12
+  store: postgres
+  parent: null
+  writtenBy:
+  - inventory
+  foreignWriters: null
+- table: inventory.transfer
+  columns: 9
+  store: postgres
+  parent: null
+  writtenBy:
+  - inventory
+  foreignWriters: null
+- table: inventory.transfer_line
+  columns: 7
+  store: postgres
+  parent: inventory.transfer
+  writtenBy: []
+  foreignWriters: null
+readsFrom:
+- service: CatalogueService
+  operations: 2
+- service: LedgerService
+  operations: 1
+- service: FnbService
+  operations: 1
+writesOutside:
+- service: CatalogueService
+  operations: 2
+  why: '**The owner defines the row; this service may only append to it.**'
+- service: TenancyService
+  operations: 1
+  why: '**The owner defines the row; this service may only append to it.**'
+screens:
+- P04:POS-011 Returns, Refunds & Exchanges
+- P06:EMP-061 Retail Inventory Command Center
+- P06:EMP-062 Store Stock & SKU Availability
+- P06:EMP-063 Requisition & Smart Store Replenishment
+- P06:EMP-064 Store-to-Store & Warehouse Transfers
+- P06:EMP-065 Receiving & Store Put-Away
+- P06:EMP-066 Stock Count & Cycle Count Management
+- P06:EMP-067 Damage, Loss, Shrinkage & Stock Adjustment
+- P06:EMP-068 Reservation, Allocation & Omnichannel Inventory
+- P06:EMP-069 Barcode, RFID, Serialized Stock & Traceability
+- P06:EMP-070 Inventory Exceptions, AI Replenishment & Action Center
+- P08:BO-007 Product Directory
+- P08:BO-049 Stock Levels
+- P08:BO-050 Stock Position & Valuation
+- P08:BO-052 Goods Receipt
+- P08:BO-078 Requisitions
+- P08:BO-079 Stock Count
+- P08:BO-080 Stock Transfers
+- P08:BO-081 Inventory Items
+- P08:BO-082 Stock Movements
+- P08:BO-083 Suppliers
+- P08:BO-114 Variants, Attributes, Barcode & RFID Management
+- P08:BO-137 Recipe Consumption & Theoretical Inventory
+- P08:BO-138 Production Execution & Batch Management
+- P08:BO-140 Product Availability, 86 & Operational Food Safety
+- P08:BO-141 Operational Alerts, AI Replenishment & Action Center
+- P16:ANL-005 Cost, Margin & Profitability
+- P16:ANL-006 Inventory & Waste Intelligence
+flows:
+- F15 A part is needed and ordered
+- F30 A count is entered, varied and posted
+- F34 A retail sale, from scan to return
+- F35 Stock arrives short and an oversell is resolved
+- F76 Stock is counted, requested, transferred and received
+- F78 A supplier is set up and a catalogue is priced and published
+- F80 A table is configured, reserved, seated and billed
+- F82 A month is analysed from incrementality to a scheduled report
+- F85 Production is planned, costed and released
+- F87 A till handles a return, a collection and a safe drop
+- F92 Store stock is watched, replenished and reconciled
+- F94 A restaurant floor is set up before service

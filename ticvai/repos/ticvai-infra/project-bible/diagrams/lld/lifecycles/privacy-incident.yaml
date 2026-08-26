@@ -1,0 +1,50 @@
+id: LLD-Privacy incident
+title: Privacy incident — 6 transitions
+generatedBy: tools/derive-diagrams.py
+index: diagrams/hld/04-lifecycles.yaml
+source: states/privacy-incident.yaml
+entity: Privacy incident
+contract: marketing-crm
+enum: PrivacyIncident.status
+enumKind: inline
+enumSchema: PrivacyIncident
+enumProperty: status
+owner: marketing-crm
+initial:
+- open
+terminal:
+- closed
+transitions:
+- from: open
+  to: assessing
+  trigger: operation
+  guard: '**The 72-hour clock started at discovery, not here** — PDPL requires notification to the Data
+    Office within 72 hours of becoming aware'
+- from: assessing
+  to: contained
+  trigger: operation
+  guard: '**The leak is stopped.** Containment is not notification and not resolution — it is the first
+    thing that matters'
+- from: contained
+  to: notified
+  trigger: operation
+  guard: Regulator informed, and the data subjects where the risk is high
+- from: assessing
+  to: notified
+  trigger: operation
+  guard: Notified before containment, where the risk demanded it
+- from: contained
+  to: closed
+  trigger: operation
+  guard: '**Assessed as below the notification threshold, and the assessment is recorded** — deciding
+    not to notify is the decision most worth being able to defend'
+- from: notified
+  to: closed
+  trigger: operation
+  guard: Remediated
+notes: '**The clock starts at discovery.** A model that starts it at assessment lets an organisation
+  delay the clock by delaying the assessment, which is what the regulation is written against.
+
+
+  **`contained` sits before `notified` on purpose** — stopping the leak comes first, and a model that
+  made notification the next step after assessment would imply otherwise.'

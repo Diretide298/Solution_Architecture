@@ -1,0 +1,61 @@
+id: LLD-Tenant subscription
+title: Tenant subscription — 7 transitions
+generatedBy: tools/derive-diagrams.py
+index: diagrams/hld/04-lifecycles.yaml
+source: states/subscription.yaml
+entity: Tenant subscription
+contract: subscription
+enum: Subscription.status
+enumKind: inline
+enumSchema: Subscription
+enumProperty: status
+owner: subscription
+initial:
+- trial
+- active
+terminal:
+- cancelled
+- expired
+transitions:
+- from: trial
+  to: active
+  operation: setSubscription
+  trigger: operation
+  guard: Converted to paying
+- from: trial
+  to: expired
+  trigger: timer
+  guard: Trial ended without converting
+- from: active
+  to: pastDue
+  trigger: timer
+  guard: '**Payment failed. Service continues** — CF-61’s principle: degrade, never stop. A gate refusing
+    entry over an invoice is worse than an unpaid invoice'
+- from: pastDue
+  to: active
+  operation: setSubscription
+  trigger: operation
+  guard: Paid
+  isReversal: true
+- from: pastDue
+  to: cancelled
+  operation: cancelSubscription
+  trigger: operation
+  guard: '**Terminated after the dunning period.** A commercial decision with a person behind it, never
+    automatic'
+- from: active
+  to: cancelled
+  operation: cancelSubscription
+  trigger: operation
+  guard: Cancelled by the tenant or by TICVAI
+- from: cancelled
+  to: active
+  operation: setSubscription
+  trigger: operation
+  guard: Reinstated within the retention window
+  isReversal: true
+notes: '**`pastDue` never stops service.** An unpaid invoice is a commercial problem and a closed gate
+  is an operational one, and the second is worse for both parties.
+
+
+  Termination is always a decision, never a timer.'

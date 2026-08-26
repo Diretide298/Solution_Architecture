@@ -1,0 +1,237 @@
+id: LLD-P14
+title: P14 Developer Portal — 8 screens
+generatedBy: tools/derive-diagrams.py
+index: diagrams/hld/00-platform.yaml
+audience: partner
+operator: partner
+app: developer-portal-web
+formFactor: web
+runtime: reactWeb
+offlineCapable: false
+deployment:
+  target: browser
+  distribution: served from the cell
+  bundleUpdate: immediate on deploy
+  hosting: in-cell, in-region
+  storeReview: false
+  deviceOwnership: developer device, unmanaged
+  networkAssumption: public internet
+  releaseCadence: 'Monthly, and the API it documents moves on a twelve-month deprecation cycle (ADR-0026).
+    **The portal may change weekly; the contract it describes may not.**
+
+    '
+why: '**Two audiences on one platform and the split matters.** A developer manages their own organisation,
+  clients, sandboxes and subscriptions. A Softlabs administrator sets quotas, certifies integrations
+  and configures licensing — `DEVELOPER_ADMIN`, and those screens are never shown to a developer.
+
+  **Nothing here is offline-capable.** A developer portal is used at a desk.
+
+  '
+modulesUsed:
+- module: developerApi
+  screens: 8
+servicesCalled:
+- service: ControlService
+  operationCalls: 21
+coverage:
+  screens: 8
+  inAFlow: 7
+  drawn: 8
+  note: '**A screen in no flow has been specified and never walked.** Every flow written in this package
+    has found a defect.'
+screens:
+- screen: DEV-001
+  name: API Reference
+  module: Developer & API
+  requiresModule: developerApi
+  wave: 2
+  density: compact
+  operations:
+  - listApiVersions
+  states:
+  - emptyFirstRun
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - DEV-002
+  - DEV-004
+  boardFrames: null
+  wireframe: wireframes/P14 Developer.dc.html#dev-001
+  inFlows:
+  - F27 A developer integrates
+- screen: DEV-002
+  name: Register & Organisation
+  module: Developer & API
+  requiresModule: developerApi
+  wave: 2
+  density: compact
+  operations:
+  - registerDeveloper
+  - setDeveloperMembers
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - developerId<-deepLink
+  goesTo:
+  - DEV-003
+  boardFrames: null
+  wireframe: wireframes/P14 Developer.dc.html#dev-002
+  inFlows:
+  - F27 A developer integrates
+- screen: DEV-003
+  name: Clients & Credentials
+  module: Developer & API
+  requiresModule: developerApi
+  wave: 2
+  density: compact
+  operations:
+  - createApiClient
+  - listApiClients
+  - revokeApiCredential
+  - rotateApiCredential
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - clientId<-deepLink
+  goesTo:
+  - DEV-004
+  - DEV-005
+  boardFrames: null
+  wireframe: wireframes/P14 Developer.dc.html#dev-003
+  inFlows:
+  - F27 A developer integrates
+- screen: DEV-004
+  name: Sandbox
+  module: Developer & API
+  requiresModule: developerApi
+  wave: 2
+  density: compact
+  operations:
+  - createSandbox
+  - listSandboxes
+  - resetSandbox
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  - partial
+  offlineState: false
+  entryParams:
+  - sandboxId<-deepLink
+  goesTo:
+  - DEV-005
+  boardFrames: null
+  wireframe: wireframes/P14 Developer.dc.html#dev-004
+  inFlows:
+  - F27 A developer integrates
+- screen: DEV-005
+  name: Webhooks
+  module: Developer & API
+  requiresModule: developerApi
+  wave: 2
+  density: compact
+  operations:
+  - createWebhookSubscription
+  - listWebhookDeliveries
+  - listWebhookSubscriptions
+  - replayEvents
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  - partial
+  offlineState: false
+  entryParams:
+  - subscriptionId<-deepLink
+  goesTo:
+  - DEV-006
+  boardFrames: null
+  wireframe: wireframes/P14 Developer.dc.html#dev-005
+  inFlows:
+  - F27 A developer integrates
+- screen: DEV-006
+  name: Usage & Limits
+  module: Developer & API
+  requiresModule: developerApi
+  wave: 2
+  density: compact
+  operations:
+  - getApiUsage
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - DEV-001
+  boardFrames: null
+  wireframe: wireframes/P14 Developer.dc.html#dev-006
+  inFlows:
+  - F27 A developer integrates
+- screen: DEV-007
+  name: Marketplace Listing
+  module: Developer & API
+  requiresModule: developerApi
+  wave: 3
+  density: compact
+  operations:
+  - listIntegrationListings
+  - submitIntegrationListing
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo: []
+  boardFrames: null
+  wireframe: wireframes/P14 Developer.dc.html#dev-007
+  inFlows:
+  - F27 A developer integrates
+- screen: DEV-008
+  name: Programme Administration
+  module: Developer & API
+  requiresModule: developerApi
+  wave: 2
+  density: compact
+  operations:
+  - certifyIntegration
+  - deprecateApiVersion
+  - setApiLicensing
+  - setApiQuota
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - listingId<-deepLink
+  - version<-deepLink
+  goesTo: []
+  boardFrames: null
+  wireframe: wireframes/P14 Developer.dc.html#dev-008
+  inFlows: null

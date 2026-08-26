@@ -1,0 +1,119 @@
+# F22 — A tenant rebrands their app
+#
+# P13 had no flow and `white-label` had 41 operations with two covered. The app-store
+# branch is ADR-0006 meeting a tenant who expects everything to be configuration.
+#
+# Validated by tools/check-flows.py.
+
+id: F22
+name: A tenant rebrands their app
+actor: venueManager
+wave: 2
+frequency: rare
+criticality: operational
+platforms:
+- P13 Venue CMS
+- P02 Guest App
+- P01 Guest Web
+offlineBehaviour: Not offline. Publishing reaches every guest surface at once, and a half-published
+  brand is worse than an old one.
+trigger:
+  description: A venue changes its logo, colours and homepage, and it must reach the website and the
+    app without a release.
+  entryScreen: CMS-002
+  entryPoints:
+  - Seasonal campaign
+  - Rebrand
+  - A new venue joining an existing tenant
+steps:
+- step: 1
+  screen: CMS-002
+  action: Uploads the new logo and icons
+  operations:
+  - createUpload
+  - completeUpload
+  - setBrandIdentity
+  outcome: '**Assets, not code.** A logo change must not be a release'
+- step: 2
+  screen: CMS-005
+  action: Sets the colour theme
+  operations:
+  - getTheme
+  - setTheme
+  outcome: Contrast checked, because a brand colour that fails 4.5:1 is inaccessible
+- step: 3
+  screen: CMS-007
+  action: Rearranges the homepage
+  operations:
+  - getHomepageLayout
+  - setHomepageLayout
+  outcome: Sections reordered, drag and drop
+- step: 4
+  screen: CMS-012
+  action: Previews in both directions
+  operations:
+  - getTenantConfig
+  - validateTenantConfig
+  outcome: '**Arabic is a mirror, not a translation** — the preview must show it'
+- step: 5
+  screen: CMS-014
+  action: Publishes
+  operations:
+  - publishTenantConfig
+  - getTenantAppStatus
+  outcome: Live on web immediately; the app picks it up on next launch
+- step: 6
+  screen: CMS-015
+  action: Rolls back when something is wrong
+  operations:
+  - listConfigVersions
+  - restoreConfigVersion
+  outcome: '**Versioned, so the previous brand is one click away**'
+branches:
+- at: 2
+  condition: The brand colour fails contrast
+  behaviour: '**Warned, not blocked.** It is the tenant’s brand and their decision, and the platform
+    records that they were told — refusing a client’s own colour is a fight the platform will lose.'
+  severity: recoverable
+  resolvedBy: Tenant
+- at: 4
+  condition: Arabic layout breaks with the new logo
+  behaviour: A wide logo that fits left-aligned may not fit mirrored. **This is why the preview toggles
+    direction**, and it is the defect that reaches production without one.
+  severity: recoverable
+  resolvedBy: Tenant
+- at: 5
+  condition: Published mid-transaction
+  behaviour: A guest partway through checkout keeps the config version they started with. **A rebrand
+    must not change a price or a layout under someone mid-purchase.**
+  severity: recoverable
+  resolvedBy: Automatic
+- at: 5
+  condition: The app store build is older than the config
+  behaviour: Config is data and the shell is a release. **Anything needing a new shell does not publish**
+    — an app icon change is a store submission, not a config change (ADR-0006).
+  severity: requiresStaff
+  resolvedBy: Tenant + Softlabs
+- at: 6
+  condition: Rollback after guests have seen the new brand
+  behaviour: Fine for a homepage, awkward for an app icon that is cached on a device. **The two roll
+    back at different speeds** and the interface should say so.
+  severity: recoverable
+  resolvedBy: Tenant
+- at: 3
+  condition: Content exists only in English
+  behaviour: Published anyway, with the gap listed per locale. **A CMS that blocks publishing until
+    every locale is complete is a CMS nobody publishes from.**
+  severity: recoverable
+  resolvedBy: Tenant
+exitStates:
+- state: completed
+  description: Published and live on every surface
+- state: deferred
+  description: Published to web, app awaits a store release
+- state: abandoned
+  description: Rolled back
+primaryContract: white-label
+contracts:
+- white-label
+- assets

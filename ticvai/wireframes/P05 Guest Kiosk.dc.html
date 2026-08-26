@@ -1,0 +1,602 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>P05 Guest Kiosk — wireframe board</title>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+/* **The Claude Design system, applied to the generated boards on 24 August.**
+   Three client packs render at 1280x700 in this system and 385 screens rendered as
+   dashed-box wireframes — and **a client reviewing both reads the difference as *those screens
+   are not done*.** The information is identical either way; the fidelity is what was being
+   judged.
+
+   Tokens are the packs': #0B1324 rail, #0D6EFD primary, #00B8FF accent, Manrope for UI,
+   IBM Plex Mono for figures and codes. */
+:root{--ink:#0B1324;--mut:#5A6577;--dim:#9AA5B6;--line:#E8ECF3;--edge:#E3E8F0;
+--brand:#0D6EFD;--accent:#00B8FF;--rail:#0B1324;--paper:#FFF;--wash:#F7F9FC;
+--ok:#0E9F6E;--okbg:#E8F6F0;--okline:#BFE3D2;--warn:#8A6D00;--warnbg:#FFF7E6;
+--bad:#A81E1E;--badbg:#FDECEC}
+*{box-sizing:border-box}
+body{margin:0;background:#F2F5F9;color:var(--ink);
+font-family:Manrope,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:13px;line-height:1.55}
+a{color:inherit}
+.wrap{max-width:1420px;margin:0 auto;padding:22px 34px 90px}
+.home{font-size:11.5px;color:var(--mut);text-decoration:none;letter-spacing:.02em}
+.head{display:flex;align-items:baseline;justify-content:space-between;gap:20px;
+margin:14px 0 6px;padding-bottom:16px;border-bottom:2px solid var(--ink)}
+.mark{font-size:13px;font-weight:800;letter-spacing:.16em;
+background:linear-gradient(90deg,var(--brand),var(--accent));-webkit-background-clip:text;
+background-clip:text;color:transparent}
+h1{font-size:19px;font-weight:800;letter-spacing:-.015em;margin:0}
+.meta{font-size:11px;color:var(--mut);font-family:'IBM Plex Mono',ui-monospace,monospace;line-height:1.7}
+.lede{font-size:12.5px;color:var(--mut);max-width:82ch;margin:16px 0 0;line-height:1.65}
+.grp{font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:11px;font-weight:600;
+letter-spacing:.14em;color:var(--dim);text-transform:uppercase;margin:52px 0 18px;
+padding-bottom:9px;border-bottom:1px solid var(--line)}
+.stack{display:flex;flex-direction:column;gap:52px}
+.scr{display:flex;flex-direction:column;gap:13px;scroll-margin-top:24px}
+.hdr{display:flex;align-items:baseline;gap:9px;flex-wrap:wrap}
+.code{font-family:'IBM Plex Mono',monospace;font-size:12px;color:#8494A8}
+.ttl{font-size:16.5px;font-weight:800;letter-spacing:-.015em}
+.pur{font-size:12px;color:#6B7280;margin-top:3px;max-width:96ch}
+.pill{font-size:9px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;
+padding:2px 7px;border-radius:5px;background:#EEF3FA;color:#4A5A70}
+.pill.named{background:var(--warnbg);color:var(--warn)}
+.pill.off{background:var(--okbg);color:var(--ok)}
+
+/* the frame — 1280x700, the packs' dimension */
+.frame{width:1280px;height:700px;display:flex;background:var(--wash);border:1px solid var(--edge);
+border-radius:14px;overflow:hidden;box-shadow:0 16px 38px rgba(12,35,64,.09)}
+.rail{flex:none;width:180px;background:var(--rail);display:flex;flex-direction:column;position:relative}
+.rail::before{content:'';position:absolute;inset:0;
+background:radial-gradient(300px 200px at 0% 4%,rgba(0,184,255,.20),transparent 70%);pointer-events:none}
+.brand{position:relative;padding:15px 14px 13px;border-bottom:1px solid rgba(255,255,255,.08)}
+.brand b{display:block;font-size:14px;font-weight:800;letter-spacing:.1em;
+background:linear-gradient(90deg,#4DA3FF,var(--accent));-webkit-background-clip:text;
+background-clip:text;color:transparent}
+.brand span{display:block;font-size:9.5px;color:#7FA3C9;margin-top:5px}
+.nav{position:relative;display:flex;flex-direction:column;gap:2px;padding:11px 9px}
+.nav i{display:block;padding:8px 10px;border-radius:9px;font-size:11.5px;font-style:normal;color:#8FA8C4}
+.nav i.on{background:linear-gradient(90deg,rgba(13,110,253,.30),rgba(0,184,255,.10));
+color:#fff;font-weight:700}
+.body{flex:1;display:flex;flex-direction:column;min-width:0}
+.top{flex:none;height:54px;display:flex;align-items:center;gap:12px;padding:0 18px;
+background:var(--paper);border-bottom:1px solid var(--line)}
+.top h2{font-size:13.5px;font-weight:800;letter-spacing:-.01em;margin:0}
+.top small{display:block;font-size:10px;color:var(--dim);font-weight:500}
+.acts{margin-left:auto;display:flex;gap:6px}
+.chip{height:32px;display:flex;align-items:center;gap:6px;padding:0 11px;border:1px solid var(--edge);
+border-radius:8px;font-size:11px;font-weight:700;color:var(--mut);background:var(--paper)}
+.chip.live{background:var(--okbg);border-color:var(--okline);color:var(--ok)}
+.chip.live::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--ok)}
+.chip.cta{background:var(--brand);border-color:var(--brand);color:#fff}
+.canvas{flex:1;display:flex;flex-direction:column;gap:12px;padding:14px 16px;min-height:0;overflow:hidden}
+.kpis{flex:none;display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.kpi{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:11px 13px;
+display:flex;flex-direction:column;gap:4px}
+.kpi b{font-size:9.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--dim)}
+.kpi span{font-family:'IBM Plex Mono',monospace;font-size:19px;font-weight:600;letter-spacing:-.02em}
+.panel{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:12px 14px;
+display:flex;flex-direction:column;gap:8px;min-height:0}
+.panel > b{font-size:11px;font-weight:800;letter-spacing:-.005em}
+.panel .why{font-size:10px;color:#7C8899;font-style:italic;line-height:1.5}
+.kind{font-family:'IBM Plex Mono',monospace;font-size:9px;color:var(--dim);
+letter-spacing:.06em;text-transform:uppercase}
+.rows{display:flex;flex-direction:column;gap:6px}
+.row{display:grid;grid-template-columns:1.6fr 1fr 1fr .7fr;gap:10px;align-items:center;
+padding:7px 0;border-top:1px solid #F0F3F8}
+.row:first-child{border-top:0;font-size:9.5px;font-weight:700;letter-spacing:.06em;
+text-transform:uppercase;color:var(--dim)}
+.bar{height:7px;border-radius:4px;background:#EDF1F7}
+.bar i{display:block;height:100%;border-radius:4px;
+background:linear-gradient(90deg,var(--brand),var(--accent))}
+.side{flex:none;width:250px;display:flex;flex-direction:column;gap:10px}
+.two{flex:1;display:flex;gap:12px;min-height:0}
+.grow{flex:1;min-width:0}
+.strip{flex:none;height:26px;display:flex;align-items:center;gap:8px;padding:0 18px;
+background:var(--warnbg);color:var(--warn);font-size:10px;font-weight:700;
+letter-spacing:.05em;text-transform:uppercase;border-bottom:1px solid #F0E0B8}
+.dark .frame{background:#0A1524}
+.dark .top{background:#0E2A4C;border-color:#1E3A5F;color:#E6F0FA}
+.dark .top small{color:#7FA3C9}
+.dark .canvas{background:#0A1524}
+.dark .kpi,.dark .panel{background:#0E2A4C;border-color:#1E3A5F;color:#E6F0FA}
+.dark .row{border-color:#193353}
+.dark .chip{background:#0E2A4C;border-color:#1E3A5F;color:#9FC0E0}
+
+.foot{font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:10px;line-height:1.85;color:#7C8899}
+.foot b{color:#4A5566;font-weight:600}
+.foot .warn{color:var(--warn)}
+.bottom{margin-top:64px;padding-top:16px;border-top:1px solid var(--line);
+display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
+</style></head><body>
+<div class="wrap">
+  <a class="home" href="TICVAI%20Wireframe%20Boards.dc.html">&larr; All boards</a>
+  <div class="head">
+    <div><span class="mark">TICVAI</span>
+      <h1>P05 · Guest Kiosk — Self-Service <span style="font-weight:600;color:#6B7280">(17 screens)</span></h1></div>
+    <div class="meta">guest · kiosk · guest-app</div>
+  </div>
+  <p class="lede"></p>
+  <div class="grp">01 — Sell · 16 screens</div><div class="stack">
+      <div id="ksk-001" class="scr">
+        <div>
+          <div class="hdr"><span class="code">KSK-001</span>
+            <span class="ttl">Attract Loop</span><span class="pill off">offline</span></div>
+          <div class="pur">Pull somebody standing in a queue out of it.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>Guest</b><span>Sell</span></div><nav class="nav"><i class="">What&#x27;s on</i><i class="on">My tickets</i><i class="">Food &amp; drink</i><i class="">Map</i><i class="">Help</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Attract Loop</h2>
+                <small>Guest Kiosk · wave 2 · touchLarge</small></div>
+              <div class="acts"><div class="chip">Sign in</div><div class="chip cta">Basket</div></div>
+            </div>
+            <div class="strip">offline capable · works from the local journal</div>
+            <div class="canvas">
+              
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">detailPanel</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">Structure from the wireframe board. Components not yet enumerated.</span></div><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">Implied by the detail template — not declared on the screen.</span></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; none declared</div>
+          <div><b>STATES</b> &middot; <span class="warn">loading · emptyFirstRun · error · offline</span></div>
+          
+          <div><b>GOES TO</b> &middot; entry point · KSK-002 · KSK-003 · KSK-004</div>
+        </div>
+      </div>
+      <div id="ksk-002" class="scr">
+        <div>
+          <div class="hdr"><span class="code">KSK-002</span>
+            <span class="ttl">Language Select</span><span class="pill off">offline</span></div>
+          <div class="pur">Ask the only question that changes everything else.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>Guest</b><span>Sell</span></div><nav class="nav"><i class="">What&#x27;s on</i><i class="on">My tickets</i><i class="">Food &amp; drink</i><i class="">Map</i><i class="">Help</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Language Select</h2>
+                <small>Guest Kiosk · wave 2 · touchLarge</small></div>
+              <div class="acts"><div class="chip">Sign in</div><div class="chip cta">Basket</div></div>
+            </div>
+            <div class="strip">offline capable · works from the local journal</div>
+            <div class="canvas">
+              
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">detailPanel</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">Structure from the wireframe board. Components not yet enumerated.</span></div><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">Implied by the detail template — not declared on the screen.</span></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; getTenantAppStatus · getTenantConfig</div>
+          <div><b>STATES</b> &middot; <span class="warn">loading · emptyFirstRun · emptyNoAccess · error · offline</span></div>
+          
+          <div><b>GOES TO</b> &middot; KSK-001 · KSK-003 · KSK-004</div>
+        </div>
+      </div>
+      <div id="ksk-003" class="scr">
+        <div>
+          <div class="hdr"><span class="code">KSK-003</span>
+            <span class="ttl">What are you buying</span><span class="pill off">offline</span></div>
+          <div class="pur">Get to a product in one touch.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>Guest</b><span>Sell</span></div><nav class="nav"><i class="">What&#x27;s on</i><i class="on">My tickets</i><i class="">Food &amp; drink</i><i class="">Map</i><i class="">Help</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>What are you buying</h2>
+                <small>Guest Kiosk · wave 2 · touchLarge</small></div>
+              <div class="acts"><div class="chip">Sign in</div><div class="chip cta">Basket</div></div>
+            </div>
+            <div class="strip">offline capable · works from the local journal</div>
+            <div class="canvas">
+              
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">detailPanel</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">Structure from the wireframe board. Components not yet enumerated.</span></div><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">Implied by the detail template — not declared on the screen.</span></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; listProducts</div>
+          <div><b>STATES</b> &middot; <span class="warn">loading · emptyFirstRun · emptyNoAccess · error · offline</span></div>
+          
+          <div><b>GOES TO</b> &middot; KSK-001 · KSK-002 · KSK-004</div>
+        </div>
+      </div>
+      <div id="ksk-004" class="scr">
+        <div>
+          <div class="hdr"><span class="code">KSK-004</span>
+            <span class="ttl">Choose tickets</span><span class="pill off">offline</span></div>
+          <div class="pur">Quantities, with targets a gloved hand can hit.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>Guest</b><span>Sell</span></div><nav class="nav"><i class="">What&#x27;s on</i><i class="on">My tickets</i><i class="">Food &amp; drink</i><i class="">Map</i><i class="">Help</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Choose tickets</h2>
+                <small>Guest Kiosk · wave 2 · touchLarge</small></div>
+              <div class="acts"><div class="chip">Sign in</div><div class="chip cta">Basket</div></div>
+            </div>
+            <div class="strip">offline capable · works from the local journal</div>
+            <div class="canvas">
+              
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">detailPanel</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">Structure from the wireframe board. Components not yet enumerated.</span></div><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">Implied by the detail template — not declared on the screen.</span></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; getAvailability · listProductVariants</div>
+          <div><b>STATES</b> &middot; <span class="warn">loading · emptyFirstRun · emptyNoAccess · error · offline</span></div>
+          <div><b>ARRIVES WITH</b> &middot; productId&larr;deepLink</div>
+          <div><b>GOES TO</b> &middot; KSK-001 · KSK-002 · KSK-003 · KSK-005</div>
+        </div>
+      </div>
+      <div id="ksk-005" class="scr">
+        <div>
+          <div class="hdr"><span class="code">KSK-005</span>
+            <span class="ttl">Choose a session</span><span class="pill off">offline</span></div>
+          <div class="pur">Pick a time that still has room.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>Guest</b><span>Sell</span></div><nav class="nav"><i class="">What&#x27;s on</i><i class="on">My tickets</i><i class="">Food &amp; drink</i><i class="">Map</i><i class="">Help</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Choose a session</h2>
+                <small>Guest Kiosk · wave 2 · touchLarge</small></div>
+              <div class="acts"><div class="chip">Sign in</div><div class="chip cta">Basket</div></div>
+            </div>
+            <div class="strip">offline capable · works from the local journal</div>
+            <div class="canvas">
+              
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">detailPanel</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">Structure from the wireframe board. Components not yet enumerated.</span></div><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">Implied by the detail template — not declared on the screen.</span></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; acquireLease · getAvailability</div>
+          <div><b>STATES</b> &middot; <span class="warn">loading · emptyFirstRun · emptyNoAccess · error · offline</span></div>
+          
+          <div><b>GOES TO</b> &middot; KSK-001 · KSK-002 · KSK-003 · KSK-006</div>
+        </div>
+      </div>
+      <div id="ksk-006" class="scr">
+        <div>
+          <div class="hdr"><span class="code">KSK-006</span>
+            <span class="ttl">Review</span><span class="pill off">offline</span></div>
+          <div class="pur">Show what is being bought before money moves.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>Guest</b><span>Sell</span></div><nav class="nav"><i class="">What&#x27;s on</i><i class="on">My tickets</i><i class="">Food &amp; drink</i><i class="">Map</i><i class="">Help</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Review</h2>
+                <small>Guest Kiosk · wave 2 · touchLarge</small></div>
+              <div class="acts"><div class="chip">Sign in</div><div class="chip cta">Basket</div></div>
+            </div>
+            <div class="strip">offline capable · works from the local journal</div>
+            <div class="canvas">
+              
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">detailPanel</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">Structure from the wireframe board. Components not yet enumerated.</span></div><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">Implied by the detail template — not declared on the screen.</span></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; getCart · addCartLine · checkoutCart · evaluatePromotions</div>
+          <div><b>STATES</b> &middot; <span class="warn">loading · emptyFirstRun · emptyNoAccess · error · offline</span></div>
+          <div><b>ARRIVES WITH</b> &middot; cartId&larr;session</div>
+          <div><b>GOES TO</b> &middot; KSK-001 · KSK-002 · KSK-003 · KSK-007</div>
+        </div>
+      </div>
+      <div id="ksk-007" class="scr">
+        <div>
+          <div class="hdr"><span class="code">KSK-007</span>
+            <span class="ttl">Payment</span><span class="pill off">offline</span></div>
+          <div class="pur">Take a card, and nothing else.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>Guest</b><span>Sell</span></div><nav class="nav"><i class="">What&#x27;s on</i><i class="on">My tickets</i><i class="">Food &amp; drink</i><i class="">Map</i><i class="">Help</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Payment</h2>
+                <small>Guest Kiosk · wave 2 · touchLarge</small></div>
+              <div class="acts"><div class="chip">Sign in</div><div class="chip cta">Basket</div></div>
+            </div>
+            <div class="strip">offline capable · works from the local journal</div>
+            <div class="canvas">
+              
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">detailPanel</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">Structure from the wireframe board. Components not yet enumerated.</span></div><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">Implied by the detail template — not declared on the screen.</span></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; createPayment</div>
+          <div><b>STATES</b> &middot; <span class="warn">loading · emptyFirstRun · emptyNoAccess · error · offline</span></div>
+          
+          <div><b>GOES TO</b> &middot; KSK-001 · KSK-002 · KSK-003 · KSK-009</div>
+        </div>
+      </div>
+      <div id="ksk-008" class="scr">
+        <div>
+          <div class="hdr"><span class="code">KSK-008</span>
+            <span class="ttl">Payment unresolved</span><span class="pill off">offline</span></div>
+          <div class="pur">Handle the state that has nobody standing next to it.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>Guest</b><span>Sell</span></div><nav class="nav"><i class="">What&#x27;s on</i><i class="on">My tickets</i><i class="">Food &amp; drink</i><i class="">Map</i><i class="">Help</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Payment unresolved</h2>
+                <small>Guest Kiosk · wave 2 · touchLarge</small></div>
+              <div class="acts"><div class="chip">Sign in</div><div class="chip cta">Basket</div></div>
+            </div>
+            <div class="strip">offline capable · works from the local journal</div>
+            <div class="canvas">
+              
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">detailPanel</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">Structure from the wireframe board. Components not yet enumerated.</span></div><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">Implied by the detail template — not declared on the screen.</span></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; inquirePaymentStatus</div>
+          <div><b>STATES</b> &middot; <span class="warn">loading · emptyFirstRun · emptyNoAccess · error · offline</span></div>
+          <div><b>ARRIVES WITH</b> &middot; paymentId&larr;deepLink</div>
+          <div><b>GOES TO</b> &middot; KSK-001 · KSK-002 · KSK-003</div>
+        </div>
+      </div>
+      <div id="ksk-009" class="scr">
+        <div>
+          <div class="hdr"><span class="code">KSK-009</span>
+            <span class="ttl">Ticket issued</span><span class="pill off">offline</span></div>
+          <div class="pur">Get the ticket into the guest’s hand.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>Guest</b><span>Sell</span></div><nav class="nav"><i class="">What&#x27;s on</i><i class="on">My tickets</i><i class="">Food &amp; drink</i><i class="">Map</i><i class="">Help</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Ticket issued</h2>
+                <small>Guest Kiosk · wave 2 · touchLarge</small></div>
+              <div class="acts"><div class="chip">Sign in</div><div class="chip cta">Basket</div></div>
+            </div>
+            <div class="strip">offline capable · works from the local journal</div>
+            <div class="canvas">
+              
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">detailPanel</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">Structure from the wireframe board. Components not yet enumerated.</span></div><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">Implied by the detail template — not declared on the screen.</span></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; transferOrderTickets · getOrder</div>
+          <div><b>STATES</b> &middot; <span class="warn">loading · emptyFirstRun · emptyNoAccess · error · offline</span></div>
+          <div><b>ARRIVES WITH</b> &middot; orderId&larr;deepLink</div>
+          <div><b>GOES TO</b> &middot; KSK-001 · KSK-002 · KSK-003</div>
+        </div>
+      </div>
+      <div id="ksk-010" class="scr">
+        <div>
+          <div class="hdr"><span class="code">KSK-010</span>
+            <span class="ttl">Print failure</span><span class="pill off">offline</span></div>
+          <div class="pur">Recover when the paper runs out mid-sale.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>Guest</b><span>Sell</span></div><nav class="nav"><i class="">What&#x27;s on</i><i class="on">My tickets</i><i class="">Food &amp; drink</i><i class="">Map</i><i class="">Help</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Print failure</h2>
+                <small>Guest Kiosk · wave 2 · touchLarge</small></div>
+              <div class="acts"><div class="chip">Sign in</div><div class="chip cta">Basket</div></div>
+            </div>
+            <div class="strip">offline capable · works from the local journal</div>
+            <div class="canvas">
+              
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">detailPanel</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">Structure from the wireframe board. Components not yet enumerated.</span></div><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">Implied by the detail template — not declared on the screen.</span></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; transferOrderTickets</div>
+          <div><b>STATES</b> &middot; <span class="warn">loading · emptyFirstRun · error · offline</span></div>
+          <div><b>ARRIVES WITH</b> &middot; orderId&larr;deepLink</div>
+          <div><b>GOES TO</b> &middot; KSK-001 · KSK-002 · KSK-003 · KSK-013</div>
+        </div>
+      </div>
+      <div id="ksk-011" class="scr">
+        <div>
+          <div class="hdr"><span class="code">KSK-011</span>
+            <span class="ttl">Collect a booking</span><span class="pill off">offline</span></div>
+          <div class="pur">Turn a reference into media.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>Guest</b><span>Sell</span></div><nav class="nav"><i class="">What&#x27;s on</i><i class="on">My tickets</i><i class="">Food &amp; drink</i><i class="">Map</i><i class="">Help</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Collect a booking</h2>
+                <small>Guest Kiosk · wave 2 · touchLarge</small></div>
+              <div class="acts"><div class="chip">Sign in</div><div class="chip cta">Basket</div></div>
+            </div>
+            <div class="strip">offline capable · works from the local journal</div>
+            <div class="canvas">
+              
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">detailPanel</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">Structure from the wireframe board. Components not yet enumerated.</span></div><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">Implied by the detail template — not declared on the screen.</span></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; lookupShopAndDrop · getOrder</div>
+          <div><b>STATES</b> &middot; <span class="warn">loading · emptyFirstRun · emptyNoAccess · error · offline</span></div>
+          <div><b>ARRIVES WITH</b> &middot; orderId&larr;deepLink</div>
+          <div><b>GOES TO</b> &middot; KSK-001 · KSK-002 · KSK-003</div>
+        </div>
+      </div>
+      <div id="ksk-012" class="scr">
+        <div>
+          <div class="hdr"><span class="code">KSK-012</span>
+            <span class="ttl">Booking found</span><span class="pill off">offline</span></div>
+          <div class="pur">Confirm it is the right booking, then print.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>Guest</b><span>Sell</span></div><nav class="nav"><i class="">What&#x27;s on</i><i class="on">My tickets</i><i class="">Food &amp; drink</i><i class="">Map</i><i class="">Help</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Booking found</h2>
+                <small>Guest Kiosk · wave 2 · touchLarge</small></div>
+              <div class="acts"><div class="chip">Sign in</div><div class="chip cta">Basket</div></div>
+            </div>
+            <div class="strip">offline capable · works from the local journal</div>
+            <div class="canvas">
+              
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">detailPanel</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">Structure from the wireframe board. Components not yet enumerated.</span></div><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">Implied by the detail template — not declared on the screen.</span></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; transferOrderTickets</div>
+          <div><b>STATES</b> &middot; <span class="warn">loading · emptyFirstRun · error · offline</span></div>
+          <div><b>ARRIVES WITH</b> &middot; orderId&larr;deepLink</div>
+          <div><b>GOES TO</b> &middot; KSK-001 · KSK-002 · KSK-003</div>
+        </div>
+      </div>
+      <div id="ksk-013" class="scr">
+        <div>
+          <div class="hdr"><span class="code">KSK-013</span>
+            <span class="ttl">Call staff</span><span class="pill off">offline</span></div>
+          <div class="pur">Get a human, without leaving the kiosk.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>Guest</b><span>Sell</span></div><nav class="nav"><i class="">What&#x27;s on</i><i class="on">My tickets</i><i class="">Food &amp; drink</i><i class="">Map</i><i class="">Help</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Call staff</h2>
+                <small>Guest Kiosk · wave 2 · touchLarge</small></div>
+              <div class="acts"><div class="chip">Sign in</div><div class="chip cta">Basket</div></div>
+            </div>
+            <div class="strip">offline capable · works from the local journal</div>
+            <div class="canvas">
+              
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">detailPanel</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">Structure from the wireframe board. Components not yet enumerated.</span></div><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">Implied by the detail template — not declared on the screen.</span></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; endKioskAssist</div>
+          <div><b>STATES</b> &middot; <span class="warn">loading · emptyFirstRun · error · offline</span></div>
+          <div><b>ARRIVES WITH</b> &middot; sessionId&larr;session</div>
+          <div><b>GOES TO</b> &middot; KSK-001 · KSK-002 · KSK-003</div>
+        </div>
+      </div>
+      <div id="ksk-014" class="scr">
+        <div>
+          <div class="hdr"><span class="code">KSK-014</span>
+            <span class="ttl">Out of service</span><span class="pill off">offline</span></div>
+          <div class="pur">Fail in a way that does not strand anybody.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>Guest</b><span>Sell</span></div><nav class="nav"><i class="">What&#x27;s on</i><i class="on">My tickets</i><i class="">Food &amp; drink</i><i class="">Map</i><i class="">Help</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Out of service</h2>
+                <small>Guest Kiosk · wave 2 · touchLarge</small></div>
+              <div class="acts"><div class="chip">Sign in</div><div class="chip cta">Basket</div></div>
+            </div>
+            <div class="strip">offline capable · works from the local journal</div>
+            <div class="canvas">
+              
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">detailPanel</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">Structure from the wireframe board. Components not yet enumerated.</span></div><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">Implied by the detail template — not declared on the screen.</span></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; none declared</div>
+          <div><b>STATES</b> &middot; <span class="warn">loading · emptyFirstRun · error · offline</span></div>
+          
+          <div><b>GOES TO</b> &middot; KSK-001 · KSK-002 · KSK-003</div>
+        </div>
+      </div>
+      <div id="ksk-016" class="scr">
+        <div>
+          <div class="hdr"><span class="code">KSK-016</span>
+            <span class="ttl">Order Food</span></div>
+          <div class="pur">Order food from the kiosk and collect it.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>Guest</b><span>Sell</span></div><nav class="nav"><i class="">What&#x27;s on</i><i class="on">My tickets</i><i class="">Food &amp; drink</i><i class="">Map</i><i class="">Help</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Order Food</h2>
+                <small>Guest Kiosk · wave 2 · touchLarge</small></div>
+              <div class="acts"><div class="chip">Sign in</div><div class="chip cta">Basket</div></div>
+            </div>
+            
+            <div class="canvas">
+              
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">cardList</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">Photographs, because **a guest at a kiosk with a queue behind them is not reading descriptions**</span></div><div class="panel"><span class="kind">banner</span><div class="strip" style="height:auto;padding:6px 10px;border:0">notice</div><span class="why">Allergens shown on the card, not behind a tap. **contains and mayContain are different claims** and a fryer shared with breaded fish makes chips a fish risk</span></div><div class="panel"><b>Add to order</b><div class="chip cta">Add to order</div></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; getGuestMenu · createGuestFnbOrder</div>
+          <div><b>STATES</b> &middot; <span class="">loading · emptyFirstRun · emptyNoResults · emptyNoAccess · error</span></div>
+          <div><b>ARRIVES WITH</b> &middot; outletId&larr;deepLink</div>
+          <div><b>GOES TO</b> &middot; KSK-017</div>
+        </div>
+      </div>
+      <div id="ksk-017" class="scr">
+        <div>
+          <div class="hdr"><span class="code">KSK-017</span>
+            <span class="ttl">Shop</span></div>
+          <div class="pur">Buy merchandise at the kiosk, or reserve it for collection.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>Guest</b><span>Sell</span></div><nav class="nav"><i class="">What&#x27;s on</i><i class="on">My tickets</i><i class="">Food &amp; drink</i><i class="">Map</i><i class="">Help</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Shop</h2>
+                <small>Guest Kiosk · wave 2 · touchLarge</small></div>
+              <div class="acts"><div class="chip">Sign in</div><div class="chip cta">Basket</div></div>
+            </div>
+            
+            <div class="canvas">
+              
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">cardList</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div></div><div class="panel"><b>Size</b><div class="chip">Size</div></div><div class="panel"><b>Add</b><div class="chip cta">Add</div></div></div><div class="side"><div class="panel"><b>Reserve for collection</b><div class="chip">Reserve for collection</div><span class="why">BL-019. **Reserve is not buy** — the guest pays at a till or on the app, and this screen is honest about which</span></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; listMerchandise · reserveMerchandise</div>
+          <div><b>STATES</b> &middot; <span class="">loading · emptyFirstRun · emptyNoResults · emptyNoAccess · error</span></div>
+          <div><b>ARRIVES WITH</b> &middot; outletId&larr;KSK-016</div>
+          <div><b>GOES TO</b> &middot; nothing declared</div>
+        </div>
+      </div></div><div class="grp">02 — AI · 1 screens</div><div class="stack">
+      <div id="ksk-015" class="scr">
+        <div>
+          <div class="hdr"><span class="code">KSK-015</span>
+            <span class="ttl">Assistant</span></div>
+          <div class="pur">Help a guest choose and pay, and nothing else.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>Guest</b><span>AI</span></div><nav class="nav"><i class="">What&#x27;s on</i><i class="on">My tickets</i><i class="">Food &amp; drink</i><i class="">Map</i><i class="">Help</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Assistant</h2>
+                <small>Guest Kiosk · wave 2 · touchLarge</small></div>
+              <div class="acts"><div class="chip">Sign in</div><div class="chip cta">Basket</div></div>
+            </div>
+            
+            <div class="canvas">
+              
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">detailPanel</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">Implied by the detail template — not declared on the screen.</span></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; sendAiMessage · listProducts · getAvailability · handoverToAgent</div>
+          <div><b>STATES</b> &middot; <span class="">loading · emptyFirstRun · emptyNoAccess · error</span></div>
+          <div><b>ARRIVES WITH</b> &middot; conversationId&larr;deepLink</div>
+          <div><b>GOES TO</b> &middot; KSK-001</div>
+        </div>
+      </div></div>
+  <div class="bottom">
+    <span>Generated by tools/derive-wireframes.py from screens/P05-guest-kiosk.yaml — do not hand-edit</span>
+    <span>P05 · 17 screens · 2 groups</span>
+  </div>
+</div></body></html>

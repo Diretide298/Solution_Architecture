@@ -1,0 +1,214 @@
+/* ── the signed-out pages ───────────────────────────────────────────
+ *
+ * From `ui-design/AUTH.md`. The invite page and the sign-in page are one
+ * design in two arrangements: the same stage, the same lattice behind it, the
+ * same fields, the same button, the same strip along the bottom. Only the
+ * furniture around them differs — a centred card on one, two columns on the
+ * other — and that is all `invite.css` and `login.css` still hold.
+ *
+ * Both carry a palette of their own rather than the app's. They are the only
+ * screens a stranger sees, they are all stage and no chrome, and the tokens
+ * that make a dense tool readable make a welcome screen look like a
+ * spreadsheet.
+ *
+ * Scoped with `:is()` rather than `:where()` on purpose. Every `.auth-*` class
+ * below is also styled by `layers.css`, where the app's own dialogs use it;
+ * `:where()` adds no specificity, so those rules would then be settled by the
+ * order of two <link> tags — a thing that breaks silently the first time
+ * somebody tidies a <head>.
+ */
+
+:is(.invite-page, .signin-page) {
+  /* night */
+  --stage: #080b0c;
+  --card-fill: rgba(18, 23, 25, 0.82);
+  --card-line: rgba(72, 207, 203, 0.16);
+  --card-shadow: 0 24px 70px rgba(0, 0, 0, 0.6);
+  --ink-title: #edf2f2;
+  --ink-body: #96a3a4;
+  --ink-strong: #cfdada;
+  --ink-label: #7e8c8d;
+  --ink-faint: #6e7b7c;
+  --field-fill: #0e1314;
+  --field-line: #24302f;
+  --field-focus: #2bb3b0;
+  --cta: linear-gradient(135deg, #2bb3b0, #48cfcb);
+  --cta-ink: #04211f;
+  --cta-glow: rgba(43, 179, 176, 0.34);
+}
+
+/* Day is the default here, as everywhere else in the viewer: :root carries it
+   and only night sits behind the attribute. Written second so it wins. */
+:root:not([data-theme="dark"]) :is(.invite-page, .signin-page) {
+  --stage: #e6f1f6;
+  --card-fill: rgba(255, 255, 255, 0.88);
+  --card-line: rgba(31, 143, 145, 0.18);
+  --card-shadow: 0 22px 60px rgba(21, 43, 49, 0.14);
+  --ink-title: #16323a;
+  --ink-body: #5f7274;
+  --ink-strong: #2a4a50;
+  --ink-label: #6c7d7f;
+  --ink-faint: #7a8a8b;
+  --field-fill: #f7fafa;
+  --field-line: #dbe3e4;
+  --field-focus: #1f8f91;
+  --cta: linear-gradient(135deg, #1f8f91, #3fc9c5);
+  --cta-glow: rgba(31, 143, 145, 0.26);
+}
+
+:is(.invite-page, .signin-page) {
+  margin: 0;
+  min-height: 100vh;
+  position: relative;
+  overflow: hidden;
+  background: var(--stage);
+  color: var(--ink-body);
+  font-family: var(--sans);
+}
+
+/* The two layers under everything: the lattice on a canvas, and a radial wash
+   that sinks it without hiding it. Each page sets its own --scrim, because
+   where the wash is transparent depends on where the page is quiet. */
+.auth-field,
+.auth-scrim {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  /* A background that can take a click from a password field is a bug. */
+  pointer-events: none;
+}
+.auth-field { display: block; }
+.auth-scrim { background: var(--scrim); }
+
+/* ── brand ─────────────────────────────────────────────────────────
+   Two cuts of one lockup. The handoff composed the day version from a mark
+   plus typeset Montserrat because no dark-wordmark file existed yet, and said
+   to swap a real one in when it arrived — it has, so this is that swap. The
+   height is the page's business: 44px on the card, 58px on the stage. */
+.auth-lockup { width: auto; max-width: 100%; display: block; }
+.auth-lockup-night { display: none; }
+:root[data-theme="dark"] .auth-lockup-day { display: none; }
+:root[data-theme="dark"] .auth-lockup-night { display: block; }
+
+/* ── the states ────────────────────────────────────────────────────
+   One at a time. The gap belongs to the page, so a state is a plain stack. */
+:is(.invite-page, .signin-page) .auth-state { display: flex; flex-direction: column; }
+:is(.invite-page, .signin-page) .auth-state[hidden] { display: none; }
+
+:is(.invite-page, .signin-page) .auth-title {
+  margin: 0;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+  color: var(--ink-title);
+}
+:is(.invite-page, .signin-page) .auth-note {
+  margin: 0;
+  font-size: 13.5px;
+  line-height: 1.6;
+  color: var(--ink-body);
+  text-wrap: pretty;
+}
+:is(.invite-page, .signin-page) .auth-note b { color: var(--ink-strong); font-weight: 600; }
+:is(.invite-page, .signin-page) .auth-fine { font-size: 12px; color: var(--ink-faint); }
+:is(.invite-page, .signin-page) .auth-fine code {
+  font-family: var(--mono);
+  font-size: 0.92em;
+  color: var(--ink-strong);
+}
+
+/* ── fields ────────────────────────────────────────────────────────── */
+.auth-field-row { display: flex; flex-direction: column; gap: 7px; }
+:is(.invite-page, .signin-page) .auth-label {
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: var(--ink-label);
+}
+:is(.invite-page, .signin-page) .auth-input {
+  width: 100%;
+  box-sizing: border-box;
+  font: inherit;
+  font-size: 14px;
+  padding: 12px 14px;
+  border-radius: 11px;
+  border: 1px solid var(--field-line);
+  background: var(--field-fill);
+  color: var(--ink-title);
+}
+:is(.invite-page, .signin-page) .auth-input::placeholder { color: var(--ink-label); }
+:is(.invite-page, .signin-page) .auth-input:focus {
+  outline: none;
+  border-color: var(--field-focus);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--field-focus) 18%, transparent);
+}
+
+:is(.invite-page, .signin-page) .auth-error {
+  margin: 0;
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: #ff8b7e;
+}
+:root:not([data-theme="dark"]) :is(.invite-page, .signin-page) .auth-error { color: #c0564f; }
+
+:is(.invite-page, .signin-page) .auth-button {
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+  text-align: center;
+  text-decoration: none;
+  font: inherit;
+  font-size: 14.5px;
+  font-weight: 700;
+  padding: 13px 18px;
+  border: 0;
+  border-radius: 11px;
+  background: var(--cta);
+  color: var(--cta-ink);
+  cursor: pointer;
+  box-shadow: 0 8px 22px var(--cta-glow);
+  transition: box-shadow 0.18s ease, transform 0.18s ease;
+}
+:is(.invite-page, .signin-page) .auth-button:hover:not(:disabled) {
+  box-shadow: 0 12px 32px var(--cta-glow);
+  transform: translateY(-1px);
+}
+:is(.invite-page, .signin-page) .auth-button:disabled { opacity: 0.62; cursor: default; }
+
+/* ── the foot ──────────────────────────────────────────────────────
+   Who built it and who it is for. The AinfiniteCore mark is two overlapping
+   rings in CSS — it is two circles, and an image of two circles is a file to
+   keep in step for nothing. */
+.auth-foot {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding-top: 18px;
+  border-top: 1px solid var(--field-line);
+}
+.auth-rings { display: flex; align-items: center; flex: none; }
+.auth-ring {
+  width: 14px; height: 14px;
+  border-radius: 50%;
+  border: 1.6px solid #48cfcb;
+}
+.auth-ring + .auth-ring { margin-left: -5px; border-color: #2bb3b0; }
+/* Day. The two above are the night accents — #48cfcb reads 1.68:1 on the pale
+   auth ground and #2bb3b0 2.28:1, so on this page they were rings nobody could
+   see. The scheme's own two teals, a step apart for the same reason. */
+:root:not([data-theme="dark"]) .auth-ring { border-color: #218dae; }
+:root:not([data-theme="dark"]) .auth-ring + .auth-ring { border-color: #12566b; }
+.auth-by { display: flex; flex-direction: column; gap: 2px; }
+.auth-by-label {
+  font-size: 8.5px; font-weight: 700; letter-spacing: 0.16em;
+  text-transform: uppercase; line-height: 1; color: var(--ink-label);
+}
+.auth-by-name {
+  font-size: 12.5px; font-weight: 700; line-height: 1; color: var(--ink-strong);
+}
+.auth-by-name b { color: #48cfcb; font-weight: 700; }
+:root:not([data-theme="dark"]) .auth-by-name b { color: #218dae; }
+.auth-partner { margin-left: auto; width: 74px; flex: none; opacity: 0.5; }
+:root[data-theme="dark"] .auth-partner { filter: brightness(0) invert(1); opacity: 0.55; }

@@ -1,0 +1,76 @@
+$schema: ./_schema.yaml
+id: F52
+name: A guest books a cabana and uses it
+actor: guest
+capability: Resource booking
+wave: 3
+frequency: Routine.
+criticality: revenue
+primaryContract: resources
+contracts:
+- resources
+- orders
+- catalogue
+platforms:
+- P02
+trigger:
+  description: A guest wants a cabana for the afternoon. **They do not want cabana seven — they want
+    a cabana**, and F25 established that the guest side had never been walked.
+offlineBehaviour: '**Availability needs the network.** Contended inventory cannot be judged from a cache.'
+steps:
+- step: 1
+  screen: GST-058
+  action: They check what is free.
+  operations:
+  - getAvailability
+  - listProducts
+  outcome: '**By kind, not by unit.** A guest choosing between eleven identical cabanas is a guest the
+    model has leaked itself to.'
+- step: 2
+  screen: GST-050
+  action: They book and pay.
+  operations:
+  - getAvailability
+  - addCartLine
+  outcome: '**The unit is assigned at booking, not chosen.** The venue keeps the ability to shuffle
+    assignments until the day.'
+  crossesDevice: true
+- step: 3
+  screen: GST-016
+  action: They see it in their reservations.
+  operations:
+  - listReservations
+  - getReservation
+  outcome: '**Alongside every other booking they hold**, not in a separate resource list.'
+  crossesDevice: true
+- step: 4
+  screen: GST-017
+  action: On the day, they arrive.
+  operations:
+  - getReservation
+  outcome: '**The reservation is the credential.** No separate check-in — the same media that admits
+    them opens the cabana.'
+  crossesDevice: true
+branches:
+- at: 2
+  condition: Everything of that kind is taken.
+  behaviour: '**Alternatives by kind and by time**, not an empty list. A guest told *no cabanas* at
+    2pm would often take one at 3pm.'
+  severity: medium
+  resolvedBy: getAvailability
+- at: 4
+  condition: They cancel on the day.
+  behaviour: '`cancelReservation` against the venue policy. **The unit returns to availability immediately**
+    — a cancelled cabana held until the system notices is an afternoon lost.'
+  severity: high
+  resolvedBy: cancelReservation
+exitStates:
+- state: used
+  description: Booked, assigned, used.
+- state: cancelled
+  description: Returned to availability.
+- state: noShow
+  description: '**Held then released.** The hold window is a venue decision.'
+notes: '**Written 24 August.** F25 walks the staff side of resource rental; **the guest side — browse,
+  book, hold, arrive — had never been walked.**'
+openQuestions: null

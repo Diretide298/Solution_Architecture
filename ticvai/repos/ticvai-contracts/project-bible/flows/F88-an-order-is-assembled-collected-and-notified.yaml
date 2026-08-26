@@ -1,0 +1,80 @@
+$schema: ./_schema.yaml
+id: F88
+name: An order is assembled, collected and notified
+actor: supervisor
+capability: An order is assembled, collected and notified
+wave: 2
+frequency: As the venue needs it.
+criticality: operational
+primaryContract: fnb
+contracts:
+- fnb
+- marketing-crm
+platforms:
+- P15
+trigger:
+  description: Food is ready and a guest has to be told and given it.
+offlineBehaviour: '**Offline-capable.** A collection counter with no network still hands food over.'
+steps:
+- step: 1
+  screen: KIT-006
+  action: Expeditor & Order Assembly.
+  operations:
+  - chaseStation
+  - markOrderCollected
+  - printOrderLabel
+  outcome: '**Drawn by the client as FNB-3F.** 3 operations on this step.'
+- step: 2
+  screen: KIT-002
+  action: Kitchen Display System (KDS).
+  operations:
+  - fireCourse
+  - holdCourse
+  - listKitchenTickets
+  - notifyServer
+  outcome: '**Drawn by the client as FNB-3B.** 4 operations on this step.'
+  crossesDevice: true
+- step: 3
+  screen: KIT-003
+  action: Order Firing & Course Management.
+  operations:
+  - fireCourse
+  - holdCourse
+  - prioritiseKitchenTicket
+  - setCourseRules
+  outcome: '**Drawn by the client as FNB-3C.** 4 operations on this step.'
+  crossesDevice: true
+- step: 4
+  screen: KIT-004
+  action: Active Order Management & Fulfilment Journey.
+  operations:
+  - getFnbOrder
+  - listKitchenTickets
+  outcome: '**Drawn by the client as FNB-3D.** 2 operations on this step.'
+  crossesDevice: true
+- step: 5
+  screen: KIT-001
+  action: Kitchen Operations Command Center.
+  operations:
+  - listFnbOrders
+  - listKitchenStations
+  - listKitchenTickets
+  outcome: '**Drawn by the client as FNB-3A.** 3 operations on this step.'
+  crossesDevice: true
+branches:
+- at: 1
+  condition: A step in the chain is not licensed for this tenant.
+  behaviour: '**The chain stops at the module boundary.** `requiresModule` on each screen decides —
+    a tenant without the retail licence does not see the retail half, and the journey is shorter rather
+    than broken.'
+  severity: medium
+  resolvedBy: getModuleEnablement
+exitStates:
+- state: completed
+  description: The chain ran as the client drew it.
+- state: stoppedAtModule
+  description: '**A licence boundary, not a failure.**'
+notes: '**F&B board 3, the expeditor chain.** `printOrderLabel` is server-side because of the allergen
+  flags. **Derived from the client''s own `GOES TO` edges**, not from an inferred path — a pair of frames
+  the client linked is evidence; a chain assembled from unrelated pairs is a guess.'
+openQuestions: null

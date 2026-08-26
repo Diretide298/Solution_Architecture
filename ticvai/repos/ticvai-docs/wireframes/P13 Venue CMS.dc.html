@@ -1,0 +1,400 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>P13 Venue CMS — wireframe board</title>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#0B1324;--mut:#6B7280;--dim:#8494A8;--line:#DCE3ED;--soft:#E5E7EB;
+--brand:#0D6EFD;--brand2:#00B8FF;--navy:#0C2340;--paper:#FFF;--wash:#F6F8FB}
+*{box-sizing:border-box}
+body{margin:0;background:var(--wash);color:var(--ink);
+font-family:Manrope,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:13px;line-height:1.5}
+a{color:inherit}
+.wrap{max-width:1680px;margin:0 auto;padding:22px 34px 90px}
+.home{font-size:11.5px;color:var(--mut);text-decoration:none;letter-spacing:.02em}
+.head{display:flex;align-items:baseline;justify-content:space-between;gap:20px;
+margin:14px 0 6px;padding-bottom:16px;border-bottom:2px solid var(--ink)}
+.mark{font-size:13px;font-weight:800;letter-spacing:.16em;
+background:linear-gradient(90deg,var(--brand),var(--brand2));-webkit-background-clip:text;
+background-clip:text;color:transparent}
+h1{font-size:19px;font-weight:800;letter-spacing:-.015em;margin:0}
+.meta{font-size:11px;color:var(--mut);font-family:'IBM Plex Mono',ui-monospace,monospace}
+.lede{font-size:12px;color:var(--mut);max-width:74ch;margin:14px 0 0}
+.grp{font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:11px;font-weight:600;
+letter-spacing:.14em;color:var(--dim);text-transform:uppercase;margin:48px 0 16px;
+padding-bottom:9px;border-bottom:1px solid var(--line)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(342px,1fr));gap:30px}
+.scr{display:flex;flex-direction:column;gap:11px;scroll-margin-top:24px}
+.ttl{font-size:15.5px;font-weight:800;letter-spacing:-.01em}
+.pur{font-size:11.5px;color:var(--mut);margin-top:2px}
+.frame{background:var(--paper);border:1px solid var(--soft);border-radius:14px;overflow:hidden;
+height:440px;display:flex;flex-direction:column;box-shadow:0 10px 26px rgba(12,35,64,.07)}
+.frame.dark{background:var(--navy);border-color:#1E3A5F}
+.bar{flex:none;height:30px;display:flex;align-items:center;gap:8px;padding:0 12px;
+border-bottom:1px solid var(--soft);font-size:10.5px;color:var(--mut)}
+.dark .bar{border-color:#1E3A5F;color:#7FA3C9}
+.strip{flex:none;height:20px;display:flex;align-items:center;padding:0 12px;font-size:9.5px;
+letter-spacing:.08em;text-transform:uppercase;background:#FFF7E6;color:#8A6D00;
+border-bottom:1px solid #F0E0B8}
+.body{flex:1;display:flex;min-height:0}
+.rail{flex:none;width:74px;background:var(--navy);display:flex;flex-direction:column;gap:6px;padding:10px 8px}
+.rail i{display:block;height:9px;border-radius:3px;background:#1E3A5F}
+.rail i.on{background:linear-gradient(90deg,var(--brand),var(--brand2))}
+.main{flex:1;padding:12px;display:flex;flex-direction:column;gap:9px;overflow:hidden}
+.side{flex:none;width:96px;border-left:1px solid var(--soft);padding:12px 10px;
+display:flex;flex-direction:column;gap:8px}
+.dark .side{border-color:#1E3A5F}
+.act{flex:none;height:38px;border-top:1px solid var(--soft);display:flex;align-items:center;
+gap:8px;padding:0 12px}
+.dark .act{border-color:#1E3A5F}
+.cmp{border:1px dashed #C7D0DC;border-radius:7px;padding:7px 9px;font-size:10px;color:var(--mut);background:#FAFBFD}
+.dark .cmp{border-color:#264a75;background:#0E2A4C;color:#9FC0E0}
+.cmp b{display:block;font-size:9.5px;letter-spacing:.09em;text-transform:uppercase;
+color:#94A3B4;font-weight:700;margin-bottom:3px}
+.cmp .why{margin-top:5px;font-size:9.5px;color:#7C8899;font-style:italic;line-height:1.45}
+.btn{height:22px;border-radius:6px;padding:0 12px;display:inline-flex;align-items:center;
+font-size:10px;font-weight:700;background:linear-gradient(90deg,var(--brand),var(--brand2));color:#FFF}
+.btn.sec{background:none;border:1px solid var(--soft);color:var(--mut);font-weight:600}
+.foot{font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:9.5px;line-height:1.75;color:#7C8899}
+.foot b{color:#4A5566;font-weight:600}
+.foot .off{color:#8A6D00}
+.tag{display:inline-block;font-size:9px;letter-spacing:.06em;text-transform:uppercase;
+padding:1px 6px;border-radius:4px;background:#EEF2F7;color:#64748B;margin-left:6px}
+.tag.named{background:#FFF1E6;color:#9A5B00}
+.bottom{margin-top:64px;padding-top:16px;border-top:1px solid var(--line);
+display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
+</style></head><body>
+<div class="wrap">
+  <a class="home" href="TICVAI%20Wireframe%20Boards.dc.html">&larr; All boards</a>
+  <div class="head">
+    <div><span class="mark">TICVAI</span>
+      <h1>P13 · Venue CMS — White Label <span style="font-weight:600;color:#6B7280">(20 screens)</span></h1></div>
+    <div class="meta">staff · web · venue-management-web</div>
+  </div>
+  <p class="lede"></p>
+  <div class="grp">01 — White Label · 20 screens</div><div class="grid">
+      <div id="cms-001" class="scr">
+        <div><div class="ttl">CMS-001 · Tenant Workspace</div>
+        <div class="pur">Land a tenant somewhere that shows what is live and what is not.</div></div>
+        <div class="frame">
+          <div class="bar">White Label · wave 2 · compact</div>
+          
+          <div class="body"><div class="main"><div class="cmp"><b>detailPanel</b>detailPanel<span class="why">Structure from the wireframe board. Components not yet enumerated.</span></div></div></div>
+          
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> · getSsoConfig · listTenants · setSsoConfig · addLicenceAddOn +17</div>
+          <div><b>STATES</b> · <span class="">loading · emptyFirstRun · emptyNoAccess · error</span></div>
+          <div><b>ARRIVES WITH</b> · tenantId←session</div>
+          <div><b>GOES TO</b> · entry point · CMS-002 · CMS-003 · CMS-004</div>
+        </div>
+      </div>
+      <div id="cms-002" class="scr">
+        <div><div class="ttl">CMS-002 · Brand Kit</div>
+        <div class="pur">Set the things every surface reads.</div></div>
+        <div class="frame">
+          <div class="bar">White Label · wave 2 · compact</div>
+          
+          <div class="body"><div class="main"><div class="cmp"><b>detailPanel</b>detailPanel<span class="why">Structure from the wireframe board. Components not yet enumerated.</span></div></div></div>
+          
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> · getBrandIdentity · setBrandIdentity · createUpload · completeUpload</div>
+          <div><b>STATES</b> · <span class="">loading · emptyFirstRun · emptyNoAccess · error</span></div>
+          <div><b>ARRIVES WITH</b> · uploadId←deepLink</div>
+          <div><b>GOES TO</b> · CMS-001 · CMS-003 · CMS-004 · CMS-005</div>
+        </div>
+      </div>
+      <div id="cms-003" class="scr">
+        <div><div class="ttl">CMS-003 · Typography</div>
+        <div class="pur">Choose the two typefaces and the scale under them.</div></div>
+        <div class="frame">
+          <div class="bar">White Label · wave 2 · compact</div>
+          
+          <div class="body"><div class="main"><div class="cmp"><b>detailPanel</b>detailPanel<span class="why">Structure from the wireframe board. Components not yet enumerated.</span></div></div></div>
+          
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> · getTenantConfig · setBrandIdentity · createBanner · createContentPage +37</div>
+          <div><b>STATES</b> · <span class="">loading · emptyFirstRun · emptyNoAccess · error</span></div>
+          <div><b>ARRIVES WITH</b> · bannerId←deepLink, pageId←deepLink, policyKind←deepLink</div>
+          <div><b>GOES TO</b> · CMS-001 · CMS-002 · CMS-004</div>
+        </div>
+      </div>
+      <div id="cms-004" class="scr">
+        <div><div class="ttl">CMS-004 · Logo &amp; Assets</div>
+        <div class="pur">Hold the marks every surface needs, at the sizes it needs them.</div></div>
+        <div class="frame">
+          <div class="bar">White Label · wave 2 · compact</div>
+          
+          <div class="body"><div class="main"><div class="cmp"><b>detailPanel</b>detailPanel<span class="why">Structure from the wireframe board. Components not yet enumerated.</span></div></div></div>
+          
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> · listAssets · getAsset · createAsset · getAssetHistory +3</div>
+          <div><b>STATES</b> · <span class="">loading · emptyFirstRun · emptyNoAccess · error</span></div>
+          <div><b>ARRIVES WITH</b> · assetId←deepLink</div>
+          <div><b>GOES TO</b> · CMS-001 · CMS-002 · CMS-003</div>
+        </div>
+      </div>
+      <div id="cms-005" class="scr">
+        <div><div class="ttl">CMS-005 · Theme Editor</div>
+        <div class="pur">Tune the theme and watch it apply everywhere at once.</div></div>
+        <div class="frame">
+          <div class="bar">White Label · wave 2 · compact</div>
+          
+          <div class="body"><div class="main"><div class="cmp"><b>detailPanel</b>detailPanel<span class="why">Structure from the wireframe board. Components not yet enumerated.</span></div></div></div>
+          
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> · getTheme · setTheme</div>
+          <div><b>STATES</b> · <span class="">loading · emptyFirstRun · emptyNoAccess · error</span></div>
+          
+          <div><b>GOES TO</b> · CMS-001 · CMS-002 · CMS-003 · CMS-007</div>
+        </div>
+      </div>
+      <div id="cms-006" class="scr">
+        <div><div class="ttl">CMS-006 · Component Preview</div>
+        <div class="pur">Check the theme against the components that carry it.</div></div>
+        <div class="frame">
+          <div class="bar">White Label · wave 2 · compact</div>
+          
+          <div class="body"><div class="main"><div class="cmp"><b>detailPanel</b>detailPanel<span class="why">Structure from the wireframe board. Components not yet enumerated.</span></div></div></div>
+          
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> · getTenantConfig · setTheme · createBanner · createContentPage +37</div>
+          <div><b>STATES</b> · <span class="">loading · emptyFirstRun · emptyNoAccess · error</span></div>
+          <div><b>ARRIVES WITH</b> · bannerId←deepLink, pageId←deepLink, policyKind←deepLink</div>
+          <div><b>GOES TO</b> · CMS-001 · CMS-002 · CMS-003</div>
+        </div>
+      </div>
+      <div id="cms-007" class="scr">
+        <div><div class="ttl">CMS-007 · Page Builder</div>
+        <div class="pur">Assemble a storefront page from blocks the tenant cannot break.</div></div>
+        <div class="frame">
+          <div class="bar">White Label · wave 2 · compact</div>
+          
+          <div class="body"><div class="main"><div class="cmp"><b>detailPanel</b>detailPanel<span class="why">Structure from the wireframe board. Components not yet enumerated.</span></div></div></div>
+          
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> · getHomepageLayout · setHomepageLayout</div>
+          <div><b>STATES</b> · <span class="">loading · emptyFirstRun · emptyNoAccess · error</span></div>
+          
+          <div><b>GOES TO</b> · CMS-001 · CMS-002 · CMS-003 · CMS-012</div>
+        </div>
+      </div>
+      <div id="cms-008" class="scr">
+        <div><div class="ttl">CMS-008 · Content Blocks</div>
+        <div class="pur">Define what a block can and cannot contain.</div></div>
+        <div class="frame">
+          <div class="bar">White Label · wave 2 · compact</div>
+          
+          <div class="body"><div class="main"><div class="cmp"><b>detailPanel</b>detailPanel<span class="why">Structure from the wireframe board. Components not yet enumerated.</span></div></div></div>
+          
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> · listPromoBlocks · listBanners</div>
+          <div><b>STATES</b> · <span class="">loading · emptyFirstRun · emptyNoAccess · error</span></div>
+          
+          <div><b>GOES TO</b> · CMS-001 · CMS-002 · CMS-003</div>
+        </div>
+      </div>
+      <div id="cms-009" class="scr">
+        <div><div class="ttl">CMS-009 · Navigation &amp; Menus</div>
+        <div class="pur">Decide what appears in the header and the footer.</div></div>
+        <div class="frame">
+          <div class="bar">White Label · wave 2 · compact</div>
+          
+          <div class="body"><div class="main"><div class="cmp"><b>detailPanel</b>detailPanel<span class="why">Structure from the wireframe board. Components not yet enumerated.</span></div></div></div>
+          
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> · listMenus · getMenu · createMenu · setMenuSections +1</div>
+          <div><b>STATES</b> · <span class="">loading · emptyFirstRun · emptyNoAccess · error</span></div>
+          <div><b>ARRIVES WITH</b> · menuId←deepLink</div>
+          <div><b>GOES TO</b> · CMS-001 · CMS-002 · CMS-003</div>
+        </div>
+      </div>
+      <div id="cms-010" class="scr">
+        <div><div class="ttl">CMS-010 · Media Library</div>
+        <div class="pur">Hold the imagery, and know where it is used.</div></div>
+        <div class="frame">
+          <div class="bar">White Label · wave 2 · compact</div>
+          
+          <div class="body"><div class="main"><div class="cmp"><b>detailPanel</b>detailPanel<span class="why">Structure from the wireframe board. Components not yet enumerated.</span></div></div></div>
+          
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> · getMediaEntitlements · searchMedia · appendEntitlementToMedia · completeUpload +8</div>
+          <div><b>STATES</b> · <span class="">loading · emptyFirstRun · emptyNoAccess · error</span></div>
+          <div><b>ARRIVES WITH</b> · mediaCode←deepLink, mediaId←deepLink, uploadId←deepLink</div>
+          <div><b>GOES TO</b> · CMS-001 · CMS-002 · CMS-003</div>
+        </div>
+      </div>
+      <div id="cms-013" class="scr">
+        <div><div class="ttl">CMS-013 · SEO &amp; Metadata</div>
+        <div class="pur">Control how a page looks everywhere it is not the page.</div></div>
+        <div class="frame">
+          <div class="bar">White Label · wave 2 · compact</div>
+          
+          <div class="body"><div class="main"><div class="cmp"><b>detailPanel</b>detailPanel<span class="why">Structure from the wireframe board. Components not yet enumerated.</span></div></div></div>
+          
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> · none declared</div>
+          <div><b>STATES</b> · <span class="">loading · emptyFirstRun · error</span></div>
+          
+          <div><b>GOES TO</b> · CMS-001 · CMS-002 · CMS-003</div>
+        </div>
+      </div>
+      <div id="cms-011" class="scr">
+        <div><div class="ttl">CMS-011 · Translations</div>
+        <div class="pur">Fill in what every language is missing.</div></div>
+        <div class="frame">
+          <div class="bar">White Label · wave 2 · compact</div>
+          
+          <div class="body"><div class="main"><div class="cmp"><b>detailPanel</b>detailPanel<span class="why">Structure from the wireframe board. Components not yet enumerated.</span></div></div></div>
+          
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> · setLanguages</div>
+          <div><b>STATES</b> · <span class="">loading · emptyFirstRun · emptyNoAccess · error</span></div>
+          
+          <div><b>GOES TO</b> · CMS-001 · CMS-002 · CMS-003</div>
+        </div>
+      </div>
+      <div id="cms-012" class="scr">
+        <div><div class="ttl">CMS-012 · RTL Preview</div>
+        <div class="pur">See the site as an Arabic reader sees it.</div></div>
+        <div class="frame">
+          <div class="bar">White Label · wave 2 · compact</div>
+          
+          <div class="body"><div class="main"><div class="cmp"><b>detailPanel</b>detailPanel<span class="why">Structure from the wireframe board. Components not yet enumerated.</span></div></div></div>
+          
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> · getTenantConfig · validateTenantConfig</div>
+          <div><b>STATES</b> · <span class="">loading · emptyFirstRun · emptyNoAccess · error</span></div>
+          
+          <div><b>GOES TO</b> · CMS-001 · CMS-002 · CMS-003 · CMS-014</div>
+        </div>
+      </div>
+      <div id="cms-014" class="scr">
+        <div><div class="ttl">CMS-014 · Publishing Workflow</div>
+        <div class="pur">Move a change from draft to live, with someone accountable.</div></div>
+        <div class="frame">
+          <div class="bar">White Label · wave 2 · compact</div>
+          
+          <div class="body"><div class="main"><div class="cmp"><b>detailPanel</b>detailPanel<span class="why">Structure from the wireframe board. Components not yet enumerated.</span></div></div></div>
+          
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> · publishTenantConfig · validateTenantConfig · getTenantAppStatus</div>
+          <div><b>STATES</b> · <span class="">loading · emptyFirstRun · emptyNoAccess · error</span></div>
+          
+          <div><b>GOES TO</b> · CMS-001 · CMS-002 · CMS-003 · CMS-015</div>
+        </div>
+      </div>
+      <div id="cms-015" class="scr">
+        <div><div class="ttl">CMS-015 · Version History</div>
+        <div class="pur">See what changed and go back if it was wrong.</div></div>
+        <div class="frame">
+          <div class="bar">White Label · wave 2 · compact</div>
+          
+          <div class="body"><div class="main"><div class="cmp"><b>detailPanel</b>detailPanel<span class="why">Structure from the wireframe board. Components not yet enumerated.</span></div></div></div>
+          
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> · listConfigVersions · diffConfigVersion · restoreConfigVersion</div>
+          <div><b>STATES</b> · <span class="">loading · emptyFirstRun · emptyNoAccess · error</span></div>
+          <div><b>ARRIVES WITH</b> · version←deepLink</div>
+          <div><b>GOES TO</b> · CMS-001 · CMS-002 · CMS-003</div>
+        </div>
+      </div>
+      <div id="cms-016" class="scr">
+        <div><div class="ttl">CMS-016 · Site Settings</div>
+        <div class="pur">The values the whole site inherits from.</div></div>
+        <div class="frame">
+          <div class="bar">White Label · wave 2 · compact</div>
+          
+          <div class="body"><div class="main"><div class="cmp"><b>detailPanel</b>detailPanel<span class="why">Structure from the wireframe board. Components not yet enumerated.</span></div></div></div>
+          
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> · getTenantConfig</div>
+          <div><b>STATES</b> · <span class="">loading · emptyFirstRun · emptyNoAccess · error</span></div>
+          
+          <div><b>GOES TO</b> · CMS-001 · CMS-002 · CMS-003</div>
+        </div>
+      </div>
+      <div id="cms-017" class="scr">
+        <div><div class="ttl">CMS-017 · Domain &amp; Certificate</div>
+        <div class="pur">Point the tenant’s own domain at their site.</div></div>
+        <div class="frame">
+          <div class="bar">White Label · wave 2 · compact</div>
+          
+          <div class="body"><div class="main"><div class="cmp"><b>detailPanel</b>detailPanel<span class="why">Structure from the wireframe board. Components not yet enumerated.</span></div></div></div>
+          
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> · none declared</div>
+          <div><b>STATES</b> · <span class="">loading · emptyFirstRun · error</span></div>
+          
+          <div><b>GOES TO</b> · CMS-001 · CMS-002 · CMS-003</div>
+        </div>
+      </div>
+      <div id="cms-018" class="scr">
+        <div><div class="ttl">CMS-018 · Consent &amp; Legal</div>
+        <div class="pur">Manage the notices every consent is captured against.</div></div>
+        <div class="frame">
+          <div class="bar">White Label · wave 2 · compact</div>
+          
+          <div class="body"><div class="main"><div class="cmp"><b>detailPanel</b>detailPanel<span class="why">Structure from the wireframe board. Components not yet enumerated.</span></div></div></div>
+          
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> · getGuestConsents · getConsentHistory · recordConsent · adjustLoyaltyPoints +7</div>
+          <div><b>STATES</b> · <span class="">loading · emptyFirstRun · emptyNoAccess · error</span></div>
+          <div><b>ARRIVES WITH</b> · subjectId←session</div>
+          <div><b>GOES TO</b> · CMS-001 · CMS-002 · CMS-003</div>
+        </div>
+      </div>
+      <div id="cms-019" class="scr">
+        <div><div class="ttl">CMS-019 · User Access</div>
+        <div class="pur">Say who in the tenant may change what.</div></div>
+        <div class="frame">
+          <div class="bar">White Label · wave 2 · compact</div>
+          
+          <div class="body"><div class="main"><div class="cmp"><b>detailPanel</b>detailPanel<span class="why">Structure from the wireframe board. Components not yet enumerated.</span></div></div></div>
+          
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> · listPrincipals · listRoles</div>
+          <div><b>STATES</b> · <span class="">loading · emptyFirstRun · emptyNoAccess · error</span></div>
+          
+          <div><b>GOES TO</b> · CMS-001 · CMS-002 · CMS-003</div>
+        </div>
+      </div>
+      <div id="cms-020" class="scr">
+        <div><div class="ttl">CMS-020 · Change Log</div>
+        <div class="pur">See who changed what, before the publish that carried it.</div></div>
+        <div class="frame">
+          <div class="bar">White Label · wave 2 · compact</div>
+          
+          <div class="body"><div class="main"><div class="cmp"><b>detailPanel</b>detailPanel<span class="why">Structure from the wireframe board. Components not yet enumerated.</span></div></div></div>
+          
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> · listConfigVersions</div>
+          <div><b>STATES</b> · <span class="">loading · emptyFirstRun · emptyNoAccess · error</span></div>
+          
+          <div><b>GOES TO</b> · CMS-001 · CMS-002 · CMS-003</div>
+        </div>
+      </div></div>
+  <div class="bottom">
+    <span>Generated by tools/derive-wireframes.py from screens/P13-white-label-cms.yaml — do not hand-edit</span>
+    <span>P13 · 20 screens · 1 groups</span>
+  </div>
+</div></body></html>

@@ -1,0 +1,640 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script>
+      // The saved day/night choice, before the stylesheets resolve. `theme.js`
+      // owns this key; this is only here because a module cannot run early
+      // enough to beat the first paint.
+      try {
+        if ((localStorage.getItem('ticvai-theme') ?? 'dark') === 'dark') {
+          document.documentElement.dataset.theme = 'dark';
+        }
+      } catch { /* storage can be denied outright; day is a fine fallback */ }
+    </script>
+    <title>Atlas — accounts</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+    href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap"
+    rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/styles.css" />
+    <link rel="stylesheet" href="/layers.css" />
+    <!-- Four rules for the date-range export, kept out of layers.css because
+         that sheet is loaded by every page in the viewer and none of the others
+         has this panel. -->
+    <link rel="stylesheet" href="/admin-export.css" />
+    <!-- And the panel that reads that same file back in. Its own sheet for the
+         same reason: a grouped list of rows nobody has agreed to yet means
+         nothing on any other page. -->
+    <link rel="stylesheet" href="/admin-decisions.css" />
+    <link rel="icon" href="/brand/atlas-mark.png" />
+    <script>
+      // The curtain's dead man's switch. A wrong loading screen is a bad page;
+      // one that never lifts is no page, so this fires whatever else breaks.
+      // `loader.js` sets `claimed` on import, which is how a page with a script
+      // of its own says it will lower the curtain at the right moment instead.
+      window.__atlasLoader = { claimed: false };
+      (function () {
+        var down = function () {
+          var box = document.getElementById('atlas-loader');
+          if (box) { box.classList.add('is-done'); setTimeout(function () { box.remove(); }, 700); }
+        };
+        window.__atlasLoader.timer = setTimeout(down, 12000);
+        window.addEventListener('load', function () {
+          // A page with no script of its own has nothing to say when it is
+          // ready, so `load` is as good as it gets. One that imported loader.js
+          // is left alone: on the viewer, `load` fires long before the index
+          // has been read.
+          setTimeout(function () { if (!window.__atlasLoader.claimed) down(); }, 300);
+        });
+      })();
+    </script>
+  </head>
+  <body class="admin-page">
+    <!-- The loading curtain. Inline, and first in the body, so it is
+         painted by the first frame — a loader that arrives with the
+         JavaScript misses the module fetch, which is the part of the
+         wait it exists to cover. `loader.js` takes it down; the guard in
+         the head above is what happens if nothing ever does. -->
+    <div class="atlas-loader" id="atlas-loader" role="status" aria-live="polite">
+      <svg class="al-mark" viewBox="0 0 210 210" aria-hidden="true" focusable="false"><g class="al-links"><line class="al-link" style="--i:1" x1="105.0" y1="18.5" x2="148.9" y2="28.9"/><line class="al-link" style="--i:3" x1="148.9" y1="28.9" x2="177.6" y2="63.1"/><line class="al-link" style="--i:5" x1="177.6" y1="63.1" x2="192.9" y2="105.0"/><line class="al-link" style="--i:7" x1="192.9" y1="105.0" x2="180.1" y2="148.4"/><line class="al-link" style="--i:9" x1="180.1" y1="148.4" x2="148.6" y2="180.5"/><line class="al-link" style="--i:11" x1="148.6" y1="180.5" x2="105.0" y2="192.3"/><line class="al-link" style="--i:13" x1="105.0" y1="192.3" x2="62.1" y2="179.3"/><line class="al-link" style="--i:15" x1="62.1" y1="179.3" x2="32.5" y2="146.8"/><line class="al-link" style="--i:17" x1="32.5" y1="146.8" x2="18.1" y2="105.0"/><line class="al-link" style="--i:19" x1="18.1" y1="105.0" x2="32.9" y2="63.4"/><line class="al-link" style="--i:21" x1="32.9" y1="63.4" x2="62.9" y2="32.1"/><line class="al-link" style="--i:23" x1="62.9" y1="32.1" x2="105.0" y2="18.5"/><line class="al-link" style="--i:1" x1="105.0" y1="18.5" x2="143.0" y2="75.0"/><line class="al-link" style="--i:3" x1="148.9" y1="28.9" x2="143.0" y2="75.0"/><line class="al-link" style="--i:4" x1="177.6" y1="63.1" x2="143.0" y2="75.0"/><line class="al-link" style="--i:7" x1="192.9" y1="105.0" x2="149.0" y2="139.0"/><line class="al-link" style="--i:8" x1="180.1" y1="148.4" x2="149.0" y2="139.0"/><line class="al-link" style="--i:11" x1="148.6" y1="180.5" x2="107.0" y2="161.0"/><line class="al-link" style="--i:12" x1="105.0" y1="192.3" x2="107.0" y2="161.0"/><line class="al-link" style="--i:15" x1="62.1" y1="179.3" x2="59.0" y2="135.0"/><line class="al-link" style="--i:16" x1="32.5" y1="146.8" x2="59.0" y2="135.0"/><line class="al-link" style="--i:19" x1="18.1" y1="105.0" x2="71.0" y2="79.0"/><line class="al-link" style="--i:20" x1="32.9" y1="63.4" x2="71.0" y2="79.0"/><line class="al-link" style="--i:21" x1="62.9" y1="32.1" x2="71.0" y2="79.0"/><line class="al-link" style="--i:19" x1="71.0" y1="79.0" x2="89.0" y2="123.0"/><line class="al-link" style="--i:5" x1="143.0" y1="75.0" x2="127.0" y2="115.0"/><line class="al-link" style="--i:14" x1="59.0" y1="135.0" x2="107.0" y2="161.0"/><line class="al-link" style="--i:8" x1="149.0" y1="139.0" x2="127.0" y2="115.0"/><line class="al-link" style="--i:13" x1="89.0" y1="123.0" x2="107.0" y2="161.0"/></g><path class="al-glyph" d="M105,28 C110,64 124,116 151,161 C134,150 119,136 105,127 C91,136 76,150 59,161 C86,116 100,64 105,28 Z"/><path class="al-stand" d="M105,128 L105,176 M105,158 L90,171 M105,158 L120,171"/><g class="al-nodes"><circle class="al-node" style="--i:0" cx="105.0" cy="18.5" r="6.6"/><circle class="al-node" style="--i:2" cx="148.9" cy="28.9" r="6.1"/><circle class="al-node" style="--i:4" cx="177.6" cy="63.1" r="5.5"/><circle class="al-node" style="--i:6" cx="192.9" cy="105.0" r="6.5"/><circle class="al-node" style="--i:8" cx="180.1" cy="148.4" r="5.4"/><circle class="al-node" style="--i:10" cx="148.6" cy="180.5" r="5.6"/><circle class="al-node" style="--i:12" cx="105.0" cy="192.3" r="6.3"/><circle class="al-node" style="--i:14" cx="62.1" cy="179.3" r="5.3"/><circle class="al-node" style="--i:16" cx="32.5" cy="146.8" r="6.6"/><circle class="al-node" style="--i:18" cx="18.1" cy="105.0" r="6.7"/><circle class="al-node" style="--i:20" cx="32.9" cy="63.4" r="5.2"/><circle class="al-node" style="--i:22" cx="62.9" cy="32.1" r="5.4"/><circle class="al-node" style="--i:20" cx="71.0" cy="79.0" r="4.6"/><circle class="al-node" style="--i:3" cx="143.0" cy="75.0" r="5.2"/><circle class="al-node" style="--i:16" cx="59.0" cy="135.0" r="4.4"/><circle class="al-node" style="--i:9" cx="149.0" cy="139.0" r="4.8"/><circle class="al-node" style="--i:12" cx="107.0" cy="161.0" r="4.2"/><circle class="al-node" style="--i:15" cx="89.0" cy="123.0" r="3.6"/><circle class="al-node" style="--i:8" cx="127.0" cy="115.0" r="3.4"/></g></svg>
+      <p class="al-text">Reading the accounts…</p>
+    </div>
+    <header class="admin-bar">
+      <!-- The same lockup the viewer chrome carries, so a reader who
+           followed a link off the main view lands somewhere that looks
+           like where they came from. Two cuts because this bar is a light
+           surface in day and a dark one at night, and the white-ink lockup
+           is invisible on the first. -->
+      <div class="brand">
+        <a class="brand-home" href="/" aria-label="Atlas — back to the viewer">
+          <img class="brand-lockup brand-lockup-day" src="/brand/atlast_blackfont.png" alt="Atlas" />
+          <img class="brand-lockup brand-lockup-night" src="/brand/atlas-lockup.png" alt="" aria-hidden="true" />
+        </a>
+        <span class="brand-sub">accounts</span>
+      </div>
+      <div class="admin-bar-right">
+        <span id="whoami" class="admin-who"></span>
+        <a class="chip" href="/">Back to the viewer</a>
+      </div>
+    </header>
+
+    <!-- Everything below is for an admin. The server refuses these calls to
+         anyone else regardless; hiding them as well is so that nobody is shown
+         a control that will only tell them no. -->
+    <main id="denied" class="admin-main" hidden>
+      <div class="admin-panel">
+        <h1 class="auth-title">Not for you</h1>
+        <p class="auth-note">
+          This page manages accounts, which only an administrator can do. If you
+          think that should be you, ask one of them.
+        </p>
+        <a class="auth-button" href="/">Back to the viewer</a>
+      </div>
+    </main>
+
+    <main id="admin" class="admin-main" hidden>
+      <!-- ── inviting ─────────────────────────────────────────────── -->
+      <section class="admin-panel">
+        <h2 class="admin-heading">Invite someone</h2>
+        <p class="auth-note">
+          The address is fixed here, by you, and cannot be changed by whoever
+          opens the link. That is what makes an invite count as having verified
+          it — so send the link however you already talk to them. It works once,
+          and only for that address.
+        </p>
+        <div class="invite-row">
+          <input id="invite-email" class="auth-input" type="email"
+                 placeholder="them@softlabsgroup.com" />
+          <select id="invite-role" class="scope-select">
+            <option value="reviewer">reviewer</option>
+            <option value="admin">admin</option>
+            <option value="client">client</option>
+          </select>
+          <select id="invite-days" class="scope-select">
+            <option value="7">7 days</option>
+            <option value="1">1 day</option>
+            <option value="30">30 days</option>
+          </select>
+          <button id="invite-create" class="chip" type="button">Make a link</button>
+        </div>
+        <!-- A client is the one role whose rules differ, and both differences
+             are invisible until the invite is made: the address may be outside
+             the company, and the link is capped at three days however long is
+             asked for. Saying so here beats a surprise afterwards. -->
+        <p class="auth-note" id="invite-client-note" hidden>
+          <strong>A client is outside the company.</strong> They read
+          everything except <strong>Decisions</strong> — the ADRs, the
+          registers and the conflict log. They can record a verdict, kept as
+          the <strong>client review</strong> rather than the team's, and they
+          cannot close an item. The
+          <code>@softlabsgroup.com</code> rule does not apply, so the address
+          can be anywhere; you typing it is what vouches for it. The link
+          expires in <strong>three days</strong> whatever is chosen above.
+        </p>
+        <p class="auth-error" id="invite-error" hidden></p>
+
+        <div id="invite-result" hidden>
+          <div class="journey-section-label">their link — shown once</div>
+          <div class="invite-link-row">
+            <input id="invite-link" class="auth-input" type="text" readonly />
+            <button id="invite-copy" class="chip" type="button">Copy</button>
+          </div>
+          <p class="auth-note auth-fine">
+            Not stored and not recoverable — only a hash of it is kept, so that
+            a copy of the database cannot be used to make accounts. If it is
+            lost, withdraw it and make another.
+          </p>
+        </div>
+      </section>
+
+      <!-- ── the invites ──────────────────────────────────────────── -->
+      <section class="admin-panel">
+        <h2 class="admin-heading">Invites <span id="invite-count" class="admin-count"></span></h2>
+        <div id="invites" class="admin-table"></div>
+      </section>
+
+      <!-- ── the people ───────────────────────────────────────────── -->
+      <section class="admin-panel">
+        <h2 class="admin-heading">Accounts <span id="account-count" class="admin-count"></span></h2>
+        <p class="auth-note auth-fine">
+          An account is disabled rather than deleted, because a verdict points
+          at the person who gave it. Deleting would either orphan the verdict or
+          take it with them, and both lose something worth keeping.
+        </p>
+        <!-- The two controls on a row look alike and are not alike, and the
+             cheaper one is the one wanted far more often. Saying which is
+             which here means the confirm on the row can be short. -->
+        <p class="auth-note auth-fine">
+          <b>End sessions</b> signs somebody out of every browser and stops
+          there. It is not <b>Disable</b>: the account still works, they can
+          sign back in, and nothing they have recorded moves. It is the answer
+          to a lost laptop or a shared machine, not to somebody leaving.
+        </p>
+        <div id="accounts" class="admin-table"></div>
+        <p class="auth-error" id="account-error" hidden></p>
+      </section>
+
+      <!-- ── a date range, as a file ──────────────────────────────── -->
+      <section class="admin-panel">
+        <h2 class="admin-heading">Download a date range</h2>
+        <p class="auth-note">
+          A month of the register, as a CSV. The reviews page exports the rows
+          it is showing you; this one takes a span of dates whether or not
+          anybody has it on screen, which is what a report at the end of a
+          month is made of. Same columns, same wording, so the two files stack.
+        </p>
+        <div class="invite-row export-row">
+          <select id="export-what" class="scope-select export-what"></select>
+          <label class="auth-label export-label" for="export-from">From</label>
+          <input id="export-from" class="auth-input export-date" type="date" />
+          <label class="auth-label export-label" for="export-to">To</label>
+          <input id="export-to" class="auth-input export-date" type="date" />
+          <button id="export-go" class="chip" type="button">Download CSV</button>
+        </div>
+        <!-- Both ends inclusive, and said out loud. A range picker that
+             silently drops the last day's rows is the standard bug here, and it
+             hides well: the file is not empty, only short by a day, so nobody
+             finds it until the totals are already in a slide. -->
+        <p class="auth-note auth-fine">
+          <b>Both dates are included, whole.</b> A row recorded at any time on
+          the <b>To</b> day is in the file. Leave <b>From</b> empty for
+          everything from the beginning, or <b>To</b> empty for everything up to
+          now — the filename says which range you took either way. Dates are
+          read in <b>UTC</b>, which is the only clock anything here is stamped
+          with.
+        </p>
+        <p class="auth-error" id="export-error" hidden></p>
+        <p class="auth-ok" id="export-ok" hidden></p>
+      </section>
+
+      <!-- ── and the same file, back again ────────────────────────── -->
+      <!-- Named, because the reviews page links straight at it: somebody who
+           has just taken an export is looking for this panel, not for the top
+           of a page with four sections above it. -->
+      <section class="admin-panel" id="close-from-sheet">
+        <h2 class="admin-heading">Close items from a spreadsheet</h2>
+        <p class="auth-note">
+          The other end of the download above. Take the range, fill in the
+          <b>our verdict</b> column against the items that have been dealt
+          with — <b>Built</b>, <b>Wired</b>, <b>Answered</b>, <b>Accepted</b> or
+          <b>Approved — no action</b> — and upload it here. The CSV as it came,
+          or the same sheet saved as .xlsx; what the file is read as comes from
+          what is inside it, not from what it is called.
+        </p>
+        <!-- The two presses are the design, so the panel says so before either
+             of them rather than after. A bulk close is the one thing on this
+             page that uploading the right file afterwards cannot put back. -->
+        <p class="auth-note auth-fine">
+          <b>Nothing is written until the second press.</b> Checking the file
+          reports what it would do — what closes, what is already closed, what
+          disagrees with the register and what could not be read — and closes
+          nothing. A blank cell is <b>no decision</b>, not a close, so a sheet
+          full of empty cells does nothing at all. Items already closed are left
+          alone: closing them again would replace who closed them and when with
+          you and today. Rows are matched by the <b>id</b> column, so a file
+          exported before that column existed cannot be applied — take the
+          range again.
+        </p>
+        <div class="invite-row decide-row">
+          <input id="decide-file" class="auth-input decide-file" type="file"
+                 accept=".csv,.xlsx,text/csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" />
+          <button id="decide-check" class="chip" type="button">Check the file</button>
+        </div>
+        <p class="auth-error" id="decide-error" hidden></p>
+        <p class="auth-ok" id="decide-ok" hidden></p>
+        <div id="decide-plan" class="decide-plan" hidden></div>
+        <button id="decide-apply" class="chip decide-apply" type="button" hidden></button>
+      </section>
+
+      <!-- ── your own password ────────────────────────────────────── -->
+      <section class="admin-panel">
+        <h2 class="admin-heading">Your password</h2>
+        <p class="auth-note auth-fine">
+          Changing it signs out every other session on your account, which is
+          the point of changing it.
+        </p>
+        <label class="auth-label" for="pw-current">Current password</label>
+        <input id="pw-current" class="auth-input" type="password" autocomplete="current-password" />
+        <label class="auth-label" for="pw-new">New password</label>
+        <input id="pw-new" class="auth-input" type="password" autocomplete="new-password" />
+        <label class="auth-label" for="pw-confirm">New password again</label>
+        <input id="pw-confirm" class="auth-input" type="password" autocomplete="new-password" />
+        <p class="auth-error" id="pw-error" hidden></p>
+        <p class="auth-ok" id="pw-ok" hidden>Changed. Other sessions have been signed out.</p>
+        <button id="pw-submit" class="auth-button" type="button">Change it</button>
+      </section>
+    </main>
+
+    <script type="module">
+      import {
+        authState, listAccounts, setAccountActive, setAccountRole,
+        createInvite, listInvites, revokeInvite, changePassword, logoutAccount,
+        makeReset,
+      } from '/validation.js';
+      import '/theme.js';                      // the saved day/night choice
+      import { hideLoader } from '/loader.js'; // and the curtain over the wait
+      // The CSV export lives in its own module rather than down here with the
+      // rest: it is the one panel that talks to the service without going
+      // through validation.js, because a file is a body to be saved rather than
+      // JSON to be read, and that difference is worth a page of reasoning it
+      // would be a shame to bury in the middle of the invites.
+      import { mountExport } from '/admin-export.js';
+      // And its other end, for the same reason: it posts a file rather than
+      // JSON, and the two presses that stand between an upload and two hundred
+      // closed items are worth explaining where they happen.
+      import { mountDecisions } from '/admin-decisions.js';
+
+      const $ = (id) => document.getElementById(id);
+      const el = (tag, cls, text) => {
+        const n = document.createElement(tag);
+        if (cls) n.className = cls;
+        if (text instanceof Node) n.append(text);
+        else if (text != null) n.textContent = text;
+        return n;
+      };
+      const when = (iso) => {
+        if (!iso) return '—';
+        const d = new Date(iso);
+        return Number.isNaN(+d) ? iso
+          : d.toLocaleString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
+      };
+
+      let me = null;
+
+      const state = await authState().catch(() => null);
+      if (!state || !state.signedIn) {
+        // Lowered before the navigation, not after: a curtain left up over a
+        // redirect reads as the redirect having stalled.
+        hideLoader();
+        location.href = `/login.html?next=${encodeURIComponent('/admin.html')}`;
+      } else if (state.account.role !== 'admin') {
+        $('denied').hidden = false;
+        $('whoami').textContent = state.account.email;
+        hideLoader();
+      } else {
+        me = state.account;
+        $('whoami').textContent = `${me.email} · admin`;
+        $('admin').hidden = false;
+        // Wired before the lists are fetched, because it needs neither of them
+        // — the export asks the service for its own rows when it is pressed.
+        mountExport();
+        // Same, and for the same reason: it asks the service about the file it
+        // is handed and needs nothing either list below has fetched. Nothing on
+        // this page shows a verdict, so an apply has nothing here to refresh —
+        // what it changed is on the reviews page, and the panel says what it
+        // did rather than sending anybody there to check.
+        mountDecisions();
+        // Both lists, because the page is not drawn until it has both — and
+        // allSettled rather than all, so one failing still shows the page it
+        // failed on rather than leaving the curtain up over it.
+        Promise.allSettled([refreshInvites(), refreshAccounts()]).then(hideLoader);
+      }
+
+      // ── invites ────────────────────────────────────────────────
+      async function refreshInvites() {
+        const box = $('invites');
+        box.innerHTML = '';
+        let invites = [];
+        try { ({ invites } = await listInvites()); }
+        catch { box.append(el('p', 'pane-note', 'Could not read the invites.')); return; }
+
+        const open = invites.filter((i) => i.state === 'open').length;
+        $('invite-count').textContent = `${open} open of ${invites.length}`;
+        if (!invites.length) {
+          box.append(el('p', 'pane-note', 'Nobody has been invited yet.'));
+          return;
+        }
+        for (const invite of invites) {
+          const row = el('div', `admin-row invite-row-item ${invite.state}`);
+          row.append(el('span', 'invite-state', invite.state));
+          row.append(el('span', 'invite-who', invite.email));
+          row.append(el('span', 'invite-role', invite.role));
+          row.append(el('span', 'admin-when',
+            invite.state === 'open' ? `expires ${when(invite.expires_at)}`
+              : invite.redeemed_at ? `used ${when(invite.redeemed_at)}`
+              : invite.revoked_at ? `withdrawn ${when(invite.revoked_at)}`
+              : `expired ${when(invite.expires_at)}`));
+          if (invite.state === 'open') {
+            const revoke = el('button', 'chip', 'Withdraw');
+            revoke.type = 'button';
+            revoke.onclick = async () => {
+              revoke.disabled = true;
+              try { await revokeInvite(invite.id); } catch { /* the refresh shows the truth */ }
+              refreshInvites();
+            };
+            row.append(revoke);
+          } else {
+            row.append(el('span'));
+          }
+          box.append(row);
+        }
+      }
+
+      // The placeholder and the note follow the role, because the address rule
+      // is the thing that changes and an @softlabsgroup.com placeholder above a
+      // guest invite reads as a refusal waiting to happen.
+      $('invite-role').onchange = () => {
+        const client = $('invite-role').value === 'client';
+        $('invite-client-note').hidden = !client;
+        $('invite-email').placeholder = client
+          ? 'them@theircompany.com'
+          : 'them@softlabsgroup.com';
+      };
+
+      $('invite-create').onclick = async () => {
+        $('invite-error').hidden = true;
+        $('invite-result').hidden = true;
+        $('invite-create').disabled = true;
+        try {
+          const invite = await createInvite(
+            $('invite-email').value.trim(),
+            $('invite-role').value,
+            Number($('invite-days').value),
+          );
+          $('invite-link').value = `${location.origin}${invite.link}`;
+          $('invite-result').hidden = false;
+          $('invite-email').value = '';
+          refreshInvites();
+        } catch (error) {
+          $('invite-error').textContent = error.message;
+          $('invite-error').hidden = false;
+        } finally {
+          $('invite-create').disabled = false;
+        }
+      };
+
+      $('invite-copy').onclick = async () => {
+        $('invite-link').select();
+        try {
+          await navigator.clipboard.writeText($('invite-link').value);
+          $('invite-copy').textContent = 'Copied';
+        } catch {
+          $('invite-copy').textContent = 'Press Ctrl+C';
+        }
+        setTimeout(() => { $('invite-copy').textContent = 'Copy'; }, 1600);
+      };
+
+      // ── accounts ───────────────────────────────────────────────
+      async function refreshAccounts() {
+        const box = $('accounts');
+        box.innerHTML = '';
+        let accounts = [];
+        try { ({ accounts } = await listAccounts()); }
+        catch { box.append(el('p', 'pane-note', 'Could not read the accounts.')); return; }
+
+        const live = accounts.filter((a) => a.active).length;
+        $('account-count').textContent = `${live} active of ${accounts.length}`;
+
+        for (const person of accounts) {
+          const row = el('div', `admin-row account-row${person.active ? '' : ' disabled'}`);
+          row.append(el('span', 'account-name', person.name || '—'));
+          row.append(el('span', 'invite-who', person.email + (person.id === me.id ? ' (you)' : '')));
+
+          const role = el('select', 'scope-select admin-role');
+          for (const value of ['reviewer', 'admin', 'client']) {
+            const option = el('option', null, value);
+            option.value = value;
+            if (person.role === value) option.selected = true;
+            role.append(option);
+          }
+          role.disabled = person.id === me.id;
+          role.onchange = async () => {
+            $('account-error').hidden = true;
+            try { await setAccountRole(person.id, role.value); }
+            catch (error) {
+              $('account-error').textContent = error.message;
+              $('account-error').hidden = false;
+            }
+            refreshAccounts();
+          };
+          row.append(role);
+
+          row.append(el('span', 'admin-when',
+            `${person.verdicts} verdict${person.verdicts === 1 ? '' : 's'}`));
+
+          if (person.id === me.id) {
+            row.append(el('span', 'admin-when', 'active'));
+          } else {
+            const toggle = el('button', 'chip', person.active ? 'Disable' : 'Enable');
+            toggle.type = 'button';
+            toggle.onclick = async () => {
+              $('account-error').hidden = true;
+              toggle.disabled = true;
+              try { await setAccountActive(person.id, !person.active); }
+              catch (error) {
+                $('account-error').textContent = error.message;
+                $('account-error').hidden = false;
+              }
+              refreshAccounts();
+            };
+            row.append(toggle);
+          }
+          // Your own row does not get one. The route would take the session
+          // this page is running on without clearing the cookie, so the page
+          // would carry on looking signed in while every call from it failed.
+          // Signing yourself out everywhere lives in the account panel in the
+          // viewer, which knows to go to the door afterwards.
+          row.append(resetControl(person, row));
+          row.append(person.id === me.id ? el('span') : endSessionsControl(person, row));
+          box.append(row);
+        }
+      }
+
+      /**
+       * End one person's sessions, from the row they are on.
+       *
+       * Opens rather than acts, like Send back on the reviews page. The press
+       * that matters is the second one, and what sits between them is a
+       * sentence about which of the two controls on this row was just
+       * reached for — Disable and End sessions read the same at a glance and
+       * one of them takes somebody's account away.
+       *
+       * The count comes back and is shown, because "ended 3 sessions" and
+       * "they had none open" are different answers and the difference is
+       * usually the thing being checked.
+       */
+      /**
+       * A link that lets one person set a new password.
+       *
+       * The admin makes the link and passes it on; the password itself is
+       * chosen behind it, by them, and is never seen here. An admin who could
+       * type somebody's password could sign in as them and leave verdicts under
+       * their name, and the review is only worth what its authorship is worth.
+       *
+       * Shown for every row including your own — losing your own password is
+       * the ordinary case, and a second admin making you a link is exactly the
+       * route the sign-in page tells people to ask for.
+       *
+       * The link is joined to this page's own origin rather than sent whole by
+       * the service, which is reachable on more than one name and cannot know
+       * which of them the person on the other end has to use.
+       */
+      function resetControl(person, row) {
+        const cell = el('span', 'account-reset');
+        const make = el('button', 'chip', 'Reset password');
+        make.type = 'button';
+        make.title = 'Make a link that lets them set a new password.';
+        cell.append(make);
+
+        make.onclick = async () => {
+          make.disabled = true;
+          $('account-error').hidden = true;
+          try {
+            const reset = await makeReset(person.id);
+            const url = `${location.origin}${reset.link}`;
+
+            const box = el('div', 'account-reset-link');
+            const field = el('input', 'auth-input');
+            field.readOnly = true;
+            field.value = url;
+            const copy = el('button', 'chip', 'Copy');
+            copy.type = 'button';
+            copy.onclick = async () => {
+              field.select();
+              try {
+                await navigator.clipboard.writeText(url);
+                copy.textContent = 'Copied';
+              } catch {
+                // clipboard access is refused outright in some browsers, and
+                // the field is already selected, so say what to press instead
+                copy.textContent = 'Press Ctrl+C';
+              }
+              setTimeout(() => { copy.textContent = 'Copy'; }, 1600);
+            };
+
+            box.append(field, copy);
+            box.append(el('p', 'auth-note auth-fine',
+              `Send this to ${person.email} however you already talk to them. It works `
+              + 'once, expires in a day, and ends every session they have open when '
+              + 'they use it. Making another link withdraws this one.'));
+            // Appended to the row, not the cell: it spans every column, the way
+            // the End sessions confirm below does.
+            row.append(box);
+            make.remove();
+          } catch (error) {
+            $('account-error').textContent = error.message;
+            $('account-error').hidden = false;
+            make.disabled = false;
+          }
+        };
+        return cell;
+      }
+
+      function endSessionsControl(person, row) {
+        const cell = el('span', 'account-sessions');
+        const open = el('button', 'chip', 'End sessions');
+        open.type = 'button';
+        open.title = 'Sign them out of every browser, without touching the account.';
+        cell.append(open);
+
+        open.onclick = () => {
+          open.disabled = true;
+          const ask = el('div', 'account-sessions-ask');
+          ask.append(el('p', 'auth-note auth-fine',
+            `Signs ${person.email} out of every browser and device. The account `
+            + 'stays enabled — they can sign straight back in — and the '
+            + `${person.verdicts} verdict${person.verdicts === 1 ? '' : 's'} they have `
+            + `recorded ${person.verdicts === 1 ? 'keeps' : 'keep'} their name. `
+            + 'This is not Disable.'));
+
+          const cancel = el('button', 'chip', 'Cancel');
+          cancel.type = 'button';
+          cancel.onclick = () => { ask.remove(); open.disabled = false; };
+
+          const go = el('button', 'chip', 'End their sessions');
+          go.type = 'button';
+          go.onclick = async () => {
+            go.disabled = true;
+            cancel.disabled = true;
+            $('account-error').hidden = true;
+            try {
+              const { dropped } = await logoutAccount(person.id);
+              open.remove();
+              ask.innerHTML = '';
+              ask.append(el('p', 'auth-note auth-fine', dropped
+                ? `Ended ${dropped} session${dropped === 1 ? '' : 's'}. `
+                  + 'The account is untouched.'
+                : 'They had no sessions open. Nothing to end.'));
+            } catch (error) {
+              $('account-error').textContent = error.message;
+              $('account-error').hidden = false;
+              go.disabled = false;
+              cancel.disabled = false;
+            }
+          };
+
+          ask.append(go, cancel);
+          row.append(ask);
+        };
+        return cell;
+      }
+
+      // ── password ───────────────────────────────────────────────
+      $('pw-submit').onclick = async () => {
+        $('pw-error').hidden = true;
+        $('pw-ok').hidden = true;
+        const next = $('pw-new').value;
+        if (next !== $('pw-confirm').value) {
+          $('pw-error').textContent = 'Those two passwords are not the same.';
+          $('pw-error').hidden = false;
+          return;
+        }
+        $('pw-submit').disabled = true;
+        try {
+          await changePassword($('pw-current').value, next);
+          for (const id of ['pw-current', 'pw-new', 'pw-confirm']) $(id).value = '';
+          $('pw-ok').hidden = false;
+        } catch (error) {
+          $('pw-error').textContent = error.message;
+          $('pw-error').hidden = false;
+        } finally {
+          $('pw-submit').disabled = false;
+        }
+      };
+    </script>
+  </body>
+</html>

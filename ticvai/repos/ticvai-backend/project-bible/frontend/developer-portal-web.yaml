@@ -1,0 +1,34 @@
+# developer-portal-web — operated by partner · partner on web
+# Serves: P14 Developer Portal
+# Derived by tools/derive-frontend.py from screens/*.yaml. Do not hand-edit.
+
+app: developer-portal-web
+operator: partner
+audience: partner
+formFactor: web
+status: not scaffolded
+runtime: reactWeb
+offlineCapable: false
+directions:
+- ltr
+platforms:
+- P14 Developer Portal
+servesMultiplePlatforms: false
+packages:
+- design-tokens
+- ui
+- api-client
+contracts:
+- public-api
+deployment:
+  target: browser
+  distribution: served from the cell
+  bundleUpdate: immediate on deploy
+  hosting: in-cell, in-region
+  storeReview: false
+  deviceOwnership: developer device, unmanaged
+  networkAssumption: public internet
+  releaseCadence: 'Monthly, and the API it documents moves on a twelve-month deprecation cycle (ADR-0026).
+    **The portal may change weekly; the contract it describes may not.**
+
+    '

@@ -1,0 +1,46 @@
+id: LLD-Deposit
+title: Deposit — 4 transitions
+generatedBy: tools/derive-diagrams.py
+index: diagrams/hld/04-lifecycles.yaml
+source: states/deposit.yaml
+entity: Deposit
+contract: finance
+enum: Deposit.status
+enumKind: inline
+enumSchema: Deposit
+enumProperty: status
+owner: finance
+initial:
+- held
+terminal:
+- convertedToRevenue
+- returned
+- forfeited
+- partiallyForfeited
+transitions:
+- from: held
+  to: convertedToRevenue
+  operation: settleDeposit
+  trigger: operation
+  guard: The sale completed. **Not a payment** — the money was already taken; this recognises it
+- from: held
+  to: returned
+  operation: settleDeposit
+  trigger: operation
+  guard: Discharged. **Not a refund** — a refund returns money taken for a sale that happened
+- from: held
+  to: forfeited
+  operation: settleDeposit
+  trigger: operation
+  guard: Past `refundableUntil` under the cancellation terms. Recognised as income
+- from: held
+  to: partiallyForfeited
+  operation: settleDeposit
+  trigger: operation
+  guard: Part returned, part kept
+notes: '**Three outcomes and none of them is a refund.** Booking any as one misstates both the liability
+  and the revenue, which is why `settleDeposit` exists rather than a flag on `createRefund`.
+
+
+  **A deposit is money held against a sale that has not happened.** Deferred revenue is the opposite
+  — a sale that happened and has not been consumed.'

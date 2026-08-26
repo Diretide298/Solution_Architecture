@@ -1,0 +1,64 @@
+$schema: ./_schema.yaml
+id: F95
+name: A fleet is watched, a fault is found, and a station is fixed
+actor: technician
+capability: A fleet is watched, a fault is found, and a station is fixed
+wave: 2
+frequency: As the venue needs it.
+criticality: operational
+primaryContract: tenancy
+contracts:
+- tenancy
+- maintenance
+platforms:
+- P08
+trigger:
+  description: A till stops printing on a Saturday and somebody has to find out which one and why.
+offlineBehaviour: '**Reading health needs the network by definition** — a workstation nobody can reach
+  reports nothing, and that absence is itself the signal.'
+steps:
+- step: 1
+  screen: BO-036
+  action: Device Registry.
+  operations:
+  - mergeGuestProfiles
+  - registerDevice
+  - searchGuests
+  - updateGuestProfile
+  outcome: '**Drawn by the client as POS-1A.**'
+- step: 2
+  screen: BO-124
+  action: Layout & Journey Builder.
+  operations:
+  - createSaleBoard
+  - deployConfigurationProfile
+  - listAuditRecords
+  - listDevices
+  outcome: '**Drawn by the client as POS-1B.**'
+  crossesDevice: true
+- step: 3
+  screen: BO-125
+  action: Product & Category Button Configuration.
+  operations:
+  - getWorkstationHealth
+  - listAlerts
+  - listProducts
+  - recordDeviceHeartbeat
+  outcome: '**Drawn by the client as POS-1C.**'
+  crossesDevice: true
+branches:
+- at: 1
+  condition: A step is not licensed for this tenant.
+  behaviour: '**The chain stops at the module boundary.** `requiresModule` decides — the journey is
+    shorter, not broken.'
+  severity: medium
+  resolvedBy: getModuleEnablement
+exitStates:
+- state: completed
+  description: The chain ran as the client drew it.
+- state: stoppedAtModule
+  description: '**A licence boundary, not a failure.**'
+notes: '**POS board 1 from the fleet view inward.** F79 walks registering and deploying; this walks
+  the failure. **A till that will not print cannot take money**, which is the sentence the client put
+  on the board. **Derived from the client''s declared `GOES TO` edges.**'
+openQuestions: null

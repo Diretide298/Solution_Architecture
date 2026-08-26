@@ -1,0 +1,2489 @@
+openapi: 3.1.0
+info:
+  title: TICVAI White Label Builder
+  version: 0.1.0
+  x-ticvai-screen-count: 30
+  x-ticvai-tier: satellite
+  x-ticvai-module: "19 — Guest Mobile App & Branding (builder)"
+  x-ticvai-requirements: 107
+  x-ticvai-capabilities: [C57, C105, C106]
+  x-ticvai-platforms:
+    - "P13 Venue CMS"
+    - "P08 Venue Management"
+  description: >
+    ## What this contract covers
+
+    **How a tenant configures their branded guest app. A CMS plus an app builder.**
+
+    | | |
+    |---|---|
+    | **Tier** | satellite |
+    | **Matrix domain** | 19 — Guest Mobile App & Branding (builder) |
+    | **Requirements** | ~107 |
+    | **Capabilities** | C57, C105, C106 |
+    | **Consumed by** | P13 Venue CMS · P08 Venue Management |
+
+    ## How to read this file
+
+    **This file is a contract.** It is hand-authored and it is the source of truth for one
+    bounded context: server code, client code and mock servers are generated from it, never
+    the other way round. If a field is not here, it does not exist.
+
+    **Contracts are split into two tiers.**
+
+    - **Spine** — the eight contexts everything else depends on: tenancy, identity,
+      catalogue, orders, shift, access, finance, cross-cell. Frozen first. A change here
+      requires a formal change request, because every satellite has pinned against it.
+    - **Satellite** — a domain that builds on the spine and can move independently.
+      Cheaper to change.
+
+    **`paths` are operations.** Each one declares four TICVAI extensions, and Redocly
+    rejects any that does not:
+
+    | Extension | Answers |
+    |---|---|
+    | `x-ticvai-permission` | Which permission the caller needs. From one enum in `shared/permissions.yaml` — never hand-typed |
+    | `x-ticvai-scope-level` | Where in the seven-level hierarchy that permission must be held |
+    | `x-ticvai-offline-capable` | Whether a disconnected terminal may queue this |
+    | `x-ticvai-conflict-policy` | How a replayed operation resolves — `append`, `serverWins`, `manual` |
+
+    Where `x-ticvai-permission` is null, one of these says why: `x-ticvai-auth: service`
+    (cell-to-cell), `x-ticvai-self-scoped` (acts only on the caller's own resources), or
+    `security: []` (genuinely public).
+
+    **`components.schemas` are API schemas — the shape of data on the wire.** They are not
+    database tables. One API schema may become three columns (`Money`) or five tables
+    (`Order`); some have no table at all (`ValidationResult`, `TrialBalance`). Roughly 70%
+    of the DDL derives from these, and the rest — partitioning, RLS, the PII split — is
+    storage design that lives in the migration scripts.
+
+    **`security` arrays hold OAuth scopes.** Empty means "this scheme, no scopes" — for
+    bearer tokens there is nothing to list. Empty is not the same as absent: absent means
+    unauthenticated.
+
+
+    ## This context
+
+    How a tenant configures their branded guest app — identity, theme, navigation, homepage,
+    content, module enablement, and publishing. Capabilities C57, C105 and C106.
+
+    Twenty screens in the client UI/UX reference. This is not a settings page; it is a CMS
+    plus an app builder, and no tenant goes live without it.
+
+    Positions this encodes:
+
+    - **Build-time and runtime configuration are separated and enforced.** Every change to a
+      build-time value costs a store review cycle, so the API marks those fields explicitly
+      and refuses to treat them as publishable config.
+    - **Publishing is a workflow, not a save.** Draft → review → preview → publish, with
+      version history and restore. A tenant editing their live app in place is a tenant one
+      keystroke from a broken storefront.
+    - **Configuration versions behave like catalogue bundles.** Immutable, versioned,
+      atomically applied, restorable. Same problem, so the same mechanism rather than a
+      second one.
+    - **Module enablement is the licensing model surfaced.** A module the tenant has not
+      licensed cannot be enabled here, and a disabled module is hidden from the guest app
+      entirely rather than shown and refused.
+    - **Arabic is a first-class layout, not a translation layer.** Fonts pair Arabic with
+      Latin, preview toggles direction, and content carries per-language versions.
+
+servers:
+  - url: https://{cellHost}/api/v1
+    variables:
+      cellHost:
+        default: cell.ticvai.local
+
+security:
+  - bearerAuth: []
+
+tags:
+  - name: overview
+  - name: brand
+  - name: theme
+  - name: navigation
+  - name: homepage
+  - name: content
+  - name: modules
+  - name: publishing
+
+paths:
+  # ---------------------------------------------------------------- overview
+  /tenant-domains:
+    get:
+      operationId: listCustomDomains
+      x-ticvai-consumed-by:
+        - "P09 ADM-017 Domain & Certificate Management"
+      summary: The domains this tenant has claimed
+      description: >
+        **Status per domain, not just the hostname.** Pending, verifying, active, expiring — a
+        tenant looking at this screen is almost always looking because something is wrong.
+      tags: [white-label]
+      x-ticvai-permission: TENANT_CONFIGURE
+      x-ticvai-audience: [staff]
+      x-ticvai-scope-level: tenant
+      x-ticvai-read-routing: replica
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '200':
+          description: Domains
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/CustomDomain' }
+    post:
+      operationId: claimCustomDomain
+      x-ticvai-consumed-by:
+        - "P09 ADM-017 Domain & Certificate Management"
+      summary: Claim a domain and get a verification token
+      description: >
+        **Claiming is not owning.** The response carries the DNS record the tenant must publish, and
+        nothing happens until it resolves.
+
+        **Refused where another tenant already holds it** — with no detail about who, because
+        telling one tenant that another owns a hostname is telling them something about a customer.
+      tags: [white-label]
+      x-ticvai-permission: TENANT_CONFIGURE
+      x-ticvai-audience: [staff]
+      x-ticvai-scope-level: tenant
+      x-ticvai-config-scope: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [hostname, kind]
+              properties:
+                hostname: { type: string }
+                kind: { type: string, enum: [guestWeb, guestApp, partnerPortal, developerPortal] }
+                verificationMethod: { type: string, enum: [dnsTxt, cname, httpFile], default: dnsTxt }
+      responses:
+        '201':
+          description: Claimed, with the record to publish
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/CustomDomain' }
+        '409':
+          description: >
+            **Already claimed.** Named as unavailable rather than attributed.
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /tenant-domains/{domainId}/verify:
+    parameters:
+      - name: domainId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    post:
+      operationId: verifyCustomDomain
+      x-ticvai-consumed-by:
+        - "P09 ADM-017 Domain & Certificate Management"
+      summary: Check the record and issue the certificate
+      description: >
+        **Verification and issuance are one act from the tenant's point of view and two states in
+        the model.** A tenant who has published the record wants a working domain, not a green tick.
+
+        **Retried by a job rather than by the tenant.** DNS propagation takes hours and a tenant
+        clicking *verify* every ten minutes is a tenant who will give up before it resolves.
+      tags: [white-label]
+      x-ticvai-permission: TENANT_CONFIGURE
+      x-ticvai-audience: [staff]
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      responses:
+        '200':
+          description: Verified, or the reason it is not yet
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/CustomDomain' }
+
+  /tenant-domains/{domainId}:
+    parameters:
+      - name: domainId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    delete:
+      operationId: releaseCustomDomain
+      x-ticvai-consumed-by:
+        - "P09 ADM-017 Domain & Certificate Management"
+      summary: Give the domain up
+      description: >
+        **Refused while it is the only active domain for a live app.** Releasing the hostname a
+        tenant's guests are using takes their storefront down, and the confirmation should say so
+        rather than the request succeeding.
+      tags: [white-label]
+      x-ticvai-permission: TENANT_CONFIGURE
+      x-ticvai-permission-escalated: TENANT_CONFIGURE
+      x-ticvai-audience: [staff]
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '204': { description: Released }
+        '409':
+          description: >
+            **The only active domain for a live app.** Refused, naming what would break.
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /footer:
+    put:
+      operationId: setFooter
+      summary: Footer columns, legal links and social
+      description: >
+        BL-002. **A header is chrome and a footer is a link surface**, which is why this is not
+        `setHeader` with different fields.
+
+        **Legal links are held separately from the free-form columns**, so a tenant reorganising
+        their footer cannot remove the privacy notice by accident.
+      tags: [whiteLabel]
+      x-ticvai-permission: TENANT_CONFIGURE
+      x-ticvai-audience: [staff]
+      x-ticvai-scope-level: tenant
+      x-ticvai-config-scope: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/FooterConfig' }
+      responses:
+        '200':
+          description: Set
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/FooterConfig' }
+
+  /content-blocks:
+    post:
+      operationId: createContentBlock
+      summary: Author a block of content
+      description: >
+        BL-172. **The CMS modelled configuration and not authoring** — a marketer could choose
+        between things a developer had built and could not write something new.
+
+        **Scheduled, localised and optionally personalised.** The page builder is a frontend over
+        this, the same way the venue map's canvas is a frontend over its graph.
+      tags: [whiteLabel]
+      x-ticvai-permission: TENANT_CONFIGURE
+      x-ticvai-audience: [staff]
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/ContentBlock' }
+      responses:
+        '201':
+          description: Created as a draft
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ContentBlock' }
+
+  /content-blocks/{blockId}/publish:
+    parameters:
+      - name: blockId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    post:
+      operationId: publishContentBlock
+      summary: Publish now, or schedule it
+      description: >
+        **A seasonal banner needing somebody awake at midnight is the same defect `Product.onSaleFrom`
+        fixed**, and the answer is the same: a date on the object rather than a person with an alarm.
+
+        Approval is separate from authoring where the tenant requires it — **the approver may not be
+        the author**, following the rule already enforced on products.
+      tags: [whiteLabel]
+      x-ticvai-permission: TENANT_PUBLISH
+      x-ticvai-audience: [staff]
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                publishAt: { type: string, format: date-time, nullable: true }
+                expireAt: { type: string, format: date-time, nullable: true }
+      responses:
+        '200':
+          description: Published or scheduled
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ContentBlock' }
+
+  /tenant-config:
+    get:
+      operationId: getTenantConfig
+      x-ticvai-consumed-by:
+        - "P01 WEB-001 Home / Landing"
+        - "P05 KSK-002 Language Select"
+        - "P13 CMS-012 RTL Preview"
+        - "P13 CMS-016 Site Settings"
+      x-ticvai-audience: [staff, guest]
+      x-ticvai-read-routing: replica
+      summary: Full working configuration
+      description: >
+        Everything the builder edits, in its current draft state. The dashboard reads this
+        for its status view — app published state, active modules, active pages, recent
+        changes.
+      tags: [overview]
+      x-ticvai-permission: TENANT_CONFIGURE
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - name: version
+          in: query
+          description: Read a published version instead of the working draft.
+          schema: { type: string }
+      responses:
+        '200':
+          description: Configuration
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/TenantConfig' }
+        '403': { $ref: '../shared/common.yaml#/components/responses/Forbidden' }
+        '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
+
+  /tenant-config/status:
+    get:
+      operationId: getTenantAppStatus
+      x-ticvai-consumed-by:
+        - "P01 WEB-001 Home / Landing"
+        - "P01 WEB-025 Help Centre / FAQ"
+        - "P01 WEB-028 Contact & Venue Information"
+        - "P01 WEB-029 Error / Sold Out / Maintenance"
+        - "P02 GST-001 Home – Default"
+        - "P02 GST-038 Digital Companion Mode"
+        - "P02 GST-047 Maintenance / Upgrade Page"
+        - "P05 KSK-002 Language Select"
+        - "P13 CMS-014 Publishing Workflow"
+      x-ticvai-audience: [device, guest]
+      x-ticvai-read-routing: replica
+      summary: App status and recent changes
+      description: >
+        Also the endpoint the guest app calls to discover a maintenance window, which is why
+        it is unauthenticated and cacheable.
+      tags: [overview]
+      x-ticvai-permission: null   # a registered device, authenticated by its enrolment rather than a person
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: true
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '200':
+          description: Status
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/TenantAppStatus' }
+
+    put:
+      operationId: setMaintenanceMode
+      x-ticvai-audience: [staff]
+      summary: Enable or clear maintenance mode
+      description: >
+        Renders the branded maintenance screen with an expected-back time. Tenant-branded,
+        because an unbranded error page in a tenant's app looks like the tenant's failure.
+      tags: [overview]
+      x-ticvai-permission: TENANT_CONFIGURE
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [isInMaintenance]
+              properties:
+                isInMaintenance: { type: boolean }
+                message: { $ref: '#/components/schemas/LocalisedText' }
+                expectedBackAt: { type: string, format: date-time }
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/TenantAppStatus' }
+
+  # ---------------------------------------------------------------- brand
+  /tenant-config/brand:
+    get:
+      operationId: getBrandIdentity
+      x-ticvai-consumed-by:
+        - "P09 ADM-016 White-Label Branding Management"
+        - "P13 CMS-002 Brand Kit"
+      x-ticvai-audience: [staff]
+      x-ticvai-read-routing: replica
+      summary: Read brand identity
+      tags: [brand]
+      x-ticvai-permission: TENANT_CONFIGURE
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '200':
+          description: Brand identity
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/BrandIdentity' }
+
+    put:
+      operationId: setBrandIdentity
+      x-ticvai-consumed-by:
+        - "P09 ADM-016 White-Label Branding Management"
+        - "P13 CMS-002 Brand Kit"
+      x-ticvai-audience: [staff]
+      summary: Set logo, favicon and splash
+      description: >
+        Logo and favicon are runtime — they change with a publish. **Splash images are
+        build-time on native apps** and are marked as such in the response, because changing
+        them requires a rebuild and a store submission.
+      tags: [brand]
+      x-ticvai-permission: TENANT_CONFIGURE
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/BrandIdentity' }
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/BrandIdentity' }
+        '400':
+          description: Asset exceeds size limits, or is not PNG or SVG
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /tenant-config/app-icons:
+    get:
+      operationId: getAppIcons
+      x-ticvai-consumed-by:
+        - "P09 ADM-016 White-Label Branding Management"
+      x-ticvai-audience: [staff]
+      x-ticvai-read-routing: replica
+      summary: Read app icon set
+      tags: [brand]
+      x-ticvai-permission: TENANT_CONFIGURE
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '200':
+          description: Icons
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/AppIcons' }
+
+    put:
+      operationId: setAppIcons
+      x-ticvai-consumed-by:
+        - "P09 ADM-016 White-Label Branding Management"
+      x-ticvai-audience: [staff]
+      summary: Set app icons
+      description: >
+        **Build-time.** Icons are baked into the binary, so a change here does not reach
+        guests until the next store release. The response states which platforms need a
+        rebuild and what is currently live, so nobody expects an icon change to appear
+        tomorrow.
+
+        Source is a single 1024×1024 PNG without transparency; derived sizes are generated.
+      tags: [brand]
+      x-ticvai-permission: TENANT_CONFIGURE
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [sourceAssetRef]
+              properties:
+                sourceAssetRef: { type: string }
+      responses:
+        '200':
+          description: Set. Requires a rebuild to reach guests
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/AppIcons' }
+        '400':
+          description: Source is not 1024×1024, or contains transparency
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  # ---------------------------------------------------------------- theme
+  /tenant-config/theme:
+    get:
+      operationId: getTheme
+      x-ticvai-consumed-by:
+        - "P09 ADM-016 White-Label Branding Management"
+        - "P13 CMS-003 Typography"
+        - "P13 CMS-005 Theme Editor"
+      x-ticvai-audience: [staff]
+      x-ticvai-read-routing: replica
+      summary: Read colour theme
+      tags: [theme]
+      x-ticvai-permission: TENANT_CONFIGURE
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '200':
+          description: Theme
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Theme' }
+
+    put:
+      operationId: setTheme
+      x-ticvai-consumed-by:
+        - "P09 ADM-016 White-Label Branding Management"
+        - "P13 CMS-003 Typography"
+        - "P13 CMS-005 Theme Editor"
+      x-ticvai-audience: [staff]
+      summary: Set colour theme
+      description: >
+        Runtime. Contrast is checked against WCAG 2.2 AA and a failing pair is refused —
+        accessibility is a stated target for the guest app, and a tenant picking two similar
+        colours should be told at configuration time rather than at audit.
+      tags: [theme]
+      x-ticvai-permission: TENANT_CONFIGURE
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/Theme' }
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Theme' }
+        '400':
+          description: A colour pair fails the contrast requirement. The response names the pairs
+          content:
+            application/problem+json:
+              schema: { $ref: '#/components/schemas/ContrastProblem' }
+
+  /tenant-config/fonts:
+    get:
+      operationId: getFonts
+      x-ticvai-consumed-by:
+        - "P13 CMS-003 Typography"
+      x-ticvai-audience: [staff]
+      x-ticvai-read-routing: replica
+      summary: Read font configuration
+      tags: [theme]
+      x-ticvai-permission: TENANT_CONFIGURE
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '200':
+          description: Fonts
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/FontConfig' }
+
+    put:
+      operationId: setFonts
+      x-ticvai-consumed-by:
+        - "P13 CMS-003 Typography"
+      x-ticvai-audience: [staff]
+      summary: Set fonts
+      description: >
+        **Every font is a pair — one Latin, one Arabic.** A Latin font selected alone leaves
+        Arabic text rendering in a system fallback that will not match, so an Arabic face is
+        required whenever Arabic is an enabled language.
+      tags: [theme]
+      x-ticvai-permission: TENANT_CONFIGURE
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/FontConfig' }
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/FontConfig' }
+        '400':
+          description: Arabic is enabled but no Arabic face is set
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  # ---------------------------------------------------------------- navigation
+  /tenant-config/header:
+    put:
+      operationId: setHeader
+      x-ticvai-audience: [staff]
+      summary: Configure the header
+      tags: [navigation]
+      x-ticvai-permission: TENANT_CONFIGURE
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/HeaderConfig' }
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/HeaderConfig' }
+
+  /tenant-config/navigation:
+    get:
+      operationId: getNavigation
+      x-ticvai-audience: [staff]
+      x-ticvai-read-routing: replica
+      summary: Read navigation
+      tags: [navigation]
+      x-ticvai-permission: TENANT_CONFIGURE
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '200':
+          description: Navigation
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/NavigationConfig' }
+
+    put:
+      operationId: setNavigation
+      x-ticvai-audience: [staff]
+      summary: Set main and overflow navigation
+      description: >
+        Items pointing at a disabled module are refused. A navigation entry that leads
+        nowhere is worse than an absent one.
+
+        Bottom navigation is capped at five visible items; the remainder moves to the
+        overflow menu.
+      tags: [navigation]
+      x-ticvai-permission: TENANT_CONFIGURE
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/NavigationConfig' }
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/NavigationConfig' }
+        '400':
+          description: An item targets a disabled module, or more than five are marked visible
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  # ---------------------------------------------------------------- homepage
+  /tenant-config/homepage:
+    get:
+      operationId: getHomepageLayout
+      x-ticvai-consumed-by:
+        - "P13 CMS-007 Page Builder"
+      x-ticvai-audience: [staff]
+      x-ticvai-read-routing: replica
+      summary: Read homepage layout
+      tags: [homepage]
+      x-ticvai-permission: TENANT_CONFIGURE
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '200':
+          description: Layout
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/HomepageLayout' }
+
+    put:
+      operationId: setHomepageLayout
+      x-ticvai-consumed-by:
+        - "P13 CMS-007 Page Builder"
+      x-ticvai-audience: [staff]
+      x-ticvai-config-scope: tenant
+      summary: Set homepage section order
+      description: >
+        The drag-and-drop builder. Sections are an ordered list; the order here is the order
+        on the guest's home screen.
+      tags: [homepage]
+      x-ticvai-permission: TENANT_CONFIGURE
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/HomepageLayout' }
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/HomepageLayout' }
+        '400':
+          description: A section references a disabled module or a missing content block
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /tenant-config/banners:
+    get:
+      operationId: listBanners
+      x-ticvai-consumed-by:
+        - "P13 CMS-008 Content Blocks"
+      x-ticvai-audience: [staff]
+      x-ticvai-read-routing: replica
+      summary: List banners
+      tags: [content]
+      x-ticvai-permission: TENANT_CONFIGURE
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - name: state
+          in: query
+          schema: { $ref: '#/components/schemas/ScheduleState' }
+        - $ref: '../shared/common.yaml#/components/parameters/PageSize'
+        - $ref: '../shared/common.yaml#/components/parameters/PageCursor'
+      responses:
+        '200':
+          description: Banners
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '../shared/common.yaml#/components/schemas/Page'
+                  - type: object
+                    properties:
+                      items:
+                        type: array
+                        items: { $ref: '#/components/schemas/Banner' }
+
+    post:
+      operationId: createBanner
+      x-ticvai-audience: [staff]
+      summary: Create a banner
+      description: >
+        Scheduled by date window. A campaign banner set to run through a religious or
+        national period should not need someone awake at midnight to switch it on.
+      tags: [content]
+      x-ticvai-permission: TENANT_CONFIGURE
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/Banner' }
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Banner' }
+
+  /tenant-config/banners/{bannerId}:
+    parameters:
+      - name: bannerId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    patch:
+      operationId: updateBanner
+      x-ticvai-audience: [staff]
+      summary: Amend or activate a banner
+      tags: [content]
+      x-ticvai-permission: TENANT_CONFIGURE
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              minProperties: 1
+              properties:
+                title: { $ref: '#/components/schemas/LocalisedText' }
+                imageAssetRef: { type: string }
+                linkTarget: { $ref: '#/components/schemas/LinkTarget' }
+                startsAt: { type: string, format: date-time }
+                endsAt: { type: string, format: date-time }
+                isActive: { type: boolean }
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Banner' }
+    delete:
+      operationId: deleteBanner
+      x-ticvai-audience: [staff]
+      summary: Delete a banner
+      tags: [content]
+      x-ticvai-permission: TENANT_CONFIGURE
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      responses:
+        '204': { description: Deleted }
+        '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
+
+  /tenant-config/promo-blocks/{promoBlockId}:
+    parameters:
+      - name: promoBlockId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    patch:
+      operationId: updatePromoBlock
+      x-ticvai-audience: [staff]
+      summary: Amend a promotional block
+      description: >
+        19.1.11. Added 18 August. `PromoBlock` carried `state`, `startsAt`, `endsAt` and
+        `sortOrder` — every field that implies amendment — against create and list alone, so a
+        tenant could raise a block and never change or withdraw it. `Banner` is the same shape
+        one path up and has always had both.
+      tags: [content]
+      x-ticvai-permission: TENANT_CONFIGURE
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              minProperties: 1
+              properties:
+                title: { $ref: '#/components/schemas/LocalisedText' }
+                description: { $ref: '#/components/schemas/LocalisedText' }
+                iconAssetRef: { type: string }
+                promotionId: { type: string, format: uuid }
+                linkTarget: { $ref: '#/components/schemas/LinkTarget' }
+                startsAt: { type: string, format: date-time }
+                endsAt: { type: string, format: date-time }
+                sortOrder: { type: integer }
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/PromoBlock' }
+        '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
+    delete:
+      operationId: deletePromoBlock
+      x-ticvai-audience: [staff]
+      summary: Delete a promotional block
+      tags: [content]
+      x-ticvai-permission: TENANT_CONFIGURE
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      responses:
+        '204': { description: Deleted }
+        '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
+
+  /tenant-config/promo-blocks:
+    get:
+      operationId: listPromoBlocks
+      x-ticvai-consumed-by:
+        - "P13 CMS-008 Content Blocks"
+      x-ticvai-audience: [staff]
+      x-ticvai-read-routing: replica
+      summary: List promotional blocks
+      tags: [content]
+      x-ticvai-permission: TENANT_CONFIGURE
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '200':
+          description: Blocks
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/PromoBlock' }
+
+    post:
+      operationId: createPromoBlock
+      x-ticvai-audience: [staff]
+      summary: Create a promotional block
+      description: >
+        Presentation only. A block may point at a promotion, but it does not create or price
+        one — that lives in the promotions module.
+      tags: [content]
+      x-ticvai-permission: TENANT_CONFIGURE
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/PromoBlock' }
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/PromoBlock' }
+
+  # ---------------------------------------------------------------- content
+  /tenant-config/pages:
+    get:
+      operationId: listContentPages
+      x-ticvai-consumed-by:
+        - "P01 WEB-045 Help Centre & Accessibility"
+        - "P02 GST-040 Help & Support"
+        - "P02 GST-057 Accessibility Information"
+      x-ticvai-audience: [staff, guest]
+      x-ticvai-read-routing: replica
+      summary: List custom content pages
+      tags: [content]
+      x-ticvai-permission: TENANT_CONFIGURE
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: true
+      x-ticvai-offline-note: >
+        24 August: **servable from a local cache.** The device holds enough to answer without the 
+        network and the answer may be stale — which is correct for a catalogue and wrong for conte
+        nded state. `getSeatAvailability`, `getSeatHold` and `getPromotionUsage` are deliberately 
+        excluded - **a stale seat is a seat sold twice.**
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - name: status
+          in: query
+          schema: { $ref: '#/components/schemas/ContentStatus' }
+        - $ref: '../shared/common.yaml#/components/parameters/PageSize'
+        - $ref: '../shared/common.yaml#/components/parameters/PageCursor'
+      responses:
+        '200':
+          description: Pages
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '../shared/common.yaml#/components/schemas/Page'
+                  - type: object
+                    properties:
+                      items:
+                        type: array
+                        items: { $ref: '#/components/schemas/ContentPage' }
+
+    post:
+      operationId: createContentPage
+      x-ticvai-audience: [staff]
+      summary: Create a content page
+      tags: [content]
+      x-ticvai-permission: TENANT_CONFIGURE
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/ContentPage' }
+      responses:
+        '201':
+          description: Created in draft
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ContentPage' }
+        '409':
+          description: Slug already in use
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /tenant-config/pages/{pageId}:
+    parameters:
+      - name: pageId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    put:
+      operationId: updateContentPage
+      x-ticvai-audience: [staff]
+      summary: Amend a content page
+      tags: [content]
+      x-ticvai-permission: TENANT_CONFIGURE
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/ContentPage' }
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ContentPage' }
+    delete:
+      operationId: deleteContentPage
+      x-ticvai-audience: [staff]
+      summary: Delete a content page
+      description: >
+        Refused where the page is referenced by navigation or the homepage. Deleting a linked
+        page produces a dead end in a live app.
+      tags: [content]
+      x-ticvai-permission: TENANT_CONFIGURE
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      responses:
+        '204': { description: Deleted }
+        '409':
+          description: Page is referenced by navigation or the homepage
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /tenant-config/faqs:
+    get:
+      operationId: listFaqs
+      x-ticvai-consumed-by:
+        - "P01 WEB-045 Help Centre & Accessibility"
+        - "P02 GST-040 Help & Support"
+        - "P09 ADM-018 Localisation & Language Pack"
+      x-ticvai-audience: [staff, guest]
+      x-ticvai-read-routing: replica
+      summary: List FAQs
+      tags: [content]
+      x-ticvai-permission: TENANT_CONFIGURE
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: true
+      x-ticvai-offline-note: >
+        24 August: **servable from a local cache.** The device holds enough to answer without the 
+        network and the answer may be stale — which is correct for a catalogue and wrong for conte
+        nded state. `getSeatAvailability`, `getSeatHold` and `getPromotionUsage` are deliberately 
+        excluded - **a stale seat is a seat sold twice.**
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '200':
+          description: FAQ categories with entries
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/FaqCategory' }
+
+    put:
+      operationId: setFaqs
+      x-ticvai-consumed-by:
+        - "P09 ADM-018 Localisation & Language Pack"
+      x-ticvai-audience: [staff]
+      summary: Set FAQ categories and entries
+      description: >
+        Also the grounding corpus for the AI concierge, which is why an answer here is
+        content rather than a support ticket.
+      tags: [content]
+      x-ticvai-permission: TENANT_CONFIGURE
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [categories]
+              properties:
+                categories:
+                  type: array
+                  items: { $ref: '#/components/schemas/FaqCategory' }
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/FaqCategory' }
+
+  /tenant-config/policies:
+    get:
+      operationId: listPolicies
+      x-ticvai-consumed-by:
+        - "P09 ADM-018 Localisation & Language Pack"
+      x-ticvai-audience: [staff]
+      x-ticvai-read-routing: replica
+      summary: List legal policies
+      tags: [content]
+      x-ticvai-permission: TENANT_CONFIGURE
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '200':
+          description: Policies
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/Policy' }
+
+  /tenant-config/policies/{policyKind}:
+    parameters:
+      - name: policyKind
+        in: path
+        required: true
+        schema: { $ref: '#/components/schemas/PolicyKind' }
+    put:
+      operationId: setPolicy
+      x-ticvai-consumed-by:
+        - "P09 ADM-018 Localisation & Language Pack"
+      x-ticvai-audience: [staff]
+      x-ticvai-config-scope: tenant
+      summary: Publish a policy version
+      description: >
+        **Policies are versioned and never overwritten.** A guest who consented to version 3
+        consented to version 3, and a privacy notice that changes silently under a recorded
+        consent is a compliance failure. Publishing creates a new version; prior versions
+        remain readable.
+      tags: [content]
+      x-ticvai-permission: TENANT_CONFIGURE
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [body, requiresReconsent]
+              properties:
+                body: { $ref: '#/components/schemas/LocalisedRichText' }
+                requiresReconsent:
+                  type: boolean
+                  description: >
+                    True prompts existing guests to consent again on next launch. Material
+                    changes to a privacy notice generally require it.
+                effectiveFrom: { type: string, format: date }
+      responses:
+        '201':
+          description: New version published
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Policy' }
+        '400':
+          description: A required language version is missing
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  # ---------------------------------------------------------------- modules
+  /tenant-config/modules:
+    get:
+      operationId: getModuleEnablement
+      x-ticvai-audience: [staff]
+      x-ticvai-read-routing: replica
+      summary: Read module enablement
+      description: >
+        Shows which modules the tenant has licensed and which are enabled. A module that is
+        not licensed cannot be enabled, so the two are returned together.
+      tags: [modules]
+      x-ticvai-permission: TENANT_CONFIGURE
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '200':
+          description: Modules
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/ModuleEnablement' }
+
+    put:
+      operationId: setModuleEnablement
+      x-ticvai-audience: [staff]
+      x-ticvai-config-scope: tenant
+      summary: Enable or disable modules
+      description: >
+        A disabled module is **hidden from the guest app entirely** — not shown and refused.
+        Disabling one that navigation or the homepage references is rejected, with the
+        references named so the tenant can clear them first.
+      tags: [modules]
+      x-ticvai-permission: TENANT_CONFIGURE
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [modules]
+              properties:
+                modules:
+                  type: array
+                  items:
+                    type: object
+                    required: [moduleKey, isEnabled]
+                    properties:
+                      moduleKey: { $ref: '#/components/schemas/ModuleKey' }
+                      isEnabled: { type: boolean }
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/ModuleEnablement' }
+        '400':
+          description: Module not licensed, or still referenced by navigation or homepage
+          content:
+            application/problem+json:
+              schema: { $ref: '#/components/schemas/ModuleReferenceProblem' }
+
+  /tenant-config/features:
+    get:
+      operationId: getFeatureToggles
+      x-ticvai-audience: [staff]
+      x-ticvai-read-routing: replica
+      summary: Read tenant feature toggles
+      tags: [modules]
+      x-ticvai-permission: TENANT_CONFIGURE
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '200':
+          description: Features
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/FeatureToggle' }
+
+    put:
+      operationId: setFeatureToggles
+      x-ticvai-audience: [staff]
+      x-ticvai-config-scope: tenant
+      summary: Set feature toggles
+      description: >
+        Finer-grained than modules — digital companion mode, AI concierge, push, social
+        sharing, wallet integration, payment options.
+
+        Several are build-time on native apps and are flagged accordingly. A tenant enabling
+        Apple Wallet should know it needs a release, not a publish.
+      tags: [modules]
+      x-ticvai-permission: TENANT_CONFIGURE
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [features]
+              properties:
+                features:
+                  type: array
+                  items:
+                    type: object
+                    required: [featureKey, isEnabled]
+                    properties:
+                      featureKey: { type: string }
+                      isEnabled: { type: boolean }
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/FeatureToggle' }
+
+  /tenant-config/languages:
+    put:
+      operationId: setLanguages
+      x-ticvai-consumed-by:
+        - "P09 ADM-018 Localisation & Language Pack"
+        - "P13 CMS-011 Translations"
+      x-ticvai-audience: [staff]
+      summary: Set enabled languages and default
+      description: >
+        Enabling a language does not translate existing content. The response reports how
+        many content items lack a version in each newly enabled language, so a tenant does
+        not publish a half-translated app.
+      tags: [modules]
+      x-ticvai-permission: TENANT_CONFIGURE
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [languages, defaultLanguage]
+              properties:
+                languages:
+                  type: array
+                  minItems: 1
+                  items: { type: string, pattern: '^[a-z]{2}$' }
+                defaultLanguage: { type: string, pattern: '^[a-z]{2}$' }
+      responses:
+        '200':
+          description: Updated, with translation gaps reported
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/LanguageConfig' }
+        '400':
+          description: Default is not among the enabled languages
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  # ---------------------------------------------------------------- publishing
+  /tenant-config/preview:
+    post:
+      operationId: createPreview
+      x-ticvai-consumed-by:
+        - "P09 ADM-016 White-Label Branding Management"
+        - "P13 CMS-006 Component Preview"
+      x-ticvai-audience: [staff]
+      summary: Generate a preview link
+      description: >
+        A short-lived link rendering the working draft as the guest app would, for a chosen
+        platform, theme and language. Shareable for review before publishing.
+      tags: [publishing]
+      x-ticvai-permission: TENANT_CONFIGURE
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                platform:
+                  type: string
+                  enum: [ios, android, web]
+                theme:
+                  type: string
+                  enum: [light, dark]
+                language: { type: string, pattern: '^[a-z]{2}$' }
+                expiresInHours: { type: integer, minimum: 1, maximum: 168, default: 24 }
+      responses:
+        '201':
+          description: Preview created
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Preview' }
+
+  /tenant-config/validate:
+    post:
+      operationId: validateTenantConfig
+      x-ticvai-consumed-by:
+        - "P13 CMS-012 RTL Preview"
+        - "P13 CMS-014 Publishing Workflow"
+      x-ticvai-audience: [staff]
+      summary: Validate the working draft
+      description: >
+        Run before publishing. Reports missing translations, navigation pointing at disabled
+        modules, unset required assets, contrast failures, and policies without a current
+        version.
+      tags: [publishing]
+      x-ticvai-permission: TENANT_CONFIGURE
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      responses:
+        '200':
+          description: Findings
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ConfigValidationReport' }
+
+  /tenant-config/publish:
+    post:
+      operationId: publishTenantConfig
+      x-ticvai-consumed-by:
+        - "P09 ADM-016 White-Label Branding Management"
+        - "P13 CMS-006 Component Preview"
+        - "P13 CMS-014 Publishing Workflow"
+      x-ticvai-audience: [staff]
+      x-ticvai-config-scope: tenant
+      summary: Publish the working draft
+      description: >
+        Validates, snapshots, versions and activates atomically. Guests receive the new
+        configuration on next launch — no store release, because runtime configuration is
+        deliberately separated from build-time.
+
+        The response names any build-time change in the draft that will **not** reach guests
+        until the next release. A tenant who changed their app icon and published should be
+        told plainly that the icon has not shipped.
+      tags: [publishing]
+      x-ticvai-permission: TENANT_PUBLISH
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [note]
+              properties:
+                note: { type: string, minLength: 3, maxLength: 500 }
+                scheduledFor:
+                  type: string
+                  format: date-time
+                  description: Publish at a future time. Useful for a campaign launch.
+      responses:
+        '201':
+          description: Published
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ConfigVersion' }
+        '409':
+          description: Validation failed. Every finding is listed
+          content:
+            application/problem+json:
+              schema: { $ref: '#/components/schemas/ConfigValidationProblem' }
+
+  /tenant-config/versions:
+    get:
+      operationId: listConfigVersions
+      x-ticvai-consumed-by:
+        - "P09 ADM-016 White-Label Branding Management"
+        - "P13 CMS-006 Component Preview"
+        - "P13 CMS-015 Version History"
+        - "P13 CMS-020 Change Log"
+      x-ticvai-audience: [staff]
+      x-ticvai-read-routing: replica
+      summary: Version history
+      tags: [publishing]
+      x-ticvai-permission: TENANT_CONFIGURE
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/PageSize'
+        - $ref: '../shared/common.yaml#/components/parameters/PageCursor'
+      responses:
+        '200':
+          description: Versions, newest first
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '../shared/common.yaml#/components/schemas/Page'
+                  - type: object
+                    properties:
+                      items:
+                        type: array
+                        items: { $ref: '#/components/schemas/ConfigVersion' }
+
+  /tenant-config/versions/{version}/restore:
+    parameters:
+      - name: version
+        in: path
+        required: true
+        schema: { type: string }
+    post:
+      operationId: restoreConfigVersion
+      x-ticvai-consumed-by:
+        - "P09 ADM-016 White-Label Branding Management"
+        - "P13 CMS-006 Component Preview"
+        - "P13 CMS-015 Version History"
+      x-ticvai-audience: [staff]
+      summary: Restore a previous version
+      description: >
+        Copies the chosen version into the working draft. **It does not publish** — restore
+        then review then publish, so a rollback is as deliberate as the change that caused
+        it.
+      tags: [publishing]
+      x-ticvai-permission: TENANT_PUBLISH
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      responses:
+        '200':
+          description: Restored into the working draft
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/TenantConfig' }
+        '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
+
+  /tenant-config/versions/{version}/diff:
+    parameters:
+      - name: version
+        in: path
+        required: true
+        schema: { type: string }
+    get:
+      operationId: diffConfigVersion
+      x-ticvai-consumed-by:
+        - "P09 ADM-016 White-Label Branding Management"
+        - "P13 CMS-006 Component Preview"
+        - "P13 CMS-015 Version History"
+      x-ticvai-audience: [staff]
+      x-ticvai-read-routing: replica
+      summary: Compare a version against the working draft
+      description: >
+        What a review step actually needs. A publish note saying "updated homepage" is not a
+        review; a field-level diff is.
+      tags: [publishing]
+      x-ticvai-permission: TENANT_CONFIGURE
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - name: against
+          in: query
+          description: Another version. Defaults to the working draft.
+          schema: { type: string }
+      responses:
+        '200':
+          description: Diff
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ConfigDiff' }
+
+components:
+  schemas:
+    LocalisedText:
+      x-ticvai-persistence: "none — jsonb column"
+      type: object
+      description: Keyed by ISO 639-1 code. Every enabled language should be present.
+      additionalProperties: { type: string }
+
+    CustomDomain:
+      type: object
+      x-ticvai-persistence: "whitelabel.custom_domain"
+      description: >
+        24 August. **`ADM-017 Domain & Certificate Management` declared 41 operations and not one of
+        them was about a domain** — it carried the same bulk-attached set as every other white-label
+        screen, and **no domain or certificate operation existed anywhere in 1,010.**
+
+        A white-label platform whose tenants cannot use their own domain is a white-label platform
+        in name only.
+
+        **Verification before issuance, always.** A certificate issued for a domain the tenant does
+        not control is a certificate issued to whoever asked.
+      required: [id, tenantId, hostname, status]
+      properties:
+        id: { type: string, format: uuid }
+        tenantId: { type: string, format: uuid }
+        hostname: { type: string }
+        kind: { type: string, enum: [guestWeb, guestApp, partnerPortal, developerPortal] }
+        status: { type: string, enum: [pending, verifying, verified, issuing, active, failed, expired, revoked] }
+        verificationMethod: { type: string, enum: [dnsTxt, cname, httpFile] }
+        verificationToken: { type: string, readOnly: true }
+        certificateExpiresAt:
+          type: string
+          format: date-time
+          nullable: true
+          description: >
+            **Renewal is a job, not a reminder.** A certificate that expires on a Saturday takes a
+            tenant's storefront down, and nobody reads a reminder email on a Saturday.
+        lastCheckedAt: { type: string, format: date-time, nullable: true }
+        failureReason: { type: string, nullable: true }
+
+
+    FooterConfig:
+      type: object
+      x-ticvai-persistence: "control.footer_config"
+      description: >
+        BL-002. **`setHeader` and `HeaderConfig` exist and the footer does not**, which looked like
+        symmetry until you notice it is not: **a header is chrome and a footer is a link surface.**
+
+        A footer carries the legal links — terms, privacy, accessibility statement, cookie
+        preferences — and **those are the ones a regulator checks.** Treating it as a mirror of the
+        header would have given it a logo and no way to reach a privacy notice.
+      required: [id, scopePath]
+      properties:
+        id: { type: string, format: uuid }
+        scopePath: { type: string }
+        columns:
+          type: array
+          items:
+            type: object
+            properties:
+              heading: { type: string }
+              links:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    label: { type: string }
+                    url: { type: string }
+                    opensCookiePreferences: { type: boolean, default: false }
+        legalLinks:
+          type: object
+          description: >
+            **Required links, held separately from the free-form columns** — a tenant reorganising
+            their footer must not be able to remove the privacy notice by accident.
+          properties:
+            termsUrl: { type: string }
+            privacyUrl: { type: string }
+            accessibilityUrl: { type: string, nullable: true }
+            cookiePolicyUrl: { type: string, nullable: true }
+        copyrightText: { type: string }
+        socialLinks:
+          type: array
+          items:
+            type: object
+            properties:
+              platform: { type: string }
+              url: { type: string }
+
+    AccessibilitySettings:
+      type: object
+      description: >
+        BL-065, 2.1.27. **POS and kiosk accessibility, which is a legal obligation in most
+        jurisdictions and was unstated.**
+
+        **A kiosk is the hard case.** A guest with low vision using a website brings their own
+        assistive technology; a guest at a kiosk gets whatever the kiosk offers, so the settings
+        have to be on the device rather than in the browser.
+      properties:
+        largeTextAvailable: { type: boolean, default: true }
+        highContrastAvailable: { type: boolean, default: true }
+        simplifiedNavigationAvailable: { type: boolean, default: true }
+        screenReaderSupported: { type: boolean, default: true }
+        reachableHeightModeAvailable:
+          type: boolean
+          default: false
+          description: >
+            **Moves the interface to the lower half of the screen** for a guest using a wheelchair.
+            A kiosk mounted at standing height is unusable otherwise, and no software setting fixes
+            the mounting — this is the mitigation.
+        sessionTimeoutMultiplier:
+          type: number
+          default: 1
+          description: >
+            **Timeouts are an accessibility barrier nobody counts.** A guest who needs three times
+            as long to read a screen should not lose their basket to a 90-second inactivity timer.
+
+
+    ContentBlock:
+      type: object
+      x-ticvai-persistence: "control.content_block"
+      description: >
+        BL-172. **`white-label` is excellent as a configuration model and is not an authoring
+        surface.** `HomepageLayout` with ordered sections, `Banner`, `PromoBlock` and `ContentPage`
+        describe what a venue has chosen; **none of them lets a marketer write something new
+        without a developer.**
+
+        A block is a piece of authored content with a type, a body and a schedule. **The page
+        builder is a frontend over this**, the same way the venue map's canvas is a frontend over
+        its graph.
+      required: [id, kind, status]
+      properties:
+        id: { type: string, format: uuid }
+        pageId: { type: string, format: uuid, nullable: true }
+        kind: { type: string, enum: [richText, image, video, gallery, cta, faq, form, embed, productGrid, countdown, testimonial] }
+        position: { type: integer }
+        body:
+          type: object
+          additionalProperties: true
+          description: Typed by `kind`, and validated against the block's own schema at save.
+        localeVariants:
+          type: object
+          additionalProperties: true
+          description: >
+            **Per-locale bodies, not per-locale pages.** A venue running Arabic and English should
+            not maintain two page trees that drift — the structure is shared and the words are not.
+        status: { type: string, enum: [draft, scheduled, published, expired, archived] }
+        publishAt:
+          type: string
+          format: date-time
+          nullable: true
+          description: >
+            **Content scheduling, which the configuration model had no room for.** A seasonal banner
+            that needs somebody awake at midnight is the same defect `Product.onSaleFrom` fixed.
+        expireAt: { type: string, format: date-time, nullable: true }
+        audienceSegmentId:
+          type: string
+          format: uuid
+          nullable: true
+          description: >
+            **Personalisation, evaluated at render.** A block shown only to members, or only to
+            first-time visitors. Null shows it to everybody, which is what every block does today.
+        approvedByPrincipalId: { type: string, format: uuid, nullable: true }
+
+
+    LocalisedRichText:
+      x-ticvai-persistence: "none — jsonb column"
+      type: object
+      description: Keyed by language code. Values are sanitised HTML.
+      additionalProperties: { type: string }
+
+    ChangeScope:
+      type: string
+      description: >
+        Whether a change reaches guests on publish or needs a store release.
+      enum: [runtime, buildTime]
+
+    ScheduleState:
+      type: string
+      enum: [draft, scheduled, active, expired]
+
+    ContentStatus:
+      type: string
+      enum: [draft, published, archived]
+
+    TenantAppStatus:
+      x-ticvai-persistence: "none — computed"
+      type: object
+      required: [tenantId, isPublished, isInMaintenance]
+      properties:
+        tenantId: { type: string, format: uuid }
+        isPublished: { type: boolean }
+        publishedVersion: { type: string, nullable: true }
+        publishedAt: { type: string, format: date-time, nullable: true }
+        draftVersion: { type: string }
+        hasUnpublishedChanges: { type: boolean }
+        activeModuleCount: { type: integer }
+        licensedModuleCount: { type: integer }
+        activePageCount: { type: integer }
+        isInMaintenance: { type: boolean }
+        maintenanceMessage: { $ref: '#/components/schemas/LocalisedText' }
+        expectedBackAt: { type: string, format: date-time, nullable: true }
+        recentChanges:
+          type: array
+          items:
+            type: object
+            properties:
+              area: { type: string }
+              description: { type: string }
+              principalId: { type: string, format: uuid }
+              at: { type: string, format: date-time }
+
+    BrandIdentity:
+      x-ticvai-persistence: "none — embedded in tenant_config"
+      type: object
+      required: [logoAssetRef]
+      properties:
+        logoAssetRef: { type: string }
+        logoDarkAssetRef:
+          type: string
+          nullable: true
+          description: Used on dark backgrounds. Falls back to the primary logo.
+        faviconAssetRef: { type: string, nullable: true }
+        splashImageAssetRefs:
+          type: array
+          items: { type: string }
+        splashDurationSeconds: { type: integer, minimum: 0, maximum: 10, default: 3 }
+        splashBackgroundColour: { type: string, pattern: '^#[0-9A-Fa-f]{6}$' }
+        showLoadingIndicator: { type: boolean, default: true }
+        splashChangeScope:
+          allOf:
+            - $ref: '#/components/schemas/ChangeScope'
+          readOnly: true
+          description: Always `buildTime` for native apps.
+
+    AppIcons:
+      x-ticvai-persistence: "none — embedded in tenant_config"
+      type: object
+      required: [sourceAssetRef, changeScope]
+      properties:
+        sourceAssetRef: { type: string }
+        derived:
+          type: array
+          readOnly: true
+          items:
+            type: object
+            properties:
+              platform: { type: string }
+              size: { type: string }
+              assetRef: { type: string }
+        changeScope:
+          allOf:
+            - $ref: '#/components/schemas/ChangeScope'
+          readOnly: true
+        liveVersion:
+          type: string
+          nullable: true
+          description: Icon currently shipped. Differs from the draft until the next release.
+        requiresRebuild: { type: boolean, readOnly: true }
+
+    Theme:
+      x-ticvai-persistence: "none — embedded in tenant_config"
+      type: object
+      required: [primaryColour, secondaryColour, backgroundColour, textColour]
+      properties:
+        primaryColour: { type: string, pattern: '^#[0-9A-Fa-f]{6}$' }
+        secondaryColour: { type: string, pattern: '^#[0-9A-Fa-f]{6}$' }
+        accentColour: { type: string, pattern: '^#[0-9A-Fa-f]{6}$' }
+        backgroundColour: { type: string, pattern: '^#[0-9A-Fa-f]{6}$' }
+        textColour: { type: string, pattern: '^#[0-9A-Fa-f]{6}$' }
+        darkMode:
+          type: object
+          description: Optional dark variant. Derived from the light theme when absent.
+          properties:
+            primaryColour: { type: string }
+            backgroundColour: { type: string }
+            textColour: { type: string }
+        cornerRadius: { type: integer, minimum: 0, maximum: 32 }
+
+    ContrastProblem:
+      x-ticvai-persistence: "none — error shape"
+      allOf:
+        - $ref: '../shared/common.yaml#/components/schemas/Problem'
+        - type: object
+          properties:
+            failures:
+              type: array
+              items:
+                type: object
+                properties:
+                  foreground: { type: string }
+                  background: { type: string }
+                  ratio: { type: number }
+                  required: { type: number }
+                  usage: { type: string }
+
+    FontConfig:
+      x-ticvai-persistence: "none — embedded in tenant_config"
+      type: object
+      required: [primaryLatin]
+      properties:
+        primaryLatin: { type: string }
+        primaryArabic:
+          type: string
+          nullable: true
+          description: >
+            Required when Arabic is enabled. A Latin face alone leaves Arabic in a system
+            fallback that will not match.
+        secondaryLatin: { type: string, nullable: true }
+        secondaryArabic: { type: string, nullable: true }
+        customFontAssetRefs:
+          type: array
+          items: { type: string }
+        changeScope:
+          allOf:
+            - $ref: '#/components/schemas/ChangeScope'
+          readOnly: true
+          description: Custom font files are `buildTime`; selecting a bundled face is `runtime`.
+
+    HeaderConfig:
+      x-ticvai-persistence: "none — embedded in tenant_config"
+      type: object
+      required: [layout]
+      properties:
+        layout:
+          type: string
+          enum: [logoLeft, logoCentre, logoWithMenu]
+        showLogo: { type: boolean, default: true }
+        showMenu: { type: boolean, default: true }
+        showNotifications: { type: boolean, default: true }
+        backgroundColour: { type: string, pattern: '^#[0-9A-Fa-f]{6}$' }
+
+    LinkTarget:
+      x-ticvai-persistence: "none — embedded"
+      type: object
+      required: [kind]
+      properties:
+        kind:
+          type: string
+          enum: [module, contentPage, product, event, externalUrl, none]
+        moduleKey: { $ref: '#/components/schemas/ModuleKey' }
+        contentPageId: { type: string, format: uuid }
+        productId: { type: string, format: uuid }
+        eventId: { type: string, format: uuid }
+        url: { type: string }
+
+    NavigationConfig:
+      x-ticvai-persistence: "whitelabel.navigation_item"
+      type: object
+      required: [kind, items]
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+          description: >
+            **Added 20 August.** The schema reference derives table columns from API response schemas, and a response is not a table — this one returned everything a caller needs and not the row's own identity, so the table had no key and no row could be addressed, updated or deleted. Found by an audit of all 365 tables, not by a reader.
+        kind:
+          type: string
+          enum: [bottomNavigation, drawer, tabs]
+        items:
+          type: array
+          maxItems: 12
+          items:
+            type: object
+            required: [label, target, isVisible, sortOrder]
+            properties:
+              id:
+                type: string
+                format: uuid
+                readOnly: true
+                description: >
+                  **Added 20 August.** The table had no key at all — no id, no parent and no natural key, so **no row could be addressed, updated or deleted.** The response schema returned everything a caller needs and not the row's own identity, which is the difference between an API response and a table.
+              label: { $ref: '#/components/schemas/LocalisedText' }
+              icon: { type: string }
+              target: { $ref: '#/components/schemas/LinkTarget' }
+              isVisible:
+                type: boolean
+                description: At most five may be visible in bottom navigation; the rest overflow.
+              sortOrder: { type: integer }
+
+    HomepageSectionKind:
+      type: string
+      enum:
+        - heroBanner
+        - quickActions
+        - tickets
+        - whatsOn
+        - attractions
+        - membership
+        - dining
+        - shop
+        - promotions
+        - map
+        - customContent
+        - spacer
+
+    HomepageLayout:
+      x-ticvai-persistence: "whitelabel.homepage_section"
+      type: object
+      required: [sections]
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+          description: >
+            **Added 20 August.** The schema reference derives table columns from API response schemas, and a response is not a table — this one returned everything a caller needs and not the row's own identity, so the table had no key and no row could be addressed, updated or deleted. Found by an audit of all 365 tables, not by a reader.
+        sections:
+          type: array
+          items:
+            type: object
+            required: [kind, sortOrder, isVisible]
+            properties:
+              id:
+                type: string
+                format: uuid
+                readOnly: true
+                description: >
+                  **Added 20 August.** The table had no key at all — no id, no parent and no natural key, so **no row could be addressed, updated or deleted.** The response schema returned everything a caller needs and not the row's own identity, which is the difference between an API response and a table.
+              kind: { $ref: '#/components/schemas/HomepageSectionKind' }
+              title: { $ref: '#/components/schemas/LocalisedText' }
+              sortOrder: { type: integer }
+              isVisible: { type: boolean }
+              contentPageId: { type: string, format: uuid, nullable: true }
+              maxItems: { type: integer, nullable: true }
+
+    Banner:
+      x-ticvai-persistence: "whitelabel.banner"
+      type: object
+      required: [id, title, imageAssetRef, startsAt]
+      properties:
+        id: { type: string, format: uuid }
+        title: { $ref: '#/components/schemas/LocalisedText' }
+        subtitle: { $ref: '#/components/schemas/LocalisedText' }
+        imageAssetRef: { type: string }
+        placement:
+          type: string
+          enum: [homepageHero, homepageBlock, explore, checkout]
+        linkTarget: { $ref: '#/components/schemas/LinkTarget' }
+        startsAt: { type: string, format: date-time }
+        endsAt: { type: string, format: date-time, nullable: true }
+        state:
+          allOf:
+            - $ref: '#/components/schemas/ScheduleState'
+          readOnly: true
+        sortOrder: { type: integer }
+        isActive: { type: boolean }
+
+    PromoBlock:
+      x-ticvai-persistence: "whitelabel.promo_block"
+      type: object
+      required: [id, title]
+      properties:
+        id: { type: string, format: uuid }
+        title: { $ref: '#/components/schemas/LocalisedText' }
+        description: { $ref: '#/components/schemas/LocalisedText' }
+        iconAssetRef: { type: string, nullable: true }
+        promotionId:
+          type: string
+          format: uuid
+          nullable: true
+          description: >
+            Presentation only. A block may point at a promotion; it does not create or price
+            one.
+        linkTarget: { $ref: '#/components/schemas/LinkTarget' }
+        startsAt: { type: string, format: date-time, nullable: true }
+        endsAt: { type: string, format: date-time, nullable: true }
+        state:
+          allOf:
+            - $ref: '#/components/schemas/ScheduleState'
+          readOnly: true
+        sortOrder: { type: integer }
+
+    ContentPage:
+      x-ticvai-persistence: "whitelabel.content_page"
+      type: object
+      required: [id, slug, title, body, status]
+      properties:
+        id: { type: string, format: uuid }
+        slug: { type: string, pattern: '^[a-z0-9-]+$' }
+        title: { $ref: '#/components/schemas/LocalisedText' }
+        body: { $ref: '#/components/schemas/LocalisedRichText' }
+        isEnabled:
+          type: boolean
+          default: true
+          description: >
+            BL-005. **Enablement is not publication.** A published page that is disabled exists,
+            keeps its URL and its history, and does not render — which is what a tenant wants when a
+            section is seasonal.
+
+            **Unpublishing loses the version; disabling does not.** Collapsing them means a venue
+            turning off its water-park section for winter has to republish it every spring.
+        status: { $ref: '#/components/schemas/ContentStatus' }
+        iconAssetRef: { type: string, nullable: true }
+        categoryCode: { type: string, nullable: true }
+        sortOrder: { type: integer }
+        isReferenced:
+          type: boolean
+          readOnly: true
+          description: True when navigation or the homepage links to this page. Blocks deletion.
+
+    FaqCategory:
+      x-ticvai-persistence: "whitelabel.faq_category + whitelabel.faq_entry"
+      type: object
+      required: [code, name, entries]
+      properties:
+        code: { type: string }
+        name: { $ref: '#/components/schemas/LocalisedText' }
+        sortOrder: { type: integer }
+        entries:
+          type: array
+          items:
+            type: object
+            required: [id, question, answer]
+            properties:
+              id: { type: string, format: uuid }
+              question: { $ref: '#/components/schemas/LocalisedText' }
+              answer: { $ref: '#/components/schemas/LocalisedRichText' }
+              sortOrder: { type: integer }
+              isPublished: { type: boolean }
+
+    PolicyKind:
+      type: string
+      enum: [privacy, termsAndConditions, refund, cookie, accessibility]
+
+    Policy:
+      x-ticvai-persistence: "whitelabel.policy"
+      type: object
+      required: [kind, version, body, effectiveFrom, publishedAt]
+      properties:
+        kind: { $ref: '#/components/schemas/PolicyKind' }
+        version:
+          type: string
+          description: >
+            Immutable. A guest who consented to version 3 consented to version 3, and a
+            policy that changes under a recorded consent is a compliance failure.
+        body: { $ref: '#/components/schemas/LocalisedRichText' }
+        requiresReconsent: { type: boolean }
+        effectiveFrom: { type: string, format: date }
+        publishedByPrincipalId: { type: string, format: uuid }
+        publishedAt: { type: string, format: date-time }
+
+    ModuleKey:
+      type: string
+      enum:
+        - ticketsAndBooking
+        - membership
+        - events
+        - attractions
+        - virtualQueue
+        - diningAndFnb
+        - shop
+        - parking
+        - gamification
+        - photoGallery
+        - wallet
+        - loyalty
+        - lostAndFound
+        - map
+
+    ModuleEnablement:
+      x-ticvai-persistence: "whitelabel.module_enablement"
+      type: object
+      required: [moduleKey, isLicensed, isEnabled]
+      properties:
+        moduleKey: { $ref: '#/components/schemas/ModuleKey' }
+        displayName: { type: string }
+        isLicensed:
+          type: boolean
+          description: From the tenant's subscription. False makes enablement impossible.
+        isEnabled: { type: boolean }
+        referencedBy:
+          type: array
+          readOnly: true
+          description: Navigation items and homepage sections pointing at this module.
+          items: { type: string }
+
+    ModuleReferenceProblem:
+      x-ticvai-persistence: "none — error shape"
+      allOf:
+        - $ref: '../shared/common.yaml#/components/schemas/Problem'
+        - type: object
+          properties:
+            moduleKey: { type: string }
+            referencedBy:
+              type: array
+              items: { type: string }
+            isLicensed: { type: boolean }
+
+    FeatureToggle:
+      x-ticvai-persistence: "whitelabel.feature_toggle"
+      type: object
+      required: [featureKey, isEnabled, changeScope]
+      properties:
+        featureKey:
+          type: string
+          enum:
+            - digitalCompanionMode
+            - aiConciergeChat
+            - lostAndFound
+            - pushNotifications
+            - socialSharing
+            - multiLanguage
+            - appleWallet
+            - googlePay
+            - applePay
+            - cashOnDelivery
+            - guestCheckout
+            - uaePassLogin
+        displayName: { type: string }
+        isEnabled: { type: boolean }
+        changeScope:
+          allOf:
+            - $ref: '#/components/schemas/ChangeScope'
+          readOnly: true
+          description: >
+            Wallet and payment integrations are `buildTime` on native apps — enabling one
+            needs a release, not a publish.
+        requiresConfiguration:
+          type: boolean
+          description: True where the feature needs credentials or setup elsewhere first.
+
+    LanguageConfig:
+      x-ticvai-persistence: "none — embedded in tenant_config"
+      type: object
+      required: [languages, defaultLanguage]
+      properties:
+        languages:
+          type: array
+          items: { type: string }
+        defaultLanguage: { type: string }
+        rtlLanguages:
+          type: array
+          readOnly: true
+          items: { type: string }
+        translationGaps:
+          type: array
+          readOnly: true
+          description: Content lacking a version in an enabled language.
+          items:
+            type: object
+            properties:
+              language: { type: string }
+              missingCount: { type: integer }
+              areas:
+                type: array
+                items: { type: string }
+
+    Preview:
+      x-ticvai-persistence: "none — short-lived, cache only"
+      type: object
+      required: [previewId, url, expiresAt]
+      properties:
+        previewId: { type: string, format: uuid }
+        url: { type: string }
+        platform: { type: string }
+        theme: { type: string }
+        language: { type: string }
+        expiresAt: { type: string, format: date-time }
+
+    ConfigFindingKind:
+      type: string
+      enum:
+        - missingTranslation
+        - navigationTargetsDisabledModule
+        - homepageReferencesMissingContent
+        - contrastFailure
+        - missingRequiredAsset
+        - policyVersionMissing
+        - noVisibleNavigationItems
+        - unlicensedModuleEnabled
+        - arabicFontMissing
+
+    ConfigValidationReport:
+      x-ticvai-persistence: "none — computed"
+      type: object
+      required: [passed, errorCount, warningCount, findings]
+      properties:
+        passed: { type: boolean }
+        errorCount: { type: integer }
+        warningCount: { type: integer }
+        findings:
+          type: array
+          items:
+            type: object
+            required: [kind, severity, message]
+            properties:
+              kind: { $ref: '#/components/schemas/ConfigFindingKind' }
+              severity:
+                type: string
+                enum: [error, warning]
+              message: { type: string }
+              area: { type: string }
+              reference: { type: string, nullable: true }
+
+    ConfigValidationProblem:
+      allOf:
+        - $ref: '../shared/common.yaml#/components/schemas/Problem'
+        - type: object
+          properties:
+            findings:
+              type: array
+              items:
+                type: object
+                properties:
+                  kind: { type: string }
+                  message: { type: string }
+                  area: { type: string }
+
+    ConfigVersion:
+      x-ticvai-persistence: "whitelabel.config_version"
+      type: object
+      required: [version, publishedAt, publishedByPrincipalId, note, isCurrent]
+      properties:
+        version: { type: string }
+        publishedAt: { type: string, format: date-time }
+        publishedByPrincipalId: { type: string, format: uuid }
+        publishedByName: { type: string }
+        note: { type: string }
+        isCurrent: { type: boolean }
+        scheduledFor: { type: string, format: date-time, nullable: true }
+        contentHash: { type: string }
+        pendingBuildTimeChanges:
+          type: array
+          description: >
+            Changes in this version that will not reach guests until the next store release.
+            Surfaced at publish so nobody expects a new icon tomorrow.
+          items:
+            type: object
+            properties:
+              area: { type: string }
+              description: { type: string }
+              platforms:
+                type: array
+                items: { type: string }
+
+    ConfigDiff:
+      x-ticvai-persistence: "none — computed"
+      type: object
+      required: [fromVersion, toVersion, changes]
+      properties:
+        fromVersion: { type: string }
+        toVersion: { type: string }
+        changes:
+          type: array
+          items:
+            type: object
+            required: [area, path, changeKind]
+            properties:
+              area: { type: string }
+              path: { type: string }
+              changeKind:
+                type: string
+                enum: [added, removed, modified]
+              before: { type: string, nullable: true }
+              after: { type: string, nullable: true }
+              changeScope: { $ref: '#/components/schemas/ChangeScope' }
+
+    TenantConfig:
+      x-ticvai-persistence: "whitelabel.tenant_config"
+      type: object
+      required: [tenantId, version, brand, theme, fonts, navigation, homepage, languages]
+      properties:
+        tenantId: { type: string, format: uuid }
+        version: { type: string }
+        isDraft: { type: boolean }
+        brand: { $ref: '#/components/schemas/BrandIdentity' }
+        appIcons: { $ref: '#/components/schemas/AppIcons' }
+        theme: { $ref: '#/components/schemas/Theme' }
+        fonts: { $ref: '#/components/schemas/FontConfig' }
+        footer:
+          $ref: '#/components/schemas/FooterConfig'
+        notificationBranding:
+          type: object
+          nullable: true
+          description: >
+            BL-003. **`marketing-crm` holds the templates and nothing said whose identity they
+            wear.** A message sent on behalf of a venue carries that venue's sender name, reply-to
+            and logo — **an operational alert arriving from `noreply@ticvai.com` is one a guest
+            marks as spam.**
+
+            Resolved on the template at send time rather than duplicated per template.
+          properties:
+            senderName: { type: string }
+            replyToEmail: { type: string, format: email }
+            smsSenderId: { type: string, nullable: true }
+            whatsappBusinessId: { type: string, nullable: true }
+            logoAssetId: { type: string, format: uuid, nullable: true }
+        enabledPaymentMethods:
+          type: array
+          nullable: true
+          description: >
+            BL-004. **`FeatureToggle` could turn Apple Pay on and could not say which cards a tenant
+            accepts.** Resolved against `orders.PaymentProvider.supportedMethods` — the tenant's
+            choice within what the gateway offers, and **a tenant enabling a method their provider
+            does not support should fail here rather than at checkout.**
+          items: { type: string }
+        accessibility:
+          $ref: '#/components/schemas/AccessibilitySettings'
+        header: { $ref: '#/components/schemas/HeaderConfig' }
+        navigation: { $ref: '#/components/schemas/NavigationConfig' }
+        homepage: { $ref: '#/components/schemas/HomepageLayout' }
+        modules:
+          type: array
+          items: { $ref: '#/components/schemas/ModuleEnablement' }
+        features:
+          type: array
+          items: { $ref: '#/components/schemas/FeatureToggle' }
+        languages: { $ref: '#/components/schemas/LanguageConfig' }
+        updatedAt: { type: string, format: date-time }
+
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

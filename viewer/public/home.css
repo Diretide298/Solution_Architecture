@@ -1,0 +1,484 @@
+/**
+ * The door.
+ *
+ * One full-viewport scene with the chrome floating over it, and no page scroll
+ * — the wheel is bound to the layers instead. Everything here is scoped under
+ * `.home-page` so that loading `styles.css` for the loading curtain and the
+ * brand rules does not drag the viewer's day palette onto a surface that has
+ * to be dark.
+ *
+ * Both cuts, and the scene follows.
+ *
+ * This said there was no light cut to be had, on the grounds that the scene is
+ * drawn with `globalCompositeOperation = 'lighter'` and additive light on a
+ * white ground is a grey smudge. The premise was right and the conclusion was
+ * not: `lighter` is not the effect, accumulation is, and on a pale ground the
+ * same construction runs with `multiply` and dark ink. galaxy.js carries both
+ * palettes now and picks by theme, so the scene here needs nothing but a
+ * ground to sit on — which is what the two token sets below are.
+ *
+ * The night values are LANDING.md's, unchanged. The day set is its mirror:
+ * same hues, same roles, inverted lightness.
+ */
+
+.home-page {
+  /* Day. Lit from the middle and darkening outward, the same shape as night —
+     the centre is the palest part, so it is where the scene's ink reads
+     strongest, which keeps the middle the focus in both cuts. */
+  --field: radial-gradient(130% 100% at 50% 46%, #ffffff, #f7fafa 34%, #edf3f3 68%, #e2ebeb 100%);
+  --ink: #12211f;
+  --body: #4a5f5e;
+  --support: #52706e;
+  --meta: #6d8482;
+  --meta-dim: #869997;
+  --line: #d9e5e4;
+  --line-soft: #e2ecec;
+  --line-hard: #c6d8d7;
+  --accent: #229799;
+  --accent-deep: #1c7e80;
+  --amber: #b07a24;
+  --veil: #f4f8f8;
+  --scrim: rgba(247, 250, 250, 0.86);
+  --panel: rgba(255, 255, 255, 0.86);
+  --chip-line: #cde2e1;
+  --chip-fill: #eef7f6;
+  --on-accent: #ffffff;
+  --pill-line: #c9dedd;
+  --pill-fill: rgba(255, 255, 255, 0.78);
+
+  margin: 0;
+  min-height: 100vh;
+  /* The scene needs room before it is a scene rather than five dots in a
+     letterbox; below this the page scrolls rather than crushing it. */
+  min-width: 0;
+  background: var(--veil);
+  color: var(--ink);
+  font-family: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
+  overflow: hidden;
+}
+
+/* Night. LANDING.md's values, exactly as they were — the day set above is the
+   mirror of this one, not the other way round. */
+:root[data-theme="dark"] .home-page {
+  --field: radial-gradient(130% 100% at 50% 46%, #16262c, #111a1f 34%, #0c1013 68%, #080a0b 100%);
+  --ink: #edf4f3;
+  --body: #9cafae;
+  --support: #93a6a5;
+  --meta: #78908e;
+  --meta-dim: #6d8482;
+  --line: #1d2c30;
+  --line-soft: #1e2c30;
+  --line-hard: #223338;
+  --accent: #48cfcb;
+  --accent-deep: #2bb3b0;
+  --amber: #e0ae52;
+  --veil: #0c1013;
+  --scrim: rgba(8, 10, 11, 0.82);
+  --panel: rgba(12, 18, 21, 0.82);
+  --chip-line: #1e3238;
+  --chip-fill: #132227;
+  --on-accent: #06211f;
+  --pill-line: #1e3b3f;
+  --pill-fill: rgba(10, 20, 22, 0.72);
+}
+
+/* The curtain takes the door's own ground rather than the viewer's, because
+   `styles.css` is scoped away from `.home-page` on purpose — see the note at
+   the head of this file. */
+.home-page .atlas-loader { background: var(--veil); }
+.home-page .al-text { color: var(--support); }
+
+/* ── the scene ───────────────────────────────────────────────────── */
+.home-scene {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  background: var(--field);
+}
+
+/* Keeps the hero legible when a bright cluster rotates behind it. Tall,
+   because the thing it is covering is a moving light source and a short scrim
+   just draws a line across the page. */
+.home-scrim {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 210px;
+  pointer-events: none;
+  background: linear-gradient(180deg, var(--scrim) 0%, transparent 100%);
+}
+
+/* ── hero ────────────────────────────────────────────────────────── */
+.home-hero {
+  position: fixed;
+  top: 46px;
+  left: 52px;
+  width: 430px;
+  max-width: calc(100vw - 104px);
+  pointer-events: none;   /* the scene behind it stays clickable */
+}
+.home-hero > * { pointer-events: auto; }
+
+.home-lockup { display: inline-block; }
+.home-lockup img { height: 42px; width: auto; display: block; }
+/* Qualified with `img`, because `.home-lockup img` above sets `display: block`
+   and out-specifies a bare class — which renders both cuts, one ghosted over
+   the other. */
+.home-lockup img.home-lockup-night { display: none; }
+:root[data-theme="dark"] .home-lockup img.home-lockup-day { display: none; }
+:root[data-theme="dark"] .home-lockup img.home-lockup-night { display: block; }
+
+/* ── the project list ─────────────────────────────── */
+.home-eyebrow {
+  margin: 30px 0 12px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--meta);
+}
+.home-projects { display: flex; flex-direction: column; gap: 2px; }
+
+/* A row rather than a card: the field behind it is the subject, and a stack of
+   filled boxes over a starfield reads as a dialog sitting on top of the page. */
+.home-project {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  padding: 9px 12px;
+  border: 0;
+  border-radius: 7px;
+  background: none;
+  font: inherit;
+  text-align: left;
+  text-decoration: none;
+  cursor: pointer;
+  color: var(--body);
+  transition: background .16s, color .16s;
+}
+.home-project:hover { background: var(--row-hover, rgba(127, 127, 127, .12)); color: var(--ink); }
+.home-project-name { font-size: 15px; font-weight: 700; letter-spacing: -0.01em; }
+.home-project-count {
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: 11.5px;
+  color: var(--meta);
+  font-variant-numeric: tabular-nums;
+}
+
+/* The one being read. A dot rather than a fill: it has to be legible over a
+   moving field in both themes, and a tinted row is neither. */
+.home-project[aria-current="true"] .home-project-name { color: var(--ink); }
+.home-project[aria-current="true"]::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--accent);
+  align-self: center;
+  margin-left: -12px;
+  margin-right: 6px;
+}
+.home-project:not([aria-current="true"])::before {
+  content: '';
+  width: 6px;
+  margin-left: -12px;
+  margin-right: 6px;
+}
+
+/* ── the colophon ────────────────────────────────── */
+.home-colophon {
+  position: fixed;
+  bottom: 44px;
+  left: 52px;
+  width: 430px;
+  max-width: calc(100vw - 104px);
+  pointer-events: none;
+}
+.home-colophon > * { pointer-events: auto; }
+
+.home-colophon h1 {
+  margin: 0;
+  /* Smaller than it was at the top of the page. It is a colophon now, and a
+     34px heading at the foot of a field competes with the thing the page is
+     actually about. */
+  font-size: 23px;
+  font-weight: 800;
+  letter-spacing: -0.024em;
+  line-height: 1.2;
+  color: var(--ink);
+}
+
+.home-support {
+  margin: 14px 0 0;
+  font-size: 14.5px;
+  line-height: 1.62;
+  color: var(--body);
+  max-width: 40ch;
+}
+
+.home-figures { display: flex; gap: 34px; margin-top: 26px; }
+.home-figure b {
+  display: block;
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: 19px;
+  font-weight: 800;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+}
+.home-figure span {
+  display: block;
+  margin-top: 3px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--meta);
+}
+
+/* Who is signed in, and the way out. A door with no handle on the inside is
+   not a door. */
+.home-account {
+  margin: 22px 0 0;
+  font-size: 11.5px;
+  color: var(--meta-dim);
+}
+.home-account button {
+  background: none;
+  border: 0;
+  padding: 0;
+  font: inherit;
+  color: var(--support);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  cursor: pointer;
+}
+.home-account button:hover { color: var(--accent); }
+
+/* ── the 3D / 2D tray ────────────────────────────────────────────── */
+
+/* ── the rail ────────────────────────────────────────────────────── */
+.home-rail {
+  position: fixed;
+  right: 52px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  align-items: flex-end;
+}
+
+.home-rail .rail-overview {
+  margin-bottom: 12px;
+  padding: 6px 0;
+  border: 0;
+  background: none;
+  font: 700 9.5px/1 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--meta);
+  cursor: pointer;
+}
+.home-rail .rail-overview:hover,
+.home-rail .rail-overview.is-on { color: var(--accent); }
+
+.home-rail .rail-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 7px 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  color: inherit;
+}
+.rail-row .rail-name {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--support);
+}
+.rail-row .rail-count {
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: 11px;
+  color: var(--meta-dim);
+  font-variant-numeric: tabular-nums;
+  min-width: 3.5ch;
+  text-align: right;
+}
+/* The bar is the whole state indicator. It grows rather than lights up,
+   because a length reads from the corner of the eye and a colour change on a
+   2px sliver does not. */
+.rail-row .rail-bar {
+  width: 12px;
+  height: 2px;
+  border-radius: 1px;
+  background: var(--line-hard);
+  transition: width 0.2s ease, background-color 0.2s ease;
+}
+.rail-row:hover .rail-name { color: var(--ink); }
+.rail-row:hover .rail-bar { width: 20px; background: var(--accent-deep); }
+.rail-row.is-on .rail-name { color: var(--ink); }
+.rail-row.is-on .rail-bar { width: 26px; background: var(--accent); }
+
+/* ── the detail panel ────────────────────────────────────────────── */
+.home-panel {
+  position: fixed;
+  left: 52px;
+  bottom: 44px;
+  width: 428px;
+  max-width: calc(100vw - 104px);
+  padding: 20px 22px 18px;
+  border-radius: 17px;
+  border: 1px solid var(--line);
+  background: var(--panel);
+  backdrop-filter: blur(9px);
+  animation: home-rise 0.34s cubic-bezier(0.22, 0.8, 0.3, 1);
+}
+@keyframes home-rise {
+  from { opacity: 0; transform: translateY(14px); }
+  to { opacity: 1; transform: none; }
+}
+
+.panel-head { display: flex; align-items: center; gap: 10px; }
+.panel-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  flex: none;
+  background: var(--tint, var(--accent));
+  box-shadow: 0 0 12px var(--tint, var(--accent));
+}
+.panel-head h2 { margin: 0; font-size: 22px; font-weight: 800; letter-spacing: -0.02em; }
+
+.panel-meta {
+  margin: 8px 0 0;
+  font-size: 12px;
+  color: var(--meta);
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+}
+.panel-blurb { margin: 12px 0 0; font-size: 13.5px; line-height: 1.62; color: var(--body); }
+
+.panel-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 15px; }
+.panel-chips a {
+  padding: 4px 10px;
+  border-radius: 999px;
+  border: 1px solid var(--chip-line);
+  background: var(--chip-fill);
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--support);
+  text-decoration: none;
+}
+.panel-chips a:hover { color: var(--ink); border-color: var(--accent-deep); }
+
+.panel-actions { display: flex; align-items: center; gap: 16px; margin-top: 18px; }
+.panel-go {
+  padding: 9px 18px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, var(--accent), var(--accent-deep));
+  color: var(--on-accent);
+  font-size: 12.5px;
+  font-weight: 700;
+  text-decoration: none;
+}
+.panel-go:hover { filter: brightness(1.08); }
+.panel-back {
+  border: 0;
+  background: none;
+  padding: 0;
+  font: 600 12px 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
+  color: var(--meta);
+  cursor: pointer;
+}
+.panel-back:hover { color: var(--support); }
+
+/* ── the hint ────────────────────────────────────────────────────── */
+/* It says what to do next, not what the page is. Breathing rather than static
+   so it reads as an invitation; it is the only thing on the page that moves
+   without being the data. */
+.home-hint {
+  position: fixed;
+  bottom: 26px;
+  left: 50%;
+  transform: translateX(-50%);
+  margin: 0;
+  font-size: 11.5px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  color: var(--meta-dim);
+  animation: home-breathe 3.4s ease-in-out infinite;
+  pointer-events: none;
+  white-space: nowrap;
+}
+@keyframes home-breathe {
+  0%, 100% { opacity: 0.45; }
+  50% { opacity: 0.9; }
+}
+
+/* ── narrow ──────────────────────────────────────────────────────── */
+/* The hero column and the panel both claim the left edge, and under about a
+   thousand pixels they claim it at the same time. The panel wins — it is the
+   thing the reader just asked for — and the hero drops its support copy. */
+@media (max-width: 1080px) {
+  .home-hero { left: 28px; top: 30px; width: 340px; }
+  .home-colophon { left: 28px; bottom: 26px; width: 340px; }
+  .home-colophon h1 { font-size: 20px; }
+  .home-rail { right: 24px; }
+  .home-panel { left: 28px; bottom: 30px; width: 340px; }
+  /* A panel open on a short window needs the room. The colophon is the first
+     thing to go, being the part nobody opened the page to read. */
+  .home-colophon:has(~ .home-panel:not([hidden])) .home-support,
+  .home-colophon:has(~ .home-panel:not([hidden])) .home-figures,
+  .home-colophon:has(~ .home-panel:not([hidden])) .home-account { display: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .home-panel { animation: none; }
+  .home-hint { animation: none; opacity: 0.75; }
+}
+
+/* ── the way back ───────────────────────────────────────────────────
+ * Bottom left of the scene rather than beside the rail: it is the counterpart
+ * of flying in, and flying in happens in the middle of the canvas.
+ */
+.home-back {
+  position: fixed;
+  left: 50%;
+  transform: translateX(-50%);
+  /* Above the hint, which lives at the bottom of the scene. Without the
+     translate the left edge sits at the middle and the button reads as
+     off-centre by half its own width. */
+  bottom: 62px;
+  z-index: 4;
+  padding: 8px 18px;
+  border: 1px solid var(--pill-line);
+  border-radius: 999px;
+  background: var(--pill-fill);
+  backdrop-filter: blur(6px);
+  color: var(--support);
+  font: 500 12px/1 "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
+  cursor: pointer;
+  transition: color 140ms ease, border-color 140ms ease, background 140ms ease;
+}
+.home-back:hover { color: var(--accent); border-color: var(--accent); }
+.home-back[hidden] { display: none; }
+
+/* ── touch targets ───────────────────────────────────────────────────
+   The 760px line the rest of the app uses, and the only reason this file needs
+   one: two controls here are text-sized rather than control-sized. "Sign out"
+   in the colophon is a bare <button> styled as a link (17px tall) and the
+   Overview switch on the rail is 21px, and both are single controls with no
+   neighbour to hit by mistake — but a reader who cannot land on Sign out has
+   no way out of the app on a phone at all. Same 32px floor as styles.css, and
+   the same reasoning for it; see the note there. */
+@media (max-width: 768px), (pointer: coarse) {
+  .home-account button,
+  .home-rail .rail-overview {
+    display: inline-flex;
+    align-items: center;
+    min-height: 32px;
+  }
+}

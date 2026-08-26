@@ -1,0 +1,1109 @@
+openapi: 3.1.0
+info:
+  title: TICVAI Access Control
+  version: 1.0.0
+  x-ticvai-screen-count: 0
+  x-ticvai-tier: spine
+  x-ticvai-module: "3 — Admission and Access"
+  x-ticvai-requirements: 201
+  x-ticvai-capabilities: [C09, C10, C23, C25, C26, C29]
+  x-ticvai-platforms:
+    - "P07 Access Handheld"
+    - "P04 POS"
+    - "P06 Staff Ops App"
+  description: >
+    ## What this contract covers
+
+    **The highest-frequency operation in a venue. Must work with no network.**
+
+    | | |
+    |---|---|
+    | **Tier** | spine |
+    | **Matrix domain** | 3 — Admission and Access |
+    | **Requirements** | ~201 |
+    | **Capabilities** | C09, C10, C23, C25, C26, C29 |
+    | **Consumed by** | P07 Access Handheld · P04 POS · P06 Staff Ops App |
+
+    ## How to read this file
+
+    **This file is a contract.** It is hand-authored and it is the source of truth for one
+    bounded context: server code, client code and mock servers are generated from it, never
+    the other way round. If a field is not here, it does not exist.
+
+    **Contracts are split into two tiers.**
+
+    - **Spine** — the eight contexts everything else depends on: tenancy, identity,
+      catalogue, orders, shift, access, finance, cross-cell. Frozen first. A change here
+      requires a formal change request, because every satellite has pinned against it.
+    - **Satellite** — a domain that builds on the spine and can move independently.
+      Cheaper to change.
+
+    **`paths` are operations.** Each one declares four TICVAI extensions, and Redocly
+    rejects any that does not:
+
+    | Extension | Answers |
+    |---|---|
+    | `x-ticvai-permission` | Which permission the caller needs. From one enum in `shared/permissions.yaml` — never hand-typed |
+    | `x-ticvai-scope-level` | Where in the seven-level hierarchy that permission must be held |
+    | `x-ticvai-offline-capable` | Whether a disconnected terminal may queue this |
+    | `x-ticvai-conflict-policy` | How a replayed operation resolves — `append`, `serverWins`, `manual` |
+
+    Where `x-ticvai-permission` is null, one of these says why: `x-ticvai-auth: service`
+    (cell-to-cell), `x-ticvai-self-scoped` (acts only on the caller's own resources), or
+    `security: []` (genuinely public).
+
+    **`components.schemas` are API schemas — the shape of data on the wire.** They are not
+    database tables. One API schema may become three columns (`Money`) or five tables
+    (`Order`); some have no table at all (`ValidationResult`, `TrialBalance`). Roughly 70%
+    of the DDL derives from these, and the rest — partitioning, RLS, the PII split — is
+    storage design that lives in the migration scripts.
+
+    **Where a schema maps to storage, `x-ticvai-persistence` says so.** The value is a table
+    name, a list of tables, or `none` with a reason. It is documentation of the mapping, not
+    a generator input — the DDL lives in versioned SQL migrations, because partitioning, RLS
+    policies, `ltree` indexes and partial indexes have no expression in OpenAPI.
+
+    **`security` arrays hold OAuth scopes.** Empty means "this scheme, no scopes" — for
+    bearer tokens there is nothing to list. Empty is not the same as absent: absent means
+    unauthenticated.
+
+
+    ## This context
+
+    Entitlement validation at an access point, and the sync path for scans recorded offline.
+    Capability C09.
+
+    Settled positions this encodes:
+
+    - Identity and entitlement are separate. Validation answers *does this media carry a
+      valid entitlement for this access point right now*, not *who is this*.
+    - Ticket ID and Media Code are different things. Media can be re-linked; the ticket ID
+      does not change.
+    - Validation reads the primary unconditionally. A ticket sold at the front gate and
+      scanned twenty metres later must not be refused by a lagging replica.
+    - Scans recorded offline are appended, never conflicting, deduplicated on the
+      client-generated ULID.
+    - Deny is always explained. A gate operator facing a queue needs a reason, not a
+      boolean.
+
+    Cross-cell (ADR-0014, ADR-0010): entitlements cross cells. A ticket issued in one cell
+    is validated in another as a REDEMPTION RIGHT — a narrow projection carrying only what a
+    gate needs, with no personal data. Redemption is authoritative in the consuming cell and
+    reconciled back to the issuer, exactly as offline scans are authoritative on the device
+    and reconciled to the server. The gate must work when the inter-cell link is down.
+
+    NOT in this contract: turnstile hardware control. That is a driver concern, and the
+    vendor SDK is outstanding. The API surface above is independent of it.
+
+servers:
+  - url: https://{cellHost}/api/v1
+    variables:
+      cellHost:
+        default: cell.ticvai.local
+
+security:
+  - bearerAuth: []
+
+tags:
+  - name: validation
+  - name: sync
+  - name: accessPoint
+
+paths:
+  /access/validate:
+    post:
+      operationId: validateAccess
+      summary: Validate media at an access point and admit or deny
+      description: >
+        The access point is inherited from the session's workstation and is not a request
+        parameter — an operator cannot validate against a gate they are not at.
+
+        This operation is offline-capable. When executed offline the client evaluates the
+        cached entitlement and deny rules locally, records the outcome, and replays through
+        /access/scans on reconnect. The server is authoritative on replay and may downgrade
+        a local `admitted` to `denied`; the client surfaces that as a reconciliation item
+        rather than silently discarding it.
+      tags: [validation]
+      x-ticvai-permission: ACCESS_VALIDATE
+      x-ticvai-scope-level: workstation
+      x-ticvai-offline-capable: true
+      x-ticvai-conflict-policy: append
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/ValidateRequest' }
+      responses:
+        '200':
+          description: >
+            Validation completed. Check `outcome` — a denial is a successful validation,
+            not an error.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ValidationResult' }
+        '400': { $ref: '../shared/common.yaml#/components/responses/BadRequest' }
+        '403': { $ref: '../shared/common.yaml#/components/responses/Forbidden' }
+        '404':
+          description: Media not recognised in this cell
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /access/override:
+    post:
+      operationId: overrideAccess
+      summary: Admit against a failed validation
+      description: >
+        Records the overriding principal, the original denial reason and a mandatory
+        justification. Every override is auditable — this is the operation most likely to
+        be examined after an incident.
+      tags: [validation]
+      x-ticvai-permission: ACCESS_OVERRIDE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: true
+      x-ticvai-conflict-policy: append
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [id, scanId, reason, recordedAt]
+              properties:
+                id:
+                  type: string
+                  pattern: '^[0-9A-HJKMNP-TV-Z]{26}$'
+                scanId:
+                  type: string
+                  pattern: '^[0-9A-HJKMNP-TV-Z]{26}$'
+                  description: The denied scan being overridden.
+                reason:
+                  type: string
+                  minLength: 3
+                  maxLength: 500
+                recordedAt: { type: string, format: date-time }
+      responses:
+        '200':
+          description: Override recorded and entry admitted
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ValidationResult' }
+        '403': { $ref: '../shared/common.yaml#/components/responses/Forbidden' }
+        '409':
+          description: The scan was not a denial, or has already been overridden
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /access/lookup:
+    get:
+      operationId: lookupTicket
+      x-ticvai-read-routing: replica
+      summary: Read-only validity check without admitting
+      description: >
+        Support and guest-services use. Does not create a scan, does not decrement re-entry
+        counts, does not admit. Distinct permission from ACCESS_VALIDATE.
+      tags: [validation]
+      x-ticvai-permission: TICKET_LOOKUP
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: true
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - name: mediaCode
+          in: query
+          schema: { type: string, maxLength: 256 }
+        - name: ticketId
+          in: query
+          schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+      responses:
+        '200':
+          description: Entitlement state
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/TicketStatus' }
+        '400':
+          description: Neither mediaCode nor ticketId supplied
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+        '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
+
+  /access/scans:
+    post:
+      operationId: syncScans
+      summary: Replay scans recorded offline
+      description: >
+        Ordered batch. The server processes in `sequence` order and stops at the first
+        entry it cannot accept, returning results for those processed — a scan that depends
+        on a prior scan must not be evaluated out of order.
+
+        Deduplication is on the scan's ULID. Replaying a batch after a crash is a no-op for
+        entries already accepted.
+      tags: [sync]
+      x-ticvai-permission: ACCESS_VALIDATE
+      x-ticvai-scope-level: workstation
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: append
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [deviceId, scans]
+              properties:
+                deviceId:
+                  type: string
+                  format: uuid
+                  description: Sequence numbers are monotonic per device, not globally.
+                scans:
+                  type: array
+                  minItems: 1
+                  maxItems: 500
+                  items: { $ref: '#/components/schemas/OfflineScan' }
+      responses:
+        '200':
+          description: >
+            Batch processed, wholly or up to the first rejection. Always inspect `results`.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ScanSyncResult' }
+        '400': { $ref: '../shared/common.yaml#/components/responses/BadRequest' }
+        '403': { $ref: '../shared/common.yaml#/components/responses/Forbidden' }
+
+    get:
+      operationId: listScans
+      x-ticvai-read-routing: replica
+      summary: List scan events
+      tags: [sync]
+      x-ticvai-permission: REPORT_VIEW_VENUE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - name: accessPointId
+          in: query
+          schema: { type: string, format: uuid }
+        - name: ticketId
+          in: query
+          schema: { type: string }
+        - name: outcome
+          in: query
+          schema: { $ref: '#/components/schemas/ScanOutcome' }
+        - name: recordedFrom
+          in: query
+          schema: { type: string, format: date-time }
+        - name: recordedTo
+          in: query
+          schema: { type: string, format: date-time }
+        - $ref: '../shared/common.yaml#/components/parameters/PageSize'
+        - $ref: '../shared/common.yaml#/components/parameters/PageCursor'
+      responses:
+        '200':
+          description: Scans
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '../shared/common.yaml#/components/schemas/Page'
+                  - type: object
+                    properties:
+                      items:
+                        type: array
+                        items: { $ref: '#/components/schemas/ScanEvent' }
+        '403': { $ref: '../shared/common.yaml#/components/responses/Forbidden' }
+
+  /access/offline-package:
+    get:
+      operationId: getOfflinePackage
+      x-ticvai-read-routing: replica
+      summary: Entitlement and rule set for offline validation
+      description: >
+        Pulled by scanners and venue edge nodes so validation continues through a WAN
+        outage. Returns entitlements valid within the requested window for the session's
+        access point, plus the deny rules needed to evaluate them.
+
+        `etag` supports conditional refresh — a device on a slow link should not re-download
+        an unchanged package.
+      tags: [sync]
+      x-ticvai-permission: ACCESS_VALIDATE
+      x-ticvai-scope-level: workstation
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - name: validFrom
+          in: query
+          required: true
+          schema: { type: string, format: date-time }
+        - name: validTo
+          in: query
+          required: true
+          schema: { type: string, format: date-time }
+        - name: If-None-Match
+          in: header
+          schema: { type: string }
+      responses:
+        '200':
+          description: Package
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/OfflinePackage' }
+          headers:
+            ETag:
+              schema: { type: string }
+        '304':
+          description: Unchanged since the supplied ETag
+        '403': { $ref: '../shared/common.yaml#/components/responses/Forbidden' }
+
+  /access-points/{accessPointId}/mode:
+    parameters:
+      - name: accessPointId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    put:
+      operationId: setTurnstileMode
+      summary: Set the operating mode of an access point
+      description: >
+        Podium operation. Changes what the gate does, not who may pass it.
+      tags: [accessPoint]
+      x-ticvai-permission: TURNSTILE_MODE_SET
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: true
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [mode]
+              properties:
+                mode: { $ref: '#/components/schemas/TurnstileMode' }
+                reason: { type: string, maxLength: 200 }
+      responses:
+        '200':
+          description: Mode set
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/AccessPoint' }
+        '403': { $ref: '../shared/common.yaml#/components/responses/Forbidden' }
+        '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
+
+  /access-points:
+    get:
+      operationId: listAccessPoints
+      x-ticvai-read-routing: replica
+      summary: List access points
+      tags: [accessPoint]
+      x-ticvai-permission: SCOPE_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: true
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - name: venueId
+          in: query
+          schema: { type: string, format: uuid }
+        - $ref: '../shared/common.yaml#/components/parameters/PageSize'
+        - $ref: '../shared/common.yaml#/components/parameters/PageCursor'
+      responses:
+        '200':
+          description: Access points
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '../shared/common.yaml#/components/schemas/Page'
+                  - type: object
+                    properties:
+                      items:
+                        type: array
+                        items: { $ref: '#/components/schemas/AccessPoint' }
+        '403': { $ref: '../shared/common.yaml#/components/responses/Forbidden' }
+    post:
+      operationId: createAccessPoint
+      summary: Create an access point
+      tags: [accessPoint]
+      x-ticvai-permission: ACCESS_POINT_CONFIGURE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/CreateAccessPointRequest' }
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/AccessPoint' }
+        '400': { $ref: '../shared/common.yaml#/components/responses/BadRequest' }
+
+  /access-points/{accessPointId}:
+    parameters:
+      - name: accessPointId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    get:
+      operationId: getAccessPoint
+      x-ticvai-read-routing: replica
+      summary: Read an access point
+      tags: [accessPoint]
+      x-ticvai-permission: SCOPE_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: true
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '200':
+          description: Access point
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/AccessPoint' }
+        '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
+    patch:
+      operationId: updateAccessPoint
+      summary: Update an access point
+      tags: [accessPoint]
+      x-ticvai-permission: ACCESS_POINT_CONFIGURE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              minProperties: 1
+              properties:
+                name: { type: string, maxLength: 200 }
+                direction: { $ref: '#/components/schemas/Direction' }
+                antiPassbackEnabled: { type: boolean }
+                requiresExitBeforeReentry: { type: boolean }
+                isActive: { type: boolean }
+                driver:
+                  type: string
+                  description: >
+                    Driver identifier for the controller behind this access point. Where the
+                    reader speaks OSDP the driver is standards-based; the controller layer
+                    above it is vendor-specific.
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/AccessPoint' }
+        '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
+
+  /admission-profiles:
+    get:
+      operationId: listAdmissionProfiles
+      x-ticvai-read-routing: replica
+      summary: List admission profiles
+      description: >
+        The rules governing entry for an entitlement — validation window, re-entry, duration
+        limits, anti-passback.
+      tags: [accessPoint]
+      x-ticvai-permission: SCOPE_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: true
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/PageSize'
+        - $ref: '../shared/common.yaml#/components/parameters/PageCursor'
+      responses:
+        '200':
+          description: Profiles
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '../shared/common.yaml#/components/schemas/Page'
+                  - type: object
+                    properties:
+                      items:
+                        type: array
+                        items: { $ref: '#/components/schemas/AdmissionProfile' }
+    post:
+      operationId: createAdmissionProfile
+      x-ticvai-config-scope: venue
+      summary: Create an admission profile
+      tags: [accessPoint]
+      x-ticvai-permission: ACCESS_POINT_CONFIGURE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/AdmissionProfile' }
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/AdmissionProfile' }
+
+  /admission-profiles/{profileId}:
+    parameters:
+      - name: profileId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    put:
+      operationId: updateAdmissionProfile
+      x-ticvai-config-scope: venue
+      summary: Update an admission profile
+      description: >
+        Changes take effect at terminals after the next offline package refresh, not
+        immediately. A profile change during trading is not retroactive.
+      tags: [accessPoint]
+      x-ticvai-permission: ACCESS_POINT_CONFIGURE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/AdmissionProfile' }
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/AdmissionProfile' }
+        '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
+
+  /blacklist:
+    get:
+      operationId: listBlacklist
+      x-ticvai-read-routing: primary   # a removed-too-late blacklist entry admits someone barred
+      summary: List blacklisted media
+      tags: [accessPoint]
+      x-ticvai-permission: SCOPE_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: true
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/PageSize'
+        - $ref: '../shared/common.yaml#/components/parameters/PageCursor'
+      responses:
+        '200':
+          description: Entries
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '../shared/common.yaml#/components/schemas/Page'
+                  - type: object
+                    properties:
+                      items:
+                        type: array
+                        items: { $ref: '#/components/schemas/BlacklistEntry' }
+    post:
+      operationId: addBlacklistEntry
+      summary: Blacklist a media code
+      description: >
+        Denies outright regardless of entitlement state. Included in the offline package so
+        it holds during an outage — a blacklist that only works online is not a blacklist.
+      tags: [accessPoint]
+      x-ticvai-permission: ACCESS_POINT_CONFIGURE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: append
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [mediaCode, reason]
+              properties:
+                mediaCode: { type: string, maxLength: 256 }
+                reason: { type: string, minLength: 3, maxLength: 500 }
+                expiresAt: { type: string, format: date-time }
+      responses:
+        '201':
+          description: Added
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/BlacklistEntry' }
+
+  /blacklist/{mediaCode}:
+    parameters:
+      - name: mediaCode
+        in: path
+        required: true
+        schema: { type: string }
+    delete:
+      operationId: removeBlacklistEntry
+      summary: Remove a blacklist entry
+      tags: [accessPoint]
+      x-ticvai-permission: ACCESS_POINT_CONFIGURE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: append
+      responses:
+        '204': { description: Removed }
+        '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
+
+  /access/group-validate:
+    post:
+      operationId: validateGroupAccess
+      summary: Admit a group on one read
+      description: >
+        A school party or tour group entering on a single credential. Partial admission is
+        normal — thirty booked, twenty-eight arrived — and the remainder stays available.
+
+        Each admission decrements the group's counter, so a group cannot re-enter beyond its
+        size by scanning repeatedly.
+      tags: [validation]
+      x-ticvai-permission: ACCESS_VALIDATE
+      x-ticvai-scope-level: workstation
+      x-ticvai-offline-capable: true
+      x-ticvai-conflict-policy: append
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [id, mediaCode, admitCount, recordedAt]
+              properties:
+                id: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+                mediaCode: { type: string, maxLength: 256 }
+                admitCount: { type: integer, minimum: 1 }
+                direction: { $ref: '#/components/schemas/Direction' }
+                recordedAt: { type: string, format: date-time }
+      responses:
+        '200':
+          description: Group admission outcome
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ValidationResult'
+                  - type: object
+                    properties:
+                      groupSize: { type: integer }
+                      totalAdmitted: { type: integer }
+                      remainingAdmissions: { type: integer }
+        '409':
+          description: Requested count exceeds the remaining group allowance
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /access-points/{accessPointId}/geofence:
+    parameters:
+      - name: accessPointId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    put:
+      operationId: setAccessPointGeofence
+      summary: Set a geofence for handheld validation
+      description: >
+        Constrains where a handheld may validate for this access point. A roaming scanner used
+        two hundred metres from the gate it claims to be at is either an error or something
+        worse.
+
+        Enforcement is configurable — warn, or deny — because GPS accuracy indoors is not a
+        thing to build a hard block on without thought.
+      tags: [accessPoint]
+      x-ticvai-permission: ACCESS_POINT_CONFIGURE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [enforcement]
+              properties:
+                latitude: { type: number }
+                longitude: { type: number }
+                radiusMetres: { type: integer, minimum: 5, maximum: 5000 }
+                enforcement:
+                  type: string
+                  enum: [off, warn, deny]
+                allowProximityBeacon:
+                  type: boolean
+                  description: Accept a BLE proximity assertion in place of GPS. Better indoors.
+      responses:
+        '200':
+          description: Set
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/AccessPoint' }
+
+components:
+  schemas:
+    CreateAccessPointRequest:
+      type: object
+      required: [code, name, venueId, direction]
+      properties:
+        code: { type: string, maxLength: 64 }
+        name: { type: string, maxLength: 200 }
+        venueId: { type: string, format: uuid }
+        direction: { $ref: '#/components/schemas/Direction' }
+        antiPassbackEnabled: { type: boolean, default: false }
+        requiresExitBeforeReentry: { type: boolean, default: false }
+        driver: { type: string }
+
+    AdmissionProfile:
+      x-ticvai-persistence: "access.admission_profile"
+      type: object
+      required: [id, code, name, openMinutesBefore, closeMinutesAfter]
+      properties:
+        id: { type: string, format: uuid }
+        code: { type: string, maxLength: 64 }
+        name: { type: string, maxLength: 200 }
+        openMinutesBefore:
+          type: integer
+          description: How long before a performance validation opens.
+        closeMinutesAfter: { type: integer }
+        maxDurationMinutes: { type: integer, nullable: true }
+        requiresExitBeforeReentry: { type: boolean, default: false }
+        maxReentries: { type: integer, nullable: true }
+        allowedAccessPointIds:
+          type: array
+          items: { type: string, format: uuid }
+          description: Empty means any access point in the venue.
+
+    BlacklistEntry:
+      x-ticvai-persistence: "access.blacklist"
+      type: object
+      required: [mediaCode, reason, addedAt, addedByPrincipalId]
+      properties:
+        mediaCode: { type: string }
+        reason: { type: string }
+        addedAt: { type: string, format: date-time }
+        addedByPrincipalId: { type: string, format: uuid }
+        expiresAt: { type: string, format: date-time, nullable: true }
+
+    MediaKind:
+      type: string
+      enum: [qr, barcode, rfid, nfc, magstripe, mobileWallet, biometric, manual]
+
+    Direction:
+      type: string
+      enum: [entry, exit, reentry, crossover]
+
+    TurnstileMode:
+      type: string
+      enum: [entry, reentry, crossover, exit, freeRotation, closed]
+
+    ScanOutcome:
+      type: string
+      enum: [admitted, denied, overridden]
+
+    DenyReason:
+      type: string
+      description: >
+        Enumerated so the client can render an appropriate operator prompt. A gate operator
+        facing a queue needs a reason and a next action, not a boolean.
+      enum:
+        - notFound
+        - notYetValid
+        - expired
+        - alreadyUsed
+        - reentryLimitReached
+        - exitRequiredBeforeReentry       # anti-passback
+        - wrongAccessPoint
+        - wrongPerformance
+        - outsideAdmissionWindow
+        - entitlementSuspended
+        - blacklisted
+        - capacityReached
+        - waiverRequired
+        - accompanimentRequired
+        - mediaDeactivated
+        - unpaid
+        - delegatedRightExhausted     # cross-cell right consumed elsewhere before sync
+        - delegatedRightRevoked       # issuing cell revoked or guest link withdrawn
+
+    ValidateRequest:
+      type: object
+      required: [id, mediaCode, mediaKind, direction, recordedAt]
+      properties:
+        id:
+          type: string
+          pattern: '^[0-9A-HJKMNP-TV-Z]{26}$'
+          description: Client-generated ULID. Also the idempotency key and dedupe key.
+        mediaCode:
+          type: string
+          maxLength: 256
+          description: >
+            What was read from the media. NOT the ticket id — media can be re-linked over a
+            ticket's life.
+        mediaKind: { $ref: '#/components/schemas/MediaKind' }
+        direction: { $ref: '#/components/schemas/Direction' }
+        groupSize:
+          type: integer
+          minimum: 1
+          description: For group media admitting several holders on one read.
+        proximityToken:
+          type: string
+          description: >
+            BLE proximity assertion where the venue requires the operator to be physically
+            at the gate. Absent where not configured.
+        recordedAt:
+          type: string
+          format: date-time
+          description: Device time of the read. Authoritative for ordering, not for validity.
+
+    ValidationResult:
+      x-ticvai-persistence: "none — computed, persisted as scan_event"
+      type: object
+      required: [scanId, outcome, accessPointId, recordedAt]
+      properties:
+        scanId: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+        outcome: { $ref: '#/components/schemas/ScanOutcome' }
+        denyReason: { $ref: '#/components/schemas/DenyReason' }
+        denyDetail:
+          type: string
+          description: Human-readable, localised. For operator display, never for logic.
+        accessPointId: { type: string, format: uuid }
+        ticket: { $ref: '#/components/schemas/TicketStatus' }
+        admittedCount:
+          type: integer
+          description: Holders admitted on this read. Differs from groupSize on partial admission.
+        recordedAt: { type: string, format: date-time }
+        serverEvaluatedAt: { type: string, format: date-time }
+
+    TicketStatus:
+      x-ticvai-persistence: "none — computed from entitlement and scans"
+      type: object
+      required: [ticketId, isValid]
+      properties:
+        ticketId:
+          type: string
+          pattern: '^[0-9A-HJKMNP-TV-Z]{26}$'
+          description: Stable for the life of the ticket, independent of the media carrying it.
+        mediaCode: { type: string, nullable: true }
+        productName: { type: string }
+        holderName:
+          type: string
+          nullable: true
+          description: >
+            Present only where the entitlement is name-bound. Identity and entitlement are
+            separate concerns; most entitlements carry no holder.
+        isValid: { type: boolean }
+        validFrom: { type: string, format: date-time, nullable: true }
+        validTo: { type: string, format: date-time, nullable: true }
+        performanceId: { type: string, format: uuid, nullable: true }
+        entriesUsed: { type: integer }
+        entriesAllowed: { type: integer, nullable: true, description: Null means unlimited. }
+        reentryAllowed: { type: boolean }
+        isInsideVenue:
+          type: boolean
+          description: Derived from the last scan. Drives anti-passback evaluation.
+        issuingCellId:
+          type: string
+          nullable: true
+          description: >
+            Present when this entitlement was issued in a different cell and is being
+            redeemed here as a delegated right (ADR-0010). Null for locally issued tickets.
+        guestLinkId:
+          type: string
+          nullable: true
+          description: >
+            Pseudonymous cross-cell guest reference. Present only on delegated rights.
+            Carries no personal data.
+        admissionProfileId: { type: string, format: uuid }
+        denyReason: { $ref: '#/components/schemas/DenyReason' }
+
+    OfflineScan:
+      x-ticvai-persistence: "none — client-side journal"
+      allOf:
+        - $ref: '#/components/schemas/ValidateRequest'
+        - type: object
+          required: [sequence, localOutcome]
+          properties:
+            sequence:
+              type: integer
+              minimum: 1
+              description: Monotonic per device. The server processes in this order.
+            localOutcome:
+              allOf:
+                - $ref: '#/components/schemas/ScanOutcome'
+              description: >
+                What the device decided offline. The server is authoritative and may
+                disagree; disagreements are returned for reconciliation, not discarded.
+            localDenyReason: { $ref: '#/components/schemas/DenyReason' }
+            overriddenByPrincipalId:
+              type: string
+              format: uuid
+              nullable: true
+            overrideReason: { type: string, nullable: true }
+
+    ScanSyncResult:
+      x-ticvai-persistence: "none — computed"
+      type: object
+      required: [accepted, results]
+      properties:
+        accepted:
+          type: integer
+          description: Entries processed before any stop.
+        stoppedAtSequence:
+          type: integer
+          nullable: true
+          description: >
+            Sequence of the first entry that could not be processed. Null when the whole
+            batch succeeded. The client retries from here — never past it.
+        results:
+          type: array
+          items:
+            type: object
+            required: [id, sequence, status]
+            properties:
+              id: { type: string }
+              sequence: { type: integer }
+              status:
+                type: string
+                enum: [accepted, duplicate, reconciled, rejected]
+              serverOutcome: { $ref: '#/components/schemas/ScanOutcome' }
+              divergence:
+                type: string
+                nullable: true
+                description: >
+                  Present when `reconciled` — the device admitted and the server would have
+                  denied, or vice versa. Surfaced to the operator, not swallowed.
+              error: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+    ScanEvent:
+      x-ticvai-persistence: "access.scan_event"
+      type: object
+      required: [id, accessPointId, venueId, outcome, direction, recordedAt]
+      properties:
+        id: { type: string }
+        accessPointId: { type: string, format: uuid }
+        venueId: { type: string, format: uuid }
+        scopePath: { type: string }
+        ticketId: { type: string, nullable: true }
+        mediaCode: { type: string, nullable: true }
+        outcome: { $ref: '#/components/schemas/ScanOutcome' }
+        denyReason: { $ref: '#/components/schemas/DenyReason' }
+        direction: { $ref: '#/components/schemas/Direction' }
+        operatorPrincipalId: { type: string, format: uuid, nullable: true }
+        deviceId: { type: string, format: uuid, nullable: true }
+        overriddenByPrincipalId: { type: string, format: uuid, nullable: true }
+        overrideReason: { type: string, nullable: true }
+        recordedAt: { type: string, format: date-time }
+        syncedAt:
+          type: string
+          format: date-time
+          nullable: true
+          description: Null while pending. Differs from recordedAt for offline scans.
+
+    AccessPoint:
+      x-ticvai-persistence: "access.access_point"
+      type: object
+      required: [id, code, name, venueId, mode, isActive]
+      properties:
+        id: { type: string, format: uuid }
+        code: { type: string }
+        name: { type: string }
+        venueId: { type: string, format: uuid }
+        scopePath: { type: string }
+        mode: { $ref: '#/components/schemas/TurnstileMode' }
+        direction: { $ref: '#/components/schemas/Direction' }
+        antiPassbackEnabled: { type: boolean }
+        isActive: { type: boolean }
+        lastHeartbeatAt: { type: string, format: date-time, nullable: true }
+
+    OfflinePackage:
+      x-ticvai-persistence: "none — generated artefact in object storage"
+      type: object
+      required: [etag, generatedAt, validFrom, validTo, accessPointId, entitlements]
+      properties:
+        etag: { type: string }
+        generatedAt: { type: string, format: date-time }
+        validFrom: { type: string, format: date-time }
+        validTo: { type: string, format: date-time }
+        accessPointId: { type: string, format: uuid }
+        entitlements:
+          type: array
+          items:
+            type: object
+            required: [ticketId, mediaCodes, validFrom, validTo, entriesAllowed, reentryAllowed]
+            properties:
+              ticketId: { type: string }
+              mediaCodes:
+                type: array
+                items: { type: string }
+                description: A ticket may carry several media over its life.
+              validFrom: { type: string, format: date-time }
+              validTo: { type: string, format: date-time }
+              performanceId: { type: string, format: uuid, nullable: true }
+              entriesAllowed: { type: integer, nullable: true }
+              entriesUsed: { type: integer }
+              reentryAllowed: { type: boolean }
+              admissionProfileId: { type: string, format: uuid }
+        delegatedRights:
+          type: array
+          description: >
+            Redemption rights issued by other cells and valid at this access point. Included
+            in the package so a cross-cell entitlement still admits when the inter-cell link
+            is down — the same reason locally issued entitlements are included.
+          items:
+            type: object
+            required: [rightId, ticketId, issuingCellId, validFrom, validTo, entriesAllowed, entriesConsumed]
+            properties:
+              rightId: { type: string }
+              ticketId: { type: string }
+              issuingCellId: { type: string }
+              guestLinkId: { type: string, nullable: true }
+              mediaCodes:
+                type: array
+                items: { type: string }
+              validFrom: { type: string, format: date-time }
+              validTo: { type: string, format: date-time }
+              entriesAllowed: { type: integer, nullable: true }
+              entriesConsumed: { type: integer }
+              admissionProfileId: { type: string, format: uuid }
+        blacklist:
+          type: array
+          items: { type: string }
+          description: Media codes to deny outright regardless of entitlement state.
+        admissionProfiles:
+          type: array
+          items:
+            type: object
+            required: [id, openMinutesBefore, closeMinutesAfter]
+            properties:
+              id: { type: string, format: uuid }
+              openMinutesBefore: { type: integer }
+              closeMinutesAfter: { type: integer }
+              maxDurationMinutes: { type: integer, nullable: true }
+              requiresExitBeforeReentry: { type: boolean }
+
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

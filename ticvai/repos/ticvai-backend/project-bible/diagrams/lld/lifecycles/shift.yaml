@@ -1,0 +1,78 @@
+id: LLD-Shift
+title: Shift — 10 transitions
+generatedBy: tools/derive-diagrams.py
+index: diagrams/hld/04-lifecycles.yaml
+source: states/shift.yaml
+entity: Shift
+contract: shift
+enum: ShiftStatus
+enumKind: named
+enumSchema: ShiftStatus
+owner: shift
+initial:
+- pendingApproval
+- open
+terminal:
+- closed
+- autoClosed
+transitions:
+- from: pendingApproval
+  to: open
+  operation: approveShiftOpen
+  trigger: operation
+  guard: Supervisor approved a float outside tolerance
+  requiresApproval: true
+- from: open
+  to: suspended
+  operation: suspendShift
+  trigger: operation
+  guard: Break or handover. The till is locked, not closed
+- from: suspended
+  to: open
+  operation: resumeShift
+  trigger: operation
+  guard: Same principal, or a supervisor
+- from: open
+  to: pendingClosure
+  operation: closeShift
+  trigger: operation
+  guard: Blind count submitted. The expected figure is withheld until this point
+- from: pendingClosure
+  to: pendingVariance
+  trigger: job
+  guard: Variance above the venue threshold
+- from: pendingClosure
+  to: closed
+  trigger: job
+  guard: Variance within tolerance
+  emits:
+  - shift.closed
+- from: pendingVariance
+  to: closed
+  operation: acceptShiftVariance
+  trigger: operation
+  guard: Supervisor accepted, with a reason
+  requiresApproval: true
+  emits:
+  - shift.closed
+- from: open
+  to: autoClosed
+  trigger: timer
+  guard: Abandoned past the venue limit. Recorded as autoClosed rather than closed — nobody counted
+    it
+- from: suspended
+  to: autoClosed
+  trigger: timer
+  guard: Abandoned while suspended
+- from: closed
+  to: open
+  operation: reopenShift
+  trigger: operation
+  guard: Correction of a wrongly closed shift
+  isReversal: true
+  requiresApproval: true
+notes: '`autoClosed` is deliberately distinct from `closed`. A shift nobody counted must not appear
+  in reconciliation as one that was.'
+offlineReachable:
+- open
+- suspended

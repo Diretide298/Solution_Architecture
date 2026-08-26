@@ -1,0 +1,309 @@
+id: LLD-platform-ops
+title: platform-ops — 25 operations
+generatedBy: tools/derive-diagrams.py
+index: diagrams/hld/03-contracts.yaml
+tier: satellite
+service: ControlService
+operations:
+- operation: applyMigration
+  verb: POST
+  path: /migrations/apply
+  scope: tenant
+  permission: PLATFORM_MIGRATION_APPLY
+  audience: null
+  offline: false
+  reads:
+  - cache:idempotency
+  - control.migration_run
+  - control.rollout_cell
+  writes:
+  - cache:idempotency
+  - control.migration_run
+  - control.rollout_cell
+- operation: createRelease
+  verb: POST
+  path: /releases
+  scope: tenant
+  permission: PLATFORM_RELEASE_MANAGE
+  audience: null
+  offline: false
+  reads:
+  - cache:idempotency
+  - control.release
+  writes:
+  - cache:idempotency
+  - control.release
+- operation: getMigrationRun
+  verb: GET
+  path: /migrations/runs/{runId}
+  scope: tenant
+  permission: PLATFORM_MIGRATION_VIEW
+  audience: null
+  offline: false
+  reads:
+  - control.migration_run
+  - control.rollout_cell
+  writes: []
+- operation: getRelease
+  verb: GET
+  path: /releases/{releaseId}
+  scope: tenant
+  permission: PLATFORM_RELEASE_VIEW
+  audience: null
+  offline: false
+  reads:
+  - control.rollout
+  writes: []
+- operation: getReleaseReadiness
+  verb: GET
+  path: /releases/{releaseId}/readiness
+  scope: tenant
+  permission: PLATFORM_RELEASE_VIEW
+  audience: null
+  offline: false
+  reads:
+  - control.release
+  writes: []
+- operation: getRollout
+  verb: GET
+  path: /rollouts/{rolloutId}
+  scope: tenant
+  permission: PLATFORM_RELEASE_VIEW
+  audience: null
+  offline: false
+  reads:
+  - control.rollout
+  - control.rollout_cell
+  writes: []
+- operation: getVersionSkew
+  verb: GET
+  path: /migrations/version-skew
+  scope: tenant
+  permission: PLATFORM_MIGRATION_VIEW
+  audience: null
+  offline: false
+  reads:
+  - control.migration
+  writes: []
+- operation: listEnvironments
+  verb: GET
+  path: /environments
+  scope: tenant
+  permission: PLATFORM_RELEASE_VIEW
+  audience: null
+  offline: false
+  reads:
+  - control.environment
+  writes: []
+- operation: listMigrations
+  verb: GET
+  path: /migrations
+  scope: tenant
+  permission: PLATFORM_MIGRATION_VIEW
+  audience: null
+  offline: false
+  reads:
+  - control.migration
+  writes: []
+- operation: listReleases
+  verb: GET
+  path: /releases
+  scope: tenant
+  permission: PLATFORM_RELEASE_VIEW
+  audience: null
+  offline: false
+  reads:
+  - control.release
+  writes: []
+- operation: listRollouts
+  verb: GET
+  path: /rollouts
+  scope: tenant
+  permission: PLATFORM_RELEASE_VIEW
+  audience: null
+  offline: false
+  reads:
+  - control.rollout
+  writes: []
+- operation: listSupportNotices
+  verb: GET
+  path: /support-notices
+  scope: tenant
+  permission: PLATFORM_RELEASE_VIEW
+  audience: null
+  offline: false
+  reads:
+  - control.support_notice
+  writes: []
+- operation: listUpgradeSchedules
+  verb: GET
+  path: /upgrade-schedules
+  scope: tenant
+  permission: PLATFORM_RELEASE_VIEW
+  audience: null
+  offline: false
+  reads:
+  - control.upgrade_schedule
+  writes: []
+- operation: pauseRollout
+  verb: POST
+  path: /rollouts/{rolloutId}/pause
+  scope: tenant
+  permission: PLATFORM_RELEASE_PROMOTE
+  audience: null
+  offline: false
+  reads:
+  - cache:idempotency
+  - control.rollout
+  - control.rollout_cell
+  writes:
+  - cache:idempotency
+  - control.rollout
+  - control.rollout_cell
+- operation: planMigration
+  verb: POST
+  path: /migrations/plan
+  scope: tenant
+  permission: PLATFORM_MIGRATION_VIEW
+  audience: null
+  offline: false
+  reads:
+  - cache:idempotency
+  - control.migration_plan
+  writes:
+  - cache:idempotency
+  - control.migration_plan
+- operation: promoteRelease
+  verb: POST
+  path: /releases/{releaseId}/promote
+  scope: tenant
+  permission: PLATFORM_RELEASE_PROMOTE
+  audience: null
+  offline: false
+  reads:
+  - cache:idempotency
+  - control.rollout
+  writes:
+  - cache:idempotency
+  - control.rollout
+- operation: publishSupportNotice
+  verb: POST
+  path: /support-notices
+  scope: tenant
+  permission: PLATFORM_RELEASE_MANAGE
+  audience: null
+  offline: false
+  reads:
+  - cache:idempotency
+  - control.support_notice
+  writes:
+  - cache:idempotency
+  - control.support_notice
+- operation: registerEnvironment
+  verb: POST
+  path: /environments
+  scope: tenant
+  permission: PLATFORM_RELEASE_MANAGE
+  audience: null
+  offline: false
+  reads:
+  - cache:idempotency
+  - control.environment
+  writes:
+  - cache:idempotency
+  - control.environment
+- operation: rejectRelease
+  verb: POST
+  path: /releases/{releaseId}/reject
+  scope: tenant
+  permission: PLATFORM_RELEASE_PROMOTE
+  audience: null
+  offline: false
+  reads:
+  - cache:idempotency
+  - control.release
+  writes:
+  - cache:idempotency
+  - control.release
+- operation: rollbackMigrationRun
+  verb: POST
+  path: /migrations/runs/{runId}/rollback
+  scope: tenant
+  permission: PLATFORM_MIGRATION_APPLY
+  audience: null
+  offline: false
+  reads:
+  - cache:idempotency
+  - control.migration_run
+  - control.rollout_cell
+  writes:
+  - cache:idempotency
+  - control.migration_run
+  - control.rollout_cell
+- operation: rollbackRollout
+  verb: POST
+  path: /rollouts/{rolloutId}/rollback
+  scope: tenant
+  permission: PLATFORM_RELEASE_PROMOTE
+  audience: null
+  offline: false
+  reads:
+  - cache:idempotency
+  - control.rollout
+  - control.rollout_cell
+  writes:
+  - cache:idempotency
+  - control.rollout
+  - control.rollout_cell
+- operation: scheduleTenantUpgrade
+  verb: POST
+  path: /upgrade-schedules
+  scope: tenant
+  permission: PLATFORM_RELEASE_MANAGE
+  audience: null
+  offline: false
+  reads:
+  - cache:idempotency
+  - control.upgrade_schedule
+  writes:
+  - cache:idempotency
+  - control.upgrade_schedule
+- operation: skipRolloutCell
+  verb: POST
+  path: /rollouts/{rolloutId}/cells/{cellId}/skip
+  scope: platform
+  permission: PLATFORM_CELL_MANAGE
+  audience: null
+  offline: false
+  reads:
+  - cache:idempotency
+  - control.rollout
+  writes:
+  - cache:idempotency
+  - control.rollout
+- operation: startRollout
+  verb: POST
+  path: /rollouts/{rolloutId}/start
+  scope: tenant
+  permission: PLATFORM_RELEASE_PROMOTE
+  audience: null
+  offline: false
+  reads:
+  - cache:idempotency
+  - control.rollout
+  writes:
+  - cache:idempotency
+  - control.rollout
+- operation: withdrawRelease
+  verb: POST
+  path: /releases/{releaseId}/withdraw
+  scope: tenant
+  permission: PLATFORM_RELEASE_MANAGE
+  audience: null
+  offline: false
+  reads:
+  - cache:idempotency
+  - control.release
+  writes:
+  - cache:idempotency
+  - control.release

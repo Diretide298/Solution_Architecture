@@ -1,0 +1,41 @@
+# Venue map import — state model
+# Contract: venue-map.VenueMapImportJob.status
+
+entity: Venue map import
+contract: venue-map
+enum: VenueMapImportJob.status
+enumKind: inline
+enumSchema: VenueMapImportJob
+enumProperty: status
+owner: venue-map
+initial:
+- parsing
+terminal:
+- committed
+- failed
+transitions:
+- from: parsing
+  to: previewReady
+  operation: importVenueGeometry
+  trigger: operation
+  guard: '**Parsed, whether or not shapes were found.** `outcome` says which — the CF-122 lesson, and
+    why `nothingFound` is not `failed`'
+- from: parsing
+  to: failed
+  trigger: timer
+  guard: Unreadable, or the source vanished
+- from: previewReady
+  to: committed
+  operation: acceptVenueLabelProposals
+  trigger: operation
+  guard: An operator reviewed the layers and the proposals and accepted
+- from: previewReady
+  to: failed
+  trigger: timer
+  guard: Abandoned. A preview nobody commits expires
+notes: '**`previewReady` with zero shapes is still `previewReady`.** The status says the parse finished
+  and `outcome` says what it found — collapsing them repeats the defect CF-122 fixed in `seating`.
+
+
+  **`noLayersMatched` is separate from `nothingFound`**: the first almost always means a role needed
+  a second entry or a name needed decoding; the second means the file is empty.'

@@ -1,0 +1,197 @@
+id: LLD-approvals
+title: approvals — 13 operations
+generatedBy: tools/derive-diagrams.py
+index: diagrams/hld/03-contracts.yaml
+tier: spine
+service: TenancyService
+operations:
+- operation: createApprovalDelegation
+  verb: POST
+  path: /delegations
+  scope: venue
+  permission: APPROVAL_DECIDE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - identity.grant
+  - identity.principal
+  writes:
+  - approvals.delegation
+  - cache:idempotency
+- operation: createApprovalRequest
+  verb: POST
+  path: /approval-requests
+  scope: venue
+  permission: APPROVAL_REQUEST
+  audience:
+  - staff
+  offline: false
+  reads:
+  - approvals.delegation
+  - approvals.matrix
+  - approvals.rule
+  - cache:idempotency
+  - identity.principal
+  writes:
+  - approvals.request
+  - cache:idempotency
+- operation: decideApprovalRequest
+  verb: POST
+  path: /approval-requests/{requestId}/decide
+  scope: venue
+  permission: APPROVAL_DECIDE
+  audience:
+  - staff
+  - public
+  offline: false
+  reads:
+  - approvals.request
+  - approvals.rule
+  - cache:idempotency
+  - identity.principal
+  writes:
+  - approvals.decision
+  - approvals.request
+  - cache:idempotency
+- operation: escalateApprovalRequest
+  verb: POST
+  path: /approval-requests/{requestId}/escalate
+  scope: venue
+  permission: APPROVAL_REQUEST
+  audience:
+  - staff
+  offline: false
+  reads:
+  - approvals.request
+  - approvals.rule
+  - cache:idempotency
+  writes:
+  - approvals.escalation
+  - approvals.request
+  - cache:idempotency
+- operation: evaluateApprovalRequirement
+  verb: POST
+  path: /approval-requests/evaluate
+  scope: venue
+  permission: APPROVAL_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - approvals.delegation
+  - approvals.matrix
+  - approvals.rule
+  - cache:idempotency
+  - identity.grant
+  - platform.scope_node
+  writes:
+  - cache:idempotency
+- operation: getApprovalAnalytics
+  verb: GET
+  path: /approval-analytics
+  scope: venue
+  permission: APPROVAL_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - approvals.decision
+  - approvals.escalation
+  - approvals.request
+  writes: []
+- operation: listApprovalDelegations
+  verb: GET
+  path: /delegations
+  scope: venue
+  permission: APPROVAL_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - approvals.delegation
+  - identity.principal
+  writes: []
+- operation: listApprovalMatrices
+  verb: GET
+  path: /approval-matrices
+  scope: venue
+  permission: APPROVAL_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - approvals.matrix
+  - approvals.rule
+  writes: []
+- operation: listApprovalRequests
+  verb: GET
+  path: /approval-requests
+  scope: venue
+  permission: APPROVAL_VIEW
+  audience:
+  - staff
+  - public
+  offline: false
+  reads:
+  - approvals.decision
+  - approvals.request
+  writes: []
+- operation: resubmitApprovalRequest
+  verb: POST
+  path: /approval-requests/{requestId}/resubmit
+  scope: venue
+  permission: APPROVAL_REQUEST
+  audience:
+  - staff
+  offline: false
+  reads:
+  - approvals.request
+  - cache:idempotency
+  writes:
+  - approvals.request
+  - cache:idempotency
+- operation: revokeApprovalDelegation
+  verb: DELETE
+  path: /delegations/{delegationId}
+  scope: venue
+  permission: APPROVAL_DECIDE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - approvals.delegation
+  - cache:idempotency
+  writes:
+  - approvals.delegation
+  - cache:idempotency
+- operation: setApprovalMatrix
+  verb: PUT
+  path: /approval-matrices
+  scope: venue
+  permission: APPROVAL_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - approvals.matrix
+  - cache:idempotency
+  writes:
+  - approvals.matrix
+  - approvals.rule
+  - cache:idempotency
+- operation: withdrawApprovalRequest
+  verb: POST
+  path: /approval-requests/{requestId}/withdraw
+  scope: venue
+  permission: APPROVAL_REQUEST
+  audience:
+  - staff
+  offline: false
+  reads:
+  - approvals.request
+  - cache:idempotency
+  writes:
+  - approvals.request
+  - cache:idempotency

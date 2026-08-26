@@ -1,0 +1,79 @@
+# Parking entitlement — state model
+# Contract: access.ParkingEntitlementStatus
+# Checked by tools/check-states.py.
+
+entity: Parking entitlement
+contract: access
+enum: ParkingEntitlementStatus
+enumKind: named
+enumSchema: ParkingEntitlementStatus
+owner: access
+initial:
+- pending
+terminal:
+- used
+- expired
+- revoked
+transitions:
+- from: pending
+  to: pushed
+  operation: createParkingEntitlement
+  trigger: operation
+  guard: The plate reached the parking system’s whitelist. **Only in `plateWhitelist` mode** — the other
+    two modes go straight to active
+- from: pending
+  to: pushFailed
+  trigger: job
+  guard: '**The push was rejected and the entitlement is still valid.** The guest paid; a barrier that
+    will not open is a staffed problem, not a refund'
+- from: pending
+  to: active
+  operation: createParkingEntitlement
+  trigger: operation
+  guard: Modes `none` and `qrHandoff` need no push — the guest presents a code
+- from: pushFailed
+  to: pushed
+  operation: updateParkingEntitlement
+  trigger: operation
+  guard: Retried, or the plate was corrected
+  isReversal: true
+- from: pushed
+  to: active
+  trigger: timer
+  guard: The validity window opened
+- from: active
+  to: used
+  trigger: job
+  guard: The barrier let them in
+- from: active
+  to: expired
+  trigger: timer
+  guard: The window closed unused
+- from: pushed
+  to: expired
+  trigger: timer
+  guard: Never used
+- from: active
+  to: revoked
+  operation: updateParkingEntitlement
+  trigger: operation
+  guard: '**Refunded or cancelled, and the plate is removed from the whitelist.** A refunded entitlement
+    whose plate still opens the barrier is a car park giving away spaces'
+- from: pushed
+  to: revoked
+  operation: updateParkingEntitlement
+  trigger: operation
+  guard: Revoked before the window opened
+- from: active
+  to: pending
+  operation: updateParkingEntitlement
+  trigger: operation
+  guard: '**The guest changed car.** The common case, and it must work after purchase — someone booking
+    a month ahead does not know which car they will bring'
+  isReversal: true
+notes: '`pushFailed` is not terminal and does not invalidate anything. The entitlement is valid; the
+  integration failed, and those are different facts.
+
+
+  The return from `active` to `pending` is a plate change, which re-pushes. It looks like a reversal
+  and is the most common amendment on this object.'

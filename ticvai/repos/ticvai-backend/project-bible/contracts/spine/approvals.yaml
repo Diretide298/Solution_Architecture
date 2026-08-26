@@ -1,0 +1,979 @@
+openapi: 3.1.0
+info:
+  title: TICVAI — Approvals
+  version: 1.0.0
+  x-ticvai-screen-count: 13
+  x-ticvai-module: "11 — Approval Workflows and Governance"
+  x-ticvai-platforms:
+    - P04 POS
+    - P08 Venue Management
+    - P11 Accreditation Web
+  # Derived from screens/*.yaml on 18 August — every platform with a screen that calls an
+  # operation in this contract. **Six contracts declared none**, which the viewer reports as
+  # missing taxonomy and no package checker tested for.
+  x-ticvai-tier: spine
+  description: >
+    **One approval mechanism, not five.**
+
+    Approval was implemented four times before this contract existed — refund thresholds, shift
+    variance, release promotion, manual discount — and a fifth was about to be written for AI
+    proposed actions. Each was correct in isolation and none shared a rule, an audit trail or a
+    delegation model, so "who approved this and why" had four different answers and "I am on
+    leave, route my approvals to Sara" had none.
+
+    This is the shared object those four collapse into. **The requesting contract does not
+    implement approval; it asks whether one is required, and blocks until it is granted.**
+
+    ## The four rules that are not configurable
+
+    **Segregation of duties.** A requester may never approve their own request (11.1.24). This
+    is enforced here, in the platform, not left to a workflow definition somebody might write
+    wrongly.
+
+    **A rejection carries a reason** (11.1.21). Without it a rejected request tells the
+    requester nothing and the analytics tell the business nothing.
+
+    **A completed record is immutable** (11.1.56). Approvals are evidence. Amending one is not
+    a correction, it is a different fact, and reopening (11.1.54) creates a new decision linked
+    to the old rather than overwriting it.
+
+    **Approval records an authorisation; it does not perform the action.** The requesting
+    contract executes, under the approver's permission, after the grant. An approval endpoint
+    that also executed would let a person authorise something they could not do themselves, and
+    the whole control depends on them being the same person.
+
+    ## What routes a request
+
+    A matrix, resolved up the scope tree the way everything else resolves (ADR-0018): tenant
+    default, region override, venue override. Rules match on **value** (11.1.11),
+    **organisational level** (11.1.38–11.1.42) and **condition** (11.1.13), and the first
+    matching rule wins so that adding a rule cannot silently change an unrelated one.
+
+    ## Deliberately absent
+
+    **Risk scoring and AI recommendations** (11.1.12, 11.1.72–11.1.75) need history to score
+    against and are parked with the rest of the model-dependent AI. The routing rule accepts a
+    `riskScore` today and nothing supplies one — the field exists so that adding the engine
+    later is configuration rather than a schema change.
+  contact:
+    name: TICVAI Platform
+servers:
+  - url: https://api.{region}.ticvai.com/approvals/v1
+    variables:
+      region:
+        default: ae
+security:
+  - bearerAuth: []
+tags:
+  - name: request
+    description: Raising, deciding and tracking an approval
+  - name: matrix
+    description: What requires approval, and who grants it
+  - name: delegation
+    description: Standing in for an approver who is away
+  - name: analytics
+    description: Volumes, times and bottlenecks
+paths:
+
+  /approval-requests:
+    get:
+      operationId: listApprovalRequests
+      x-ticvai-consumed-by:
+        - "P08 BO-084 Approval Inbox"
+        - "P08 BO-085 Approval Request"
+        - "P11 ACC-002 Registration Form"
+        - "P11 ACC-005 Accreditation Badge"
+        - "P11 ACC-007 Reviewer Application Detail"
+      x-ticvai-audience: [staff, public]
+      summary: Requests awaiting a decision, or already decided
+      description: >
+        11.1.16. The approver's queue and the requester's history are the same list filtered
+        differently, so they are one operation.
+
+        Sorted by SLA proximity rather than age. **A request breaching in ten minutes matters
+        more than one raised yesterday with a week to run**, and sorting by age buries it.
+      tags: [request]
+      x-ticvai-permission: APPROVAL_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-read-routing: primary
+      parameters:
+        - name: assignedToMe
+          in: query
+          schema: { type: boolean }
+        - name: raisedByMe
+          in: query
+          schema: { type: boolean }
+        - name: status
+          in: query
+          schema: { $ref: '#/components/schemas/ApprovalStatus' }
+        - name: kind
+          in: query
+          schema: { $ref: '#/components/schemas/ApprovalKind' }
+        - name: breachingWithinMinutes
+          in: query
+          description: 11.1.15. What is about to miss its SLA.
+          schema: { type: integer }
+        - $ref: '../shared/common.yaml#/components/parameters/PageSize'
+        - $ref: '../shared/common.yaml#/components/parameters/PageCursor'
+      responses:
+        '200':
+          description: Requests
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '../shared/common.yaml#/components/schemas/Page'
+                  - type: object
+                    properties:
+                      items:
+                        type: array
+                        items: { $ref: '#/components/schemas/ApprovalRequest' }
+
+    post:
+      operationId: createApprovalRequest
+      x-ticvai-consumed-by:
+        - "P04 POS-002 Sell — Ticket Catalogue"
+        - "P04 POS-020 Shift Exceptions & Alerts"
+      x-ticvai-audience: [staff]
+      summary: Raise a request
+      description: >
+        Called by the contract that needs the authorisation, not by a person. `createRefund`
+        asks `evaluateApprovalRequirement` first, and where one is required it raises this and
+        holds the refund at `pendingApproval`.
+
+        **The subject is a reference, never a copy.** The request points at the order, the
+        shift or the proposed action; it does not embed it. A copy goes stale between raising
+        and deciding, and an approver reading a stale copy approves something that no longer
+        exists.
+
+        Draft is supported (11.1.51) for the case where a person raises it themselves and wants
+        to gather detail first.
+      tags: [request]
+      x-ticvai-permission: APPROVAL_REQUEST
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/CreateApprovalRequest' }
+      responses:
+        '201':
+          description: Raised, and routed
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ApprovalRequest' }
+        '409':
+          description: >
+            An open request already exists for this subject. Two approvals for one refund is
+            how a refund gets paid twice.
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /approval-requests/evaluate:
+    post:
+      operationId: evaluateApprovalRequirement
+      x-ticvai-consumed-by:
+        - "P04 POS-002 Sell — Ticket Catalogue"
+        - "P04 POS-004 Sell — Seat Map"
+        - "P08 BO-085 Approval Request"
+      x-ticvai-audience: [staff]
+      summary: Does this need approval, and from whom
+      description: >
+        **The operation every other contract calls.** It answers before the action, not after,
+        so a cashier learns a discount needs a manager while the guest is still at the counter.
+
+        Returns the matching rule and the resolved approver chain, so the caller can say *"this
+        needs Sara, and she has four hours"* rather than *"this needs approval"*.
+
+        Read-only and deliberately cheap. It runs on the hot path — every refund, every
+        discount, every price override — and a slow answer here is a slow till.
+      tags: [request]
+      x-ticvai-permission: APPROVAL_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-read-routing: primary
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [kind, scopePath]
+              properties:
+                kind: { $ref: '#/components/schemas/ApprovalKind' }
+                scopePath: { type: string }
+                amount: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+                attributes:
+                  type: object
+                  additionalProperties: true
+                  description: Whatever the conditional rules match on (11.1.13).
+      responses:
+        '200':
+          description: Whether approval is required, and who would grant it
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ApprovalRequirement' }
+
+  /approval-requests/{requestId}/decide:
+    parameters:
+      - name: requestId
+        in: path
+        required: true
+        schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+    post:
+      operationId: decideApprovalRequest
+      x-ticvai-consumed-by:
+        - "P04 POS-020 Shift Exceptions & Alerts"
+        - "P08 BO-084 Approval Inbox"
+        - "P08 BO-085 Approval Request"
+        - "P08 BO-133 Offline Alerts, Limits & Audit"
+        - "P11 ACC-007 Reviewer Application Detail"
+      x-ticvai-audience: [staff, public]
+      summary: Approve or reject
+      description: >
+        **Records an authorisation. Does not perform the action.** The requesting contract
+        executes afterwards under the approver's permission.
+
+        Refused where the approver is the requester (11.1.24), where they do not hold the
+        permission the rule demands, or where the rule requires MFA and the step-up token is
+        absent (11.1.60).
+
+        A rejection requires a reason (11.1.21). An approval may carry a comment (11.1.20) and
+        usually should — six months later the comment is the only record of why the exception
+        was allowed.
+      tags: [request]
+      x-ticvai-permission: APPROVAL_DECIDE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [decision]
+              properties:
+                decision: { type: string, enum: [approve, reject] }
+                comment: { type: string, maxLength: 1000 }
+                reason:
+                  type: string
+                  maxLength: 500
+                  description: Required on rejection.
+                stepUpToken:
+                  type: string
+                  description: Where the rule demands MFA (11.1.60).
+                signature:
+                  type: string
+                  description: 11.1.57. Where the rule demands a digital signature.
+      responses:
+        '200':
+          description: >
+            Decided. On a multi-level chain the request advances to the next level rather than
+            completing.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ApprovalRequest' }
+        '403':
+          description: >
+            The approver is the requester, lacks the permission, or is not in the resolved
+            chain.
+          content:
+            application/problem+json:
+              schema: { $ref: '#/components/schemas/ApprovalRefusedProblem' }
+        '409':
+          description: Already decided, withdrawn or expired
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /approval-requests/{requestId}/withdraw:
+    parameters:
+      - name: requestId
+        in: path
+        required: true
+        schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+    post:
+      operationId: withdrawApprovalRequest
+      x-ticvai-consumed-by:
+        - "P08 BO-085 Approval Request"
+      x-ticvai-audience: [staff]
+      summary: The requester takes it back
+      description: >
+        11.1.22. Distinct from a rejection: nobody refused it, and the analytics must not read
+        it as one. A cashier who realises the discount is wrong should be able to pull the
+        request without it counting against the approver's rejection rate.
+      tags: [request]
+      x-ticvai-permission: APPROVAL_REQUEST
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                reason: { type: string, maxLength: 300 }
+      responses:
+        '200':
+          description: Withdrawn
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ApprovalRequest' }
+        '409':
+          description: Already decided
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /approval-requests/{requestId}/escalate:
+    parameters:
+      - name: requestId
+        in: path
+        required: true
+        schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+    post:
+      operationId: escalateApprovalRequest
+      x-ticvai-consumed-by:
+        - "P08 BO-084 Approval Inbox"
+      x-ticvai-audience: [staff]
+      summary: Move it up a level
+      description: >
+        11.1.5, 11.1.47. Usually automatic on an SLA breach; manual where a requester needs it
+        sooner.
+
+        **Escalation adds an approver, it does not replace one.** The original remains in the
+        chain and the history keeps both, because "who was asked and did not answer" is the
+        question the escalation report exists to answer.
+      tags: [request]
+      x-ticvai-permission: APPROVAL_REQUEST
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [reason]
+              properties:
+                reason: { type: string, maxLength: 300 }
+      responses:
+        '200':
+          description: Escalated
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ApprovalRequest' }
+
+  /approval-requests/{requestId}/resubmit:
+    parameters:
+      - name: requestId
+        in: path
+        required: true
+        schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+    post:
+      operationId: resubmitApprovalRequest
+      x-ticvai-consumed-by:
+        - "P08 BO-085 Approval Request"
+      x-ticvai-audience: [staff]
+      summary: Amend a rejected request and try again
+      description: >
+        11.1.23. **Creates a new request linked to the rejected one** rather than reopening it,
+        so the rejection stays in the record. A request that was refused twice and granted on
+        the third attempt is a pattern worth being able to see.
+      tags: [request]
+      x-ticvai-permission: APPROVAL_REQUEST
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [changes]
+              properties:
+                changes: { type: string, maxLength: 1000, description: What was changed in response to the rejection }
+                amount: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+      responses:
+        '201':
+          description: A new request, linked to the rejected one
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ApprovalRequest' }
+
+  /approval-matrices:
+    get:
+      operationId: listApprovalMatrices
+      x-ticvai-consumed-by:
+        - "P08 BO-086 Approval Matrix"
+      x-ticvai-audience: [staff]
+      summary: What requires approval here
+      description: >
+        11.1.38–11.1.42. Resolves up the scope tree: tenant default, region override, venue
+        override (ADR-0018). A venue may tighten a threshold and never loosen one — **a venue
+        that can raise its own refund limit is not a control.**
+      tags: [matrix]
+      x-ticvai-permission: APPROVAL_CONFIGURE
+      x-ticvai-scope-level: venue
+      x-ticvai-config-scope: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-read-routing: replica
+      parameters:
+        - name: kind
+          in: query
+          schema: { $ref: '#/components/schemas/ApprovalKind' }
+        - name: effective
+          in: query
+          description: Show the resolved matrix as it applies here, rather than the rules set at this level.
+          schema: { type: boolean, default: false }
+      responses:
+        '200':
+          description: Matrices
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/ApprovalMatrix' }
+
+    put:
+      operationId: setApprovalMatrix
+      x-ticvai-consumed-by:
+        - "P08 BO-086 Approval Matrix"
+      x-ticvai-audience: [staff]
+      summary: Configure what requires approval
+      description: >
+        11.1.2. Rules are ordered and **the first match wins**, so adding a rule cannot silently
+        change an unrelated one. A matrix with overlapping unordered rules is a matrix nobody
+        can reason about, and the ordering is the thing that makes it reviewable.
+
+        Changing a matrix creates a version (11.1.80). Requests in flight keep the version they
+        were raised under — **a request must be decided by the rules it was raised under**, or
+        an approver is answering a question that changed while they read it.
+      tags: [matrix]
+      x-ticvai-permission: APPROVAL_CONFIGURE
+      x-ticvai-scope-level: venue
+      x-ticvai-config-scope: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/ApprovalMatrix' }
+      responses:
+        '200':
+          description: Set, as a new version
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ApprovalMatrix' }
+        '409':
+          description: >
+            The matrix would loosen a rule set at a higher scope, or a rule is unreachable
+            behind an earlier one.
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /delegations:
+    get:
+      operationId: listApprovalDelegations
+      x-ticvai-consumed-by:
+        - "P08 BO-087 Approval Delegations"
+      x-ticvai-audience: [staff]
+      summary: Who is standing in for whom
+      description: 11.1.8–11.1.10.
+      tags: [delegation]
+      x-ticvai-permission: APPROVAL_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-read-routing: replica
+      responses:
+        '200':
+          description: Delegations
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/ApprovalDelegation' }
+
+    post:
+      operationId: createApprovalDelegation
+      x-ticvai-consumed-by:
+        - "P08 BO-087 Approval Delegations"
+      x-ticvai-audience: [staff]
+      summary: Delegate approval authority
+      description: >
+        11.1.9. **Always time-bounded.** An open-ended delegation is an approver who quietly
+        stopped approving months ago and a delegate who does not know they still hold it.
+
+        The delegate cannot exceed the delegator's own authority, and **cannot approve a request
+        the delegator raised** — segregation of duties survives delegation, or delegation
+        becomes the way around it.
+      tags: [delegation]
+      x-ticvai-permission: APPROVAL_DECIDE
+      x-ticvai-permission-escalated: APPROVAL_DELEGATE   # delegating is distinct from deciding — CF-59a
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/ApprovalDelegation' }
+      responses:
+        '201':
+          description: Delegated
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ApprovalDelegation' }
+        '403':
+          description: The delegate does not hold the permission being delegated
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /delegations/{delegationId}:
+    parameters:
+      - name: delegationId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    delete:
+      operationId: revokeApprovalDelegation
+      x-ticvai-consumed-by:
+        - "P08 BO-087 Approval Delegations"
+      x-ticvai-audience: [staff]
+      summary: End a delegation early
+      description: >
+        Requests already routed to the delegate stay with them. **Re-routing in flight would
+        leave a request assigned to nobody** while the original approver is still away.
+      tags: [delegation]
+      x-ticvai-permission: APPROVAL_DECIDE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      responses:
+        '204':
+          description: Revoked
+        '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
+
+  /approval-analytics:
+    get:
+      operationId: getApprovalAnalytics
+      x-ticvai-consumed-by:
+        - "P08 BO-088 Approval Analytics"
+      x-ticvai-audience: [staff]
+      summary: Volumes, times, rejections and bottlenecks
+      description: >
+        11.1.27, 11.1.67–11.1.71. Volume, median and p95 decision time, rejection rate,
+        escalation rate and SLA breach rate, by kind, approver, venue and period.
+
+        **Bottleneck analysis is the useful part** (11.1.69): the approver whose queue is
+        always breaching is usually a person with a day job, not a person who is slow, and the
+        fix is the matrix rather than the person.
+      tags: [analytics]
+      x-ticvai-permission: APPROVAL_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-read-routing: analytical
+      parameters:
+        - name: from
+          in: query
+          schema: { type: string, format: date }
+        - name: groupBy
+          in: query
+          schema: { type: string, enum: [kind, approver, venue, day, week] }
+      responses:
+        '200':
+          description: Analytics
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ApprovalAnalytics' }
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    ApprovalKind:
+      type: string
+      description: >
+        11.1.7 and 11.1.30–11.1.37. **The first four already exist as bespoke implementations**
+        and this contract is what they collapse into.
+      enum:
+        - refund
+        - priceOverride
+        - discountOverride
+        - complimentaryTicket
+        - membershipCancellation
+        - accessPermissionChange
+        - configurationChange
+        - aiRecommendation
+        - shiftVariance
+        - releasePromotion
+        - requisition
+        - stockWriteOff
+        - journalEntry
+        - periodReopen
+        - tenantMigration
+
+    ApprovalStatus:
+      type: string
+      enum: [draft, pending, escalated, approved, rejected, withdrawn, expired, cancelled]
+
+    ApprovalMode:
+      type: string
+      description: >
+        11.1.43–11.1.46. **Sequential** asks one at a time, **parallel** asks everyone at once,
+        **consensus** needs all of them, **majority** needs more than half.
+
+        Parallel and consensus differ in when it completes: parallel completes on the first
+        approval, consensus waits for all. Conflating them is how a four-eyes rule turns into a
+        one-eye rule.
+      enum: [sequential, parallel, consensus, majority]
+
+    ApprovalRule:
+      type: object
+      x-ticvai-persistence: "approvals.rule"
+      required: [order, approverRoleIds, mode]
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+          description: >
+            **Added 20 August.** The schema reference derives table columns from API response schemas, and a response is not a table — this one returned everything a caller needs and not the row's own identity, so the table had no key and no row could be addressed, updated or deleted. Found by an audit of all 365 tables, not by a reader.
+        order:
+          type: integer
+          description: >
+            **First match wins.** Explicit ordering is what makes a matrix reviewable — an
+            unordered set of overlapping rules is one nobody can reason about.
+        minAmount: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+        maxAmount: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+        riskScoreAbove:
+          type: number
+          nullable: true
+          description: >
+            11.1.12. **Nothing supplies this yet** — risk scoring is parked with the
+            model-dependent AI. The field exists so adding the engine later is configuration
+            rather than a schema change.
+        condition:
+          type: string
+          nullable: true
+          description: 11.1.13. Evaluated against the attributes the caller supplied.
+        approverRoleIds:
+          type: array
+          minItems: 1
+          items: { type: string, format: uuid }
+        approverScopeLevel:
+          type: string
+          enum: [venue, department, region, tenant]
+          description: 11.1.39. Which organisational level the approver must sit at.
+        mode: { $ref: '#/components/schemas/ApprovalMode' }
+        levels:
+          type: integer
+          default: 1
+          description: 11.1.3. Multi-level chains ask each level in turn.
+        requiresMfa: { type: boolean, default: false }
+        requiresSignature: { type: boolean, default: false }
+        slaMinutes:
+          type: integer
+          nullable: true
+          description: 11.1.14. Null means no SLA, which is different from a long one.
+        escalateAfterMinutes: { type: integer, nullable: true }
+        escalateToRoleIds:
+          type: array
+          items: { type: string, format: uuid }
+        expiresAfterMinutes:
+          type: integer
+          nullable: true
+          description: 11.1.53. An unanswered request eventually stops waiting.
+
+    ApprovalMatrix:
+      type: object
+      x-ticvai-persistence: "approvals.matrix"
+      required: [kind, scopeLevel, rules]
+      properties:
+        id: { type: string, format: uuid, readOnly: true }
+        kind: { $ref: '#/components/schemas/ApprovalKind' }
+        scopeLevel: { type: string, enum: [tenant, region, venue] }
+        scopePath: { type: string, readOnly: true }
+        version:
+          type: integer
+          readOnly: true
+          description: >
+            11.1.80. **A request is decided by the rules it was raised under.** Changing the
+            matrix mid-flight would mean an approver answering a question that changed while
+            they read it.
+        rules:
+          type: array
+          items: { $ref: '#/components/schemas/ApprovalRule' }
+        isActive: { type: boolean }
+
+    ApprovalRequirement:
+      type: object
+      x-ticvai-persistence: "none — computed"
+      description: The answer to "does this need approval", returned before the action.
+      required: [isRequired]
+      properties:
+        isRequired: { type: boolean }
+        matchedRule:
+          allOf:
+            - $ref: '#/components/schemas/ApprovalRule'
+          nullable: true
+        matrixVersion: { type: integer, nullable: true }
+        approvers:
+          type: array
+          description: >
+            Resolved, with delegations applied. **Named so the caller can say "this needs Sara"**
+            rather than "this needs approval".
+          items:
+            type: object
+            properties:
+              principalId: { type: string, format: uuid }
+              displayName: { type: string }
+              level: { type: integer }
+              isDelegate: { type: boolean }
+              delegatedFrom: { type: string, format: uuid, nullable: true }
+        slaMinutes: { type: integer, nullable: true }
+        noApproverAvailable:
+          type: boolean
+          description: >
+            **The case that must not fail silently.** A rule requiring a role nobody at this
+            venue holds means the action is blocked forever, and the caller needs to know that
+            now rather than after raising a request nobody can decide.
+
+    CreateApprovalRequest:
+      type: object
+      x-ticvai-persistence: "none — request only"
+      required: [id, kind, subjectContract, subjectType, subjectId, scopePath, summary]
+      properties:
+        id: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+        kind: { $ref: '#/components/schemas/ApprovalKind' }
+        subjectContract:
+          type: string
+          description: Which contract owns the thing being approved.
+        subjectType: { type: string }
+        subjectId:
+          type: string
+          description: >
+            **A reference, never a copy.** A copy goes stale between raising and deciding, and
+            an approver reading a stale copy approves something that no longer exists.
+        scopePath: { type: string }
+        summary:
+          type: string
+          maxLength: 300
+          description: What the approver sees in their queue before opening it.
+        amount: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+        attributes:
+          type: object
+          additionalProperties: true
+        justification: { type: string, maxLength: 1000 }
+        isDraft: { type: boolean, default: false }
+
+    ApprovalDecision:
+      type: object
+      x-ticvai-persistence: "approvals.decision"
+      required: [level, principalId, decision, decidedAt]
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+          description: >
+            **Added 20 August.** The schema reference derives table columns from API response schemas, and a response is not a table — this one returned everything a caller needs and not the row's own identity, so the table had no key and no row could be addressed, updated or deleted. Found by an audit of all 365 tables, not by a reader.
+        level: { type: integer }
+        principalId: { type: string, format: uuid }
+        displayName: { type: string }
+        isDelegate: { type: boolean }
+        delegatedFrom: { type: string, format: uuid, nullable: true }
+        decision: { type: string, enum: [approve, reject] }
+        comment: { type: string, nullable: true }
+        reason: { type: string, nullable: true }
+        usedMfa: { type: boolean }
+        signatureRef: { type: string, nullable: true }
+        decidedAt: { type: string, format: date-time }
+
+    ApprovalRequest:
+      type: object
+      x-ticvai-persistence: "approvals.request"
+      required: [id, kind, status, requestedByPrincipalId, requestedAt]
+      properties:
+        id: { type: string }
+        kind: { $ref: '#/components/schemas/ApprovalKind' }
+        rerouteOnNoApprover:
+          type: boolean
+          default: true
+          description: >
+            BL-154. **An approver on leave is an approval that waits for them to come back.**
+            Reroutes to the next in the chain rather than stalling — `workforce` already knows who
+            is on leave, and an approval queue nobody is watching is the thing that stops a venue.
+        outOfOfficeDelegateId:
+          type: string
+          format: uuid
+          nullable: true
+        allowEmailApproval:
+          type: boolean
+          default: false
+          description: >
+            **Approving from an email link with no second factor is the weakest path in the
+            system**, so it is off by default and available only below a configured value.
+        reopenedFrom:
+          type: string
+          format: uuid
+          nullable: true
+          description: >
+            **Reopening a decided approval creates a new one that points back.** Editing a decision
+            in place destroys the record of what was originally approved, which is the only thing an
+            audit wants.
+        status: { $ref: '#/components/schemas/ApprovalStatus' }
+        subjectContract: { type: string }
+        subjectType: { type: string }
+        subjectId: { type: string }
+        scopePath: { type: string }
+        summary: { type: string }
+        amount: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+        justification: { type: string, nullable: true }
+        requestedByPrincipalId: { type: string, format: uuid }
+        matrixVersion: { type: integer }
+        mode: { $ref: '#/components/schemas/ApprovalMode' }
+        currentLevel: { type: integer }
+        totalLevels: { type: integer }
+        pendingApprovers:
+          type: array
+          items:
+            type: object
+            properties:
+              principalId: { type: string, format: uuid }
+              displayName: { type: string }
+              isDelegate: { type: boolean }
+        decisions:
+          type: array
+          description: >
+            Every decision at every level, in order. **Immutable once the request completes**
+            (11.1.56) — an approval is evidence, and amending one is a different fact.
+          items: { $ref: '#/components/schemas/ApprovalDecision' }
+        escalations:
+          type: array
+          description: >
+            11.1.48. Who was asked, when, and why it moved up. **Escalation adds an approver
+            rather than replacing one**, so the original stays in the record.
+          items:
+            type: object
+            properties:
+              at: { type: string, format: date-time }
+              reason: { type: string }
+              fromLevel: { type: integer }
+              toLevel: { type: integer }
+              wasAutomatic: { type: boolean }
+        resubmittedFromId: { type: string, nullable: true }
+        reopenedFromId: { type: string, nullable: true }
+        slaDueAt: { type: string, format: date-time, nullable: true }
+        slaBreached: { type: boolean }
+        expiresAt: { type: string, format: date-time, nullable: true }
+        requestedAt: { type: string, format: date-time }
+        completedAt: { type: string, format: date-time, nullable: true }
+
+    ApprovalDelegation:
+      type: object
+      x-ticvai-persistence: "approvals.delegation"
+      required: [delegatorPrincipalId, delegatePrincipalId, from, to]
+      properties:
+        id: { type: string, format: uuid, readOnly: true }
+        delegatorPrincipalId: { type: string, format: uuid }
+        delegatePrincipalId: { type: string, format: uuid }
+        kinds:
+          type: array
+          description: Absent means everything the delegator may approve.
+          items: { $ref: '#/components/schemas/ApprovalKind' }
+        maxAmount:
+          allOf:
+            - $ref: '../shared/common.yaml#/components/schemas/Money'
+          description: A delegate may be given less authority than the delegator, never more.
+        from: { type: string, format: date-time }
+        to:
+          type: string
+          format: date-time
+          description: >
+            **Required.** An open-ended delegation is an approver who quietly stopped approving
+            and a delegate who does not know they still hold it.
+        reason: { type: string }
+        isActive: { type: boolean, readOnly: true }
+
+    ApprovalRefusedProblem:
+      allOf:
+        - $ref: '../shared/common.yaml#/components/schemas/Problem'
+        - type: object
+          x-ticvai-persistence: "none — error shape"
+          properties:
+            refusedReason:
+              type: string
+              enum:
+                - approverIsRequester
+                - notInApproverChain
+                - insufficientPermission
+                - mfaRequired
+                - signatureRequired
+                - delegationExpired
+                - alreadyDecidedAtThisLevel
+
+    ApprovalAnalytics:
+      type: object
+      x-ticvai-persistence: "none — aggregated from approvals.request"
+      properties:
+        from: { type: string, format: date }
+        to: { type: string, format: date }
+        groupBy: { type: string }
+        rows:
+          type: array
+          items:
+            type: object
+            properties:
+              key: { type: string }
+              raised: { type: integer }
+              approved: { type: integer }
+              rejected: { type: integer }
+              withdrawn: { type: integer }
+              expired:
+                type: integer
+                description: >
+                  **Requests nobody answered.** Usually a routing defect rather than a busy
+                  approver, and the number that says the matrix names the wrong person.
+              escalated: { type: integer }
+              slaBreached: { type: integer }
+              medianMinutes: { type: number }
+              p95Minutes: { type: number }

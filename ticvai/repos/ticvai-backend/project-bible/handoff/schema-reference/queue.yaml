@@ -1,0 +1,188 @@
+# queue — derived from the API contracts, not hand-written
+# Migration: V0017
+#
+# Columns come from schema properties. Types are inferred: format uuid to uuid,
+# date-time to timestamptz, ULID patterns to char(26), Money to numeric(18,4).
+# What is NOT here: partitioning, RLS policies, indexes, the PII split. That is
+# storage design and lives in the migration scripts.
+
+module: queue
+migration: V0017
+tableCount: 4
+columnCount: 51
+tables:
+  queue.entry:
+    derivedFrom: QueueEntry
+    columns:
+    - name: id
+      type: text
+      required: true
+    - name: queue_id
+      type: uuid
+      required: true
+    - name: queue_name
+      type: jsonb
+      required: false
+    - name: subject_id
+      type: uuid
+      required: false
+    - name: party_number
+      type: integer
+      required: true
+      description: What the guest sees and what appears on signage.
+    - name: party_size
+      type: integer
+      required: true
+    - name: status
+      type: jsonb
+      required: true
+    - name: position_in_queue
+      type: integer
+      required: false
+    - name: parties_ahead
+      type: integer
+      required: false
+    - name: estimated_call_at
+      type: timestamptz
+      required: false
+    - name: is_fast_pass
+      type: boolean
+      required: false
+    - name: entitlement_id
+      type: text
+      required: false
+    - name: called_at
+      type: timestamptz
+      required: false
+    - name: return_window_ends_at
+      type: timestamptz
+      required: false
+    - name: redeemed_at
+      type: timestamptz
+      required: false
+    - name: admitted_count
+      type: integer
+      required: false
+    - name: joined_at
+      type: timestamptz
+      required: true
+    - name: synced_at
+      type: timestamptz
+      required: false
+  queue.feed:
+    derivedFrom: QueueFeed
+    columns:
+    - name: id
+      type: uuid
+      required: true
+    - name: queue_id
+      type: uuid
+      required: true
+    - name: adaptor
+      type: jsonb
+      required: true
+    - name: adaptor_name
+      type: text
+      required: false
+      description: Named vendor where `adaptor` is `vendorAdaptor`.
+    - name: credentials_ref
+      type: text
+      required: false
+      description: Key vault reference. Credentials are never returned.
+    - name: expected_interval_seconds
+      type: integer
+      required: false
+      description: Beyond this without a reading, the feed is considered quiet.
+    - name: is_enabled
+      type: boolean
+      required: true
+  queue.queue:
+    derivedFrom: Queue
+    columns:
+    - name: code
+      type: varchar(64)
+      required: true
+    - name: name
+      type: jsonb
+      required: true
+    - name: venue_id
+      type: uuid
+      required: true
+    - name: attraction_product_id
+      type: uuid
+      required: false
+    - name: asset_id
+      type: uuid
+      required: false
+      description: The ride. Taking it out of service closes this queue rather than leaving guests holding
+        positions for something that is not running.
+    - name: access_point_id
+      type: uuid
+      required: false
+    - name: capacity_per_cycle
+      type: integer
+      required: true
+    - name: cycle_minutes
+      type: numeric
+      required: true
+    - name: max_party_size
+      type: integer
+      required: false
+    - name: return_window_minutes
+      type: integer
+      required: false
+      description: How long a called party has to arrive before the entry expires.
+    - name: height_requirement_cm
+      type: integer
+      required: false
+    - name: fast_pass_allocation_percent
+      type: numeric
+      required: false
+      description: Share of each cycle reserved for Fast Pass holders.
+    - name: zone
+      type: text
+      required: false
+    - name: id
+      type: uuid
+      required: true
+    - name: status
+      type: jsonb
+      required: true
+    - name: status_reason
+      type: text
+      required: false
+    - name: waiting_party_count
+      type: integer
+      required: true
+    - name: waiting_guest_count
+      type: integer
+      required: false
+    - name: current_wait_minutes
+      type: integer
+      required: false
+    - name: wait_time_source
+      type: jsonb
+      required: false
+    - name: expected_reopen_at
+      type: timestamptz
+      required: false
+  queue.reading:
+    derivedFrom: QueueReading
+    columns:
+    - name: id
+      type: char(26)
+      required: true
+    - name: kind
+      type: text
+      required: true
+      description: Deliberately narrow. Anything richer would couple the platform to one vendor's model
+        of a queue.
+    - name: value
+      type: numeric
+      required: true
+    - name: confidence
+      type: numeric
+      required: false
+    - name: observed_at
+      type: timestamptz
+      required: true

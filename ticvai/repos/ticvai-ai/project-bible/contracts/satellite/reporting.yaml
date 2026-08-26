@@ -1,0 +1,1842 @@
+openapi: 3.1.0
+info:
+  title: TICVAI Reporting & Analytics
+  version: 0.1.0
+  x-ticvai-screen-count: 18
+  x-ticvai-tier: satellite
+  x-ticvai-module: "8 — Unified Operations Dashboard  ·  cross-cutting"
+  x-ticvai-requirements: 332
+  x-ticvai-capabilities: [C21, C97, AI-57]
+  x-ticvai-platforms:
+    - "P08 Venue Management"
+    - "P09 TICVAI Web"
+  description: >
+    ## What this contract covers
+
+    **Reads a lag-tolerant replica, never the primary.**
+
+    | | |
+    |---|---|
+    | **Tier** | satellite |
+    | **Matrix domain** | 8 — Unified Operations Dashboard  ·  cross-cutting |
+    | **Requirements** | ~332 |
+    | **Capabilities** | C21, C97, AI-57 |
+    | **Consumed by** | P08 Venue Management · P09 TICVAI Web |
+
+    ## How to read this file
+
+    **This file is a contract.** It is hand-authored and it is the source of truth for one
+    bounded context: server code, client code and mock servers are generated from it, never
+    the other way round. If a field is not here, it does not exist.
+
+    **Contracts are split into two tiers.**
+
+    - **Spine** — the eight contexts everything else depends on: tenancy, identity,
+      catalogue, orders, shift, access, finance, cross-cell. Frozen first. A change here
+      requires a formal change request, because every satellite has pinned against it.
+    - **Satellite** — a domain that builds on the spine and can move independently.
+      Cheaper to change.
+
+    **`paths` are operations.** Each one declares four TICVAI extensions, and Redocly
+    rejects any that does not:
+
+    | Extension | Answers |
+    |---|---|
+    | `x-ticvai-permission` | Which permission the caller needs. From one enum in `shared/permissions.yaml` — never hand-typed |
+    | `x-ticvai-scope-level` | Where in the seven-level hierarchy that permission must be held |
+    | `x-ticvai-offline-capable` | Whether a disconnected terminal may queue this |
+    | `x-ticvai-conflict-policy` | How a replayed operation resolves — `append`, `serverWins`, `manual` |
+
+    Where `x-ticvai-permission` is null, one of these says why: `x-ticvai-auth: service`
+    (cell-to-cell), `x-ticvai-self-scoped` (acts only on the caller's own resources), or
+    `security: []` (genuinely public).
+
+    **`components.schemas` are API schemas — the shape of data on the wire.** They are not
+    database tables. One API schema may become three columns (`Money`) or five tables
+    (`Order`); some have no table at all (`ValidationResult`, `TrialBalance`). Roughly 70%
+    of the DDL derives from these, and the rest — partitioning, RLS, the PII split — is
+    storage design that lives in the migration scripts.
+
+    **`security` arrays hold OAuth scopes.** Empty means "this scheme, no scopes" — for
+    bearer tokens there is nothing to list. Empty is not the same as absent: absent means
+    unauthenticated.
+
+
+    ## This context
+
+    Report definitions, execution, scheduling, exports and dashboards. Cross-cutting — every
+    domain feeds it.
+
+    Positions this encodes:
+
+    - **Reporting reads a lag-tolerant replica, never the primary.** A month-end report
+      running against the transactional database during a venue spike is the most likely
+      single cause of an outage this platform has.
+    - **Every report is scope-filtered by the caller's resolved permissions**, not by
+      parameters. A venue manager cannot widen a filter to see another venue, because the
+      filter is not what constrains them.
+    - **Definition and execution are separate.** A definition is versioned and reusable; an
+      execution is a dated artefact with its own parameters and result. A report someone can
+      no longer reproduce is not evidence.
+    - **Large exports are asynchronous.** A synchronous export of a year of scan events is a
+      timeout, and a retry of a timeout is two.
+    - Cross-cell and cross-tenant reporting comes from the central warehouse
+      (ADR-0001 (retired — see ADR-0014 and ADR-0017), ADR-0014). **Cells are never queried directly**, and aggregates only.
+
+servers:
+  - url: https://{cellHost}/api/v1
+    variables:
+      cellHost:
+        default: cell.ticvai.local
+
+security:
+  - bearerAuth: []
+
+tags:
+  - name: catalogue
+  - name: execution
+  - name: schedule
+  - name: export
+  - name: dashboard
+  - name: naturalLanguage
+
+paths:
+  # ---------------------------------------------------------------- catalogue
+  /reports/seeded:
+    get:
+      operationId: listSeededReports
+      summary: The reports every venue starts with
+      description: >
+        BL-053. **A venue opening on Monday does not want a report builder — it wants the reports
+        every venue runs.**
+
+        Seeded at provisioning and **editable**: a venue that cannot change a system report will
+        rebuild it from scratch and maintain two.
+
+        Covers approval throughput and ageing (11.1), supplier performance and spend (15.3),
+        slow-moving and expiring stock (15.4), void checks (6.1.29) and the financial pack (5.7.80)
+        — **every one of them a report over data that already existed.**
+      tags: [reporting]
+      x-ticvai-permission: REPORT_VIEW_VENUE
+      x-ticvai-audience: [staff]
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '200':
+          description: Seeded reports
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/SeededReport' }
+
+  /suppliers/{supplierId}/performance:
+    parameters:
+      - name: supplierId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    get:
+      operationId: getSupplierPerformance
+      x-ticvai-consumed-by:
+        - "P08 BO-083 Suppliers"
+      summary: On-time, in-full, and what was rejected
+      description: >
+        15.3.3 and 15.3.17. **Receipts and rejections recorded what arrived and nothing scored it** —
+        so a venue could see every delivery and could not tell a good supplier from a bad one.
+
+        **OTIF is the measure procurement actually uses**: on time *and* in full, because a delivery
+        that is early and short is not a good delivery.
+
+        **Rejection reasons are separated from short deliveries.** One is a quality problem and the
+        other is a supply problem, and a single fill-rate number hides which.
+      tags: [reporting]
+      x-ticvai-permission: REPORT_VIEW_VENUE
+      x-ticvai-audience: [staff]
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: analytical
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - name: from
+          in: query
+          schema: { type: string, format: date }
+        - name: to
+          in: query
+          schema: { type: string, format: date }
+      responses:
+        '200':
+          description: Performance
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ordersPlaced: { type: integer }
+                  onTimeInFullPercent: { type: number }
+                  averageDaysLate: { type: number }
+                  shortDeliveryPercent: { type: number }
+                  rejectionPercent: { type: number }
+                  rejectionReasons:
+                    type: object
+                    additionalProperties: { type: integer }
+                  priceVariancePercent:
+                    type: number
+                    description: >
+                      Quoted against invoiced. **The number that finds a supplier quietly raising
+                      prices**, which no delivery record shows.
+
+  /alert-rules:
+    get:
+      operationId: listAlertRules
+      summary: Thresholds being watched
+      tags: [reporting]
+      x-ticvai-permission: REPORT_VIEW_VENUE
+      x-ticvai-audience: [staff]
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '200':
+          description: Rules
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/AlertRule' }
+    put:
+      operationId: setAlertRule
+      x-ticvai-consumed-by:
+        - "P08 BO-133 Offline Alerts, Limits & Audit"
+        - "P16 ANL-009 AI Assistant & Action Center"
+      summary: Watch a metric and tell somebody
+      description: >
+        BL-152. **The metric comes from the closed set**, so a rule cannot watch something nothing
+        produces.
+      tags: [reporting]
+      x-ticvai-permission: REPORT_MANAGE
+      x-ticvai-audience: [staff]
+      x-ticvai-scope-level: venue
+      x-ticvai-config-scope: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/AlertRule' }
+      responses:
+        '200':
+          description: Set
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/AlertRule' }
+
+  /alerts:
+    get:
+      operationId: listAlerts
+      x-ticvai-consumed-by:
+        - "P04 POS-009 Staff Roster"
+        - "P04 POS-020 Shift Exceptions & Alerts"
+        - "P06 EMP-070 Inventory Exceptions, AI Replenishment & Action Center"
+        - "P08 BO-036 Device Registry"
+        - "P08 BO-125 Product & Category Button Configuration"
+        - "P08 BO-133 Offline Alerts, Limits & Audit"
+        - "P08 BO-141 Operational Alerts, AI Replenishment & Action Center"
+        - "P16 ANL-001 Executive Command Center"
+        - "P16 ANL-003 Operational Performance"
+        - "P16 ANL-009 AI Assistant & Action Center"
+      summary: What is currently wrong
+      description: >
+        **The dashboard panel reads this.** Critical first, then unacknowledged, then by age — an
+        alert list sorted by time puts a resolved info notice above an unacknowledged critical.
+      tags: [reporting]
+      x-ticvai-permission: REPORT_VIEW_VENUE
+      x-ticvai-audience: [staff]
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - name: status
+          in: query
+          schema: { type: string }
+      responses:
+        '200':
+          description: Alerts
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/Alert' }
+
+  /alerts/{alertId}/acknowledge:
+    parameters:
+      - name: alertId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    post:
+      operationId: acknowledgeAlert
+      x-ticvai-consumed-by:
+        - "P06 EMP-070 Inventory Exceptions, AI Replenishment & Action Center"
+        - "P08 BO-141 Operational Alerts, AI Replenishment & Action Center"
+        - "P16 ANL-009 AI Assistant & Action Center"
+      summary: Mark it seen
+      description: >
+        CF-134. **Acknowledged, not dismissed** — the difference is that this records who saw it,
+        and an alert nobody acknowledged is what escalation is for.
+
+        **Acknowledging does not resolve.** The metric is still out of range; somebody is now
+        dealing with it.
+      tags: [reporting]
+      x-ticvai-permission: REPORT_VIEW_VENUE
+      x-ticvai-audience: [staff]
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                note: { type: string, maxLength: 300 }
+      responses:
+        '200':
+          description: Acknowledged
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Alert' }
+
+  /reports:
+    get:
+      operationId: listReports
+      x-ticvai-consumed-by:
+        - "P04 POS-008 Reports"
+        - "P08 BO-029 Report Builder"
+        - "P08 BO-058 Reporting Home"
+        - "P08 BO-059 Sales Reports"
+        - "P08 BO-060 Attendance & Footfall"
+        - "P08 BO-061 Scheduled Reports"
+        - "P10 PTR-018 Reports & Sales Performance"
+        - "P12 SUP-008 Agent Performance & SLA View"
+      x-ticvai-audience: [staff, partner]
+      x-ticvai-read-routing: analytical
+      summary: List available report definitions
+      description: >
+        Only definitions the caller may run. A report requiring `REPORT_VIEW_TENANT` does not
+        appear to a venue-scoped user at all — an empty result is a worse answer than an
+        absent entry.
+      tags: [catalogue]
+      x-ticvai-permission: REPORT_VIEW_VENUE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - name: category
+          in: query
+          schema: { $ref: '#/components/schemas/ReportCategory' }
+        - name: search
+          in: query
+          schema: { type: string }
+        - $ref: '../shared/common.yaml#/components/parameters/PageSize'
+        - $ref: '../shared/common.yaml#/components/parameters/PageCursor'
+      responses:
+        '200':
+          description: Definitions
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '../shared/common.yaml#/components/schemas/Page'
+                  - type: object
+                    properties:
+                      items:
+                        type: array
+                        items: { $ref: '#/components/schemas/ReportDefinition' }
+        '403': { $ref: '../shared/common.yaml#/components/responses/Forbidden' }
+
+    post:
+      operationId: createReport
+      x-ticvai-consumed-by:
+        - "P08 BO-029 Report Builder"
+        - "P08 BO-058 Reporting Home"
+        - "P08 BO-059 Sales Reports"
+        - "P08 BO-060 Attendance & Footfall"
+        - "P08 BO-061 Scheduled Reports"
+        - "P10 PTR-018 Reports & Sales Performance"
+        - "P12 SUP-008 Agent Performance & SLA View"
+      x-ticvai-audience: [staff, partner]
+      summary: Create a custom report definition
+      description: >
+        The self-service builder. A definition names its data source, columns, filters,
+        grouping and the permission required to run it.
+
+        **The author cannot grant a permission they do not hold.** A venue user building a
+        report cannot mark it tenant-scoped and thereby see other venues.
+      tags: [catalogue]
+      x-ticvai-permission: REPORT_MANAGE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/CreateReportRequest' }
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ReportDefinition' }
+        '400':
+          description: Unknown field, invalid filter, or estimated cost beyond the limit
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+        '403':
+          description: Author does not hold the permission they assigned to the report
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /reports/{reportId}:
+    parameters:
+      - name: reportId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    get:
+      operationId: getReport
+      x-ticvai-consumed-by:
+        - "P04 POS-008 Reports"
+        - "P08 BO-029 Report Builder"
+        - "P08 BO-058 Reporting Home"
+        - "P08 BO-059 Sales Reports"
+        - "P08 BO-060 Attendance & Footfall"
+        - "P08 BO-061 Scheduled Reports"
+        - "P10 PTR-018 Reports & Sales Performance"
+        - "P12 SUP-008 Agent Performance & SLA View"
+      x-ticvai-audience: [staff, partner]
+      x-ticvai-read-routing: analytical
+      summary: Read a report definition
+      tags: [catalogue]
+      x-ticvai-permission: REPORT_VIEW_VENUE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '200':
+          description: Definition
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ReportDefinition' }
+        '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
+
+    put:
+      operationId: updateReport
+      x-ticvai-consumed-by:
+        - "P08 BO-029 Report Builder"
+        - "P08 BO-058 Reporting Home"
+        - "P08 BO-059 Sales Reports"
+        - "P08 BO-060 Attendance & Footfall"
+        - "P08 BO-061 Scheduled Reports"
+        - "P10 PTR-018 Reports & Sales Performance"
+        - "P12 SUP-008 Agent Performance & SLA View"
+      x-ticvai-audience: [staff, partner]
+      summary: Publish a new version of a definition
+      description: >
+        Definitions are versioned. Historic executions keep the version they ran against, so
+        a report produced last quarter remains reproducible after the definition changes.
+      tags: [catalogue]
+      x-ticvai-permission: REPORT_MANAGE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/CreateReportRequest' }
+      responses:
+        '200':
+          description: New version published
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ReportDefinition' }
+
+    delete:
+      operationId: deleteReport
+      x-ticvai-consumed-by:
+        - "P04 POS-008 Reports"
+        - "P08 BO-029 Report Builder"
+        - "P08 BO-058 Reporting Home"
+        - "P08 BO-059 Sales Reports"
+        - "P08 BO-060 Attendance & Footfall"
+        - "P08 BO-061 Scheduled Reports"
+        - "P10 PTR-018 Reports & Sales Performance"
+        - "P12 SUP-008 Agent Performance & SLA View"
+      x-ticvai-audience: [staff, partner]
+      summary: Retire a report definition
+      description: >
+        Retired rather than deleted where executions or schedules reference it. History must
+        continue to resolve.
+      tags: [catalogue]
+      x-ticvai-permission: REPORT_MANAGE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      responses:
+        '204': { description: Retired }
+        '409':
+          description: Active schedules reference this report
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /report-fields:
+    get:
+      operationId: listReportFields
+      x-ticvai-audience: [staff]
+      x-ticvai-read-routing: analytical
+      summary: Fields available for a data source
+      description: >
+        Powers the builder. Returns type, whether the field is groupable, aggregatable or
+        filterable, and the permission it requires — some fields are visible only to
+        principals who may see personal data.
+      tags: [catalogue]
+      x-ticvai-permission: REPORT_VIEW_VENUE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - name: dataSource
+          in: query
+          required: true
+          schema: { $ref: '#/components/schemas/DataSource' }
+      responses:
+        '200':
+          description: Fields
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/ReportField' }
+
+  # ---------------------------------------------------------------- execution
+  /reports/{reportId}/run:
+    parameters:
+      - name: reportId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    post:
+      operationId: runReport
+      x-ticvai-consumed-by:
+        - "P04 POS-008 Reports"
+        - "P04 POS-020 Shift Exceptions & Alerts"
+        - "P08 BO-010 Promotions & Coupons"
+        - "P08 BO-029 Report Builder"
+        - "P08 BO-058 Reporting Home"
+        - "P08 BO-059 Sales Reports"
+        - "P08 BO-060 Attendance & Footfall"
+        - "P08 BO-061 Scheduled Reports"
+        - "P08 BO-115 Category, Brand & Merchandise Hierarchy"
+        - "P08 BO-118 Campaign & Audience Management"
+        - "P08 BO-126 Deployment, Preview & Audit"
+        - "P08 BO-133 Offline Alerts, Limits & Audit"
+        - "P10 PTR-018 Reports & Sales Performance"
+        - "P12 SUP-008 Agent Performance & SLA View"
+        - "P16 ANL-001 Executive Command Center"
+        - "P16 ANL-002 Sales, Revenue & Channel"
+        - "P16 ANL-003 Operational Performance"
+        - "P16 ANL-004 Product Performance"
+        - "P16 ANL-005 Cost, Margin & Profitability"
+        - "P16 ANL-006 Inventory & Waste Intelligence"
+        - "P16 ANL-007 Guest & Conversion Intelligence"
+        - "P16 ANL-009 AI Assistant & Action Center"
+      x-ticvai-audience: [staff, partner]
+      summary: Run a report
+      description: >
+        Executes against the **reporting replica**, never the primary.
+
+        Small results return inline. Anything beyond the inline threshold returns `202` with
+        an execution to poll — a synchronous response containing a year of scan events is a
+        timeout waiting to happen.
+
+        Scope is applied from the caller's resolved permissions. Parameters narrow; they
+        never widen.
+      tags: [execution]
+      x-ticvai-permission: REPORT_VIEW_VENUE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/RunReportRequest' }
+      responses:
+        '200':
+          description: Completed inline
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ReportResult' }
+        '202':
+          description: Queued. Poll the execution
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ReportExecution' }
+        '400':
+          description: Required parameter missing, or the date range exceeds the limit
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+        '403': { $ref: '../shared/common.yaml#/components/responses/Forbidden' }
+
+  /report-executions:
+    get:
+      operationId: listReportExecutions
+      x-ticvai-consumed-by:
+        - "P08 BO-058 Reporting Home"
+      x-ticvai-audience: [staff]
+      x-ticvai-read-routing: analytical
+      summary: List executions
+      tags: [execution]
+      x-ticvai-permission: REPORT_VIEW_VENUE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - name: reportId
+          in: query
+          schema: { type: string, format: uuid }
+        - name: status
+          in: query
+          schema: { $ref: '#/components/schemas/ExecutionStatus' }
+        - name: mineOnly
+          in: query
+          schema: { type: boolean, default: true }
+        - $ref: '../shared/common.yaml#/components/parameters/PageSize'
+        - $ref: '../shared/common.yaml#/components/parameters/PageCursor'
+      responses:
+        '200':
+          description: Executions
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '../shared/common.yaml#/components/schemas/Page'
+                  - type: object
+                    properties:
+                      items:
+                        type: array
+                        items: { $ref: '#/components/schemas/ReportExecution' }
+
+  /report-executions/{executionId}:
+    parameters:
+      - name: executionId
+        in: path
+        required: true
+        schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+    get:
+      operationId: getReportExecution
+      x-ticvai-audience: [staff]
+      x-ticvai-read-routing: analytical
+      summary: Execution status and result
+      description: >
+        Carries the definition version, parameters and scope it ran under — everything needed
+        to reproduce it. A report nobody can reproduce is not evidence.
+      tags: [execution]
+      x-ticvai-permission: REPORT_VIEW_VENUE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '200':
+          description: Execution
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ReportExecution' }
+        '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
+
+    delete:
+      operationId: cancelReportExecution
+      x-ticvai-audience: [staff]
+      summary: Cancel a running execution
+      tags: [execution]
+      x-ticvai-permission: REPORT_VIEW_VENUE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      responses:
+        '204': { description: Cancelled }
+        '409':
+          description: Already completed
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /report-executions/{executionId}/result:
+    parameters:
+      - name: executionId
+        in: path
+        required: true
+        schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+    get:
+      operationId: getReportResult
+      x-ticvai-audience: [staff]
+      x-ticvai-read-routing: analytical
+      summary: Paged result rows
+      tags: [execution]
+      x-ticvai-permission: REPORT_VIEW_VENUE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/PageSize'
+        - $ref: '../shared/common.yaml#/components/parameters/PageCursor'
+      responses:
+        '200':
+          description: Rows
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ReportResult' }
+        '409':
+          description: Execution has not completed
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  # ---------------------------------------------------------------- schedules
+  /report-schedules:
+    get:
+      operationId: listReportSchedules
+      x-ticvai-audience: [staff]
+      x-ticvai-read-routing: analytical
+      summary: List scheduled reports
+      tags: [schedule]
+      x-ticvai-permission: REPORT_VIEW_VENUE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/PageSize'
+        - $ref: '../shared/common.yaml#/components/parameters/PageCursor'
+      responses:
+        '200':
+          description: Schedules
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '../shared/common.yaml#/components/schemas/Page'
+                  - type: object
+                    properties:
+                      items:
+                        type: array
+                        items: { $ref: '#/components/schemas/ReportSchedule' }
+
+    post:
+      operationId: createReportSchedule
+      x-ticvai-consumed-by:
+        - "P08 BO-058 Reporting Home"
+      x-ticvai-audience: [staff]
+      summary: Schedule a report
+      description: >
+        Runs under the **owner's** permissions, not the recipients'. A schedule is a standing
+        grant of whatever the owner could see, so recipients are recorded and the owner is
+        accountable for the distribution list.
+
+        Heavy schedules are spread across the window rather than all firing at midnight.
+      tags: [schedule]
+      x-ticvai-permission: REPORT_SCHEDULE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/CreateReportScheduleRequest' }
+      responses:
+        '201':
+          description: Scheduled
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ReportSchedule' }
+        '400':
+          description: Invalid cadence, or no recipients
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /report-schedules/{scheduleId}:
+    parameters:
+      - name: scheduleId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    patch:
+      operationId: updateReportSchedule
+      x-ticvai-audience: [staff]
+      summary: Amend, pause or resume a schedule
+      tags: [schedule]
+      x-ticvai-permission: REPORT_SCHEDULE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              minProperties: 1
+              properties:
+                isPaused: { type: boolean }
+                cadence: { $ref: '#/components/schemas/Cadence' }
+                recipients:
+                  type: array
+                  items: { $ref: '#/components/schemas/Recipient' }
+                format: { $ref: '#/components/schemas/ExportFormat' }
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ReportSchedule' }
+
+    delete:
+      operationId: deleteReportSchedule
+      x-ticvai-audience: [staff]
+      summary: Delete a schedule
+      tags: [schedule]
+      x-ticvai-permission: REPORT_SCHEDULE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      responses:
+        '204': { description: Deleted }
+
+  # ---------------------------------------------------------------- exports
+  /report-executions/{executionId}/export:
+    parameters:
+      - name: executionId
+        in: path
+        required: true
+        schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+    post:
+      operationId: exportReportResult
+      x-ticvai-audience: [staff]
+      summary: Export a completed result
+      description: >
+        Asynchronous. Returns a signed, expiring download link once ready.
+
+        Exports carrying personal data are recorded against the requesting principal and
+        appear in the audit trail — a spreadsheet of guest details leaving the platform is an
+        event someone should own.
+      tags: [export]
+      x-ticvai-permission: REPORT_EXPORT
+      x-ticvai-permission-escalated: REPORT_EXPORT_PII   # where the export contains personal data (ADR-0023)
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [format]
+              properties:
+                format: { $ref: '#/components/schemas/ExportFormat' }
+                includePersonalData:
+                  type: boolean
+                  default: false
+                  description: Requires REPORT_EXPORT_PII. Recorded in the audit trail.
+                purpose:
+                  type: string
+                  maxLength: 500
+                  description: Required when personal data is included.
+      responses:
+        '202':
+          description: Export queued
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ReportExport' }
+        '403':
+          description: Personal data requested without REPORT_EXPORT_PII
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /report-exports/{exportId}:
+    parameters:
+      - name: exportId
+        in: path
+        required: true
+        schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+    get:
+      operationId: getReportExport
+      x-ticvai-audience: [staff]
+      x-ticvai-read-routing: analytical
+      summary: Export status and download link
+      tags: [export]
+      x-ticvai-permission: REPORT_EXPORT
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '200':
+          description: Export
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ReportExport' }
+        '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
+
+  # ---------------------------------------------------------------- dashboards
+  /dashboards:
+    get:
+      operationId: listDashboards
+      x-ticvai-consumed-by:
+        - "P09 ADM-031 Security & Compliance Dashboard"
+      x-ticvai-audience: [staff]
+      x-ticvai-read-routing: analytical
+      summary: List dashboards
+      tags: [dashboard]
+      x-ticvai-permission: REPORT_VIEW_VENUE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '200':
+          description: Dashboards
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/Dashboard' }
+
+    post:
+      operationId: createDashboard
+      x-ticvai-consumed-by:
+        - "P09 ADM-031 Security & Compliance Dashboard"
+      x-ticvai-audience: [staff]
+      x-ticvai-config-scope: tenant
+      summary: Create a dashboard
+      description: >
+        Tiles reference report definitions. Each tile carries its own refresh interval, and
+        the response reports the aggregate query cost — a dashboard of twelve tiles refreshing
+        every thirty seconds is a load problem disguised as a convenience.
+      tags: [dashboard]
+      x-ticvai-permission: REPORT_MANAGE
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/CreateDashboardRequest' }
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Dashboard' }
+        '400':
+          description: Aggregate refresh cost exceeds the configured budget
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /dashboards/{dashboardId}:
+    parameters:
+      - name: dashboardId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    get:
+      operationId: getDashboard
+      x-ticvai-consumed-by:
+        - "P08 BO-010 Promotions & Coupons"
+        - "P09 ADM-031 Security & Compliance Dashboard"
+        - "P15 KIT-010 Kitchen Performance, AI & Operational Optimization"
+        - "P16 ANL-001 Executive Command Center"
+        - "P16 ANL-002 Sales, Revenue & Channel"
+        - "P16 ANL-003 Operational Performance"
+        - "P16 ANL-004 Product Performance"
+        - "P16 ANL-005 Cost, Margin & Profitability"
+        - "P16 ANL-006 Inventory & Waste Intelligence"
+        - "P16 ANL-007 Guest & Conversion Intelligence"
+        - "P16 ANL-008 Demand Forecasting"
+      x-ticvai-audience: [staff]
+      x-ticvai-read-routing: analytical
+      summary: Read a dashboard with tile data
+      tags: [dashboard]
+      x-ticvai-permission: REPORT_VIEW_VENUE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - name: refresh
+          in: query
+          description: Bypass cached tile data. Rate-limited.
+          schema: { type: boolean, default: false }
+      responses:
+        '200':
+          description: Dashboard with data
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/DashboardData' }
+        '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
+
+    put:
+      operationId: updateDashboard
+      x-ticvai-consumed-by:
+        - "P09 ADM-031 Security & Compliance Dashboard"
+      x-ticvai-audience: [staff]
+      x-ticvai-config-scope: tenant
+      summary: Update a dashboard
+      tags: [dashboard]
+      x-ticvai-permission: REPORT_MANAGE
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/CreateDashboardRequest' }
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Dashboard' }
+
+  # ---------------------------------------------------------------- natural language
+  /reports/ask:
+    post:
+      operationId: askReportingQuestion
+      x-ticvai-consumed-by:
+        - "P04 POS-008 Reports"
+        - "P08 BO-029 Report Builder"
+        - "P08 BO-058 Reporting Home"
+        - "P08 BO-059 Sales Reports"
+        - "P08 BO-060 Attendance & Footfall"
+        - "P08 BO-061 Scheduled Reports"
+        - "P10 PTR-018 Reports & Sales Performance"
+        - "P12 SUP-008 Agent Performance & SLA View"
+        - "P15 KIT-010 Kitchen Performance, AI & Operational Optimization"
+        - "P16 ANL-008 Demand Forecasting"
+        - "P16 ANL-009 AI Assistant & Action Center"
+      x-ticvai-audience: [staff, partner]
+      x-ticvai-ai-capability: naturalLanguageQuery
+      summary: Natural-language reporting query
+      description: >
+        **This is an AI capability and is governed as one.** It resolves its provider through
+        `ai.provider`, respects `ai.policy` including the masking list, and writes an
+        `ai.interaction` with its prompt, response, model, tokens and cost — the same audit
+        trail as the assistant (8.3.55–8.3.57).
+
+        Distinct from `sendAiMessage`, which retrieves from documents. **This generates a
+        query against the analytical replica and returns it**, so a finance user can check
+        the number rather than trust it.
+
+        AI-57, Phase 1. Queries data that already exists, so it works from day one — unlike
+        forecasting, which needs history.
+
+        **Returns the generated query alongside the answer.** An answer nobody can check is
+        worse than no answer, and a finance user asked to trust an unexplained number will
+        rightly refuse.
+
+        Runs under the caller's resolved permissions. The generated query cannot widen scope,
+        because scope is applied after generation, not by it.
+      tags: [naturalLanguage]
+      x-ticvai-permission: REPORT_VIEW_VENUE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [question]
+              properties:
+                question: { type: string, minLength: 3, maxLength: 1000 }
+                conversationId:
+                  type: string
+                  description: Continue a prior exchange for follow-up questions.
+                venueId: { type: string, format: uuid }
+      responses:
+        '200':
+          description: Answer with its query
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/NaturalLanguageAnswer' }
+        '400':
+          description: Question could not be interpreted. The response suggests alternatives
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+        '403': { $ref: '../shared/common.yaml#/components/responses/Forbidden' }
+
+  /reports/ask/{conversationId}/save:
+    parameters:
+      - name: conversationId
+        in: path
+        required: true
+        schema: { type: string }
+    post:
+      operationId: saveNaturalLanguageQuery
+      x-ticvai-consumed-by:
+        - "P04 POS-008 Reports"
+        - "P08 BO-029 Report Builder"
+        - "P08 BO-058 Reporting Home"
+        - "P08 BO-059 Sales Reports"
+        - "P08 BO-060 Attendance & Footfall"
+        - "P08 BO-061 Scheduled Reports"
+        - "P10 PTR-018 Reports & Sales Performance"
+        - "P12 SUP-008 Agent Performance & SLA View"
+      x-ticvai-audience: [staff, partner]
+      summary: Save a natural-language answer as a report definition
+      description: >
+        Turns a one-off question into something schedulable. The generated query becomes the
+        definition, reviewable and versioned like any other.
+      tags: [naturalLanguage]
+      x-ticvai-permission: REPORT_MANAGE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [name]
+              properties:
+                name: { type: string, maxLength: 200 }
+                category: { $ref: '#/components/schemas/ReportCategory' }
+      responses:
+        '201':
+          description: Saved as a definition
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ReportDefinition' }
+
+components:
+  schemas:
+    ReportCategory:
+      type: string
+      enum: [sales, admission, financial, inventory, guest, operations, marketing, workforce, compliance, custom]
+
+    SeededReport:
+      type: object
+      description: >
+        BL-053. **`ReportDefinition.isSystem` existed and nothing populated it.** Twenty-eight
+        requirements asked for dashboards and analyses over data that was already there, and the
+        answer to every one of them was *"the builder can do that"* — which is true and is not a
+        deliverable.
+
+        **A venue opening on Monday does not want a report builder. It wants the eight reports every
+        venue runs**, and the ability to change them.
+
+        Seeded at provisioning, `isSystem` true, **editable and forkable rather than locked**: a
+        venue that cannot change a system report will rebuild it from scratch and maintain two.
+      required: [code, name, category, dataSource]
+      properties:
+        code: { type: string }
+        name: { type: string }
+        category: { $ref: '#/components/schemas/ReportCategory' }
+        dataSource: { $ref: '#/components/schemas/DataSource' }
+        appliesToVenueKinds:
+          type: array
+          description: >
+            **A water park does not need a theatre's seat-utilisation report.** Empty means every
+            venue kind.
+          items: { type: string }
+        defaultSchedule: { $ref: '#/components/schemas/Cadence' }
+        rationale:
+          type: string
+          description: >
+            **Why this report ships, in words a venue manager reads.** A seeded report with no
+            rationale is one somebody deletes as clutter in the first week.
+
+
+    AlertRule:
+      type: object
+      x-ticvai-persistence: "reporting.alert_rule"
+      description: >
+        BL-152, CF-134. **Six contracts detect their own trouble and none told a person.**
+
+        Five sections ask for this and it is the same gap as `MessageTrigger`, seen from the
+        operational side — **that one tells a guest something happened; this one tells an operator
+        something is wrong.**
+
+        **A threshold that nobody is watching is a threshold nobody set.** 6.1.57 wants an exception
+        when a KPI leaves range, and an exception that arrives in a nightly report is an exception
+        nobody acted on.
+      required: [id, name, metric, comparator, threshold, severity, isActive]
+      properties:
+        id: { type: string, format: uuid }
+        name: { type: string }
+        metric:
+          allOf:
+            - $ref: '#/components/schemas/MetricSource'
+          description: >
+            **From the closed set**, so a rule cannot watch something nothing produces — the same
+            discipline `MetricSource` exists for.
+        comparator: { type: string, enum: [above, below, outsideRange, changesBy, equals] }
+        threshold: { type: number }
+        thresholdUpper: { type: number, nullable: true }
+        windowMinutes:
+          type: integer
+          default: 15
+          description: >
+            **The window is what stops an alert firing on noise.** A queue that spikes for ninety
+            seconds is not a queue that needs a manager, and a rule with no window is a rule
+            somebody mutes within a week.
+        severity: { type: string, enum: [info, warning, critical] }
+        deliverTo:
+          type: array
+          description: >
+            CF-134. **The dashboard panel is the default and the only one that always applies.**
+            Email or WhatsApp where the matrix names them — an operational alert arriving by email
+            is an alert nobody sees in time.
+          items: { type: string, enum: [dashboardPanel, email, whatsapp, sms] }
+        recipientRoleIds:
+          type: array
+          items: { type: string, format: uuid }
+        cooldownMinutes:
+          type: integer
+          default: 30
+          description: >
+            **How long before the same rule may fire again.** Without it, a metric hovering on a
+            threshold produces forty alerts an hour and the panel becomes something people close.
+        isActive: { type: boolean }
+
+    Alert:
+      type: object
+      x-ticvai-persistence: "reporting.alert"
+      description: >
+        A raised alert. **Acknowledged rather than dismissed** — CF-134 asked for it markable, and
+        the difference is that an acknowledgement records who saw it.
+      required: [id, ruleId, raisedAt, severity, status]
+      properties:
+        id: { type: string, format: uuid }
+        ruleId: { type: string, format: uuid }
+        raisedAt: { type: string, format: date-time }
+        severity: { type: string, enum: [info, warning, critical] }
+        status: { type: string, enum: [raised, acknowledged, resolved, expired] }
+        observedValue: { type: number }
+        threshold: { type: number }
+        scopePath: { type: string }
+        acknowledgedByPrincipalId: { type: string, format: uuid, nullable: true }
+        acknowledgedAt: { type: string, format: date-time, nullable: true }
+        resolvedAt:
+          type: string
+          format: date-time
+          nullable: true
+          description: >
+            **Set when the metric returns to range, automatically.** An alert that only a person can
+            close is an alert list that only grows.
+        escalatedAt:
+          type: string
+          format: date-time
+          nullable: true
+          description: >
+            Where `VenueSettings.alerting.escalateAfterMinutes` passed with no acknowledgement.
+            **A critical alert nobody acknowledged is the case escalation exists for.**
+
+
+    MetricSource:
+      type: string
+      description: >
+        **A named metric with a verified source.** BL-053, 75 requirement rows.
+
+        `reporting` is a generic builder, and **a generic builder makes every reporting requirement
+        look covered** — it will happily assemble a report over data nobody produces. That is the
+        shape to watch across the whole walk, and this enum is the answer to it: each value below
+        was checked against the schema before being named.
+
+        | Metric | Source |
+        |---|---|
+        | `occupancy` | `catalogue.envelope.sold` and `leased` against `capacity` |
+        | `capacityUtilisation` | `catalogue.envelope.remaining` over the same window |
+        | `admissionRate` | `access.scan_event.outcome`, in-direction |
+        | `noShowRate` | Entitlements issued against scans that never arrived |
+        | `conversion` | `orders.cart` against `orders.sales_order` |
+        | `salesByOperator` | `orders.sales_order.principal_id` |
+        | `salesByWorkstation` | The workstation on the shift that took it |
+        | `waitTime` | `queue.entry.estimated_call_at` against `called_at` |
+        | `throughput` | `queue.entry` completions per hour |
+        | `abandonmentRate` | Queue entries that left before being called |
+
+        **`salesByInstructor` is deliberately absent.** It needs the staff-assignment link that
+        CL-01 covers, and naming a metric with no source is the defect this enum exists to prevent.
+      enum: [occupancy, capacityUtilisation, admissionRate, noShowRate, conversion,
+             salesByOperator, salesByWorkstation, waitTime, throughput, abandonmentRate,
+             inventoryValuation, stockTurnover, stockAgeing, wastageRate,
+             resaleVolume, resaleCommission,
+             salesByInstructor, resourceUtilisation,
+             allocationUtilisation, channelAllocationBurn,
+             membershipChurn, membershipRenewalRate,
+             supplierDeliveryPerformance,
+             revenuePerEntitlement, revenuePerVisitor,
+             assetDowntime, meanTimeToRepair,
+             challengeCompletionRate, attributedRevenue]
+      x-ticvai-extended: "18 August 2026"
+      x-ticvai-extension-note: >
+        **Nineteen metrics added when their upstream models landed**, which is how BL-053 was always
+        going to close — not by changing `reporting` but by building the things it wanted to report
+        on.
+
+        `inventoryValuation`, `stockTurnover`, `stockAgeing` and `wastageRate` came from
+        `inventory.StockBatch`; `resaleVolume` and `resaleCommission` from `orders.ResaleListing`;
+        **`salesByInstructor` from `resources.Resource`, which was the one metric this enum
+        deliberately refused to name in the morning** because nothing produced it.
+        `allocationUtilisation` from `PartnerUser` and `ChannelListing`, `membershipChurn` from
+        `Journey`, `supplierDeliveryPerformance` from `ProductionRun`, `assetDowntime` and
+        `meanTimeToRepair` from `WorkOrder.downtimeMinutes`, `challengeCompletionRate` from
+        `ChallengeProgress`, `attributedRevenue` from `AttributionTouch`.
+
+        **Each was checked against the schema before being named.** That rule has not changed —
+        naming a metric with no source is the defect this enum exists to prevent.
+
+
+    DataSource:
+      type: string
+      description: >
+        What a report may be built over. **A closed set, and that is the point** — a builder that
+        accepts any table will happily produce a report over data nobody maintains.
+
+        **Eight sources added 18 August** (BL-143), each because the matrix asks for a report the
+        builder could not source. `stockCounts` and `waste`: 6.1.21 wants count variance and
+        `stockMovements` records the movement rather than **the count that found the discrepancy**.
+        `workstations`, `devices` and `principals`: 6.1.28 — **who did what at which till** is the
+        question an auditor asks first and it had no source. `loyalty`: 6.1.37, points earned,
+        burned and expiring. `reviews`: 6.1.46. `queueEntries`: **wait times are already measured
+        and nothing could report on them.**
+
+        **Adding a source is a decision, not an omission.** `principals`, `guests`, `loyalty` and
+        `reviews` all name a person, and `REPORT_EXPORT_PII` gates them.
+      enum:
+        - orders
+        - orderLines
+        - payments
+        - refunds
+        - shifts
+        - scanEvents
+        - entitlements
+        - products
+        - inventory
+        - stockMovements
+        - stockCounts
+        - waste
+        - workstations
+        - devices
+        - principals
+        - loyalty
+        - reviews
+        - queueEntries
+        - guests
+        - campaigns
+        - cases
+        - ledgerEntries
+        - workOrders
+        # Eleven added 18 August on the BL-053 re-walk, each because a requirement names a report
+        # over it and the source has landed since this enum was last written.
+        - approvals          # 11.1 x10 — throughput, ageing, bottleneck by approver
+        - purchaseOrders     # 15.3 — spend by supplier, by category, by period
+        - receipts           # 15.3.3, 15.3.17 — OTIF, short deliveries, rejection reasons
+        - requisitions       # 15.4.4-6 — suggested against actual, and who overrode
+        - stockBatches       # 15.4.8-9 — slow-moving, dead stock, expiring
+        - resourceBookings   # utilisation of cabanas, instructors, equipment
+        - delegations        # 5.5.17b portfolio aggregation — needed CF-132 first
+        - forms              # waiver completion, survey scores
+        - challenges         # 22.6 completion and reward cost
+        - wallets            # 22.14.8 balance as a segment attribute
+        - resaleListings     # volume, commission, price against face
+
+    FieldType:
+      type: string
+      enum: [string, integer, decimal, money, boolean, date, dateTime, uuid, enum]
+
+    ReportField:
+      x-ticvai-persistence: "none — metadata catalogue, generated"
+      type: object
+      required: [key, label, type, isGroupable, isAggregatable, isFilterable]
+      properties:
+        key: { type: string }
+        label: { type: string }
+        type: { $ref: '#/components/schemas/FieldType' }
+        isGroupable: { type: boolean }
+        isAggregatable: { type: boolean }
+        isFilterable: { type: boolean }
+        isPersonalData:
+          type: boolean
+          description: Requires REPORT_EXPORT_PII to include in an export.
+        requiredPermission: { type: string, nullable: true }
+        enumValues:
+          type: array
+          items: { type: string }
+
+    Aggregation:
+      type: string
+      enum: [none, count, countDistinct, sum, average, min, max]
+
+    ReportColumn:
+      x-ticvai-persistence: "reporting.report_column"
+      type: object
+      required: [field]
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+          description: >
+            **Added 20 August.** The schema reference derives table columns from API response schemas, and a response is not a table — this one returned everything a caller needs and not the row's own identity, so the table had no key and no row could be addressed, updated or deleted. Found by an audit of all 365 tables, not by a reader.
+        field: { type: string }
+        label: { type: string }
+        aggregation:
+          allOf:
+            - $ref: '#/components/schemas/Aggregation'
+          default: none
+        sortOrder: { type: integer }
+        sortDirection:
+          type: string
+          enum: [asc, desc]
+        format: { type: string, nullable: true }
+
+    ReportFilter:
+      x-ticvai-persistence: "reporting.report_filter"
+      type: object
+      required: [field, operator]
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+          description: >
+            **Added 20 August.** The schema reference derives table columns from API response schemas, and a response is not a table — this one returned everything a caller needs and not the row's own identity, so the table had no key and no row could be addressed, updated or deleted. Found by an audit of all 365 tables, not by a reader.
+        field: { type: string }
+        operator:
+          type: string
+          enum: [equals, notEquals, greaterThan, lessThan, between, in, notIn, contains, isNull, isNotNull]
+        value: {}
+        values:
+          type: array
+          items: {}
+        isParameter:
+          type: boolean
+          default: false
+          description: >
+            Prompted at run time rather than fixed. Parameters narrow the result; they never
+            widen scope.
+
+    ReportParameter:
+      x-ticvai-persistence: "reporting.report_parameter"
+      type: object
+      required: [key, label, type, isRequired]
+      properties:
+        key: { type: string }
+        label: { type: string }
+        type: { $ref: '#/components/schemas/FieldType' }
+        isRequired: { type: boolean }
+        defaultValue: {}
+
+    CreateReportRequest:
+      x-ticvai-persistence: "none — request only"
+      type: object
+      required: [name, category, dataSource, columns, requiredPermission]
+      properties:
+        name: { type: string, maxLength: 200 }
+        description: { type: string, maxLength: 1000 }
+        category: { $ref: '#/components/schemas/ReportCategory' }
+        dataSource: { $ref: '#/components/schemas/DataSource' }
+        columns:
+          type: array
+          minItems: 1
+          items: { $ref: '#/components/schemas/ReportColumn' }
+        filters:
+          type: array
+          items: { $ref: '#/components/schemas/ReportFilter' }
+        groupBy:
+          type: array
+          items: { type: string }
+        parameters:
+          type: array
+          items: { $ref: '#/components/schemas/ReportParameter' }
+        requiredPermission:
+          type: string
+          description: >
+            Permission needed to run this report. **The author cannot assign one they do not
+            hold** — otherwise a venue user could build themselves a tenant-wide view.
+        maxDateRangeDays:
+          type: integer
+          nullable: true
+          description: Guards against a query spanning years of scan events.
+
+    ReportDefinition:
+      x-ticvai-persistence: "reporting.report_definition + reporting.report_column + reporting.report_filter"
+      allOf:
+        - $ref: '#/components/schemas/CreateReportRequest'
+        - type: object
+          required: [id, version, isSystem, isRetired, createdAt]
+          properties:
+            id: { type: string, format: uuid }
+            version: { type: string }
+            isSystem:
+              type: boolean
+              description: Shipped with the platform. Cannot be amended, only cloned.
+            isRetired: { type: boolean }
+            estimatedCost:
+              type: string
+              enum: [low, medium, high]
+              description: Informs whether it may run inline or must be queued.
+            createdByPrincipalId: { type: string, format: uuid, nullable: true }
+            createdAt: { type: string, format: date-time }
+            lastRunAt: { type: string, format: date-time, nullable: true }
+
+    RunReportRequest:
+      x-ticvai-persistence: "none — request only"
+      type: object
+      properties:
+        parameters:
+          type: object
+          additionalProperties: true
+        venueId:
+          type: string
+          format: uuid
+          description: >
+            Narrows to one venue. Omitting it returns everything the caller's scope permits —
+            it cannot be used to reach beyond that.
+        dateFrom: { type: string, format: date }
+        dateTo: { type: string, format: date }
+        forceAsync:
+          type: boolean
+          default: false
+          description: Queue regardless of size, for a result to be collected later.
+
+    ExecutionStatus:
+      type: string
+      enum: [queued, running, completed, failed, cancelled, expired]
+
+    ReportExecution:
+      x-ticvai-persistence: "reporting.execution"
+      type: object
+      required: [id, reportId, definitionVersion, status, requestedByPrincipalId, requestedAt]
+      properties:
+        id: { type: string }
+        reportId: { type: string, format: uuid }
+        reportName: { type: string }
+        definitionVersion:
+          type: string
+          description: >
+            The version this ran against. With the parameters and scope below, it is
+            everything needed to reproduce the result.
+        status: { $ref: '#/components/schemas/ExecutionStatus' }
+        parameters:
+          type: object
+          additionalProperties: true
+        scopeApplied:
+          type: array
+          description: Scope paths the caller held. What constrained the result.
+          items: { type: string }
+        rowCount: { type: integer, nullable: true }
+        durationMs: { type: integer, nullable: true }
+        error: { type: string, nullable: true }
+        requestedByPrincipalId: { type: string, format: uuid }
+        scheduleId: { type: string, format: uuid, nullable: true }
+        requestedAt: { type: string, format: date-time }
+        completedAt: { type: string, format: date-time, nullable: true }
+        expiresAt:
+          type: string
+          format: date-time
+          nullable: true
+          description: Results are retained for a limited period, then discarded.
+
+    ReportResult:
+      x-ticvai-persistence: "none — result set, cached in object storage"
+      type: object
+      required: [executionId, columns, rows]
+      properties:
+        executionId: { type: string }
+        columns:
+          type: array
+          items:
+            type: object
+            properties:
+              key: { type: string }
+              label: { type: string }
+              type: { $ref: '#/components/schemas/FieldType' }
+        rows:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
+        totals:
+          type: object
+          additionalProperties: true
+        rowCount: { type: integer }
+        nextCursor: { type: string, nullable: true }
+        generatedAt: { type: string, format: date-time }
+        dataAsOf:
+          type: string
+          format: date-time
+          description: >
+            Replica position the result was read at. Reporting reads a lag-tolerant replica,
+            so this may trail the primary by seconds — stating it prevents an argument about
+            a figure that moved.
+
+    Cadence:
+      x-ticvai-persistence: "none — embedded in schedule"
+      type: object
+      required: [frequency]
+      properties:
+        frequency:
+          type: string
+          enum: [daily, weekly, monthly, quarterly, onShiftClose, onPeriodClose]
+        dayOfWeek: { type: integer, minimum: 0, maximum: 6 }
+        dayOfMonth: { type: integer, minimum: 1, maximum: 31 }
+        timeOfDay: { type: string, pattern: '^([01]\d|2[0-3]):[0-5]\d$' }
+        timeZone: { type: string }
+
+    Recipient:
+      x-ticvai-persistence: "reporting.schedule_recipient"
+      type: object
+      required: [kind, address]
+      properties:
+        kind:
+          type: string
+          enum: [principal, email, sftp, webhook]
+        address: { type: string }
+        principalId: { type: string, format: uuid }
+
+    ExportFormat:
+      type: string
+      enum: [csv, xlsx, pdf, json]
+
+    CreateReportScheduleRequest:
+      x-ticvai-persistence: "none — request only"
+      type: object
+      required: [reportId, cadence, recipients, format]
+      properties:
+        reportId: { type: string, format: uuid }
+        name: { type: string, maxLength: 200 }
+        cadence: { $ref: '#/components/schemas/Cadence' }
+        parameters:
+          type: object
+          additionalProperties: true
+        recipients:
+          type: array
+          minItems: 1
+          items: { $ref: '#/components/schemas/Recipient' }
+        format: { $ref: '#/components/schemas/ExportFormat' }
+        includePersonalData: { type: boolean, default: false }
+        skipIfEmpty:
+          type: boolean
+          default: true
+          description: An empty report every morning trains people to ignore the report.
+
+    ReportSchedule:
+      x-ticvai-persistence: "reporting.schedule"
+      allOf:
+        - $ref: '#/components/schemas/CreateReportScheduleRequest'
+        - type: object
+          required: [id, ownerPrincipalId, isPaused, createdAt]
+          properties:
+            id: { type: string, format: uuid }
+            ownerPrincipalId:
+              type: string
+              format: uuid
+              description: >
+                The schedule runs under this principal's permissions, not the recipients'.
+                A standing grant of whatever the owner can see.
+            isPaused: { type: boolean }
+            lastRunAt: { type: string, format: date-time, nullable: true }
+            lastRunStatus: { $ref: '#/components/schemas/ExecutionStatus' }
+            nextRunAt: { type: string, format: date-time, nullable: true }
+            consecutiveFailures: { type: integer }
+            createdAt: { type: string, format: date-time }
+
+    ReportExport:
+      x-ticvai-persistence: "reporting.export"
+      type: object
+      required: [id, executionId, format, status, requestedByPrincipalId, requestedAt]
+      properties:
+        id: { type: string }
+        executionId: { type: string }
+        format: { $ref: '#/components/schemas/ExportFormat' }
+        status:
+          type: string
+          enum: [queued, generating, ready, failed, expired]
+        includesPersonalData: { type: boolean }
+        purpose: { type: string, nullable: true }
+        downloadUrl:
+          type: string
+          nullable: true
+          description: Signed and expiring. Present only while status is `ready`.
+        sizeBytes: { type: integer, nullable: true }
+        requestedByPrincipalId: { type: string, format: uuid }
+        requestedAt: { type: string, format: date-time }
+        expiresAt: { type: string, format: date-time, nullable: true }
+
+    DashboardTile:
+      x-ticvai-persistence: "reporting.dashboard_tile"
+      type: object
+      required: [id, reportId, visualisation, position]
+      properties:
+        id: { type: string, format: uuid }
+        title: { type: string }
+        reportId: { type: string, format: uuid }
+        visualisation:
+          type: string
+          enum: [number, line, bar, stackedBar, pie, table, gauge, heatmap]
+        parameters:
+          type: object
+          additionalProperties: true
+        refreshSeconds:
+          type: integer
+          minimum: 30
+          description: >
+            Minimum thirty seconds. A tile refreshing every second is a load problem wearing
+            a convenience costume.
+        position:
+          type: object
+          required: [row, column, width, height]
+          properties:
+            row: { type: integer }
+            column: { type: integer }
+            width: { type: integer }
+            height: { type: integer }
+
+    CreateDashboardRequest:
+      x-ticvai-persistence: "none — request only"
+      type: object
+      required: [name, tiles]
+      properties:
+        name: { type: string, maxLength: 200 }
+        description: { type: string, maxLength: 1000 }
+        venueId: { type: string, format: uuid }
+        isShared: { type: boolean, default: false }
+        tiles:
+          type: array
+          minItems: 1
+          maxItems: 24
+          items: { $ref: '#/components/schemas/DashboardTile' }
+
+    Dashboard:
+      x-ticvai-persistence: "reporting.dashboard + reporting.dashboard_tile"
+      allOf:
+        - $ref: '#/components/schemas/CreateDashboardRequest'
+        - type: object
+          required: [id, ownerPrincipalId, aggregateCost, createdAt]
+          properties:
+            id: { type: string, format: uuid }
+            ownerPrincipalId: { type: string, format: uuid }
+            aggregateCost:
+              type: string
+              enum: [low, medium, high]
+              description: Combined refresh load of every tile.
+            createdAt: { type: string, format: date-time }
+
+    DashboardData:
+      x-ticvai-persistence: "none — computed"
+      allOf:
+        - $ref: '#/components/schemas/Dashboard'
+        - type: object
+          properties:
+            tileData:
+              type: array
+              items:
+                type: object
+                properties:
+                  tileId: { type: string, format: uuid }
+                  result: { $ref: '#/components/schemas/ReportResult' }
+                  isCached: { type: boolean }
+                  error: { type: string, nullable: true }
+
+    NaturalLanguageAnswer:
+      x-ticvai-persistence: "none — computed"
+      type: object
+      required: [conversationId, question, interpretation, result, confidence]
+      properties:
+        conversationId: { type: string }
+        question: { type: string }
+        interpretation:
+          type: string
+          description: What the question was understood to mean, in plain language.
+        generatedQuery:
+          type: object
+          description: >
+            The structured query produced — data source, columns, filters, grouping. Returned
+            so the answer can be checked. An answer nobody can verify is worse than no answer.
+          properties:
+            dataSource: { $ref: '#/components/schemas/DataSource' }
+            columns:
+              type: array
+              items: { $ref: '#/components/schemas/ReportColumn' }
+            filters:
+              type: array
+              items: { $ref: '#/components/schemas/ReportFilter' }
+            groupBy:
+              type: array
+              items: { type: string }
+        result: { $ref: '#/components/schemas/ReportResult' }
+        confidence:
+          type: number
+          minimum: 0
+          maximum: 1
+        suggestedFollowUps:
+          type: array
+          items: { type: string }
+        modelVersion: { type: string }
+        tokensUsed: { type: integer }
+
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

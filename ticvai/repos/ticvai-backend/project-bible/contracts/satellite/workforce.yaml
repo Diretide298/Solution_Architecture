@@ -1,0 +1,740 @@
+openapi: 3.1.0
+info:
+  title: TICVAI — Workforce
+  version: 1.0.0
+  x-ticvai-screen-count: 11
+  x-ticvai-module: "18 — Employee Mobile App & AI Assistant (workforce)"
+  x-ticvai-platforms:
+    - P06 Venue Staff App
+    - P08 Venue Management
+  # Derived from screens/*.yaml on 18 August — every platform with a screen that calls an
+  # operation in this contract. **Six contracts declared none**, which the viewer reports as
+  # missing taxonomy and no package checker tested for.
+  x-ticvai-tier: satellite
+  description: >
+    **Rota, attendance and announcements.** The three things the employee app needs that no
+    contract owned.
+
+    CF-71 called this "a task has no contract", and reading the fifty requirements showed the
+    premise was half wrong: **18.2.x is Work Order Inbox, Accept, Reject, Start, Pause,
+    Complete and Close** — a task in the employee app *is* a work order, and the fix there was
+    seven lifecycle operations on `maintenance`, not a new Task object. Building one would have
+    given a venue two inboxes for one job.
+
+    What genuinely had no home is here.
+
+    ## Rota is not a shift
+
+    `orders.shift` is a cash-handling session — a drawer opened, counted and closed, tied to a
+    workstation. **A rota assignment is a person expected somewhere at a time**, and most of
+    the people on a rota never touch a till.
+
+    Conflating them is how a lifeguard becomes uncountable. The two link where they overlap: a
+    cashier's assignment names the workstation their shift will open on.
+
+    ## Attendance is not the rota either
+
+    The rota says who *should* be there. Attendance says who *was*. **The gap between them is
+    the entire operational value** — a venue with only the rota believes it is fully staffed
+    every day.
+
+    ## Deliberately not here
+
+    **Payroll.** Attendance produces hours; what they are worth is a finance system's problem
+    and almost certainly an existing one. This contract exports; it does not calculate pay.
+
+    **Leave and absence approval.** Requests route through `approvals`, which already has
+    delegation, escalation and segregation of duties. A second approval mechanism here would be
+    the fifth one this platform has already collapsed.
+  contact:
+    name: TICVAI Platform
+servers:
+  - url: https://api.{region}.ticvai.com/workforce/v1
+    variables:
+      region:
+        default: ae
+security:
+  - bearerAuth: []
+tags:
+  - name: rota
+    description: Who is expected where, and when
+  - name: attendance
+    description: Who actually turned up
+  - name: announcements
+    description: Telling staff something
+paths:
+  /rota-assignments:
+    get:
+      operationId: listRotaAssignments
+      x-ticvai-consumed-by:
+        - "P04 POS-009 Staff Roster"
+        - "P04 POS-018 Safe Drop & Cash Transfer Management"
+        - "P06 EMP-021 Roster"
+        - "P06 EMP-022 My rota"
+        - "P06 EMP-023 Swap request"
+        - "P08 BO-055 Rota & Scheduling"
+      x-ticvai-audience: [staff]
+      summary: The rota
+      description: >
+        18.9.2. A supervisor sees the venue; a steward sees themselves. **The same operation,
+        scoped by permission** — a steward without `WORKFORCE_VIEW` gets their own assignments
+        and no one else's, which is what `EMP-022 My rota` renders.
+      tags: [rota]
+      x-ticvai-permission: WORKFORCE_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: true
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-read-routing: replica
+      parameters:
+        - name: from
+          in: query
+          schema: { type: string, format: date }
+        - name: to
+          in: query
+          schema: { type: string, format: date }
+        - name: principalId
+          in: query
+          schema: { type: string, format: uuid }
+        - name: departmentId
+          in: query
+          schema: { type: string, format: uuid }
+        - $ref: '../shared/common.yaml#/components/parameters/PageSize'
+        - $ref: '../shared/common.yaml#/components/parameters/PageCursor'
+      responses:
+        '200':
+          description: Assignments
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/RotaAssignment' }
+
+    post:
+      operationId: createRotaAssignment
+      x-ticvai-consumed-by:
+        - "P04 POS-009 Staff Roster"
+        - "P04 POS-018 Safe Drop & Cash Transfer Management"
+        - "P08 BO-055 Rota & Scheduling"
+      x-ticvai-audience: [staff]
+      summary: Put someone on the rota
+      description: >
+        Refused where the person already has an overlapping assignment, or lacks the role the
+        position requires. **A rota that lets one person be in two places is a rota that gets
+        ignored.**
+
+        Where the position needs a till, the assignment names the workstation their shift will
+        open on — the link between a rota and a cash session, without merging the two.
+      tags: [rota]
+      x-ticvai-permission: WORKFORCE_MANAGE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/RotaAssignment' }
+      responses:
+        '201':
+          description: Assigned
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/RotaAssignment' }
+        '409':
+          description: Overlaps an existing assignment, or the person lacks the required role
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /guest-broadcast:
+    post:
+      operationId: broadcastToGuests
+      summary: Venue-wide notice to every guest on site
+      description: >
+        BL-020. **`publishAnnouncement` carries an emergency kind and is staff-facing.** A venue-wide
+        evacuation notice is not a marketing message and must not ride the marketing path — **consent
+        and suppression do not apply to a fire.**
+
+        Reaches every guest with a live entitlement at this venue, by every channel they have.
+        **Bypasses quiet hours, journey throttling and channel preference**, which is the entire
+        reason it is a separate operation rather than a campaign with a flag.
+
+        **Requires two principals for `evacuation`.** A venue-wide alarm sent in error empties a
+        park and it is not recallable.
+      tags: [workforce]
+      x-ticvai-permission: ANNOUNCEMENT_PUBLISH
+      x-ticvai-permission-escalated: ANNOUNCEMENT_PUBLISH
+      x-ticvai-audience: [staff]
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [kind, message]
+              properties:
+                kind: { type: string, enum: [evacuation, weather, rideClosure, lostChild, operational, allClear] }
+                message: { type: string, maxLength: 300 }
+                messageLocalised:
+                  type: object
+                  additionalProperties: { type: string }
+                  description: >
+                    **Every enabled language, and a missing one is sent in the default rather than
+                    withheld.** A guest who cannot read the notice is better served than a guest who
+                    never receives it.
+                assemblyPointIds:
+                  type: array
+                  description: >
+                    For an evacuation. **The map resolves them to the nearest one per guest** where
+                    the venue is georeferenced — a single assembly point named in text sends
+                    everybody the same direction regardless of where they are standing.
+                  items: { type: string, format: uuid }
+                secondPrincipalId: { type: string, format: uuid, nullable: true }
+      responses:
+        '202':
+          description: Broadcasting
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+
+  /rota-assignments/{assignmentId}:
+    parameters:
+      - name: assignmentId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    patch:
+      operationId: updateRotaAssignment
+      x-ticvai-consumed-by:
+        - "P08 BO-055 Rota & Scheduling"
+      x-ticvai-audience: [staff]
+      summary: Move or cancel an assignment
+      tags: [rota]
+      x-ticvai-permission: WORKFORCE_MANAGE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/RotaAssignment' }
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/RotaAssignment' }
+
+  /rota-assignments/{assignmentId}/swap:
+    parameters:
+      - name: assignmentId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    post:
+      operationId: requestShiftSwap
+      x-ticvai-consumed-by:
+        - "P06 EMP-021 Roster"
+        - "P06 EMP-022 My rota"
+        - "P06 EMP-023 Swap request"
+        - "P08 BO-055 Rota & Scheduling"
+      x-ticvai-audience: [staff]
+      summary: Ask someone to take your shift
+      description: >
+        `EMP-023`. **Routes through `approvals`** rather than implementing its own — the
+        supervisor approving a swap is the same mechanism as the one approving a refund, with
+        the same audit trail and the same rule that a requester cannot approve themselves.
+
+        Both parties must accept before the supervisor sees it. A swap approved against someone
+        who never agreed is a gap in the rota nobody notices until the shift starts.
+      tags: [rota]
+      x-ticvai-permission: WORKFORCE_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [toPrincipalId]
+              properties:
+                toPrincipalId: { type: string, format: uuid }
+                reason: { type: string, maxLength: 300 }
+      responses:
+        '202':
+          description: Awaiting the other party, then approval
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ShiftSwap' }
+
+  /attendance:
+    get:
+      operationId: listAttendance
+      x-ticvai-consumed-by:
+        - "P06 EMP-024 Clock in / out"
+        - "P06 EMP-025 Break management"
+        - "P08 BO-056 Time & Attendance"
+      x-ticvai-audience: [staff]
+      summary: Who was here
+      description: >
+        18.9.1. **Against the rota, not on its own.** A list of clock-ins says nothing; a list
+        of clock-ins beside the assignments that expected them shows the no-shows, the late
+        starts and the people who covered.
+      tags: [attendance]
+      x-ticvai-permission: WORKFORCE_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-read-routing: replica
+      parameters:
+        - name: date
+          in: query
+          schema: { type: string, format: date }
+        - name: principalId
+          in: query
+          schema: { type: string, format: uuid }
+        - name: exceptionsOnly
+          in: query
+          description: Late, absent, no clock-out. **The list a duty manager actually opens.**
+          schema: { type: boolean }
+      responses:
+        '200':
+          description: Attendance
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/AttendanceRecord' }
+
+  /attendance/clock:
+    post:
+      operationId: recordAttendance
+      x-ticvai-consumed-by:
+        - "P06 EMP-024 Clock in / out"
+        - "P06 EMP-025 Break management"
+        - "P08 BO-056 Time & Attendance"
+      x-ticvai-audience: [staff]
+      summary: Clock in, clock out, or take a break
+      description: >
+        18.9.1 and `EMP-024`, `EMP-025`. **Offline-capable and timestamped on the device**, then
+        reconciled. A steward clocking in at a gate with no signal must not be marked absent.
+
+        Where the venue requires it, the record carries the access point or geofence the clock
+        happened at — **a clock-in from a car park is a different fact from one at the staff
+        entrance**, and the difference is what makes attendance evidence rather than
+        self-report.
+
+        A missing clock-out is not corrected automatically. It is flagged, because guessing when
+        someone left is how a payroll dispute starts.
+      tags: [attendance]
+      x-ticvai-permission: ATTENDANCE_RECORD
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: true
+      x-ticvai-conflict-policy: append
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [kind, occurredAt]
+              properties:
+                kind: { type: string, enum: [clockIn, clockOut, breakStart, breakEnd] }
+                occurredAt:
+                  type: string
+                  format: date-time
+                  description: Device time. The server records both this and when it arrived.
+                assignmentId: { type: string, format: uuid, nullable: true }
+                accessPointId: { type: string, format: uuid, nullable: true }
+                latitude: { type: number, nullable: true }
+                longitude: { type: number, nullable: true }
+      responses:
+        '201':
+          description: Recorded
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/AttendanceRecord' }
+        '409':
+          description: >
+            Out of sequence — a clock-out with no clock-in, or a second clock-in. **Reported
+            rather than silently corrected.**
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /attendance/{recordId}/amend:
+    parameters:
+      - name: recordId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    post:
+      operationId: amendAttendance
+      x-ticvai-consumed-by:
+        - "P06 EMP-024 Clock in / out"
+        - "P08 BO-056 Time & Attendance"
+      x-ticvai-audience: [staff]
+      summary: A supervisor corrects a record
+      description: >
+        Forgotten clock-outs and phones that died. **The original is kept and the amendment is
+        recorded against it** — attendance feeds pay, and a record that can be quietly rewritten
+        is not evidence of anything.
+      tags: [attendance]
+      x-ticvai-permission: WORKFORCE_MANAGE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [correctedAt, reason]
+              properties:
+                correctedAt: { type: string, format: date-time }
+                reason: { type: string, maxLength: 300 }
+      responses:
+        '200':
+          description: Amended, with the original retained
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/AttendanceRecord' }
+
+  /announcements:
+    get:
+      operationId: listAnnouncements
+      x-ticvai-consumed-by:
+        - "P06 EMP-007 Handover notes"
+        - "P06 EMP-037 Notifications"
+        - "P06 EMP-038 Broadcast to team"
+        - "P06 EMP-039 Announcements"
+        - "P06 EMP-047 Emergency mode"
+        - "P08 BO-066 Notification Settings"
+      x-ticvai-audience: [staff]
+      summary: What staff have been told
+      description: 18.9.3 and 18.9.5. `EMP-039`.
+      tags: [announcements]
+      x-ticvai-permission: WORKFORCE_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: true
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-read-routing: replica
+      parameters:
+        - name: unacknowledgedOnly
+          in: query
+          schema: { type: boolean }
+      responses:
+        '200':
+          description: Announcements
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/Announcement' }
+
+    post:
+      operationId: publishAnnouncement
+      x-ticvai-consumed-by:
+        - "P06 EMP-007 Handover notes"
+        - "P06 EMP-037 Notifications"
+        - "P06 EMP-038 Broadcast to team"
+        - "P06 EMP-039 Announcements"
+        - "P06 EMP-047 Emergency mode"
+        - "P08 BO-066 Notification Settings"
+      x-ticvai-audience: [staff]
+      summary: Tell staff something
+      description: >
+        18.9.3, 18.9.4, `EMP-038`. Targeted by venue, department or role.
+
+        **`emergency` is not a louder `operational`.** It overrides the home screen (`EMP-047`),
+        bypasses quiet hours, requires acknowledgement, and reports who has not acknowledged —
+        because during an evacuation the useful list is the people who have not confirmed they
+        know.
+
+        A separate permission, so the ability to post a staff notice does not carry the ability
+        to declare an emergency.
+      tags: [announcements]
+      x-ticvai-permission: ANNOUNCEMENT_PUBLISH
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/Announcement' }
+      responses:
+        '201':
+          description: Published
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Announcement' }
+
+  /announcements/{announcementId}/acknowledge:
+    parameters:
+      - name: announcementId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    post:
+      operationId: acknowledgeAnnouncement
+      x-ticvai-consumed-by:
+        - "P06 EMP-007 Handover notes"
+        - "P06 EMP-037 Notifications"
+        - "P06 EMP-038 Broadcast to team"
+        - "P06 EMP-039 Announcements"
+        - "P06 EMP-047 Emergency mode"
+        - "P08 BO-066 Notification Settings"
+      x-ticvai-audience: [staff]
+      summary: Confirm you have read it
+      description: >
+        Queued offline. **An emergency acknowledgement that needs a network is one that does not
+        arrive when it matters most.**
+      tags: [announcements]
+      x-ticvai-permission: WORKFORCE_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: true
+      x-ticvai-conflict-policy: append
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      responses:
+        '204':
+          description: Acknowledged
+
+  /announcements/{announcementId}/reach:
+    parameters:
+      - name: announcementId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    get:
+      operationId: getAnnouncementReach
+      x-ticvai-consumed-by:
+        - "P06 EMP-007 Handover notes"
+        - "P06 EMP-037 Notifications"
+        - "P06 EMP-038 Broadcast to team"
+        - "P06 EMP-039 Announcements"
+        - "P06 EMP-047 Emergency mode"
+        - "P08 BO-066 Notification Settings"
+      x-ticvai-audience: [staff]
+      summary: Who has acknowledged, and who has not
+      description: >
+        **The second list is the one that matters.** For an operational notice it measures
+        whether anyone read it; during an emergency it is the roll call.
+      tags: [announcements]
+      x-ticvai-permission: WORKFORCE_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-read-routing: primary
+      responses:
+        '200':
+          description: Reach
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/AnnouncementReach' }
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    RotaStatus:
+      type: string
+      enum: [planned, published, confirmed, swapPending, cancelled, completed, noShow]
+
+    RotaAssignment:
+      type: object
+      x-ticvai-persistence: "workforce.rota_assignment"
+      required: [principalId, venueId, startsAt, endsAt, position]
+      properties:
+        overtimeMinutes:
+          type: integer
+          nullable: true
+          readOnly: true
+          description: >
+            BL-044, 1.2.83. **UAE labour law limits working hours and mandates rest periods**, and
+            nothing in the package counted either. Derived from attendance against the shift.
+        restPeriodBefore:
+          type: integer
+          nullable: true
+          description: >
+            Minutes since the previous shift ended. **The check that stops a closing shift followed
+            by an opening one**, which is legal in most places and unsafe in all of them.
+        breachesWorkingHourLimit:
+          type: boolean
+          default: false
+          readOnly: true
+          description: >
+            **Flagged at assignment, not discovered at payroll.** A rota that breaches a statutory
+            limit is a rota somebody has to redo, and finding out a month later means it was worked.
+        labourCost:
+          allOf:
+            - $ref: '../shared/common.yaml#/components/schemas/Money'
+          description: >
+            **Cost at the point of scheduling.** A manager building a rota without seeing its cost is
+            a manager who finds out from finance.
+        id: { type: string, format: uuid, readOnly: true }
+        principalId: { type: string, format: uuid }
+        displayName: { type: string, readOnly: true }
+        venueId: { type: string, format: uuid }
+        departmentId: { type: string, format: uuid, nullable: true }
+        position:
+          type: string
+          description: >
+            What they are rostered to do — gate steward, cashier, lifeguard, technician. **Most
+            positions never touch a till**, which is why a rota assignment is not a shift.
+        requiredRoleId:
+          type: string
+          format: uuid
+          nullable: true
+          description: Checked on assignment. A rota naming someone unqualified is a rota that gets overridden.
+        workstationId:
+          type: string
+          format: uuid
+          nullable: true
+          description: >
+            Where the position needs a till. **The link between a rota and a cash session**,
+            without merging the two.
+        startsAt: { type: string, format: date-time }
+        endsAt: { type: string, format: date-time }
+        status: { $ref: '#/components/schemas/RotaStatus' }
+        breakMinutes: { type: integer, nullable: true }
+        note: { type: string, nullable: true }
+
+    ShiftSwap:
+      type: object
+      x-ticvai-persistence: "workforce.shift_swap"
+      required: [id, assignmentId, fromPrincipalId, toPrincipalId, status]
+      properties:
+        id: { type: string, format: uuid }
+        assignmentId: { type: string, format: uuid }
+        fromPrincipalId: { type: string, format: uuid }
+        toPrincipalId: { type: string, format: uuid }
+        status:
+          type: string
+          enum: [awaitingPeer, awaitingApproval, approved, rejected, withdrawn]
+          description: >
+            **Both parties before the supervisor.** A swap approved against someone who never
+            agreed is a gap in the rota nobody notices until the shift starts.
+        approvalRequestId:
+          type: string
+          nullable: true
+          description: Routed through `approvals` rather than a second mechanism here.
+        reason: { type: string, nullable: true }
+        requestedAt: { type: string, format: date-time }
+
+    AttendanceRecord:
+      type: object
+      x-ticvai-persistence: "workforce.attendance"
+      required: [id, principalId, kind, occurredAt]
+      properties:
+        id: { type: string, format: uuid }
+        principalId: { type: string, format: uuid }
+        assignmentId: { type: string, format: uuid, nullable: true }
+        venueId: { type: string, format: uuid }
+        kind: { type: string, enum: [clockIn, clockOut, breakStart, breakEnd] }
+        occurredAt:
+          type: string
+          format: date-time
+          description: Device time — when it happened.
+        recordedAt:
+          type: string
+          format: date-time
+          description: >
+            When the server received it. **Both are kept**: a steward clocking in offline at a
+            gate is not late because the sync was.
+        accessPointId: { type: string, format: uuid, nullable: true }
+        latitude: { type: number, nullable: true }
+        longitude: { type: number, nullable: true }
+        isAmended: { type: boolean, readOnly: true }
+        amendedByPrincipalId: { type: string, format: uuid, nullable: true }
+        amendmentReason: { type: string, nullable: true }
+        originalOccurredAt:
+          type: string
+          format: date-time
+          nullable: true
+          description: >
+            **The original is never overwritten.** Attendance feeds pay, and a record that can be
+            quietly rewritten is not evidence.
+        exception:
+          type: string
+          nullable: true
+          enum: [late, earlyLeave, missingClockOut, noShow, outOfGeofence, unscheduled]
+          description: Computed against the rota. Null where the record matches what was expected.
+
+    AnnouncementKind:
+      type: string
+      description: >
+        `emergency` is not a louder `operational`. It overrides the home screen, bypasses quiet
+        hours, requires acknowledgement, and carries a separate permission.
+      enum: [operational, safety, emergency, hr, celebration]
+
+    Announcement:
+      type: object
+      x-ticvai-persistence: "workforce.announcement"
+      required: [title, body, kind, publishedAt]
+      properties:
+        id: { type: string, format: uuid, readOnly: true }
+        title: { type: string, maxLength: 140 }
+        body: { type: string, maxLength: 4000 }
+        kind: { $ref: '#/components/schemas/AnnouncementKind' }
+        venueIds:
+          type: array
+          items: { type: string, format: uuid }
+        departmentIds:
+          type: array
+          items: { type: string, format: uuid }
+        roleIds:
+          type: array
+          items: { type: string, format: uuid }
+        requiresAcknowledgement: { type: boolean }
+        expiresAt: { type: string, format: date-time, nullable: true }
+        publishedByPrincipalId: { type: string, format: uuid, readOnly: true }
+        publishedAt: { type: string, format: date-time }
+        locale: { type: string, nullable: true }
+
+    AnnouncementReach:
+      type: object
+      x-ticvai-persistence: "none — computed from workforce.announcement_receipt"
+      properties:
+        announcementId: { type: string, format: uuid }
+        targeted: { type: integer }
+        delivered: { type: integer }
+        acknowledged: { type: integer }
+        outstanding:
+          type: array
+          description: >
+            **The list that matters.** For an operational notice it measures whether anyone read
+            it; during an emergency it is the roll call.
+          items:
+            type: object
+            properties:
+              principalId: { type: string, format: uuid }
+              displayName: { type: string }
+              onShift: { type: boolean }

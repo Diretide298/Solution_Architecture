@@ -1,0 +1,1165 @@
+id: LLD-MarketingService
+title: MarketingService — 96 operations, 37 tables
+generatedBy: tools/derive-diagrams.py
+tier: engagement
+index: diagrams/hld/02-services.yaml
+why: '**93 operations and 37 tables — the biggest thing in the package, and probably two services eventually.**
+  CRM and campaigns have different write patterns: a guest profile is read constantly and written rarely;
+  a campaign send is a burst of millions of rows nobody reads again.
+
+
+  **Kept as one for now** because splitting a service before it has a load profile is guessing.'
+scale: Bursty on send, read-heavy otherwise. **The one to watch for a split.**
+ifDown: Down stops campaigns and guest lookup. Neither stops trading.
+coverage:
+  operations: 96
+  inAFlow: 39
+  percent: 41%
+  note: '**Flow coverage is how much of this service a journey has walked.** A service under 40% is
+    unwalked rather than under-documented.'
+schemas:
+- schema: marketing
+  tables: 37
+  stores:
+  - postgres
+  largestTable: marketing.conversation
+operationsByContract:
+- contract: marketing-crm
+  count: 96
+  operations:
+  - operation: accrueLoyaltyPoints
+    verb: POST
+    path: /loyalty/accruals
+    scope: venue
+    permission: LOYALTY_ACCRUE
+    offline: false
+    reads: 4
+    writes: 2
+  - operation: activateJourney
+    verb: POST
+    path: /journeys/{journeyId}/activate
+    scope: venue
+    permission: MARKETING_SEND
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: addCaseMessage
+    verb: POST
+    path: /cases/{caseId}/messages
+    scope: venue
+    permission: CASE_MANAGE
+    offline: true
+    reads: 2
+    writes: 2
+  - operation: addGuestNote
+    verb: POST
+    path: /guests/{subjectId}/notes
+    scope: venue
+    permission: GUEST_MANAGE
+    offline: true
+    reads: 2
+    writes: 1
+  - operation: addSuppression
+    verb: POST
+    path: /consent/suppression-list
+    scope: tenant
+    permission: GUEST_MANAGE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: addToWishlist
+    verb: POST
+    path: /guests/{subjectId}/wishlist
+    scope: venue
+    permission: null
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: adjustLoyaltyPoints
+    verb: POST
+    path: /guests/{subjectId}/loyalty/adjust
+    scope: venue
+    permission: LEDGER_POST
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: claimConversation
+    verb: POST
+    path: /conversations/{conversationId}/claim
+    scope: tenant
+    permission: CASE_MANAGE
+    offline: false
+    reads: 3
+    writes: 2
+  - operation: closeConversation
+    verb: POST
+    path: /conversations/{conversationId}/close
+    scope: tenant
+    permission: CASE_MANAGE
+    offline: false
+    reads: 2
+    writes: 3
+  - operation: createCampaign
+    verb: POST
+    path: /campaigns
+    scope: venue
+    permission: MARKETING_MANAGE
+    offline: false
+    reads: 3
+    writes: 3
+  - operation: createCase
+    verb: POST
+    path: /cases
+    scope: venue
+    permission: CASE_MANAGE
+    offline: true
+    reads: 2
+    writes: 2
+  - operation: createChallenge
+    verb: POST
+    path: /challenges
+    scope: venue
+    permission: MARKETING_MANAGE
+    offline: false
+    reads: 3
+    writes: 2
+  - operation: createForm
+    verb: POST
+    path: /forms
+    scope: venue
+    permission: MARKETING_MANAGE
+    offline: false
+    reads: 3
+    writes: 2
+  - operation: createInvitationCampaign
+    verb: POST
+    path: /invitation-campaigns
+    scope: venue
+    permission: MARKETING_MANAGE
+    offline: false
+    reads: 3
+    writes: 2
+  - operation: createJourney
+    verb: POST
+    path: /journeys
+    scope: venue
+    permission: MARKETING_MANAGE
+    offline: false
+    reads: 3
+    writes: 2
+  - operation: createLoyaltyProgramme
+    verb: POST
+    path: /loyalty/programmes
+    scope: tenant
+    permission: MARKETING_MANAGE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: createMessageTemplate
+    verb: POST
+    path: /message-templates
+    scope: tenant
+    permission: MARKETING_MANAGE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: createReferral
+    verb: POST
+    path: /referrals
+    scope: venue
+    permission: MARKETING_MANAGE
+    offline: false
+    reads: 3
+    writes: 2
+  - operation: createSegment
+    verb: POST
+    path: /segments
+    scope: venue
+    permission: MARKETING_MANAGE
+    offline: false
+    reads: 3
+    writes: 3
+  - operation: createUrlRedirect
+    verb: POST
+    path: /seo-redirects
+    scope: tenant
+    permission: MARKETING_MANAGE
+    offline: false
+    reads: 2
+    writes: 3
+  - operation: endKioskAssist
+    verb: POST
+    path: /kiosk-assists/{sessionId}/end
+    scope: venue
+    permission: null
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: escalateCase
+    verb: POST
+    path: /cases/{caseId}/escalate
+    scope: venue
+    permission: CASE_MANAGE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: getCampaign
+    verb: GET
+    path: /campaigns/{campaignId}
+    scope: venue
+    permission: MARKETING_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: getCampaignPerformance
+    verb: GET
+    path: /campaigns/{campaignId}/performance
+    scope: venue
+    permission: MARKETING_VIEW
+    offline: false
+    reads: 3
+    writes: 0
+  - operation: getCase
+    verb: GET
+    path: /cases/{caseId}
+    scope: venue
+    permission: CASE_VIEW
+    offline: false
+    reads: 2
+    writes: 0
+  - operation: getConsentHistory
+    verb: GET
+    path: /guests/{subjectId}/consents/history
+    scope: venue
+    permission: GUEST_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: getConversation
+    verb: GET
+    path: /conversations/{conversationId}
+    scope: tenant
+    permission: CASE_VIEW
+    offline: false
+    reads: 3
+    writes: 0
+  - operation: getGuestConsents
+    verb: GET
+    path: /guests/{subjectId}/consents
+    scope: venue
+    permission: GUEST_VIEW
+    offline: false
+    reads: 3
+    writes: 0
+  - operation: getGuestLoyalty
+    verb: GET
+    path: /guests/{subjectId}/loyalty
+    scope: venue
+    permission: GUEST_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: getGuestProfile
+    verb: GET
+    path: /guests/{subjectId}
+    scope: venue
+    permission: GUEST_VIEW
+    offline: false
+    reads: 5
+    writes: 0
+  - operation: getJourneyPerformance
+    verb: GET
+    path: /journeys/{journeyId}/performance
+    scope: venue
+    permission: MARKETING_VIEW
+    offline: false
+    reads: 4
+    writes: 0
+  - operation: getLostItemMatches
+    verb: GET
+    path: /lost-items/{itemId}/matches
+    scope: venue
+    permission: CASE_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: getLoyaltyPosition
+    verb: GET
+    path: /loyalty/position
+    scope: tenant
+    permission: null
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: getMessageStatus
+    verb: GET
+    path: /messages/{messageId}
+    scope: venue
+    permission: GUEST_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: getMyChallenges
+    verb: GET
+    path: /guests/me/challenges
+    scope: venue
+    permission: MARKETING_VIEW
+    offline: false
+    reads: 2
+    writes: 0
+  - operation: getSuppressionList
+    verb: GET
+    path: /consent/suppression-list
+    scope: tenant
+    permission: GUEST_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: getWaiverStatus
+    verb: GET
+    path: /guests/{subjectId}/waiver-status
+    scope: venue
+    permission: GUEST_VIEW
+    offline: true
+    reads: 4
+    writes: 0
+  - operation: getWishlist
+    verb: GET
+    path: /guests/{subjectId}/wishlist
+    scope: venue
+    permission: null
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: handoverToAgent
+    verb: POST
+    path: /conversations/{conversationId}/handover
+    scope: tenant
+    permission: null
+    offline: false
+    reads: 3
+    writes: 2
+  - operation: identifyGuest
+    verb: POST
+    path: /guests/identify
+    scope: venue
+    permission: GUEST_VIEW
+    offline: false
+    reads: 5
+    writes: 0
+  - operation: launchCampaign
+    verb: POST
+    path: /campaigns/{campaignId}/launch
+    scope: venue
+    permission: MARKETING_SEND
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: listCampaigns
+    verb: GET
+    path: /campaigns
+    scope: venue
+    permission: MARKETING_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listCases
+    verb: GET
+    path: /cases
+    scope: venue
+    permission: CASE_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listConsentPurposes
+    verb: GET
+    path: /consent-purposes
+    scope: tenant
+    permission: GUEST_VIEW
+    offline: true
+    reads: 2
+    writes: 1
+  - operation: listConversations
+    verb: GET
+    path: /conversations
+    scope: tenant
+    permission: CASE_VIEW
+    offline: false
+    reads: 2
+    writes: 0
+  - operation: listGuestDevices
+    verb: GET
+    path: /guests/{subjectId}/devices
+    scope: tenant
+    permission: null
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listJourneys
+    verb: GET
+    path: /journeys
+    scope: venue
+    permission: MARKETING_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listLostItems
+    verb: GET
+    path: /lost-items
+    scope: venue
+    permission: CASE_VIEW
+    offline: false
+    reads: 2
+    writes: 0
+  - operation: listLoyaltyProgrammes
+    verb: GET
+    path: /loyalty/programmes
+    scope: venue
+    permission: MARKETING_VIEW
+    offline: true
+    reads: 1
+    writes: 0
+  - operation: listMessageTemplates
+    verb: GET
+    path: /message-templates
+    scope: venue
+    permission: MARKETING_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listMessageTriggers
+    verb: GET
+    path: /message-triggers
+    scope: venue
+    permission: MARKETING_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listMyCases
+    verb: GET
+    path: /my/cases
+    scope: tenant
+    permission: null
+    offline: false
+    reads: 2
+    writes: 0
+  - operation: listReviews
+    verb: GET
+    path: /reviews
+    scope: venue
+    permission: MARKETING_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listSegmentMembers
+    verb: GET
+    path: /segments/{segmentId}/members
+    scope: venue
+    permission: MARKETING_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listSegments
+    verb: GET
+    path: /segments
+    scope: venue
+    permission: MARKETING_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: matchGuest
+    verb: POST
+    path: /guests/match
+    scope: venue
+    permission: GUEST_VIEW
+    offline: false
+    reads: 2
+    writes: 0
+  - operation: matchLostItem
+    verb: POST
+    path: /lost-items/{itemId}/match
+    scope: venue
+    permission: CASE_MANAGE
+    offline: false
+    reads: 2
+    writes: 3
+  - operation: mergeGuestProfiles
+    verb: POST
+    path: /guests/{subjectId}/merge
+    scope: venue
+    permission: GUEST_MANAGE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: mergeGuests
+    verb: POST
+    path: /guests/merge
+    scope: tenant
+    permission: GUEST_MANAGE
+    offline: false
+    reads: 4
+    writes: 3
+  - operation: pauseCampaign
+    verb: POST
+    path: /campaigns/{campaignId}/pause
+    scope: venue
+    permission: MARKETING_MANAGE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: previewSegment
+    verb: POST
+    path: /segments/{segmentId}/preview
+    scope: venue
+    permission: MARKETING_VIEW
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: raiseMyCase
+    verb: POST
+    path: /my/cases
+    scope: tenant
+    permission: null
+    offline: true
+    reads: 2
+    writes: 2
+  - operation: recordConsent
+    verb: POST
+    path: /guests/{subjectId}/consents
+    scope: venue
+    permission: null
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: recordLostItem
+    verb: POST
+    path: /lost-items
+    scope: venue
+    permission: CASE_MANAGE
+    offline: true
+    reads: 4
+    writes: 2
+  - operation: recordPrivacyIncident
+    verb: POST
+    path: /privacy-incidents
+    scope: tenant
+    permission: GUEST_MANAGE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: recordTouchPoint
+    verb: POST
+    path: /attribution/touches
+    scope: venue
+    permission: MARKETING_MANAGE
+    offline: false
+    reads: 3
+    writes: 2
+  - operation: redeemLoyaltyPoints
+    verb: POST
+    path: /loyalty/redemptions
+    scope: venue
+    permission: LOYALTY_REDEEM
+    offline: false
+    reads: 3
+    writes: 3
+  - operation: registerGuestDevice
+    verb: POST
+    path: /guests/{subjectId}/devices
+    scope: tenant
+    permission: null
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: removeFromWishlist
+    verb: DELETE
+    path: /guests/{subjectId}/wishlist/{itemId}
+    scope: venue
+    permission: null
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: reopenCase
+    verb: POST
+    path: /cases/{caseId}/reopen
+    scope: venue
+    permission: CASE_MANAGE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: replyToMyCase
+    verb: POST
+    path: /my/cases/{caseId}/messages
+    scope: tenant
+    permission: null
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: respondToInvitation
+    verb: POST
+    path: /invitations/{token}/respond
+    scope: venue
+    permission: GUEST_VIEW
+    offline: false
+    reads: 3
+    writes: 2
+  - operation: respondToReview
+    verb: POST
+    path: /reviews/{reviewId}/respond
+    scope: venue
+    permission: MARKETING_MANAGE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: retryMessageDispatch
+    verb: POST
+    path: /message-dispatches/{dispatchId}/retry
+    scope: venue
+    permission: MARKETING_SEND
+    offline: false
+    reads: 4
+    writes: 2
+  - operation: revokeGuestDevice
+    verb: DELETE
+    path: /guests/{subjectId}/devices/{deviceId}
+    scope: tenant
+    permission: null
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: searchGuests
+    verb: GET
+    path: /guests
+    scope: venue
+    permission: GUEST_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: sendConversationMessage
+    verb: POST
+    path: /conversations/{conversationId}/messages
+    scope: tenant
+    permission: CASE_MANAGE
+    offline: false
+    reads: 2
+    writes: 3
+  - operation: sendTransactionalMessage
+    verb: POST
+    path: /messages
+    scope: venue
+    permission: null
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: setAgentAvailability
+    verb: PUT
+    path: /agent-availability
+    scope: tenant
+    permission: CASE_MANAGE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: setCallDisposition
+    verb: POST
+    path: /conversations/{conversationId}/disposition
+    scope: venue
+    permission: CASE_MANAGE
+    offline: false
+    reads: 3
+    writes: 3
+  - operation: setConsentPurposes
+    verb: PUT
+    path: /consent-purposes
+    scope: tenant
+    permission: GUEST_MANAGE
+    offline: false
+    reads: 2
+    writes: 3
+  - operation: setMessageTrigger
+    verb: POST
+    path: /message-triggers
+    scope: venue
+    permission: MARKETING_MANAGE
+    offline: false
+    reads: 3
+    writes: 2
+  - operation: setSeoMetadata
+    verb: PUT
+    path: /seo-metadata
+    scope: tenant
+    permission: MARKETING_MANAGE
+    offline: false
+    reads: 2
+    writes: 3
+  - operation: startKioskAssist
+    verb: POST
+    path: /kiosk-assists
+    scope: venue
+    permission: CASE_MANAGE
+    offline: false
+    reads: 3
+    writes: 2
+  - operation: stopCampaign
+    verb: POST
+    path: /campaigns/{campaignId}/stop
+    scope: venue
+    permission: MARKETING_SEND
+    offline: false
+    reads: 3
+    writes: 3
+  - operation: submitForm
+    verb: POST
+    path: /form-submissions
+    scope: venue
+    permission: GUEST_VIEW
+    offline: true
+    reads: 4
+    writes: 3
+  - operation: submitReview
+    verb: POST
+    path: /reviews
+    scope: venue
+    permission: null
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: testSendCampaign
+    verb: POST
+    path: /campaigns/{campaignId}/test-send
+    scope: venue
+    permission: MARKETING_MANAGE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: transferConversation
+    verb: POST
+    path: /conversations/{conversationId}/transfer
+    scope: tenant
+    permission: CASE_MANAGE
+    offline: false
+    reads: 3
+    writes: 2
+  - operation: unscheduleCampaign
+    verb: POST
+    path: /campaigns/{campaignId}/unschedule
+    scope: venue
+    permission: MARKETING_MANAGE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: updateCampaign
+    verb: PATCH
+    path: /campaigns/{campaignId}
+    scope: venue
+    permission: MARKETING_MANAGE
+    offline: false
+    reads: 3
+    writes: 3
+  - operation: updateCase
+    verb: PATCH
+    path: /cases/{caseId}
+    scope: venue
+    permission: CASE_MANAGE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: updateGuestPreferences
+    verb: PUT
+    path: /guests/{subjectId}/preferences
+    scope: tenant
+    permission: GUEST_MANAGE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: updateGuestProfile
+    verb: PATCH
+    path: /guests/{subjectId}
+    scope: venue
+    permission: GUEST_MANAGE
+    offline: false
+    reads: 3
+    writes: 3
+  - operation: updateMyProfile
+    verb: PATCH
+    path: /guests/me/profile
+    scope: venue
+    permission: GUEST_VIEW
+    offline: false
+    reads: 2
+    writes: 3
+  - operation: uploadGuestDocument
+    verb: POST
+    path: /guest-documents
+    scope: venue
+    permission: GUEST_VIEW_PII
+    offline: false
+    reads: 3
+    writes: 2
+tables:
+- store: cache:idempotency
+  kind: cache
+  columns: 5
+  backing: redis
+  owned: false
+  why: '**Not a table and not owned by a service.** Derived from something already read, invalidated
+    by an event already consumed, losable without consequence — no migration, no backup, no owner.'
+- store: cache:resolution
+  kind: cache
+  columns: 4
+  backing: redis
+  owned: false
+  why: '**Not a table and not owned by a service.** Derived from something already read, invalidated
+    by an event already consumed, losable without consequence — no migration, no backup, no owner.'
+- table: marketing.agent_availability
+  columns: 1
+  store: postgres
+  parent: identity.principal
+  writtenBy:
+  - marketing-crm
+  foreignWriters: null
+- table: marketing.attribution_touch
+  columns: 8
+  store: postgres
+  parent: null
+  writtenBy: []
+  foreignWriters: null
+- table: marketing.campaign
+  columns: 17
+  store: postgres
+  parent: null
+  writtenBy:
+  - marketing-crm
+  foreignWriters: null
+- table: marketing.case
+  columns: 17
+  store: postgres
+  parent: null
+  writtenBy:
+  - marketing-crm
+  foreignWriters: null
+- table: marketing.case_message
+  columns: 9
+  store: postgres
+  parent: marketing.case
+  writtenBy:
+  - marketing-crm
+  foreignWriters: null
+- table: marketing.challenge
+  columns: 12
+  store: postgres
+  parent: null
+  writtenBy:
+  - marketing-crm
+  foreignWriters: null
+- table: marketing.challenge_progress
+  columns: 9
+  store: postgres
+  parent: marketing.challenge
+  writtenBy: []
+  foreignWriters: null
+- table: marketing.consent_purpose
+  columns: 7
+  store: postgres
+  parent: null
+  writtenBy:
+  - marketing-crm
+  foreignWriters: null
+- table: marketing.consent_record
+  columns: 10
+  store: postgres
+  parent: null
+  writtenBy:
+  - access
+  - marketing-crm
+  - orders
+  foreignWriters:
+  - access
+  - orders
+- table: marketing.conversation
+  columns: 21
+  store: postgres
+  parent: null
+  writtenBy:
+  - marketing-crm
+  foreignWriters: null
+- table: marketing.conversation_message
+  columns: 8
+  store: postgres
+  parent: marketing.conversation
+  writtenBy:
+  - marketing-crm
+  foreignWriters: null
+- table: marketing.form_definition
+  columns: 14
+  store: postgres
+  parent: null
+  writtenBy:
+  - marketing-crm
+  foreignWriters: null
+- table: marketing.form_submission
+  columns: 11
+  store: postgres
+  parent: null
+  writtenBy:
+  - marketing-crm
+  foreignWriters: null
+- table: marketing.guest_device
+  columns: 13
+  store: postgres
+  parent: null
+  writtenBy:
+  - marketing-crm
+  foreignWriters: null
+- table: marketing.guest_document
+  columns: 9
+  store: postgres
+  parent: null
+  writtenBy:
+  - marketing-crm
+  foreignWriters: null
+- table: marketing.guest_profile
+  columns: 16
+  store: postgres
+  parent: null
+  writtenBy:
+  - marketing-crm
+  foreignWriters: null
+- table: marketing.invitation
+  columns: 12
+  store: postgres
+  parent: null
+  writtenBy:
+  - marketing-crm
+  foreignWriters: null
+- table: marketing.invitation_campaign
+  columns: 10
+  store: postgres
+  parent: null
+  writtenBy:
+  - marketing-crm
+  foreignWriters: null
+- table: marketing.journey
+  columns: 8
+  store: postgres
+  parent: null
+  writtenBy:
+  - marketing-crm
+  foreignWriters: null
+- table: marketing.journey_entrant
+  columns: 0
+  store: postgres
+  parent: null
+  writtenBy: []
+  foreignWriters: null
+- table: marketing.kiosk_assist_session
+  columns: 10
+  store: postgres
+  parent: null
+  writtenBy:
+  - marketing-crm
+  foreignWriters: null
+- table: marketing.lost_item
+  columns: 14
+  store: postgres
+  parent: null
+  writtenBy:
+  - marketing-crm
+  foreignWriters: null
+- table: marketing.loyalty_position
+  columns: 9
+  store: postgres
+  parent: pii.subject
+  writtenBy:
+  - marketing-crm
+  foreignWriters: null
+- table: marketing.loyalty_programme
+  columns: 7
+  store: postgres
+  parent: null
+  writtenBy:
+  - marketing-crm
+  foreignWriters: null
+- table: marketing.loyalty_tier
+  columns: 5
+  store: postgres
+  parent: marketing.loyalty_programme
+  writtenBy: []
+  foreignWriters: null
+- table: marketing.message_delivery
+  columns: 1
+  store: postgres
+  parent: marketing.campaign
+  writtenBy: []
+  foreignWriters: null
+- table: marketing.message_dispatch
+  columns: 10
+  store: postgres
+  parent: null
+  writtenBy:
+  - fnb
+  - identity
+  - marketing-crm
+  - orders
+  - public-api
+  - workforce
+  foreignWriters:
+  - fnb
+  - identity
+  - orders
+  - public-api
+  - workforce
+- table: marketing.message_template
+  columns: 10
+  store: postgres
+  parent: null
+  writtenBy:
+  - marketing-crm
+  foreignWriters: null
+- table: marketing.message_trigger
+  columns: 7
+  store: postgres
+  parent: null
+  writtenBy:
+  - marketing-crm
+  foreignWriters: null
+- table: marketing.privacy_incident
+  columns: 11
+  store: postgres
+  parent: null
+  writtenBy:
+  - marketing-crm
+  foreignWriters: null
+- table: marketing.referral
+  columns: 9
+  store: postgres
+  parent: null
+  writtenBy:
+  - marketing-crm
+  foreignWriters: null
+- table: marketing.review
+  columns: 13
+  store: postgres
+  parent: null
+  writtenBy:
+  - marketing-crm
+  foreignWriters: null
+- table: marketing.segment
+  columns: 10
+  store: postgres
+  parent: null
+  writtenBy:
+  - marketing-crm
+  foreignWriters: null
+- table: marketing.segment_criterion
+  columns: 5
+  store: postgres
+  parent: marketing.segment
+  writtenBy:
+  - marketing-crm
+  foreignWriters: null
+- table: marketing.suppression
+  columns: 6
+  store: postgres
+  parent: null
+  writtenBy:
+  - marketing-crm
+  foreignWriters: null
+- table: marketing.touch_point
+  columns: 8
+  store: postgres
+  parent: null
+  writtenBy:
+  - marketing-crm
+  foreignWriters: null
+- table: marketing.wishlist_item
+  columns: 12
+  store: postgres
+  parent: pii.subject
+  writtenBy:
+  - marketing-crm
+  foreignWriters: null
+readsFrom:
+- service: IdentityService
+  operations: 15
+- service: CatalogueService
+  operations: 7
+- service: AccessService
+  operations: 3
+- service: OrderService
+  operations: 2
+- service: VenueOpsService
+  operations: 2
+- service: TenancyService
+  operations: 1
+writesOutside:
+- service: IdentityService
+  operations: 2
+  why: '**The owner defines the row; this service may only append to it.**'
+- service: ControlService
+  operations: 2
+  why: '**The owner defines the row; this service may only append to it.**'
+- service: OrderService
+  operations: 1
+  why: '**The owner defines the row; this service may only append to it.**'
+screens:
+- P01:WEB-009 Wishlist
+- P01:WEB-011 Guest Details & Attendee Forms
+- P01:WEB-017 My Account Dashboard
+- P01:WEB-020 Profile & Preferences
+- P01:WEB-024 Loyalty & Rewards
+- P01:WEB-026 Survey & Feedback
+- P01:WEB-027 Newsletter Subscription
+- P01:WEB-034 Lost & Found
+- P01:WEB-043 Loyalty & Rewards
+- P01:WEB-044 AI Concierge
+- P02:GST-001 Home – Default
+- P02:GST-020 Saved Items / Wishlist
+- P02:GST-032 AI Concierge – Chat
+- P02:GST-034 Lost & Found
+- P02:GST-035 Feedback & Ratings
+- P02:GST-036 Loyalty & Rewards
+- P02:GST-039 Profile
+- P02:GST-040 Help & Support
+- P02:GST-065 Newsletter & Preferences
+- P04:POS-002 Sell — Ticket Catalogue
+- P04:POS-005 Payment
+- P05:KSK-013 Call staff
+- P05:KSK-015 Assistant
+- P06:EMP-028 Lost & found
+- P06:EMP-029 Guest assistance
+- P06:EMP-057 Guest Profile & Dining History
+- P08:BO-005 Queue Monitor
+- P08:BO-036 Device Registry
+- P08:BO-073 Lost & Found Register
+- P08:BO-118 Campaign & Audience Management
+- P08:BO-120 Omnichannel Commerce & Journey Configuration
+- P08:BO-121 Personalized Offers & Guest Engagement
+- P10:PTR-004 Notifications
+- P10:PTR-021 Support & Contact
+- P12:SUP-002 Agent Dashboard
+- P12:SUP-003 Availability & Routing Settings
+- P12:SUP-004 Conversation Queue
+- P12:SUP-005 Live Chat Workspace
+- P12:SUP-007 Canned Response Management
+- P12:SUP-008 Agent Performance & SLA View
+- P13:CMS-018 Consent & Legal
+- P16:ANL-007 Guest & Conversion Intelligence
+flows:
+- F01 Guest buys a ticket online
+- F02 Guest buys seated tickets
+- F05 Agent resolves a guest complaint
+- F09 Event is cancelled and refunded
+- F24 A guest asks the assistant and ends up with a person
+- F34 A retail sale, from scan to return
+- F53 A guest earns, sees and spends loyalty
+- F54 Something goes wrong in the venue
+- F55 A guest buys on the web and transfers to a friend
+- F56 A guest registers, verifies and sets preferences
+- F57 A guest uses a kiosk and it fails
+- F58 A ticket is sold at a till, added to, and refunded
+- F70 A guest needs help and something is lost
+- F75 A kiosk serves itself and calls for help
+- F79 A workstation is registered, configured and rolled out
+- F82 A month is analysed from incrementality to a scheduled report
+- F86 A POS layout is designed, previewed and deployed
+- F95 A fleet is watched, a fault is found, and a station is fixed

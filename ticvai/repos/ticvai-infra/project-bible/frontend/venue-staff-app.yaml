@@ -1,0 +1,355 @@
+# venue-staff-app — operated by venue · staff on mobileApp
+# Serves: P06 Venue Staff App — Operations
+# Derived by tools/derive-frontend.py from screens/*.yaml. Do not hand-edit.
+
+app: venue-staff-app
+operator: venue
+audience: staff
+formFactor: mobileApp
+status: scaffolded
+runtime: reactNative
+offlineCapable: true
+directions:
+- ltr
+- rtl
+platforms:
+- P06 Venue Staff App — Operations
+servesMultiplePlatforms: false
+packages:
+- design-tokens
+- ui
+- api-client
+- offline-core
+contracts:
+- access
+- ai
+- assets
+- catalogue
+- fnb
+- identity
+- inventory
+- maintenance
+- marketing-crm
+- orders
+- queue
+- reporting
+- retail
+- shift
+- tenancy
+- venue-map
+- workforce
+deployment:
+  target: iOS / Android native
+  distribution: MDM, not a public store
+  bundleUpdate: on launch
+  hosting: in-cell
+  storeReview: false
+  deviceOwnership: venue-owned or BYOD
+  networkAssumption: venue wifi, dead zones expected
+  releaseCadence: fortnightly
+screenCount: 50
+byWave:
+  wave1: 29
+  wave2: 20
+  wave3: 1
+screens:
+- id: EMP-001
+  name: Sign in
+  route: /operations/sign-in
+  component: apps/venue-staff-app/src/routes/operations/SignInDetail.tsx
+  wave: 1
+  status: notStarted
+- id: EMP-002
+  name: Select venue & role
+  route: /operations/select-venue-role
+  component: apps/venue-staff-app/src/routes/operations/SelectVenueRoleDetail.tsx
+  wave: 1
+  status: notStarted
+- id: EMP-003
+  name: Home — on duty
+  route: /operations/home-on-duty
+  component: apps/venue-staff-app/src/routes/operations/HomeOnDutyDetail.tsx
+  wave: 1
+  status: notStarted
+- id: EMP-004
+  name: Task list
+  route: /operations/task-list
+  component: apps/venue-staff-app/src/routes/operations/TaskListDetail.tsx
+  wave: 1
+  status: notStarted
+- id: EMP-005
+  name: Task detail
+  route: /operations/task-detail
+  component: apps/venue-staff-app/src/routes/operations/TaskDetailDetail.tsx
+  wave: 1
+  status: notStarted
+- id: EMP-006
+  name: Raise a task
+  route: /operations/raise-a-task
+  component: apps/venue-staff-app/src/routes/operations/RaiseATaskDetail.tsx
+  wave: 1
+  status: notStarted
+- id: EMP-009
+  name: End shift
+  route: /operations/end-shift
+  component: apps/venue-staff-app/src/routes/operations/EndShiftDetail.tsx
+  wave: 1
+  status: notStarted
+- id: EMP-010
+  name: Scan — ready
+  route: /operations/scan-ready
+  component: apps/venue-staff-app/src/routes/operations/ScanReadyDetail.tsx
+  wave: 1
+  status: notStarted
+- id: EMP-011
+  name: Scan — admitted
+  route: /operations/scan-admitted
+  component: apps/venue-staff-app/src/routes/operations/ScanAdmittedDetail.tsx
+  wave: 1
+  status: notStarted
+- id: EMP-012
+  name: Scan — denied
+  route: /operations/scan-denied
+  component: apps/venue-staff-app/src/routes/operations/ScanDeniedDetail.tsx
+  wave: 1
+  status: notStarted
+- id: EMP-013
+  name: Override
+  route: /operations/override
+  component: apps/venue-staff-app/src/routes/operations/OverrideDetail.tsx
+  wave: 1
+  status: notStarted
+- id: EMP-014
+  name: Ticket lookup
+  route: /operations/ticket-lookup
+  component: apps/venue-staff-app/src/routes/operations/TicketLookupDetail.tsx
+  wave: 1
+  status: notStarted
+- id: EMP-016
+  name: Offline scanning
+  route: /operations/offline-scanning
+  component: apps/venue-staff-app/src/routes/operations/OfflineScanningDetail.tsx
+  wave: 1
+  status: notStarted
+- id: EMP-017
+  name: Sync & reconciliation
+  route: /operations/sync-reconciliation
+  component: apps/venue-staff-app/src/routes/operations/SyncReconciliationDetail.tsx
+  wave: 1
+  status: notStarted
+- id: EMP-018
+  name: Offline package
+  route: /operations/offline-package
+  component: apps/venue-staff-app/src/routes/operations/OfflinePackageDetail.tsx
+  wave: 1
+  status: notStarted
+- id: EMP-019
+  name: AI assistant — home
+  route: /operations/ai-assistant-home
+  component: apps/venue-staff-app/src/routes/operations/AiAssistantHomeDetail.tsx
+  wave: 1
+  status: notStarted
+- id: EMP-020
+  name: AI assistant — answer
+  route: /operations/ai-assistant-answer
+  component: apps/venue-staff-app/src/routes/operations/AiAssistantAnswerDetail.tsx
+  wave: 1
+  status: notStarted
+- id: EMP-021
+  name: Roster
+  route: /operations/roster
+  component: apps/venue-staff-app/src/routes/operations/RosterDetail.tsx
+  wave: 1
+  status: notStarted
+- id: EMP-022
+  name: My rota
+  route: /operations/my-rota
+  component: apps/venue-staff-app/src/routes/operations/MyRotaDetail.tsx
+  wave: 1
+  status: notStarted
+- id: EMP-024
+  name: Clock in / out
+  route: /operations/clock-in-out
+  component: apps/venue-staff-app/src/routes/operations/ClockInOutDetail.tsx
+  wave: 1
+  status: notStarted
+- id: EMP-026
+  name: Incident report
+  route: /operations/incident-report
+  component: apps/venue-staff-app/src/routes/operations/IncidentReportDetail.tsx
+  wave: 1
+  status: notStarted
+- id: EMP-037
+  name: Notifications
+  route: /operations/notifications
+  component: apps/venue-staff-app/src/routes/operations/NotificationsDetail.tsx
+  wave: 1
+  status: notStarted
+- id: EMP-042
+  name: Profile
+  route: /operations/profile
+  component: apps/venue-staff-app/src/routes/operations/ProfileDetail.tsx
+  wave: 1
+  status: notStarted
+- id: EMP-043
+  name: Device settings
+  route: /operations/device-settings
+  component: apps/venue-staff-app/src/routes/operations/DeviceSettingsDetail.tsx
+  wave: 1
+  status: notStarted
+- id: EMP-045
+  name: Arabic / RTL
+  route: /operations/arabic-rtl
+  component: apps/venue-staff-app/src/routes/operations/ArabicRtlDetail.tsx
+  wave: 1
+  status: notStarted
+- id: EMP-046
+  name: Sign out
+  route: /operations/sign-out
+  component: apps/venue-staff-app/src/routes/operations/SignOutDetail.tsx
+  wave: 1
+  status: notStarted
+- id: EMP-047
+  name: Emergency mode
+  route: /operations/emergency-mode
+  component: apps/venue-staff-app/src/routes/operations/EmergencyModeDetail.tsx
+  wave: 1
+  status: notStarted
+- id: EMP-048
+  name: Opening checklist
+  route: /operations/opening-checklist
+  component: apps/venue-staff-app/src/routes/operations/OpeningChecklistDetail.tsx
+  wave: 1
+  status: notStarted
+- id: EMP-049
+  name: Hand over the journal
+  route: /operations/hand-over-the-journal
+  component: apps/venue-staff-app/src/routes/operations/HandOverTheJournalDetail.tsx
+  wave: 1
+  status: notStarted
+- id: EMP-007
+  name: Handover notes
+  route: /operations/handover-notes
+  component: apps/venue-staff-app/src/routes/operations/HandoverNotesDetail.tsx
+  wave: 2
+  status: notStarted
+- id: EMP-008
+  name: Shift summary
+  route: /operations/shift-summary
+  component: apps/venue-staff-app/src/routes/operations/ShiftSummaryDetail.tsx
+  wave: 2
+  status: notStarted
+- id: EMP-015
+  name: Group scan
+  route: /operations/group-scan
+  component: apps/venue-staff-app/src/routes/operations/GroupScanDetail.tsx
+  wave: 2
+  status: notStarted
+- id: EMP-023
+  name: Swap request
+  route: /operations/swap-request
+  component: apps/venue-staff-app/src/routes/operations/SwapRequestDetail.tsx
+  wave: 2
+  status: notStarted
+- id: EMP-025
+  name: Break management
+  route: /operations/break-management
+  component: apps/venue-staff-app/src/routes/operations/BreakManagementDetail.tsx
+  wave: 2
+  status: notStarted
+- id: EMP-027
+  name: Incident detail
+  route: /operations/incident-detail
+  component: apps/venue-staff-app/src/routes/operations/IncidentDetailDetail.tsx
+  wave: 2
+  status: notStarted
+- id: EMP-028
+  name: Lost & found
+  route: /operations/lost-found
+  component: apps/venue-staff-app/src/routes/operations/LostFoundDetail.tsx
+  wave: 2
+  status: notStarted
+- id: EMP-029
+  name: Guest assistance
+  route: /operations/guest-assistance
+  component: apps/venue-staff-app/src/routes/operations/GuestAssistanceDetail.tsx
+  wave: 2
+  status: notStarted
+- id: EMP-030
+  name: Venue map
+  route: /operations/venue-map
+  component: apps/venue-staff-app/src/routes/operations/VenueMapDetail.tsx
+  wave: 2
+  status: notStarted
+- id: EMP-031
+  name: Queue monitor
+  route: /operations/queue-monitor
+  component: apps/venue-staff-app/src/routes/operations/QueueMonitorDetail.tsx
+  wave: 2
+  status: notStarted
+- id: EMP-032
+  name: Manual wait entry
+  route: /operations/manual-wait-entry
+  component: apps/venue-staff-app/src/routes/operations/ManualWaitEntryDetail.tsx
+  wave: 2
+  status: notStarted
+- id: EMP-033
+  name: Capacity view
+  route: /operations/capacity-view
+  component: apps/venue-staff-app/src/routes/operations/CapacityViewDetail.tsx
+  wave: 2
+  status: notStarted
+- id: EMP-034
+  name: Walk-up sale
+  route: /operations/walk-up-sale
+  component: apps/venue-staff-app/src/routes/operations/WalkUpSaleDetail.tsx
+  wave: 2
+  status: notStarted
+- id: EMP-035
+  name: Payment on device
+  route: /operations/payment-on-device
+  component: apps/venue-staff-app/src/routes/operations/PaymentOnDeviceDetail.tsx
+  wave: 2
+  status: notStarted
+- id: EMP-036
+  name: Issue media
+  route: /operations/issue-media
+  component: apps/venue-staff-app/src/routes/operations/IssueMediaDetail.tsx
+  wave: 2
+  status: notStarted
+- id: EMP-038
+  name: Broadcast to team
+  route: /operations/broadcast-to-team
+  component: apps/venue-staff-app/src/routes/operations/BroadcastToTeamDetail.tsx
+  wave: 2
+  status: notStarted
+- id: EMP-039
+  name: Announcements
+  route: /operations/announcements
+  component: apps/venue-staff-app/src/routes/operations/AnnouncementsDetail.tsx
+  wave: 2
+  status: notStarted
+- id: EMP-040
+  name: Knowledge base
+  route: /operations/knowledge-base
+  component: apps/venue-staff-app/src/routes/operations/KnowledgeBaseDetail.tsx
+  wave: 2
+  status: notStarted
+- id: EMP-044
+  name: Accessibility
+  route: /operations/accessibility
+  component: apps/venue-staff-app/src/routes/operations/AccessibilityDetail.tsx
+  wave: 2
+  status: notStarted
+- id: EMP-050
+  name: Post-incident restore
+  route: /operations/post-incident-restore
+  component: apps/venue-staff-app/src/routes/operations/PostIncidentRestoreDetail.tsx
+  wave: 2
+  status: notStarted
+- id: EMP-041
+  name: Training
+  route: /operations/training
+  component: apps/venue-staff-app/src/routes/operations/TrainingDetail.tsx
+  wave: 3
+  status: notStarted

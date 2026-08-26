@@ -1,0 +1,1130 @@
+id: LLD-FnbService
+title: FnbService — 96 operations, 34 tables
+generatedBy: tools/derive-diagrams.py
+tier: operations
+index: diagrams/hld/02-services.yaml
+why: '**96 operations and 34 tables — the largest single domain after marketing.** Its own service because
+  a kitchen pass has a latency profile nothing else shares: a bump must land in under a second on a
+  display that may be offline.'
+scale: Write-heavy during service, idle between. **Two peaks a day, sharply.**
+ifDown: Down means the kitchen falls back to paper. Offline-capable by design.
+coverage:
+  operations: 96
+  inAFlow: 70
+  percent: 73%
+  note: '**Flow coverage is how much of this service a journey has walked.** A service under 40% is
+    unwalked rather than under-documented.'
+schemas:
+- schema: fnb
+  tables: 34
+  stores:
+  - postgres
+  largestTable: fnb.kitchen_ticket
+operationsByContract:
+- contract: fnb
+  count: 96
+  operations:
+  - operation: acceptFnbOrder
+    verb: POST
+    path: /fnb-orders/{orderId}/accept
+    scope: venue
+    permission: ORDER_MODIFY
+    offline: true
+    reads: 2
+    writes: 2
+  - operation: amendFnbOrder
+    verb: PATCH
+    path: /fnb-orders/{orderId}
+    scope: venue
+    permission: ORDER_MODIFY
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: applyMenuActions
+    verb: POST
+    path: /menus/{menuId}/actions
+    scope: venue
+    permission: PRODUCT_CONFIGURE
+    offline: false
+    reads: 4
+    writes: 4
+  - operation: attachModifierGroup
+    verb: PUT
+    path: /menu-items/{menuItemId}/modifier-groups
+    scope: venue
+    permission: PRODUCT_CONFIGURE
+    offline: false
+    reads: 3
+    writes: 3
+  - operation: buildProductionPlan
+    verb: POST
+    path: /production-plans
+    scope: venue
+    permission: PRODUCT_CONFIGURE
+    offline: false
+    reads: 4
+    writes: 2
+  - operation: cancelFnbOrder
+    verb: POST
+    path: /fnb-orders/{orderId}/cancel
+    scope: venue
+    permission: ORDER_MODIFY
+    offline: true
+    reads: 2
+    writes: 2
+  - operation: chaseStation
+    verb: POST
+    path: /kitchen-stations/{stationId}/chase
+    scope: venue
+    permission: ORDER_MODIFY
+    offline: true
+    reads: 3
+    writes: 2
+  - operation: claimLocationSession
+    verb: POST
+    path: /location-sessions
+    scope: venue
+    permission: null
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: claimTableSession
+    verb: POST
+    path: /table-sessions
+    scope: venue
+    permission: null
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: clearTable
+    verb: POST
+    path: /tables/{tableId}/clear
+    scope: venue
+    permission: ORDER_MODIFY
+    offline: true
+    reads: 2
+    writes: 2
+  - operation: closeTableVisit
+    verb: POST
+    path: /table-visits/{visitId}/close
+    scope: workstation
+    permission: ORDER_CREATE
+    offline: false
+    reads: 3
+    writes: 3
+  - operation: compItem
+    verb: POST
+    path: /table-visits/{visitId}/comp
+    scope: venue
+    permission: ORDER_MODIFY
+    offline: true
+    reads: 3
+    writes: 3
+  - operation: completeProductionRun
+    verb: POST
+    path: /production-runs/{runId}/complete
+    scope: venue
+    permission: FNB_MANAGE
+    offline: true
+    reads: 3
+    writes: 3
+  - operation: createCombo
+    verb: POST
+    path: /combos
+    scope: venue
+    permission: PRODUCT_CONFIGURE
+    offline: false
+    reads: 3
+    writes: 3
+  - operation: createFnbOrder
+    verb: POST
+    path: /fnb-orders
+    scope: workstation
+    permission: ORDER_CREATE
+    offline: true
+    reads: 2
+    writes: 2
+  - operation: createGuestFnbOrder
+    verb: POST
+    path: /guest-orders
+    scope: venue
+    permission: null
+    offline: false
+    reads: 4
+    writes: 3
+  - operation: createMenu
+    verb: POST
+    path: /menus
+    scope: venue
+    permission: PRODUCT_CONFIGURE
+    offline: false
+    reads: 4
+    writes: 4
+  - operation: createModifierGroup
+    verb: POST
+    path: /modifier-groups
+    scope: venue
+    permission: PRODUCT_CONFIGURE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: createTable
+    verb: POST
+    path: /tables
+    scope: venue
+    permission: PRODUCT_CONFIGURE
+    offline: false
+    reads: 1
+    writes: 3
+  - operation: createTableReservation
+    verb: POST
+    path: /table-reservations
+    scope: venue
+    permission: null
+    offline: false
+    reads: 3
+    writes: 2
+  - operation: enterCountLine
+    verb: POST
+    path: /stock-counts/{countId}/lines
+    scope: venue
+    permission: PRODUCT_CONFIGURE
+    offline: true
+    reads: 3
+    writes: 1
+  - operation: fireCourse
+    verb: POST
+    path: /kitchen-tickets/{ticketId}/fire
+    scope: venue
+    permission: ORDER_MODIFY
+    offline: true
+    reads: 2
+    writes: 2
+  - operation: getBill
+    verb: GET
+    path: /table-visits/{visitId}/bill
+    scope: venue
+    permission: ORDER_VIEW
+    offline: true
+    reads: 3
+    writes: 0
+  - operation: getFnbOrder
+    verb: GET
+    path: /fnb-orders/{orderId}
+    scope: venue
+    permission: ORDER_VIEW
+    offline: true
+    reads: 1
+    writes: 0
+  - operation: getGuestBill
+    verb: GET
+    path: /table-sessions/{sessionId}/bill
+    scope: venue
+    permission: null
+    offline: false
+    reads: 3
+    writes: 0
+  - operation: getGuestMenu
+    verb: GET
+    path: /outlets/{outletId}/guest-menu
+    scope: venue
+    permission: null
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: getGuestOrderStatus
+    verb: GET
+    path: /guest-orders/{orderId}
+    scope: venue
+    permission: null
+    offline: false
+    reads: 3
+    writes: 0
+  - operation: getHaccpStatus
+    verb: GET
+    path: /food-safety/status
+    scope: venue
+    permission: INCIDENT_VIEW
+    offline: true
+    reads: 3
+    writes: 0
+  - operation: getMenu
+    verb: GET
+    path: /menus/{menuId}
+    scope: venue
+    permission: PRODUCT_VIEW
+    offline: false
+    reads: 3
+    writes: 0
+  - operation: getProductionRun
+    verb: GET
+    path: /production-runs/{runId}
+    scope: venue
+    permission: PRODUCT_VIEW
+    offline: true
+    reads: 3
+    writes: 0
+  - operation: getTableMap
+    verb: GET
+    path: /outlets/{outletId}/tables
+    scope: venue
+    permission: ORDER_VIEW
+    offline: true
+    reads: 1
+    writes: 0
+  - operation: getTableVisit
+    verb: GET
+    path: /table-visits/{visitId}
+    scope: venue
+    permission: ORDER_VIEW
+    offline: true
+    reads: 2
+    writes: 0
+  - operation: holdCourse
+    verb: POST
+    path: /kitchen-tickets/{ticketId}/hold
+    scope: venue
+    permission: ORDER_MODIFY
+    offline: true
+    reads: 2
+    writes: 2
+  - operation: joinRestaurantWaitlist
+    verb: POST
+    path: /waitlist
+    scope: venue
+    permission: FNB_SERVE
+    offline: true
+    reads: 3
+    writes: 2
+  - operation: list86Events
+    verb: GET
+    path: /outlets/{outletId}/86-events
+    scope: venue
+    permission: PRODUCT_VIEW
+    offline: true
+    reads: 2
+    writes: 0
+  - operation: listDeliveryLocations
+    verb: GET
+    path: /venues/{venueId}/delivery-locations
+    scope: venue
+    permission: null
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listDiningOutlets
+    verb: GET
+    path: /venues/{venueId}/dining
+    scope: venue
+    permission: null
+    offline: false
+    reads: 3
+    writes: 0
+  - operation: listFnbOrders
+    verb: GET
+    path: /fnb-orders
+    scope: venue
+    permission: ORDER_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listKitchenStations
+    verb: GET
+    path: /kitchen/stations
+    scope: venue
+    permission: PRODUCT_VIEW
+    offline: true
+    reads: 1
+    writes: 0
+  - operation: listKitchenTickets
+    verb: GET
+    path: /kitchen/tickets
+    scope: venue
+    permission: ORDER_VIEW
+    offline: true
+    reads: 1
+    writes: 0
+  - operation: listMenus
+    verb: GET
+    path: /menus
+    scope: venue
+    permission: PRODUCT_VIEW
+    offline: false
+    reads: 2
+    writes: 0
+  - operation: listModifierGroups
+    verb: GET
+    path: /modifier-groups
+    scope: venue
+    permission: PRODUCT_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listProductionRuns
+    verb: GET
+    path: /production-runs
+    scope: venue
+    permission: PRODUCT_VIEW
+    offline: true
+    reads: 3
+    writes: 0
+  - operation: listRecipes
+    verb: GET
+    path: /recipes
+    scope: venue
+    permission: PRODUCT_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listTableReservations
+    verb: GET
+    path: /table-reservations
+    scope: venue
+    permission: FNB_OPERATE
+    offline: true
+    reads: 2
+    writes: 0
+  - operation: logColdChain
+    verb: POST
+    path: /food-safety/cold-chain
+    scope: venue
+    permission: INCIDENT_REPORT
+    offline: true
+    reads: 3
+    writes: 3
+  - operation: logKitchenException
+    verb: POST
+    path: /kitchen-exceptions
+    scope: venue
+    permission: INCIDENT_REPORT
+    offline: true
+    reads: 2
+    writes: 2
+  - operation: logTemperature
+    verb: POST
+    path: /food-safety/temperature-logs
+    scope: venue
+    permission: INCIDENT_REPORT
+    offline: true
+    reads: 3
+    writes: 3
+  - operation: markOrderCollected
+    verb: POST
+    path: /orders/{orderId}/collected
+    scope: venue
+    permission: ORDER_MODIFY
+    offline: true
+    reads: 3
+    writes: 3
+  - operation: mergeTableVisits
+    verb: POST
+    path: /table-visits/{visitId}/merge
+    scope: venue
+    permission: ORDER_MODIFY
+    offline: false
+    reads: 3
+    writes: 3
+  - operation: moveTableVisit
+    verb: POST
+    path: /table-visits/{visitId}/move
+    scope: venue
+    permission: ORDER_MODIFY
+    offline: true
+    reads: 4
+    writes: 3
+  - operation: notifyServer
+    verb: POST
+    path: /table-visits/{visitId}/notify-server
+    scope: venue
+    permission: ORDER_MODIFY
+    offline: false
+    reads: 3
+    writes: 2
+  - operation: notifyWaitlistParty
+    verb: POST
+    path: /waitlist/{entryId}/notify
+    scope: venue
+    permission: ORDER_MODIFY
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: openTableVisit
+    verb: POST
+    path: /table-visits
+    scope: workstation
+    permission: ORDER_CREATE
+    offline: true
+    reads: 3
+    writes: 3
+  - operation: planProductionRun
+    verb: POST
+    path: /production-runs
+    scope: venue
+    permission: FNB_MANAGE
+    offline: false
+    reads: 4
+    writes: 2
+  - operation: printOrderLabel
+    verb: POST
+    path: /kitchen-tickets/{ticketId}/label
+    scope: venue
+    permission: ORDER_VIEW
+    offline: true
+    reads: 1
+    writes: 0
+  - operation: prioritiseKitchenTicket
+    verb: POST
+    path: /kitchen/tickets/{ticketId}/prioritise
+    scope: venue
+    permission: ORDER_MODIFY
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: publishMenu
+    verb: POST
+    path: /menus/{menuId}/publish
+    scope: venue
+    permission: PRODUCT_CONFIGURE
+    offline: false
+    reads: 3
+    writes: 4
+  - operation: quoteWaitTime
+    verb: POST
+    path: /waitlist/{entryId}/quote
+    scope: venue
+    permission: ORDER_MODIFY
+    offline: false
+    reads: 3
+    writes: 1
+  - operation: reassignServer
+    verb: PUT
+    path: /table-visits/{visitId}/server
+    scope: venue
+    permission: ORDER_MODIFY
+    offline: true
+    reads: 3
+    writes: 2
+  - operation: rebalanceStationLoad
+    verb: POST
+    path: /kitchen-stations/rebalance
+    scope: venue
+    permission: PRODUCT_CONFIGURE
+    offline: false
+    reads: 2
+    writes: 3
+  - operation: recallKitchenTicket
+    verb: POST
+    path: /kitchen-tickets/{ticketId}/recall
+    scope: venue
+    permission: ORDER_MODIFY
+    offline: true
+    reads: 2
+    writes: 2
+  - operation: recordOrderHandover
+    verb: POST
+    path: /guest-orders/{orderId}/delivery
+    scope: venue
+    permission: ORDER_MODIFY
+    offline: true
+    reads: 3
+    writes: 2
+  - operation: recordWaste
+    verb: POST
+    path: /outlets/{outletId}/waste
+    scope: venue
+    permission: ORDER_MODIFY
+    offline: true
+    reads: 3
+    writes: 2
+  - operation: refireItem
+    verb: POST
+    path: /kitchen-tickets/{ticketId}/refire
+    scope: venue
+    permission: ORDER_MODIFY
+    offline: true
+    reads: 3
+    writes: 3
+  - operation: releaseProductionPlan
+    verb: POST
+    path: /production-plans/{planId}/release
+    scope: venue
+    permission: PRODUCT_CONFIGURE
+    offline: false
+    reads: 2
+    writes: 3
+  - operation: requestBill
+    verb: POST
+    path: /table-visits/{visitId}/request-bill
+    scope: venue
+    permission: ORDER_MODIFY
+    offline: true
+    reads: 2
+    writes: 2
+  - operation: requestRecount
+    verb: POST
+    path: /stock-counts/{countId}/recount
+    scope: venue
+    permission: PRODUCT_CONFIGURE
+    offline: false
+    reads: 1
+    writes: 1
+  - operation: resolveBookingConflict
+    verb: GET
+    path: /table-reservations/conflicts
+    scope: venue
+    permission: ORDER_VIEW
+    offline: false
+    reads: 3
+    writes: 0
+  - operation: rollbackMenu
+    verb: POST
+    path: /menus/{menuId}/rollback
+    scope: venue
+    permission: PRODUCT_CONFIGURE
+    offline: false
+    reads: 2
+    writes: 3
+  - operation: scheduleMenuPublish
+    verb: POST
+    path: /menus/{menuId}/schedule
+    scope: venue
+    permission: PRODUCT_CONFIGURE
+    offline: false
+    reads: 2
+    writes: 3
+  - operation: seatTableReservation
+    verb: POST
+    path: /table-reservations/{reservationId}/seat
+    scope: venue
+    permission: FNB_OPERATE
+    offline: true
+    reads: 3
+    writes: 4
+  - operation: sendBookingConfirmation
+    verb: POST
+    path: /table-reservations/{reservationId}/confirm
+    scope: venue
+    permission: ORDER_MODIFY
+    offline: false
+    reads: 3
+    writes: 3
+  - operation: sendOrderNotification
+    verb: POST
+    path: /fnb-orders/{orderId}/notify
+    scope: venue
+    permission: ORDER_MODIFY
+    offline: false
+    reads: 3
+    writes: 2
+  - operation: setComboSlots
+    verb: PUT
+    path: /combos/{comboId}/slots
+    scope: venue
+    permission: PRODUCT_CONFIGURE
+    offline: false
+    reads: 3
+    writes: 2
+  - operation: setCourseRules
+    verb: PUT
+    path: /outlets/{outletId}/course-rules
+    scope: venue
+    permission: PRODUCT_CONFIGURE
+    offline: false
+    reads: 1
+    writes: 2
+  - operation: setItemAvailability
+    verb: PUT
+    path: /menu-items/{itemId}/availability
+    scope: venue
+    permission: PRODUCT_CONFIGURE
+    offline: true
+    reads: 2
+    writes: 2
+  - operation: setKitchenSla
+    verb: PUT
+    path: /outlets/{outletId}/kitchen-sla
+    scope: venue
+    permission: PRODUCT_CONFIGURE
+    offline: false
+    reads: 1
+    writes: 2
+  - operation: setKitchenStations
+    verb: PUT
+    path: /kitchen/stations
+    scope: venue
+    permission: PRODUCT_CONFIGURE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: setKitchenTicketStatus
+    verb: PUT
+    path: /kitchen/tickets/{ticketId}/status
+    scope: venue
+    permission: ORDER_MODIFY
+    offline: true
+    reads: 2
+    writes: 2
+  - operation: setMenuSections
+    verb: PUT
+    path: /menus/{menuId}/sections
+    scope: venue
+    permission: PRODUCT_CONFIGURE
+    offline: false
+    reads: 4
+    writes: 4
+  - operation: setRecipe
+    verb: PUT
+    path: /recipes
+    scope: venue
+    permission: PRODUCT_CONFIGURE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: setSectionLayout
+    verb: PUT
+    path: /outlets/{outletId}/sections
+    scope: venue
+    permission: PRODUCT_CONFIGURE
+    offline: false
+    reads: 2
+    writes: 3
+  - operation: setServiceStage
+    verb: PUT
+    path: /table-visits/{visitId}/stage
+    scope: venue
+    permission: ORDER_MODIFY
+    offline: true
+    reads: 2
+    writes: 2
+  - operation: setSubstitutionRules
+    verb: PUT
+    path: /substitution-rules
+    scope: venue
+    permission: PRODUCT_CONFIGURE
+    offline: false
+    reads: 2
+    writes: 3
+  - operation: setTableCombinations
+    verb: PUT
+    path: /outlets/{outletId}/table-combinations
+    scope: venue
+    permission: PRODUCT_CONFIGURE
+    offline: false
+    reads: 2
+    writes: 3
+  - operation: setTableLayout
+    verb: PUT
+    path: /outlets/{outletId}/tables
+    scope: venue
+    permission: PRODUCT_CONFIGURE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: signCorrectiveAction
+    verb: POST
+    path: /food-safety/corrective-actions/{actionId}/sign
+    scope: venue
+    permission: INCIDENT_MANAGE
+    offline: false
+    reads: 3
+    writes: 2
+  - operation: splitBill
+    verb: POST
+    path: /table-visits/{visitId}/bill/split
+    scope: venue
+    permission: ORDER_MODIFY
+    offline: true
+    reads: 2
+    writes: 2
+  - operation: transferOrderItems
+    verb: POST
+    path: /table-visits/{visitId}/transfer-items
+    scope: venue
+    permission: ORDER_MODIFY
+    offline: true
+    reads: 3
+    writes: 3
+  - operation: transferTableVisit
+    verb: POST
+    path: /table-visits/{visitId}/transfer
+    scope: venue
+    permission: FNB_SERVE
+    offline: true
+    reads: 3
+    writes: 2
+  - operation: updateMenu
+    verb: PATCH
+    path: /menus/{menuId}
+    scope: venue
+    permission: PRODUCT_CONFIGURE
+    offline: false
+    reads: 4
+    writes: 4
+  - operation: updateTable
+    verb: PUT
+    path: /tables/{tableId}
+    scope: venue
+    permission: PRODUCT_CONFIGURE
+    offline: false
+    reads: 3
+    writes: 3
+  - operation: updateTableReservation
+    verb: PATCH
+    path: /table-reservations/{reservationId}
+    scope: venue
+    permission: null
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: updateTableVisit
+    verb: PATCH
+    path: /table-visits/{visitId}
+    scope: venue
+    permission: ORDER_MODIFY
+    offline: true
+    reads: 3
+    writes: 3
+  - operation: verifyAllergens
+    verb: POST
+    path: /menu-items/{menuItemId}/verify-allergens
+    scope: venue
+    permission: PRODUCT_VIEW
+    offline: false
+    reads: 4
+    writes: 0
+tables:
+- table: fnb.bill_split
+  columns: 3
+  store: postgres
+  parent: null
+  writtenBy:
+  - fnb
+  foreignWriters: null
+- table: fnb.cold_chain_event
+  columns: 9
+  store: postgres
+  parent: null
+  writtenBy:
+  - fnb
+  foreignWriters: null
+- table: fnb.combo
+  columns: 7
+  store: postgres
+  parent: null
+  writtenBy:
+  - fnb
+  foreignWriters: null
+- table: fnb.combo_slot
+  columns: 6
+  store: postgres
+  parent: fnb.combo
+  writtenBy:
+  - fnb
+  foreignWriters: null
+- table: fnb.corrective_action
+  columns: 11
+  store: postgres
+  parent: null
+  writtenBy:
+  - fnb
+  foreignWriters: null
+- table: fnb.delivery_location
+  columns: 11
+  store: postgres
+  parent: null
+  writtenBy: []
+  foreignWriters: null
+- table: fnb.delivery_location_outlet
+  columns: 2
+  store: postgres
+  parent: fnb.delivery_location
+  writtenBy: []
+  foreignWriters: null
+- table: fnb.eighty_six_event
+  columns: 8
+  store: postgres
+  parent: null
+  writtenBy: []
+  foreignWriters: null
+- table: fnb.fnb_order
+  columns: 14
+  store: postgres
+  parent: null
+  writtenBy:
+  - fnb
+  foreignWriters: null
+- table: fnb.fnb_order_line
+  columns: 11
+  store: postgres
+  parent: fnb.fnb_order
+  writtenBy: []
+  foreignWriters: null
+- table: fnb.guest_note
+  columns: 0
+  store: postgres
+  parent: null
+  writtenBy: []
+  foreignWriters: null
+- table: fnb.kitchen_exception
+  columns: 9
+  store: postgres
+  parent: null
+  writtenBy:
+  - fnb
+  foreignWriters: null
+- table: fnb.kitchen_station
+  columns: 7
+  store: postgres
+  parent: null
+  writtenBy:
+  - fnb
+  foreignWriters: null
+- table: fnb.kitchen_ticket
+  columns: 15
+  store: postgres
+  parent: null
+  writtenBy:
+  - fnb
+  foreignWriters: null
+- table: fnb.kitchen_ticket_line
+  columns: 10
+  store: postgres
+  parent: fnb.kitchen_ticket
+  writtenBy:
+  - fnb
+  foreignWriters: null
+- table: fnb.location_code
+  columns: 1
+  store: postgres
+  parent: null
+  writtenBy: []
+  foreignWriters: null
+- table: fnb.location_session
+  columns: 10
+  store: postgres
+  parent: null
+  writtenBy:
+  - fnb
+  foreignWriters: null
+- table: fnb.menu
+  columns: 6
+  store: postgres
+  parent: null
+  writtenBy:
+  - fnb
+  foreignWriters: null
+- table: fnb.menu_item
+  columns: 13
+  store: postgres
+  parent: null
+  writtenBy:
+  - fnb
+  foreignWriters: null
+- table: fnb.menu_section
+  columns: 4
+  store: postgres
+  parent: fnb.menu
+  writtenBy:
+  - fnb
+  foreignWriters: null
+- table: fnb.modifier_group
+  columns: 5
+  store: postgres
+  parent: null
+  writtenBy:
+  - fnb
+  foreignWriters: null
+- table: fnb.modifier_option
+  columns: 6
+  store: postgres
+  parent: fnb.modifier_group
+  writtenBy: []
+  foreignWriters: null
+- table: fnb.production_plan
+  columns: 6
+  store: postgres
+  parent: null
+  writtenBy:
+  - fnb
+  foreignWriters: null
+- table: fnb.production_run
+  columns: 9
+  store: postgres
+  parent: null
+  writtenBy:
+  - fnb
+  foreignWriters: null
+- table: fnb.recipe
+  columns: 3
+  store: postgres
+  parent: fnb.menu_item
+  writtenBy:
+  - fnb
+  foreignWriters: null
+- table: fnb.recipe_ingredient
+  columns: 5
+  store: postgres
+  parent: fnb.recipe
+  writtenBy: []
+  foreignWriters: null
+- table: fnb.sub_bill
+  columns: 11
+  store: postgres
+  parent: null
+  writtenBy: []
+  foreignWriters: null
+- table: fnb.substitution_rule
+  columns: 9
+  store: postgres
+  parent: null
+  writtenBy:
+  - fnb
+  foreignWriters: null
+- table: fnb.table
+  columns: 7
+  store: postgres
+  parent: null
+  writtenBy:
+  - fnb
+  foreignWriters: null
+- table: fnb.table_reservation
+  columns: 15
+  store: postgres
+  parent: null
+  writtenBy:
+  - fnb
+  foreignWriters: null
+- table: fnb.table_session
+  columns: 9
+  store: postgres
+  parent: fnb.table
+  writtenBy:
+  - fnb
+  foreignWriters: null
+- table: fnb.table_visit
+  columns: 13
+  store: postgres
+  parent: fnb.table
+  writtenBy:
+  - fnb
+  foreignWriters: null
+- table: fnb.temperature_log
+  columns: 11
+  store: postgres
+  parent: null
+  writtenBy:
+  - fnb
+  foreignWriters: null
+- table: fnb.waitlist_entry
+  columns: 9
+  store: postgres
+  parent: null
+  writtenBy:
+  - fnb
+  foreignWriters: null
+readsFrom:
+- service: InventoryService
+  operations: 7
+- service: IdentityService
+  operations: 7
+- service: TenancyService
+  operations: 5
+- service: OrderService
+  operations: 4
+- service: CatalogueService
+  operations: 2
+- service: AiService
+  operations: 1
+writesOutside:
+- service: MarketingService
+  operations: 4
+  why: '**The owner defines the row; this service may only append to it.**'
+- service: InventoryService
+  operations: 3
+  why: '**The owner defines the row; this service may only append to it.**'
+- service: OrderService
+  operations: 3
+  why: '**The owner defines the row; this service may only append to it.**'
+- service: CatalogueService
+  operations: 2
+  why: '**The owner defines the row; this service may only append to it.**'
+screens:
+- P02:GST-024 F&B – Browse & Order
+- P02:GST-025 F&B – Order Tracking
+- P02:GST-029 Venue Info & Services
+- P02:GST-030 In-Venue Notifications
+- P02:GST-031 AI Concierge – Home
+- P02:GST-032 AI Concierge – Chat
+- P02:GST-061 Menu Item Detail
+- P04:POS-012 Omnichannel Order & Fulfilment Center
+- P04:POS-021 Sell — Food & Drink
+- P04:POS-022 Send to Kitchen
+- P04:POS-024 Outlet Setup
+- P05:KSK-016 Order Food
+- P06:EMP-030 Venue map
+- P06:EMP-051 Restaurant Service Command Center
+- P06:EMP-052 Floor Plan & Table Map
+- P06:EMP-053 Table & Seating Configuration
+- P06:EMP-054 Reservation Calendar & Timeline
+- P06:EMP-055 Create / Edit Reservation
+- P06:EMP-056 Walk-In & Waitlist Management
+- P06:EMP-058 Live Table & Service Management
+- P06:EMP-059 Table Order, Bill & Payment Management
+- P06:EMP-060 Reservation & Table Performance
+- P06:EMP-062 Store Stock & SKU Availability
+- P06:EMP-065 Receiving & Store Put-Away
+- P06:EMP-066 Stock Count & Cycle Count Management
+- P06:EMP-067 Damage, Loss, Shrinkage & Stock Adjustment
+- P08:BO-003 Queue Integration Setup
+- P08:BO-007 Product Directory
+- P08:BO-014 Catalogue Publishing
+- P08:BO-020 F&B Order Management
+- P08:BO-021 Order Search
+- P08:BO-044 F&B Outlets
+- P08:BO-045 Menu Management
+- P08:BO-046 Kitchen Display
+- P08:BO-049 Stock Levels
+- P08:BO-062 Venue Profile
+- P08:BO-065 Venue Configuration
+- P08:BO-079 Stock Count
+- P08:BO-109 Menu Builder & POS Layout Designer
+- P08:BO-110 Recipe & BOM Management
+- P08:BO-111 Ingredient Substitution, Allergen & Nutrition
+- P08:BO-112 Production Planning & Production Sheets
+- P08:BO-113 Central Kitchen & Commissary Management
+- P08:BO-134 Kitchen & Preparation Stations
+- P08:BO-135 Order Routing & KDS/Printer Rules
+- P08:BO-136 F&B Global Settings & Controls
+- P08:BO-137 Recipe Consumption & Theoretical Inventory
+- P08:BO-138 Production Execution & Batch Management
+- P08:BO-139 Wastage, Spoilage, Returns & Write-Off
+- P08:BO-140 Product Availability, 86 & Operational Food Safety
+- P13:CMS-009 Navigation & Menus
+- P15:KIT-001 Kitchen Operations Command Center
+- P15:KIT-002 Kitchen Display System (KDS)
+- P15:KIT-003 Order Firing & Course Management
+- P15:KIT-004 Active Order Management & Fulfilment Journey
+- P15:KIT-005 Kitchen Station Workload & Dynamic Routing
+- P15:KIT-006 Expeditor & Order Assembly
+- P15:KIT-007 Guest Collection, Buzzer & Digital Notification
+- P15:KIT-008 Exceptions, Re-Fire & Unavailable Items
+- P15:KIT-009 SLA, Priority & Service Rules
+flows:
+- F108 A guest orders food at a counter and collects it
+- F11 Guest orders food to a lounger
+- F28 A temperature excursion is caught and signed off
+- F29 A table is seated, coursed and split
+- F30 A count is entered, varied and posted
+- F31 A menu is drafted, scheduled and rolled back
+- F35 Stock arrives short and an oversell is resolved
+- F48 A guest finds it, queues for it, and eats
+- F60 An online order is collected at the counter
+- F70 A guest needs help and something is lost
+- F78 A supplier is set up and a catalogue is priced and published
+- F80 A table is configured, reserved, seated and billed
+- F81 A retail sale runs from overview to tender
+- F83 A kitchen works a service from the rail to the exception
+- F85 Production is planned, costed and released
+- F88 An order is assembled, collected and notified
+- F93 A recipe changes and its allergen claim is re-verified
+- F94 A restaurant floor is set up before service

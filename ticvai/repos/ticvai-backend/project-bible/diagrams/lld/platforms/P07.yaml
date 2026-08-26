@@ -1,0 +1,382 @@
+id: LLD-P07
+title: P07 Venue Scanner — Access Control — 11 screens
+generatedBy: tools/derive-diagrams.py
+index: diagrams/hld/00-platform.yaml
+audience: staff
+operator: venue
+app: venue-scanner
+formFactor: handheld
+runtime: reactNative
+offlineCapable: true
+deployment:
+  target: rugged handheld — Android
+  distribution: MDM
+  bundleUpdate: at shift start
+  hosting: local, offline-first (ADR-0013)
+  storeReview: false
+  deviceOwnership: venue-owned, issued per shift
+  networkAssumption: must function with none
+  releaseCadence: monthly, never on an event day
+why: null
+modulesUsed:
+- module: access
+  screens: 9
+- module: core
+  screens: 2
+servicesCalled:
+- service: AccessService
+  operationCalls: 56
+- service: IdentityService
+  operationCalls: 7
+- service: OrderService
+  operationCalls: 3
+- service: CrossCellService
+  operationCalls: 3
+coverage:
+  screens: 11
+  inAFlow: 9
+  drawn: 11
+  note: '**A screen in no flow has been specified and never walked.** Every flow written in this package
+    has found a defect.'
+screens:
+- screen: SCN-001
+  name: Sign in
+  module: Access
+  requiresModule: core
+  wave: 1
+  density: comfortable
+  operations:
+  - getCurrentSession
+  - getCurrentShift
+  - getGuestSession
+  - listMfaMethods
+  - listSsoProviders
+  - login
+  - resolvePermissions
+  - selectRole
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams:
+  - sessionId<-session
+  - shiftId<-session
+  goesTo:
+  - SCN-002
+  - SCN-003
+  boardFrames: null
+  wireframe: wireframes/P07 Venue Scanner.dc.html#scn-001
+  inFlows:
+  - F06 Guest enters the venue
+  - F61 A gate opens, a steward signs in, and a group is admitted
+- screen: SCN-002
+  name: Access point & direction
+  module: Access
+  requiresModule: access
+  wave: 1
+  density: comfortable
+  operations:
+  - getAccessPoint
+  - listAccessPoints
+  - setTurnstileMode
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams:
+  - accessPointId<-deepLink
+  goesTo:
+  - SCN-001
+  - SCN-003
+  - SCN-015
+  boardFrames: null
+  wireframe: wireframes/P07 Venue Scanner.dc.html#scn-002
+  inFlows:
+  - F06 Guest enters the venue
+  - F61 A gate opens, a steward signs in, and a group is admitted
+- screen: SCN-003
+  name: Ready to scan
+  module: Access
+  requiresModule: access
+  wave: 1
+  density: comfortable
+  operations:
+  - consumeRedemptionRight
+  - getOfflinePackage
+  - listBlacklist
+  - listScans
+  - lookupTicket
+  - overrideAccess
+  - syncScans
+  - validateAccess
+  - validateGroupAccess
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  - offline
+  - outcomeAdmitted
+  - outcomeBlacklisted
+  - outcomeDenied
+  - overrideDialog
+  offlineState: true
+  entryParams:
+  - mediaCode<-deepLink
+  - rightId<-deepLink
+  goesTo:
+  - SCN-001
+  - SCN-002
+  - SCN-003
+  boardFrames: null
+  wireframe: wireframes/P07 Venue Scanner.dc.html#scn-003
+  inFlows:
+  - F06 Guest enters the venue
+  - F10 Partner books, uses and settles
+  - F19 A membership works in another country
+  - F23 A contractor gets a badge and uses it
+  - F61 A gate opens, a steward signs in, and a group is admitted
+  - F62 A ticket will not scan
+- screen: SCN-007
+  name: Group admission
+  module: Access
+  requiresModule: access
+  wave: 1
+  density: comfortable
+  operations:
+  - getOfflinePackage
+  - listScans
+  - lookupTicket
+  - overrideAccess
+  - syncScans
+  - validateAccess
+  - validateGroupAccess
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams: []
+  goesTo:
+  - SCN-001
+  - SCN-002
+  - SCN-003
+  boardFrames: null
+  wireframe: wireframes/P07 Venue Scanner.dc.html#scn-007
+  inFlows:
+  - F61 A gate opens, a steward signs in, and a group is admitted
+- screen: SCN-008
+  name: Manual entry
+  module: Access
+  requiresModule: access
+  wave: 1
+  density: comfortable
+  operations:
+  - getOfflinePackage
+  - listScans
+  - lookupTicket
+  - overrideAccess
+  - syncScans
+  - validateAccess
+  - validateGroupAccess
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams: []
+  goesTo:
+  - SCN-001
+  - SCN-002
+  - SCN-003
+  boardFrames: null
+  wireframe: wireframes/P07 Venue Scanner.dc.html#scn-008
+  inFlows:
+  - F62 A ticket will not scan
+- screen: SCN-009
+  name: Ticket lookup
+  module: Access
+  requiresModule: access
+  wave: 1
+  density: comfortable
+  operations:
+  - getOfflinePackage
+  - listScans
+  - lookupTicket
+  - overrideAccess
+  - syncScans
+  - validateAccess
+  - validateGroupAccess
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams: []
+  goesTo:
+  - SCN-001
+  - SCN-002
+  - SCN-003
+  boardFrames: null
+  wireframe: wireframes/P07 Venue Scanner.dc.html#scn-009
+  inFlows:
+  - F62 A ticket will not scan
+- screen: SCN-011
+  name: Delegated right
+  module: Access
+  requiresModule: core
+  wave: 1
+  density: comfortable
+  operations:
+  - consumeRedemptionRight
+  - getRedemptionRight
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams:
+  - rightId<-deepLink
+  goesTo:
+  - SCN-001
+  - SCN-002
+  - SCN-003
+  boardFrames: null
+  wireframe: wireframes/P07 Venue Scanner.dc.html#scn-011
+  inFlows: null
+- screen: SCN-013
+  name: Offline journal
+  module: Access
+  requiresModule: access
+  wave: 1
+  density: comfortable
+  operations:
+  - getOfflinePackage
+  - listScans
+  - lookupTicket
+  - overrideAccess
+  - syncScans
+  - validateAccess
+  - validateGroupAccess
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams: []
+  goesTo:
+  - SCN-001
+  - SCN-002
+  - SCN-003
+  boardFrames: null
+  wireframe: wireframes/P07 Venue Scanner.dc.html#scn-013
+  inFlows:
+  - F63 A gate goes offline and reconciles
+- screen: SCN-014
+  name: Sync & reconciliation
+  module: Access
+  requiresModule: access
+  wave: 1
+  density: comfortable
+  operations:
+  - getOfflinePackage
+  - listScans
+  - listSyncRejections
+  - lookupTicket
+  - overrideAccess
+  - syncOrders
+  - syncScans
+  - validateAccess
+  - validateGroupAccess
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams: []
+  goesTo:
+  - SCN-001
+  - SCN-002
+  - SCN-003
+  boardFrames: null
+  wireframe: wireframes/P07 Venue Scanner.dc.html#scn-014
+  inFlows:
+  - F06 Guest enters the venue
+  - F19 A membership works in another country
+  - F63 A gate goes offline and reconciles
+- screen: SCN-015
+  name: Offline package
+  module: Access
+  requiresModule: access
+  wave: 1
+  density: comfortable
+  operations:
+  - getOfflinePackage
+  - listScans
+  - lookupTicket
+  - overrideAccess
+  - syncScans
+  - validateAccess
+  - validateGroupAccess
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams: []
+  goesTo:
+  - SCN-001
+  - SCN-002
+  - SCN-003
+  boardFrames: null
+  wireframe: wireframes/P07 Venue Scanner.dc.html#scn-015
+  inFlows:
+  - F06 Guest enters the venue
+  - F61 A gate opens, a steward signs in, and a group is admitted
+  - F63 A gate goes offline and reconciles
+- screen: SCN-016
+  name: Gate mode
+  module: Access
+  requiresModule: access
+  wave: 1
+  density: comfortable
+  operations:
+  - getAccessPoint
+  - listAccessPoints
+  - setTurnstileMode
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams:
+  - accessPointId<-deepLink
+  goesTo:
+  - SCN-001
+  - SCN-002
+  - SCN-003
+  boardFrames: null
+  wireframe: wireframes/P07 Venue Scanner.dc.html#scn-016
+  inFlows: null

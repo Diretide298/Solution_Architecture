@@ -1,0 +1,390 @@
+id: LLD-AccessService
+title: AccessService — 30 operations, 8 tables
+generatedBy: tools/derive-diagrams.py
+tier: commerce
+index: diagrams/hld.yaml
+why: '**The gate.** Validating an entitlement is a sub-300ms decision made forty times a minute per
+  lane, and it must work when the network does not.'
+scale: Read-heavy, extreme latency sensitivity, edge-cached. **`frozenDays` is held rather than replayed**
+  precisely because the gate cannot afford the arithmetic.
+ifDown: Down means the gates stop. Runs at the edge with a local decision cache.
+coverage:
+  operations: 30
+  inAFlow: 17
+  percent: 57%
+  note: '**Flow coverage is how much of this service a journey has walked.** A service under 40% is
+    unwalked rather than under-documented.'
+schemas:
+- schema: access
+  tables: 8
+  storage: A guest bought parking. Carries the plate where the mode is plateWhitelist — **personal data**,
+    since a plate identifies a person
+operationsByContract:
+- contract: access
+  count: 30
+  operations:
+  - operation: addBlacklistEntry
+    verb: POST
+    path: /blacklist
+    scope: venue
+    permission: ACCESS_POINT_CONFIGURE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: createAccessPoint
+    verb: POST
+    path: /access-points
+    scope: venue
+    permission: ACCESS_POINT_CONFIGURE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: createAdmissionProfile
+    verb: POST
+    path: /admission-profiles
+    scope: venue
+    permission: ACCESS_POINT_CONFIGURE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: createParkingEntitlement
+    verb: POST
+    path: /parking-entitlements
+    scope: venue
+    permission: null
+    offline: false
+    reads: 3
+    writes: 2
+  - operation: enrolFacePass
+    verb: POST
+    path: /face-pass/enrolments
+    scope: venue
+    permission: GUEST_MANAGE
+    offline: false
+    reads: 3
+    writes: 3
+  - operation: getAccessPoint
+    verb: GET
+    path: /access-points/{accessPointId}
+    scope: venue
+    permission: SCOPE_VIEW
+    offline: true
+    reads: 1
+    writes: 0
+  - operation: getEntitlement
+    verb: GET
+    path: /entitlements/{entitlementId}
+    scope: venue
+    permission: ORDER_VIEW
+    offline: true
+    reads: 3
+    writes: 0
+  - operation: getEntitlementCredential
+    verb: GET
+    path: /entitlements/{entitlementId}/credential
+    scope: venue
+    permission: ORDER_VIEW
+    offline: false
+    reads: 1
+    writes: 1
+  - operation: getEntitlementHistory
+    verb: GET
+    path: /entitlements/{entitlementId}/history
+    scope: venue
+    permission: ORDER_VIEW
+    offline: false
+    reads: 2
+    writes: 0
+  - operation: getFacePassEnrolment
+    verb: GET
+    path: /face-pass/enrolments/{enrolmentId}
+    scope: venue
+    permission: GUEST_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: getOfflinePackage
+    verb: GET
+    path: /access/offline-package
+    scope: workstation
+    permission: ACCESS_VALIDATE
+    offline: false
+    reads: 9
+    writes: 1
+  - operation: listAccessPoints
+    verb: GET
+    path: /access-points
+    scope: venue
+    permission: SCOPE_VIEW
+    offline: true
+    reads: 1
+    writes: 0
+  - operation: listAdmissionProfiles
+    verb: GET
+    path: /admission-profiles
+    scope: venue
+    permission: SCOPE_VIEW
+    offline: true
+    reads: 1
+    writes: 0
+  - operation: listBlacklist
+    verb: GET
+    path: /blacklist
+    scope: venue
+    permission: SCOPE_VIEW
+    offline: true
+    reads: 1
+    writes: 0
+  - operation: listMyEntitlements
+    verb: GET
+    path: /guests/me/entitlements
+    scope: venue
+    permission: ORDER_VIEW
+    offline: true
+    reads: 4
+    writes: 0
+  - operation: listParkingFacilities
+    verb: GET
+    path: /parking-facilities
+    scope: venue
+    permission: ACCESS_POINT_CONFIGURE
+    offline: true
+    reads: 1
+    writes: 0
+  - operation: listScans
+    verb: GET
+    path: /access/scans
+    scope: venue
+    permission: REPORT_VIEW_VENUE
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: lookupTicket
+    verb: GET
+    path: /access/lookup
+    scope: venue
+    permission: TICKET_LOOKUP
+    offline: true
+    reads: 4
+    writes: 0
+  - operation: overrideAccess
+    verb: POST
+    path: /access/override
+    scope: venue
+    permission: ACCESS_OVERRIDE
+    offline: true
+    reads: 4
+    writes: 2
+  - operation: removeBlacklistEntry
+    verb: DELETE
+    path: /blacklist/{mediaCode}
+    scope: venue
+    permission: ACCESS_POINT_CONFIGURE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: revokeFacePass
+    verb: DELETE
+    path: /face-pass/enrolments/{enrolmentId}
+    scope: venue
+    permission: GUEST_MANAGE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: setAccessPointGeofence
+    verb: PUT
+    path: /access-points/{accessPointId}/geofence
+    scope: venue
+    permission: ACCESS_POINT_CONFIGURE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: setParkingFacility
+    verb: PUT
+    path: /parking-facilities
+    scope: venue
+    permission: PARKING_CONFIGURE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: setTurnstileMode
+    verb: PUT
+    path: /access-points/{accessPointId}/mode
+    scope: venue
+    permission: TURNSTILE_MODE_SET
+    offline: true
+    reads: 2
+    writes: 2
+  - operation: syncScans
+    verb: POST
+    path: /access/scans
+    scope: workstation
+    permission: ACCESS_VALIDATE
+    offline: false
+    reads: 1
+    writes: 2
+  - operation: updateAccessPoint
+    verb: PATCH
+    path: /access-points/{accessPointId}
+    scope: venue
+    permission: ACCESS_POINT_CONFIGURE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: updateAdmissionProfile
+    verb: PUT
+    path: /admission-profiles/{profileId}
+    scope: venue
+    permission: ACCESS_POINT_CONFIGURE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: updateParkingEntitlement
+    verb: PATCH
+    path: /parking-entitlements/{entitlementId}
+    scope: venue
+    permission: null
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: validateAccess
+    verb: POST
+    path: /access/validate
+    scope: workstation
+    permission: ACCESS_VALIDATE
+    offline: true
+    reads: 6
+    writes: 2
+  - operation: validateGroupAccess
+    verb: POST
+    path: /access/group-validate
+    scope: workstation
+    permission: ACCESS_VALIDATE
+    offline: true
+    reads: 4
+    writes: 2
+tables:
+- table: access.access_point
+  columns: 12
+  store: postgres
+  parent: null
+  writtenBy:
+  - access
+  foreignWriters: null
+- table: access.admission_profile
+  columns: 9
+  store: postgres
+  parent: null
+  writtenBy:
+  - access
+  foreignWriters: null
+- table: access.blacklist
+  columns: 5
+  store: postgres
+  parent: null
+  writtenBy:
+  - access
+  foreignWriters: null
+- table: access.entitlement
+  columns: 24
+  store: postgres
+  parent: null
+  writtenBy:
+  - access
+  - catalogue
+  - orders
+  foreignWriters:
+  - catalogue
+  - orders
+- table: access.parking_entitlement
+  columns: 12
+  store: postgres
+  parent: null
+  writtenBy:
+  - access
+  foreignWriters: null
+- table: access.parking_facility
+  columns: 13
+  store: postgres
+  parent: null
+  writtenBy:
+  - access
+  foreignWriters: null
+- table: access.scan_event
+  columns: 15
+  store: postgres
+  parent: null
+  writtenBy:
+  - access
+  foreignWriters: null
+- table: access.scan_event_unassigned
+  columns: 0
+  store: postgres
+  parent: null
+  writtenBy: []
+  foreignWriters: null
+readsFrom:
+- service: IdentityService
+  operations: 8
+- service: CatalogueService
+  operations: 7
+- service: VenueOpsService
+  operations: 3
+- service: OrderService
+  operations: 2
+- service: MarketingService
+  operations: 1
+writesOutside:
+- service: IdentityService
+  operations: 2
+  why: '**The owner defines the row; this service may only append to it.**'
+- service: CrossCellService
+  operations: 1
+  why: '**The owner defines the row; this service may only append to it.**'
+- service: MarketingService
+  operations: 1
+  why: '**The owner defines the row; this service may only append to it.**'
+screens:
+- P01:WEB-018 My Tickets
+- P02:GST-001 Home – Default
+- P02:GST-012 My Tickets
+- P02:GST-013 Ticket Details
+- P02:GST-027 Parking – Reserve & Pay
+- P02:GST-028 Parking – Reservation Confirmed
+- P04:POS-002 Sell — Ticket Catalogue
+- P04:POS-013 Mobile POS, Event Sales & Offline Operations
+- P06:EMP-010 Scan — ready
+- P06:EMP-015 Group scan
+- P06:EMP-017 Sync & reconciliation
+- P06:EMP-049 Hand over the journal
+- P07:SCN-002 Access point & direction
+- P07:SCN-003 Ready to scan
+- P07:SCN-007 Group admission
+- P07:SCN-008 Manual entry
+- P07:SCN-009 Ticket lookup
+- P07:SCN-013 Offline journal
+- P07:SCN-014 Sync & reconciliation
+- P07:SCN-015 Offline package
+- P07:SCN-016 Gate mode
+- P08:BO-006 Parking Configuration
+- P08:BO-032 Admission Profiles
+- P08:BO-033 Blacklist Management
+- P08:BO-034 Scan Activity
+- P08:BO-035 Override Audit
+- P08:BO-037 Offline Package Status
+- P08:BO-060 Attendance & Footfall
+- P08:BO-064 Zones & Areas
+flows:
+- F06 Guest enters the venue
+- F10 Partner books, uses and settles
+- F107 A report is defined, scheduled and delivered
+- F19 A membership works in another country
+- F23 A contractor gets a badge and uses it
+- F50 A guest arrives, parks, and gets in
+- F58 A ticket is sold at a till, added to, and refunded
+- F61 A gate opens, a steward signs in, and a group is admitted
+- F62 A ticket will not scan
+- F63 A gate goes offline and reconciles
+- F71 A device is prepared, used and handed over
+- F72 A shift ends and the summary is read
+- F87 A till handles a return, a collection and a safe drop

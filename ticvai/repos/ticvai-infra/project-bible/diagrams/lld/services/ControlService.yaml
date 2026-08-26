@@ -1,0 +1,1216 @@
+id: LLD-ControlService
+title: ControlService — 102 operations, 41 tables
+generatedBy: tools/derive-diagrams.py
+tier: platform
+index: diagrams/hld/02-services.yaml
+why: '**Three contracts, one schema, 41 tables.** Subscription, platform operations and the public API
+  all write `control.*` — **they are one bounded context that was split into three contracts for API-surface
+  reasons, not for data reasons.**
+
+
+  Splitting them would give three services writing one schema, which is the arrangement every distributed-data
+  guide warns about.'
+scale: Low volume, high consequence. Tenant provisioning and licensing.
+ifDown: Down blocks provisioning and the developer API. **Trading is unaffected.**
+coverage:
+  operations: 102
+  inAFlow: 40
+  percent: 39%
+  note: '**Flow coverage is how much of this service a journey has walked.** A service under 40% is
+    unwalked rather than under-documented.'
+schemas:
+- schema: control
+  tables: 41
+  stores:
+  - postgres
+  largestTable: control.partner_agreement
+operationsByContract:
+- contract: subscription
+  count: 55
+  operations:
+  - operation: addLicenceAddOn
+    verb: POST
+    path: /tenants/{tenantId}/licences/add-ons
+    scope: tenant
+    permission: PLATFORM_TENANT_MANAGE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: cancelDecommission
+    verb: POST
+    path: /cells/{cellId}/cancel-decommission
+    scope: tenant
+    permission: PLATFORM_CELL_MANAGE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: cancelInvoice
+    verb: POST
+    path: /invoices/{invoiceId}/cancel
+    scope: tenant
+    permission: PLATFORM_BILLING_MANAGE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: cancelSubscription
+    verb: POST
+    path: /subscriptions/{subscriptionId}/cancel
+    scope: tenant
+    permission: PLATFORM_BILLING_MANAGE
+    offline: false
+    reads: 3
+    writes: 2
+  - operation: createPartnerAgreement
+    verb: POST
+    path: /partner-agreements
+    scope: tenant
+    permission: PARTNER_MANAGE
+    offline: false
+    reads: 3
+    writes: 3
+  - operation: createPartnerUser
+    verb: POST
+    path: /partners/{partnerId}/users
+    scope: tenant
+    permission: PARTNER_MANAGE
+    offline: false
+    reads: 4
+    writes: 2
+  - operation: createPlan
+    verb: POST
+    path: /plans
+    scope: tenant
+    permission: PLATFORM_PLAN_MANAGE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: createPlanVersion
+    verb: POST
+    path: /plans/{planId}
+    scope: tenant
+    permission: PLATFORM_PLAN_MANAGE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: createTenant
+    verb: POST
+    path: /tenants
+    scope: tenant
+    permission: PLATFORM_TENANT_MANAGE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: decommissionCell
+    verb: POST
+    path: /cells/{cellId}/decommission
+    scope: tenant
+    permission: PLATFORM_CELL_MANAGE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: disputeInvoice
+    verb: POST
+    path: /invoices/{invoiceId}/dispute
+    scope: tenant
+    permission: PLATFORM_BILLING_MANAGE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: executeTenantMigration
+    verb: POST
+    path: /tenant-migrations/{migrationId}/execute
+    scope: tenant
+    permission: PLATFORM_CELL_MANAGE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: exportPartnerInvoice
+    verb: POST
+    path: /partners/{partnerId}/invoice-export
+    scope: tenant
+    permission: LEDGER_VIEW
+    offline: false
+    reads: 5
+    writes: 1
+  - operation: generateInvoice
+    verb: POST
+    path: /tenants/{tenantId}/invoices
+    scope: tenant
+    permission: PLATFORM_BILLING_MANAGE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: getCell
+    verb: GET
+    path: /cells/{cellId}
+    scope: tenant
+    permission: PLATFORM_CELL_VIEW
+    offline: false
+    reads: 2
+    writes: 0
+  - operation: getCellCapacity
+    verb: GET
+    path: /cells/{cellId}/capacity
+    scope: tenant
+    permission: PLATFORM_CELL_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: getCellHealth
+    verb: GET
+    path: /cells/{cellId}/health
+    scope: tenant
+    permission: PLATFORM_CELL_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: getCommissionStatement
+    verb: GET
+    path: /partner-agreements/{agreementId}/commission-statement
+    scope: tenant
+    permission: PARTNER_VIEW
+    offline: false
+    reads: 4
+    writes: 0
+  - operation: getEntitlementUsage
+    verb: GET
+    path: /tenants/{tenantId}/entitlement-usage
+    scope: tenant
+    permission: PLATFORM_TENANT_VIEW
+    offline: false
+    reads: 3
+    writes: 0
+  - operation: getPlan
+    verb: GET
+    path: /plans/{planId}
+    scope: tenant
+    permission: PLATFORM_TENANT_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: getSubscription
+    verb: GET
+    path: /tenants/{tenantId}/subscription
+    scope: tenant
+    permission: PLATFORM_TENANT_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: getTenant
+    verb: GET
+    path: /tenants/{tenantId}
+    scope: tenant
+    permission: PLATFORM_TENANT_VIEW
+    offline: false
+    reads: 3
+    writes: 0
+  - operation: getTenantLicences
+    verb: GET
+    path: /tenants/{tenantId}/licences
+    scope: tenant
+    permission: PLATFORM_TENANT_VIEW
+    offline: true
+    reads: 3
+    writes: 0
+  - operation: getUsageMetering
+    verb: GET
+    path: /tenants/{tenantId}/usage
+    scope: tenant
+    permission: PLATFORM_TENANT_VIEW
+    offline: false
+    reads: 2
+    writes: 0
+  - operation: launchCellCluster
+    verb: POST
+    path: /cell-clusters
+    scope: tenant
+    permission: PLATFORM_CELL_MANAGE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: listCellClusters
+    verb: GET
+    path: /cell-clusters
+    scope: tenant
+    permission: PLATFORM_CELL_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listCellJobs
+    verb: GET
+    path: /cells/{cellId}/jobs
+    scope: tenant
+    permission: PLATFORM_CELL_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listChannelListings
+    verb: GET
+    path: /channel-listings
+    scope: venue
+    permission: PARTNER_VIEW
+    offline: false
+    reads: 2
+    writes: 0
+  - operation: listPartnerAgreements
+    verb: GET
+    path: /partner-agreements
+    scope: tenant
+    permission: PARTNER_MANAGE
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listPartnerUsers
+    verb: GET
+    path: /partners/{partnerId}/users
+    scope: tenant
+    permission: PARTNER_VIEW
+    offline: false
+    reads: 2
+    writes: 0
+  - operation: listPlans
+    verb: GET
+    path: /plans
+    scope: tenant
+    permission: PLATFORM_TENANT_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listSubscriptionInvoices
+    verb: GET
+    path: /tenants/{tenantId}/invoices
+    scope: tenant
+    permission: PLATFORM_BILLING_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listTenantCells
+    verb: GET
+    path: /tenants/{tenantId}/cells
+    scope: tenant
+    permission: PLATFORM_CELL_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listTenantMigrations
+    verb: GET
+    path: /tenant-migrations
+    scope: tenant
+    permission: PLATFORM_CELL_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listTenants
+    verb: GET
+    path: /tenants
+    scope: tenant
+    permission: PLATFORM_TENANT_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listVenueTypeTemplates
+    verb: GET
+    path: /venue-type-templates
+    scope: tenant
+    permission: TENANT_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: planTenantMigration
+    verb: POST
+    path: /tenant-migrations
+    scope: tenant
+    permission: PLATFORM_CELL_VIEW
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: previewSubscriptionChange
+    verb: POST
+    path: /tenants/{tenantId}/subscription/preview
+    scope: tenant
+    permission: PLATFORM_TENANT_VIEW
+    offline: false
+    reads: 4
+    writes: 1
+  - operation: provisionCell
+    verb: POST
+    path: /tenants/{tenantId}/cells
+    scope: tenant
+    permission: PLATFORM_CELL_MANAGE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: reactivateTenant
+    verb: POST
+    path: /tenants/{tenantId}/reactivate
+    scope: tenant
+    permission: PLATFORM_TENANT_MANAGE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: recordInvoicePayment
+    verb: POST
+    path: /invoices/{invoiceId}/payment
+    scope: tenant
+    permission: PLATFORM_BILLING_MANAGE
+    offline: false
+    reads: 3
+    writes: 2
+  - operation: recordUsage
+    verb: POST
+    path: /usage-records
+    scope: tenant
+    permission: null
+    offline: false
+    reads: 3
+    writes: 2
+  - operation: registerPartner
+    verb: POST
+    path: /partner-registrations
+    scope: tenant
+    permission: null
+    offline: false
+    reads: 1
+    writes: 3
+  - operation: removeLicenceAddOn
+    verb: DELETE
+    path: /tenants/{tenantId}/licences/add-ons
+    scope: tenant
+    permission: PLATFORM_TENANT_MANAGE
+    offline: false
+    reads: 2
+    writes: 3
+  - operation: resolveInvoiceDispute
+    verb: POST
+    path: /invoices/{invoiceId}/resolve-dispute
+    scope: tenant
+    permission: PLATFORM_BILLING_MANAGE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: rollbackTenantMigration
+    verb: POST
+    path: /tenant-migrations/{migrationId}/rollback
+    scope: tenant
+    permission: PLATFORM_CELL_MANAGE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: setChannelListing
+    verb: PUT
+    path: /channel-listings
+    scope: venue
+    permission: PARTNER_MANAGE
+    offline: false
+    reads: 4
+    writes: 2
+  - operation: setSubscription
+    verb: PUT
+    path: /tenants/{tenantId}/subscription
+    scope: tenant
+    permission: PLATFORM_TENANT_MANAGE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: settleAiUsage
+    verb: POST
+    path: /ai-usage/settle
+    scope: tenant
+    permission: PLATFORM_BILLING_MANAGE
+    offline: false
+    reads: 5
+    writes: 2
+  - operation: submitOnboardingApplication
+    verb: POST
+    path: /onboarding-applications
+    scope: tenant
+    permission: TENANT_VIEW
+    offline: false
+    reads: 3
+    writes: 2
+  - operation: suspendTenant
+    verb: POST
+    path: /tenants/{tenantId}/suspend
+    scope: tenant
+    permission: PLATFORM_TENANT_MANAGE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: terminateTenant
+    verb: POST
+    path: /tenants/{tenantId}/terminate
+    scope: tenant
+    permission: PLATFORM_TENANT_TERMINATE
+    offline: false
+    reads: 3
+    writes: 3
+  - operation: updateCellTier
+    verb: PATCH
+    path: /cells/{cellId}
+    scope: tenant
+    permission: PLATFORM_CELL_MANAGE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: updatePartnerAgreement
+    verb: PATCH
+    path: /partner-agreements/{agreementId}
+    scope: tenant
+    permission: PARTNER_MANAGE
+    offline: false
+    reads: 3
+    writes: 2
+  - operation: updateTenant
+    verb: PATCH
+    path: /tenants/{tenantId}
+    scope: tenant
+    permission: PLATFORM_TENANT_MANAGE
+    offline: false
+    reads: 2
+    writes: 2
+- contract: platform-ops
+  count: 25
+  operations:
+  - operation: applyMigration
+    verb: POST
+    path: /migrations/apply
+    scope: tenant
+    permission: PLATFORM_MIGRATION_APPLY
+    offline: false
+    reads: 3
+    writes: 3
+  - operation: createRelease
+    verb: POST
+    path: /releases
+    scope: tenant
+    permission: PLATFORM_RELEASE_MANAGE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: getMigrationRun
+    verb: GET
+    path: /migrations/runs/{runId}
+    scope: tenant
+    permission: PLATFORM_MIGRATION_VIEW
+    offline: false
+    reads: 2
+    writes: 0
+  - operation: getRelease
+    verb: GET
+    path: /releases/{releaseId}
+    scope: tenant
+    permission: PLATFORM_RELEASE_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: getReleaseReadiness
+    verb: GET
+    path: /releases/{releaseId}/readiness
+    scope: tenant
+    permission: PLATFORM_RELEASE_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: getRollout
+    verb: GET
+    path: /rollouts/{rolloutId}
+    scope: tenant
+    permission: PLATFORM_RELEASE_VIEW
+    offline: false
+    reads: 2
+    writes: 0
+  - operation: getVersionSkew
+    verb: GET
+    path: /migrations/version-skew
+    scope: tenant
+    permission: PLATFORM_MIGRATION_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listEnvironments
+    verb: GET
+    path: /environments
+    scope: tenant
+    permission: PLATFORM_RELEASE_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listMigrations
+    verb: GET
+    path: /migrations
+    scope: tenant
+    permission: PLATFORM_MIGRATION_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listReleases
+    verb: GET
+    path: /releases
+    scope: tenant
+    permission: PLATFORM_RELEASE_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listRollouts
+    verb: GET
+    path: /rollouts
+    scope: tenant
+    permission: PLATFORM_RELEASE_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listSupportNotices
+    verb: GET
+    path: /support-notices
+    scope: tenant
+    permission: PLATFORM_RELEASE_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listUpgradeSchedules
+    verb: GET
+    path: /upgrade-schedules
+    scope: tenant
+    permission: PLATFORM_RELEASE_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: pauseRollout
+    verb: POST
+    path: /rollouts/{rolloutId}/pause
+    scope: tenant
+    permission: PLATFORM_RELEASE_PROMOTE
+    offline: false
+    reads: 3
+    writes: 3
+  - operation: planMigration
+    verb: POST
+    path: /migrations/plan
+    scope: tenant
+    permission: PLATFORM_MIGRATION_VIEW
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: promoteRelease
+    verb: POST
+    path: /releases/{releaseId}/promote
+    scope: tenant
+    permission: PLATFORM_RELEASE_PROMOTE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: publishSupportNotice
+    verb: POST
+    path: /support-notices
+    scope: tenant
+    permission: PLATFORM_RELEASE_MANAGE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: registerEnvironment
+    verb: POST
+    path: /environments
+    scope: tenant
+    permission: PLATFORM_RELEASE_MANAGE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: rejectRelease
+    verb: POST
+    path: /releases/{releaseId}/reject
+    scope: tenant
+    permission: PLATFORM_RELEASE_PROMOTE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: rollbackMigrationRun
+    verb: POST
+    path: /migrations/runs/{runId}/rollback
+    scope: tenant
+    permission: PLATFORM_MIGRATION_APPLY
+    offline: false
+    reads: 3
+    writes: 3
+  - operation: rollbackRollout
+    verb: POST
+    path: /rollouts/{rolloutId}/rollback
+    scope: tenant
+    permission: PLATFORM_RELEASE_PROMOTE
+    offline: false
+    reads: 3
+    writes: 3
+  - operation: scheduleTenantUpgrade
+    verb: POST
+    path: /upgrade-schedules
+    scope: tenant
+    permission: PLATFORM_RELEASE_MANAGE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: skipRolloutCell
+    verb: POST
+    path: /rollouts/{rolloutId}/cells/{cellId}/skip
+    scope: platform
+    permission: PLATFORM_CELL_MANAGE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: startRollout
+    verb: POST
+    path: /rollouts/{rolloutId}/start
+    scope: tenant
+    permission: PLATFORM_RELEASE_PROMOTE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: withdrawRelease
+    verb: POST
+    path: /releases/{releaseId}/withdraw
+    scope: tenant
+    permission: PLATFORM_RELEASE_MANAGE
+    offline: false
+    reads: 2
+    writes: 2
+- contract: public-api
+  count: 22
+  operations:
+  - operation: certifyIntegration
+    verb: POST
+    path: /listings/{listingId}/certify
+    scope: tenant
+    permission: DEVELOPER_ADMIN
+    offline: false
+    reads: 3
+    writes: 2
+  - operation: createApiClient
+    verb: POST
+    path: /api-clients
+    scope: tenant
+    permission: DEVELOPER_MANAGE
+    offline: false
+    reads: 3
+    writes: 2
+  - operation: createSandbox
+    verb: POST
+    path: /sandboxes
+    scope: tenant
+    permission: DEVELOPER_MANAGE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: createWebhookSubscription
+    verb: POST
+    path: /webhook-subscriptions
+    scope: tenant
+    permission: DEVELOPER_MANAGE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: deprecateApiVersion
+    verb: POST
+    path: /api-versions/{version}/deprecate
+    scope: tenant
+    permission: DEVELOPER_ADMIN
+    offline: false
+    reads: 3
+    writes: 3
+  - operation: getApiUsage
+    verb: GET
+    path: /api-usage
+    scope: tenant
+    permission: DEVELOPER_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: issueApiToken
+    verb: POST
+    path: /oauth/token
+    scope: tenant
+    permission: DEVELOPER_VIEW
+    offline: false
+    reads: 2
+    writes: 0
+  - operation: listApiClients
+    verb: GET
+    path: /api-clients
+    scope: tenant
+    permission: DEVELOPER_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listApiVersions
+    verb: GET
+    path: /api-versions
+    scope: tenant
+    permission: DEVELOPER_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listIntegrationListings
+    verb: GET
+    path: /listings
+    scope: tenant
+    permission: DEVELOPER_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listSandboxes
+    verb: GET
+    path: /sandboxes
+    scope: tenant
+    permission: DEVELOPER_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listWebhookDeliveries
+    verb: GET
+    path: /webhook-subscriptions/{subscriptionId}/deliveries
+    scope: tenant
+    permission: DEVELOPER_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listWebhookSubscriptions
+    verb: GET
+    path: /webhook-subscriptions
+    scope: tenant
+    permission: DEVELOPER_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: registerDeveloper
+    verb: POST
+    path: /developers
+    scope: tenant
+    permission: DEVELOPER_VIEW
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: replayEvents
+    verb: POST
+    path: /webhook-subscriptions/{subscriptionId}/replay
+    scope: tenant
+    permission: DEVELOPER_MANAGE
+    offline: false
+    reads: 3
+    writes: 2
+  - operation: resetSandbox
+    verb: POST
+    path: /sandboxes/{sandboxId}/reset
+    scope: tenant
+    permission: DEVELOPER_MANAGE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: revokeApiCredential
+    verb: DELETE
+    path: /api-clients/{clientId}/credentials
+    scope: tenant
+    permission: DEVELOPER_MANAGE
+    offline: false
+    reads: 2
+    writes: 1
+  - operation: rotateApiCredential
+    verb: POST
+    path: /api-clients/{clientId}/credentials
+    scope: tenant
+    permission: DEVELOPER_MANAGE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: setApiLicensing
+    verb: PUT
+    path: /api-licensing
+    scope: tenant
+    permission: DEVELOPER_ADMIN
+    offline: false
+    reads: 2
+    writes: 3
+  - operation: setApiQuota
+    verb: PUT
+    path: /api-quotas
+    scope: tenant
+    permission: DEVELOPER_ADMIN
+    offline: false
+    reads: 2
+    writes: 3
+  - operation: setDeveloperMembers
+    verb: PUT
+    path: /developers/{developerId}/members
+    scope: tenant
+    permission: DEVELOPER_MANAGE
+    offline: false
+    reads: 3
+    writes: 3
+  - operation: submitIntegrationListing
+    verb: POST
+    path: /listings
+    scope: tenant
+    permission: DEVELOPER_MANAGE
+    offline: false
+    reads: 2
+    writes: 2
+tables:
+- table: control.api_client
+  columns: 10
+  store: postgres
+  parent: null
+  writtenBy:
+  - public-api
+  foreignWriters: null
+- table: control.api_licence
+  columns: 8
+  store: postgres
+  parent: null
+  writtenBy:
+  - public-api
+  foreignWriters: null
+- table: control.api_quota
+  columns: 7
+  store: postgres
+  parent: null
+  writtenBy:
+  - public-api
+  foreignWriters: null
+- table: control.api_version
+  columns: 8
+  store: postgres
+  parent: null
+  writtenBy:
+  - public-api
+  foreignWriters: null
+- table: control.cell
+  columns: 19
+  store: postgres
+  parent: null
+  writtenBy:
+  - subscription
+  foreignWriters: null
+- table: control.cell_cluster
+  columns: 11
+  store: postgres
+  parent: control.cell
+  writtenBy:
+  - subscription
+  foreignWriters: null
+- table: control.cell_job
+  columns: 10
+  store: postgres
+  parent: control.cell
+  writtenBy:
+  - subscription
+  foreignWriters: null
+- table: control.channel_listing
+  columns: 12
+  store: postgres
+  parent: null
+  writtenBy:
+  - subscription
+  foreignWriters: null
+- table: control.content_block
+  columns: 11
+  store: postgres
+  parent: null
+  writtenBy:
+  - white-label
+  foreignWriters:
+  - white-label
+- table: control.developer_account
+  columns: 8
+  store: postgres
+  parent: null
+  writtenBy:
+  - public-api
+  foreignWriters: null
+- table: control.environment
+  columns: 9
+  store: postgres
+  parent: null
+  writtenBy:
+  - platform-ops
+  foreignWriters: null
+- table: control.footer_config
+  columns: 4
+  store: postgres
+  parent: null
+  writtenBy:
+  - white-label
+  foreignWriters:
+  - white-label
+- table: control.integration_listing
+  columns: 11
+  store: postgres
+  parent: null
+  writtenBy:
+  - public-api
+  foreignWriters: null
+- table: control.invoice
+  columns: 13
+  store: postgres
+  parent: null
+  writtenBy:
+  - subscription
+  foreignWriters: null
+- table: control.invoice_line
+  columns: 7
+  store: postgres
+  parent: control.invoice
+  writtenBy: []
+  foreignWriters: null
+- table: control.licence_add_on
+  columns: 6
+  store: postgres
+  parent: null
+  writtenBy:
+  - subscription
+  foreignWriters: null
+- table: control.migration
+  columns: 11
+  store: postgres
+  parent: null
+  writtenBy: []
+  foreignWriters: null
+- table: control.migration_plan
+  columns: 7
+  store: postgres
+  parent: null
+  writtenBy:
+  - platform-ops
+  foreignWriters: null
+- table: control.migration_plan_cell
+  columns: 7
+  store: postgres
+  parent: control.migration_plan
+  writtenBy: []
+  foreignWriters: null
+- table: control.migration_run
+  columns: 10
+  store: postgres
+  parent: null
+  writtenBy:
+  - platform-ops
+  foreignWriters: null
+- table: control.migration_run_cell
+  columns: 13
+  store: postgres
+  parent: control.migration_run
+  writtenBy: []
+  foreignWriters: null
+- table: control.onboarding_application
+  columns: 11
+  store: postgres
+  parent: null
+  writtenBy:
+  - subscription
+  foreignWriters: null
+- table: control.partner_agreement
+  columns: 28
+  store: postgres
+  parent: null
+  writtenBy:
+  - subscription
+  foreignWriters: null
+- table: control.partner_user
+  columns: 7
+  store: postgres
+  parent: null
+  writtenBy:
+  - subscription
+  foreignWriters: null
+- table: control.plan
+  columns: 15
+  store: postgres
+  parent: null
+  writtenBy:
+  - subscription
+  foreignWriters: null
+- table: control.release
+  columns: 1
+  store: postgres
+  parent: control.plan
+  writtenBy:
+  - platform-ops
+  foreignWriters: null
+- table: control.rollout
+  columns: 12
+  store: postgres
+  parent: null
+  writtenBy:
+  - platform-ops
+  foreignWriters: null
+- table: control.rollout_cell
+  columns: 12
+  store: postgres
+  parent: control.cell
+  writtenBy:
+  - platform-ops
+  foreignWriters: null
+- table: control.sandbox
+  columns: 8
+  store: postgres
+  parent: null
+  writtenBy:
+  - public-api
+  foreignWriters: null
+- table: control.seo_metadata
+  columns: 14
+  store: postgres
+  parent: null
+  writtenBy:
+  - marketing-crm
+  foreignWriters:
+  - marketing-crm
+- table: control.subscription
+  columns: 10
+  store: postgres
+  parent: platform.tenant
+  writtenBy:
+  - subscription
+  foreignWriters: null
+- table: control.support_notice
+  columns: 7
+  store: postgres
+  parent: null
+  writtenBy:
+  - platform-ops
+  foreignWriters: null
+- table: control.tenant
+  columns: 14
+  store: postgres
+  parent: null
+  writtenBy:
+  - subscription
+  foreignWriters: null
+- table: control.tenant_migration
+  columns: 15
+  store: postgres
+  parent: control.tenant
+  writtenBy:
+  - subscription
+  foreignWriters: null
+- table: control.tenant_migration_plan
+  columns: 13
+  store: postgres
+  parent: control.tenant
+  writtenBy:
+  - subscription
+  foreignWriters: null
+- table: control.upgrade_schedule
+  columns: 8
+  store: postgres
+  parent: platform.tenant
+  writtenBy:
+  - platform-ops
+  foreignWriters: null
+- table: control.url_redirect
+  columns: 7
+  store: postgres
+  parent: null
+  writtenBy:
+  - marketing-crm
+  foreignWriters:
+  - marketing-crm
+- table: control.usage_record
+  columns: 6
+  store: postgres
+  parent: null
+  writtenBy:
+  - subscription
+  foreignWriters: null
+- table: control.venue_type_template
+  columns: 7
+  store: postgres
+  parent: null
+  writtenBy: []
+  foreignWriters: null
+- table: control.webhook_delivery
+  columns: 10
+  store: postgres
+  parent: null
+  writtenBy:
+  - public-api
+  foreignWriters: null
+- table: control.webhook_subscription
+  columns: 9
+  store: postgres
+  parent: null
+  writtenBy:
+  - public-api
+  foreignWriters: null
+readsFrom:
+- service: LedgerService
+  operations: 6
+- service: TenancyService
+  operations: 4
+- service: CatalogueService
+  operations: 4
+- service: AiService
+  operations: 3
+- service: OrderService
+  operations: 3
+- service: IdentityService
+  operations: 3
+writesOutside:
+- service: TenancyService
+  operations: 2
+  why: '**The owner defines the row; this service may only append to it.**'
+- service: IdentityService
+  operations: 1
+  why: '**The owner defines the row; this service may only append to it.**'
+- service: MarketingService
+  operations: 1
+  why: '**The owner defines the row; this service may only append to it.**'
+screens:
+- P08:BO-013 Channel & Distribution
+- P08:BO-126 Deployment, Preview & Audit
+- P09:ADM-002 Platform Dashboard
+- P09:ADM-003 Cross-Tenant Health Dashboard
+- P09:ADM-005 Tenant Directory
+- P09:ADM-006 Tenant Hierarchy Explorer
+- P09:ADM-007 Module & Feature Entitlement
+- P09:ADM-008 Subscription & Plan Management
+- P09:ADM-009 Tenant Billing & Invoicing
+- P09:ADM-010 Usage Metering
+- P09:ADM-011 Licence & Seat Management
+- P09:ADM-012 Tenant Isolation & Resource Pool
+- P09:ADM-013 Tenant Performance Monitor
+- P09:ADM-014 Auto-Scaling Configuration
+- P09:ADM-015 API Rate Limit & Quota Management
+- P09:ADM-019 Global Configuration & Defaults
+- P09:ADM-022 Release & Version Management
+- P09:ADM-023 Staging Promotion & Approval
+- P09:ADM-024 Release Notification Composer
+- P09:ADM-025 Tenant Upgrade Scheduler
+- P09:ADM-026 End-of-Support Notice Management
+- P09:ADM-027 Database Migration Console
+- P09:ADM-028 Environment Registry
+- P09:ADM-029 Deployment Monitor
+- P09:ADM-030 Infrastructure Sizing & Scaling Policy
+- P09:ADM-032 WAF & Security Policy View
+- P09:ADM-033 Backup & DR Status
+- P09:ADM-034 Archival Job Monitor
+- P09:ADM-035 Support & Escalation Console
+- P09:ADM-036 Platform Notification Broadcast
+- P10:PTR-001 Partner Login / MFA
+- P10:PTR-011 Quote Management
+- P10:PTR-017 Commission Statement
+- P13:CMS-001 Tenant Workspace
+- P14:DEV-001 API Reference
+- P14:DEV-002 Register & Organisation
+- P14:DEV-003 Clients & Credentials
+- P14:DEV-004 Sandbox
+- P14:DEV-005 Webhooks
+- P14:DEV-006 Usage & Limits
+- P14:DEV-007 Marketplace Listing
+- P14:DEV-008 Programme Administration
+flows:
+- F04 Platform admin ships a release
+- F102 A brand is set, previewed, published and rolled back
+- F104 A platform operator signs in under MFA
+- F105 A rate limit is set and a developer hits it
+- F16 A venue opens for the first time
+- F27 A developer integrates
+- F77 A promotion is built, bundled, published and measured
+- F79 A workstation is registered, configured and rolled out
+- F96 A tenant is provisioned, licensed and its modules enabled
+- F97 A cell is capacity-checked and a tenant is placed on it

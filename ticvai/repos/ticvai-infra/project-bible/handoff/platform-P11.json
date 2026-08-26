@@ -1,0 +1,129 @@
+{
+ "code": "P11",
+ "name": "Accreditation Web \u2014 Applications",
+ "shortName": "Accreditation Web",
+ "app": "accreditation-web",
+ "operator": "public",
+ "audience": "public",
+ "formFactor": "web",
+ "offlineCapable": false,
+ "generated": "2026-08-24",
+ "note": "Derived by tools/derive-platform.py. **The gaps section is the point** \u2014 a page listing what exists is a directory; one listing what is missing is a worklist.",
+ "counts": {
+  "screens": 8,
+  "operations": 3,
+  "contracts": 2,
+  "modules": 2,
+  "undrawn": 0,
+  "operationsWithNoScreen": 0
+ },
+ "waves": {
+  "wave3": 8
+ },
+ "modules": [
+  {
+   "module": "Applicant Journey",
+   "screens": 5,
+   "waves": [
+    3
+   ]
+  },
+  {
+   "module": "Reviewer (Internal)",
+   "screens": 3,
+   "waves": [
+    3
+   ]
+  }
+ ],
+ "contracts": [
+  {
+   "contract": "approvals",
+   "operations": 2
+  },
+  {
+   "contract": "queue",
+   "operations": 1
+  }
+ ],
+ "screens": [
+  {
+   "id": "ACC-001",
+   "name": "Landing / Programme Overview",
+   "module": "Applicant Journey",
+   "wave": 3,
+   "route": "/applicant-journey/landing-programme-overview",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ACC-002",
+   "name": "Registration Form",
+   "module": "Applicant Journey",
+   "wave": 3,
+   "route": "/applicant-journey/registration-form",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ACC-003",
+   "name": "Application Review & Submit",
+   "module": "Applicant Journey",
+   "wave": 3,
+   "route": "/applicant-journey/application-review-and-submit",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ACC-004",
+   "name": "Application Status Tracking",
+   "module": "Applicant Journey",
+   "wave": 3,
+   "route": "/applicant-journey/application-status-tracking",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ACC-005",
+   "name": "Accreditation Badge",
+   "module": "Applicant Journey",
+   "wave": 3,
+   "route": "/applicant-journey/accreditation-badge",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ACC-006",
+   "name": "Reviewer Queue",
+   "module": "Reviewer (Internal)",
+   "wave": 3,
+   "route": "/reviewer-internal/reviewer-queue",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ACC-007",
+   "name": "Reviewer Application Detail",
+   "module": "Reviewer (Internal)",
+   "wave": 3,
+   "route": "/reviewer-internal/reviewer-application-detail",
+   "operations": 2,
+   "drawn": true
+  },
+  {
+   "id": "ACC-008",
+   "name": "Credential Register",
+   "module": "Reviewer (Internal)",
+   "wave": 3,
+   "route": "/reviewer-internal/credential-register",
+   "operations": 0,
+   "drawn": true
+  }
+ ],
+ "gaps": {
+  "operationsWithNoScreen": [],
+  "modulesSplitAcrossWaves": [],
+  "screensNotDrawn": [],
+  "flowsNamingAMissingScreen": []
+ }
+}

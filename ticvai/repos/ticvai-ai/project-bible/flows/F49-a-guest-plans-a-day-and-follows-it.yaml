@@ -1,0 +1,72 @@
+$schema: ./_schema.yaml
+id: F49
+name: A guest plans a day and follows it
+actor: guest
+capability: Itinerary planning
+wave: 3
+frequency: Routine.
+criticality: revenue
+primaryContract: ai
+contracts:
+- ai
+- catalogue
+- queue
+platforms:
+- P02
+trigger:
+  description: A guest with a whole day and too many options. **Planning is the feature a venue sells
+    a full-day ticket on.**
+offlineBehaviour: '**A saved itinerary reads offline; building one does not.** The plan is worth having
+  in a basement; making it needs availability nobody can cache.'
+steps:
+- step: 1
+  screen: GST-051
+  action: They start planning.
+  operations:
+  - listProducts
+  outcome: What is on, and when.
+- step: 2
+  screen: GST-052
+  action: Suggested itineraries are offered.
+  operations:
+  - listProducts
+  outcome: '**Seeded, not generated, on day one.** A venue with no history has nothing to learn from,
+    and a suggestion built on nothing is worse than a curated list.'
+  crossesDevice: true
+- step: 3
+  screen: GST-053
+  action: They build their own instead.
+  operations:
+  - listProducts
+  outcome: '**Availability at build time, not at save time.** A plan that books nothing is a plan the
+    venue cannot honour.'
+  crossesDevice: true
+- step: 4
+  screen: GST-054
+  action: An optimised order is proposed.
+  operations:
+  - requestSuggestion
+  outcome: '**`kind=scenario` through the one suggestion operation** — not a bespoke endpoint, which
+    is the whole point of the abstraction.'
+  crossesDevice: true
+- step: 5
+  screen: GST-059
+  action: They follow it through the day.
+  operations:
+  - getWaitTimes
+  outcome: '**Re-ordered as waits change.** A plan fixed at 9am is a plan abandoned by 11.'
+  crossesDevice: true
+exitStates:
+- state: followed
+  description: Planned and largely followed.
+- state: abandoned
+  description: '**Plans are abandoned constantly and that is normal** — the value is in what was attempted.'
+branches:
+- at: 4
+  condition: There is not enough history to optimise.
+  behaviour: '**Refused with a reason** — `requestSuggestion` returns 422 naming what is missing. A
+    confident itinerary built on nothing teaches a guest not to trust the next one.'
+  severity: medium
+  resolvedBy: requestSuggestion
+notes: '**Written 24 August.** Five screens, and `GST-054` is the first guest-facing use of `requestSuggestion`.'
+openQuestions: null

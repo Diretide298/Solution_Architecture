@@ -1,0 +1,692 @@
+id: LLD-white-label
+title: white-label — 50 operations
+generatedBy: tools/derive-diagrams.py
+index: diagrams/hld/03-contracts.yaml
+tier: satellite
+service: WhiteLabelService
+operations:
+- operation: claimCustomDomain
+  verb: POST
+  path: /tenant-domains
+  scope: tenant
+  permission: TENANT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - control.tenant
+  - whitelabel.custom_domain
+  writes:
+  - cache:idempotency
+  - whitelabel.custom_domain
+- operation: createBanner
+  verb: POST
+  path: /tenant-config/banners
+  scope: tenant
+  permission: TENANT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - whitelabel.banner
+  writes:
+  - cache:idempotency
+  - whitelabel.banner
+- operation: createContentBlock
+  verb: POST
+  path: /content-blocks
+  scope: tenant
+  permission: TENANT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - marketing.segment
+  writes:
+  - cache:idempotency
+  - control.content_block
+- operation: createContentPage
+  verb: POST
+  path: /tenant-config/pages
+  scope: tenant
+  permission: TENANT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - whitelabel.content_page
+  writes:
+  - cache:idempotency
+  - whitelabel.content_page
+- operation: createPreview
+  verb: POST
+  path: /tenant-config/preview
+  scope: tenant
+  permission: TENANT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - whitelabel.tenant_config
+  writes:
+  - cache:idempotency
+  - whitelabel.tenant_config
+- operation: createPromoBlock
+  verb: POST
+  path: /tenant-config/promo-blocks
+  scope: tenant
+  permission: TENANT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - whitelabel.promo_block
+  writes:
+  - cache:idempotency
+  - whitelabel.promo_block
+- operation: deleteBanner
+  verb: DELETE
+  path: /tenant-config/banners/{bannerId}
+  scope: tenant
+  permission: TENANT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - whitelabel.tenant_config
+  writes:
+  - cache:idempotency
+  - whitelabel.tenant_config
+- operation: deleteContentPage
+  verb: DELETE
+  path: /tenant-config/pages/{pageId}
+  scope: tenant
+  permission: TENANT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - whitelabel.tenant_config
+  writes:
+  - cache:idempotency
+  - whitelabel.tenant_config
+- operation: deletePromoBlock
+  verb: DELETE
+  path: /tenant-config/promo-blocks/{promoBlockId}
+  scope: tenant
+  permission: TENANT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - whitelabel.promo_block
+  writes:
+  - cache:idempotency
+  - whitelabel.promo_block
+- operation: diffConfigVersion
+  verb: GET
+  path: /tenant-config/versions/{version}/diff
+  scope: tenant
+  permission: TENANT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - whitelabel.tenant_config
+  writes: []
+- operation: getAppIcons
+  verb: GET
+  path: /tenant-config/app-icons
+  scope: tenant
+  permission: TENANT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - whitelabel.tenant_config
+  writes: []
+- operation: getBrandIdentity
+  verb: GET
+  path: /tenant-config/brand
+  scope: tenant
+  permission: TENANT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - whitelabel.tenant_config
+  writes: []
+- operation: getFeatureToggles
+  verb: GET
+  path: /tenant-config/features
+  scope: tenant
+  permission: TENANT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:resolution
+  - whitelabel.feature_toggle
+  writes:
+  - cache:resolution
+- operation: getFonts
+  verb: GET
+  path: /tenant-config/fonts
+  scope: tenant
+  permission: TENANT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - whitelabel.tenant_config
+  writes: []
+- operation: getHomepageLayout
+  verb: GET
+  path: /tenant-config/homepage
+  scope: tenant
+  permission: TENANT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - whitelabel.homepage_section
+  writes: []
+- operation: getModuleEnablement
+  verb: GET
+  path: /tenant-config/modules
+  scope: tenant
+  permission: TENANT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:resolution
+  - whitelabel.module_enablement
+  writes:
+  - cache:resolution
+- operation: getNavigation
+  verb: GET
+  path: /tenant-config/navigation
+  scope: tenant
+  permission: TENANT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:resolution
+  - whitelabel.navigation_item
+  writes:
+  - cache:resolution
+- operation: getTenantAppStatus
+  verb: GET
+  path: /tenant-config/status
+  scope: tenant
+  permission: null
+  audience:
+  - device
+  - guest
+  offline: true
+  reads:
+  - whitelabel.config_version
+  - whitelabel.tenant_config
+  writes: []
+- operation: getTenantConfig
+  verb: GET
+  path: /tenant-config
+  scope: tenant
+  permission: TENANT_CONFIGURE
+  audience:
+  - staff
+  - guest
+  offline: false
+  reads:
+  - cache:resolution
+  - whitelabel.feature_toggle
+  - whitelabel.homepage_section
+  - whitelabel.module_enablement
+  - whitelabel.navigation_item
+  - whitelabel.tenant_config
+  writes:
+  - cache:resolution
+- operation: getTheme
+  verb: GET
+  path: /tenant-config/theme
+  scope: tenant
+  permission: TENANT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:resolution
+  - whitelabel.tenant_config
+  writes:
+  - cache:resolution
+- operation: listBanners
+  verb: GET
+  path: /tenant-config/banners
+  scope: tenant
+  permission: TENANT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - whitelabel.banner
+  writes: []
+- operation: listConfigVersions
+  verb: GET
+  path: /tenant-config/versions
+  scope: tenant
+  permission: TENANT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - whitelabel.config_version
+  writes: []
+- operation: listContentPages
+  verb: GET
+  path: /tenant-config/pages
+  scope: tenant
+  permission: TENANT_CONFIGURE
+  audience:
+  - staff
+  - guest
+  offline: true
+  reads:
+  - whitelabel.content_page
+  writes: []
+- operation: listCustomDomains
+  verb: GET
+  path: /tenant-domains
+  scope: tenant
+  permission: TENANT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - whitelabel.custom_domain
+  writes: []
+- operation: listFaqs
+  verb: GET
+  path: /tenant-config/faqs
+  scope: tenant
+  permission: TENANT_CONFIGURE
+  audience:
+  - staff
+  - guest
+  offline: true
+  reads:
+  - whitelabel.faq_category
+  writes: []
+- operation: listPolicies
+  verb: GET
+  path: /tenant-config/policies
+  scope: tenant
+  permission: TENANT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - whitelabel.policy
+  writes: []
+- operation: listPromoBlocks
+  verb: GET
+  path: /tenant-config/promo-blocks
+  scope: tenant
+  permission: TENANT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - whitelabel.promo_block
+  writes: []
+- operation: publishContentBlock
+  verb: POST
+  path: /content-blocks/{blockId}/publish
+  scope: tenant
+  permission: TENANT_PUBLISH
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - control.content_block
+  - identity.principal
+  writes:
+  - cache:idempotency
+  - cache:resolution
+  - control.content_block
+- operation: publishTenantConfig
+  verb: POST
+  path: /tenant-config/publish
+  scope: tenant
+  permission: TENANT_PUBLISH
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - whitelabel.config_version
+  writes:
+  - cache:idempotency
+  - cache:resolution
+  - whitelabel.config_version
+- operation: releaseCustomDomain
+  verb: DELETE
+  path: /tenant-domains/{domainId}
+  scope: tenant
+  permission: TENANT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - whitelabel.config_version
+  - whitelabel.custom_domain
+  writes:
+  - cache:idempotency
+  - cache:resolution
+  - whitelabel.custom_domain
+- operation: restoreConfigVersion
+  verb: POST
+  path: /tenant-config/versions/{version}/restore
+  scope: tenant
+  permission: TENANT_PUBLISH
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - whitelabel.feature_toggle
+  - whitelabel.homepage_section
+  - whitelabel.module_enablement
+  - whitelabel.navigation_item
+  - whitelabel.tenant_config
+  writes:
+  - cache:idempotency
+  - cache:resolution
+  - whitelabel.feature_toggle
+  - whitelabel.homepage_section
+  - whitelabel.module_enablement
+  - whitelabel.navigation_item
+  - whitelabel.tenant_config
+- operation: setAppIcons
+  verb: PUT
+  path: /tenant-config/app-icons
+  scope: tenant
+  permission: TENANT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - whitelabel.tenant_config
+  writes:
+  - cache:idempotency
+  - whitelabel.tenant_config
+- operation: setBrandIdentity
+  verb: PUT
+  path: /tenant-config/brand
+  scope: tenant
+  permission: TENANT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - whitelabel.tenant_config
+  writes:
+  - cache:idempotency
+  - whitelabel.tenant_config
+- operation: setFaqs
+  verb: PUT
+  path: /tenant-config/faqs
+  scope: tenant
+  permission: TENANT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - whitelabel.faq_category
+  writes:
+  - cache:idempotency
+  - whitelabel.faq_category
+- operation: setFeatureToggles
+  verb: PUT
+  path: /tenant-config/features
+  scope: tenant
+  permission: TENANT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - whitelabel.feature_toggle
+  writes:
+  - cache:idempotency
+  - cache:resolution
+  - whitelabel.feature_toggle
+- operation: setFonts
+  verb: PUT
+  path: /tenant-config/fonts
+  scope: tenant
+  permission: TENANT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - whitelabel.tenant_config
+  writes:
+  - cache:idempotency
+  - whitelabel.tenant_config
+- operation: setFooter
+  verb: PUT
+  path: /footer
+  scope: tenant
+  permission: TENANT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - control.footer_config
+  writes:
+  - cache:idempotency
+  - cache:resolution
+  - control.footer_config
+- operation: setHeader
+  verb: PUT
+  path: /tenant-config/header
+  scope: tenant
+  permission: TENANT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - whitelabel.tenant_config
+  writes:
+  - cache:idempotency
+  - whitelabel.tenant_config
+- operation: setHomepageLayout
+  verb: PUT
+  path: /tenant-config/homepage
+  scope: tenant
+  permission: TENANT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - whitelabel.homepage_section
+  writes:
+  - cache:idempotency
+  - whitelabel.homepage_section
+- operation: setLanguages
+  verb: PUT
+  path: /tenant-config/languages
+  scope: tenant
+  permission: TENANT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - whitelabel.tenant_config
+  writes:
+  - cache:idempotency
+  - whitelabel.tenant_config
+- operation: setMaintenanceMode
+  verb: PUT
+  path: /tenant-config/status
+  scope: tenant
+  permission: TENANT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - whitelabel.tenant_config
+  writes:
+  - cache:idempotency
+  - whitelabel.tenant_config
+- operation: setModuleEnablement
+  verb: PUT
+  path: /tenant-config/modules
+  scope: tenant
+  permission: TENANT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - whitelabel.module_enablement
+  writes:
+  - cache:idempotency
+  - cache:resolution
+  - whitelabel.module_enablement
+- operation: setNavigation
+  verb: PUT
+  path: /tenant-config/navigation
+  scope: tenant
+  permission: TENANT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - whitelabel.navigation_item
+  writes:
+  - cache:idempotency
+  - cache:resolution
+  - whitelabel.navigation_item
+- operation: setPolicy
+  verb: PUT
+  path: /tenant-config/policies/{policyKind}
+  scope: tenant
+  permission: TENANT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - whitelabel.policy
+  writes:
+  - cache:idempotency
+  - whitelabel.policy
+- operation: setTheme
+  verb: PUT
+  path: /tenant-config/theme
+  scope: tenant
+  permission: TENANT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - whitelabel.tenant_config
+  writes:
+  - cache:idempotency
+  - cache:resolution
+  - whitelabel.tenant_config
+- operation: updateBanner
+  verb: PATCH
+  path: /tenant-config/banners/{bannerId}
+  scope: tenant
+  permission: TENANT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - whitelabel.banner
+  writes:
+  - cache:idempotency
+  - whitelabel.banner
+- operation: updateContentPage
+  verb: PUT
+  path: /tenant-config/pages/{pageId}
+  scope: tenant
+  permission: TENANT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - whitelabel.content_page
+  writes:
+  - cache:idempotency
+  - whitelabel.content_page
+- operation: updatePromoBlock
+  verb: PATCH
+  path: /tenant-config/promo-blocks/{promoBlockId}
+  scope: tenant
+  permission: TENANT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - whitelabel.promo_block
+  writes:
+  - cache:idempotency
+  - whitelabel.promo_block
+- operation: validateTenantConfig
+  verb: POST
+  path: /tenant-config/validate
+  scope: tenant
+  permission: TENANT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - whitelabel.tenant_config
+  writes:
+  - cache:idempotency
+  - whitelabel.tenant_config
+- operation: verifyCustomDomain
+  verb: POST
+  path: /tenant-domains/{domainId}/verify
+  scope: tenant
+  permission: TENANT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - whitelabel.custom_domain
+  writes:
+  - cache:idempotency
+  - whitelabel.custom_domain

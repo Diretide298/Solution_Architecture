@@ -1,0 +1,56 @@
+id: LLD-Voucher
+title: Voucher — 7 transitions
+generatedBy: tools/derive-diagrams.py
+index: diagrams/hld/04-lifecycles.yaml
+source: states/voucher.yaml
+entity: Voucher
+contract: promotions
+enum: Voucher.status
+enumKind: inline
+enumSchema: Voucher
+enumProperty: status
+owner: promotions
+initial:
+- issued
+terminal:
+- redeemed
+- expired
+- voided
+transitions:
+- from: issued
+  to: partiallyRedeemed
+  operation: redeemVoucher
+  trigger: operation
+  guard: '**Part of the value used.** A 100 voucher spent 40 leaves 60'
+- from: partiallyRedeemed
+  to: redeemed
+  operation: redeemVoucher
+  trigger: operation
+  guard: Exhausted
+- from: issued
+  to: redeemed
+  operation: redeemVoucher
+  trigger: operation
+  guard: Used in one go
+- from: issued
+  to: expired
+  trigger: timer
+  guard: '**Unredeemed value is a liability that stops being one** — and whether it is written back
+    to revenue is a finance decision, not a technical one'
+- from: partiallyRedeemed
+  to: expired
+  trigger: timer
+  guard: Partially used and lapsed
+- from: issued
+  to: voided
+  operation: voidVoucher
+  trigger: operation
+  guard: Cancelled — issued in error, or fraud
+- from: partiallyRedeemed
+  to: voided
+  operation: voidVoucher
+  trigger: operation
+  guard: '**Voiding a partly-used voucher does not reverse what was spent.** The redemption already
+    happened'
+notes: A voucher carries value and therefore a liability. **`expired` is where that liability is released**,
+  and the accounting treatment of breakage should be stated rather than assumed.

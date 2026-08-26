@@ -1,0 +1,70 @@
+$schema: ./_schema.yaml
+id: F80
+name: A table is configured, reserved, seated and billed
+actor: supervisor
+capability: A table is configured, reserved, seated and billed
+wave: 2
+frequency: As the venue needs it.
+criticality: revenue
+primaryContract: fnb
+contracts:
+- fnb
+- orders
+- marketing-crm
+platforms:
+- P06
+trigger:
+  description: A restaurant sets up its floor and works a service on it.
+offlineBehaviour: '**Service works offline; configuration does not.** A floor plan edited on two devices
+  with no network is two floor plans.'
+steps:
+- step: 1
+  screen: EMP-059
+  action: Table Order, Bill & Payment Management.
+  operations:
+  - transferOrderItems
+  outcome: '**Drawn by the client as FNB-4J.** 1 operations on this step.'
+- step: 2
+  screen: EMP-058
+  action: Live Table & Service Management.
+  operations:
+  - holdCourse
+  - joinRestaurantWaitlist
+  - mergeTableVisits
+  - moveTableVisit
+  - notifyWaitlistParty
+  - quoteWaitTime
+  outcome: '**Drawn by the client as FNB-4B.** 10 operations on this step.'
+- step: 3
+  screen: EMP-060
+  action: Reservation & Table Performance.
+  operations:
+  - getTableMap
+  - listTableReservations
+  outcome: '**Drawn by the client as FNB-4C.** 2 operations on this step.'
+  crossesDevice: true
+- step: 4
+  screen: EMP-061
+  action: Retail Inventory Command Center.
+  operations:
+  - listStockMovements
+  outcome: '**Drawn by the client as FNB-4D.** 1 operations on this step.'
+  crossesDevice: true
+branches:
+- at: 1
+  condition: A step in the chain is not licensed for this tenant.
+  behaviour: '**The chain stops at the module boundary.** `requiresModule` on each screen decides —
+    a tenant without the retail licence does not see the retail half, and the journey is shorter rather
+    than broken.'
+  severity: medium
+  resolvedBy: getModuleEnablement
+exitStates:
+- state: completed
+  description: The chain ran as the client drew it.
+- state: stoppedAtModule
+  description: '**A licence boundary, not a failure.**'
+notes: '**F&B board 4 as the client drew it** — configuration through to the bill, which F29 covers
+  only from seating onward. **Derived from the client''s own `GOES TO` edges**, not from an inferred
+  path — a pair of frames the client linked is evidence; a chain assembled from unrelated pairs is a
+  guess.'
+openQuestions: null

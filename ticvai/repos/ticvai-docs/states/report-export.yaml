@@ -1,0 +1,44 @@
+# Report export — state model
+# Contract: reporting.ReportExport.status
+# Checked by tools/check-states.py.
+
+entity: Report export
+contract: reporting
+enum: ReportExport.status
+enumKind: inline
+enumSchema: ReportExport
+enumProperty: status
+owner: reporting
+initial:
+- queued
+terminal:
+- ready
+- failed
+- expired
+transitions:
+- from: queued
+  to: generating
+  operation: exportReportResult
+  trigger: operation
+  guard: Running against the analytical replica
+- from: generating
+  to: ready
+  trigger: job
+  guard: '**A signed URL with a lifetime**, not a permanent file'
+- from: generating
+  to: failed
+  trigger: job
+  guard: Too large, timed out, or the query broke
+- from: ready
+  to: expired
+  trigger: timer
+  guard: '**The link lapsed.** A report containing guest data must not sit on a URL forever, and re-running
+    is cheap'
+- from: failed
+  to: queued
+  operation: exportReportResult
+  trigger: operation
+  guard: Retried
+  isReversal: true
+notes: '`expired` is a privacy control rather than housekeeping. **An export may contain personal data,
+  and a permanent link is a permanent exposure** — CF-64 decides the lifetime.'

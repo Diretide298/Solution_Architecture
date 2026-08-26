@@ -1,0 +1,88 @@
+$schema: ./_schema.yaml
+id: F55
+name: A guest buys on the web and transfers to a friend
+actor: guest
+capability: Web purchase and ticket transfer
+wave: 2
+frequency: Routine.
+criticality: revenue
+primaryContract: orders
+contracts:
+- orders
+- identity
+- access
+- marketing-crm
+platforms:
+- P01
+- P02
+trigger:
+  description: A guest buys four tickets and three are for other people. **The platform has to get a
+    ticket to somebody who has never used it.**
+offlineBehaviour: '**None of it works offline** — a web purchase and a transfer both need the network
+  by definition.'
+steps:
+- step: 1
+  screen: WEB-010
+  action: They build a cart.
+  operations:
+  - getCart
+  - addCartLine
+  - evaluatePromotions
+  - getCouponCode
+  - extendCart
+  outcome: '**`extendCart` exists because a cart with a timed-entry lease expires.** A guest deciding
+    for ten minutes should not lose the slot silently.'
+- step: 2
+  screen: WEB-011
+  action: Attendee details are captured.
+  operations:
+  - getGuestProfile
+  - listConsentPurposes
+  - recordConsent
+  outcome: '**Consent per attendee, not per purchase.** A guest buying for three friends cannot consent
+    on their behalf — CF-160 again, and this is where it bites.'
+- step: 3
+  screen: WEB-010
+  action: They check out.
+  operations:
+  - checkoutCart
+  outcome: '**The lease converts server-side on payment.**'
+- step: 4
+  screen: WEB-030
+  action: They transfer three tickets.
+  operations:
+  - transferOrderTickets
+  - listOrders
+  outcome: '**Transferred, not forwarded.** A PDF sent by WhatsApp is a ticket sold four times.'
+  crossesDevice: true
+- step: 5
+  screen: GST-014
+  action: The friend claims it in the app.
+  operations:
+  - claimTicketTransfer
+  outcome: '**The claim is what binds it to them.** An unclaimed transfer stays with the buyer, which
+    is the only safe default.'
+  crossesDevice: true
+branches:
+- at: 1
+  condition: The cart expires while they decide.
+  behaviour: '`abandonCart` releases the lease. **Recorded** — abandonment against cart age is what
+    sizes the expiry window.'
+  severity: medium
+  resolvedBy: abandonCart
+- at: 5
+  condition: The friend never claims it.
+  behaviour: '**It stays with the buyer and is still valid.** A ticket that evaporates because a friend
+    ignored an email is a ticket the venue was paid for and nobody used.'
+  severity: high
+  resolvedBy: claimTicketTransfer
+exitStates:
+- state: transferred
+  description: Bought, transferred, claimed.
+- state: unclaimed
+  description: '**Still the buyer’s and still valid.**'
+- state: abandoned
+  description: Cart expired, lease released.
+notes: '**Written 24 August.** The web purchase path was partly walked by F01; **the transfer and claim
+  half — `transferOrderTickets`, `claimTicketTransfer`, and consent per attendee — was not.**'
+openQuestions: null

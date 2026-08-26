@@ -1,0 +1,178 @@
+**Minutes of Meeting**
+
+*TICVAI Kick-off Meeting — **FnB**, Wireframe Q**&**A **&** POS/Workstation Management*
+
+| **Date** | 14 August 2026 | **Project** | TICVAI |
+| --- | --- | --- | --- |
+| **Meeting Type** | Workshop — FnB Flow, Product Q&A, Design/Wireframe Walkthrough | **Prepared by** | Chitrangi Mestry |
+
+**Primary Objective**
+
+To resolve open functional and design questions raised by the Softlabs team across AI, finance, front-end (guest website/app), Food & Beverage, retail, POS/kiosk branding, queue management, and parking, and to walk through Allam's wireframes for workstation, till, and POS/device management dashboards, ahead of finalizing the discovery-phase deliverables.
+
+**Participants**
+
+- TICVAI Team 
+
+- Softlabs Team
+
+**Agenda**
+
+- AI configuration assistant — phase-one scope
+
+- Finance — currency locking rules for refunds
+
+- Guest website vs. guest mobile app — architecture and feature parity
+
+- White-labeling and tenant branding/customization boundaries
+
+- Movie ticketing as a supported product category
+
+- Food & Beverage — ordering, delivery, and redemption flows
+
+- Retail — cart, inventory, and cross-venue stock rules
+
+- POS/Kiosk branding and UI ownership
+
+- Queue management — live wait-time integration
+
+- Parking — integration models with third-party systems
+
+- Wireframe walkthrough — workstation/POS/till management dashboards
+
+- Multi-tenant / multi-region database architecture and data residency
+
+- Outstanding deliverables and next steps
+
+**Discussion Summary**
+
+**1. AI Configuration Assistant — Phase-One Scope**
+
+Chinmay clarified that forecasting-type AI use cases (e.g., demand/revenue forecasting) require substantial historical data to train models and cannot be delivered in phase one, though the supporting front-end, back-end, and database components can be built. Qossai and Allam confirmed the priority AI use case for phase one is a configuration assistant that helps a system admin set up products, promotions, and similar configurations conversationally (e.g., prompting the admin on product type — admission, time slot, etc.) rather than data-dependent forecasting. Chinmay also flagged a feasible near-term AI use case: auto-generating a map/seating layout and associated ticket configuration once a venue uploads its map schema and layout image.
+
+**2. Finance — Currency Locking for Refunds**
+
+Chinmay raised the question of at which point (purchase, redemption, or expiry) a currency value should be locked for refund purposes. Allam clarified the platform's model: all transactions are stored and reconciled in the base/local currency configured for the system's region (e.g., UAE). Foreign-currency payments are converted and recorded at the local-currency equivalent at the time of transaction; change and refunds are always issued in the local currency, never in the foreign currency originally tendered. A separate foreign-currency transactions report will show cashier-level foreign-currency activity for reconciliation, but the underlying value is locked at purchase in the base currency regardless of subsequent exchange-rate movement.
+
+**3. Guest Website vs. Guest Mobile App**
+
+Pradnya asked whether each tenant needs its own guest website or shares a common one. Allam described two models: (a) a shared instance where small tenants operate under a subdomain/subpath of the TICVAI domain, and (b) a dedicated tenant model where larger clients get a fully dedicated URL on their own domain. On feature parity, both agreed the guest website and guest mobile app should share the same CMS/back-end publishing and the same branding, look, and feel, but functionality can differ: the mobile app carries full tenant/product/venue information end-to-end (since it's downloaded per tenant), while a client's own website typically only links out to a TICVAI-hosted checkout ('Buy Tickets') rather than being managed by TICVAI directly.
+
+**4. White-****Labeling**** and Customization Boundaries**
+
+Qossai and Allam agreed the base structure (header, footer, layout) stays consistent across tenants, but branding elements — logo, color, font — and module-level visibility (e.g., hiding Dining or Retail if a client doesn't offer them) must be configurable per tenant, independently for web and mobile if needed.
+
+**5. Movie Ticketing**
+
+Pradnya asked whether movie tickets are in scope. Allam confirmed yes — a dedicated seat management module will support this, citing an existing client (a museum/science center in Kuwait with an in-house educational cinema) as a reference use case.
+
+**6. Food ****&**** Beverage — Ordering, Delivery, and Redemption**
+
+- Ticket + combo meal: a single QR code encodes both the admission ticket and the meal entitlement; the guest scans once at entry and again at the F&B counter to redeem the meal, after which it cannot be redeemed again.
+
+- On-seat delivery: for seated events, a guest can choose pickup or delivery to their seat; for open/outdoor venues (e.g., a beach or water park), physical QR codes placed at each seat/location let the guest scan to specify exactly where food should be delivered.
+
+- Group bookings: the system supports either one shared QR code for the whole group (redeemed together at the counter) or individual QR codes per person (each guest can link their ticket to their own profile via the mobile app). For small groups (2–4 people), the cashier can assign specific meals per ticket at time of sale; for large groups this is impractical and it was agreed the group would instead redeem centrally at the counter.
+
+- Order-only-inside-the-park: guests already inside the venue should be able to order F&B directly from the mobile app without visiting the counter, choosing pickup or in-park delivery to a specified location.
+
+- Standalone F&B purchase without a ticket (i.e., entering just to buy food) was discussed as a rare edge case; the team agreed to exclude it from scope, as it falls under general food-delivery apps rather than TICVAI's use case.
+
+**7. Retail — Cart and Inventory**
+
+- Ticketing, F&B, and retail will share a single cart/checkout and a single unified receipt and QR code per customer — no separate receipts or wristbands per product line.
+
+- Inventory will be centralized at the venue level across all sales channels (web, mobile, kiosk, POS). Stock is not shared across venues by default; an inter-venue stock transfer capability will allow moving stock between venues when needed, with the destination venue's system-recorded stock (not physical stock) gating what can be sold.
+
+- Add-on entitlements (e.g., adding a locker) can be linked to an existing ticket's QR code by scanning it, rather than issuing a new QR code.
+
+**8. POS / Kiosk Branding**
+
+Allam and Qossai confirmed that POS and tablet interfaces used by staff (cashiers) should always carry TICVAI branding, not client branding, with 'Powered by TICVAI' shown consistently across staff and guest-facing surfaces. Kiosks, however, are guest-facing (used directly by park visitors) and should therefore be white-labeled to the client's branding, similar to the guest website, while still following a kiosk-specific layout.
+
+**9. Queue Management**
+
+Chinmay asked how ride/attraction wait times would be sourced. Qossai explained that venues typically calculate wait time from entry-counting sensors or cameras (e.g., people entering × average time per person) and expose this via a live API; TICVAI would consume that wait-time API/data feed and surface it in the guest mobile app, potentially feeding an AI recommendation ('which ride to visit next') in future phases.
+
+**10. Parking Integrations**
+
+Chinmay and Qossai reviewed three parking integration models: (1) no integration — TICVAI issues its own QR code and on-site security manually verifies it; (2) ANPR/plate-number integration — the guest enters their plate number at checkout, and TICVAI's API pushes the plate number to the parking system's whitelist so the barrier opens automatically; (3) QR-code handoff — TICVAI sends a QR code to the parking system's barrier for entry validation. A separate, pay-per-hour parking model (unrelated to ticketing) can be handled independently via the parking system's own POS. Qossai noted the team has integrated with such parking APIs before (consuming and pushing data) and that the architecture should be built to make future parking-vendor integrations quick (targeted at a few days, not weeks).
+
+**11. Wireframe Walkthrough — Workstation, Till ****&**** POS Management**
+
+- Workstation Overview Dashboard: shows all configured workstations for a venue (or across venues in a multi-venue setup), grouped by department/sub-department, with online/offline/health status and workstation type (mobile POS, kiosk, on-site POS).
+
+- New Workstation setup: captures workstation name, auto-generated ID, department, and mode; workstation detail view shows ID, department, IP address, configuration, linked devices, operator/shift activity, and sales totals.
+
+- Hardware & Peripheral Management: configures devices per workstation (receipt printer, cash drawer, payment terminal, barcode/ticket scanner/printer) and shows device-level status.
+
+- Live Workstation Monitor: department-level health overview, with a proposed graphical park-map view showing workstation locations and live status — feasibility depends on clean input metadata (zones/regions) from the venue, or manual drag-and-drop placement as a fallback.
+
+- Software Configuration: tracks software version and pending/completed updates per workstation.
+
+- Till / Cash Management: total cash and card transactions, variance tracking, till configuration, denomination setup (configurable per currency/region — e.g., UAE 2 decimals vs. Bahrain/Kuwait 3 decimals, with no rounding of the third decimal), opening float (by amount or by denomination), and cash-in/cash-out for mid-shift cash pickups.
+
+- Shift Management: shift assignment and scheduling by cashier/department, shift templates and policies, shift opening/closing, and exception/alert handling; Allam suggested exploring a merge of the shift-closing and till-closing screens to reduce dashboard count.
+
+- POS Profile & Layout Management: links each department to its workstation types and counts, and defines a distinct front-end product layout per workstation type (ticketing, F&B, retail, kiosk) via drag-and-drop product/category configuration, plus sales rules restricting which products a given workstation can sell (e.g., admission-only vs. membership-only).
+
+- Offline Policies and a venue-level Operations Summary Dashboard were also shown, aggregating the department-level views into a single venue overview.
+
+- Allam and Qossai stressed the wireframes are reference-only (partly generated via ChatGPT prompting on functional requirements) and not to be replicated as-is; Chinmay's team has full discretion to consolidate dashboards and should cross-check the shared functionality matrix, since some matrix items are not yet reflected in the wireframes.
+
+**12. Multi-Tenant / Multi-Region Database Architecture**
+
+Chinmay raised a scenario around cross-region validity (e.g., a membership pass purchased in one region needing to work across other regions/countries, drawing an analogy to a globally valid F1 season pass). Allam explained that for a single client operating within one jurisdiction (e.g., Miral Experiences in the UAE), all venues/tenants share a single centralized database, distinguished by venue/site ID, even as new venues are added within that region. If a client's new venue falls under a different jurisdiction with data-residency requirements (e.g., a Qatar venue with local data-hosting law), a separate, isolated database would be created for that region, and cross-region-valid entitlements (e.g., a multi-region membership) would then need to be synced between the databases. For TICVAI's own shared multi-tenant infrastructure (used by smaller clients who don't want to bear dedicated infrastructure cost), all tenants can reside in one physical database for cost efficiency, but must be logically and securely isolated by venue/tenant ID so no tenant can see another's data or configuration. Clients wanting full isolation can pay for a dedicated database as a premium option. Dinesh confirmed the shared database must be built to scale to high-volume, short-duration events (e.g., 20,000–30,000 attendees/day) even for otherwise small tenants, and the team agreed cost/efficiency should guide the isolation boundary rather than segregating for its own sake.
+
+**13. Outstanding Deliverables and Next Steps**
+
+Aishwarya flagged that the POS/ticketing UI reference PDF (as distinct from the F&B POS PDF already shared) was missing from an earlier session. Allam and Qossai clarified no separate PDF was created for this — the team had instead pointed to a previously shared demo software link as the UI reference for ticketing POS design, since the earlier PDF referenced was based on an outdated UI. Chinmay confirmed he is building a hosted, interactive reference tool listing all pages, functionalities, contracts, and back-end schema/tables for Qossai's team to validate against, to be shared once hosted (targeted for next week).
+
+**Decisions Made**
+
+- The phase-one AI scope will focus on a configuration assistant for admins (product/promotion setup guidance), not data-dependent forecasting models.
+
+- Refund and change amounts are always issued in the local/base currency, locked at the value recorded at time of purchase; foreign-currency activity is tracked via a separate reporting layer only.
+
+- Guest website and guest mobile app will share the same branding, look, and feel and be driven by a common CMS, but can differ in functionality — the mobile app carries full tenant detail, while client-owned websites link out to a TICVAI-hosted checkout.
+
+- Base UI structure (header, footer, layout) is fixed across tenants; branding (logo/color/font) and module visibility (e.g., hide Dining/Retail) are configurable per tenant, independently for web and mobile.
+
+- Movie/cinema ticketing is in scope via the seat management module.
+
+- Ticketing, F&B, and retail share one cart, one receipt, and one unified QR code/wristband per customer; add-ons are linked to the existing entitlement rather than issued separately.
+
+- Retail inventory is centralized per venue across all channels; cross-venue stock is not shared automatically and requires an inter-venue stock transfer.
+
+- Staff-facing POS and tablet UIs are TICVAI-branded; guest-facing kiosks are white-labeled to client branding.
+
+- Standalone F&B purchase without an admission ticket is excluded from scope as an edge case better served by third-party food-delivery apps.
+
+- Multi-tenant data isolation will be logical (shared database, isolated by venue/tenant ID) by default for cost efficiency, with dedicated, fully isolated databases offered as a paid option; jurisdiction-driven data-residency requirements will force a separate regional database with sync for cross-region entitlements.
+
+**Action Items**
+
+| **Action Item** | **Owner** | **Status** |
+| --- | --- | --- |
+| Update the shared functionality matrix (metrics) to add a column capturing the AI configuration-assistant requirement discussed today | Chinmay Parab | **Pending** |
+| Cross-check the workstation/POS wireframes against the functionality matrix and consolidate/redesign dashboards as needed | Chinmay Parab / Softlabs Team | **In Progress** |
+| Host and share the interactive reference tool listing pages, functionalities, contracts, and back-end schema for validation | Chinmay Parab | **In Progress** |
+| Update the open-items task tracker with points clarified in this and prior sessions | Chinmay Parab | **Pending** |
+| Schedule a short (10–15 min) dedicated session to review and close out the task tracker early next week | Chinmay Parab / Allam | **Pending** |
+| Confirm scheduling for Monday/Tuesday's workshop (Food & Beverage, Retail, and Procurement/Inventory topics) | Chinmay Parab | **Pending** |
+
+**Next Meeting**
+
+**Date: **Monday or Tuesday (17–18 August 2026) — to be confirmed
+
+**Time: **To be confirmed
+
+**Planned Topics**
+
+- Food & Beverage, Retail, and Procurement/Inventory workshop (topics to be finalized based on interdependencies)
+
+- Tracker review and close-out session (10–15 minutes)
+
+**Closing Remarks**
+
+This session resolved a broad set of open functional questions spanning AI scope, finance/currency handling, front-end architecture, white-labeling, Food & Beverage flows, retail/inventory, POS and kiosk branding, queue management, and parking integrations, and included a detailed walkthrough of Allam's workstation/POS/till management wireframes. Both teams also aligned on the multi-tenant, multi-region database strategy, balancing data isolation, compliance, and infrastructure cost. Next steps include updating the functionality matrix and task tracker, finalizing the Food & Beverage/Retail/Procurement workshop schedule, and a short tracker close-out session early next week.

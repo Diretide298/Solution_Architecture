@@ -1,0 +1,209 @@
+id: LLD-P11
+title: P11 Accreditation Web — Applications — 8 screens
+generatedBy: tools/derive-diagrams.py
+index: diagrams/hld/00-platform.yaml
+audience: public
+operator: public
+app: accreditation-web
+formFactor: web
+runtime: reactWeb
+offlineCapable: false
+deployment:
+  target: browser
+  distribution: public, served from the cell
+  bundleUpdate: immediate on deploy
+  hosting: in-cell, in-region
+  storeReview: false
+  deviceOwnership: applicant device, unmanaged
+  networkAssumption: public internet
+  releaseCadence: monthly
+why: null
+modulesUsed:
+- module: accreditation
+  screens: 8
+servicesCalled:
+- service: TenancyService
+  operationCalls: 4
+- service: VenueOpsService
+  operationCalls: 1
+coverage:
+  screens: 8
+  inAFlow: 3
+  drawn: 8
+  note: '**A screen in no flow has been specified and never walked.** Every flow written in this package
+    has found a defect.'
+screens:
+- screen: ACC-001
+  name: Landing / Programme Overview
+  module: Applicant Journey
+  requiresModule: accreditation
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ACC-002
+  - ACC-003
+  - ACC-004
+  boardFrames: null
+  wireframe: wireframes/P11 Accreditation Web.dc.html#acc-001
+  inFlows: null
+- screen: ACC-002
+  name: Registration Form
+  module: Applicant Journey
+  requiresModule: accreditation
+  wave: 3
+  density: compact
+  operations:
+  - listApprovalRequests
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ACC-001
+  - ACC-003
+  - ACC-004
+  - ACC-007
+  boardFrames: null
+  wireframe: wireframes/P11 Accreditation Web.dc.html#acc-002
+  inFlows:
+  - F23 A contractor gets a badge and uses it
+- screen: ACC-003
+  name: Application Review & Submit
+  module: Applicant Journey
+  requiresModule: accreditation
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ACC-001
+  - ACC-002
+  - ACC-004
+  boardFrames: null
+  wireframe: wireframes/P11 Accreditation Web.dc.html#acc-003
+  inFlows: null
+- screen: ACC-004
+  name: Application Status Tracking
+  module: Applicant Journey
+  requiresModule: accreditation
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ACC-001
+  - ACC-002
+  - ACC-003
+  boardFrames: null
+  wireframe: wireframes/P11 Accreditation Web.dc.html#acc-004
+  inFlows: null
+- screen: ACC-005
+  name: Accreditation Badge
+  module: Applicant Journey
+  requiresModule: accreditation
+  wave: 3
+  density: compact
+  operations:
+  - listApprovalRequests
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ACC-001
+  - ACC-002
+  - ACC-003
+  boardFrames: null
+  wireframe: wireframes/P11 Accreditation Web.dc.html#acc-005
+  inFlows:
+  - F23 A contractor gets a badge and uses it
+- screen: ACC-006
+  name: Reviewer Queue
+  module: Reviewer (Internal)
+  requiresModule: accreditation
+  wave: 3
+  density: compact
+  operations:
+  - getWaitTimes
+  states:
+  - emptyFirstRun
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ACC-001
+  - ACC-007
+  - ACC-008
+  boardFrames: null
+  wireframe: wireframes/P11 Accreditation Web.dc.html#acc-006
+  inFlows: null
+- screen: ACC-007
+  name: Reviewer Application Detail
+  module: Reviewer (Internal)
+  requiresModule: accreditation
+  wave: 3
+  density: compact
+  operations:
+  - decideApprovalRequest
+  - listApprovalRequests
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - requestId<-deepLink
+  goesTo:
+  - ACC-001
+  - ACC-005
+  - ACC-006
+  - ACC-008
+  boardFrames: null
+  wireframe: wireframes/P11 Accreditation Web.dc.html#acc-007
+  inFlows:
+  - F23 A contractor gets a badge and uses it
+- screen: ACC-008
+  name: Credential Register
+  module: Reviewer (Internal)
+  requiresModule: accreditation
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ACC-001
+  - ACC-006
+  - ACC-007
+  boardFrames: null
+  wireframe: wireframes/P11 Accreditation Web.dc.html#acc-008
+  inFlows: null

@@ -1,0 +1,1602 @@
+{
+ "code": "P06",
+ "name": "Venue Staff App \u2014 Operations",
+ "shortName": "Venue Staff App",
+ "app": "venue-staff-app",
+ "operator": "venue",
+ "audience": "staff",
+ "formFactor": "mobileApp",
+ "offlineCapable": true,
+ "generated": "2026-08-26",
+ "note": "Derived by tools/derive-platform.py. **The gaps section is the point** \u2014 a page listing what exists is a directory; one listing what is missing is a worklist.",
+ "counts": {
+  "screens": 66,
+  "operations": 180,
+  "contracts": 17,
+  "modules": 3,
+  "undrawn": 0,
+  "operationsWithNoScreen": 145
+ },
+ "waves": {
+  "wave1": 25,
+  "wave2": 40,
+  "wave3": 1
+ },
+ "modules": [
+  {
+   "module": "Operations",
+   "screens": 46,
+   "waves": [
+    1,
+    2,
+    3
+   ]
+  },
+  {
+   "module": "Floor Service",
+   "screens": 10,
+   "waves": [
+    2
+   ]
+  },
+  {
+   "module": "Stock on the Floor",
+   "screens": 10,
+   "waves": [
+    2
+   ]
+  }
+ ],
+ "contracts": [
+  {
+   "contract": "fnb",
+   "operations": 36
+  },
+  {
+   "contract": "maintenance",
+   "operations": 25
+  },
+  {
+   "contract": "orders",
+   "operations": 22
+  },
+  {
+   "contract": "catalogue",
+   "operations": 17
+  },
+  {
+   "contract": "inventory",
+   "operations": 15
+  },
+  {
+   "contract": "shift",
+   "operations": 13
+  },
+  {
+   "contract": "workforce",
+   "operations": 9
+  },
+  {
+   "contract": "identity",
+   "operations": 8
+  },
+  {
+   "contract": "marketing-crm",
+   "operations": 8
+  },
+  {
+   "contract": "access",
+   "operations": 7
+  },
+  {
+   "contract": "queue",
+   "operations": 7
+  },
+  {
+   "contract": "ai",
+   "operations": 4
+  },
+  {
+   "contract": "venue-map",
+   "operations": 2
+  },
+  {
+   "contract": "retail",
+   "operations": 2
+  },
+  {
+   "contract": "reporting",
+   "operations": 2
+  },
+  {
+   "contract": "tenancy",
+   "operations": 2
+  },
+  {
+   "contract": "assets",
+   "operations": 1
+  }
+ ],
+ "screens": [
+  {
+   "id": "EMP-001",
+   "name": "Sign in",
+   "module": "Operations",
+   "wave": 1,
+   "route": "/operations/sign-in",
+   "operations": 5,
+   "drawn": true
+  },
+  {
+   "id": "EMP-002",
+   "name": "Select venue & role",
+   "module": "Operations",
+   "wave": 1,
+   "route": "/operations/select-venue-role",
+   "operations": 6,
+   "drawn": true
+  },
+  {
+   "id": "EMP-003",
+   "name": "Home \u2014 on duty",
+   "module": "Operations",
+   "wave": 1,
+   "route": "/operations/home-on-duty",
+   "operations": 17,
+   "drawn": true
+  },
+  {
+   "id": "EMP-004",
+   "name": "Task list",
+   "module": "Operations",
+   "wave": 1,
+   "route": "/operations/task-list",
+   "operations": 15,
+   "drawn": true
+  },
+  {
+   "id": "EMP-005",
+   "name": "Task detail",
+   "module": "Operations",
+   "wave": 1,
+   "route": "/operations/task-detail",
+   "operations": 15,
+   "drawn": true
+  },
+  {
+   "id": "EMP-006",
+   "name": "Raise a task",
+   "module": "Operations",
+   "wave": 1,
+   "route": "/operations/raise-a-task",
+   "operations": 16,
+   "drawn": true
+  },
+  {
+   "id": "EMP-007",
+   "name": "Handover notes",
+   "module": "Operations",
+   "wave": 2,
+   "route": "/operations/handover-notes",
+   "operations": 4,
+   "drawn": true
+  },
+  {
+   "id": "EMP-008",
+   "name": "Shift summary",
+   "module": "Operations",
+   "wave": 2,
+   "route": "/operations/shift-summary",
+   "operations": 5,
+   "drawn": true
+  },
+  {
+   "id": "EMP-009",
+   "name": "End shift",
+   "module": "Operations",
+   "wave": 1,
+   "route": "/operations/end-shift",
+   "operations": 13,
+   "drawn": true
+  },
+  {
+   "id": "EMP-010",
+   "name": "Scan \u2014 ready",
+   "module": "Operations",
+   "wave": 1,
+   "route": "/operations/scan-ready",
+   "operations": 7,
+   "drawn": true
+  },
+  {
+   "id": "EMP-014",
+   "name": "Ticket lookup",
+   "module": "Operations",
+   "wave": 1,
+   "route": "/operations/ticket-lookup",
+   "operations": 14,
+   "drawn": true
+  },
+  {
+   "id": "EMP-015",
+   "name": "Group scan",
+   "module": "Operations",
+   "wave": 2,
+   "route": "/operations/group-scan",
+   "operations": 7,
+   "drawn": true
+  },
+  {
+   "id": "EMP-017",
+   "name": "Sync & reconciliation",
+   "module": "Operations",
+   "wave": 1,
+   "route": "/operations/sync-reconciliation",
+   "operations": 9,
+   "drawn": true
+  },
+  {
+   "id": "EMP-018",
+   "name": "Offline package",
+   "module": "Operations",
+   "wave": 1,
+   "route": "/operations/offline-package",
+   "operations": 3,
+   "drawn": true
+  },
+  {
+   "id": "EMP-019",
+   "name": "AI assistant \u2014 home",
+   "module": "Operations",
+   "wave": 1,
+   "route": "/operations/ai-assistant-home",
+   "operations": 3,
+   "drawn": true
+  },
+  {
+   "id": "EMP-020",
+   "name": "AI assistant \u2014 answer",
+   "module": "Operations",
+   "wave": 1,
+   "route": "/operations/ai-assistant-answer",
+   "operations": 3,
+   "drawn": true
+  },
+  {
+   "id": "EMP-021",
+   "name": "Roster",
+   "module": "Operations",
+   "wave": 1,
+   "route": "/operations/roster",
+   "operations": 2,
+   "drawn": true
+  },
+  {
+   "id": "EMP-022",
+   "name": "My rota",
+   "module": "Operations",
+   "wave": 1,
+   "route": "/operations/my-rota",
+   "operations": 2,
+   "drawn": true
+  },
+  {
+   "id": "EMP-023",
+   "name": "Swap request",
+   "module": "Operations",
+   "wave": 2,
+   "route": "/operations/swap-request",
+   "operations": 2,
+   "drawn": true
+  },
+  {
+   "id": "EMP-024",
+   "name": "Clock in / out",
+   "module": "Operations",
+   "wave": 1,
+   "route": "/operations/clock-in-out",
+   "operations": 3,
+   "drawn": true
+  },
+  {
+   "id": "EMP-025",
+   "name": "Break management",
+   "module": "Operations",
+   "wave": 2,
+   "route": "/operations/break-management",
+   "operations": 2,
+   "drawn": true
+  },
+  {
+   "id": "EMP-026",
+   "name": "Incident report",
+   "module": "Operations",
+   "wave": 1,
+   "route": "/operations/incident-report",
+   "operations": 5,
+   "drawn": true
+  },
+  {
+   "id": "EMP-027",
+   "name": "Incident detail",
+   "module": "Operations",
+   "wave": 2,
+   "route": "/operations/incident-detail",
+   "operations": 3,
+   "drawn": true
+  },
+  {
+   "id": "EMP-028",
+   "name": "Lost & found",
+   "module": "Operations",
+   "wave": 2,
+   "route": "/operations/lost-found",
+   "operations": 7,
+   "drawn": true
+  },
+  {
+   "id": "EMP-029",
+   "name": "Guest assistance",
+   "module": "Operations",
+   "wave": 2,
+   "route": "/operations/guest-assistance",
+   "operations": 12,
+   "drawn": true
+  },
+  {
+   "id": "EMP-030",
+   "name": "Venue map",
+   "module": "Operations",
+   "wave": 2,
+   "route": "/operations/venue-map",
+   "operations": 4,
+   "drawn": true
+  },
+  {
+   "id": "EMP-031",
+   "name": "Queue monitor",
+   "module": "Operations",
+   "wave": 2,
+   "route": "/operations/queue-monitor",
+   "operations": 7,
+   "drawn": true
+  },
+  {
+   "id": "EMP-032",
+   "name": "Manual wait entry",
+   "module": "Operations",
+   "wave": 2,
+   "route": "/operations/manual-wait-entry",
+   "operations": 5,
+   "drawn": true
+  },
+  {
+   "id": "EMP-033",
+   "name": "Capacity view",
+   "module": "Operations",
+   "wave": 2,
+   "route": "/operations/capacity-view",
+   "operations": 6,
+   "drawn": true
+  },
+  {
+   "id": "EMP-034",
+   "name": "Walk-up sale",
+   "module": "Operations",
+   "wave": 2,
+   "route": "/operations/walk-up-sale",
+   "operations": 22,
+   "drawn": true
+  },
+  {
+   "id": "EMP-035",
+   "name": "Payment on device",
+   "module": "Operations",
+   "wave": 2,
+   "route": "/operations/payment-on-device",
+   "operations": 4,
+   "drawn": true
+  },
+  {
+   "id": "EMP-036",
+   "name": "Issue media",
+   "module": "Operations",
+   "wave": 2,
+   "route": "/operations/issue-media",
+   "operations": 3,
+   "drawn": true
+  },
+  {
+   "id": "EMP-037",
+   "name": "Notifications",
+   "module": "Operations",
+   "wave": 1,
+   "route": "/operations/notifications",
+   "operations": 4,
+   "drawn": true
+  },
+  {
+   "id": "EMP-038",
+   "name": "Broadcast to team",
+   "module": "Operations",
+   "wave": 2,
+   "route": "/operations/broadcast-to-team",
+   "operations": 4,
+   "drawn": true
+  },
+  {
+   "id": "EMP-039",
+   "name": "Announcements",
+   "module": "Operations",
+   "wave": 2,
+   "route": "/operations/announcements",
+   "operations": 4,
+   "drawn": true
+  },
+  {
+   "id": "EMP-040",
+   "name": "Knowledge base",
+   "module": "Operations",
+   "wave": 2,
+   "route": "/operations/knowledge-base",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "EMP-041",
+   "name": "Training",
+   "module": "Operations",
+   "wave": 3,
+   "route": "/operations/training",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "EMP-042",
+   "name": "Profile",
+   "module": "Operations",
+   "wave": 1,
+   "route": "/operations/profile",
+   "operations": 4,
+   "drawn": true
+  },
+  {
+   "id": "EMP-043",
+   "name": "Device settings",
+   "module": "Operations",
+   "wave": 1,
+   "route": "/operations/device-settings",
+   "operations": 2,
+   "drawn": true
+  },
+  {
+   "id": "EMP-044",
+   "name": "Accessibility",
+   "module": "Operations",
+   "wave": 2,
+   "route": "/operations/accessibility",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "EMP-045",
+   "name": "Arabic / RTL",
+   "module": "Operations",
+   "wave": 1,
+   "route": "/operations/arabic-rtl",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "EMP-046",
+   "name": "Sign out",
+   "module": "Operations",
+   "wave": 1,
+   "route": "/operations/sign-out",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "EMP-047",
+   "name": "Emergency mode",
+   "module": "Operations",
+   "wave": 1,
+   "route": "/operations/emergency-mode",
+   "operations": 4,
+   "drawn": true
+  },
+  {
+   "id": "EMP-048",
+   "name": "Opening checklist",
+   "module": "Operations",
+   "wave": 1,
+   "route": "/operations/opening-checklist",
+   "operations": 4,
+   "drawn": true
+  },
+  {
+   "id": "EMP-049",
+   "name": "Hand over the journal",
+   "module": "Operations",
+   "wave": 1,
+   "route": "/operations/hand-over-the-journal",
+   "operations": 2,
+   "drawn": true
+  },
+  {
+   "id": "EMP-050",
+   "name": "Post-incident restore",
+   "module": "Operations",
+   "wave": 2,
+   "route": "/operations/post-incident-restore",
+   "operations": 4,
+   "drawn": true
+  },
+  {
+   "id": "EMP-051",
+   "name": "Restaurant Service Command Center",
+   "module": "Floor Service",
+   "wave": 2,
+   "route": "/operations/restaurant-service-command-center",
+   "operations": 3,
+   "drawn": true
+  },
+  {
+   "id": "EMP-052",
+   "name": "Floor Plan & Table Map",
+   "module": "Floor Service",
+   "wave": 2,
+   "route": "/operations/floor-plan-table-map",
+   "operations": 2,
+   "drawn": true
+  },
+  {
+   "id": "EMP-053",
+   "name": "Table & Seating Configuration",
+   "module": "Floor Service",
+   "wave": 2,
+   "route": "/operations/table-seating-configuration",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "EMP-054",
+   "name": "Reservation Calendar & Timeline",
+   "module": "Floor Service",
+   "wave": 2,
+   "route": "/operations/reservation-calendar-timeline",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "EMP-055",
+   "name": "Create / Edit Reservation",
+   "module": "Floor Service",
+   "wave": 2,
+   "route": "/operations/create-edit-reservation",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "EMP-056",
+   "name": "Walk-In & Waitlist Management",
+   "module": "Floor Service",
+   "wave": 2,
+   "route": "/operations/walk-in-waitlist-management",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "EMP-057",
+   "name": "Guest Profile & Dining History",
+   "module": "Floor Service",
+   "wave": 2,
+   "route": "/operations/guest-profile-dining-history",
+   "operations": 2,
+   "drawn": true
+  },
+  {
+   "id": "EMP-058",
+   "name": "Live Table & Service Management",
+   "module": "Floor Service",
+   "wave": 2,
+   "route": "/operations/live-table-service-management",
+   "operations": 16,
+   "drawn": true
+  },
+  {
+   "id": "EMP-059",
+   "name": "Table Order, Bill & Payment Management",
+   "module": "Floor Service",
+   "wave": 2,
+   "route": "/operations/table-order-bill-payment-management",
+   "operations": 7,
+   "drawn": true
+  },
+  {
+   "id": "EMP-060",
+   "name": "Reservation & Table Performance",
+   "module": "Floor Service",
+   "wave": 2,
+   "route": "/operations/reservation-table-performance",
+   "operations": 2,
+   "drawn": true
+  },
+  {
+   "id": "EMP-061",
+   "name": "Retail Inventory Command Center",
+   "module": "Stock on the Floor",
+   "wave": 2,
+   "route": "/operations/retail-inventory-command-center",
+   "operations": 2,
+   "drawn": true
+  },
+  {
+   "id": "EMP-062",
+   "name": "Store Stock & SKU Availability",
+   "module": "Stock on the Floor",
+   "wave": 2,
+   "route": "/operations/store-stock-sku-availability",
+   "operations": 4,
+   "drawn": true
+  },
+  {
+   "id": "EMP-063",
+   "name": "Requisition & Smart Store Replenishment",
+   "module": "Stock on the Floor",
+   "wave": 2,
+   "route": "/operations/requisition-smart-store-replenishment",
+   "operations": 2,
+   "drawn": true
+  },
+  {
+   "id": "EMP-064",
+   "name": "Store-to-Store & Warehouse Transfers",
+   "module": "Stock on the Floor",
+   "wave": 2,
+   "route": "/operations/store-to-store-warehouse-transfers",
+   "operations": 2,
+   "drawn": true
+  },
+  {
+   "id": "EMP-065",
+   "name": "Receiving & Store Put-Away",
+   "module": "Stock on the Floor",
+   "wave": 2,
+   "route": "/operations/receiving-store-put-away",
+   "operations": 4,
+   "drawn": true
+  },
+  {
+   "id": "EMP-066",
+   "name": "Stock Count & Cycle Count Management",
+   "module": "Stock on the Floor",
+   "wave": 2,
+   "route": "/operations/stock-count-cycle-count-management",
+   "operations": 6,
+   "drawn": true
+  },
+  {
+   "id": "EMP-067",
+   "name": "Damage, Loss, Shrinkage & Stock Adjustment",
+   "module": "Stock on the Floor",
+   "wave": 2,
+   "route": "/operations/damage-loss-shrinkage-stock-adjustment",
+   "operations": 4,
+   "drawn": true
+  },
+  {
+   "id": "EMP-068",
+   "name": "Reservation, Allocation & Omnichannel Inventory",
+   "module": "Stock on the Floor",
+   "wave": 2,
+   "route": "/operations/reservation-allocation-omnichannel-inventory",
+   "operations": 2,
+   "drawn": true
+  },
+  {
+   "id": "EMP-069",
+   "name": "Barcode, RFID, Serialized Stock & Traceability",
+   "module": "Stock on the Floor",
+   "wave": 2,
+   "route": "/operations/barcode-rfid-serialized-stock-traceability",
+   "operations": 2,
+   "drawn": true
+  },
+  {
+   "id": "EMP-070",
+   "name": "Inventory Exceptions, AI Replenishment & Action Center",
+   "module": "Stock on the Floor",
+   "wave": 2,
+   "route": "/operations/inventory-exceptions-ai-replenishment-action-cen",
+   "operations": 3,
+   "drawn": true
+  }
+ ],
+ "gaps": {
+  "operationsWithNoScreen": [
+   {
+    "operation": "enrolFacePass",
+    "contract": "access",
+    "verb": "POST",
+    "summary": "Register a facial profile against an entitlement"
+   },
+   {
+    "operation": "getFacePassEnrolment",
+    "contract": "access",
+    "verb": "GET",
+    "summary": "Whether a pass has a face registered, and when"
+   },
+   {
+    "operation": "revokeFacePass",
+    "contract": "access",
+    "verb": "DELETE",
+    "summary": "Remove a facial profile"
+   },
+   {
+    "operation": "createKnowledgeCollection",
+    "contract": "ai",
+    "verb": "POST",
+    "summary": "Create a collection"
+   },
+   {
+    "operation": "generateVenueLayout",
+    "contract": "ai",
+    "verb": "POST",
+    "summary": "Draft a seat map from an uploaded plan"
+   },
+   {
+    "operation": "ingestKnowledgeDocument",
+    "contract": "ai",
+    "verb": "POST",
+    "summary": "Add a document"
+   },
+   {
+    "operation": "listIndexSources",
+    "contract": "ai",
+    "verb": "GET",
+    "summary": "What is indexed, and how current it is"
+   },
+   {
+    "operation": "listKnowledgeCollections",
+    "contract": "ai",
+    "verb": "GET",
+    "summary": "Collections available to this tenant"
+   },
+   {
+    "operation": "proposeTranslations",
+    "contract": "ai",
+    "verb": "POST",
+    "summary": ""
+   },
+   {
+    "operation": "proposeWalkways",
+    "contract": "ai",
+    "verb": "POST",
+    "summary": "Find walkable space in a drawing that has no vectors"
+   },
+   {
+    "operation": "reindexSource",
+    "contract": "ai",
+    "verb": "POST",
+    "summary": "Rebuild a source"
+   },
+   {
+    "operation": "removeIndexEntry",
+    "contract": "ai",
+    "verb": "DELETE",
+    "summary": "Remove one record from the index"
+   },
+   {
+    "operation": "setIndexSource",
+    "contract": "ai",
+    "verb": "PUT",
+    "summary": "Declare a source indexed"
+   },
+   {
+    "operation": "setSuggestionProvider",
+    "contract": "ai",
+    "verb": "PUT",
+    "summary": ""
+   },
+   {
+    "operation": "assessProductChange",
+    "contract": "catalogue",
+    "verb": "POST",
+    "summary": "What a change would touch, before making it"
+   },
+   {
+    "operation": "bulkChangePrices",
+    "contract": "catalogue",
+    "verb": "POST",
+    "summary": "Reprice a category or a whole catalogue"
+   },
+   {
+    "operation": "cloneProduct",
+    "contract": "catalogue",
+    "verb": "POST",
+    "summary": "Copy a product as a new draft"
+   },
+   {
+    "operation": "commitCatalogueImport",
+    "contract": "catalogue",
+    "verb": "POST",
+    "summary": "Apply a parsed catalogue import"
+   },
+   {
+    "operation": "createDonationCampaign",
+    "contract": "catalogue",
+    "verb": "POST",
+    "summary": "Create a campaign"
+   },
+   {
+    "operation": "freezeEntitlement",
+    "contract": "catalogue",
+    "verb": "POST",
+    "summary": "Pause a membership at the guest's request"
+   },
+   {
+    "operation": "listDonationCampaigns",
+    "contract": "catalogue",
+    "verb": "GET",
+    "summary": "Campaigns a guest can give to"
+   },
+   {
+    "operation": "listProductVersions",
+    "contract": "catalogue",
+    "verb": "GET",
+    "summary": "What this product used to be"
+   },
+   {
+    "operation": "listWaitlistEntries",
+    "contract": "catalogue",
+    "verb": "GET",
+    "summary": "Who is waiting for capacity"
+   },
+   {
+    "operation": "offerWaitlistCapacity",
+    "contract": "catalogue",
+    "verb": "POST",
+    "summary": "Tell a waiting guest that capacity appeared"
+   },
+   {
+    "operation": "reinstateEntitlement",
+    "contract": "catalogue",
+    "verb": "POST",
+    "summary": "Lift a suspension"
+   },
+   {
+    "operation": "restoreProductVersion",
+    "contract": "catalogue",
+    "verb": "POST",
+    "summary": "Put a previous version back"
+   },
+   {
+    "operation": "suspendEntitlement",
+    "contract": "catalogue",
+    "verb": "POST",
+    "summary": "Suspend or reinstate an entitlement"
+   },
+   {
+    "operation": "updateDonationCampaign",
+    "contract": "catalogue",
+    "verb": "PATCH",
+    "summary": "Amend or close a campaign"
+   },
+   {
+    "operation": "attachModifierGroup",
+    "contract": "fnb",
+    "verb": "PUT",
+    "summary": "Give an item its choices"
+   },
+   {
+    "operation": "clearTable",
+    "contract": "fnb",
+    "verb": "POST",
+    "summary": "Mark a table cleared and free"
+   },
+   {
+    "operation": "closeCorrectiveAction",
+    "contract": "fnb",
+    "verb": "POST",
+    "summary": "Close a signed finding"
+   },
+   {
+    "operation": "createCombo",
+    "contract": "fnb",
+    "verb": "POST",
+    "summary": "A meal deal, priced as one thing"
+   },
+   {
+    "operation": "createModifierGroup",
+    "contract": "fnb",
+    "verb": "POST",
+    "summary": "Create a modifier group"
+   },
+   {
+    "operation": "createTable",
+    "contract": "fnb",
+    "verb": "POST",
+    "summary": "A table as a thing, not an inference"
+   },
+   {
+    "operation": "escalateCorrectiveAction",
+    "contract": "fnb",
+    "verb": "POST",
+    "summary": "Escalate a finding"
+   },
+   {
+    "operation": "getTableVisit",
+    "contract": "fnb",
+    "verb": "GET",
+    "summary": "Read a visit with all its orders"
+   },
+   {
+    "operation": "rebalanceStationLoad",
+    "contract": "fnb",
+    "verb": "POST",
+    "summary": "Move work between stations mid-service"
+   },
+   {
+    "operation": "recordCorrectiveAction",
+    "contract": "fnb",
+    "verb": "POST",
+    "summary": "Record what was done about a finding"
+   },
+   {
+    "operation": "requestBill",
+    "contract": "fnb",
+    "verb": "POST",
+    "summary": "The party asked to pay"
+   },
+   {
+    "operation": "resolveBookingConflict",
+    "contract": "fnb",
+    "verb": "GET",
+    "summary": "Two bookings, one table \u2014 and what to do about it"
+   },
+   {
+    "operation": "sendBookingConfirmation",
+    "contract": "fnb",
+    "verb": "POST",
+    "summary": "Confirm a booking, and ask them to confirm back"
+   },
+   {
+    "operation": "sendOrderNotification",
+    "contract": "fnb",
+    "verb": "POST",
+    "summary": "Tell the guest where their order is"
+   },
+   {
+    "operation": "setComboSlots",
+    "contract": "fnb",
+    "verb": "PUT",
+    "summary": "What the guest chooses, and what it costs extra"
+   },
+   {
+    "operation": "setKitchenSla",
+    "contract": "fnb",
+    "verb": "PUT",
+    "summary": "How long a ticket may sit before it is late"
+   },
+   {
+    "operation": "setSectionLayout",
+    "contract": "fnb",
+    "verb": "PUT",
+    "summary": "Divide the floor into sections and give each a server"
+   },
+   {
+    "operation": "updateTable",
+    "contract": "fnb",
+    "verb": "PUT",
+    "summary": "Change what a table is"
+   },
+   {
+    "operation": "createMfaChallenge",
+    "contract": "identity",
+    "verb": "POST",
+    "summary": "Step-up authentication for a sensitive action"
+   },
+   {
+    "operation": "exportSubjectData",
+    "contract": "identity",
+    "verb": "POST",
+    "summary": "Everything the platform holds about one guest"
+   },
+   {
+    "operation": "setPasswordPolicy",
+    "contract": "identity",
+    "verb": "PUT",
+    "summary": "Length, breach check, lockout and step-up"
+   },
+   {
+    "operation": "setSegregationRules",
+    "contract": "identity",
+    "verb": "PUT",
+    "summary": "Which permissions may not be held together"
+   },
+   {
+    "operation": "submitCountLines",
+    "contract": "inventory",
+    "verb": "POST",
+    "summary": "Submit counted quantities"
+   },
+   {
+    "operation": "updateMaintenancePlan",
+    "contract": "maintenance",
+    "verb": "PATCH",
+    "summary": "Amend or suspend a plan"
+   },
+   {
+    "operation": "activateJourney",
+    "contract": "marketing-crm",
+    "verb": "POST",
+    "summary": "Start it, or stop it"
+   },
+   {
+    "operation": "addGuestNote",
+    "contract": "marketing-crm",
+    "verb": "POST",
+    "summary": "What the floor needs to know about this table"
+   },
+   {
+    "operation": "addSuppression",
+    "contract": "marketing-crm",
+    "verb": "POST",
+    "summary": "Suppress an address"
+   },
+   {
+    "operation": "createChallenge",
+    "contract": "marketing-crm",
+    "verb": "POST",
+    "summary": "Define a challenge, mission or streak"
+   },
+   {
+    "operation": "createForm",
+    "contract": "marketing-crm",
+    "verb": "POST",
+    "summary": "Define a waiver, survey or capture form"
+   },
+   {
+    "operation": "createInvitationCampaign",
+    "contract": "marketing-crm",
+    "verb": "POST",
+    "summary": "A quota-bounded, addressed invitation"
+   },
+   {
+    "operation": "createLoyaltyProgramme",
+    "contract": "marketing-crm",
+    "verb": "POST",
+    "summary": "Create a loyalty programme"
+   },
+   {
+    "operation": "createReferral",
+    "contract": "marketing-crm",
+    "verb": "POST",
+    "summary": "Issue a referral code"
+   },
+   {
+    "operation": "createUrlRedirect",
+    "contract": "marketing-crm",
+    "verb": "POST",
+    "summary": "301, 302 and custom redirects"
+   },
+   {
+    "operation": "getJourneyPerformance",
+    "contract": "marketing-crm",
+    "verb": "GET",
+    "summary": "Entrants, completions, goals reached"
+   },
+   {
+    "operation": "getLostItemMatches",
+    "contract": "marketing-crm",
+    "verb": "GET",
+    "summary": "Candidate matches, scored"
+   },
+   {
+    "operation": "getMyChallenges",
+    "contract": "marketing-crm",
+    "verb": "GET",
+    "summary": "Active challenges and how far along I am"
+   },
+   {
+    "operation": "getSuppressionList",
+    "contract": "marketing-crm",
+    "verb": "GET",
+    "summary": "Addresses suppressed from all sending"
+   },
+   {
+    "operation": "getWaiverStatus",
+    "contract": "marketing-crm",
+    "verb": "GET",
+    "summary": "Whether this guest may be issued a ticket that requires a waiver"
+   },
+   {
+    "operation": "listMessageTriggers",
+    "contract": "marketing-crm",
+    "verb": "GET",
+    "summary": "What fires a message, and when"
+   },
+   {
+    "operation": "listReviews",
+    "contract": "marketing-crm",
+    "verb": "GET",
+    "summary": "List guest reviews and ratings"
+   },
+   {
+    "operation": "listSegmentMembers",
+    "contract": "marketing-crm",
+    "verb": "GET",
+    "summary": "List guests currently matching a segment"
+   },
+   {
+    "operation": "matchGuest",
+    "contract": "marketing-crm",
+    "verb": "POST",
+    "summary": "Is this the same person we already have?"
+   },
+   {
+    "operation": "mergeGuests",
+    "contract": "marketing-crm",
+    "verb": "POST",
+    "summary": "Two records, one person"
+   },
+   {
+    "operation": "recordLostItem",
+    "contract": "marketing-crm",
+    "verb": "POST",
+    "summary": "Report something lost, or hand something in"
+   },
+   {
+    "operation": "recordPrivacyIncident",
+    "contract": "marketing-crm",
+    "verb": "POST",
+    "summary": "Log a personal-data breach and start the clock"
+   },
+   {
+    "operation": "respondToReview",
+    "contract": "marketing-crm",
+    "verb": "POST",
+    "summary": "Respond to a review"
+   },
+   {
+    "operation": "retryMessageDispatch",
+    "contract": "marketing-crm",
+    "verb": "POST",
+    "summary": "Send it again, or by another channel"
+   },
+   {
+    "operation": "setCallDisposition",
+    "contract": "marketing-crm",
+    "verb": "POST",
+    "summary": "Why the conversation ended, and any callback"
+   },
+   {
+    "operation": "setConsentPurposes",
+    "contract": "marketing-crm",
+    "verb": "PUT",
+    "summary": "Configure consent purposes"
+   },
+   {
+    "operation": "setMessageTrigger",
+    "contract": "marketing-crm",
+    "verb": "POST",
+    "summary": "Fire a message from a platform event"
+   },
+   {
+    "operation": "setSeoMetadata",
+    "contract": "marketing-crm",
+    "verb": "PUT",
+    "summary": "Titles, descriptions, canonicals and hreflang"
+   },
+   {
+    "operation": "startKioskAssist",
+    "contract": "marketing-crm",
+    "verb": "POST",
+    "summary": "A staff member helps a guest at a kiosk, remotely"
+   },
+   {
+    "operation": "submitForm",
+    "contract": "marketing-crm",
+    "verb": "POST",
+    "summary": "Sign a waiver, answer a survey, capture details"
+   },
+   {
+    "operation": "updateGuestPreferences",
+    "contract": "marketing-crm",
+    "verb": "PUT",
+    "summary": "The things a regular should not have to say twice"
+   },
+   {
+    "operation": "uploadGuestDocument",
+    "contract": "marketing-crm",
+    "verb": "POST",
+    "summary": "Store a guest photo, ID or signed document"
+   },
+   {
+    "operation": "captureStoredValue",
+    "contract": "orders",
+    "verb": "POST",
+    "summary": "Take some or all of a held balance"
+   },
+   {
+    "operation": "convertReservation",
+    "contract": "orders",
+    "verb": "POST",
+    "summary": "Convert a reservation into an order"
+   },
+   {
+    "operation": "convertToTermProduct",
+    "contract": "orders",
+    "verb": "POST",
+    "summary": "Turn a visit into a membership or season pass"
+   },
+   {
+    "operation": "createPaymentLink",
+    "contract": "orders",
+    "verb": "POST",
+    "summary": "Send a guest a link to pay later"
+   },
+   {
+    "operation": "createResaleListing",
+    "contract": "orders",
+    "verb": "POST",
+    "summary": "List an entitlement for resale"
+   },
+   {
+    "operation": "createReservation",
+    "contract": "orders",
+    "verb": "POST",
+    "summary": "Hold without payment"
+   },
+   {
+    "operation": "extendReservation",
+    "contract": "orders",
+    "verb": "POST",
+    "summary": "Extend a reservation"
+   },
+   {
+    "operation": "getGroupBooking",
+    "contract": "orders",
+    "verb": "GET",
+    "summary": ""
+   },
+   {
+    "operation": "issueInvitation",
+    "contract": "orders",
+    "verb": "POST",
+    "summary": "Issue a complimentary entitlement, with no payment expected"
+   },
+   {
+    "operation": "listAbandonedCarts",
+    "contract": "orders",
+    "verb": "GET",
+    "summary": "Carts that lapsed without checking out"
+   },
+   {
+    "operation": "listChargebacks",
+    "contract": "orders",
+    "verb": "GET",
+    "summary": "Open disputes, by deadline"
+   },
+   {
+    "operation": "listFraudRules",
+    "contract": "orders",
+    "verb": "GET",
+    "summary": ""
+   },
+   {
+    "operation": "listInvitationAllowances",
+    "contract": "orders",
+    "verb": "GET",
+    "summary": "Who may issue comps, and how many are left"
+   },
+   {
+    "operation": "listPaymentProviders",
+    "contract": "orders",
+    "verb": "GET",
+    "summary": "Gateways configured for this scope"
+   },
+   {
+    "operation": "listPaymentTokens",
+    "contract": "orders",
+    "verb": "GET",
+    "summary": "A guest's saved payment methods"
+   },
+   {
+    "operation": "openGuestCreditAccount",
+    "contract": "orders",
+    "verb": "POST",
+    "summary": "A credit limit for an individual booking ahead"
+   },
+   {
+    "operation": "printTicketProof",
+    "contract": "orders",
+    "verb": "POST",
+    "summary": "Print a sample without selling anything"
+   },
+   {
+    "operation": "pushWalletPassUpdate",
+    "contract": "orders",
+    "verb": "POST",
+    "summary": "Push a change to every device holding it"
+   },
+   {
+    "operation": "quoteUpgrade",
+    "contract": "orders",
+    "verb": "POST",
+    "summary": "What an upgrade costs, pro-rata"
+   },
+   {
+    "operation": "reissueEntitlement",
+    "contract": "orders",
+    "verb": "POST",
+    "summary": "Zero-value reissue of an expired entitlement for a later date"
+   },
+   {
+    "operation": "resendPaymentLink",
+    "contract": "orders",
+    "verb": "POST",
+    "summary": ""
+   },
+   {
+    "operation": "respondToChargeback",
+    "contract": "orders",
+    "verb": "POST",
+    "summary": "Submit evidence, or accept the loss"
+   },
+   {
+    "operation": "setFraudRules",
+    "contract": "orders",
+    "verb": "PUT",
+    "summary": ""
+   },
+   {
+    "operation": "setPaymentProvider",
+    "contract": "orders",
+    "verb": "PUT",
+    "summary": "Configure a gateway and its routing"
+   },
+   {
+    "operation": "shareEntitlement",
+    "contract": "orders",
+    "verb": "POST",
+    "summary": "Let somebody else use this, without giving it away"
+   },
+   {
+    "operation": "splitOrder",
+    "contract": "orders",
+    "verb": "POST",
+    "summary": "Break one order into independent orders"
+   },
+   {
+    "operation": "storePaymentToken",
+    "contract": "orders",
+    "verb": "POST",
+    "summary": "Save a payment method for future use"
+   },
+   {
+    "operation": "voidPayment",
+    "contract": "orders",
+    "verb": "POST",
+    "summary": "Release an authorisation before it is captured"
+   },
+   {
+    "operation": "overrideQueueEntry",
+    "contract": "queue",
+    "verb": "POST",
+    "summary": "Admit against a failed redemption"
+   },
+   {
+    "operation": "redeemQueueEntry",
+    "contract": "queue",
+    "verb": "POST",
+    "summary": "Admit a party at the ride"
+   },
+   {
+    "operation": "cancelReportExecution",
+    "contract": "reporting",
+    "verb": "DELETE",
+    "summary": "Cancel a running execution"
+   },
+   {
+    "operation": "deleteReportSchedule",
+    "contract": "reporting",
+    "verb": "DELETE",
+    "summary": "Delete a schedule"
+   },
+   {
+    "operation": "exportReportResult",
+    "contract": "reporting",
+    "verb": "POST",
+    "summary": "Export a completed result"
+   },
+   {
+    "operation": "getReportExecution",
+    "contract": "reporting",
+    "verb": "GET",
+    "summary": "Execution status and result"
+   },
+   {
+    "operation": "getReportExport",
+    "contract": "reporting",
+    "verb": "GET",
+    "summary": "Export status and download link"
+   },
+   {
+    "operation": "getReportResult",
+    "contract": "reporting",
+    "verb": "GET",
+    "summary": "Paged result rows"
+   },
+   {
+    "operation": "listAlertRules",
+    "contract": "reporting",
+    "verb": "GET",
+    "summary": "What raises an alert, and when"
+   },
+   {
+    "operation": "listReportFields",
+    "contract": "reporting",
+    "verb": "GET",
+    "summary": "Fields available for a data source"
+   },
+   {
+    "operation": "listReportSchedules",
+    "contract": "reporting",
+    "verb": "GET",
+    "summary": "List scheduled reports"
+   },
+   {
+    "operation": "listSeededReports",
+    "contract": "reporting",
+    "verb": "GET",
+    "summary": ""
+   },
+   {
+    "operation": "updateReportSchedule",
+    "contract": "reporting",
+    "verb": "PATCH",
+    "summary": "Amend, pause or resume a schedule"
+   },
+   {
+    "operation": "activateGiftCard",
+    "contract": "retail",
+    "verb": "POST",
+    "summary": "Activate a card at the point of sale"
+   },
+   {
+    "operation": "adjustWallet",
+    "contract": "retail",
+    "verb": "POST",
+    "summary": "Manually adjust a wallet balance"
+   },
+   {
+    "operation": "blockGiftCard",
+    "contract": "retail",
+    "verb": "POST",
+    "summary": "Block a gift card"
+   },
+   {
+    "operation": "cancelMerchandiseReservation",
+    "contract": "retail",
+    "verb": "POST",
+    "summary": "Release a reservation"
+   },
+   {
+    "operation": "closeWallet",
+    "contract": "retail",
+    "verb": "POST",
+    "summary": "Close a wallet"
+   },
+   {
+    "operation": "collectMerchandiseReservation",
+    "contract": "retail",
+    "verb": "POST",
+    "summary": "The guest picked it up"
+   },
+   {
+    "operation": "collectShopAndDrop",
+    "contract": "retail",
+    "verb": "POST",
+    "summary": "Hand the goods over"
+   },
+   {
+    "operation": "createRetailExchange",
+    "contract": "retail",
+    "verb": "POST",
+    "summary": "Exchange one item for another"
+   },
+   {
+    "operation": "createShopAndDrop",
+    "contract": "retail",
+    "verb": "POST",
+    "summary": "Buy now, collect on the way out"
+   },
+   {
+    "operation": "disposeShopAndDrop",
+    "contract": "retail",
+    "verb": "POST",
+    "summary": "Dispose of an uncollected item"
+   },
+   {
+    "operation": "issueGiftCard",
+    "contract": "retail",
+    "verb": "POST",
+    "summary": "Issue or activate a gift card"
+   },
+   {
+    "operation": "listRetailReturns",
+    "contract": "retail",
+    "verb": "GET",
+    "summary": "List returns"
+   },
+   {
+    "operation": "redeemGiftCard",
+    "contract": "retail",
+    "verb": "POST",
+    "summary": "Spend against a card"
+   },
+   {
+    "operation": "reinstateWallet",
+    "contract": "retail",
+    "verb": "POST",
+    "summary": "Unfreeze a wallet"
+   },
+   {
+    "operation": "suspendWallet",
+    "contract": "retail",
+    "verb": "POST",
+    "summary": "Freeze a wallet"
+   },
+   {
+    "operation": "topUpWallet",
+    "contract": "retail",
+    "verb": "POST",
+    "summary": "Add value to a wallet"
+   },
+   {
+    "operation": "transferWalletBalance",
+    "contract": "retail",
+    "verb": "POST",
+    "summary": "Send balance to another guest"
+   },
+   {
+    "operation": "getRegionSettings",
+    "contract": "tenancy",
+    "verb": "GET",
+    "summary": "Read region settings"
+   },
+   {
+    "operation": "updateRegionSettings",
+    "contract": "tenancy",
+    "verb": "PUT",
+    "summary": "Update region settings"
+   },
+   {
+    "operation": "acceptWalkwayProposals",
+    "contract": "venue-map",
+    "verb": "POST",
+    "summary": "Accept or reject proposed walkways"
+   },
+   {
+    "operation": "broadcastToGuests",
+    "contract": "workforce",
+    "verb": "POST",
+    "summary": ""
+   }
+  ],
+  "modulesSplitAcrossWaves": [
+   {
+    "module": "Operations",
+    "waves": [
+     1,
+     2,
+     3
+    ]
+   }
+  ],
+  "screensNotDrawn": [],
+  "flowsNamingAMissingScreen": []
+ }
+}

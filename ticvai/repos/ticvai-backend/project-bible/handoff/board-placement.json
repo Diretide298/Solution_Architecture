@@ -1,0 +1,1101 @@
+[
+ {
+  "domain": "F&B",
+  "board": 1,
+  "boardName": "Outlet & configuration",
+  "screen": "F&B Command Center",
+  "platform": "P08 back office"
+ },
+ {
+  "domain": "F&B",
+  "board": 1,
+  "boardName": "Outlet & configuration",
+  "screen": "Outlet Management",
+  "platform": "P08 back office"
+ },
+ {
+  "domain": "F&B",
+  "board": 1,
+  "boardName": "Outlet & configuration",
+  "screen": "Create / Edit Outlet",
+  "platform": "P08 back office"
+ },
+ {
+  "domain": "F&B",
+  "board": 1,
+  "boardName": "Outlet & configuration",
+  "screen": "Outlet Types & Templates",
+  "platform": "P08 back office"
+ },
+ {
+  "domain": "F&B",
+  "board": 1,
+  "boardName": "Outlet & configuration",
+  "screen": "Operating Hours & Service Periods",
+  "platform": "P08 back office"
+ },
+ {
+  "domain": "F&B",
+  "board": 1,
+  "boardName": "Outlet & configuration",
+  "screen": "POS & Device Assignment",
+  "platform": "P08 back office"
+ },
+ {
+  "domain": "F&B",
+  "board": 1,
+  "boardName": "Outlet & configuration",
+  "screen": "Service Channel Configuration",
+  "platform": "P08 back office"
+ },
+ {
+  "domain": "F&B",
+  "board": 1,
+  "boardName": "Outlet & configuration",
+  "screen": "Kitchen & Preparation Stations",
+  "platform": "P08 back office"
+ },
+ {
+  "domain": "F&B",
+  "board": 1,
+  "boardName": "Outlet & configuration",
+  "screen": "Order Routing & KDS/Printer Rules",
+  "platform": "P08 back office"
+ },
+ {
+  "domain": "F&B",
+  "board": 1,
+  "boardName": "Outlet & configuration",
+  "screen": "F&B Global Settings & Controls",
+  "platform": "P08 back office"
+ },
+ {
+  "domain": "F&B",
+  "board": 2,
+  "boardName": "Menu & product",
+  "screen": "Menu & Product Command Center",
+  "platform": "P08 back office"
+ },
+ {
+  "domain": "F&B",
+  "board": 2,
+  "boardName": "Menu & product",
+  "screen": "Menu Builder & POS Layout Designer",
+  "platform": "P08 back office"
+ },
+ {
+  "domain": "F&B",
+  "board": 2,
+  "boardName": "Menu & product",
+  "screen": "Product / PLU Master",
+  "platform": "P08 back office"
+ },
+ {
+  "domain": "F&B",
+  "board": 2,
+  "boardName": "Menu & product",
+  "screen": "Variants, Modifiers & Special Selling Rules",
+  "platform": "P08 back office"
+ },
+ {
+  "domain": "F&B",
+  "board": 2,
+  "boardName": "Menu & product",
+  "screen": "Combo & Meal Builder",
+  "platform": "P08 back office"
+ },
+ {
+  "domain": "F&B",
+  "board": 2,
+  "boardName": "Menu & product",
+  "screen": "Recipe & BOM Management",
+  "platform": "P08 back office"
+ },
+ {
+  "domain": "F&B",
+  "board": 2,
+  "boardName": "Menu & product",
+  "screen": "Ingredient Substitution, Allergen & Nutrition",
+  "platform": "P08 back office"
+ },
+ {
+  "domain": "F&B",
+  "board": 2,
+  "boardName": "Menu & product",
+  "screen": "Production Planning & Production Sheets",
+  "platform": "P08 back office"
+ },
+ {
+  "domain": "F&B",
+  "board": 2,
+  "boardName": "Menu & product",
+  "screen": "Central Kitchen & Commissary Management",
+  "platform": "P08 back office"
+ },
+ {
+  "domain": "F&B",
+  "board": 2,
+  "boardName": "Menu & product",
+  "screen": "Availability, Pricing, Channels & Publishing",
+  "platform": "P08 back office"
+ },
+ {
+  "domain": "F&B",
+  "board": 3,
+  "boardName": "Kitchen operations",
+  "screen": "Kitchen Operations Command Center",
+  "platform": "kitchen (new)"
+ },
+ {
+  "domain": "F&B",
+  "board": 3,
+  "boardName": "Kitchen operations",
+  "screen": "Kitchen Display System (KDS)",
+  "platform": "kitchen (new)"
+ },
+ {
+  "domain": "F&B",
+  "board": 3,
+  "boardName": "Kitchen operations",
+  "screen": "Order Firing & Course Management",
+  "platform": "kitchen (new)"
+ },
+ {
+  "domain": "F&B",
+  "board": 3,
+  "boardName": "Kitchen operations",
+  "screen": "Active Order Management & Fulfilment Journey",
+  "platform": "kitchen (new)"
+ },
+ {
+  "domain": "F&B",
+  "board": 3,
+  "boardName": "Kitchen operations",
+  "screen": "Kitchen Station Workload & Dynamic Routing",
+  "platform": "kitchen (new)"
+ },
+ {
+  "domain": "F&B",
+  "board": 3,
+  "boardName": "Kitchen operations",
+  "screen": "Expeditor & Order Assembly",
+  "platform": "kitchen (new)"
+ },
+ {
+  "domain": "F&B",
+  "board": 3,
+  "boardName": "Kitchen operations",
+  "screen": "Guest Collection, Buzzer & Digital Notification",
+  "platform": "kitchen (new)"
+ },
+ {
+  "domain": "F&B",
+  "board": 3,
+  "boardName": "Kitchen operations",
+  "screen": "Exceptions, Re-Fire & Unavailable Items",
+  "platform": "kitchen (new)"
+ },
+ {
+  "domain": "F&B",
+  "board": 3,
+  "boardName": "Kitchen operations",
+  "screen": "SLA, Priority & Service Rules",
+  "platform": "kitchen (new)"
+ },
+ {
+  "domain": "F&B",
+  "board": 3,
+  "boardName": "Kitchen operations",
+  "screen": "Kitchen Performance, AI & Operational Optimization",
+  "platform": "kitchen (new)"
+ },
+ {
+  "domain": "F&B",
+  "board": 4,
+  "boardName": "Restaurant service",
+  "screen": "Restaurant Service Command Center",
+  "platform": "P06 staff app"
+ },
+ {
+  "domain": "F&B",
+  "board": 4,
+  "boardName": "Restaurant service",
+  "screen": "Floor Plan & Table Map",
+  "platform": "P06 staff app"
+ },
+ {
+  "domain": "F&B",
+  "board": 4,
+  "boardName": "Restaurant service",
+  "screen": "Table & Seating Configuration",
+  "platform": "P06 staff app"
+ },
+ {
+  "domain": "F&B",
+  "board": 4,
+  "boardName": "Restaurant service",
+  "screen": "Reservation Calendar & Timeline",
+  "platform": "P06 staff app"
+ },
+ {
+  "domain": "F&B",
+  "board": 4,
+  "boardName": "Restaurant service",
+  "screen": "Create / Edit Reservation",
+  "platform": "P06 staff app"
+ },
+ {
+  "domain": "F&B",
+  "board": 4,
+  "boardName": "Restaurant service",
+  "screen": "Walk-In & Waitlist Management",
+  "platform": "P06 staff app"
+ },
+ {
+  "domain": "F&B",
+  "board": 4,
+  "boardName": "Restaurant service",
+  "screen": "Guest Profile & Dining History",
+  "platform": "P06 staff app"
+ },
+ {
+  "domain": "F&B",
+  "board": 4,
+  "boardName": "Restaurant service",
+  "screen": "Live Table & Service Management",
+  "platform": "P06 staff app"
+ },
+ {
+  "domain": "F&B",
+  "board": 4,
+  "boardName": "Restaurant service",
+  "screen": "Table Order, Bill & Payment Management",
+  "platform": "P06 staff app"
+ },
+ {
+  "domain": "F&B",
+  "board": 4,
+  "boardName": "Restaurant service",
+  "screen": "Reservation & Table Performance",
+  "platform": "P06 staff app"
+ },
+ {
+  "domain": "F&B",
+  "board": 5,
+  "boardName": "Stock & production",
+  "screen": "F&B Stock & Operations Command Center",
+  "platform": "P08 back office"
+ },
+ {
+  "domain": "F&B",
+  "board": 5,
+  "boardName": "Stock & production",
+  "screen": "Outlet Stock & Ingredient Availability",
+  "platform": "P08 back office"
+ },
+ {
+  "domain": "F&B",
+  "board": 5,
+  "boardName": "Stock & production",
+  "screen": "Recipe Consumption & Theoretical Inventory",
+  "platform": "P08 back office"
+ },
+ {
+  "domain": "F&B",
+  "board": 5,
+  "boardName": "Stock & production",
+  "screen": "Production Execution & Batch Management",
+  "platform": "P08 back office"
+ },
+ {
+  "domain": "F&B",
+  "board": 5,
+  "boardName": "Stock & production",
+  "screen": "Wastage, Spoilage, Returns & Write-Off",
+  "platform": "P08 back office"
+ },
+ {
+  "domain": "F&B",
+  "board": 5,
+  "boardName": "Stock & production",
+  "screen": "Requisition & Smart Replenishment",
+  "platform": "P08 back office"
+ },
+ {
+  "domain": "F&B",
+  "board": 5,
+  "boardName": "Stock & production",
+  "screen": "Transfers, Distribution & Outlet Receiving",
+  "platform": "P08 back office"
+ },
+ {
+  "domain": "F&B",
+  "board": 5,
+  "boardName": "Stock & production",
+  "screen": "Stock Count, Reconciliation & Variance",
+  "platform": "P08 back office"
+ },
+ {
+  "domain": "F&B",
+  "board": 5,
+  "boardName": "Stock & production",
+  "screen": "Product Availability, 86 & Operational Food Safety",
+  "platform": "P08 back office"
+ },
+ {
+  "domain": "F&B",
+  "board": 5,
+  "boardName": "Stock & production",
+  "screen": "Operational Alerts, AI Replenishment & Action Center",
+  "platform": "P08 back office"
+ },
+ {
+  "domain": "F&B",
+  "board": 6,
+  "boardName": "Analytics & intelligence",
+  "screen": "F&B Executive Command Center",
+  "platform": "analytics (new)"
+ },
+ {
+  "domain": "F&B",
+  "board": 6,
+  "boardName": "Analytics & intelligence",
+  "screen": "Sales, Revenue & Channel Analytics",
+  "platform": "analytics (new)"
+ },
+ {
+  "domain": "F&B",
+  "board": 6,
+  "boardName": "Analytics & intelligence",
+  "screen": "Outlet, Service & Guest Performance",
+  "platform": "analytics (new)"
+ },
+ {
+  "domain": "F&B",
+  "board": 6,
+  "boardName": "Analytics & intelligence",
+  "screen": "Product Performance & Menu Engineering",
+  "platform": "analytics (new)"
+ },
+ {
+  "domain": "F&B",
+  "board": 6,
+  "boardName": "Analytics & intelligence",
+  "screen": "Food Cost, Margin & Profitability Intelligence",
+  "platform": "analytics (new)"
+ },
+ {
+  "domain": "F&B",
+  "board": 6,
+  "boardName": "Analytics & intelligence",
+  "screen": "Inventory, Waste & Production Intelligence",
+  "platform": "analytics (new)"
+ },
+ {
+  "domain": "F&B",
+  "board": 6,
+  "boardName": "Analytics & intelligence",
+  "screen": "Kitchen, Service & Fulfilment Performance",
+  "platform": "analytics (new)"
+ },
+ {
+  "domain": "F&B",
+  "board": 6,
+  "boardName": "Analytics & intelligence",
+  "screen": "Demand Forecasting & Operational Planning",
+  "platform": "analytics (new)"
+ },
+ {
+  "domain": "F&B",
+  "board": 6,
+  "boardName": "Analytics & intelligence",
+  "screen": "AI Recommendation, Simulation & Optimization Center",
+  "platform": "analytics (new)"
+ },
+ {
+  "domain": "F&B",
+  "board": 6,
+  "boardName": "Analytics & intelligence",
+  "screen": "AI Assistant, Alerts & Management Action Center",
+  "platform": "analytics (new)"
+ },
+ {
+  "domain": "Retail",
+  "board": 1,
+  "boardName": "Store & configuration",
+  "screen": "Retail Command Center",
+  "platform": "P08 back office"
+ },
+ {
+  "domain": "Retail",
+  "board": 1,
+  "boardName": "Store & configuration",
+  "screen": "Store Management",
+  "platform": "P08 back office"
+ },
+ {
+  "domain": "Retail",
+  "board": 1,
+  "boardName": "Store & configuration",
+  "screen": "Create / Edit Retail Store",
+  "platform": "P08 back office"
+ },
+ {
+  "domain": "Retail",
+  "board": 1,
+  "boardName": "Store & configuration",
+  "screen": "Store Types & Templates",
+  "platform": "P08 back office"
+ },
+ {
+  "domain": "Retail",
+  "board": 1,
+  "boardName": "Store & configuration",
+  "screen": "Operating Hours & Sales Periods",
+  "platform": "P08 back office"
+ },
+ {
+  "domain": "Retail",
+  "board": 1,
+  "boardName": "Store & configuration",
+  "screen": "POS & Device Assignment",
+  "platform": "P08 back office"
+ },
+ {
+  "domain": "Retail",
+  "board": 1,
+  "boardName": "Store & configuration",
+  "screen": "Sales Channel Configuration",
+  "platform": "P08 back office"
+ },
+ {
+  "domain": "Retail",
+  "board": 1,
+  "boardName": "Store & configuration",
+  "screen": "Store Inventory & Replenishment Configuration",
+  "platform": "P08 back office"
+ },
+ {
+  "domain": "Retail",
+  "board": 1,
+  "boardName": "Store & configuration",
+  "screen": "Store Rules, Controls & Permissions",
+  "platform": "P08 back office"
+ },
+ {
+  "domain": "Retail",
+  "board": 1,
+  "boardName": "Store & configuration",
+  "screen": "Retail Global Settings & Controls",
+  "platform": "P08 back office"
+ },
+ {
+  "domain": "Retail",
+  "board": 2,
+  "boardName": "Product & catalogue",
+  "screen": "Retail Product & Catalog Command Center",
+  "platform": "P08 back office"
+ },
+ {
+  "domain": "Retail",
+  "board": 2,
+  "boardName": "Product & catalogue",
+  "screen": "Product / SKU Master",
+  "platform": "P08 back office"
+ },
+ {
+  "domain": "Retail",
+  "board": 2,
+  "boardName": "Product & catalogue",
+  "screen": "Variants, Attributes, Barcode & RFID Management",
+  "platform": "P08 back office"
+ },
+ {
+  "domain": "Retail",
+  "board": 2,
+  "boardName": "Product & catalogue",
+  "screen": "Category, Brand & Merchandise Hierarchy",
+  "platform": "P08 back office"
+ },
+ {
+  "domain": "Retail",
+  "board": 2,
+  "boardName": "Product & catalogue",
+  "screen": "Catalog Builder & Store Assortment",
+  "platform": "P08 back office"
+ },
+ {
+  "domain": "Retail",
+  "board": 2,
+  "boardName": "Product & catalogue",
+  "screen": "Price Book & Retail Pricing Management",
+  "platform": "P08 back office"
+ },
+ {
+  "domain": "Retail",
+  "board": 2,
+  "boardName": "Product & catalogue",
+  "screen": "Bundle, Kit & Gift Set Builder",
+  "platform": "P08 back office"
+ },
+ {
+  "domain": "Retail",
+  "board": 2,
+  "boardName": "Product & catalogue",
+  "screen": "Merchandising & Product Presentation",
+  "platform": "P08 back office"
+ },
+ {
+  "domain": "Retail",
+  "board": 2,
+  "boardName": "Product & catalogue",
+  "screen": "Product Availability, Lifecycle & Publishing",
+  "platform": "P08 back office"
+ },
+ {
+  "domain": "Retail",
+  "board": 2,
+  "boardName": "Product & catalogue",
+  "screen": "Product Import, Governance & AI Configuration Assistant",
+  "platform": "P08 back office"
+ },
+ {
+  "domain": "Retail",
+  "board": 3,
+  "boardName": "Transaction",
+  "screen": "Retail Sales & POS Command Center",
+  "platform": "P04 POS"
+ },
+ {
+  "domain": "Retail",
+  "board": 3,
+  "boardName": "Transaction",
+  "screen": "Retail POS Selling Workspace",
+  "platform": "P04 POS"
+ },
+ {
+  "domain": "Retail",
+  "board": 3,
+  "boardName": "Transaction",
+  "screen": "Guest, Membership, Loyalty & Entitlement Interaction",
+  "platform": "P04 POS"
+ },
+ {
+  "domain": "Retail",
+  "board": 3,
+  "boardName": "Transaction",
+  "screen": "Cart, Promotions, Discounts & Price Control",
+  "platform": "P04 POS"
+ },
+ {
+  "domain": "Retail",
+  "board": 3,
+  "boardName": "Transaction",
+  "screen": "Checkout, Payment & Receipt",
+  "platform": "P04 POS"
+ },
+ {
+  "domain": "Retail",
+  "board": 3,
+  "boardName": "Transaction",
+  "screen": "Transaction Search, Hold, Recall & Post-Sale Management",
+  "platform": "P04 POS"
+ },
+ {
+  "domain": "Retail",
+  "board": 3,
+  "boardName": "Transaction",
+  "screen": "Returns, Refunds & Exchanges",
+  "platform": "P04 POS"
+ },
+ {
+  "domain": "Retail",
+  "board": 3,
+  "boardName": "Transaction",
+  "screen": "Omnichannel Order & Fulfilment Center",
+  "platform": "P04 POS"
+ },
+ {
+  "domain": "Retail",
+  "board": 3,
+  "boardName": "Transaction",
+  "screen": "Mobile POS, Event Sales & Offline Operations",
+  "platform": "P04 POS"
+ },
+ {
+  "domain": "Retail",
+  "board": 3,
+  "boardName": "Transaction",
+  "screen": "Sales Exceptions, Controls & Operational Action Center",
+  "platform": "P04 POS"
+ },
+ {
+  "domain": "Retail",
+  "board": 4,
+  "boardName": "Operational",
+  "screen": "Retail Inventory Command Center",
+  "platform": "P06 staff app"
+ },
+ {
+  "domain": "Retail",
+  "board": 4,
+  "boardName": "Operational",
+  "screen": "Store Stock & SKU Availability",
+  "platform": "P06 staff app"
+ },
+ {
+  "domain": "Retail",
+  "board": 4,
+  "boardName": "Operational",
+  "screen": "Requisition & Smart Store Replenishment",
+  "platform": "P06 staff app"
+ },
+ {
+  "domain": "Retail",
+  "board": 4,
+  "boardName": "Operational",
+  "screen": "Store-to-Store & Warehouse Transfers",
+  "platform": "P06 staff app"
+ },
+ {
+  "domain": "Retail",
+  "board": 4,
+  "boardName": "Operational",
+  "screen": "Receiving & Store Put-Away",
+  "platform": "P06 staff app"
+ },
+ {
+  "domain": "Retail",
+  "board": 4,
+  "boardName": "Operational",
+  "screen": "Stock Count & Cycle Count Management",
+  "platform": "P06 staff app"
+ },
+ {
+  "domain": "Retail",
+  "board": 4,
+  "boardName": "Operational",
+  "screen": "Damage, Loss, Shrinkage & Stock Adjustment",
+  "platform": "P06 staff app"
+ },
+ {
+  "domain": "Retail",
+  "board": 4,
+  "boardName": "Operational",
+  "screen": "Reservation, Allocation & Omnichannel Inventory",
+  "platform": "P06 staff app"
+ },
+ {
+  "domain": "Retail",
+  "board": 4,
+  "boardName": "Operational",
+  "screen": "Barcode, RFID, Serialized Stock & Traceability",
+  "platform": "P06 staff app"
+ },
+ {
+  "domain": "Retail",
+  "board": 4,
+  "boardName": "Operational",
+  "screen": "Inventory Exceptions, AI Replenishment & Action Center",
+  "platform": "P06 staff app"
+ },
+ {
+  "domain": "Retail",
+  "board": 5,
+  "boardName": "Commercial",
+  "screen": "Retail Commercial Command Center",
+  "platform": "P08 back office"
+ },
+ {
+  "domain": "Retail",
+  "board": 5,
+  "boardName": "Commercial",
+  "screen": "Promotion & Offer Builder",
+  "platform": "P08 back office"
+ },
+ {
+  "domain": "Retail",
+  "board": 5,
+  "boardName": "Commercial",
+  "screen": "Promotion Eligibility, Priority & Conflict Rules",
+  "platform": "P08 back office"
+ },
+ {
+  "domain": "Retail",
+  "board": 5,
+  "boardName": "Commercial",
+  "screen": "Campaign & Audience Management",
+  "platform": "P08 back office"
+ },
+ {
+  "domain": "Retail",
+  "board": 5,
+  "boardName": "Commercial",
+  "screen": "Coupons, Vouchers & Promotional Codes",
+  "platform": "P08 back office"
+ },
+ {
+  "domain": "Retail",
+  "board": 5,
+  "boardName": "Commercial",
+  "screen": "Cross-Sell, Upsell & Recommendation Rules",
+  "platform": "P08 back office"
+ },
+ {
+  "domain": "Retail",
+  "board": 5,
+  "boardName": "Commercial",
+  "screen": "Omnichannel Commerce & Journey Configuration",
+  "platform": "P08 back office"
+ },
+ {
+  "domain": "Retail",
+  "board": 5,
+  "boardName": "Commercial",
+  "screen": "Ticketing, Event & Experience Commerce Integration",
+  "platform": "P08 back office"
+ },
+ {
+  "domain": "Retail",
+  "board": 5,
+  "boardName": "Commercial",
+  "screen": "Personalized Offers & Guest Engagement",
+  "platform": "P08 back office"
+ },
+ {
+  "domain": "Retail",
+  "board": 5,
+  "boardName": "Commercial",
+  "screen": "Promotion Performance, AI Optimization & Action Center",
+  "platform": "P08 back office"
+ },
+ {
+  "domain": "Retail",
+  "board": 6,
+  "boardName": "Intelligence",
+  "screen": "Retail Executive Command Center",
+  "platform": "analytics (new)"
+ },
+ {
+  "domain": "Retail",
+  "board": 6,
+  "boardName": "Intelligence",
+  "screen": "Sales, Revenue & Channel Analytics",
+  "platform": "analytics (new)"
+ },
+ {
+  "domain": "Retail",
+  "board": 6,
+  "boardName": "Intelligence",
+  "screen": "Store & Operational Performance",
+  "platform": "analytics (new)"
+ },
+ {
+  "domain": "Retail",
+  "board": 6,
+  "boardName": "Intelligence",
+  "screen": "Product, SKU & Merchandise Performance",
+  "platform": "analytics (new)"
+ },
+ {
+  "domain": "Retail",
+  "board": 6,
+  "boardName": "Intelligence",
+  "screen": "Inventory, Sell-Through & Stock Intelligence",
+  "platform": "analytics (new)"
+ },
+ {
+  "domain": "Retail",
+  "board": 6,
+  "boardName": "Intelligence",
+  "screen": "Guest, Conversion & Basket Intelligence",
+  "platform": "analytics (new)"
+ },
+ {
+  "domain": "Retail",
+  "board": 6,
+  "boardName": "Intelligence",
+  "screen": "Promotion, Pricing & Margin Intelligence",
+  "platform": "analytics (new)"
+ },
+ {
+  "domain": "Retail",
+  "board": 6,
+  "boardName": "Intelligence",
+  "screen": "Demand Forecasting & Merchandise Planning",
+  "platform": "analytics (new)"
+ },
+ {
+  "domain": "Retail",
+  "board": 6,
+  "boardName": "Intelligence",
+  "screen": "AI Recommendation, Simulation & Optimization Center",
+  "platform": "analytics (new)"
+ },
+ {
+  "domain": "Retail",
+  "board": 6,
+  "boardName": "Intelligence",
+  "screen": "AI Assistant, Alerts & Management Action Center",
+  "platform": "analytics (new)"
+ },
+ {
+  "domain": "Retail",
+  "board": 2,
+  "boardName": "Product & catalogue",
+  "screen": "Product Import, Governance & AI Configuration",
+  "platform": "P08 back office"
+ },
+ {
+  "domain": "POS",
+  "board": 1,
+  "boardName": "Workstation & device",
+  "screen": "Workstation Overview Dashboard",
+  "platform": "P08 back office"
+ },
+ {
+  "domain": "POS",
+  "board": 1,
+  "boardName": "Workstation & device",
+  "screen": "Workstation Registry",
+  "platform": "P08 back office"
+ },
+ {
+  "domain": "POS",
+  "board": 1,
+  "boardName": "Workstation & device",
+  "screen": "Workstation Details & Configuration",
+  "platform": "P08 back office"
+ },
+ {
+  "domain": "POS",
+  "board": 1,
+  "boardName": "Workstation & device",
+  "screen": "Hardware & Peripherals Management",
+  "platform": "P08 back office"
+ },
+ {
+  "domain": "POS",
+  "board": 1,
+  "boardName": "Workstation & device",
+  "screen": "Live Workstation Health Monitor",
+  "platform": "P08 back office"
+ },
+ {
+  "domain": "POS",
+  "board": 1,
+  "boardName": "Workstation & device",
+  "screen": "Software, Configuration & Version Management",
+  "platform": "P08 back office"
+ },
+ {
+  "domain": "POS",
+  "board": 2,
+  "boardName": "Cash & till",
+  "screen": "Cash Operations Dashboard",
+  "platform": "P04 POS"
+ },
+ {
+  "domain": "POS",
+  "board": 2,
+  "boardName": "Cash & till",
+  "screen": "Till Configuration",
+  "platform": "P04 POS"
+ },
+ {
+  "domain": "POS",
+  "board": 2,
+  "boardName": "Cash & till",
+  "screen": "Opening Float Management",
+  "platform": "P04 POS"
+ },
+ {
+  "domain": "POS",
+  "board": 2,
+  "boardName": "Cash & till",
+  "screen": "Cash In / Cash Out Operations",
+  "platform": "P04 POS"
+ },
+ {
+  "domain": "POS",
+  "board": 2,
+  "boardName": "Cash & till",
+  "screen": "Safe Drop & Cash Transfer Management",
+  "platform": "P04 POS"
+ },
+ {
+  "domain": "POS",
+  "board": 2,
+  "boardName": "Cash & till",
+  "screen": "Cash Reconciliation & Variance Management",
+  "platform": "P04 POS"
+ },
+ {
+  "domain": "POS",
+  "board": 3,
+  "boardName": "Shift & operator",
+  "screen": "Shift & Operator Dashboard",
+  "platform": "P04 POS"
+ },
+ {
+  "domain": "POS",
+  "board": 3,
+  "boardName": "Shift & operator",
+  "screen": "Operator & Workstation Assignment",
+  "platform": "P04 POS"
+ },
+ {
+  "domain": "POS",
+  "board": 3,
+  "boardName": "Shift & operator",
+  "screen": "Shift Templates & Policies",
+  "platform": "P04 POS"
+ },
+ {
+  "domain": "POS",
+  "board": 3,
+  "boardName": "Shift & operator",
+  "screen": "Shift Opening & Login",
+  "platform": "P04 POS"
+ },
+ {
+  "domain": "POS",
+  "board": 3,
+  "boardName": "Shift & operator",
+  "screen": "Shift Exceptions & Alerts",
+  "platform": "P04 POS"
+ },
+ {
+  "domain": "POS",
+  "board": 3,
+  "boardName": "Shift & operator",
+  "screen": "Shift Closing & Settlements",
+  "platform": "P04 POS"
+ },
+ {
+  "domain": "POS",
+  "board": 4,
+  "boardName": "POS experience",
+  "screen": "POS Experience Dashboard",
+  "platform": "P08 back office"
+ },
+ {
+  "domain": "POS",
+  "board": 4,
+  "boardName": "POS experience",
+  "screen": "POS Profile Management",
+  "platform": "P08 back office"
+ },
+ {
+  "domain": "POS",
+  "board": 4,
+  "boardName": "POS experience",
+  "screen": "Layout & Journey Builder",
+  "platform": "P08 back office"
+ },
+ {
+  "domain": "POS",
+  "board": 4,
+  "boardName": "POS experience",
+  "screen": "Product & Category Button Configuration",
+  "platform": "P08 back office"
+ },
+ {
+  "domain": "POS",
+  "board": 4,
+  "boardName": "POS experience",
+  "screen": "Sales Rules, Discounts & Promotions",
+  "platform": "P08 back office"
+ },
+ {
+  "domain": "POS",
+  "board": 4,
+  "boardName": "POS experience",
+  "screen": "Deployment, Preview & Audit",
+  "platform": "P08 back office"
+ },
+ {
+  "domain": "POS",
+  "board": 5,
+  "boardName": "Offline & sync",
+  "screen": "Offline Operations Dashboard",
+  "platform": "P08 back office"
+ },
+ {
+  "domain": "POS",
+  "board": 5,
+  "boardName": "Offline & sync",
+  "screen": "Offline Policy & Rules Configuration",
+  "platform": "P08 back office"
+ },
+ {
+  "domain": "POS",
+  "board": 5,
+  "boardName": "Offline & sync",
+  "screen": "Offline Product & Data Cache Management",
+  "platform": "P08 back office"
+ },
+ {
+  "domain": "POS",
+  "board": 5,
+  "boardName": "Offline & sync",
+  "screen": "Connectivity & Auto-Switch Settings",
+  "platform": "P08 back office"
+ },
+ {
+  "domain": "POS",
+  "board": 5,
+  "boardName": "Offline & sync",
+  "screen": "Offline Transaction Monitor & Sync Queue",
+  "platform": "P08 back office"
+ },
+ {
+  "domain": "POS",
+  "board": 5,
+  "boardName": "Offline & sync",
+  "screen": "Offline Alerts, Limits & Audit",
+  "platform": "P08 back office"
+ },
+ {
+  "domain": "POS",
+  "board": 6,
+  "boardName": "Enterprise analytics",
+  "screen": "Enterprise Frontline Operations Dashboard",
+  "platform": "analytics (new)"
+ },
+ {
+  "domain": "POS",
+  "board": 6,
+  "boardName": "Enterprise analytics",
+  "screen": "Venue Operations Dashboard",
+  "platform": "analytics (new)"
+ },
+ {
+  "domain": "POS",
+  "board": 6,
+  "boardName": "Enterprise analytics",
+  "screen": "Department & Sub-Department Dashboard",
+  "platform": "analytics (new)"
+ },
+ {
+  "domain": "POS",
+  "board": 6,
+  "boardName": "Enterprise analytics",
+  "screen": "Workstation Operations Dashboard",
+  "platform": "analytics (new)"
+ },
+ {
+  "domain": "POS",
+  "board": 6,
+  "boardName": "Enterprise analytics",
+  "screen": "Transaction & Exception Monitoring",
+  "platform": "analytics (new)"
+ },
+ {
+  "domain": "POS",
+  "board": 6,
+  "boardName": "Enterprise analytics",
+  "screen": "Frontline Analytics, AI Insights & Audit",
+  "platform": "analytics (new)"
+ }
+]

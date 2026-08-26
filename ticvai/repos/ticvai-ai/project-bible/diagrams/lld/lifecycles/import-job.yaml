@@ -1,0 +1,46 @@
+id: LLD-Seat import job
+title: Seat import job — 6 transitions
+generatedBy: tools/derive-diagrams.py
+index: diagrams/hld/04-lifecycles.yaml
+source: states/import-job.yaml
+entity: Seat import job
+contract: seating
+enum: ImportJobStatus
+enumKind: named
+enumSchema: ImportJobStatus
+owner: seating
+initial:
+- parsing
+terminal:
+- committed
+- failed
+transitions:
+- from: parsing
+  to: previewReady
+  trigger: job
+  guard: Parsed. **Nothing is written yet** — the preview is what stops a bad manifest becoming a bad
+    map
+- from: parsing
+  to: failed
+  trigger: job
+  guard: Unparseable file
+- from: previewReady
+  to: committing
+  operation: commitImportJob
+  trigger: operation
+  guard: A human looked at the preview and accepted it
+- from: committing
+  to: committed
+  trigger: job
+  guard: Seats written
+- from: committing
+  to: failed
+  trigger: job
+  guard: Write failed. Partial writes are rolled back — half a seat map is worse than none
+- from: previewReady
+  to: failed
+  operation: commitImportJob
+  trigger: operation
+  guard: Rejected at preview
+notes: The preview step exists because a seat manifest is a spreadsheet somebody made, and the first
+  one is always wrong in a way only a person looking at it will notice.

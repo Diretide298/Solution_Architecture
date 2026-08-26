@@ -1,0 +1,66 @@
+# F05 — Agent resolves a guest complaint
+#
+# Validated against _schema.yaml by tools/check-flows.py.
+
+id: F05
+name: Agent resolves a guest complaint
+actor: agent
+wave: 3
+frequency: hourly
+criticality: operational
+platforms:
+- P12 Venue Support
+offlineBehaviour: Case creation is offline-capable; resolution is not.
+trigger:
+  description: A guest contacts support about an order.
+  entryScreen: SUP-004
+steps:
+- step: 1
+  screen: SUP-004
+  action: Picks up the case
+  operations:
+  - listCases
+  outcome: Sees SLA state and priority, breached first
+- step: 2
+  screen: SUP-005
+  action: Reads the history and replies
+  operations:
+  - getCase
+  - addCaseMessage
+  outcome: Internal notes and guest replies are distinct, and the distinction is required rather than
+    defaulted
+- step: 3
+  screen: SUP-005
+  action: Resolves or escalates
+  operations:
+  - updateCase
+  - escalateCase
+  outcome: Resolution requires a note. A case closed with no findings is a lesson nobody learned
+branches:
+- at: 2
+  condition: The guest asks for a refund
+  severity: requiresStaff
+  behaviour: The agent raises a refund request rather than refunding. Above the venue threshold it enters
+    the approval queue — a guest cannot self-serve money out of the ledger and neither can a first-line
+    agent.
+  resolvedBy: createRefundRequest
+- at: 2
+  condition: An internal note is sent to the guest by mistake
+  severity: dataLoss
+  behaviour: isInternal is required, never defaulted, and the reply target is shown in the composer.
+    Once sent it cannot be recalled — the prevention is the control.
+  resolvedBy: agent
+- at: 3
+  condition: SLA breaches while awaiting an internal team
+  severity: recoverable
+  behaviour: The clock does not pause. It pauses only while awaiting the guest — otherwise every breach
+    becomes someone else queue and the metric stops meaning anything.
+  resolvedBy: Automatic
+exitStates:
+- state: completed
+  description: Case resolved with findings recorded
+- state: escalated
+  description: Passed to a supervisor with a reason
+primaryContract: marketing-crm
+contracts:
+- marketing-crm

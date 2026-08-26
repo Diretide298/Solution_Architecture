@@ -1,0 +1,77 @@
+$schema: ./_schema.yaml
+id: F98
+name: A day is reconciled from takings to the ledger
+actor: financeController
+capability: A day is reconciled from takings to the ledger
+wave: 2
+frequency: As needed.
+criticality: financial
+primaryContract: finance
+contracts:
+- finance
+- orders
+- shift
+platforms:
+- P08
+trigger:
+  description: Yesterday happened and the numbers have to agree.
+offlineBehaviour: '**None of it offline and correctness beats availability here.** A ledger briefly
+  unavailable is recoverable; one briefly wrong is not.'
+steps:
+- step: 1
+  screen: BO-043
+  action: Daily Reconciliation.
+  operations:
+  - getSettlement
+  - ingestSettlementFile
+  - listLedgerEntries
+  - listSettlementExceptions
+  - listSettlements
+  - resolveSettlementException
+  outcome: 6 operations, 6 of them previously unwalked.
+- step: 2
+  screen: BO-074
+  action: Chart of Accounts.
+  operations:
+  - createCostCenter
+  - createLegalEntity
+  - getAccount
+  - listCostCenters
+  - listLegalEntities
+  - updateAccount
+  outcome: 6 operations, 6 of them previously unwalked.
+  crossesDevice: true
+- step: 3
+  screen: BO-075
+  action: Account Mapping.
+  operations:
+  - createTaxCode
+  - createTaxExemption
+  - listTaxCodes
+  - listTaxExemptions
+  - updateTaxCode
+  outcome: 5 operations, 5 of them previously unwalked.
+- step: 4
+  screen: BO-076
+  action: Revenue Recognition.
+  operations:
+  - createRecognitionSchedule
+  - getDeferredRevenue
+  - listRecognitionSchedules
+  - runRecognition
+  outcome: 4 operations, 4 of them previously unwalked.
+branches:
+- at: 1
+  condition: The acting principal lacks the permission at this scope.
+  behaviour: '**Refused at the first step, not the last.** ADR-0002 makes authorisation user-driven
+    — a person who gets three steps in and then cannot finish has been told the wrong thing.'
+  severity: medium
+  resolvedBy: resolvePermissions
+exitStates:
+- state: completed
+  description: The journey ran end to end.
+- state: refused
+  description: '**Stopped at a permission or a licence boundary**, with the reason named.'
+notes: '**LedgerService at 22%.** `BO-043 Daily Reconciliation` and `BO-074 Chart of Accounts` held
+  six uncovered each. **The money path had the thinnest coverage of any service on the sale path.**'
+openQuestions: null

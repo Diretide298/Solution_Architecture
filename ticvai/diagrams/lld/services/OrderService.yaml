@@ -1,0 +1,1240 @@
+id: LLD-OrderService
+title: OrderService — 97 operations, 34 tables
+generatedBy: tools/derive-diagrams.py
+tier: commerce
+index: diagrams/hld/02-services.yaml
+why: '**The transactional core.** 96 operations, 34 tables, and the highest write rate in the platform.
+  Separate because its scaling profile is unlike anything else — a Saturday evening is ten times a Tuesday
+  morning.
+
+
+  **`shift` belongs here and not in Tenancy.** A shift is venue-scoped, which is what made it look like
+  a tenancy concern — but **venue scope is the platform''s default rather than a service boundary**:
+  675 of 1,014 operations are venue-scoped.
+
+
+  **What decides the service is who owns the tables.** A shift holds cash, `orders.deposit_box` reconciles
+  against payments, and `orders.cash_movement` posts to `ledger.entry` at close. **A till''s takings
+  and a till''s drawer are the same money counted twice** — separating them makes every settlement a
+  distributed join.'
+scale: Write-heavy, spiky, latency-critical. **The one that autoscales.**
+ifDown: '**Down means no sales.** Highest availability target in the platform.'
+coverage:
+  operations: 97
+  inAFlow: 53
+  percent: 55%
+  note: '**Flow coverage is how much of this service a journey has walked.** A service under 40% is
+    unwalked rather than under-documented.'
+schemas:
+- schema: orders
+  tables: 34
+  stores:
+  - postgres
+  largestTable: orders.shift
+operationsByContract:
+- contract: orders
+  count: 78
+  operations:
+  - operation: abandonCart
+    verb: DELETE
+    path: /carts/{cartId}
+    scope: venue
+    permission: null
+    offline: false
+    reads: 2
+    writes: 3
+  - operation: addCartLine
+    verb: POST
+    path: /carts/{cartId}/lines
+    scope: venue
+    permission: null
+    offline: false
+    reads: 4
+    writes: 4
+  - operation: addTip
+    verb: POST
+    path: /payments/{paymentId}/tip
+    scope: workstation
+    permission: ORDER_MODIFY
+    offline: true
+    reads: 2
+    writes: 2
+  - operation: appendEntitlementToMedia
+    verb: POST
+    path: /media/{mediaCode}/entitlements
+    scope: workstation
+    permission: ORDER_CREATE
+    offline: false
+    reads: 5
+    writes: 5
+  - operation: applyManualDiscount
+    verb: POST
+    path: /orders/{orderId}/discounts
+    scope: workstation
+    permission: ORDER_DISCOUNT
+    offline: true
+    reads: 4
+    writes: 4
+  - operation: approveRefund
+    verb: POST
+    path: /refunds/{refundId}/approve
+    scope: venue
+    permission: ORDER_REFUND_APPROVE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: authoriseStoredValue
+    verb: POST
+    path: /stored-value/authorisations
+    scope: venue
+    permission: ORDER_CREATE
+    offline: false
+    reads: 3
+    writes: 2
+  - operation: cancelReservation
+    verb: DELETE
+    path: /reservations/{reservationId}
+    scope: venue
+    permission: ORDER_CANCEL
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: capturePayment
+    verb: POST
+    path: /payments/{paymentId}/capture
+    scope: workstation
+    permission: ORDER_CREATE
+    offline: false
+    reads: 3
+    writes: 2
+  - operation: captureStoredValue
+    verb: POST
+    path: /stored-value/authorisations/{authorisationId}/capture
+    scope: venue
+    permission: ORDER_CREATE
+    offline: false
+    reads: 1
+    writes: 3
+  - operation: checkoutCart
+    verb: POST
+    path: /carts/{cartId}/checkout
+    scope: venue
+    permission: null
+    offline: false
+    reads: 4
+    writes: 4
+  - operation: claimCart
+    verb: POST
+    path: /carts/{cartId}/claim
+    scope: venue
+    permission: null
+    offline: false
+    reads: 3
+    writes: 3
+  - operation: claimTicketTransfer
+    verb: POST
+    path: /ticket-transfers/{transferId}/claim
+    scope: venue
+    permission: null
+    offline: false
+    reads: 3
+    writes: 3
+  - operation: convertReservation
+    verb: POST
+    path: /reservations/{reservationId}/convert
+    scope: workstation
+    permission: ORDER_CREATE
+    offline: false
+    reads: 4
+    writes: 4
+  - operation: convertToTermProduct
+    verb: POST
+    path: /orders/{orderId}/convert-to-term
+    scope: venue
+    permission: ORDER_MODIFY
+    offline: false
+    reads: 3
+    writes: 2
+  - operation: createBulkRefund
+    verb: POST
+    path: /refunds/bulk
+    scope: venue
+    permission: ORDER_REFUND_BULK
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: createCart
+    verb: POST
+    path: /carts
+    scope: venue
+    permission: null
+    offline: false
+    reads: 3
+    writes: 2
+  - operation: createOrder
+    verb: POST
+    path: /orders
+    scope: workstation
+    permission: ORDER_CREATE
+    offline: true
+    reads: 4
+    writes: 4
+  - operation: createPayment
+    verb: POST
+    path: /payments
+    scope: workstation
+    permission: ORDER_CREATE
+    offline: true
+    reads: 4
+    writes: 4
+  - operation: createPaymentLink
+    verb: POST
+    path: /payment-links
+    scope: venue
+    permission: ORDER_CREATE
+    offline: false
+    reads: 3
+    writes: 3
+  - operation: createRefund
+    verb: POST
+    path: /orders/{orderId}/refunds
+    scope: venue
+    permission: ORDER_REFUND
+    offline: false
+    reads: 4
+    writes: 4
+  - operation: createRefundRequest
+    verb: POST
+    path: /refund-requests
+    scope: venue
+    permission: null
+    offline: false
+    reads: 3
+    writes: 2
+  - operation: createResaleListing
+    verb: POST
+    path: /resale-listings
+    scope: venue
+    permission: ORDER_CREATE
+    offline: false
+    reads: 4
+    writes: 2
+  - operation: createReservation
+    verb: POST
+    path: /reservations
+    scope: venue
+    permission: ORDER_CREATE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: exchangeOrderLines
+    verb: POST
+    path: /orders/{orderId}/exchanges
+    scope: venue
+    permission: ORDER_EXCHANGE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: extendCart
+    verb: POST
+    path: /carts/{cartId}/extend
+    scope: venue
+    permission: null
+    offline: false
+    reads: 3
+    writes: 3
+  - operation: extendReservation
+    verb: POST
+    path: /reservations/{reservationId}/extend
+    scope: venue
+    permission: ORDER_CREATE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: getB2bCredit
+    verb: GET
+    path: /b2b-accounts/{accountId}/credit
+    scope: venue
+    permission: ORDER_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: getCart
+    verb: GET
+    path: /carts/{cartId}
+    scope: venue
+    permission: null
+    offline: false
+    reads: 5
+    writes: 0
+  - operation: getGroupBooking
+    verb: GET
+    path: /group-bookings/{groupBookingId}
+    scope: venue
+    permission: ORDER_VIEW
+    offline: false
+    reads: 3
+    writes: 0
+  - operation: getMediaEntitlements
+    verb: GET
+    path: /media/{mediaCode}/entitlements
+    scope: venue
+    permission: ORDER_VIEW
+    offline: true
+    reads: 5
+    writes: 0
+  - operation: getOrder
+    verb: GET
+    path: /orders/{orderId}
+    scope: venue
+    permission: ORDER_VIEW
+    offline: true
+    reads: 3
+    writes: 0
+  - operation: getOrderStatement
+    verb: GET
+    path: /orders/{orderId}/statement
+    scope: venue
+    permission: ORDER_VIEW
+    offline: false
+    reads: 4
+    writes: 0
+  - operation: getPaymentLink
+    verb: GET
+    path: /payment-links/{token}
+    scope: venue
+    permission: ORDER_VIEW
+    offline: false
+    reads: 5
+    writes: 0
+  - operation: getRefundPolicy
+    verb: GET
+    path: /venues/{venueId}/refund-policy
+    scope: venue
+    permission: ORDER_VIEW
+    offline: true
+    reads: 2
+    writes: 1
+  - operation: getReservation
+    verb: GET
+    path: /reservations/{reservationId}
+    scope: venue
+    permission: ORDER_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: holdOrder
+    verb: POST
+    path: /orders/{orderId}/hold
+    scope: workstation
+    permission: ORDER_MODIFY
+    offline: true
+    reads: 4
+    writes: 4
+  - operation: inquirePaymentStatus
+    verb: POST
+    path: /payments/{paymentId}/inquiry
+    scope: workstation
+    permission: ORDER_CREATE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: issueInvitation
+    verb: POST
+    path: /invitations
+    scope: venue
+    permission: ORDER_CREATE
+    offline: false
+    reads: 4
+    writes: 4
+  - operation: issueWalletPass
+    verb: POST
+    path: /wallet-passes
+    scope: venue
+    permission: ORDER_VIEW
+    offline: false
+    reads: 3
+    writes: 2
+  - operation: listAbandonedCarts
+    verb: GET
+    path: /carts/abandoned
+    scope: venue
+    permission: MARKETING_MANAGE
+    offline: false
+    reads: 3
+    writes: 0
+  - operation: listChargebacks
+    verb: GET
+    path: /chargebacks
+    scope: venue
+    permission: ORDER_REFUND_APPROVE
+    offline: false
+    reads: 2
+    writes: 0
+  - operation: listFraudRules
+    verb: GET
+    path: /fraud-rules
+    scope: tenant
+    permission: ORDER_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listInvitationAllowances
+    verb: GET
+    path: /invitations/allowances
+    scope: venue
+    permission: ORDER_VIEW
+    offline: false
+    reads: 2
+    writes: 0
+  - operation: listMyOrders
+    verb: GET
+    path: /my/orders
+    scope: tenant
+    permission: null
+    offline: false
+    reads: 3
+    writes: 0
+  - operation: listOrderRefunds
+    verb: GET
+    path: /orders/{orderId}/refunds
+    scope: venue
+    permission: ORDER_VIEW
+    offline: true
+    reads: 1
+    writes: 0
+  - operation: listOrders
+    verb: GET
+    path: /orders
+    scope: venue
+    permission: ORDER_VIEW
+    offline: true
+    reads: 2
+    writes: 0
+  - operation: listPaymentProviders
+    verb: GET
+    path: /payment-providers
+    scope: venue
+    permission: ORDER_VIEW
+    offline: false
+    reads: 2
+    writes: 0
+  - operation: listPaymentTokens
+    verb: GET
+    path: /payment-tokens
+    scope: venue
+    permission: ORDER_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listReservations
+    verb: GET
+    path: /reservations
+    scope: venue
+    permission: ORDER_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listSyncRejections
+    verb: GET
+    path: /sync/rejections
+    scope: venue
+    permission: ORDER_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: modifyOrder
+    verb: POST
+    path: /orders/{orderId}/modify
+    scope: venue
+    permission: ORDER_MODIFY
+    offline: false
+    reads: 4
+    writes: 4
+  - operation: openGuestCreditAccount
+    verb: POST
+    path: /guest-credit-accounts
+    scope: venue
+    permission: ORDER_CREATE
+    offline: false
+    reads: 2
+    writes: 1
+  - operation: overrideCreditLimit
+    verb: POST
+    path: /b2b-accounts/{accountId}/credit/override
+    scope: venue
+    permission: CREDIT_OVERRIDE
+    offline: false
+    reads: 3
+    writes: 3
+  - operation: payByLink
+    verb: POST
+    path: /payment-links/{token}/pay
+    scope: venue
+    permission: ORDER_CREATE
+    offline: false
+    reads: 5
+    writes: 6
+  - operation: printTicketProof
+    verb: POST
+    path: /ticket-templates/{templateId}/proof
+    scope: venue
+    permission: ORDER_REPRINT
+    offline: true
+    reads: 3
+    writes: 1
+  - operation: pushWalletPassUpdate
+    verb: POST
+    path: /wallet-passes/{passId}/push
+    scope: venue
+    permission: ORDER_MODIFY
+    offline: false
+    reads: 3
+    writes: 2
+  - operation: quoteUpgrade
+    verb: POST
+    path: /orders/{orderId}/upgrade-quote
+    scope: venue
+    permission: ORDER_MODIFY
+    offline: false
+    reads: 4
+    writes: 0
+  - operation: reissueEntitlement
+    verb: POST
+    path: /entitlements/{entitlementId}/reissue
+    scope: venue
+    permission: ORDER_EXCHANGE
+    offline: false
+    reads: 3
+    writes: 2
+  - operation: releaseStoredValue
+    verb: POST
+    path: /stored-value/authorisations/{authorisationId}/release
+    scope: venue
+    permission: ORDER_CREATE
+    offline: false
+    reads: 1
+    writes: 2
+  - operation: removeCartLine
+    verb: DELETE
+    path: /carts/{cartId}/lines/{lineId}
+    scope: venue
+    permission: null
+    offline: false
+    reads: 2
+    writes: 3
+  - operation: reprintOrder
+    verb: POST
+    path: /orders/{orderId}/reprints
+    scope: venue
+    permission: ORDER_REPRINT
+    offline: true
+    reads: 2
+    writes: 2
+  - operation: rescheduleOrder
+    verb: POST
+    path: /orders/{orderId}/reschedule
+    scope: venue
+    permission: ORDER_RESCHEDULE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: resendPaymentLink
+    verb: POST
+    path: /payment-links/{linkId}/resend
+    scope: venue
+    permission: ORDER_MODIFY
+    offline: false
+    reads: 3
+    writes: 3
+  - operation: respondToChargeback
+    verb: POST
+    path: /chargebacks/{chargebackId}/respond
+    scope: venue
+    permission: ORDER_REFUND_APPROVE
+    offline: false
+    reads: 5
+    writes: 3
+  - operation: resumeOrder
+    verb: POST
+    path: /orders/{orderId}/resume
+    scope: workstation
+    permission: ORDER_MODIFY
+    offline: false
+    reads: 4
+    writes: 4
+  - operation: setB2bCreditLimit
+    verb: PUT
+    path: /b2b-accounts/{accountId}/credit
+    scope: venue
+    permission: CREDIT_MANAGE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: setFraudRules
+    verb: PUT
+    path: /fraud-rules
+    scope: tenant
+    permission: ORDER_MODIFY
+    offline: false
+    reads: 2
+    writes: 3
+  - operation: setPaymentProvider
+    verb: PUT
+    path: /payment-providers
+    scope: venue
+    permission: TENANT_CONFIGURE
+    offline: false
+    reads: 2
+    writes: 3
+  - operation: setRefundPolicy
+    verb: PUT
+    path: /venues/{venueId}/refund-policy
+    scope: venue
+    permission: REGION_CONFIGURE
+    offline: false
+    reads: 2
+    writes: 3
+  - operation: shareEntitlement
+    verb: POST
+    path: /entitlements/{entitlementId}/share
+    scope: venue
+    permission: ORDER_MODIFY
+    offline: false
+    reads: 4
+    writes: 3
+  - operation: splitOrder
+    verb: POST
+    path: /orders/{orderId}/split
+    scope: venue
+    permission: ORDER_MODIFY
+    offline: false
+    reads: 4
+    writes: 3
+  - operation: storePaymentToken
+    verb: POST
+    path: /payment-tokens
+    scope: venue
+    permission: ORDER_CREATE
+    offline: false
+    reads: 3
+    writes: 3
+  - operation: syncOrders
+    verb: POST
+    path: /sync/orders
+    scope: workstation
+    permission: ORDER_CREATE
+    offline: false
+    reads: 1
+    writes: 1
+  - operation: transferOrderTickets
+    verb: POST
+    path: /orders/{orderId}/transfer
+    scope: venue
+    permission: null
+    offline: false
+    reads: 3
+    writes: 3
+  - operation: updateCartLine
+    verb: PATCH
+    path: /carts/{cartId}/lines/{lineId}
+    scope: venue
+    permission: null
+    offline: false
+    reads: 3
+    writes: 3
+  - operation: voidOrder
+    verb: POST
+    path: /orders/{orderId}/voids
+    scope: venue
+    permission: ORDER_VOID
+    offline: true
+    reads: 4
+    writes: 4
+  - operation: voidPayment
+    verb: POST
+    path: /payments/{paymentId}/void
+    scope: venue
+    permission: PAYMENT_VOID
+    offline: false
+    reads: 2
+    writes: 2
+- contract: shift
+  count: 19
+  operations:
+  - operation: acceptShiftVariance
+    verb: POST
+    path: /shifts/{shiftId}/accept-variance
+    scope: venue
+    permission: OVERSHORT_ACCEPT
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: adjustDepositBoxFloat
+    verb: POST
+    path: /deposit-boxes/{boxId}/adjust-float
+    scope: venue
+    permission: CASH_ADD
+    offline: false
+    reads: 2
+    writes: 3
+  - operation: allocateDepositBox
+    verb: POST
+    path: /deposit-boxes
+    scope: venue
+    permission: SHIFT_OPEN
+    offline: true
+    reads: 3
+    writes: 3
+  - operation: approveShiftOpen
+    verb: POST
+    path: /shifts/{shiftId}/approve-open
+    scope: venue
+    permission: SHIFT_APPROVE_OPEN
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: closeDepositBoxes
+    verb: POST
+    path: /deposit-boxes/close
+    scope: venue
+    permission: SHIFT_CLOSE
+    offline: false
+    reads: 4
+    writes: 3
+  - operation: closeShift
+    verb: POST
+    path: /shifts/{shiftId}/close
+    scope: workstation
+    permission: SHIFT_CLOSE
+    offline: true
+    reads: 7
+    writes: 4
+  - operation: createCashMovement
+    verb: POST
+    path: /shifts/{shiftId}/cash-movements
+    scope: venue
+    permission: CASH_LIFT
+    offline: true
+    reads: 3
+    writes: 3
+  - operation: getCurrentShift
+    verb: GET
+    path: /shifts/current
+    scope: workstation
+    permission: SHIFT_OPEN
+    offline: true
+    reads: 1
+    writes: 0
+  - operation: getShift
+    verb: GET
+    path: /shifts/{shiftId}
+    scope: venue
+    permission: REPORT_VIEW_WORKSTATION
+    offline: true
+    reads: 1
+    writes: 0
+  - operation: listCashMovements
+    verb: GET
+    path: /shifts/{shiftId}/cash-movements
+    scope: venue
+    permission: REPORT_VIEW_WORKSTATION
+    offline: true
+    reads: 2
+    writes: 0
+  - operation: listDenominations
+    verb: GET
+    path: /denominations
+    scope: venue
+    permission: SHIFT_OPEN
+    offline: true
+    reads: 2
+    writes: 0
+  - operation: listDepositBoxes
+    verb: GET
+    path: /deposit-boxes
+    scope: venue
+    permission: SHIFT_OPEN
+    offline: true
+    reads: 2
+    writes: 0
+  - operation: listShifts
+    verb: GET
+    path: /shifts
+    scope: venue
+    permission: REPORT_VIEW_WORKSTATION
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: openShift
+    verb: POST
+    path: /shifts
+    scope: workstation
+    permission: SHIFT_OPEN
+    offline: true
+    reads: 6
+    writes: 3
+  - operation: recordNoSale
+    verb: POST
+    path: /shifts/{shiftId}/no-sale
+    scope: workstation
+    permission: SHIFT_SUSPEND
+    offline: true
+    reads: 2
+    writes: 2
+  - operation: reopenShift
+    verb: POST
+    path: /shifts/{shiftId}/reopen
+    scope: venue
+    permission: SHIFT_REOPEN
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: resumeShift
+    verb: POST
+    path: /shifts/{shiftId}/resume
+    scope: workstation
+    permission: SHIFT_OPEN
+    offline: true
+    reads: 2
+    writes: 2
+  - operation: suspendShift
+    verb: POST
+    path: /shifts/{shiftId}/suspend
+    scope: workstation
+    permission: SHIFT_SUSPEND
+    offline: true
+    reads: 2
+    writes: 2
+  - operation: withdrawFromDepositBox
+    verb: POST
+    path: /deposit-boxes/{boxId}/withdraw
+    scope: venue
+    permission: CASH_LIFT
+    offline: true
+    reads: 2
+    writes: 3
+tables:
+- store: cache:idempotency
+  kind: cache
+  columns: 5
+  backing: redis
+  owned: false
+  why: '**Not a table and not owned by a service.** Derived from something already read, invalidated
+    by an event already consumed, losable without consequence — no migration, no backup, no owner.'
+- store: cache:resolution
+  kind: cache
+  columns: 4
+  backing: redis
+  owned: false
+  why: '**Not a table and not owned by a service.** Derived from something already read, invalidated
+    by an event already consumed, losable without consequence — no migration, no backup, no owner.'
+- table: orders.b2b_credit
+  columns: 11
+  store: postgres
+  parent: null
+  writtenBy:
+  - orders
+  foreignWriters: null
+- table: orders.cart
+  columns: 17
+  store: postgres
+  parent: null
+  writtenBy:
+  - orders
+  foreignWriters: null
+- table: orders.cart_line
+  columns: 15
+  store: postgres
+  parent: orders.cart
+  writtenBy:
+  - orders
+  foreignWriters: null
+- table: orders.cash_count_line
+  columns: 9
+  store: postgres
+  parent: null
+  writtenBy:
+  - shift
+  foreignWriters: null
+- table: orders.cash_movement
+  columns: 11
+  store: postgres
+  parent: null
+  writtenBy:
+  - shift
+  foreignWriters: null
+- table: orders.chargeback
+  columns: 11
+  store: postgres
+  parent: null
+  writtenBy:
+  - orders
+  foreignWriters: null
+- table: orders.credit_override
+  columns: 6
+  store: postgres
+  parent: orders.b2b_credit
+  writtenBy:
+  - orders
+  foreignWriters: null
+- table: orders.deposit_box
+  columns: 15
+  store: postgres
+  parent: null
+  writtenBy:
+  - shift
+  foreignWriters: null
+- table: orders.donation_line
+  columns: 2
+  store: postgres
+  parent: null
+  writtenBy: []
+  foreignWriters: null
+- table: orders.fraud_rule
+  columns: 6
+  store: postgres
+  parent: null
+  writtenBy:
+  - orders
+  foreignWriters: null
+- table: orders.group_booking
+  columns: 10
+  store: postgres
+  parent: null
+  writtenBy: []
+  foreignWriters: null
+- table: orders.invitation
+  columns: 12
+  store: postgres
+  parent: null
+  writtenBy:
+  - orders
+  foreignWriters: null
+- table: orders.invitation_allowance
+  columns: 8
+  store: postgres
+  parent: null
+  writtenBy:
+  - orders
+  foreignWriters: null
+- table: orders.no_sale_event
+  columns: 8
+  store: postgres
+  parent: null
+  writtenBy:
+  - shift
+  foreignWriters: null
+- table: orders.order_discount
+  columns: 1
+  store: postgres
+  parent: null
+  writtenBy:
+  - fnb
+  foreignWriters:
+  - fnb
+- table: orders.order_line
+  columns: 17
+  store: postgres
+  parent: null
+  writtenBy:
+  - fnb
+  - orders
+  foreignWriters:
+  - fnb
+- table: orders.order_media_link
+  columns: 1
+  store: postgres
+  parent: null
+  writtenBy: []
+  foreignWriters: null
+- table: orders.payment
+  columns: 16
+  store: postgres
+  parent: null
+  writtenBy:
+  - orders
+  foreignWriters: null
+- table: orders.payment_link
+  columns: 13
+  store: postgres
+  parent: null
+  writtenBy:
+  - orders
+  foreignWriters: null
+- table: orders.payment_provider
+  columns: 14
+  store: postgres
+  parent: null
+  writtenBy:
+  - orders
+  foreignWriters: null
+- table: orders.payment_routing
+  columns: 5
+  store: postgres
+  parent: null
+  writtenBy:
+  - orders
+  foreignWriters: null
+- table: orders.payment_tip
+  columns: 1
+  store: postgres
+  parent: orders.payment
+  writtenBy: []
+  foreignWriters: null
+- table: orders.payment_token
+  columns: 9
+  store: postgres
+  parent: null
+  writtenBy:
+  - orders
+  foreignWriters: null
+- table: orders.refund
+  columns: 17
+  store: postgres
+  parent: null
+  writtenBy:
+  - orders
+  foreignWriters: null
+- table: orders.refund_policy
+  columns: 8
+  store: postgres
+  parent: null
+  writtenBy:
+  - orders
+  foreignWriters: null
+- table: orders.resale_listing
+  columns: 11
+  store: postgres
+  parent: null
+  writtenBy:
+  - orders
+  foreignWriters: null
+- table: orders.reservation
+  columns: 6
+  store: postgres
+  parent: null
+  writtenBy:
+  - orders
+  foreignWriters: null
+- table: orders.sales_order
+  columns: 18
+  store: postgres
+  parent: null
+  writtenBy:
+  - identity
+  - orders
+  foreignWriters:
+  - identity
+- table: orders.sales_order_unassigned
+  columns: 0
+  store: postgres
+  parent: null
+  writtenBy: []
+  foreignWriters: null
+- table: orders.shift
+  columns: 19
+  store: postgres
+  parent: null
+  writtenBy:
+  - shift
+  foreignWriters: null
+- table: orders.stored_value_authorisation
+  columns: 8
+  store: postgres
+  parent: null
+  writtenBy:
+  - marketing-crm
+  - orders
+  - resources
+  foreignWriters:
+  - marketing-crm
+  - resources
+- table: orders.ticket_template
+  columns: 10
+  store: postgres
+  parent: null
+  writtenBy: []
+  foreignWriters: null
+- table: orders.ticket_transfer
+  columns: 11
+  store: postgres
+  parent: null
+  writtenBy:
+  - orders
+  foreignWriters: null
+- table: orders.wallet_pass
+  columns: 8
+  store: postgres
+  parent: null
+  writtenBy:
+  - orders
+  foreignWriters: null
+readsFrom:
+- service: CatalogueService
+  operations: 19
+- service: IdentityService
+  operations: 13
+- service: AccessService
+  operations: 12
+- service: TenancyService
+  operations: 8
+- service: LedgerService
+  operations: 5
+- service: RetailService
+  operations: 2
+writesOutside:
+- service: LedgerService
+  operations: 7
+  why: '**The owner defines the row; this service may only append to it.**'
+- service: AccessService
+  operations: 7
+  why: '**The owner defines the row; this service may only append to it.**'
+- service: CatalogueService
+  operations: 5
+  why: '**The owner defines the row; this service may only append to it.**'
+- service: MarketingService
+  operations: 3
+  why: '**The owner defines the row; this service may only append to it.**'
+screens:
+- P01:WEB-008 Add-ons & Upsell
+- P01:WEB-010 Shopping Cart
+- P01:WEB-012 Checkout — Payment
+- P01:WEB-013 Order Confirmation
+- P01:WEB-014 Pay for a Booking
+- P01:WEB-016 Login / Register
+- P01:WEB-019 Order History
+- P01:WEB-023 Membership Management
+- P01:WEB-030 Ticket Transfer
+- P01:WEB-031 My Reservations
+- P01:WEB-033 Shop
+- P02:GST-008 Tickets & Add-ons
+- P02:GST-009 Review & Payment
+- P02:GST-010 Booking Confirmation
+- P02:GST-012 My Tickets
+- P02:GST-013 Ticket Details
+- P02:GST-014 Ticket Transfer
+- P02:GST-016 My Reservations
+- P02:GST-017 Reservation Details
+- P02:GST-018 Add to Calendar / Reminders
+- P02:GST-019 Order History (Wallet)
+- P02:GST-032 AI Concierge – Chat
+- P02:GST-041 Checkout Entry
+- P02:GST-045 Ticket Delivery & Sharing
+- P02:GST-048 Upsell / Cross-Sell
+- P02:GST-050 Resource Booking – Cabana
+- P02:GST-053 Build Your Own Itinerary
+- P02:GST-055 Dynamic QR Ticket
+- P02:GST-056 Bundle Package
+- P04:POS-001 Begin Shift
+- P04:POS-002 Sell — Ticket Catalogue
+- P04:POS-004 Sell — Seat Map
+- P04:POS-005 Payment
+- P04:POS-006 Held Orders
+- P04:POS-007 Close Shift
+- P04:POS-009 Staff Roster
+- P04:POS-010 Add to Existing Ticket
+- P04:POS-011 Returns, Refunds & Exchanges
+- P04:POS-012 Omnichannel Order & Fulfilment Center
+- P04:POS-013 Mobile POS, Event Sales & Offline Operations
+- P04:POS-014 Sales Exceptions, Controls & Operational Actions
+- P04:POS-015 Cash Operations Dashboard
+- P04:POS-016 Till Configuration
+- P04:POS-017 Cash In / Cash Out Operations
+- P04:POS-018 Safe Drop & Cash Transfer Management
+- P04:POS-019 Shift Templates & Policies
+- P04:POS-020 Shift Exceptions & Alerts
+- P04:POS-021 Sell — Food & Drink
+- P04:POS-023 Sell — Merchandise
+- P05:KSK-006 Review
+- P05:KSK-007 Payment
+- P05:KSK-008 Payment unresolved
+- P05:KSK-009 Ticket issued
+- P05:KSK-010 Print failure
+- P05:KSK-011 Collect a booking
+- P05:KSK-012 Booking found
+- P06:EMP-003 Home — on duty
+- P06:EMP-008 Shift summary
+- P06:EMP-009 End shift
+- P06:EMP-014 Ticket lookup
+- P06:EMP-017 Sync & reconciliation
+- P06:EMP-034 Walk-up sale
+- P06:EMP-035 Payment on device
+- P06:EMP-036 Issue media
+- P06:EMP-057 Guest Profile & Dining History
+- P06:EMP-059 Table Order, Bill & Payment Management
+- P07:SCN-001 Sign in
+- P07:SCN-014 Sync & reconciliation
+- P08:BO-004 Manual Wait Time Entry
+- P08:BO-022 Order Detail
+- P08:BO-023 Refunds & Exchanges
+- P08:BO-024 Payment Exceptions
+- P08:BO-026 Group Bookings
+- P08:BO-027 Reissue & Media Replacement
+- P08:BO-028 Refund Approval Queue
+- P08:BO-037 Offline Package Status
+- P08:BO-039 Shift Directory
+- P08:BO-040 Variance Approval
+- P08:BO-041 Cash Movements
+- P08:BO-042 Banking & Safe
+- P08:BO-047 F&B Order Management
+- P08:BO-051 Purchase Orders
+- P08:BO-062 Venue Profile
+- P08:BO-065 Venue Configuration
+- P08:BO-070 Work Orders
+- P08:BO-082 Stock Movements
+- P08:BO-097 Check Out & Check In
+- P08:BO-100 Venue Home
+- P08:BO-130 Offline Policy & Rules Configuration
+- P08:BO-132 Offline Transaction Monitor & Sync Queue
+- P08:BO-133 Offline Alerts, Limits & Audit
+- P10:PTR-001 Partner Login / MFA
+- P10:PTR-002 Partner Dashboard
+- P10:PTR-005 Inventory & Allocation View
+- P10:PTR-008 Booking Creation
+- P10:PTR-010 Cart & Quote
+- P10:PTR-012 Checkout / Credit Purchase
+- P10:PTR-013 Credit Limit & Balance
+- P10:PTR-015 Order History
+- P10:PTR-016 Voucher / Ticket Download
+- P13:CMS-010 Media Library
+- P16:ANL-009 AI Assistant & Action Center
+flows:
+- F01 Guest buys a ticket online
+- F02 Guest buys seated tickets
+- F03 Partner books on credit
+- F06 Guest enters the venue
+- F07 Guest buys at a kiosk
+- F08 Steward works a shift on the employee app
+- F09 Event is cancelled and refunded
+- F10 Partner books, uses and settles
+- F104 A platform operator signs in under MFA
+- F108 A guest orders food at a counter and collects it
+- F11 Guest orders food to a lounger
+- F13 Month end closes
+- F14 A discount needs a manager
+- F17 A guest buys merchandise and collects later
+- F25 A guest rents a cabana
+- F29 A table is seated, coursed and split
+- F32 A till opens, trades and settles
+- F33 A till goes offline and comes back
+- F34 A retail sale, from scan to return
+- F35 Stock arrives short and an oversell is resolved
+- F50 A guest arrives, parks, and gets in
+- F51 A guest shops in the venue and collects on the way out
+- F52 A guest books a cabana and uses it
+- F55 A guest buys on the web and transfers to a friend
+- F56 A guest registers, verifies and sets preferences
+- F57 A guest uses a kiosk and it fails
+- F58 A ticket is sold at a till, added to, and refunded
+- F59 A seat is picked, held and sold at a window
+- F60 An online order is collected at the counter
+- F64 A steward signs in and takes a venue and a role
+- F66 A walk-up sale is taken on a handheld
+- F72 A shift ends and the summary is read
+- F73 A till is configured and its cash rules set
+- F74 A shift closes and the day is reported
+- F75 A kiosk serves itself and calls for help
+- F81 A retail sale runs from overview to tender
+- F87 A till handles a return, a collection and a safe drop
+- F99 A chargeback arrives and is defended

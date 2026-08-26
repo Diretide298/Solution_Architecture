@@ -1,0 +1,354 @@
+id: LLD-P15
+title: P15 Kitchen Display — Pass and Stations — 10 screens
+generatedBy: tools/derive-diagrams.py
+index: diagrams/hld/00-platform.yaml
+audience: staff
+operator: venue
+app: kitchen-display
+formFactor: kiosk
+runtime: reactWeb
+offlineCapable: true
+deployment:
+  target: browser
+  distribution: served from the cell
+  bundleUpdate: on next idle
+  hosting: in-cell, in-region
+  storeReview: false
+  deviceOwnership: venue-owned, wall-mounted, never moved
+  networkAssumption: venue LAN, and it must survive losing it
+  releaseCadence: '**Deployed when the kitchen is closed, never during service.** A display that restarts
+    mid-service loses the rail a chef is reading.'
+why: '**Its own platform, and the placement rule is what put it here.** Three questions decide where
+  a board screen rests, and a kitchen display answers all three differently from a back office: it is
+  used standing, it **must survive the network going down because the kitchen still has to send food
+  out**, and no existing platform does it — P08 had a `Kitchen Display` screen among 143 back-office
+  screens, which is a rail buried in a configuration tool.
+
+
+  **Nobody logs in.** It is on when the kitchen is open and resolves its station from the device assignment,
+  which is why every screen here is cold-entry and none of them has a sign-in.
+
+
+  **Dark theme only.** A kitchen is lit for cooking, not for reading, and a white screen at head height
+  in a service window is a light source.
+
+
+  **Depends on `offline-core`.**  refused the platform without it, and correctly — **an app that queues
+  writes without it does not queue them anywhere**, and every bump on this platform is a write that
+  has to survive a dropped network.'
+modulesUsed:
+- module: fnb
+  screens: 10
+servicesCalled:
+- service: FnbService
+  operationCalls: 32
+- service: ReportingService
+  operationCalls: 2
+- service: TenancyService
+  operationCalls: 1
+coverage:
+  screens: 10
+  inAFlow: 6
+  drawn: 10
+  note: '**A screen in no flow has been specified and never walked.** Every flow written in this package
+    has found a defect.'
+screens:
+- screen: KIT-001
+  name: Kitchen Operations Command Center
+  module: Kitchen
+  requiresModule: fnb
+  wave: 2
+  density: touchLarge
+  operations:
+  - listFnbOrders
+  - listKitchenStations
+  - listKitchenTickets
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams:
+  - venueId<-session
+  - stationId<-session
+  goesTo:
+  - KIT-002
+  - KIT-003
+  - KIT-004
+  - KIT-005
+  - KIT-006
+  - KIT-007
+  - KIT-008
+  - KIT-009
+  - KIT-010
+  boardFrames:
+  - FNB-3A
+  wireframe: wireframes/P15 Kitchen Display.dc.html#kit-001
+  inFlows:
+  - F83 A kitchen works a service from the rail to the exception
+  - F88 An order is assembled, collected and notified
+- screen: KIT-002
+  name: Kitchen Display System (KDS)
+  module: Kitchen
+  requiresModule: fnb
+  wave: 2
+  density: touchLarge
+  operations:
+  - fireCourse
+  - holdCourse
+  - listKitchenTickets
+  - notifyServer
+  - recallKitchenTicket
+  - refireItem
+  - setKitchenTicketStatus
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams:
+  - venueId<-session
+  - stationId<-session
+  - ticketId<-KIT-002
+  - visitId<-deepLink
+  goesTo: []
+  boardFrames:
+  - FNB-3B
+  wireframe: wireframes/P15 Kitchen Display.dc.html#kit-002
+  inFlows:
+  - F108 A guest orders food at a counter and collects it
+  - F29 A table is seated, coursed and split
+  - F83 A kitchen works a service from the rail to the exception
+  - F88 An order is assembled, collected and notified
+- screen: KIT-003
+  name: Order Firing & Course Management
+  module: Kitchen
+  requiresModule: fnb
+  wave: 2
+  density: touchLarge
+  operations:
+  - fireCourse
+  - holdCourse
+  - prioritiseKitchenTicket
+  - setCourseRules
+  - setKitchenTicketStatus
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams:
+  - venueId<-session
+  - stationId<-session
+  - ticketId<-KIT-002
+  - outletId<-session
+  goesTo: []
+  boardFrames:
+  - FNB-3C
+  wireframe: wireframes/P15 Kitchen Display.dc.html#kit-003
+  inFlows:
+  - F83 A kitchen works a service from the rail to the exception
+  - F88 An order is assembled, collected and notified
+- screen: KIT-004
+  name: Active Order Management & Fulfilment Journey
+  module: Kitchen
+  requiresModule: fnb
+  wave: 2
+  density: touchLarge
+  operations:
+  - getFnbOrder
+  - listKitchenTickets
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams:
+  - venueId<-session
+  - stationId<-session
+  - orderId<-KIT-002
+  goesTo: []
+  boardFrames:
+  - FNB-3D
+  wireframe: wireframes/P15 Kitchen Display.dc.html#kit-004
+  inFlows:
+  - F83 A kitchen works a service from the rail to the exception
+  - F88 An order is assembled, collected and notified
+- screen: KIT-005
+  name: Kitchen Station Workload & Dynamic Routing
+  module: Kitchen
+  requiresModule: fnb
+  wave: 2
+  density: touchLarge
+  operations:
+  - listKitchenStations
+  - setKitchenStations
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams:
+  - venueId<-session
+  - stationId<-session
+  goesTo: []
+  boardFrames:
+  - FNB-3E
+  wireframe: wireframes/P15 Kitchen Display.dc.html#kit-005
+  inFlows: null
+- screen: KIT-006
+  name: Expeditor & Order Assembly
+  module: Kitchen
+  requiresModule: fnb
+  wave: 2
+  density: touchLarge
+  operations:
+  - chaseStation
+  - listKitchenTickets
+  - markOrderCollected
+  - printOrderLabel
+  - setKitchenTicketStatus
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams:
+  - venueId<-session
+  - stationId<-session
+  - ticketId<-KIT-002
+  - orderId<-session
+  goesTo: []
+  boardFrames:
+  - FNB-3F
+  wireframe: wireframes/P15 Kitchen Display.dc.html#kit-006
+  inFlows:
+  - F88 An order is assembled, collected and notified
+- screen: KIT-007
+  name: Guest Collection, Buzzer & Digital Notification
+  module: Kitchen
+  requiresModule: fnb
+  wave: 2
+  density: touchLarge
+  operations:
+  - listKitchenTickets
+  - recordOrderHandover
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams:
+  - venueId<-session
+  - stationId<-session
+  - orderId<-KIT-002
+  goesTo: []
+  boardFrames:
+  - FNB-3G
+  wireframe: wireframes/P15 Kitchen Display.dc.html#kit-007
+  inFlows: null
+- screen: KIT-008
+  name: Exceptions, Re-Fire & Unavailable Items
+  module: Kitchen
+  requiresModule: fnb
+  wave: 2
+  density: touchLarge
+  operations:
+  - getHaccpStatus
+  - list86Events
+  - logKitchenException
+  - setItemAvailability
+  - setKitchenTicketStatus
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams:
+  - venueId<-session
+  - stationId<-session
+  - itemId<-KIT-002
+  - ticketId<-KIT-002
+  - outletId<-session
+  goesTo: []
+  boardFrames:
+  - FNB-3H
+  wireframe: wireframes/P15 Kitchen Display.dc.html#kit-008
+  inFlows:
+  - F83 A kitchen works a service from the rail to the exception
+- screen: KIT-009
+  name: SLA, Priority & Service Rules
+  module: Kitchen
+  requiresModule: fnb
+  wave: 2
+  density: touchLarge
+  operations:
+  - prioritiseKitchenTicket
+  - setVenueSettings
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams:
+  - venueId<-session
+  - stationId<-session
+  - ticketId<-KIT-002
+  goesTo: []
+  boardFrames:
+  - FNB-3J
+  wireframe: wireframes/P15 Kitchen Display.dc.html#kit-009
+  inFlows: null
+- screen: KIT-010
+  name: Kitchen Performance, AI & Operational Optimization
+  module: Kitchen
+  requiresModule: fnb
+  wave: 2
+  density: touchLarge
+  operations:
+  - askReportingQuestion
+  - getDashboard
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams:
+  - venueId<-session
+  - stationId<-session
+  - dashboardId<-KIT-002
+  goesTo: []
+  boardFrames:
+  - FNB-3K
+  wireframe: wireframes/P15 Kitchen Display.dc.html#kit-010
+  inFlows: null

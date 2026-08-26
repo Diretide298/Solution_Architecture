@@ -1,0 +1,99 @@
+entity: CorrectiveAction
+contract: fnb
+enum: CorrectiveAction.status
+enumKind: inline
+enumSchema: CorrectiveAction
+enumProperty: status
+owner: FnbService
+description: 'What happens to a food-safety finding between somebody noticing it and an inspector reading
+  it.
+
+  **Built 20 August from board 5J of the client F&B pack.** The board draws `safetyBreach` and `correctiveActionOpen`
+  as screen states, and a screen state with no lifecycle behind it is a colour on a tile.
+
+  **The model exists to prevent one outcome: a finding that quietly stops being one.** An action that
+  is opened, worked and never signed reads to an inspector as an action that did not happen, and the
+  only difference between a venue that handles excursions well and one that does not is whether the
+  signature is there.
+
+  '
+initial:
+- open
+terminal:
+- closed
+states:
+- name: open
+  description: 'Raised, and **almost always raised by the platform rather than a person**. An out-of-range
+    temperature reading or a cold-chain breach opens this automatically, because an action that depends
+    on somebody remembering to raise it is an action that is not raised.
+
+    '
+- name: actioned
+  description: 'Something was done and it is recorded — discarded, reworked, quarantined, returned.
+    **Not yet signed**, which is the state most findings sit in and the state that matters.
+
+    '
+- name: signed
+  description: 'A named principal put their name to what was done. **This is the record.** *Discarded
+    and reset* with nobody against it is not a corrective action.
+
+    '
+- name: escalated
+  description: 'A critical finding a shift cannot close on its own. **A supervisor signs what a cook
+    should not**, and the refusal lives here rather than in a policy document.
+
+    '
+- name: closed
+  description: 'Signed and past its review window. **Terminal, and it is never deleted** — a HACCP record
+    removed is worse than a HACCP record that says something went wrong.
+
+    '
+transitions:
+- from: open
+  to: actioned
+  trigger: recordAction
+  operation: recordCorrectiveAction
+  guard: 'An action must be described. **A disposal of `none` is allowed and must be justified** — a
+    reading that came back into range on its own is a real outcome, and forcing a disposal teaches a
+    kitchen to discard stock it did not need to.
+
+    '
+- from: actioned
+  to: signed
+  trigger: sign
+  operation: signCorrectiveAction
+  guard: '**The signing principal may not be the one who raised it, where the severity is critical.**
+    Refused with the escalation path named rather than silently allowed.
+
+    '
+- from: open
+  to: escalated
+  trigger: escalate
+  operation: escalateCorrectiveAction
+  guard: Severity is critical, or the action has been open past the venue's threshold.
+- from: actioned
+  to: escalated
+  trigger: escalate
+  operation: escalateCorrectiveAction
+- from: escalated
+  to: signed
+  trigger: signBySupervisor
+  operation: signCorrectiveAction
+  guard: The signing principal holds INCIDENT_MANAGE at venue scope or above.
+- from: signed
+  to: closed
+  trigger: closeAfterReview
+  operation: closeCorrectiveAction
+  guard: '**A job, not a button.** Findings close on the venue''s review cycle so that a manager cannot
+    close a bad week by clicking through it.
+
+    '
+openQuestions: null
+notes: "**No transition deletes and none reverses.** A finding that was signed cannot be unsigned —\
+  \ a correction to a signature is a new finding referencing the first, because **an audit trail that\
+  \ can be edited is not an audit trail.**\n**`actioned` is deliberately not terminal.** The obvious\
+  \ model closes at *action taken*, and that is the model that produces a year of unsigned entries nobody\
+  \ notices until an inspection.\n\n  **Corrected 24 August.** Every transition named `signCorrectiveAction`\
+  \ and `signed -> closed` named nothing. **One operation cannot be the fix, the escalation and the\
+  \ attestation** — `recordCorrectiveAction`, `escalateCorrectiveAction` and `closeCorrectiveAction`\
+  \ were built, and a signed finding can now be closed by somebody other than whoever signed it."

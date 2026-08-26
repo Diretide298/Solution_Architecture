@@ -1,0 +1,1028 @@
+# P16 — Venue Analytics
+#
+# Board 6 of every client design set, received 20 August 2026.
+# 26 board screens collapsed to nine with a domain selector — six were duplicated across
+# F&B and Retail, two word for word.
+#
+# Validated against _schema.yaml; component kinds from _components.yaml.
+
+platform:
+  code: P16
+  formFactor: web
+  surface: staffFacing
+  runtime: reactWeb
+  themes:
+  - light
+  - dark
+  directions:
+  - ltr
+  - rtl
+  app: venue-management-web
+  appStatus: not scaffolded
+  operator: venue
+  deployment:
+    target: browser
+    distribution: served from the cell
+    bundleUpdate: immediate on deploy
+    hosting: in-cell, in-region
+    storeReview: false
+    deviceOwnership: venue-owned workstation
+    networkAssumption: venue LAN
+    releaseCadence: fortnightly
+  name: Venue Analytics — Cross-Domain Reporting
+  shortName: Venue Analytics
+  audience: staff
+  offlineCapable: false
+  screenCount: 10
+  notes: '**26 board screens collapsed to nine.** F&B, Retail and POS each ended their set with an executive
+    command centre, a sales and revenue view, a performance view, a forecasting view and an AI centre
+    — and **two of them are word-for-word identical across domains.**
+
+
+    **A domain is a filter on an analytics screen, not a copy of it.** Building three sets means maintaining
+    one screen three times and watching them drift, and the drift is invisible until two dashboards
+    disagree about last month.
+
+
+    **Its own platform rather than a P08 section** because it is read rather than operated: opened on
+    a Monday morning, never during service, by somebody asking about a period rather than doing a job.
+
+
+    **Shares the `venue-management-web` app.** A separate platform is a navigation and permission boundary,
+    not necessarily a separate codebase.'
+  wireframeBoard: wireframes/P16 Venue Analytics.dc.html
+  wireframeBoardNote: '**The generated board for the whole platform.** Individual screens keep the client-pack
+    anchor where one exists — a screen the client drew should open the client''s frame — and this renders
+    every screen on the platform including the ones no pack covers.
+
+
+    **Declared 24 August.** The file was written from the first generation and nothing pointed at it:
+    `check-wireframes` has no unmatched-board concept, so the Python suite passed while the viewer flagged
+    an orphan. **A board nobody references is a board nobody reviews.**'
+screens:
+- id: ANL-001
+  name: Executive Command Center
+  module: Analytics
+  wave: 3
+  purpose: Executive Command Center — across F&B, retail, ticketing and frontline, filtered by domain.
+  density: compact
+  apis:
+  - operationId: getDashboard
+    contract: reporting
+    purpose: Read a dashboard with tile data
+    trigger: onLoad
+  - operationId: listAlerts
+    contract: reporting
+    purpose: What is currently raised
+    trigger: onLoad
+  - operationId: requestSuggestion
+    contract: ai
+    purpose: requestSuggestion
+    trigger: onAction
+  - operationId: runReport
+    contract: reporting
+    purpose: Run a report
+    trigger: onAction
+  states:
+    loading: Tiles render in place; **each resolves on its own** so one slow source does not hold the
+      page.
+    emptyFirstRun: '**A venue with no trading history.** Links to the seeded reports rather than showing
+      zeroes — a dashboard of zeroes teaches a new manager nothing.'
+    emptyNoResults: Nothing in this window. **Last week and last month are the useful defaults**, not
+      today — an analytics screen opened on a Monday is asking about a period.
+    emptyNoAccess: You do not have reporting permission at this scope. **Sections you cannot see are
+      not shown** rather than greyed out.
+    error: Could not load. **Trading is unaffected** — this reads and writes nothing.
+    partial: '**Some tiles resolved and some did not, and it says which.** A dashboard showing three
+      numbers where four were promised is a manager acting on an incomplete picture without knowing
+      it.'
+  entryState:
+    params:
+    - name: venueId
+      from: session
+    - name: domain
+      from: session
+      optional: true
+    - name: dashboardId
+      from: deepLink
+    - name: reportId
+      from: deepLink
+    coldEntry: '**A bookmarked dashboard is the normal way in** — a manager opens the same view every
+      Monday. The domain and the window come from the link where it carries them, and from the last
+      view where it does not.'
+  layout:
+    template: dashboard
+    regions:
+    - name: contentBody
+      components:
+      - kind: multiSelect
+        label: Domain
+        notes: '**The selector that collapses 26 board screens into nine.** A domain is a filter on
+          an analytics screen, not a copy of it — building three sets means maintaining one screen three
+          times and watching them drift.'
+      - kind: metricTile
+      - kind: chart
+        notes: '**Comparison against the previous period by default.** A number with nothing beside
+          it is a number nobody can act on.'
+      - kind: dataTable
+  navigation:
+    isEntryPoint: true
+    exitTo:
+    - ANL-002
+    - ANL-003
+    - ANL-004
+    - ANL-005
+    - ANL-006
+    - ANL-007
+    - ANL-008
+    - ANL-009
+    - ANL-010
+  implementation:
+    app: venue-management-web
+    route: /analytics/executive-command-center
+    component: apps/venue-management-web/src/routes/analytics/ExecutiveCommandCenterDashboard.tsx
+    status: notStarted
+  wireframe:
+    status: generated
+    board: wireframes/P16 Venue Analytics.dc.html#anl-001
+    source: Claude Design POS pack, 24 August
+    note: '**Drawn as POS-6A in the client POS pack.** The pack''s frame is the specification — it carries
+      operations, states, entry params and exits, and it is better specified than anything derived from
+      the screen file.'
+    derivedFrom: wireframes/POS Board 6.dc.html#pos-6a
+  provenance: client board, specified
+  notes: '**Built 20 August. Answers 3 board screens**: F&B Executive Command Center; Retail Executive
+    Command Center; Enterprise Frontline Operations Dashboard. **Three board screens, one screen with
+    a domain selector.** F&B, Retail and POS each drew an executive command centre and they differ only
+    in which numbers fill the tiles. **Owns POS board frame(s) POS-6A** (client pack, 24 August). **Assigned
+    by board purpose rather than by operation overlap** — three attempts at deriving that mapping produced
+    plausible nonsense, and a reader who trusts a bad table is worse off than one who has none. **Board
+    repointed 24 August.** This screen pointed at `wireframes/POS Board 6.dc.html#pos-6a` — a frame
+    in the client pack, which is where the design came from and not where this screen is drawn. **`P15
+    Kitchen Display.dc.html` and `P16 Venue Analytics.dc.html` carry one anchor per screen and nothing
+    referenced either**, so both shipped correctly anchored and unreachable. The pack frame is kept
+    in `derivedFrom` because provenance is worth more than the wrong pointer. **`wireframe.status` corrected
+    25 August.** When these screens were repointed from the client pack to their own board on 24 August,
+    the status stayed `designed` — **which claimed a client had drawn a board this package generated.**
+    `derivedFrom` keeps the pack frame, which is where the design came from; `status` describes the
+    file being pointed at, and those are different facts.'
+  requiresModule: analytics
+  boardFrames:
+  - FNB-6A
+  - POS-6A
+  - RET-6A
+- id: ANL-002
+  name: Sales, Revenue & Channel
+  module: Analytics
+  wave: 3
+  purpose: Sales, Revenue & Channel — across F&B, retail, ticketing and frontline, filtered by domain.
+  density: compact
+  apis:
+  - operationId: getDashboard
+    contract: reporting
+    purpose: Read a dashboard with tile data
+    trigger: onLoad
+  - operationId: runReport
+    contract: reporting
+    purpose: Run a report
+    trigger: onAction
+  states:
+    loading: Tiles render in place; **each resolves on its own** so one slow source does not hold the
+      page.
+    emptyFirstRun: '**A venue with no trading history.** Links to the seeded reports rather than showing
+      zeroes — a dashboard of zeroes teaches a new manager nothing.'
+    emptyNoResults: Nothing in this window. **Last week and last month are the useful defaults**, not
+      today — an analytics screen opened on a Monday is asking about a period.
+    emptyNoAccess: You do not have reporting permission at this scope. **Sections you cannot see are
+      not shown** rather than greyed out.
+    error: Could not load. **Trading is unaffected** — this reads and writes nothing.
+    partial: '**Some tiles resolved and some did not, and it says which.** A dashboard showing three
+      numbers where four were promised is a manager acting on an incomplete picture without knowing
+      it.'
+  entryState:
+    params:
+    - name: venueId
+      from: session
+    - name: domain
+      from: session
+      optional: true
+    - name: dashboardId
+      from: deepLink
+    - name: reportId
+      from: deepLink
+    coldEntry: '**A bookmarked dashboard is the normal way in** — a manager opens the same view every
+      Monday. The domain and the window come from the link where it carries them, and from the last
+      view where it does not.'
+  layout:
+    template: dashboard
+    regions:
+    - name: contentBody
+      components:
+      - kind: multiSelect
+        label: Domain
+        notes: '**The selector that collapses 26 board screens into nine.** A domain is a filter on
+          an analytics screen, not a copy of it — building three sets means maintaining one screen three
+          times and watching them drift.'
+      - kind: metricTile
+      - kind: chart
+        notes: '**Comparison against the previous period by default.** A number with nothing beside
+          it is a number nobody can act on.'
+      - kind: dataTable
+  navigation:
+    entryFrom:
+    - ANL-001
+    exitTo: []
+  implementation:
+    app: venue-management-web
+    route: /analytics/sales-revenue-channel
+    component: apps/venue-management-web/src/routes/analytics/SalesRevenueChannelDashboard.tsx
+    status: notStarted
+  wireframe:
+    status: generated
+    board: wireframes/P16 Venue Analytics.dc.html#anl-002
+    source: Claude Design Retail pack, 24 August
+    note: '**Drawn as RET-6L in the client Retail pack.**'
+    derivedFrom: wireframes/Retail Board 6.dc.html#ret-6l
+  provenance: client board, specified
+  notes: '**Built 20 August. Answers 2 board screens**: Sales, Revenue & Channel Analytics; Sales, Revenue
+    & Channel Analytics. **The same screen twice in the client set, word for word.** Revenue by channel
+    is revenue by channel whether the line is a burger or a t-shirt. **Board repointed 24 August.**
+    This screen pointed at `wireframes/Retail Board 6.dc.html#ret-6l` — a frame in the client pack,
+    which is where the design came from and not where this screen is drawn. **`P15 Kitchen Display.dc.html`
+    and `P16 Venue Analytics.dc.html` carry one anchor per screen and nothing referenced either**, so
+    both shipped correctly anchored and unreachable. The pack frame is kept in `derivedFrom` because
+    provenance is worth more than the wrong pointer.'
+  requiresModule: analytics
+  boardFrames:
+  - FNB-6B
+  - RET-6L
+- id: ANL-003
+  name: Operational Performance
+  module: Analytics
+  wave: 3
+  purpose: Operational Performance — across F&B, retail, ticketing and frontline, filtered by domain.
+  density: compact
+  apis:
+  - operationId: getDashboard
+    contract: reporting
+    purpose: Read a dashboard with tile data
+    trigger: onLoad
+  - operationId: runReport
+    contract: reporting
+    purpose: Run a report
+    trigger: onAction
+  - operationId: listAlerts
+    contract: reporting
+    purpose: What is currently raised
+    trigger: onLoad
+  - operationId: listDevices
+    contract: tenancy
+    purpose: List registered devices
+    trigger: onLoad
+  - operationId: listPrincipals
+    contract: identity
+    purpose: List principals
+    trigger: onLoad
+  states:
+    loading: Tiles render in place; **each resolves on its own** so one slow source does not hold the
+      page.
+    emptyFirstRun: '**A venue with no trading history.** Links to the seeded reports rather than showing
+      zeroes — a dashboard of zeroes teaches a new manager nothing.'
+    emptyNoResults: Nothing in this window. **Last week and last month are the useful defaults**, not
+      today — an analytics screen opened on a Monday is asking about a period.
+    emptyNoAccess: You do not have reporting permission at this scope. **Sections you cannot see are
+      not shown** rather than greyed out.
+    error: Could not load. **Trading is unaffected** — this reads and writes nothing.
+    partial: '**Some tiles resolved and some did not, and it says which.** A dashboard showing three
+      numbers where four were promised is a manager acting on an incomplete picture without knowing
+      it.'
+  entryState:
+    params:
+    - name: venueId
+      from: session
+    - name: domain
+      from: session
+      optional: true
+    - name: dashboardId
+      from: deepLink
+    - name: reportId
+      from: deepLink
+    coldEntry: '**A bookmarked dashboard is the normal way in** — a manager opens the same view every
+      Monday. The domain and the window come from the link where it carries them, and from the last
+      view where it does not.'
+  layout:
+    template: dashboard
+    regions:
+    - name: contentBody
+      components:
+      - kind: multiSelect
+        label: Domain
+        notes: '**The selector that collapses 26 board screens into nine.** A domain is a filter on
+          an analytics screen, not a copy of it — building three sets means maintaining one screen three
+          times and watching them drift.'
+      - kind: metricTile
+      - kind: chart
+        notes: '**Comparison against the previous period by default.** A number with nothing beside
+          it is a number nobody can act on.'
+      - kind: dataTable
+  navigation:
+    entryFrom:
+    - ANL-001
+    exitTo: []
+  implementation:
+    app: venue-management-web
+    route: /analytics/operational-performance
+    component: apps/venue-management-web/src/routes/analytics/OperationalPerformanceDashboard.tsx
+    status: notStarted
+  wireframe:
+    status: generated
+    board: wireframes/P16 Venue Analytics.dc.html#anl-003
+    source: Claude Design POS pack, 24 August
+    note: '**Drawn as POS-6B, POS-6C, POS-6D in the client POS pack.** The pack''s frame is the specification
+      — it carries operations, states, entry params and exits, and it is better specified than anything
+      derived from the screen file.'
+    derivedFrom: wireframes/POS Board 6.dc.html#pos-6b
+  provenance: client board, specified
+  notes: '**Built 20 August. Answers 4 board screens**: Outlet, Service & Guest Performance; Store &
+    Operational Performance; Venue Operations Dashboard and 1 more. **Four board screens.** Outlet,
+    store, venue and department are the same question at four levels of `scope_path` — which is a filter,
+    not four screens. **Owns POS board frame(s) POS-6B, POS-6C, POS-6D** (client pack, 24 August). **Assigned
+    by board purpose rather than by operation overlap** — three attempts at deriving that mapping produced
+    plausible nonsense, and a reader who trusts a bad table is worse off than one who has none. **Board
+    repointed 24 August.** This screen pointed at `wireframes/POS Board 6.dc.html#pos-6b` — a frame
+    in the client pack, which is where the design came from and not where this screen is drawn. **`P15
+    Kitchen Display.dc.html` and `P16 Venue Analytics.dc.html` carry one anchor per screen and nothing
+    referenced either**, so both shipped correctly anchored and unreachable. The pack frame is kept
+    in `derivedFrom` because provenance is worth more than the wrong pointer.'
+  requiresModule: analytics
+  boardFrames:
+  - FNB-4K
+  - FNB-6C
+  - FNB-6G
+  - POS-6B
+  - POS-6C
+  - POS-6D
+  - RET-6B
+- id: ANL-004
+  name: Product Performance
+  module: Analytics
+  wave: 3
+  purpose: Product Performance — across F&B, retail, ticketing and frontline, filtered by domain.
+  density: compact
+  apis:
+  - operationId: getDashboard
+    contract: reporting
+    purpose: Read a dashboard with tile data
+    trigger: onLoad
+  - operationId: runReport
+    contract: reporting
+    purpose: Run a report
+    trigger: onAction
+  - operationId: listProducts
+    contract: catalogue
+    purpose: List products
+    trigger: onLoad
+  states:
+    loading: Tiles render in place; **each resolves on its own** so one slow source does not hold the
+      page.
+    emptyFirstRun: '**A venue with no trading history.** Links to the seeded reports rather than showing
+      zeroes — a dashboard of zeroes teaches a new manager nothing.'
+    emptyNoResults: Nothing in this window. **Last week and last month are the useful defaults**, not
+      today — an analytics screen opened on a Monday is asking about a period.
+    emptyNoAccess: You do not have reporting permission at this scope. **Sections you cannot see are
+      not shown** rather than greyed out.
+    error: Could not load. **Trading is unaffected** — this reads and writes nothing.
+    partial: '**Some tiles resolved and some did not, and it says which.** A dashboard showing three
+      numbers where four were promised is a manager acting on an incomplete picture without knowing
+      it.'
+  entryState:
+    params:
+    - name: venueId
+      from: session
+    - name: domain
+      from: session
+      optional: true
+    - name: dashboardId
+      from: deepLink
+    - name: reportId
+      from: deepLink
+    coldEntry: '**A bookmarked dashboard is the normal way in** — a manager opens the same view every
+      Monday. The domain and the window come from the link where it carries them, and from the last
+      view where it does not.'
+  layout:
+    template: dashboard
+    regions:
+    - name: contentBody
+      components:
+      - kind: multiSelect
+        label: Domain
+        notes: '**The selector that collapses 26 board screens into nine.** A domain is a filter on
+          an analytics screen, not a copy of it — building three sets means maintaining one screen three
+          times and watching them drift.'
+      - kind: metricTile
+      - kind: chart
+        notes: '**Comparison against the previous period by default.** A number with nothing beside
+          it is a number nobody can act on.'
+      - kind: dataTable
+  navigation:
+    entryFrom:
+    - ANL-001
+    exitTo: []
+  implementation:
+    app: venue-management-web
+    route: /analytics/product-performance
+    component: apps/venue-management-web/src/routes/analytics/ProductPerformanceDashboard.tsx
+    status: notStarted
+  wireframe:
+    status: generated
+    board: wireframes/P16 Venue Analytics.dc.html#anl-004
+    source: Claude Design Retail pack, 24 August
+    note: '**Drawn as RET-6C in the client Retail pack.**'
+    derivedFrom: wireframes/Retail Board 6.dc.html#ret-6c
+  provenance: client board, specified
+  notes: '**Built 20 August. Answers 2 board screens**: Product Performance & Menu Engineering; Product,
+    SKU & Merchandise Performance. **Menu engineering and SKU performance are one analysis.** Both rank
+    products by margin against volume; only the vocabulary differs. **Board repointed 24 August.** This
+    screen pointed at `wireframes/Retail Board 6.dc.html#ret-6c` — a frame in the client pack, which
+    is where the design came from and not where this screen is drawn. **`P15 Kitchen Display.dc.html`
+    and `P16 Venue Analytics.dc.html` carry one anchor per screen and nothing referenced either**, so
+    both shipped correctly anchored and unreachable. The pack frame is kept in `derivedFrom` because
+    provenance is worth more than the wrong pointer.'
+  requiresModule: analytics
+  boardFrames:
+  - FNB-6D
+  - RET-6C
+- id: ANL-005
+  name: Cost, Margin & Profitability
+  module: Analytics
+  wave: 3
+  purpose: Cost, Margin & Profitability — across F&B, retail, ticketing and frontline, filtered by domain.
+  density: compact
+  apis:
+  - operationId: getDashboard
+    contract: reporting
+    purpose: Read a dashboard with tile data
+    trigger: onLoad
+  - operationId: runReport
+    contract: reporting
+    purpose: Run a report
+    trigger: onAction
+  - operationId: getStockValuation
+    contract: inventory
+    purpose: Stock value by location and category
+    trigger: onLoad
+  states:
+    loading: Tiles render in place; **each resolves on its own** so one slow source does not hold the
+      page.
+    emptyFirstRun: '**A venue with no trading history.** Links to the seeded reports rather than showing
+      zeroes — a dashboard of zeroes teaches a new manager nothing.'
+    emptyNoResults: Nothing in this window. **Last week and last month are the useful defaults**, not
+      today — an analytics screen opened on a Monday is asking about a period.
+    emptyNoAccess: You do not have reporting permission at this scope. **Sections you cannot see are
+      not shown** rather than greyed out.
+    error: Could not load. **Trading is unaffected** — this reads and writes nothing.
+    partial: '**Some tiles resolved and some did not, and it says which.** A dashboard showing three
+      numbers where four were promised is a manager acting on an incomplete picture without knowing
+      it.'
+  entryState:
+    params:
+    - name: venueId
+      from: session
+    - name: domain
+      from: session
+      optional: true
+    - name: dashboardId
+      from: deepLink
+    - name: reportId
+      from: deepLink
+    coldEntry: '**A bookmarked dashboard is the normal way in** — a manager opens the same view every
+      Monday. The domain and the window come from the link where it carries them, and from the last
+      view where it does not.'
+  layout:
+    template: dashboard
+    regions:
+    - name: contentBody
+      components:
+      - kind: multiSelect
+        label: Domain
+        notes: '**The selector that collapses 26 board screens into nine.** A domain is a filter on
+          an analytics screen, not a copy of it — building three sets means maintaining one screen three
+          times and watching them drift.'
+      - kind: metricTile
+      - kind: chart
+        notes: '**Comparison against the previous period by default.** A number with nothing beside
+          it is a number nobody can act on.'
+      - kind: dataTable
+  navigation:
+    entryFrom:
+    - ANL-001
+    exitTo: []
+  implementation:
+    app: venue-management-web
+    route: /analytics/cost-margin-profitability
+    component: apps/venue-management-web/src/routes/analytics/CostMarginProfitabilityDashboard.tsx
+    status: notStarted
+  wireframe:
+    status: generated
+    board: wireframes/P16 Venue Analytics.dc.html#anl-005
+    source: Claude Design Retail pack, 24 August
+    note: '**Drawn as RET-6F in the client Retail pack.**'
+    derivedFrom: wireframes/Retail Board 6.dc.html#ret-6f
+  provenance: client board, specified
+  notes: '**Built 20 August. Answers 2 board screens**: Food Cost, Margin & Profitability Intelligence;
+    Promotion, Pricing & Margin Intelligence. Cost against price against what actually sold. **Board
+    repointed 24 August.** This screen pointed at `wireframes/Retail Board 6.dc.html#ret-6f` — a frame
+    in the client pack, which is where the design came from and not where this screen is drawn. **`P15
+    Kitchen Display.dc.html` and `P16 Venue Analytics.dc.html` carry one anchor per screen and nothing
+    referenced either**, so both shipped correctly anchored and unreachable. The pack frame is kept
+    in `derivedFrom` because provenance is worth more than the wrong pointer.'
+  requiresModule: analytics
+  boardFrames:
+  - FNB-6E
+  - RET-6F
+- id: ANL-006
+  name: Inventory & Waste Intelligence
+  module: Analytics
+  wave: 3
+  purpose: Inventory & Waste Intelligence — across F&B, retail, ticketing and frontline, filtered by
+    domain.
+  density: compact
+  apis:
+  - operationId: getDashboard
+    contract: reporting
+    purpose: Read a dashboard with tile data
+    trigger: onLoad
+  - operationId: runReport
+    contract: reporting
+    purpose: Run a report
+    trigger: onAction
+  - operationId: getCountVariance
+    contract: inventory
+    purpose: Variance between counted and expected
+    trigger: onLoad
+  - operationId: listExpiringBatches
+    contract: inventory
+    purpose: What is about to go out of date
+    trigger: onLoad
+  states:
+    loading: Tiles render in place; **each resolves on its own** so one slow source does not hold the
+      page.
+    emptyFirstRun: '**A venue with no trading history.** Links to the seeded reports rather than showing
+      zeroes — a dashboard of zeroes teaches a new manager nothing.'
+    emptyNoResults: Nothing in this window. **Last week and last month are the useful defaults**, not
+      today — an analytics screen opened on a Monday is asking about a period.
+    emptyNoAccess: You do not have reporting permission at this scope. **Sections you cannot see are
+      not shown** rather than greyed out.
+    error: Could not load. **Trading is unaffected** — this reads and writes nothing.
+    partial: '**Some tiles resolved and some did not, and it says which.** A dashboard showing three
+      numbers where four were promised is a manager acting on an incomplete picture without knowing
+      it.'
+  entryState:
+    params:
+    - name: venueId
+      from: session
+    - name: domain
+      from: session
+      optional: true
+    - name: countId
+      from: deepLink
+    - name: dashboardId
+      from: deepLink
+    - name: reportId
+      from: deepLink
+    coldEntry: '**A bookmarked dashboard is the normal way in** — a manager opens the same view every
+      Monday. The domain and the window come from the link where it carries them, and from the last
+      view where it does not.'
+  layout:
+    template: dashboard
+    regions:
+    - name: contentBody
+      components:
+      - kind: multiSelect
+        label: Domain
+        notes: '**The selector that collapses 26 board screens into nine.** A domain is a filter on
+          an analytics screen, not a copy of it — building three sets means maintaining one screen three
+          times and watching them drift.'
+      - kind: metricTile
+      - kind: chart
+        notes: '**Comparison against the previous period by default.** A number with nothing beside
+          it is a number nobody can act on.'
+      - kind: dataTable
+  navigation:
+    entryFrom:
+    - ANL-001
+    exitTo: []
+  implementation:
+    app: venue-management-web
+    route: /analytics/inventory-waste-intelligence
+    component: apps/venue-management-web/src/routes/analytics/InventoryWasteIntelligenceDashboard.tsx
+    status: notStarted
+  wireframe:
+    status: generated
+    board: wireframes/P16 Venue Analytics.dc.html#anl-006
+    source: Claude Design Retail pack, 24 August
+    note: '**Drawn as RET-6D in the client Retail pack.**'
+    derivedFrom: wireframes/Retail Board 6.dc.html#ret-6d
+  provenance: client board, specified
+  notes: '**Built 20 August. Answers 2 board screens**: Inventory, Waste & Production Intelligence;
+    Inventory, Sell-Through & Stock Intelligence. **Theoretical against actual is the whole analysis**
+    — a recipe says 400 portions, the run says 380, and the gap is waste, theft or a wrong recipe. **Board
+    repointed 24 August.** This screen pointed at `wireframes/Retail Board 6.dc.html#ret-6d` — a frame
+    in the client pack, which is where the design came from and not where this screen is drawn. **`P15
+    Kitchen Display.dc.html` and `P16 Venue Analytics.dc.html` carry one anchor per screen and nothing
+    referenced either**, so both shipped correctly anchored and unreachable. The pack frame is kept
+    in `derivedFrom` because provenance is worth more than the wrong pointer.'
+  requiresModule: analytics
+  boardFrames:
+  - FNB-6F
+  - RET-6D
+- id: ANL-007
+  name: Guest & Conversion Intelligence
+  module: Analytics
+  wave: 3
+  purpose: Guest & Conversion Intelligence — across F&B, retail, ticketing and frontline, filtered by
+    domain.
+  density: compact
+  apis:
+  - operationId: getDashboard
+    contract: reporting
+    purpose: Read a dashboard with tile data
+    trigger: onLoad
+  - operationId: runReport
+    contract: reporting
+    purpose: Run a report
+    trigger: onAction
+  - operationId: listSegments
+    contract: marketing-crm
+    purpose: List segments
+    trigger: onLoad
+  - operationId: createSegment
+    contract: marketing-crm
+    purpose: Create a segment
+    trigger: onAction
+  - operationId: previewSegment
+    contract: marketing-crm
+    purpose: Estimate segment size and reachability
+    trigger: onAction
+  states:
+    loading: Tiles render in place; **each resolves on its own** so one slow source does not hold the
+      page.
+    emptyFirstRun: '**A venue with no trading history.** Links to the seeded reports rather than showing
+      zeroes — a dashboard of zeroes teaches a new manager nothing.'
+    emptyNoResults: Nothing in this window. **Last week and last month are the useful defaults**, not
+      today — an analytics screen opened on a Monday is asking about a period.
+    emptyNoAccess: You do not have reporting permission at this scope. **Sections you cannot see are
+      not shown** rather than greyed out.
+    error: Could not load. **Trading is unaffected** — this reads and writes nothing.
+    partial: '**Some tiles resolved and some did not, and it says which.** A dashboard showing three
+      numbers where four were promised is a manager acting on an incomplete picture without knowing
+      it.'
+  entryState:
+    params:
+    - name: venueId
+      from: session
+    - name: domain
+      from: session
+      optional: true
+    - name: dashboardId
+      from: deepLink
+    - name: reportId
+      from: deepLink
+    - name: segmentId
+      from: deepLink
+    coldEntry: '**A bookmarked dashboard is the normal way in** — a manager opens the same view every
+      Monday. The domain and the window come from the link where it carries them, and from the last
+      view where it does not. A segment opened from the list.'
+  layout:
+    template: dashboard
+    regions:
+    - name: contentBody
+      components:
+      - kind: multiSelect
+        label: Domain
+        notes: '**The selector that collapses 26 board screens into nine.** A domain is a filter on
+          an analytics screen, not a copy of it — building three sets means maintaining one screen three
+          times and watching them drift.'
+      - kind: metricTile
+      - kind: chart
+        notes: '**Comparison against the previous period by default.** A number with nothing beside
+          it is a number nobody can act on.'
+      - kind: dataTable
+  navigation:
+    entryFrom:
+    - ANL-001
+    exitTo: []
+  implementation:
+    app: venue-management-web
+    route: /analytics/guest-conversion-intelligence
+    component: apps/venue-management-web/src/routes/analytics/GuestConversionIntelligenceDashboard.tsx
+    status: notStarted
+  wireframe:
+    status: generated
+    board: wireframes/P16 Venue Analytics.dc.html#anl-007
+    source: Claude Design Retail pack, 24 August
+    note: '**Drawn as RET-6E in the client Retail pack.**'
+    derivedFrom: wireframes/Retail Board 6.dc.html#ret-6e
+  provenance: client board, specified
+  notes: '**Built 20 August. Answers 2 board screens**: Guest, Conversion & Basket Intelligence; Kitchen,
+    Service & Fulfilment Performance. Who bought, what else they nearly bought, and how long they waited.
+    **Retail board operations wired 24 August.** **Board repointed 24 August.** This screen pointed
+    at `wireframes/Retail Board 6.dc.html#ret-6e` — a frame in the client pack, which is where the design
+    came from and not where this screen is drawn. **`P15 Kitchen Display.dc.html` and `P16 Venue Analytics.dc.html`
+    carry one anchor per screen and nothing referenced either**, so both shipped correctly anchored
+    and unreachable. The pack frame is kept in `derivedFrom` because provenance is worth more than the
+    wrong pointer.'
+  requiresModule: analytics
+  boardFrames:
+  - RET-6E
+- id: ANL-008
+  name: Demand Forecasting
+  module: Analytics
+  wave: 3
+  purpose: Demand Forecasting — across F&B, retail, ticketing and frontline, filtered by domain.
+  density: compact
+  apis:
+  - operationId: askReportingQuestion
+    contract: reporting
+    purpose: Natural-language reporting query
+    trigger: onAction
+  - operationId: getDashboard
+    contract: reporting
+    purpose: Read a dashboard with tile data
+    trigger: onLoad
+  states:
+    loading: Tiles render in place; **each resolves on its own** so one slow source does not hold the
+      page.
+    emptyFirstRun: '**A venue with no trading history.** Links to the seeded reports rather than showing
+      zeroes — a dashboard of zeroes teaches a new manager nothing.'
+    emptyNoResults: Nothing in this window. **Last week and last month are the useful defaults**, not
+      today — an analytics screen opened on a Monday is asking about a period.
+    emptyNoAccess: You do not have reporting permission at this scope. **Sections you cannot see are
+      not shown** rather than greyed out.
+    error: Could not load. **Trading is unaffected** — this reads and writes nothing.
+    partial: '**Some tiles resolved and some did not, and it says which.** A dashboard showing three
+      numbers where four were promised is a manager acting on an incomplete picture without knowing
+      it.'
+  entryState:
+    params:
+    - name: venueId
+      from: session
+    - name: domain
+      from: session
+      optional: true
+    - name: dashboardId
+      from: deepLink
+    coldEntry: '**A bookmarked dashboard is the normal way in** — a manager opens the same view every
+      Monday. The domain and the window come from the link where it carries them, and from the last
+      view where it does not.'
+  layout:
+    template: dashboard
+    regions:
+    - name: contentBody
+      components:
+      - kind: multiSelect
+        label: Domain
+        notes: '**The selector that collapses 26 board screens into nine.** A domain is a filter on
+          an analytics screen, not a copy of it — building three sets means maintaining one screen three
+          times and watching them drift.'
+      - kind: metricTile
+      - kind: chart
+        notes: '**Comparison against the previous period by default.** A number with nothing beside
+          it is a number nobody can act on.'
+      - kind: dataTable
+  navigation:
+    entryFrom:
+    - ANL-001
+    exitTo: []
+  implementation:
+    app: venue-management-web
+    route: /analytics/demand-forecasting
+    component: apps/venue-management-web/src/routes/analytics/DemandForecastingDashboard.tsx
+    status: notStarted
+  wireframe:
+    status: generated
+    board: wireframes/P16 Venue Analytics.dc.html#anl-008
+    source: Claude Design Retail pack, 24 August
+    note: '**Drawn as RET-6G in the client Retail pack.**'
+    derivedFrom: wireframes/Retail Board 6.dc.html#ret-6g
+  provenance: client board, specified
+  notes: '**Built 20 August. Answers 2 board screens**: Demand Forecasting & Operational Planning; Demand
+    Forecasting & Merchandise Planning. **A forecast is an input to a requisition, not a report.** Its
+    value is that somebody orders differently because of it. **Board repointed 24 August.** This screen
+    pointed at `wireframes/Retail Board 6.dc.html#ret-6g` — a frame in the client pack, which is where
+    the design came from and not where this screen is drawn. **`P15 Kitchen Display.dc.html` and `P16
+    Venue Analytics.dc.html` carry one anchor per screen and nothing referenced either**, so both shipped
+    correctly anchored and unreachable. The pack frame is kept in `derivedFrom` because provenance is
+    worth more than the wrong pointer.'
+  requiresModule: analytics
+  boardFrames:
+  - FNB-6H
+  - RET-6G
+- id: ANL-009
+  name: AI Assistant & Action Center
+  module: Analytics
+  wave: 3
+  purpose: AI Assistant & Action Center — across F&B, retail, ticketing and frontline, filtered by domain.
+  density: compact
+  apis:
+  - operationId: askReportingQuestion
+    contract: reporting
+    purpose: Natural-language reporting query
+    trigger: onAction
+  - operationId: listAlerts
+    contract: reporting
+    purpose: What is currently raised
+    trigger: onLoad
+  - operationId: acknowledgeAlert
+    contract: reporting
+    purpose: Take responsibility for it
+    trigger: onAction
+  - operationId: listOrders
+    contract: orders
+    purpose: List orders
+    trigger: onLoad
+  - operationId: runReport
+    contract: reporting
+    purpose: Run a report
+    trigger: onAction
+  - operationId: setAlertRule
+    contract: reporting
+    purpose: Raise an alert when a number leaves a range
+    trigger: onAction
+  - operationId: listProposedActions
+    contract: ai
+    purpose: What the assistant has proposed and nobody has decided
+    trigger: onLoad
+  - operationId: decideProposedAction
+    contract: ai
+    purpose: Approve or reject a proposal
+    trigger: onAction
+  states:
+    loading: Tiles render in place; **each resolves on its own** so one slow source does not hold the
+      page.
+    emptyFirstRun: '**A venue with no trading history.** Links to the seeded reports rather than showing
+      zeroes — a dashboard of zeroes teaches a new manager nothing.'
+    emptyNoResults: Nothing in this window. **Last week and last month are the useful defaults**, not
+      today — an analytics screen opened on a Monday is asking about a period.
+    emptyNoAccess: You do not have reporting permission at this scope. **Sections you cannot see are
+      not shown** rather than greyed out.
+    error: Could not load. **Trading is unaffected** — this reads and writes nothing.
+    partial: '**Some tiles resolved and some did not, and it says which.** A dashboard showing three
+      numbers where four were promised is a manager acting on an incomplete picture without knowing
+      it.'
+  entryState:
+    params:
+    - name: venueId
+      from: session
+    - name: domain
+      from: session
+      optional: true
+    - name: alertId
+      from: deepLink
+    - name: reportId
+      from: deepLink
+    - name: actionId
+      from: deepLink
+    coldEntry: '**A bookmarked dashboard is the normal way in** — a manager opens the same view every
+      Monday. The domain and the window come from the link where it carries them, and from the last
+      view where it does not. A proposed action opened from the queue or an alert.'
+  layout:
+    template: dashboard
+    regions:
+    - name: contentBody
+      components:
+      - kind: multiSelect
+        label: Domain
+        notes: '**The selector that collapses 26 board screens into nine.** A domain is a filter on
+          an analytics screen, not a copy of it — building three sets means maintaining one screen three
+          times and watching them drift.'
+      - kind: metricTile
+      - kind: chart
+        notes: '**Comparison against the previous period by default.** A number with nothing beside
+          it is a number nobody can act on.'
+      - kind: dataTable
+  navigation:
+    entryFrom:
+    - ANL-001
+    exitTo: []
+  implementation:
+    app: venue-management-web
+    route: /analytics/ai-assistant-action-center
+    component: apps/venue-management-web/src/routes/analytics/AiAssistantActionCenterDashboard.tsx
+    status: notStarted
+  wireframe:
+    status: generated
+    board: wireframes/P16 Venue Analytics.dc.html#anl-009
+    source: Claude Design POS pack, 24 August
+    note: '**Drawn as POS-6E in the client POS pack.** The pack''s frame is the specification — it carries
+      operations, states, entry params and exits, and it is better specified than anything derived from
+      the screen file.'
+    derivedFrom: wireframes/POS Board 6.dc.html#pos-6e
+  provenance: client board, specified
+  notes: '**Built 20 August. Answers 5 board screens**: AI Recommendation, Simulation & Optimization
+    Center; AI Assistant, Alerts & Management Action Center; Transaction & Exception Monitoring and
+    2 more. **Five board screens, and the collapse is the point.** Every domain drew an AI centre and
+    an alert centre; **an alert nobody can act on from the screen showing it is a notification**, so
+    recommendation and action are one place. **Owns POS board frame(s) POS-6E** (client pack, 24 August).
+    **Assigned by board purpose rather than by operation overlap** — three attempts at deriving that
+    mapping produced plausible nonsense, and a reader who trusts a bad table is worse off than one who
+    has none. **Retail board operations wired 24 August.** **Board repointed 24 August.** This screen
+    pointed at `wireframes/POS Board 6.dc.html#pos-6e` — a frame in the client pack, which is where
+    the design came from and not where this screen is drawn. **`P15 Kitchen Display.dc.html` and `P16
+    Venue Analytics.dc.html` carry one anchor per screen and nothing referenced either**, so both shipped
+    correctly anchored and unreachable. The pack frame is kept in `derivedFrom` because provenance is
+    worth more than the wrong pointer.'
+  requiresModule: analytics
+  boardFrames:
+  - FNB-5K
+  - FNB-6J
+  - FNB-6K
+  - POS-6E
+  - RET-5K
+  - RET-6K
+- id: ANL-010
+  name: Suggestions & Advice
+  module: Analytics
+  wave: 3
+  requiresModule: ai
+  purpose: Every open suggestion, what it is based on, and whether the venue took it.
+  density: compact
+  apis:
+  - operationId: requestSuggestion
+    contract: ai
+    purpose: Ask for an answer
+    trigger: onAction
+  - operationId: recordSuggestionOutcome
+    contract: ai
+    purpose: What the venue did
+    trigger: onAction
+  states:
+    loading: Open suggestions, newest first, grouped by kind.
+    emptyFirstRun: '**A venue with no history has nothing to suggest from**, and the screen says so
+      rather than showing a rule dressed as advice. Names when there will be enough data.'
+    emptyNoResults: Nothing open in this window. **Acted-on suggestions move to history rather than
+      vanishing** — a manager reviewing last month needs to see what was advised.
+    emptyNoAccess: You do not have AI permission at this venue.
+    error: Could not load. **Trading is unaffected** — this advises and does not act.
+    shadowRunning: '**A model is running alongside the rule and its answers are not shown.** Named here
+      so a manager knows a comparison is in progress and when it reports.'
+  entryState:
+    params:
+    - name: venueId
+      from: session
+    - name: suggestionId
+      from: deepLink
+      optional: true
+    coldEntry: A bookmarked view opened weekly, or **a link from an alert naming one suggestion** —
+      an alert that cannot take a manager to the thing it is about is a notification.
+  layout:
+    template: list
+    regions:
+    - name: contentBody
+      components:
+      - kind: multiSelect
+        label: Kind
+      - kind: cardList
+        bindsTo: Suggestion[]
+        notes: '**The basis is on the card, not behind a tap.** A manager must see that today’s answer
+          is a margin rule and next quarter’s is a model — the same screen, a different basis.'
+      - kind: detailPanel
+        notes: The explanation in plain words and the inputs it used. **Advice computed from data the
+          manager cannot see is advice they will not trust.**
+      - kind: primaryButton
+        label: Take it
+      - kind: secondaryButton
+        label: Do something else
+        notes: '**Records the outcome either way.** A rejected suggestion is the case the current rule
+          got wrong, which is exactly what a model is trained to beat.'
+  navigation:
+    entryFrom:
+    - ANL-001
+    exitTo: []
+  implementation:
+    app: venue-management-web
+    route: /analytics/suggestions
+    component: apps/venue-management-web/src/routes/analytics/SuggestionsDashboard.tsx
+    status: notStarted
+  wireframe:
+    status: generated
+    board: wireframes/P16 Venue Analytics.dc.html#anl-010
+    source: Claude Design POS pack, 24 August
+    note: '**Drawn as POS-6F in the client POS pack.** The pack''s frame is the specification — it carries
+      operations, states, entry params and exits, and it is better specified than anything derived from
+      the screen file.'
+    derivedFrom: wireframes/POS Board 6.dc.html#pos-6f
+  provenance: client board, specified
+  notes: '**Built 24 August.** The client F&B boards drew six suggestion endpoints — price, requisition,
+    replenishment, scenario, SLA, demand plan. **One screen and one operation answer all six**, because
+    a suggestion surface that differs per domain is six screens to change when the model changes. **Owns
+    POS board frame(s) POS-6F** (client pack, 24 August). **Assigned by board purpose rather than by
+    operation overlap** — three attempts at deriving that mapping produced plausible nonsense, and a
+    reader who trusts a bad table is worse off than one who has none. **Board repointed 24 August.**
+    This screen pointed at `wireframes/POS Board 6.dc.html#pos-6f` — a frame in the client pack, which
+    is where the design came from and not where this screen is drawn. **`P15 Kitchen Display.dc.html`
+    and `P16 Venue Analytics.dc.html` carry one anchor per screen and nothing referenced either**, so
+    both shipped correctly anchored and unreachable. The pack frame is kept in `derivedFrom` because
+    provenance is worth more than the wrong pointer.'
+  boardFrames:
+  - POS-6F

@@ -1,0 +1,663 @@
+id: LLD-inventory
+title: inventory — 50 operations
+generatedBy: tools/derive-diagrams.py
+index: diagrams/hld/03-contracts.yaml
+tier: satellite
+service: InventoryService
+operations:
+- operation: acknowledgePurchaseOrder
+  verb: POST
+  path: /purchase-orders/{purchaseOrderId}/acknowledge
+  scope: venue
+  permission: PRODUCT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - inventory.purchase_order
+  writes:
+  - cache:idempotency
+  - inventory.purchase_order
+- operation: approveRequisition
+  verb: POST
+  path: /requisitions/{requisitionId}/approve
+  scope: venue
+  permission: APPROVAL_ACT
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - inventory.requisition
+  writes:
+  - cache:idempotency
+  - inventory.requisition
+- operation: bulkUpdateProducts
+  verb: POST
+  path: /products/bulk
+  scope: venue
+  permission: PRODUCT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - catalogue.price
+  - catalogue.product
+  - inventory.item
+  writes:
+  - cache:idempotency
+  - cache:resolution
+  - catalogue.price
+  - catalogue.product
+  - inventory.item
+- operation: cancelPurchaseOrder
+  verb: POST
+  path: /purchase-orders/{purchaseOrderId}/cancel
+  scope: venue
+  permission: ORDER_CANCEL
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - inventory.purchase_order
+  writes:
+  - cache:idempotency
+  - inventory.purchase_order
+- operation: cancelRequisition
+  verb: POST
+  path: /requisitions/{requisitionId}/cancel
+  scope: venue
+  permission: PRODUCT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - inventory.requisition
+  writes:
+  - cache:idempotency
+  - inventory.requisition
+- operation: cancelStockCount
+  verb: POST
+  path: /stock-counts/{countId}/cancel
+  scope: venue
+  permission: PRODUCT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - inventory.count
+  writes:
+  - cache:idempotency
+  - inventory.count
+- operation: closePurchaseOrderShort
+  verb: POST
+  path: /purchase-orders/{purchaseOrderId}/close-short
+  scope: venue
+  permission: LEDGER_APPROVE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - inventory.purchase_order
+  writes:
+  - cache:idempotency
+  - inventory.purchase_order
+- operation: closeTransferShort
+  verb: POST
+  path: /stock-transfers/{transferId}/close-short
+  scope: venue
+  permission: LEDGER_APPROVE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - inventory.transfer
+  writes:
+  - cache:idempotency
+  - inventory.transfer
+- operation: compareQuotations
+  verb: GET
+  path: /requisitions/{requisitionId}/quotations
+  scope: venue
+  permission: PRODUCT_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - inventory.quotation
+  writes: []
+- operation: createGoodsReceipt
+  verb: POST
+  path: /goods-receipts
+  scope: venue
+  permission: PRODUCT_CONFIGURE
+  audience:
+  - staff
+  offline: true
+  reads:
+  - cache:idempotency
+  - inventory.goods_receipt
+  writes:
+  - cache:idempotency
+  - inventory.goods_receipt
+- operation: createInventoryItem
+  verb: POST
+  path: /inventory-items
+  scope: venue
+  permission: PRODUCT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - inventory.item
+  writes:
+  - cache:idempotency
+  - inventory.item
+- operation: createPurchaseOrder
+  verb: POST
+  path: /purchase-orders
+  scope: venue
+  permission: ORDER_CREATE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - inventory.purchase_order
+  writes:
+  - cache:idempotency
+  - inventory.purchase_order
+- operation: createRequisition
+  verb: POST
+  path: /requisitions
+  scope: venue
+  permission: ORDER_CREATE
+  audience:
+  - staff
+  offline: true
+  reads:
+  - cache:idempotency
+  - inventory.requisition
+  writes:
+  - cache:idempotency
+  - inventory.requisition
+- operation: createStockLocation
+  verb: POST
+  path: /stock-locations
+  scope: venue
+  permission: PRODUCT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - inventory.location
+  writes:
+  - cache:idempotency
+  - inventory.location
+- operation: createStockMovement
+  verb: POST
+  path: /stock-movements
+  scope: venue
+  permission: PRODUCT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - inventory.movement
+  writes:
+  - cache:idempotency
+  - inventory.movement
+- operation: createStockTransfer
+  verb: POST
+  path: /stock-transfers
+  scope: venue
+  permission: PRODUCT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - inventory.transfer
+  writes:
+  - cache:idempotency
+  - inventory.transfer
+- operation: createSupplier
+  verb: POST
+  path: /suppliers
+  scope: region
+  permission: PRODUCT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - inventory.supplier
+  writes:
+  - cache:idempotency
+  - inventory.supplier
+- operation: getCountVariance
+  verb: GET
+  path: /stock-counts/{countId}/variance
+  scope: venue
+  permission: PRODUCT_VIEW
+  audience:
+  - staff
+  offline: true
+  reads:
+  - inventory.count
+  writes: []
+- operation: getInventoryItem
+  verb: GET
+  path: /inventory-items/{itemId}
+  scope: venue
+  permission: PRODUCT_VIEW
+  audience:
+  - staff
+  offline: true
+  reads:
+  - inventory.item
+  writes: []
+- operation: getPurchaseOrder
+  verb: GET
+  path: /purchase-orders/{purchaseOrderId}
+  scope: venue
+  permission: PRODUCT_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - inventory.purchase_order
+  writes: []
+- operation: getStockPositions
+  verb: GET
+  path: /stock
+  scope: venue
+  permission: PRODUCT_VIEW
+  audience:
+  - staff
+  offline: true
+  reads:
+  - inventory.item
+  - inventory.location
+  - inventory.stock_level
+  writes: []
+- operation: getStockTransfer
+  verb: GET
+  path: /stock-transfers/{transferId}
+  scope: venue
+  permission: PRODUCT_VIEW
+  audience:
+  - staff
+  offline: true
+  reads:
+  - fnb.cold_chain_event
+  - inventory.item
+  writes: []
+- operation: getStockValuation
+  verb: GET
+  path: /stock/valuation
+  scope: venue
+  permission: LEDGER_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - inventory.item
+  - inventory.stock_level
+  - ledger.account
+  writes: []
+- operation: getSuggestedRequisitions
+  verb: GET
+  path: /requisitions/suggested
+  scope: venue
+  permission: PRODUCT_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - inventory.requisition
+  writes: []
+- operation: listExpiringBatches
+  verb: GET
+  path: /stock-batches/expiring
+  scope: venue
+  permission: INVENTORY_VIEW
+  audience:
+  - staff
+  offline: true
+  reads:
+  - inventory.item
+  - inventory.stock_batch
+  writes: []
+- operation: listGoodsReceipts
+  verb: GET
+  path: /goods-receipts
+  scope: venue
+  permission: PRODUCT_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - inventory.goods_receipt
+  writes: []
+- operation: listInventoryItems
+  verb: GET
+  path: /inventory-items
+  scope: venue
+  permission: PRODUCT_VIEW
+  audience:
+  - staff
+  offline: true
+  reads:
+  - inventory.item
+  writes: []
+- operation: listPurchaseOrders
+  verb: GET
+  path: /purchase-orders
+  scope: venue
+  permission: PRODUCT_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - inventory.purchase_order
+  writes: []
+- operation: listRequisitions
+  verb: GET
+  path: /requisitions
+  scope: venue
+  permission: PRODUCT_VIEW
+  audience:
+  - staff
+  offline: true
+  reads:
+  - inventory.requisition
+  writes: []
+- operation: listSerialisedItems
+  verb: GET
+  path: /serialised-items
+  scope: venue
+  permission: PRODUCT_VIEW
+  audience:
+  - staff
+  offline: true
+  reads:
+  - inventory.item
+  - inventory.serialised_item
+  - inventory.stock_batch
+  writes: []
+- operation: listStockCounts
+  verb: GET
+  path: /stock-counts
+  scope: venue
+  permission: PRODUCT_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - inventory.count
+  writes: []
+- operation: listStockLocations
+  verb: GET
+  path: /stock-locations
+  scope: venue
+  permission: PRODUCT_VIEW
+  audience:
+  - staff
+  offline: true
+  reads:
+  - inventory.location
+  writes: []
+- operation: listStockMovements
+  verb: GET
+  path: /stock-movements
+  scope: venue
+  permission: PRODUCT_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - inventory.movement
+  writes: []
+- operation: listStockTransfers
+  verb: GET
+  path: /stock-transfers
+  scope: venue
+  permission: PRODUCT_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - inventory.transfer
+  writes: []
+- operation: listSuppliers
+  verb: GET
+  path: /suppliers
+  scope: region
+  permission: PRODUCT_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - inventory.supplier
+  writes: []
+- operation: lookupInventoryItem
+  verb: GET
+  path: /inventory-items/lookup
+  scope: venue
+  permission: PRODUCT_VIEW
+  audience:
+  - staff
+  offline: true
+  reads:
+  - inventory.item
+  writes: []
+- operation: postStockCount
+  verb: POST
+  path: /stock-counts/{countId}/post
+  scope: venue
+  permission: LEDGER_POST
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - inventory.count
+  writes:
+  - cache:idempotency
+  - inventory.count
+- operation: receiveStockTransfer
+  verb: POST
+  path: /stock-transfers/{transferId}/receive
+  scope: venue
+  permission: PRODUCT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - inventory.transfer
+  writes:
+  - cache:idempotency
+  - inventory.transfer
+- operation: recordQuotation
+  verb: POST
+  path: /suppliers/{supplierId}/quotations
+  scope: venue
+  permission: PRODUCT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - inventory.quotation
+  writes:
+  - cache:idempotency
+  - inventory.quotation
+- operation: recountStockCount
+  verb: POST
+  path: /stock-counts/{countId}/recount
+  scope: venue
+  permission: LEDGER_APPROVE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - inventory.count
+  writes:
+  - cache:idempotency
+  - inventory.count
+- operation: rejectReceivedGoods
+  verb: POST
+  path: /goods-receipts/{receiptId}/reject
+  scope: venue
+  permission: PRODUCT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - inventory.goods_receipt
+  writes:
+  - cache:idempotency
+  - inventory.goods_receipt
+- operation: rejectRequisition
+  verb: POST
+  path: /requisitions/{requisitionId}/reject
+  scope: venue
+  permission: LEDGER_APPROVE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - inventory.requisition
+  writes:
+  - cache:idempotency
+  - inventory.requisition
+- operation: returnRequisition
+  verb: POST
+  path: /requisitions/{requisitionId}/return
+  scope: venue
+  permission: LEDGER_APPROVE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - inventory.requisition
+  writes:
+  - cache:idempotency
+  - inventory.requisition
+- operation: sendPurchaseOrder
+  verb: POST
+  path: /purchase-orders/{purchaseOrderId}/send
+  scope: venue
+  permission: PRODUCT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - inventory.purchase_order
+  writes:
+  - cache:idempotency
+  - inventory.purchase_order
+- operation: setDailyCount
+  verb: PUT
+  path: /stock-counts/daily
+  scope: venue
+  permission: PRODUCT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - inventory.item
+  writes:
+  - cache:idempotency
+  - cache:resolution
+- operation: startStockCount
+  verb: POST
+  path: /stock-counts
+  scope: venue
+  permission: PRODUCT_CONFIGURE
+  audience:
+  - staff
+  offline: true
+  reads:
+  - cache:idempotency
+  - inventory.count
+  writes:
+  - cache:idempotency
+  - inventory.count
+- operation: submitCountLines
+  verb: POST
+  path: /stock-counts/{countId}/lines
+  scope: venue
+  permission: PRODUCT_CONFIGURE
+  audience:
+  - staff
+  offline: true
+  reads:
+  - cache:idempotency
+  - inventory.count
+  writes:
+  - cache:idempotency
+  - inventory.count
+- operation: updateInventoryItem
+  verb: PATCH
+  path: /inventory-items/{itemId}
+  scope: venue
+  permission: PRODUCT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - inventory.item
+  writes:
+  - cache:idempotency
+  - inventory.item
+- operation: updateRequisitionLines
+  verb: PUT
+  path: /requisitions/{requisitionId}/lines
+  scope: venue
+  permission: PRODUCT_CONFIGURE
+  audience:
+  - staff
+  offline: true
+  reads:
+  - cache:idempotency
+  - inventory.item
+  - inventory.requisition
+  writes:
+  - cache:idempotency
+  - inventory.requisition
+- operation: updateSupplier
+  verb: PUT
+  path: /suppliers/{supplierId}
+  scope: tenant
+  permission: PRODUCT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - inventory.supplier
+  writes:
+  - cache:idempotency
+  - cache:resolution
+  - inventory.supplier
+  - platform.audit_record

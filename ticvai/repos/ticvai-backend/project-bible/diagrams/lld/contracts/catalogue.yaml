@@ -1,0 +1,830 @@
+id: LLD-catalogue
+title: catalogue — 66 operations
+generatedBy: tools/derive-diagrams.py
+index: diagrams/hld/03-contracts.yaml
+tier: spine
+service: CatalogueService
+operations:
+- operation: acquireLease
+  verb: POST
+  path: /leases
+  scope: workstation
+  permission: ORDER_CREATE
+  audience: null
+  offline: false
+  reads:
+  - cache:idempotency
+  - catalogue.envelope
+  - catalogue.inventory_lease
+  - platform.workstation
+  writes:
+  - cache:idempotency
+  - catalogue.inventory_lease
+- operation: assessProductChange
+  verb: POST
+  path: /products/{productId}/change-impact
+  scope: venue
+  permission: PRODUCT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - access.entitlement
+  - catalogue.product
+  - orders.cart
+  - orders.sales_order
+  writes: []
+- operation: bulkChangePrices
+  verb: POST
+  path: /products/bulk-price
+  scope: venue
+  permission: PRODUCT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - catalogue.price_list
+  - catalogue.product
+  writes:
+  - cache:idempotency
+  - catalogue.price_list
+  - catalogue.product_version
+- operation: cancelPerformance
+  verb: POST
+  path: /performances/{performanceId}/cancel
+  scope: venue
+  permission: PERFORMANCE_CONFIGURE
+  audience: null
+  offline: false
+  reads:
+  - cache:idempotency
+  - catalogue.performance
+  writes:
+  - cache:idempotency
+  - catalogue.performance
+- operation: cloneProduct
+  verb: POST
+  path: /products/{productId}/clone
+  scope: venue
+  permission: PRODUCT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - catalogue.product
+  - catalogue.variant
+  writes:
+  - cache:idempotency
+  - catalogue.product
+  - catalogue.variant
+- operation: commitCatalogueImport
+  verb: POST
+  path: /products/import/{jobId}/commit
+  scope: venue
+  permission: PRODUCT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - catalogue.import_job
+  writes:
+  - cache:idempotency
+  - catalogue.import_job
+  - catalogue.product
+  - catalogue.variant
+- operation: copyPriceList
+  verb: POST
+  path: /price-lists/{priceListId}/copy
+  scope: venue
+  permission: PRICE_CONFIGURE
+  audience: null
+  offline: false
+  reads:
+  - cache:idempotency
+  - catalogue.price_list
+  writes:
+  - cache:idempotency
+  - catalogue.price_list
+- operation: createDonationCampaign
+  verb: POST
+  path: /donation-campaigns
+  scope: venue
+  permission: PRODUCT_CONFIGURE
+  audience: null
+  offline: false
+  reads:
+  - cache:idempotency
+  - ledger.account
+  writes:
+  - cache:idempotency
+  - catalogue.donation_campaign
+- operation: createEntitlementTemplate
+  verb: POST
+  path: /entitlement-templates
+  scope: venue
+  permission: PRODUCT_CONFIGURE
+  audience: null
+  offline: false
+  reads:
+  - cache:idempotency
+  - catalogue.entitlement_template
+  writes:
+  - cache:idempotency
+  - catalogue.entitlement_template
+- operation: createEnvelope
+  verb: POST
+  path: /envelopes
+  scope: venue
+  permission: CAPACITY_CONFIGURE
+  audience: null
+  offline: false
+  reads:
+  - cache:idempotency
+  - catalogue.envelope
+  writes:
+  - cache:idempotency
+  - catalogue.envelope
+- operation: createEvent
+  verb: POST
+  path: /events
+  scope: venue
+  permission: EVENT_CONFIGURE
+  audience: null
+  offline: false
+  reads:
+  - cache:idempotency
+  - catalogue.event
+  writes:
+  - cache:idempotency
+  - catalogue.event
+- operation: createPerformances
+  verb: POST
+  path: /events/{eventId}/performances
+  scope: venue
+  permission: PERFORMANCE_CONFIGURE
+  audience: null
+  offline: false
+  reads:
+  - cache:idempotency
+  - catalogue.performance
+  writes:
+  - cache:idempotency
+  - catalogue.performance
+- operation: createPriceList
+  verb: POST
+  path: /price-lists
+  scope: venue
+  permission: PRICE_CONFIGURE
+  audience: null
+  offline: false
+  reads:
+  - cache:idempotency
+  - catalogue.price_list
+  writes:
+  - cache:idempotency
+  - catalogue.price_list
+- operation: createProduct
+  verb: POST
+  path: /products
+  scope: venue
+  permission: PRODUCT_CONFIGURE
+  audience: null
+  offline: false
+  reads:
+  - cache:idempotency
+  - catalogue.product
+  writes:
+  - cache:idempotency
+  - catalogue.product
+- operation: forceReleaseLease
+  verb: POST
+  path: /leases/{leaseId}/force-release
+  scope: venue
+  permission: CAPACITY_CONFIGURE
+  audience: null
+  offline: false
+  reads:
+  - cache:idempotency
+  - catalogue.inventory_lease
+  writes:
+  - cache:idempotency
+  - catalogue.inventory_lease
+- operation: freezeEntitlement
+  verb: POST
+  path: /entitlements/{entitlementId}/freeze
+  scope: venue
+  permission: PRODUCT_CONFIGURE
+  audience:
+  - staff
+  - guest
+  offline: false
+  reads:
+  - access.entitlement
+  writes:
+  - access.entitlement
+  - cache:idempotency
+- operation: getAvailability
+  verb: GET
+  path: /availability
+  scope: venue
+  permission: PRODUCT_VIEW
+  audience: null
+  offline: false
+  reads:
+  - catalogue.envelope
+  - catalogue.inventory_lease
+  - catalogue.performance
+  writes: []
+- operation: getChannelAllocations
+  verb: GET
+  path: /envelopes/{envelopeId}/channel-allocations
+  scope: venue
+  permission: PRODUCT_VIEW
+  audience: null
+  offline: false
+  reads:
+  - catalogue.channel_allocation
+  writes: []
+- operation: getEvent
+  verb: GET
+  path: /events/{eventId}
+  scope: venue
+  permission: PRODUCT_VIEW
+  audience: null
+  offline: false
+  reads:
+  - catalogue.event
+  writes: []
+- operation: getLatestBundle
+  verb: GET
+  path: /catalogue/bundles/latest
+  scope: workstation
+  permission: PRODUCT_VIEW
+  audience: null
+  offline: false
+  reads:
+  - catalogue.published_bundle
+  writes: []
+- operation: getMyMemberships
+  verb: GET
+  path: /guests/me/memberships
+  scope: venue
+  permission: PRODUCT_VIEW
+  audience:
+  - staff
+  - guest
+  offline: false
+  reads:
+  - access.entitlement
+  - catalogue.product
+  - marketing.loyalty_position
+  writes: []
+- operation: getPerformance
+  verb: GET
+  path: /performances/{performanceId}
+  scope: venue
+  permission: PRODUCT_VIEW
+  audience: null
+  offline: false
+  reads:
+  - catalogue.performance
+  writes: []
+- operation: getPriceList
+  verb: GET
+  path: /price-lists/{priceListId}
+  scope: venue
+  permission: PRICE_VIEW
+  audience: null
+  offline: false
+  reads:
+  - catalogue.price_list
+  writes: []
+- operation: getProduct
+  verb: GET
+  path: /products/{productId}
+  scope: venue
+  permission: PRODUCT_VIEW
+  audience: null
+  offline: false
+  reads:
+  - catalogue.product
+  writes: []
+- operation: importProductCatalogue
+  verb: POST
+  path: /products/import
+  scope: venue
+  permission: PRODUCT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - catalogue.product
+  writes:
+  - cache:idempotency
+  - catalogue.import_job
+- operation: joinWaitlist
+  verb: POST
+  path: /waitlist-entries
+  scope: venue
+  permission: null
+  audience: null
+  offline: false
+  reads:
+  - cache:idempotency
+  - catalogue.envelope
+  - catalogue.performance
+  writes:
+  - cache:idempotency
+  - catalogue.waitlist_entry
+- operation: leaveWaitlist
+  verb: DELETE
+  path: /waitlist-entries/{entryId}
+  scope: venue
+  permission: null
+  audience: null
+  offline: false
+  reads:
+  - cache:idempotency
+  - catalogue.waitlist_entry
+  writes:
+  - cache:idempotency
+  - catalogue.waitlist_entry
+- operation: listAlternativeCodes
+  verb: GET
+  path: /products/{productId}/alternative-codes
+  scope: venue
+  permission: PRODUCT_VIEW
+  audience: null
+  offline: false
+  reads:
+  - catalogue.alternative_code
+  writes: []
+- operation: listCatalogueBundles
+  verb: GET
+  path: /catalogue/bundles
+  scope: venue
+  permission: PRODUCT_VIEW
+  audience: null
+  offline: false
+  reads:
+  - catalogue.product
+  - catalogue.published_bundle
+  writes: []
+- operation: listDonationCampaigns
+  verb: GET
+  path: /donation-campaigns
+  scope: venue
+  permission: PRODUCT_VIEW
+  audience: null
+  offline: true
+  reads:
+  - catalogue.donation_campaign
+  writes: []
+- operation: listEntitlementTemplates
+  verb: GET
+  path: /entitlement-templates
+  scope: venue
+  permission: PRODUCT_VIEW
+  audience: null
+  offline: true
+  reads:
+  - catalogue.entitlement_template
+  writes: []
+- operation: listEnvelopes
+  verb: GET
+  path: /envelopes
+  scope: venue
+  permission: PRODUCT_VIEW
+  audience: null
+  offline: false
+  reads:
+  - catalogue.envelope
+  writes: []
+- operation: listEvents
+  verb: GET
+  path: /events
+  scope: venue
+  permission: PRODUCT_VIEW
+  audience: null
+  offline: false
+  reads:
+  - catalogue.event
+  writes: []
+- operation: listGuestMemberships
+  verb: GET
+  path: /guest/memberships
+  scope: venue
+  permission: PRODUCT_VIEW
+  audience:
+  - staff
+  - guest
+  offline: false
+  reads:
+  - catalogue.entitlement_template
+  - catalogue.product
+  - orders.sales_order
+  writes: []
+- operation: listLeases
+  verb: GET
+  path: /leases
+  scope: venue
+  permission: PRODUCT_VIEW
+  audience: null
+  offline: false
+  reads:
+  - catalogue.inventory_lease
+  writes: []
+- operation: listPerformances
+  verb: GET
+  path: /events/{eventId}/performances
+  scope: venue
+  permission: PRODUCT_VIEW
+  audience: null
+  offline: false
+  reads:
+  - catalogue.performance
+  writes: []
+- operation: listPriceLists
+  verb: GET
+  path: /price-lists
+  scope: venue
+  permission: PRICE_VIEW
+  audience: null
+  offline: false
+  reads:
+  - catalogue.price_list
+  writes: []
+- operation: listPrices
+  verb: GET
+  path: /price-lists/{priceListId}/prices
+  scope: venue
+  permission: PRICE_VIEW
+  audience: null
+  offline: false
+  reads:
+  - cache:resolution
+  - catalogue.price
+  writes:
+  - cache:resolution
+- operation: listProductCategories
+  verb: GET
+  path: /product-categories
+  scope: venue
+  permission: PRODUCT_VIEW
+  audience:
+  - staff
+  - guest
+  offline: true
+  reads:
+  - catalogue.product
+  - catalogue.product_category
+  writes: []
+- operation: listProductVariants
+  verb: GET
+  path: /products/{productId}/variants
+  scope: venue
+  permission: PRODUCT_VIEW
+  audience: null
+  offline: false
+  reads:
+  - catalogue.variant
+  writes: []
+- operation: listProductVersions
+  verb: GET
+  path: /products/{productId}/versions
+  scope: venue
+  permission: PRODUCT_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - catalogue.product_version
+  writes: []
+- operation: listProducts
+  verb: GET
+  path: /products
+  scope: venue
+  permission: PRODUCT_VIEW
+  audience: null
+  offline: false
+  reads:
+  - catalogue.product
+  writes: []
+- operation: listWaitlistEntries
+  verb: GET
+  path: /waitlist-entries
+  scope: venue
+  permission: PRODUCT_VIEW
+  audience: null
+  offline: false
+  reads:
+  - catalogue.performance
+  - catalogue.waitlist_entry
+  writes: []
+- operation: offerWaitlistCapacity
+  verb: POST
+  path: /waitlist-entries/{entryId}/offer
+  scope: venue
+  permission: PRODUCT_CONFIGURE
+  audience: null
+  offline: false
+  reads:
+  - cache:idempotency
+  - catalogue.envelope
+  - catalogue.waitlist_entry
+  writes:
+  - cache:idempotency
+  - catalogue.inventory_lease
+  - catalogue.waitlist_entry
+- operation: publishBundle
+  verb: POST
+  path: /catalogue/bundles
+  scope: venue
+  permission: PRODUCT_CONFIGURE
+  audience: null
+  offline: false
+  reads:
+  - cache:idempotency
+  - catalogue.published_bundle
+  writes:
+  - cache:idempotency
+  - catalogue.published_bundle
+- operation: reinstateEntitlement
+  verb: POST
+  path: /entitlements/{entitlementId}/reinstate
+  scope: venue
+  permission: PRODUCT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - access.entitlement
+  writes:
+  - access.entitlement
+  - cache:idempotency
+- operation: releaseChannelAllocation
+  verb: POST
+  path: /envelopes/{envelopeId}/channel-allocations/release
+  scope: venue
+  permission: CAPACITY_CONFIGURE
+  audience: null
+  offline: false
+  reads:
+  - cache:idempotency
+  - catalogue.channel_allocation
+  writes:
+  - cache:idempotency
+  - catalogue.channel_allocation
+- operation: releaseLease
+  verb: DELETE
+  path: /leases/{leaseId}
+  scope: workstation
+  permission: ORDER_CREATE
+  audience: null
+  offline: false
+  reads:
+  - cache:idempotency
+  - catalogue.inventory_lease
+  writes:
+  - cache:idempotency
+  - catalogue.inventory_lease
+- operation: renewLease
+  verb: POST
+  path: /leases/{leaseId}/renew
+  scope: workstation
+  permission: ORDER_CREATE
+  audience: null
+  offline: false
+  reads:
+  - cache:idempotency
+  - catalogue.inventory_lease
+  writes:
+  - cache:idempotency
+  - catalogue.inventory_lease
+- operation: reportBundleApplied
+  verb: POST
+  path: /catalogue/bundles/{version}/applied
+  scope: workstation
+  permission: PRODUCT_VIEW
+  audience: null
+  offline: false
+  reads:
+  - cache:idempotency
+  - catalogue.published_bundle
+  writes:
+  - cache:idempotency
+  - catalogue.published_bundle
+- operation: resolveProductByCode
+  verb: GET
+  path: /products/resolve
+  scope: venue
+  permission: PRODUCT_VIEW
+  audience: null
+  offline: false
+  reads:
+  - catalogue.variant
+  writes: []
+- operation: restoreProductVersion
+  verb: POST
+  path: /products/{productId}/versions/{version}/restore
+  scope: venue
+  permission: PRODUCT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - catalogue.product
+  - catalogue.product_version
+  writes:
+  - cache:idempotency
+  - catalogue.product
+  - catalogue.product_version
+- operation: searchCatalogue
+  verb: GET
+  path: /search
+  scope: venue
+  permission: null
+  audience: null
+  offline: true
+  reads:
+  - catalogue.event
+  - catalogue.product
+  - catalogue.variant
+  writes: []
+- operation: setAlternativeCodes
+  verb: PUT
+  path: /products/{productId}/alternative-codes
+  scope: venue
+  permission: PRODUCT_CONFIGURE
+  audience: null
+  offline: false
+  reads:
+  - cache:idempotency
+  - catalogue.alternative_code
+  writes:
+  - cache:idempotency
+  - catalogue.alternative_code
+- operation: setChannelAllocations
+  verb: PUT
+  path: /envelopes/{envelopeId}/channel-allocations
+  scope: venue
+  permission: CAPACITY_CONFIGURE
+  audience: null
+  offline: false
+  reads:
+  - cache:idempotency
+  - catalogue.channel_allocation
+  writes:
+  - cache:idempotency
+  - catalogue.channel_allocation
+- operation: setPrices
+  verb: PUT
+  path: /price-lists/{priceListId}/prices
+  scope: venue
+  permission: PRICE_CONFIGURE
+  audience: null
+  offline: false
+  reads:
+  - cache:idempotency
+  - catalogue.price_list
+  writes:
+  - cache:idempotency
+  - cache:resolution
+  - catalogue.price_list
+- operation: setProductAttributes
+  verb: PUT
+  path: /products/{productId}/attributes
+  scope: venue
+  permission: PRODUCT_CONFIGURE
+  audience: null
+  offline: false
+  reads:
+  - cache:idempotency
+  - catalogue.attribute_axis
+  writes:
+  - cache:idempotency
+  - catalogue.attribute_axis
+- operation: setProductCategories
+  verb: PUT
+  path: /product-categories
+  scope: venue
+  permission: PRODUCT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - catalogue.product_category
+  writes:
+  - cache:idempotency
+  - cache:resolution
+  - catalogue.product_category
+- operation: suspendEntitlement
+  verb: POST
+  path: /entitlements/{entitlementId}/suspend
+  scope: venue
+  permission: ORDER_MODIFY
+  audience: null
+  offline: false
+  reads:
+  - access.entitlement
+  - cache:idempotency
+  - catalogue.entitlement_template
+  writes:
+  - access.entitlement
+  - cache:idempotency
+- operation: transitionProductLifecycle
+  verb: POST
+  path: /products/{productId}/lifecycle
+  scope: venue
+  permission: PRODUCT_CONFIGURE
+  audience: null
+  offline: false
+  reads:
+  - cache:idempotency
+  - catalogue.product
+  writes:
+  - cache:idempotency
+  - catalogue.product
+- operation: updateDonationCampaign
+  verb: PATCH
+  path: /donation-campaigns/{campaignId}
+  scope: venue
+  permission: PRODUCT_CONFIGURE
+  audience: null
+  offline: false
+  reads:
+  - cache:idempotency
+  - catalogue.donation_campaign
+  writes:
+  - cache:idempotency
+  - catalogue.donation_campaign
+- operation: updateEnvelope
+  verb: PATCH
+  path: /envelopes/{envelopeId}
+  scope: venue
+  permission: CAPACITY_CONFIGURE
+  audience: null
+  offline: false
+  reads:
+  - cache:idempotency
+  - catalogue.envelope
+  writes:
+  - cache:idempotency
+  - catalogue.envelope
+- operation: updateEvent
+  verb: PATCH
+  path: /events/{eventId}
+  scope: venue
+  permission: EVENT_CONFIGURE
+  audience: null
+  offline: false
+  reads:
+  - cache:idempotency
+  - catalogue.event
+  writes:
+  - cache:idempotency
+  - catalogue.event
+- operation: updatePerformance
+  verb: PATCH
+  path: /performances/{performanceId}
+  scope: venue
+  permission: PERFORMANCE_CONFIGURE
+  audience: null
+  offline: false
+  reads:
+  - cache:idempotency
+  - catalogue.performance
+  writes:
+  - cache:idempotency
+  - catalogue.performance
+- operation: updatePriceList
+  verb: PATCH
+  path: /price-lists/{priceListId}
+  scope: venue
+  permission: PRICE_CONFIGURE
+  audience: null
+  offline: false
+  reads:
+  - cache:idempotency
+  - catalogue.price_list
+  writes:
+  - cache:idempotency
+  - catalogue.price_list
+- operation: updateProduct
+  verb: PATCH
+  path: /products/{productId}
+  scope: venue
+  permission: PRODUCT_CONFIGURE
+  audience: null
+  offline: false
+  reads:
+  - cache:idempotency
+  - catalogue.product
+  writes:
+  - cache:idempotency
+  - catalogue.product

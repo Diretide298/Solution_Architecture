@@ -1,0 +1,169 @@
+$schema: ./_schema.yaml
+id: F61
+name: A gate opens, a steward signs in, and a group is admitted
+actor: gateOperator
+capability: Admission at a gate
+wave: 1
+frequency: 'Every gate, every session. **Forty scans a minute per lane at peak**, and the whole journey
+  has to fit inside a guest''s stride.
+
+  '
+criticality: safety
+primaryContract: access
+contracts:
+- access
+- identity
+- tenancy
+- catalogue
+platforms:
+- P07
+trigger:
+  description: 'A session is about to open and a steward picks up a handheld. **The device is shared
+    and the person is not** — ADR-0002 makes authorisation user-driven, which is why signing in is step
+    one rather than a device setting.
+
+    '
+  operations:
+  - login
+offlineBehaviour: '**The whole flow works offline and this is the platform''s hardest offline case.**
+  A gate cannot wait for a network and cannot admit twice.
+
+  **The offline package is pulled before the session, not during it.** `getOfflinePackage` carries the
+  entitlements valid for this access point and this window, and **a steward who reaches the gate without
+  it has a scanner that cannot decide anything.**
+
+  '
+steps:
+- step: 1
+  screen: SCN-001
+  action: The steward signs in and takes a role for the session.
+  operations:
+  - login
+  - selectRole
+  - resolvePermissions
+  outcome: '**The person carries the authority, not the device** (ADR-0002). A handheld passed to a
+    colleague at a break carries nothing with it, which is the property that makes a shared device safe.
+
+    '
+- step: 2
+  screen: SCN-002
+  action: They pick an access point and a direction.
+  operations:
+  - listAccessPoints
+  - getAccessPoint
+  outcome: '**Direction is a choice and not an inference.** The same lane runs entry in the morning
+    and exit at close, and a scanner that guesses will count a departure as an arrival.
+
+    '
+- step: 3
+  screen: SCN-015
+  action: The device pulls its offline package for the session.
+  operations:
+  - getOfflinePackage
+  outcome: 'Entitlements valid for this point and this window, held locally. **Pulled before the session
+    because a gate that fetches at first scan has already queued.**
+
+    '
+- step: 4
+  screen: SCN-003
+  action: A guest presents a ticket and it scans.
+  operations:
+  - validateAccess
+  - listScans
+  outcome: '**Decided locally against the package**, in under 300ms. `frozenDays` is held rather than
+    replayed precisely because the gate cannot afford the arithmetic.
+
+    '
+- step: 5
+  screen: SCN-007
+  action: A school party of forty arrives on one booking.
+  operations:
+  - validateGroupAccess
+  - listScans
+  outcome: '**One credential, forty admissions, counted individually.** A group scanned as a single
+    event is a group the venue cannot evacuate — occupancy needs the count, not the booking.
+
+    '
+- step: 6
+  screen: SCN-007
+  action: Thirty-eight go through and two are missing.
+  operations:
+  - listScans
+  outcome: '**The group stays open and the remaining two can arrive later.** A group closed at the first
+    scan forces two children to be refused at the gate their teacher just walked through.
+
+    '
+- step: 7
+  screen: SCN-003
+  action: The session ends and the device syncs.
+  operations:
+  - syncScans
+  outcome: 'Scans posted in sequence. **A duplicate scan across two devices is resolved on sync, not
+    at the gate** — refusing a guest because another lane might have seen them is a queue nobody accepts.
+
+    '
+branches:
+- at: 1
+  condition: The steward has no role at this venue.
+  behaviour: 'Refused at sign-in rather than at first scan. **A person who reaches the lane and then
+    cannot scan has already formed a queue behind them.**
+
+    '
+  severity: medium
+  resolvedBy: selectRole
+- at: 4
+  condition: The ticket is valid but already used.
+  behaviour: '**Refused, with when and where it was used.** *Already scanned* with no detail is an argument;
+    *scanned at North Gate at 10:14* is an answer.
+
+    '
+  severity: high
+  resolvedBy: validateAccess
+- at: 4
+  condition: The ticket will not scan at all — damaged, wrong day, wrong venue.
+  behaviour: 'Falls through to `SCN-008` manual entry and `SCN-009` lookup. **F62 walks that.**
+
+    '
+  severity: medium
+  resolvedBy: lookupTicket
+- at: 5
+  condition: The group is larger than the booking.
+  behaviour: '**Admitted up to the booking and the excess is an override.** A steward at a gate with
+    a teacher and two extra children needs a decision recorded, not a refusal — and `overrideAccess`
+    records who allowed it.
+
+    '
+  severity: high
+  resolvedBy: overrideAccess
+- at: 7
+  condition: The same guest was scanned at two lanes while both were offline.
+  behaviour: '**Both scans post and the duplicate is a reconciliation task**, not a reversal. The guest
+    is inside either way; the question is which lane counted them.
+
+    '
+  severity: medium
+  resolvedBy: listSyncRejections
+exitStates:
+- state: admitted
+  description: Guest inside, scan recorded, occupancy incremented. **The ordinary case.**
+- state: admittedOnOverride
+  description: 'A steward allowed something the rules refused. **Recorded with a name** — the override
+    rate at a gate is the number that finds a lane being waved through.
+
+    '
+- state: refused
+  description: Refused with a stated reason the guest can act on.
+- state: syncedWithDuplicates
+  description: 'Two lanes counted the same guest. **Visible rather than silently deduplicated** — occupancy
+    was wrong for a period and somebody should know by how much.
+
+    '
+notes: '**Written 24 August.** `SCN-001` declares 20 operations and 12 were in no flow; the sign-in
+  and access-point selection had never been walked despite the scanning itself being covered by F14.
+
+  **Step 3 is the ordering that matters.** The offline package is pulled before the session, not at
+  first scan — and a reviewer reading the screens alone would not see that, because both screens exist
+  and neither says which comes first.
+
+  '
+openQuestions: null

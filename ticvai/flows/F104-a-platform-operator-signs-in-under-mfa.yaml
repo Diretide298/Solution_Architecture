@@ -1,0 +1,66 @@
+$schema: ./_schema.yaml
+id: F104
+name: A platform operator signs in under MFA
+actor: platformAdmin
+capability: A platform operator signs in under MFA
+wave: 3
+frequency: As needed.
+criticality: safety
+primaryContract: identity
+contracts:
+- identity
+platforms:
+- P09
+- P10
+- P12
+trigger:
+  description: Somebody with platform-wide authority signs in.
+offlineBehaviour: '**Never offline.** A credential validated locally is a credential anybody can forge.'
+steps:
+- step: 1
+  screen: ADM-001
+  action: Platform Login / MFA.
+  operations:
+  - forceLogout
+  - getGuestSession
+  - listActiveSessions
+  - revokeAllSessions
+  outcome: 4 operations, 4 of them previously unwalked.
+- step: 2
+  screen: PTR-001
+  action: Partner Login / MFA.
+  operations:
+  - forceLogout
+  - getGuestSession
+  - listActiveSessions
+  - listPartnerAgreements
+  - overrideCreditLimit
+  - revokeAllSessions
+  outcome: 7 operations, 7 of them previously unwalked.
+  crossesDevice: true
+- step: 3
+  screen: SUP-001
+  action: Agent Login.
+  operations:
+  - forceLogout
+  - getGuestSession
+  - listActiveSessions
+  - revokeAllSessions
+  outcome: 4 operations, 4 of them previously unwalked.
+  crossesDevice: true
+branches:
+- at: 1
+  condition: The acting principal lacks the permission at this scope.
+  behaviour: '**Refused at the first step, not the last.** ADR-0002 makes authorisation user-driven
+    — a person who gets three steps in and then cannot finish has been told the wrong thing.'
+  severity: medium
+  resolvedBy: resolvePermissions
+exitStates:
+- state: completed
+  description: The journey ran end to end.
+- state: refused
+  description: '**Stopped at a permission or a licence boundary**, with the reason named.'
+notes: '**IdentityService at 32% and the platform, partner and support sign-ins all uncovered.** F56
+  walks the guest front door; **this walks the one that matters more** — a platform admin session has
+  cross-tenant reach.'
+openQuestions: null

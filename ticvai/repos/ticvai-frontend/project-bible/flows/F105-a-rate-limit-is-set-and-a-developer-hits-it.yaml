@@ -1,0 +1,64 @@
+$schema: ./_schema.yaml
+id: F105
+name: A rate limit is set and a developer hits it
+actor: platformAdmin
+capability: A rate limit is set and a developer hits it
+wave: 3
+frequency: As needed.
+criticality: operational
+primaryContract: public-api
+contracts:
+- public-api
+- subscription
+platforms:
+- P09
+- P10
+trigger:
+  description: A partner integration starts hammering the API.
+offlineBehaviour: None of it offline.
+steps:
+- step: 1
+  screen: ADM-015
+  action: API Rate Limit & Quota Management.
+  operations:
+  - setApiQuota
+  - listApiClients
+  - getApiUsage
+  outcome: 15 operations, 15 of them previously unwalked.
+  note: '**This screen declared no quota operation at all** until 24 August — it carried nine subscription
+    operations and six tenant-lifecycle ones instead. **The screen for the job could not do the job.**'
+- step: 2
+  screen: ADM-011
+  action: Licence & Seat Management.
+  operations:
+  - getTenantLicences
+  - previewSubscriptionChange
+  - addLicenceAddOn
+  outcome: 15 operations, 15 of them previously unwalked.
+  crossesDevice: true
+- step: 3
+  screen: PTR-020
+  action: Sub-Agent Management.
+  operations:
+  - listGrants
+  - createGrant
+  outcome: 3 operations, 3 of them previously unwalked.
+  crossesDevice: true
+branches:
+- at: 1
+  condition: The acting principal lacks the permission at this scope.
+  behaviour: '**Refused at the first step, not the last.** ADR-0002 makes authorisation user-driven
+    — a person who gets three steps in and then cannot finish has been told the wrong thing.'
+  severity: medium
+  resolvedBy: resolvePermissions
+exitStates:
+- state: completed
+  description: The journey ran end to end.
+- state: refused
+  description: '**Stopped at a permission or a licence boundary**, with the reason named.'
+notes: '**`ADM-015 API Rate Limit & Quota Management` held 13 uncovered operations.** A quota is a commercial
+  artefact as much as a technical one — it is bought, and `addLicenceAddOn` is what raises it. **Rewritten
+  24 August.** The first draft was written against  as it then was — carrying nine subscription operations
+  and six tenant-lifecycle ones from the 18 August bulk attach. **121 operations were stripped from
+  P09** and this flow now walks what the screen is actually for.'
+openQuestions: null

@@ -1,0 +1,381 @@
+id: LLD-tenancy
+title: tenancy — 27 operations
+generatedBy: tools/derive-diagrams.py
+index: diagrams/hld/03-contracts.yaml
+tier: spine
+service: TenancyService
+operations:
+- operation: configureWorkstation
+  verb: PUT
+  path: /workstations/{workstationId}
+  scope: venue
+  permission: WORKSTATION_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - platform.device
+  - platform.workstation
+  writes:
+  - cache:idempotency
+  - platform.device
+  - platform.workstation
+- operation: createOutlet
+  verb: POST
+  path: /outlets
+  scope: venue
+  permission: REGION_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - platform.outlet
+  writes:
+  - cache:idempotency
+  - platform.outlet
+- operation: createSaleBoard
+  verb: POST
+  path: /sale-boards
+  scope: venue
+  permission: WORKSTATION_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - platform.sale_board
+  writes:
+  - cache:idempotency
+  - platform.sale_board
+- operation: createScopeNode
+  verb: POST
+  path: /scope-nodes
+  scope: brand
+  permission: SCOPE_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - platform.scope_node
+  writes:
+  - cache:idempotency
+  - cache:resolution
+  - platform.scope_node
+- operation: deployConfigurationProfile
+  verb: POST
+  path: /configuration-profiles/{profileId}/deploy
+  scope: tenant
+  permission: TENANT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - platform.configuration_profile
+  - platform.workstation
+  writes:
+  - cache:idempotency
+  - platform.profile_deployment
+  - platform.workstation
+- operation: getRegionSettings
+  verb: GET
+  path: /regions/{regionId}/settings
+  scope: region
+  permission: SCOPE_VIEW
+  audience:
+  - staff
+  offline: true
+  reads:
+  - cache:resolution
+  - platform.region_settings
+  writes:
+  - cache:resolution
+- operation: getScopeNode
+  verb: GET
+  path: /scope-nodes/{scopeNodeId}
+  scope: venue
+  permission: SCOPE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:resolution
+  - platform.scope_node
+  writes:
+  - cache:resolution
+- operation: getVenueSettings
+  verb: GET
+  path: /venues/{venueId}/settings
+  scope: venue
+  permission: TENANT_VIEW
+  audience:
+  - staff
+  offline: true
+  reads:
+  - cache:resolution
+  - platform.venue_settings
+  writes: []
+- operation: getWorkstation
+  verb: GET
+  path: /workstations/{workstationId}
+  scope: workstation
+  permission: SCOPE_VIEW
+  audience:
+  - staff
+  offline: true
+  reads:
+  - platform.device
+  - platform.workstation
+  writes: []
+- operation: getWorkstationHealth
+  verb: GET
+  path: /workstations/{workstationId}/health
+  scope: tenant
+  permission: DEVICE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - platform.device
+  - platform.device_heartbeat
+  - platform.workstation
+  writes: []
+- operation: listAuditRecords
+  verb: GET
+  path: /audit-records
+  scope: venue
+  permission: AI_AUDIT_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - identity.principal
+  - platform.audit_record
+  - platform.scope_node
+  writes:
+  - platform.audit_read
+- operation: listDevices
+  verb: GET
+  path: /devices
+  scope: venue
+  permission: DEVICE_VIEW
+  audience:
+  - staff
+  offline: true
+  reads:
+  - platform.device
+  writes: []
+- operation: listOutlets
+  verb: GET
+  path: /outlets
+  scope: venue
+  permission: SCOPE_VIEW
+  audience:
+  - staff
+  offline: true
+  reads:
+  - platform.outlet
+  writes: []
+- operation: listSaleBoards
+  verb: GET
+  path: /sale-boards
+  scope: venue
+  permission: SCOPE_VIEW
+  audience:
+  - staff
+  offline: true
+  reads:
+  - platform.sale_board
+  writes: []
+- operation: listScopeNodes
+  verb: GET
+  path: /scope-nodes
+  scope: tenant
+  permission: SCOPE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:resolution
+  - platform.scope_node
+  writes:
+  - cache:resolution
+- operation: listWorkstations
+  verb: GET
+  path: /workstations
+  scope: venue
+  permission: SCOPE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - platform.device
+  - platform.workstation
+  writes: []
+- operation: recordDeviceHeartbeat
+  verb: POST
+  path: /devices/{deviceId}/heartbeat
+  scope: workstation
+  permission: null
+  audience:
+  - device
+  offline: false
+  reads:
+  - platform.device
+  writes:
+  - platform.device
+- operation: registerDevice
+  verb: POST
+  path: /devices
+  scope: venue
+  permission: DEVICE_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - platform.device
+  writes:
+  - cache:idempotency
+  - platform.device
+- operation: setConfigurationProfile
+  verb: PUT
+  path: /configuration-profiles
+  scope: tenant
+  permission: TENANT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - platform.configuration_profile
+  writes:
+  - cache:idempotency
+  - cache:resolution
+  - platform.configuration_profile
+- operation: setConnectivityThresholds
+  verb: PUT
+  path: /connectivity-policy
+  scope: venue
+  permission: TENANT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - platform.connectivity_policy
+  writes:
+  - cache:idempotency
+  - cache:resolution
+  - platform.connectivity_policy
+- operation: setOfflinePolicy
+  verb: PUT
+  path: /offline-policy
+  scope: venue
+  permission: TENANT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - platform.offline_policy
+  writes:
+  - cache:idempotency
+  - cache:resolution
+  - platform.offline_policy
+- operation: setRolePermissions
+  verb: PUT
+  path: /roles/{roleId}/permissions
+  scope: tenant
+  permission: ROLE_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - identity.role
+  - identity.role_permission
+  - identity.segregation_rule
+  writes:
+  - cache:idempotency
+  - cache:resolution
+  - identity.role_permission
+  - platform.audit_record
+- operation: setVenueSettings
+  verb: PUT
+  path: /venues/{venueId}/settings
+  scope: venue
+  permission: TENANT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - access.access_point
+  - cache:idempotency
+  - platform.venue_settings
+  writes:
+  - cache:idempotency
+  - cache:resolution
+  - platform.venue_settings
+- operation: updateOutlet
+  verb: PATCH
+  path: /outlets/{outletId}
+  scope: venue
+  permission: REGION_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - platform.outlet
+  writes:
+  - cache:idempotency
+  - platform.outlet
+- operation: updateRegionSettings
+  verb: PUT
+  path: /regions/{regionId}/settings
+  scope: region
+  permission: REGION_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - platform.region_settings
+  writes:
+  - cache:idempotency
+  - cache:resolution
+  - platform.region_settings
+- operation: updateSaleBoard
+  verb: PUT
+  path: /sale-boards/{saleBoardId}
+  scope: venue
+  permission: WORKSTATION_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - platform.sale_board
+  writes:
+  - cache:idempotency
+  - platform.sale_board
+- operation: updateScopeNode
+  verb: PATCH
+  path: /scope-nodes/{scopeNodeId}
+  scope: brand
+  permission: SCOPE_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - platform.scope_node
+  writes:
+  - cache:idempotency
+  - cache:resolution
+  - platform.scope_node

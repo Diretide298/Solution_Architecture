@@ -1,0 +1,2413 @@
+openapi: 3.1.0
+info:
+  title: TICVAI Marketing & CRM
+  version: 0.1.0
+  x-ticvai-screen-count: 17
+  x-ticvai-tier: satellite
+  x-ticvai-module: "20 — Marketing & CRM"
+  x-ticvai-requirements: 319
+  x-ticvai-capabilities: [C32, C33, C59, C60, C61, C62, C63, C64, C65, C66, C93]
+  x-ticvai-platforms:
+    - "P08 Venue Back Office"
+    - "P12 Support Console"
+    - "P02 Guest App"
+  description: >
+    ## What this contract covers
+
+    **Consent gates everything. A segment is a definition, not a list.**
+
+    | | |
+    |---|---|
+    | **Tier** | satellite |
+    | **Matrix domain** | 20 — Marketing & CRM |
+    | **Requirements** | ~319 |
+    | **Capabilities** | C32, C33, C59, C60, C61, C62, C63, C64, C65, C66, C93 |
+    | **Consumed by** | P08 Venue Back Office · P12 Support Console · P02 Guest App |
+
+    ## How to read this file
+
+    **This file is a contract.** It is hand-authored and it is the source of truth for one
+    bounded context: server code, client code and mock servers are generated from it, never
+    the other way round. If a field is not here, it does not exist.
+
+    **Contracts are split into two tiers.**
+
+    - **Spine** — the eight contexts everything else depends on: tenancy, identity,
+      catalogue, orders, shift, access, finance, cross-cell. Frozen first. A change here
+      requires a formal change request, because every satellite has pinned against it.
+    - **Satellite** — a domain that builds on the spine and can move independently.
+      Cheaper to change.
+
+    **`paths` are operations.** Each one declares four TICVAI extensions, and Redocly
+    rejects any that does not:
+
+    | Extension | Answers |
+    |---|---|
+    | `x-ticvai-permission` | Which permission the caller needs. From one enum in `shared/permissions.yaml` — never hand-typed |
+    | `x-ticvai-scope-level` | Where in the seven-level hierarchy that permission must be held |
+    | `x-ticvai-offline-capable` | Whether a disconnected terminal may queue this |
+    | `x-ticvai-conflict-policy` | How a replayed operation resolves — `append`, `serverWins`, `manual` |
+
+    Where `x-ticvai-permission` is null, one of these says why: `x-ticvai-auth: service`
+    (cell-to-cell), `x-ticvai-self-scoped` (acts only on the caller's own resources), or
+    `security: []` (genuinely public).
+
+    **`components.schemas` are API schemas — the shape of data on the wire.** They are not
+    database tables. One API schema may become three columns (`Money`) or five tables
+    (`Order`); some have no table at all (`ValidationResult`, `TrialBalance`). Roughly 70%
+    of the DDL derives from these, and the rest — partitioning, RLS, the PII split — is
+    storage design that lives in the migration scripts.
+
+    **`security` arrays hold OAuth scopes.** Empty means "this scheme, no scopes" — for
+    bearer tokens there is nothing to list. Empty is not the same as absent: absent means
+    unauthenticated.
+
+
+    ## This context
+
+    Guest profiles, segmentation, campaigns, consent, service cases, loyalty and feedback.
+    Domain 20 — 319 requirements.
+
+    Positions this encodes:
+
+    - **Consent gates everything.** No campaign sends to a guest without a current, recorded
+      consent for that channel and purpose. Consent is checked at send time, not at segment
+      build time, because a guest may withdraw between the two.
+    - **Consent management is Wave 1**, ahead of the rest of this context. It is the
+      precondition for AI-66 and for any outbound message at all.
+    - **A segment is a definition, not a list.** It is evaluated when used. A materialised
+      list goes stale the moment a guest transacts, and stale audience lists are how people
+      receive offers for things they already bought.
+    - **Guest identity is separate from entitlement.** A profile here references a Subject by
+      opaque ID; the personal data lives in the erasable store, which is what makes erasure
+      possible against an append-only ledger.
+    - Where a guest is linked across cells, marketing operates on the **local** subject.
+      Cross-cell aggregation happens in the warehouse, never by querying another cell.
+
+servers:
+  - url: https://{cellHost}/api/v1
+    variables:
+      cellHost:
+        default: cell.ticvai.local
+
+security:
+  - bearerAuth: []
+
+tags:
+  - name: guest
+  - name: consent
+  - name: segment
+  - name: campaign
+  - name: message
+  - name: case
+  - name: loyalty
+  - name: feedback
+
+paths:
+  # ---------------------------------------------------------------- guests
+  /guests:
+    get:
+      operationId: searchGuests
+      x-ticvai-read-routing: replica
+      summary: Search guest profiles
+      description: >
+        Returns profiles the caller's scope permits. Personal fields are returned only to
+        principals holding `GUEST_VIEW_PII`; everyone else sees the opaque subject reference
+        and behavioural attributes.
+      tags: [guest]
+      x-ticvai-permission: GUEST_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - name: search
+          in: query
+          description: Name, email, phone or membership number. Requires GUEST_VIEW_PII.
+          schema: { type: string }
+        - name: segmentId
+          in: query
+          schema: { type: string, format: uuid }
+        - name: hasConsentFor
+          in: query
+          schema: { $ref: '#/components/schemas/ConsentPurpose' }
+        - $ref: '../shared/common.yaml#/components/parameters/PageSize'
+        - $ref: '../shared/common.yaml#/components/parameters/PageCursor'
+      responses:
+        '200':
+          description: Guests
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '../shared/common.yaml#/components/schemas/Page'
+                  - type: object
+                    properties:
+                      items:
+                        type: array
+                        items: { $ref: '#/components/schemas/GuestProfile' }
+        '403': { $ref: '../shared/common.yaml#/components/responses/Forbidden' }
+
+  /guests/{subjectId}:
+    parameters:
+      - name: subjectId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    get:
+      operationId: getGuestProfile
+      x-ticvai-consumed-by:
+        - "P01 WEB-011 Guest Details & Attendee Forms"
+        - "P01 WEB-017 My Account Dashboard"
+      x-ticvai-read-routing: replica
+      summary: Read a guest profile
+      description: >
+        The single-guest view a service agent works from — profile, consent state, recent
+        orders, open cases, loyalty position.
+      tags: [guest]
+      x-ticvai-permission: GUEST_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '200':
+          description: Profile
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/GuestProfileDetail' }
+        '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
+
+    patch:
+      operationId: updateGuestProfile
+      x-ticvai-consumed-by:
+        - "P01 WEB-020 Profile & Preferences"
+      summary: Amend a guest profile
+      tags: [guest]
+      x-ticvai-permission: GUEST_MANAGE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              minProperties: 1
+              properties:
+                displayName: { type: string, maxLength: 200 }
+                preferredLanguage: { type: string, pattern: '^[a-z]{2}$' }
+                preferredChannel: { $ref: '#/components/schemas/MessageChannel' }
+                tags:
+                  type: array
+                  items: { type: string }
+                notes: { type: string, maxLength: 2000 }
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/GuestProfileDetail' }
+
+  /guests/{subjectId}/merge:
+    parameters:
+      - name: subjectId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    post:
+      operationId: mergeGuestProfiles
+      summary: Merge a duplicate profile into this one
+      description: >
+        Orders, cases, loyalty and consent transfer to the surviving profile. **Consent does
+        not combine permissively** — where the two profiles disagree, the more restrictive
+        position wins, because merging must never widen what a guest agreed to.
+
+        The absorbed profile is retained as a redirect rather than deleted; historic
+        references must continue to resolve.
+      tags: [guest]
+      x-ticvai-permission: GUEST_MANAGE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [duplicateSubjectId, reason]
+              properties:
+                duplicateSubjectId: { type: string, format: uuid }
+                reason: { type: string, minLength: 3, maxLength: 500 }
+      responses:
+        '200':
+          description: Merged
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/MergeResult' }
+        '409':
+          description: Either profile is already merged, or they are the same profile
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  # ---------------------------------------------------------------- consent
+  /guests/{subjectId}/consents:
+    parameters:
+      - name: subjectId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    get:
+      operationId: getGuestConsents
+      x-ticvai-read-routing: primary   # sending against a withdrawn consent is a compliance failure
+      summary: Read a guest's consent state
+      description: >
+        Current position per purpose and channel, with the version of the notice consented
+        to and when. A consent whose notice version has since been superseded is reported as
+        requiring renewal.
+      tags: [consent]
+      x-ticvai-permission: GUEST_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '200':
+          description: Consent state
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ConsentState' }
+        '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
+
+    post:
+      operationId: recordConsent
+      x-ticvai-consumed-by:
+        - "P01 WEB-020 Profile & Preferences"
+        - "P01 WEB-027 Newsletter Subscription"
+      security:
+        - guestAuth: []
+        - bearerAuth: []
+      x-ticvai-self-scoped: subject
+      summary: Record a consent decision
+      description: >
+        **Append-only.** A change of mind is a new record, never an edit — the history of
+        what a guest agreed to and when is the evidence that matters if it is ever
+        questioned.
+
+        Every record captures the notice version, the channel, the purpose, the source and
+        the timestamp.
+
+        **Two callers, two rules.** A guest recording their own consent uses a guest token
+        and may only act on their own subject. An agent recording on a guest's behalf uses a
+        staff token, requires `GUEST_MANAGE`, and the resulting record names them in
+        `recordedByPrincipalId` — consent captured by proxy has to be attributable.
+      tags: [consent]
+      x-ticvai-permission: null   # guest self-scoped, or GUEST_MANAGE when agent-recorded
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: append
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/RecordConsentRequest' }
+      responses:
+        '201':
+          description: Recorded
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ConsentState' }
+        '400':
+          description: Notice version unknown, or the purpose is not configured
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /guests/{subjectId}/consents/history:
+    parameters:
+      - name: subjectId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    get:
+      operationId: getConsentHistory
+      x-ticvai-read-routing: analytical
+      summary: Full consent history
+      description: Every decision in sequence. This is what a regulator asks to see.
+      tags: [consent]
+      x-ticvai-permission: GUEST_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/PageSize'
+        - $ref: '../shared/common.yaml#/components/parameters/PageCursor'
+      responses:
+        '200':
+          description: History
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '../shared/common.yaml#/components/schemas/Page'
+                  - type: object
+                    properties:
+                      items:
+                        type: array
+                        items: { $ref: '#/components/schemas/ConsentRecord' }
+
+  /consent-purposes:
+    get:
+      operationId: listConsentPurposes
+      x-ticvai-consumed-by:
+        - "P01 WEB-011 Guest Details & Attendee Forms"
+      x-ticvai-read-routing: replica
+      summary: Configured consent purposes
+      tags: [consent]
+      x-ticvai-permission: GUEST_VIEW
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: true
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '200':
+          description: Purposes
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/ConsentPurposeConfig' }
+
+    put:
+      operationId: setConsentPurposes
+      summary: Configure consent purposes
+      description: >
+        Each purpose names the channels it covers, whether it is required for service, and
+        the notice version currently in force. Adding a purpose does not grant it for
+        existing guests — they are asked.
+      tags: [consent]
+      x-ticvai-permission: GUEST_MANAGE
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [purposes]
+              properties:
+                purposes:
+                  type: array
+                  items: { $ref: '#/components/schemas/ConsentPurposeConfig' }
+      responses:
+        '200':
+          description: Configured
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/ConsentPurposeConfig' }
+
+  /consent/suppression-list:
+    get:
+      operationId: getSuppressionList
+      x-ticvai-read-routing: primary   # a complaint that has not replicated results in another send
+      summary: Addresses suppressed from all sending
+      description: >
+        Hard bounces, complaints, explicit global opt-outs and unsubscribes. Checked at send
+        time regardless of segment or consent — a complaint outranks a consent record.
+      tags: [consent]
+      x-ticvai-permission: GUEST_VIEW
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/PageSize'
+        - $ref: '../shared/common.yaml#/components/parameters/PageCursor'
+      responses:
+        '200':
+          description: Suppressions
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '../shared/common.yaml#/components/schemas/Page'
+                  - type: object
+                    properties:
+                      items:
+                        type: array
+                        items: { $ref: '#/components/schemas/Suppression' }
+
+    post:
+      operationId: addSuppression
+      summary: Suppress an address
+      tags: [consent]
+      x-ticvai-permission: GUEST_MANAGE
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: append
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [channel, address, reason]
+              properties:
+                channel: { $ref: '#/components/schemas/MessageChannel' }
+                address: { type: string }
+                reason:
+                  type: string
+                  enum: [hardBounce, complaint, globalOptOut, unsubscribe, invalid, manual]
+      responses:
+        '201':
+          description: Suppressed
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Suppression' }
+
+  /guests/{subjectId}/wishlist:
+    parameters:
+      - name: subjectId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    get:
+      operationId: getWishlist
+      x-ticvai-consumed-by:
+        - "P01 WEB-009 Wishlist"
+      x-ticvai-read-routing: replica
+      summary: Read a guest's saved items
+      description: >
+        Deliberately here rather than in the catalogue. A wishlist is a record of a person's
+        intent, not a property of a product — and it is the same shape as every other
+        behavioural signal segmentation already reads.
+
+        Items whose product has been withdrawn are returned with `isAvailable: false` rather
+        than dropped. A guest who saved something and finds it silently gone assumes the
+        feature is broken.
+      tags: [guest]
+      x-ticvai-permission: null
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-self-scoped: subject
+      security:
+        - guestAuth: []
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Wishlist
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Wishlist' }
+        '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
+
+    post:
+      operationId: addToWishlist
+      x-ticvai-consumed-by:
+        - "P01 WEB-009 Wishlist"
+      summary: Save an item
+      description: >
+        Idempotent on the variant — saving twice is one entry, not two. The count matters to
+        the guest and to demand signals, so a double tap must not inflate it.
+      tags: [guest]
+      x-ticvai-permission: null
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-self-scoped: subject
+      security:
+        - guestAuth: []
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [variantId]
+              properties:
+                variantId: { type: string, format: uuid }
+                performanceId:
+                  type: string
+                  format: uuid
+                  nullable: true
+                  description: Saving a specific date rather than the product generally.
+                note: { type: string, maxLength: 200 }
+      responses:
+        '200':
+          description: Saved, or already present
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Wishlist' }
+        '404':
+          description: Variant not found or not sellable in this venue
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /guests/{subjectId}/wishlist/{itemId}:
+    parameters:
+      - name: subjectId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+      - name: itemId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    delete:
+      operationId: removeFromWishlist
+      x-ticvai-consumed-by:
+        - "P01 WEB-009 Wishlist"
+      summary: Remove a saved item
+      tags: [guest]
+      x-ticvai-permission: null
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-self-scoped: subject
+      security:
+        - guestAuth: []
+      responses:
+        '204': { description: Removed }
+        '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
+
+  /guests/{subjectId}/devices:
+    parameters:
+      - name: subjectId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    get:
+      operationId: listGuestDevices
+      summary: A guest's registered devices
+      description: >
+        Here rather than in tenancy. `platform.device` is staff hardware bound to a
+        workstation — printers, readers, turnstiles. A guest's phone is neither owned by the
+        venue nor bound to anything, and it is registered for one reason: to be sent to.
+        That makes it guest engagement.
+      tags: [guest]
+      x-ticvai-permission: null
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-read-routing: replica
+      x-ticvai-self-scoped: subject
+      security:
+        - guestAuth: []
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Devices
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/GuestDevice' }
+
+    post:
+      operationId: registerGuestDevice
+      summary: Register a device for push
+      description: >
+        Called on install and again whenever the provider rotates the token — which happens
+        without warning and without an uninstall. Idempotent on the token, so re-registration
+        updates rather than duplicates.
+
+        **A registered device is not consent to send.** Push still requires a current consent
+        for the purpose; this only records where a message could go.
+      tags: [guest]
+      x-ticvai-permission: null
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-self-scoped: subject
+      security:
+        - guestAuth: []
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [platform, token]
+              properties:
+                platform:
+                  type: string
+                  enum: [ios, android, web]
+                token: { type: string, maxLength: 512 }
+                appVersion: { type: string }
+                osVersion: { type: string }
+                deviceModel: { type: string }
+                locale: { type: string }
+      responses:
+        '200':
+          description: Registered, or an existing registration refreshed
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/GuestDevice' }
+
+  /guests/{subjectId}/devices/{deviceId}:
+    parameters:
+      - name: subjectId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+      - name: deviceId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    delete:
+      operationId: revokeGuestDevice
+      summary: Revoke a device registration
+      description: >
+        Sign-out, uninstall, or a guest removing a device they no longer have. Revoked rather
+        than deleted — a token that starts failing needs a record explaining why, or the same
+        dead token gets retried indefinitely.
+      tags: [guest]
+      x-ticvai-permission: null
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-self-scoped: subject
+      security:
+        - guestAuth: []
+      responses:
+        '204': { description: Revoked }
+        '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
+
+  # ---------------------------------------------------------------- segments
+  /segments:
+    get:
+      operationId: listSegments
+      x-ticvai-read-routing: replica
+      summary: List segments
+      tags: [segment]
+      x-ticvai-permission: MARKETING_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/PageSize'
+        - $ref: '../shared/common.yaml#/components/parameters/PageCursor'
+      responses:
+        '200':
+          description: Segments
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '../shared/common.yaml#/components/schemas/Page'
+                  - type: object
+                    properties:
+                      items:
+                        type: array
+                        items: { $ref: '#/components/schemas/Segment' }
+
+    post:
+      operationId: createSegment
+      summary: Create a segment
+      description: >
+        **A definition, not a list.** Evaluated when used, so it cannot go stale. A
+        materialised audience list is out of date the moment a guest transacts, which is how
+        people receive offers for things they have already bought.
+      tags: [segment]
+      x-ticvai-permission: MARKETING_MANAGE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/CreateSegmentRequest' }
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Segment' }
+        '400':
+          description: Criteria are contradictory or reference unknown attributes
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /segments/{segmentId}/preview:
+    parameters:
+      - name: segmentId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    post:
+      operationId: previewSegment
+      summary: Estimate segment size and reachability
+      description: >
+        Returns the matching count, and separately the **reachable** count per channel after
+        consent and suppression are applied. A segment of 50,000 with 3,000 email consents is
+        a 3,000-person campaign, and knowing that before sending avoids a very awkward
+        report.
+      tags: [segment]
+      x-ticvai-permission: MARKETING_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '200':
+          description: Preview
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/SegmentPreview' }
+
+  /segments/{segmentId}/members:
+    parameters:
+      - name: segmentId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    get:
+      operationId: listSegmentMembers
+      x-ticvai-read-routing: replica
+      summary: List guests currently matching a segment
+      description: Evaluated live. Useful for spot-checking a definition before use.
+      tags: [segment]
+      x-ticvai-permission: MARKETING_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/PageSize'
+        - $ref: '../shared/common.yaml#/components/parameters/PageCursor'
+      responses:
+        '200':
+          description: Members
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '../shared/common.yaml#/components/schemas/Page'
+                  - type: object
+                    properties:
+                      items:
+                        type: array
+                        items: { $ref: '#/components/schemas/GuestProfile' }
+
+  # ---------------------------------------------------------------- campaigns
+  /campaigns:
+    get:
+      operationId: listCampaigns
+      x-ticvai-read-routing: replica
+      summary: List campaigns
+      tags: [campaign]
+      x-ticvai-permission: MARKETING_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - name: status
+          in: query
+          schema: { $ref: '#/components/schemas/CampaignStatus' }
+        - $ref: '../shared/common.yaml#/components/parameters/PageSize'
+        - $ref: '../shared/common.yaml#/components/parameters/PageCursor'
+      responses:
+        '200':
+          description: Campaigns
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '../shared/common.yaml#/components/schemas/Page'
+                  - type: object
+                    properties:
+                      items:
+                        type: array
+                        items: { $ref: '#/components/schemas/Campaign' }
+
+    post:
+      operationId: createCampaign
+      summary: Create a campaign
+      description: >
+        Created in draft. One-off, scheduled, or triggered by an event such as a booking, a
+        visit or a birthday.
+      tags: [campaign]
+      x-ticvai-permission: MARKETING_MANAGE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/CreateCampaignRequest' }
+      responses:
+        '201':
+          description: Created in draft
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Campaign' }
+        '400': { $ref: '../shared/common.yaml#/components/responses/BadRequest' }
+
+  /campaigns/{campaignId}:
+    parameters:
+      - name: campaignId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    get:
+      operationId: getCampaign
+      x-ticvai-read-routing: replica
+      summary: Read a campaign with performance
+      tags: [campaign]
+      x-ticvai-permission: MARKETING_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '200':
+          description: Campaign
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/CampaignDetail' }
+        '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
+
+    patch:
+      operationId: updateCampaign
+      summary: Amend, pause or resume a campaign
+      description: >
+        Content and audience are editable only in draft. A live campaign may be paused,
+        rescheduled or stopped — nothing else. Changing the audience mid-send produces a
+        campaign nobody can report on afterwards.
+      tags: [campaign]
+      x-ticvai-permission: MARKETING_MANAGE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              minProperties: 1
+              properties:
+                name: { type: string, maxLength: 200 }
+                isPaused: { type: boolean }
+                scheduledFor: { type: string, format: date-time }
+                content: { $ref: '#/components/schemas/CampaignContent' }
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Campaign' }
+        '409':
+          description: Content or audience amended on a live campaign
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /campaigns/{campaignId}/test-send:
+    parameters:
+      - name: campaignId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    post:
+      operationId: testSendCampaign
+      summary: Send a test to named recipients
+      description: >
+        Renders with sample personalisation. Bypasses consent because the recipients are
+        staff, and is recorded as a test so it never appears in campaign metrics.
+      tags: [campaign]
+      x-ticvai-permission: MARKETING_MANAGE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [recipients]
+              properties:
+                recipients:
+                  type: array
+                  minItems: 1
+                  maxItems: 10
+                  items: { type: string }
+                sampleSubjectId:
+                  type: string
+                  format: uuid
+                  description: Personalise using this guest's data. Otherwise placeholders are used.
+      responses:
+        '202':
+          description: Test queued
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  sentCount: { type: integer }
+
+  /campaigns/{campaignId}/launch:
+    parameters:
+      - name: campaignId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    post:
+      operationId: launchCampaign
+      summary: Launch or schedule a campaign
+      description: >
+        Evaluates the segment, applies consent and suppression, and queues the send. The
+        response reports how many were excluded and why, before anything goes out.
+
+        **Consent is checked at send time, not at segment build time** — a guest may withdraw
+        between the two, and the later check is the one that matters.
+      tags: [campaign]
+      x-ticvai-permission: MARKETING_SEND
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                scheduledFor: { type: string, format: date-time }
+                confirmAudienceSize:
+                  type: integer
+                  description: >
+                    Guard against a segment that has grown unexpectedly. When supplied and
+                    the evaluated size differs beyond tolerance, the launch is refused.
+      responses:
+        '202':
+          description: Queued
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/LaunchResult' }
+        '403': { $ref: '../shared/common.yaml#/components/responses/Forbidden' }
+        '409':
+          description: >
+            Already launched, audience size differs beyond tolerance, or every recipient was
+            excluded.
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /campaigns/{campaignId}/pause:
+    parameters:
+      - name: campaignId
+        in: path
+        required: true
+        schema: { type: string }
+    post:
+      operationId: pauseCampaign
+      summary: Pause a campaign mid-send
+      description: >
+        Halts sending. **Recipients already sent to are not unsent** — pausing stops the next message, not the last one.
+
+        Resuming continues from where it stopped rather than from the start, which is why `paused` cannot return to `scheduled`.
+      tags: [campaign]
+      x-ticvai-permission: MARKETING_MANAGE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [reason]
+              properties:
+                reason: { type: string }
+      responses:
+        '200':
+          description: Done
+        '409':
+          description: Not in a state that permits this
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /campaigns/{campaignId}/unschedule:
+    parameters:
+      - name: campaignId
+        in: path
+        required: true
+        schema: { type: string }
+    post:
+      operationId: unscheduleCampaign
+      summary: Pull a scheduled campaign before it sends
+      description: >
+        Returns it to draft. Distinct from stopping: nothing has been sent, so there is no partial audience to reason about.
+      tags: [campaign]
+      x-ticvai-permission: MARKETING_MANAGE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      responses:
+        '200':
+          description: Done
+        '409':
+          description: Not in a state that permits this
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /campaigns/{campaignId}/stop:
+    parameters:
+      - name: campaignId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    post:
+      operationId: stopCampaign
+      summary: Stop a campaign mid-send
+      description: >
+        Halts remaining sends immediately. Messages already dispatched cannot be recalled,
+        and the response reports how many went out.
+      tags: [campaign]
+      x-ticvai-permission: MARKETING_SEND
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [reason]
+              properties:
+                reason: { type: string, minLength: 3, maxLength: 500 }
+      responses:
+        '200':
+          description: Stopped
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Campaign' }
+
+  /campaigns/{campaignId}/performance:
+    parameters:
+      - name: campaignId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    get:
+      operationId: getCampaignPerformance
+      x-ticvai-read-routing: analytical
+      summary: Delivery and engagement
+      description: >
+        Sent, delivered, opened, clicked, bounced, complained, unsubscribed — and attributed
+        revenue where a booking followed within the attribution window.
+      tags: [campaign]
+      x-ticvai-permission: MARKETING_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '200':
+          description: Performance
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/CampaignPerformance' }
+
+  # ---------------------------------------------------------------- messages
+  /message-templates:
+    get:
+      operationId: listMessageTemplates
+      x-ticvai-consumed-by:
+        - "P12 SUP-007 Canned Response Management"
+      x-ticvai-read-routing: replica
+      summary: List message templates
+      tags: [message]
+      x-ticvai-permission: MARKETING_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - name: channel
+          in: query
+          schema: { $ref: '#/components/schemas/MessageChannel' }
+        - $ref: '../shared/common.yaml#/components/parameters/PageSize'
+        - $ref: '../shared/common.yaml#/components/parameters/PageCursor'
+      responses:
+        '200':
+          description: Templates
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '../shared/common.yaml#/components/schemas/Page'
+                  - type: object
+                    properties:
+                      items:
+                        type: array
+                        items: { $ref: '#/components/schemas/MessageTemplate' }
+
+    post:
+      operationId: createMessageTemplate
+      x-ticvai-config-scope: tenant
+      summary: Create a message template
+      description: >
+        Per-language bodies with named merge fields. A template missing a version in an
+        enabled language is flagged rather than silently falling back — a guest receiving
+        English when they chose Arabic is a defect, not a graceful degradation.
+      tags: [message]
+      x-ticvai-permission: MARKETING_MANAGE
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/MessageTemplate' }
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/MessageTemplate' }
+        '400':
+          description: Unknown merge field, or a required language is missing
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /messages:
+    post:
+      operationId: sendTransactionalMessage
+      x-ticvai-consumed-by:
+        - "P10 PTR-004 Notifications"
+      security:
+        - serviceAuth: []
+        - bearerAuth: []
+      x-ticvai-auth: service
+      summary: Send a transactional message
+      description: >
+        Booking confirmations, reminders, service updates. **Transactional messages are not
+        marketing** and are sent under contract performance rather than marketing consent —
+        but they still respect the suppression list, because a hard bounce is a hard bounce.
+      tags: [message]
+      x-ticvai-permission: null
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [subjectId, templateId, channel]
+              properties:
+                subjectId: { type: string, format: uuid }
+                templateId: { type: string, format: uuid }
+                channel: { $ref: '#/components/schemas/MessageChannel' }
+                mergeValues:
+                  type: object
+                  additionalProperties: true
+      responses:
+        '202':
+          description: Queued
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/MessageDispatch' }
+        '409':
+          description: Address suppressed, or the guest has no address for that channel
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /messages/{messageId}:
+    parameters:
+      - name: messageId
+        in: path
+        required: true
+        schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+    get:
+      operationId: getMessageStatus
+      x-ticvai-read-routing: replica
+      summary: Delivery status of one message
+      tags: [message]
+      x-ticvai-permission: GUEST_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '200':
+          description: Status
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/MessageDispatch' }
+        '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
+
+  # ---------------------------------------------------------------- cases
+  /cases:
+    get:
+      operationId: listCases
+      x-ticvai-consumed-by:
+        - "P12 SUP-002 Agent Dashboard"
+        - "P12 SUP-004 Conversation Queue"
+      x-ticvai-read-routing: replica
+      summary: List service cases
+      tags: [case]
+      x-ticvai-permission: CASE_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - name: status
+          in: query
+          schema: { $ref: '#/components/schemas/CaseStatus' }
+        - name: assignedToPrincipalId
+          in: query
+          schema: { type: string, format: uuid }
+        - name: breachedSla
+          in: query
+          schema: { type: boolean }
+        - name: priority
+          in: query
+          schema: { $ref: '#/components/schemas/CasePriority' }
+        - $ref: '../shared/common.yaml#/components/parameters/PageSize'
+        - $ref: '../shared/common.yaml#/components/parameters/PageCursor'
+      responses:
+        '200':
+          description: Cases
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '../shared/common.yaml#/components/schemas/Page'
+                  - type: object
+                    properties:
+                      items:
+                        type: array
+                        items: { $ref: '#/components/schemas/Case' }
+
+    post:
+      operationId: createCase
+      x-ticvai-consumed-by:
+        - "P10 PTR-021 Support & Contact"
+      summary: Raise a service case
+      description: >
+        From any channel — agent, guest app, email, chat. The SLA clock starts at creation
+        and pauses only while awaiting the guest, never while awaiting an internal team.
+      tags: [case]
+      x-ticvai-permission: CASE_MANAGE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: true
+      x-ticvai-conflict-policy: append
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/CreateCaseRequest' }
+      responses:
+        '201':
+          description: Raised
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Case' }
+
+  /cases/{caseId}:
+    parameters:
+      - name: caseId
+        in: path
+        required: true
+        schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+    get:
+      operationId: getCase
+      x-ticvai-consumed-by:
+        - "P12 SUP-005 Live Chat Workspace"
+      x-ticvai-read-routing: replica
+      summary: Read a case with its thread
+      tags: [case]
+      x-ticvai-permission: CASE_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '200':
+          description: Case
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/CaseDetail' }
+        '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
+
+    patch:
+      operationId: updateCase
+      x-ticvai-consumed-by:
+        - "P12 SUP-005 Live Chat Workspace"
+      summary: Assign, reprioritise or resolve a case
+      tags: [case]
+      x-ticvai-permission: CASE_MANAGE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              minProperties: 1
+              properties:
+                status: { $ref: '#/components/schemas/CaseStatus' }
+                priority: { $ref: '#/components/schemas/CasePriority' }
+                assignedToPrincipalId: { type: string, format: uuid }
+                categoryId: { type: string, format: uuid }
+                resolutionNote: { type: string, maxLength: 2000 }
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Case' }
+        '400':
+          description: Resolving without a resolution note
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /cases/{caseId}/messages:
+    parameters:
+      - name: caseId
+        in: path
+        required: true
+        schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+    post:
+      operationId: addCaseMessage
+      x-ticvai-consumed-by:
+        - "P12 SUP-005 Live Chat Workspace"
+      summary: Add a message or internal note
+      description: >
+        `isInternal` distinguishes a note from a reply to the guest. Getting that wrong sends
+        an internal comment to a customer, so it is required rather than defaulted.
+      tags: [case]
+      x-ticvai-permission: CASE_MANAGE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: true
+      x-ticvai-conflict-policy: append
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [id, body, isInternal, recordedAt]
+              properties:
+                id: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+                body: { type: string, minLength: 1, maxLength: 10000 }
+                isInternal: { type: boolean }
+                channel: { $ref: '#/components/schemas/MessageChannel' }
+                attachmentRefs:
+                  type: array
+                  items: { type: string }
+                recordedAt: { type: string, format: date-time }
+      responses:
+        '201':
+          description: Added
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/CaseMessage' }
+
+  /cases/{caseId}/reopen:
+    parameters:
+      - name: caseId
+        in: path
+        required: true
+        schema: { type: string }
+    post:
+      operationId: reopenCase
+      summary: Reopen a resolved case
+      description: >
+        The guest came back on the same issue. Reopening rather than raising a new case is what makes repeat problems visible — a second case looks like a second problem.
+
+        Refused once closed: the reopen window has passed and a genuinely new contact deserves its own case.
+      tags: [case]
+      x-ticvai-permission: CASE_MANAGE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [reason]
+              properties:
+                reason: { type: string }
+      responses:
+        '200':
+          description: Done
+        '409':
+          description: Not in a state that permits this
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /cases/{caseId}/escalate:
+    parameters:
+      - name: caseId
+        in: path
+        required: true
+        schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+    post:
+      operationId: escalateCase
+      x-ticvai-consumed-by:
+        - "P12 SUP-005 Live Chat Workspace"
+      summary: Escalate a case
+      tags: [case]
+      x-ticvai-permission: CASE_MANAGE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [reason]
+              properties:
+                reason: { type: string, minLength: 3, maxLength: 500 }
+                assignToPrincipalId: { type: string, format: uuid }
+                newPriority: { $ref: '#/components/schemas/CasePriority' }
+      responses:
+        '200':
+          description: Escalated
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Case' }
+
+  # ---------------------------------------------------------------- loyalty
+  /loyalty/programmes:
+    get:
+      operationId: listLoyaltyProgrammes
+      x-ticvai-read-routing: replica
+      summary: List loyalty programmes
+      tags: [loyalty]
+      x-ticvai-permission: MARKETING_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: true
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '200':
+          description: Programmes
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/LoyaltyProgramme' }
+
+    post:
+      operationId: createLoyaltyProgramme
+      x-ticvai-config-scope: tenant
+      summary: Create a loyalty programme
+      description: >
+        Earn rules, tiers and redemption options. **Points are a liability** and post to the
+        ledger on accrual, not on redemption — the obligation exists the moment they are
+        earned.
+      tags: [loyalty]
+      x-ticvai-permission: MARKETING_MANAGE
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/LoyaltyProgramme' }
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/LoyaltyProgramme' }
+
+  /guests/{subjectId}/loyalty:
+    parameters:
+      - name: subjectId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    get:
+      operationId: getGuestLoyalty
+      x-ticvai-consumed-by:
+        - "P01 WEB-024 Loyalty & Rewards"
+      x-ticvai-read-routing: replica
+      summary: A guest's loyalty position
+      tags: [loyalty]
+      x-ticvai-permission: GUEST_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '200':
+          description: Position
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/LoyaltyPosition' }
+        '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
+
+  /guests/{subjectId}/loyalty/adjust:
+    parameters:
+      - name: subjectId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    post:
+      operationId: adjustLoyaltyPoints
+      summary: Manually adjust points
+      description: >
+        Goodwill, correction, or reversal. Requires a reason and is reported separately —
+        manual point adjustments are the loyalty equivalent of a wallet adjustment and get
+        the same scrutiny.
+      tags: [loyalty]
+      x-ticvai-permission: LEDGER_POST
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [points, reason]
+              properties:
+                points: { type: integer }
+                reason: { type: string, minLength: 3, maxLength: 500 }
+      responses:
+        '200':
+          description: Adjusted
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/LoyaltyPosition' }
+
+  # ---------------------------------------------------------------- feedback
+  /reviews:
+    get:
+      operationId: listReviews
+      x-ticvai-read-routing: replica
+      summary: List guest reviews and ratings
+      tags: [feedback]
+      x-ticvai-permission: MARKETING_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - name: venueId
+          in: query
+          schema: { type: string, format: uuid }
+        - name: minRating
+          in: query
+          schema: { type: integer, minimum: 1, maximum: 5 }
+        - name: hasResponse
+          in: query
+          schema: { type: boolean }
+        - $ref: '../shared/common.yaml#/components/parameters/PageSize'
+        - $ref: '../shared/common.yaml#/components/parameters/PageCursor'
+      responses:
+        '200':
+          description: Reviews
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '../shared/common.yaml#/components/schemas/Page'
+                  - type: object
+                    properties:
+                      items:
+                        type: array
+                        items: { $ref: '#/components/schemas/Review' }
+
+    post:
+      operationId: submitReview
+      x-ticvai-consumed-by:
+        - "P01 WEB-026 Survey & Feedback"
+        - "P02 GST-035 Feedback & Ratings"
+      security:
+        - guestAuth: []
+      x-ticvai-self-scoped: subject
+      summary: Submit a review
+      description: >
+        Guest-facing. A low rating may open a service case automatically where the venue
+        configures it — feedback that goes nowhere is worse than no feedback mechanism.
+      tags: [feedback]
+      x-ticvai-permission: null
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: append
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/SubmitReviewRequest' }
+      responses:
+        '201':
+          description: Submitted
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Review' }
+
+  /reviews/{reviewId}/respond:
+    parameters:
+      - name: reviewId
+        in: path
+        required: true
+        schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+    post:
+      operationId: respondToReview
+      summary: Respond to a review
+      tags: [feedback]
+      x-ticvai-permission: MARKETING_MANAGE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [body, isPublic]
+              properties:
+                body: { type: string, minLength: 1, maxLength: 5000 }
+                isPublic: { type: boolean }
+      responses:
+        '200':
+          description: Responded
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Review' }
+
+components:
+  schemas:
+    MessageChannel:
+      type: string
+      enum: [email, sms, whatsapp, push, inApp, post]
+
+    ConsentPurpose:
+      type: string
+      enum:
+        - marketing
+        - personalisation
+        - profiling
+        - thirdPartySharing
+        - aiProcessing
+        - transactional
+
+    ConsentDecision:
+      type: string
+      enum: [granted, withdrawn, notAsked]
+
+    ConsentSource:
+      type: string
+      enum: [guestApp, website, kiosk, pos, callCentre, import, agentRecorded]
+
+    GuestProfile:
+      x-ticvai-persistence: "marketing.guest_profile"
+      type: object
+      required: [subjectId, isActive]
+      properties:
+        subjectId:
+          type: string
+          format: uuid
+          description: >
+            Opaque reference. Personal data lives in the separately erasable store, which is
+            what makes erasure possible against an append-only ledger.
+        displayName: { type: string, nullable: true }
+        email: { type: string, nullable: true }
+        phone: { type: string, nullable: true }
+        preferredLanguage: { type: string, nullable: true }
+        preferredChannel: { $ref: '#/components/schemas/MessageChannel' }
+        guestLinkId:
+          type: string
+          nullable: true
+          description: Present where the guest is linked across cells. Marketing acts locally.
+        tags:
+          type: array
+          items: { type: string }
+        lifetimeValue: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+        visitCount: { type: integer }
+        lastVisitAt: { type: string, format: date-time, nullable: true }
+        isActive: { type: boolean }
+
+    GuestProfileDetail:
+      x-ticvai-persistence: "marketing.guest_profile"
+      allOf:
+        - $ref: '#/components/schemas/GuestProfile'
+        - type: object
+          properties:
+            consents: { $ref: '#/components/schemas/ConsentState' }
+            loyalty: { $ref: '#/components/schemas/LoyaltyPosition' }
+            openCaseCount: { type: integer }
+            recentOrderIds:
+              type: array
+              items: { type: string }
+            membershipIds:
+              type: array
+              items: { type: string, format: uuid }
+            notes: { type: string, nullable: true }
+
+    MergeResult:
+      x-ticvai-persistence: "none — computed"
+      type: object
+      required: [survivingSubjectId, absorbedSubjectId, transferred]
+      properties:
+        survivingSubjectId: { type: string, format: uuid }
+        absorbedSubjectId: { type: string, format: uuid }
+        transferred:
+          type: object
+          properties:
+            orders: { type: integer }
+            cases: { type: integer }
+            loyaltyPoints: { type: integer }
+        consentOutcome:
+          type: array
+          description: >
+            Per purpose, the resulting position. Where the two profiles disagreed, the more
+            restrictive position won.
+          items:
+            type: object
+            properties:
+              purpose: { $ref: '#/components/schemas/ConsentPurpose' }
+              result: { $ref: '#/components/schemas/ConsentDecision' }
+              wasRestricted: { type: boolean }
+
+    Wishlist:
+      type: object
+      required: [subjectId, items]
+      x-ticvai-persistence: "none — wrapper. The items are the table, keyed by subject"
+      properties:
+        subjectId: { type: string, format: uuid }
+        items:
+          type: array
+          x-ticvai-persistence: "marketing.wishlist_item"
+          items:
+            type: object
+            required: [id, variantId, addedAt, isAvailable]
+            properties:
+              id: { type: string, format: uuid }
+              variantId: { type: string, format: uuid }
+              productName: { type: string }
+              performanceId: { type: string, format: uuid, nullable: true }
+              performanceStartsAt: { type: string, format: date-time, nullable: true }
+              price: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+              imageAssetRef: { type: string, nullable: true }
+              isAvailable:
+                type: boolean
+                description: >
+                  False where the product has been withdrawn or the performance has passed.
+                  Returned rather than dropped — a guest who saved something and finds it
+                  silently gone assumes the feature is broken.
+              unavailableReason: { type: string, nullable: true }
+              note: { type: string, nullable: true }
+              addedAt: { type: string, format: date-time }
+
+    GuestDevice:
+      type: object
+      x-ticvai-persistence: "marketing.guest_device"
+      required: [id, subjectId, platform, status, registeredAt]
+      properties:
+        id: { type: string, format: uuid }
+        subjectId: { type: string, format: uuid }
+        platform:
+          type: string
+          enum: [ios, android, web]
+        tokenFingerprint:
+          type: string
+          description: >
+            Hash of the token, not the token. The token itself is write-only — returning it
+            would put a push credential in every response a support agent can read.
+        appVersion: { type: string, nullable: true }
+        osVersion: { type: string, nullable: true }
+        deviceModel: { type: string, nullable: true }
+        locale: { type: string, nullable: true }
+        status:
+          type: string
+          enum: [active, revoked, failed]
+        failureCount:
+          type: integer
+          description: >
+            Consecutive delivery failures. Past the threshold the device is marked failed and
+            stops being targeted — a dead token retried forever is wasted quota and a
+            misleading delivery rate.
+        registeredAt: { type: string, format: date-time }
+        lastSeenAt: { type: string, format: date-time, nullable: true }
+        revokedAt: { type: string, format: date-time, nullable: true }
+
+    ConsentPurposeConfig:
+      x-ticvai-persistence: "marketing.consent_purpose"
+      type: object
+      required: [purpose, channels, noticeVersion, isRequiredForService]
+      properties:
+        purpose: { $ref: '#/components/schemas/ConsentPurpose' }
+        displayName: { type: string }
+        description: { type: string }
+        channels:
+          type: array
+          items: { $ref: '#/components/schemas/MessageChannel' }
+        noticeVersion:
+          type: string
+          description: >
+            Current version of the notice. A consent against a superseded version is reported
+            as requiring renewal rather than silently honoured.
+        isRequiredForService:
+          type: boolean
+          description: >
+            True for transactional. Withdrawing it means the service cannot be delivered, so
+            it is presented differently.
+        expiresAfterMonths: { type: integer, nullable: true }
+
+    RecordConsentRequest:
+      x-ticvai-persistence: "none — request only"
+      type: object
+      required: [purpose, decision, noticeVersion, source, recordedAt]
+      properties:
+        purpose: { $ref: '#/components/schemas/ConsentPurpose' }
+        decision: { $ref: '#/components/schemas/ConsentDecision' }
+        channels:
+          type: array
+          description: Omit to apply to every channel the purpose covers.
+          items: { $ref: '#/components/schemas/MessageChannel' }
+        noticeVersion: { type: string }
+        source: { $ref: '#/components/schemas/ConsentSource' }
+        recordedAt: { type: string, format: date-time }
+
+    ConsentRecord:
+      x-ticvai-persistence: "marketing.consent_record"
+      allOf:
+        - $ref: '#/components/schemas/RecordConsentRequest'
+        - type: object
+          required: [id, subjectId]
+          properties:
+            id: { type: string }
+            subjectId: { type: string, format: uuid }
+            recordedByPrincipalId: { type: string, format: uuid, nullable: true }
+            supersededAt: { type: string, format: date-time, nullable: true }
+
+    ConsentState:
+      x-ticvai-persistence: "none — projection over consent_record"
+      type: object
+      required: [subjectId, purposes]
+      properties:
+        subjectId: { type: string, format: uuid }
+        purposes:
+          type: array
+          items:
+            type: object
+            required: [purpose, decision, requiresRenewal]
+            properties:
+              purpose: { $ref: '#/components/schemas/ConsentPurpose' }
+              decision: { $ref: '#/components/schemas/ConsentDecision' }
+              channels:
+                type: array
+                items: { $ref: '#/components/schemas/MessageChannel' }
+              noticeVersion: { type: string, nullable: true }
+              requiresRenewal:
+                type: boolean
+                description: True where the notice has been superseded since consent was given.
+              decidedAt: { type: string, format: date-time, nullable: true }
+
+    Suppression:
+      x-ticvai-persistence: "marketing.suppression"
+      type: object
+      required: [channel, address, reason, suppressedAt]
+      properties:
+        channel: { $ref: '#/components/schemas/MessageChannel' }
+        address: { type: string }
+        reason: { type: string }
+        suppressedAt: { type: string, format: date-time }
+        suppressedByPrincipalId: { type: string, format: uuid, nullable: true }
+
+    SegmentCriterion:
+      x-ticvai-persistence: "marketing.segment_criterion"
+      type: object
+      required: [attribute, operator]
+      properties:
+        attribute:
+          type: string
+          description: >
+            Behavioural or profile attribute — visit count, last visit, lifetime value,
+            product purchased, membership tier, venue visited, language.
+        operator:
+          type: string
+          enum: [equals, notEquals, greaterThan, lessThan, between, in, notIn, exists, notExists, withinDays]
+        value: {}
+        values:
+          type: array
+          items: {}
+
+    CreateSegmentRequest:
+      x-ticvai-persistence: "none — request only"
+      type: object
+      required: [name, criteria]
+      properties:
+        name: { type: string, maxLength: 200 }
+        description: { type: string, maxLength: 1000 }
+        venueId: { type: string, format: uuid }
+        match:
+          type: string
+          enum: [all, any]
+          default: all
+        criteria:
+          type: array
+          minItems: 1
+          items: { $ref: '#/components/schemas/SegmentCriterion' }
+        excludeSegmentIds:
+          type: array
+          items: { type: string, format: uuid }
+
+    Segment:
+      x-ticvai-persistence: "marketing.segment + marketing.segment_criterion"
+      allOf:
+        - $ref: '#/components/schemas/CreateSegmentRequest'
+        - type: object
+          required: [id, createdAt]
+          properties:
+            id: { type: string, format: uuid }
+            lastEvaluatedSize: { type: integer, nullable: true }
+            lastEvaluatedAt: { type: string, format: date-time, nullable: true }
+            createdAt: { type: string, format: date-time }
+
+    SegmentPreview:
+      x-ticvai-persistence: "none — evaluated live"
+      type: object
+      required: [segmentId, matchingCount, reachable]
+      properties:
+        segmentId: { type: string, format: uuid }
+        matchingCount: { type: integer }
+        reachable:
+          type: array
+          description: >
+            Per channel, after consent and suppression. A segment of 50,000 with 3,000 email
+            consents is a 3,000-person campaign.
+          items:
+            type: object
+            properties:
+              channel: { $ref: '#/components/schemas/MessageChannel' }
+              reachableCount: { type: integer }
+              excludedNoConsent: { type: integer }
+              excludedSuppressed: { type: integer }
+              excludedNoAddress: { type: integer }
+        evaluatedAt: { type: string, format: date-time }
+
+    CampaignStatus:
+      type: string
+      enum: [draft, scheduled, sending, paused, completed, stopped, failed]
+
+    CampaignKind:
+      type: string
+      enum: [oneOff, scheduled, triggered, recurring]
+
+    CampaignTrigger:
+      x-ticvai-persistence: "none — embedded in campaign"
+      type: object
+      properties:
+        event:
+          type: string
+          enum: [bookingConfirmed, visitCompleted, membershipExpiring, birthday, abandonedCart, firstVisit, inactivity]
+        delayHours: { type: integer }
+        conditions:
+          type: array
+          items: { $ref: '#/components/schemas/SegmentCriterion' }
+
+    CampaignContent:
+      x-ticvai-persistence: "none — embedded in campaign"
+      type: object
+      required: [templateId]
+      properties:
+        templateId: { type: string, format: uuid }
+        subjectOverride: { type: object, additionalProperties: { type: string } }
+        mergeDefaults:
+          type: object
+          additionalProperties: true
+        promotionId:
+          type: string
+          format: uuid
+          nullable: true
+          description: Offer carried by the campaign. Coupon codes are issued from it.
+
+    CreateCampaignRequest:
+      x-ticvai-persistence: "none — request only"
+      type: object
+      required: [name, kind, channel, segmentId, content]
+      properties:
+        name: { type: string, maxLength: 200 }
+        kind: { $ref: '#/components/schemas/CampaignKind' }
+        channel: { $ref: '#/components/schemas/MessageChannel' }
+        venueId: { type: string, format: uuid }
+        segmentId: { type: string, format: uuid }
+        content: { $ref: '#/components/schemas/CampaignContent' }
+        trigger: { $ref: '#/components/schemas/CampaignTrigger' }
+        scheduledFor: { type: string, format: date-time }
+        consentPurpose:
+          allOf:
+            - $ref: '#/components/schemas/ConsentPurpose'
+          default: marketing
+        sendWindow:
+          type: object
+          description: >
+            Hours during which sending is permitted. A promotional message at 3am is a
+            complaint waiting to happen.
+          properties:
+            startTime: { type: string }
+            endTime: { type: string }
+            timeZone: { type: string }
+
+    Campaign:
+      x-ticvai-persistence: "marketing.campaign"
+      allOf:
+        - $ref: '#/components/schemas/CreateCampaignRequest'
+        - type: object
+          required: [id, status, createdAt]
+          properties:
+            id: { type: string, format: uuid }
+            status: { $ref: '#/components/schemas/CampaignStatus' }
+            isPaused: { type: boolean }
+            createdByPrincipalId: { type: string, format: uuid }
+            createdAt: { type: string, format: date-time }
+            launchedAt: { type: string, format: date-time, nullable: true }
+            completedAt: { type: string, format: date-time, nullable: true }
+
+    CampaignDetail:
+      x-ticvai-persistence: "marketing.campaign"
+      allOf:
+        - $ref: '#/components/schemas/Campaign'
+        - type: object
+          properties:
+            performance: { $ref: '#/components/schemas/CampaignPerformance' }
+
+    LaunchResult:
+      x-ticvai-persistence: "none — computed"
+      type: object
+      required: [campaignId, audienceSize, queuedCount, excluded]
+      properties:
+        campaignId: { type: string, format: uuid }
+        audienceSize: { type: integer }
+        queuedCount: { type: integer }
+        excluded:
+          type: array
+          description: Why each excluded guest was excluded, in aggregate.
+          items:
+            type: object
+            properties:
+              reason:
+                type: string
+                enum: [noConsent, consentRequiresRenewal, suppressed, noAddress, frequencyCap, outsideSendWindow]
+              count: { type: integer }
+        scheduledFor: { type: string, format: date-time, nullable: true }
+
+    CampaignPerformance:
+      x-ticvai-persistence: "none — aggregated from dispatch"
+      type: object
+      required: [campaignId, sent, delivered]
+      properties:
+        campaignId: { type: string, format: uuid }
+        sent: { type: integer }
+        delivered: { type: integer }
+        opened: { type: integer }
+        clicked: { type: integer }
+        bounced: { type: integer }
+        complained: { type: integer }
+        unsubscribed: { type: integer }
+        attributedOrders: { type: integer }
+        attributedRevenue: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+        attributionWindowDays: { type: integer }
+
+    MessageTemplate:
+      x-ticvai-persistence: "marketing.message_template"
+      type: object
+      required: [id, code, name, channel, bodies]
+      properties:
+        id: { type: string, format: uuid }
+        code: { type: string, maxLength: 64 }
+        name: { type: string, maxLength: 200 }
+        channel: { $ref: '#/components/schemas/MessageChannel' }
+        subjects:
+          type: object
+          description: Per language. Email only.
+          additionalProperties: { type: string }
+        bodies:
+          type: object
+          description: Per language, keyed by ISO 639-1 code.
+          additionalProperties: { type: string }
+        mergeFields:
+          type: array
+          items: { type: string }
+        missingLanguages:
+          type: array
+          readOnly: true
+          description: >
+            Enabled languages without a body. Flagged rather than silently falling back — a
+            guest receiving English when they chose Arabic is a defect.
+          items: { type: string }
+        providerTemplateId:
+          type: string
+          nullable: true
+          description: Required for WhatsApp, where templates are pre-approved by the provider.
+
+    MessageDispatch:
+      x-ticvai-persistence: "marketing.message_dispatch"
+      type: object
+      required: [id, subjectId, channel, status, queuedAt]
+      properties:
+        id: { type: string }
+        subjectId: { type: string, format: uuid }
+        campaignId: { type: string, format: uuid, nullable: true }
+        channel: { $ref: '#/components/schemas/MessageChannel' }
+        templateId: { type: string, format: uuid }
+        status:
+          type: string
+          enum: [queued, sent, delivered, opened, clicked, bounced, failed, suppressed]
+        failureReason: { type: string, nullable: true }
+        providerReference: { type: string, nullable: true }
+        queuedAt: { type: string, format: date-time }
+        deliveredAt: { type: string, format: date-time, nullable: true }
+
+    CaseStatus:
+      type: string
+      enum: [open, inProgress, awaitingGuest, escalated, resolved, closed]
+
+    CasePriority:
+      type: string
+      enum: [low, normal, high, urgent]
+
+    CreateCaseRequest:
+      x-ticvai-persistence: "none — request only"
+      type: object
+      required: [id, subject, description, channel, recordedAt]
+      properties:
+        id: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+        subjectId: { type: string, format: uuid }
+        subject: { type: string, maxLength: 200 }
+        description: { type: string, maxLength: 10000 }
+        categoryId: { type: string, format: uuid }
+        priority:
+          allOf:
+            - $ref: '#/components/schemas/CasePriority'
+          default: normal
+        channel: { $ref: '#/components/schemas/MessageChannel' }
+        venueId: { type: string, format: uuid }
+        relatedOrderId: { type: string }
+        attachmentRefs:
+          type: array
+          items: { type: string }
+        recordedAt: { type: string, format: date-time }
+
+    Case:
+      x-ticvai-persistence: "marketing.case"
+      type: object
+      required: [id, caseNumber, subject, status, priority, createdAt]
+      properties:
+        id: { type: string }
+        caseNumber: { type: string }
+        subjectId: { type: string, format: uuid, nullable: true }
+        guestName: { type: string, nullable: true }
+        subject: { type: string }
+        categoryId: { type: string, format: uuid, nullable: true }
+        status: { $ref: '#/components/schemas/CaseStatus' }
+        priority: { $ref: '#/components/schemas/CasePriority' }
+        assignedToPrincipalId: { type: string, format: uuid, nullable: true }
+        venueId: { type: string, format: uuid, nullable: true }
+        relatedOrderId: { type: string, nullable: true }
+        slaDueAt: { type: string, format: date-time, nullable: true }
+        isSlaBreached: { type: boolean }
+        slaPausedSeconds:
+          type: integer
+          description: >
+            Accrued only while awaiting the guest. Waiting on an internal team does not pause
+            the clock.
+        escalationCount: { type: integer }
+        createdAt: { type: string, format: date-time }
+        resolvedAt: { type: string, format: date-time, nullable: true }
+
+    CaseDetail:
+      x-ticvai-persistence: "marketing.case"
+      allOf:
+        - $ref: '#/components/schemas/Case'
+        - type: object
+          properties:
+            description: { type: string }
+            resolutionNote: { type: string, nullable: true }
+            messages:
+              type: array
+              items: { $ref: '#/components/schemas/CaseMessage' }
+
+    CaseMessage:
+      x-ticvai-persistence: "marketing.case_message"
+      type: object
+      required: [id, body, isInternal, authorKind, recordedAt]
+      properties:
+        id: { type: string }
+        body: { type: string }
+        isInternal: { type: boolean }
+        authorKind:
+          type: string
+          enum: [agent, guest, system, ai]
+        authorPrincipalId: { type: string, format: uuid, nullable: true }
+        channel: { $ref: '#/components/schemas/MessageChannel' }
+        attachmentRefs:
+          type: array
+          items: { type: string }
+        recordedAt: { type: string, format: date-time }
+
+    LoyaltyProgramme:
+      x-ticvai-persistence: "marketing.loyalty_programme + marketing.loyalty_tier"
+      type: object
+      required: [id, code, name, earnRules, tiers]
+      properties:
+        id: { type: string, format: uuid }
+        code: { type: string }
+        name: { type: string }
+        venueId: { type: string, format: uuid, nullable: true }
+        pointsLiabilityAccountId:
+          type: string
+          format: uuid
+          description: >
+            Points post here on accrual. They are a liability from the moment they are
+            earned, not from the moment they are spent.
+        earnRules:
+          type: array
+          items:
+            type: object
+            required: [trigger, points]
+            properties:
+              trigger:
+                type: string
+                enum: [perCurrencyUnit, perVisit, perProduct, onSignup, onBirthday, onReview]
+              points: { type: number }
+              productKinds:
+                type: array
+                items: { type: string }
+              multiplier: { type: number }
+        tiers:
+          type: array
+          items:
+            type: object
+            required: [code, name, thresholdPoints]
+            properties:
+              code: { type: string }
+              name: { type: string }
+              thresholdPoints: { type: integer }
+              benefits:
+                type: array
+                items: { type: string }
+              earnMultiplier: { type: number }
+        pointsExpireAfterMonths: { type: integer, nullable: true }
+        isActive: { type: boolean }
+
+    LoyaltyPosition:
+      x-ticvai-persistence: "marketing.loyalty_position"
+      type: object
+      required: [subjectId, programmeId, pointsBalance, tierCode]
+      properties:
+        subjectId: { type: string, format: uuid }
+        programmeId: { type: string, format: uuid }
+        pointsBalance: { type: integer }
+        lifetimePoints: { type: integer }
+        tierCode: { type: string }
+        tierName: { type: string }
+        pointsToNextTier: { type: integer, nullable: true }
+        nextExpiryPoints: { type: integer, nullable: true }
+        nextExpiryAt: { type: string, format: date-time, nullable: true }
+
+    SubmitReviewRequest:
+      x-ticvai-persistence: "none — request only"
+      type: object
+      required: [id, rating, venueId, recordedAt]
+      properties:
+        id: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+        subjectId: { type: string, format: uuid }
+        venueId: { type: string, format: uuid }
+        relatedOrderId: { type: string }
+        rating: { type: integer, minimum: 1, maximum: 5 }
+        body: { type: string, maxLength: 5000 }
+        aspects:
+          type: array
+          description: Aspect chips — exhibitions, staff, cleanliness, food, value.
+          items: { type: string }
+        recordedAt: { type: string, format: date-time }
+
+    Review:
+      x-ticvai-persistence: "marketing.review"
+      allOf:
+        - $ref: '#/components/schemas/SubmitReviewRequest'
+        - type: object
+          required: [status]
+          properties:
+            status:
+              type: string
+              enum: [pendingModeration, published, hidden, rejected]
+            response: { type: string, nullable: true }
+            responseIsPublic: { type: boolean }
+            respondedByPrincipalId: { type: string, format: uuid, nullable: true }
+            openedCaseId:
+              type: string
+              nullable: true
+              description: >
+                Case raised automatically where the rating fell below the venue's threshold.
+                Feedback that goes nowhere is worse than no feedback mechanism.
+
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

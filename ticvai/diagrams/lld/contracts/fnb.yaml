@@ -1,0 +1,1427 @@
+id: LLD-fnb
+title: fnb — 99 operations
+generatedBy: tools/derive-diagrams.py
+index: diagrams/hld/03-contracts.yaml
+tier: satellite
+service: FnbService
+operations:
+- operation: acceptFnbOrder
+  verb: POST
+  path: /fnb-orders/{orderId}/accept
+  scope: venue
+  permission: ORDER_MODIFY
+  audience:
+  - staff
+  offline: true
+  reads:
+  - cache:idempotency
+  - fnb.fnb_order
+  writes:
+  - cache:idempotency
+  - fnb.fnb_order
+- operation: amendFnbOrder
+  verb: PATCH
+  path: /fnb-orders/{orderId}
+  scope: venue
+  permission: ORDER_MODIFY
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - fnb.fnb_order
+  writes:
+  - cache:idempotency
+  - fnb.fnb_order
+- operation: applyMenuActions
+  verb: POST
+  path: /menus/{menuId}/actions
+  scope: venue
+  permission: PRODUCT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - catalogue.price
+  - fnb.menu
+  - fnb.menu_item
+  writes:
+  - cache:idempotency
+  - cache:resolution
+  - catalogue.price
+  - fnb.menu_item
+- operation: attachModifierGroup
+  verb: PUT
+  path: /menu-items/{menuItemId}/modifier-groups
+  scope: venue
+  permission: PRODUCT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - fnb.menu_item
+  - fnb.modifier_group
+  writes:
+  - cache:idempotency
+  - cache:resolution
+  - fnb.menu_item
+- operation: buildProductionPlan
+  verb: POST
+  path: /production-plans
+  scope: venue
+  permission: PRODUCT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - ai.suggestion
+  - cache:idempotency
+  - fnb.menu_item
+  - fnb.recipe
+  writes:
+  - cache:idempotency
+  - fnb.production_plan
+- operation: cancelFnbOrder
+  verb: POST
+  path: /fnb-orders/{orderId}/cancel
+  scope: venue
+  permission: ORDER_MODIFY
+  audience:
+  - staff
+  offline: true
+  reads:
+  - cache:idempotency
+  - fnb.fnb_order
+  writes:
+  - cache:idempotency
+  - fnb.fnb_order
+- operation: chaseStation
+  verb: POST
+  path: /kitchen-stations/{stationId}/chase
+  scope: venue
+  permission: ORDER_MODIFY
+  audience:
+  - staff
+  offline: true
+  reads:
+  - cache:idempotency
+  - fnb.kitchen_station
+  - fnb.kitchen_ticket
+  writes:
+  - cache:idempotency
+  - fnb.kitchen_exception
+- operation: claimLocationSession
+  verb: POST
+  path: /location-sessions
+  scope: venue
+  permission: null
+  audience:
+  - guest
+  offline: false
+  reads:
+  - cache:idempotency
+  - fnb.location_session
+  writes:
+  - cache:idempotency
+  - fnb.location_session
+- operation: claimTableSession
+  verb: POST
+  path: /table-sessions
+  scope: venue
+  permission: null
+  audience:
+  - guest
+  offline: false
+  reads:
+  - cache:idempotency
+  - fnb.table_session
+  writes:
+  - cache:idempotency
+  - fnb.table_session
+- operation: clearTable
+  verb: POST
+  path: /tables/{tableId}/clear
+  scope: venue
+  permission: ORDER_MODIFY
+  audience:
+  - staff
+  offline: true
+  reads:
+  - cache:idempotency
+  - fnb.table
+  writes:
+  - cache:idempotency
+  - fnb.table
+- operation: closeCorrectiveAction
+  verb: POST
+  path: /food-safety/corrective-actions/{actionId}/close
+  scope: venue
+  permission: INCIDENT_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - fnb.corrective_action
+  - identity.principal
+  writes:
+  - cache:idempotency
+  - fnb.corrective_action
+- operation: closeTableVisit
+  verb: POST
+  path: /table-visits/{visitId}/close
+  scope: workstation
+  permission: ORDER_CREATE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - fnb.fnb_order
+  - fnb.table_visit
+  writes:
+  - cache:idempotency
+  - fnb.fnb_order
+  - fnb.table_visit
+- operation: compItem
+  verb: POST
+  path: /table-visits/{visitId}/comp
+  scope: venue
+  permission: ORDER_MODIFY
+  audience:
+  - staff
+  offline: true
+  reads:
+  - cache:idempotency
+  - fnb.table_visit
+  - orders.order_line
+  writes:
+  - cache:idempotency
+  - orders.order_discount
+  - orders.order_line
+- operation: completeProductionRun
+  verb: POST
+  path: /production-runs/{runId}/complete
+  scope: venue
+  permission: FNB_MANAGE
+  audience:
+  - staff
+  offline: true
+  reads:
+  - cache:idempotency
+  - fnb.production_run
+  - fnb.recipe
+  writes:
+  - cache:idempotency
+  - fnb.production_run
+  - inventory.movement
+- operation: createCombo
+  verb: POST
+  path: /combos
+  scope: venue
+  permission: PRODUCT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - catalogue.product
+  - fnb.menu_item
+  writes:
+  - cache:idempotency
+  - fnb.combo
+  - fnb.combo_slot
+- operation: createFnbOrder
+  verb: POST
+  path: /fnb-orders
+  scope: workstation
+  permission: ORDER_CREATE
+  audience:
+  - staff
+  offline: true
+  reads:
+  - cache:idempotency
+  - fnb.fnb_order
+  writes:
+  - cache:idempotency
+  - fnb.fnb_order
+- operation: createGuestFnbOrder
+  verb: POST
+  path: /guest-orders
+  scope: venue
+  permission: null
+  audience:
+  - guest
+  offline: false
+  reads:
+  - cache:idempotency
+  - fnb.location_session
+  - fnb.menu_item
+  - inventory.stock_level
+  writes:
+  - cache:idempotency
+  - fnb.fnb_order
+  - fnb.kitchen_ticket
+- operation: createMenu
+  verb: POST
+  path: /menus
+  scope: venue
+  permission: PRODUCT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - fnb.menu
+  - fnb.menu_item
+  - fnb.menu_section
+  writes:
+  - cache:idempotency
+  - fnb.menu
+  - fnb.menu_item
+  - fnb.menu_section
+- operation: createModifierGroup
+  verb: POST
+  path: /modifier-groups
+  scope: venue
+  permission: PRODUCT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - fnb.modifier_group
+  writes:
+  - cache:idempotency
+  - fnb.modifier_group
+- operation: createTable
+  verb: POST
+  path: /tables
+  scope: venue
+  permission: PRODUCT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  writes:
+  - cache:idempotency
+  - cache:resolution
+  - fnb.table
+- operation: createTableReservation
+  verb: POST
+  path: /table-reservations
+  scope: venue
+  permission: null
+  audience:
+  - guest
+  offline: false
+  reads:
+  - cache:idempotency
+  - fnb.table
+  - fnb.table_reservation
+  writes:
+  - cache:idempotency
+  - fnb.table_reservation
+- operation: enterCountLine
+  verb: POST
+  path: /stock-counts/{countId}/lines
+  scope: venue
+  permission: PRODUCT_CONFIGURE
+  audience:
+  - staff
+  offline: true
+  reads:
+  - cache:idempotency
+  - inventory.item
+  - inventory.movement
+  writes:
+  - cache:idempotency
+- operation: escalateCorrectiveAction
+  verb: POST
+  path: /food-safety/corrective-actions/{actionId}/escalate
+  scope: venue
+  permission: INCIDENT_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - fnb.corrective_action
+  - identity.principal
+  writes:
+  - cache:idempotency
+  - fnb.corrective_action
+- operation: fireCourse
+  verb: POST
+  path: /kitchen-tickets/{ticketId}/fire
+  scope: venue
+  permission: ORDER_MODIFY
+  audience:
+  - staff
+  offline: true
+  reads:
+  - cache:idempotency
+  - fnb.kitchen_ticket
+  writes:
+  - cache:idempotency
+  - fnb.kitchen_ticket
+- operation: getBill
+  verb: GET
+  path: /table-visits/{visitId}/bill
+  scope: venue
+  permission: ORDER_VIEW
+  audience:
+  - staff
+  offline: true
+  reads:
+  - fnb.fnb_order
+  - fnb.table_session
+  - orders.payment
+  writes: []
+- operation: getFnbOrder
+  verb: GET
+  path: /fnb-orders/{orderId}
+  scope: venue
+  permission: ORDER_VIEW
+  audience:
+  - staff
+  offline: true
+  reads:
+  - fnb.fnb_order
+  writes: []
+- operation: getGuestBill
+  verb: GET
+  path: /table-sessions/{sessionId}/bill
+  scope: venue
+  permission: null
+  audience:
+  - guest
+  offline: false
+  reads:
+  - fnb.fnb_order
+  - fnb.table_session
+  - orders.payment
+  writes: []
+- operation: getGuestMenu
+  verb: GET
+  path: /outlets/{outletId}/guest-menu
+  scope: venue
+  permission: null
+  audience:
+  - guest
+  offline: true
+  reads:
+  - fnb.modifier_group
+  writes: []
+- operation: getGuestOrderStatus
+  verb: GET
+  path: /guest-orders/{orderId}
+  scope: venue
+  permission: null
+  audience:
+  - guest
+  offline: false
+  reads:
+  - fnb.delivery_location
+  - fnb.fnb_order
+  - fnb.kitchen_ticket
+  writes: []
+- operation: getHaccpStatus
+  verb: GET
+  path: /food-safety/status
+  scope: venue
+  permission: INCIDENT_VIEW
+  audience:
+  - staff
+  offline: true
+  reads:
+  - fnb.cold_chain_event
+  - fnb.corrective_action
+  - fnb.temperature_log
+  writes: []
+- operation: getMenu
+  verb: GET
+  path: /menus/{menuId}
+  scope: venue
+  permission: PRODUCT_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - fnb.menu
+  - fnb.menu_item
+  - fnb.menu_section
+  writes: []
+- operation: getProductionRun
+  verb: GET
+  path: /production-runs/{runId}
+  scope: venue
+  permission: PRODUCT_VIEW
+  audience:
+  - staff
+  offline: true
+  reads:
+  - fnb.production_run
+  - fnb.recipe
+  - inventory.movement
+  writes: []
+- operation: getTableMap
+  verb: GET
+  path: /outlets/{outletId}/tables
+  scope: venue
+  permission: ORDER_VIEW
+  audience:
+  - staff
+  offline: true
+  reads:
+  - fnb.table
+  writes: []
+- operation: getTableVisit
+  verb: GET
+  path: /table-visits/{visitId}
+  scope: venue
+  permission: ORDER_VIEW
+  audience:
+  - staff
+  offline: true
+  reads:
+  - fnb.fnb_order
+  - fnb.table_visit
+  writes: []
+- operation: holdCourse
+  verb: POST
+  path: /kitchen-tickets/{ticketId}/hold
+  scope: venue
+  permission: ORDER_MODIFY
+  audience:
+  - staff
+  offline: true
+  reads:
+  - cache:idempotency
+  - fnb.kitchen_ticket
+  writes:
+  - cache:idempotency
+  - fnb.kitchen_ticket
+- operation: joinRestaurantWaitlist
+  verb: POST
+  path: /waitlist
+  scope: venue
+  permission: FNB_SERVE
+  audience:
+  - staff
+  - guest
+  offline: true
+  reads:
+  - cache:idempotency
+  - fnb.table
+  - platform.outlet
+  writes:
+  - cache:idempotency
+  - fnb.waitlist_entry
+- operation: list86Events
+  verb: GET
+  path: /outlets/{outletId}/86-events
+  scope: venue
+  permission: PRODUCT_VIEW
+  audience:
+  - staff
+  offline: true
+  reads:
+  - fnb.eighty_six_event
+  - fnb.menu_item
+  writes: []
+- operation: listDeliveryLocations
+  verb: GET
+  path: /venues/{venueId}/delivery-locations
+  scope: venue
+  permission: null
+  audience:
+  - guest
+  offline: true
+  reads:
+  - fnb.delivery_location
+  writes: []
+- operation: listDiningOutlets
+  verb: GET
+  path: /venues/{venueId}/dining
+  scope: venue
+  permission: null
+  audience:
+  - guest
+  offline: false
+  reads:
+  - fnb.fnb_order
+  - fnb.menu
+  - platform.outlet
+  writes: []
+- operation: listFnbOrders
+  verb: GET
+  path: /fnb-orders
+  scope: venue
+  permission: ORDER_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - fnb.fnb_order
+  writes: []
+- operation: listKitchenStations
+  verb: GET
+  path: /kitchen/stations
+  scope: venue
+  permission: PRODUCT_VIEW
+  audience:
+  - staff
+  offline: true
+  reads:
+  - fnb.kitchen_station
+  writes: []
+- operation: listKitchenTickets
+  verb: GET
+  path: /kitchen/tickets
+  scope: venue
+  permission: ORDER_VIEW
+  audience:
+  - staff
+  offline: true
+  reads:
+  - fnb.kitchen_ticket
+  writes: []
+- operation: listMenus
+  verb: GET
+  path: /menus
+  scope: venue
+  permission: PRODUCT_VIEW
+  audience:
+  - staff
+  offline: true
+  reads:
+  - fnb.menu
+  - fnb.menu_section
+  writes: []
+- operation: listModifierGroups
+  verb: GET
+  path: /modifier-groups
+  scope: venue
+  permission: PRODUCT_VIEW
+  audience:
+  - staff
+  - guest
+  offline: true
+  reads:
+  - fnb.modifier_group
+  writes: []
+- operation: listProductionRuns
+  verb: GET
+  path: /production-runs
+  scope: venue
+  permission: PRODUCT_VIEW
+  audience:
+  - staff
+  offline: true
+  reads:
+  - fnb.production_run
+  - fnb.recipe
+  - inventory.movement
+  writes: []
+- operation: listRecipes
+  verb: GET
+  path: /recipes
+  scope: venue
+  permission: PRODUCT_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - fnb.recipe
+  writes: []
+- operation: listTableReservations
+  verb: GET
+  path: /table-reservations
+  scope: venue
+  permission: FNB_OPERATE
+  audience:
+  - staff
+  offline: true
+  reads:
+  - fnb.table
+  - fnb.table_reservation
+  writes: []
+- operation: logColdChain
+  verb: POST
+  path: /food-safety/cold-chain
+  scope: venue
+  permission: INCIDENT_REPORT
+  audience:
+  - staff
+  offline: true
+  reads:
+  - cache:idempotency
+  - fnb.cold_chain_event
+  - inventory.goods_receipt
+  writes:
+  - cache:idempotency
+  - fnb.cold_chain_event
+  - fnb.corrective_action
+- operation: logKitchenException
+  verb: POST
+  path: /kitchen-exceptions
+  scope: venue
+  permission: INCIDENT_REPORT
+  audience:
+  - staff
+  offline: true
+  reads:
+  - cache:idempotency
+  - fnb.kitchen_station
+  writes:
+  - cache:idempotency
+  - fnb.kitchen_exception
+- operation: logTemperature
+  verb: POST
+  path: /food-safety/temperature-logs
+  scope: venue
+  permission: INCIDENT_REPORT
+  audience:
+  - staff
+  offline: true
+  reads:
+  - cache:idempotency
+  - fnb.temperature_log
+  - platform.scope_node
+  writes:
+  - cache:idempotency
+  - fnb.corrective_action
+  - fnb.temperature_log
+- operation: markOrderCollected
+  verb: POST
+  path: /orders/{orderId}/collected
+  scope: venue
+  permission: ORDER_MODIFY
+  audience:
+  - staff
+  offline: true
+  reads:
+  - cache:idempotency
+  - fnb.fnb_order
+  - fnb.kitchen_ticket
+  writes:
+  - cache:idempotency
+  - fnb.fnb_order
+  - fnb.kitchen_ticket
+- operation: mergeTableVisits
+  verb: POST
+  path: /table-visits/{visitId}/merge
+  scope: venue
+  permission: ORDER_MODIFY
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - fnb.fnb_order
+  - fnb.table_visit
+  writes:
+  - cache:idempotency
+  - fnb.fnb_order
+  - fnb.table_visit
+- operation: moveTableVisit
+  verb: POST
+  path: /table-visits/{visitId}/move
+  scope: venue
+  permission: ORDER_MODIFY
+  audience:
+  - staff
+  offline: true
+  reads:
+  - cache:idempotency
+  - fnb.kitchen_ticket
+  - fnb.table
+  - fnb.table_visit
+  writes:
+  - cache:idempotency
+  - fnb.kitchen_ticket
+  - fnb.table_visit
+- operation: notifyServer
+  verb: POST
+  path: /table-visits/{visitId}/notify-server
+  scope: venue
+  permission: ORDER_MODIFY
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - fnb.table_visit
+  - identity.principal
+  writes:
+  - cache:idempotency
+  - marketing.message_dispatch
+- operation: notifyWaitlistParty
+  verb: POST
+  path: /waitlist/{entryId}/notify
+  scope: venue
+  permission: ORDER_MODIFY
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - pii.subject
+  writes:
+  - cache:idempotency
+  - marketing.message_dispatch
+- operation: openTableVisit
+  verb: POST
+  path: /table-visits
+  scope: workstation
+  permission: ORDER_CREATE
+  audience:
+  - staff
+  offline: true
+  reads:
+  - cache:idempotency
+  - fnb.fnb_order
+  - fnb.table_visit
+  writes:
+  - cache:idempotency
+  - fnb.fnb_order
+  - fnb.table_visit
+- operation: planProductionRun
+  verb: POST
+  path: /production-runs
+  scope: venue
+  permission: FNB_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - fnb.recipe
+  - inventory.stock_level
+  - platform.outlet
+  writes:
+  - cache:idempotency
+  - fnb.production_run
+- operation: printOrderLabel
+  verb: POST
+  path: /kitchen-tickets/{ticketId}/label
+  scope: venue
+  permission: ORDER_VIEW
+  audience:
+  - staff
+  offline: true
+  reads:
+  - fnb.kitchen_ticket
+  writes: []
+- operation: prioritiseKitchenTicket
+  verb: POST
+  path: /kitchen/tickets/{ticketId}/prioritise
+  scope: venue
+  permission: ORDER_MODIFY
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - fnb.kitchen_ticket
+  writes:
+  - cache:idempotency
+  - fnb.kitchen_ticket
+- operation: publishMenu
+  verb: POST
+  path: /menus/{menuId}/publish
+  scope: venue
+  permission: PRODUCT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - fnb.menu
+  - fnb.menu_section
+  writes:
+  - cache:idempotency
+  - cache:resolution
+  - catalogue.product_version
+  - fnb.menu
+- operation: quoteWaitTime
+  verb: POST
+  path: /waitlist/{entryId}/quote
+  scope: venue
+  permission: ORDER_MODIFY
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - fnb.table
+  - fnb.table_visit
+  writes:
+  - cache:idempotency
+- operation: reassignServer
+  verb: PUT
+  path: /table-visits/{visitId}/server
+  scope: venue
+  permission: ORDER_MODIFY
+  audience:
+  - staff
+  offline: true
+  reads:
+  - cache:idempotency
+  - fnb.table_visit
+  - identity.principal
+  writes:
+  - cache:idempotency
+  - fnb.table_visit
+- operation: rebalanceStationLoad
+  verb: POST
+  path: /kitchen-stations/rebalance
+  scope: venue
+  permission: PRODUCT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - fnb.kitchen_station
+  writes:
+  - cache:idempotency
+  - cache:resolution
+  - fnb.kitchen_station
+- operation: recallKitchenTicket
+  verb: POST
+  path: /kitchen-tickets/{ticketId}/recall
+  scope: venue
+  permission: ORDER_MODIFY
+  audience:
+  - staff
+  offline: true
+  reads:
+  - cache:idempotency
+  - fnb.kitchen_ticket
+  writes:
+  - cache:idempotency
+  - fnb.kitchen_ticket
+- operation: recordCorrectiveAction
+  verb: POST
+  path: /food-safety/corrective-actions/{actionId}/action
+  scope: venue
+  permission: INCIDENT_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - fnb.corrective_action
+  - identity.principal
+  writes:
+  - cache:idempotency
+  - fnb.corrective_action
+- operation: recordOrderHandover
+  verb: POST
+  path: /guest-orders/{orderId}/delivery
+  scope: venue
+  permission: ORDER_MODIFY
+  audience:
+  - staff
+  offline: true
+  reads:
+  - cache:idempotency
+  - fnb.delivery_location
+  - fnb.fnb_order
+  writes:
+  - cache:idempotency
+  - fnb.fnb_order
+- operation: recordWaste
+  verb: POST
+  path: /outlets/{outletId}/waste
+  scope: venue
+  permission: ORDER_MODIFY
+  audience:
+  - staff
+  offline: true
+  reads:
+  - cache:idempotency
+  - fnb.menu_item
+  - platform.outlet
+  writes:
+  - cache:idempotency
+  - inventory.movement
+- operation: refireItem
+  verb: POST
+  path: /kitchen-tickets/{ticketId}/refire
+  scope: venue
+  permission: ORDER_MODIFY
+  audience:
+  - staff
+  offline: true
+  reads:
+  - cache:idempotency
+  - fnb.kitchen_ticket
+  - fnb.kitchen_ticket_line
+  writes:
+  - cache:idempotency
+  - fnb.kitchen_ticket_line
+  - inventory.movement
+- operation: releaseProductionPlan
+  verb: POST
+  path: /production-plans/{planId}/release
+  scope: venue
+  permission: PRODUCT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - fnb.production_plan
+  writes:
+  - cache:idempotency
+  - fnb.production_plan
+  - fnb.production_run
+- operation: requestBill
+  verb: POST
+  path: /table-visits/{visitId}/request-bill
+  scope: venue
+  permission: ORDER_MODIFY
+  audience:
+  - staff
+  offline: true
+  reads:
+  - cache:idempotency
+  - fnb.table_visit
+  writes:
+  - cache:idempotency
+  - fnb.table_visit
+- operation: requestRecount
+  verb: POST
+  path: /stock-counts/{countId}/recount
+  scope: venue
+  permission: PRODUCT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  writes:
+  - cache:idempotency
+- operation: resolveBookingConflict
+  verb: GET
+  path: /table-reservations/conflicts
+  scope: venue
+  permission: ORDER_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - fnb.table
+  - fnb.table_reservation
+  - fnb.table_visit
+  writes: []
+- operation: rollbackMenu
+  verb: POST
+  path: /menus/{menuId}/rollback
+  scope: venue
+  permission: PRODUCT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - fnb.menu
+  writes:
+  - cache:idempotency
+  - cache:resolution
+  - fnb.menu
+- operation: scheduleMenuPublish
+  verb: POST
+  path: /menus/{menuId}/schedule
+  scope: venue
+  permission: PRODUCT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - fnb.menu
+  writes:
+  - cache:idempotency
+  - cache:resolution
+  - fnb.menu
+- operation: seatTableReservation
+  verb: POST
+  path: /table-reservations/{reservationId}/seat
+  scope: venue
+  permission: FNB_OPERATE
+  audience:
+  - staff
+  offline: true
+  reads:
+  - cache:idempotency
+  - fnb.table
+  - fnb.table_reservation
+  writes:
+  - cache:idempotency
+  - fnb.table_reservation
+  - fnb.table_session
+  - fnb.table_visit
+- operation: sendBookingConfirmation
+  verb: POST
+  path: /table-reservations/{reservationId}/confirm
+  scope: venue
+  permission: ORDER_MODIFY
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - fnb.table_reservation
+  - pii.subject
+  writes:
+  - cache:idempotency
+  - fnb.table_reservation
+  - marketing.message_dispatch
+- operation: sendOrderNotification
+  verb: POST
+  path: /fnb-orders/{orderId}/notify
+  scope: venue
+  permission: ORDER_MODIFY
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - fnb.fnb_order
+  - pii.subject
+  writes:
+  - cache:idempotency
+  - marketing.message_dispatch
+- operation: setComboSlots
+  verb: PUT
+  path: /combos/{comboId}/slots
+  scope: venue
+  permission: PRODUCT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - fnb.combo
+  - fnb.menu_item
+  writes:
+  - cache:idempotency
+  - fnb.combo_slot
+- operation: setCourseRules
+  verb: PUT
+  path: /outlets/{outletId}/course-rules
+  scope: venue
+  permission: PRODUCT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  writes:
+  - cache:idempotency
+  - cache:resolution
+- operation: setItemAvailability
+  verb: PUT
+  path: /menu-items/{itemId}/availability
+  scope: venue
+  permission: PRODUCT_CONFIGURE
+  audience:
+  - staff
+  offline: true
+  reads:
+  - cache:idempotency
+  - fnb.menu_item
+  writes:
+  - cache:idempotency
+  - fnb.menu_item
+- operation: setKitchenSla
+  verb: PUT
+  path: /outlets/{outletId}/kitchen-sla
+  scope: venue
+  permission: PRODUCT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  writes:
+  - cache:idempotency
+  - cache:resolution
+- operation: setKitchenStations
+  verb: PUT
+  path: /kitchen/stations
+  scope: venue
+  permission: PRODUCT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - fnb.kitchen_station
+  writes:
+  - cache:idempotency
+  - fnb.kitchen_station
+- operation: setKitchenTicketStatus
+  verb: PUT
+  path: /kitchen/tickets/{ticketId}/status
+  scope: venue
+  permission: ORDER_MODIFY
+  audience:
+  - staff
+  offline: true
+  reads:
+  - cache:idempotency
+  - fnb.kitchen_ticket
+  writes:
+  - cache:idempotency
+  - fnb.kitchen_ticket
+- operation: setMenuSections
+  verb: PUT
+  path: /menus/{menuId}/sections
+  scope: venue
+  permission: PRODUCT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - fnb.menu
+  - fnb.menu_item
+  - fnb.menu_section
+  writes:
+  - cache:idempotency
+  - fnb.menu
+  - fnb.menu_item
+  - fnb.menu_section
+- operation: setRecipe
+  verb: PUT
+  path: /recipes
+  scope: venue
+  permission: PRODUCT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - fnb.recipe
+  writes:
+  - cache:idempotency
+  - fnb.recipe
+- operation: setSectionLayout
+  verb: PUT
+  path: /outlets/{outletId}/sections
+  scope: venue
+  permission: PRODUCT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - fnb.table
+  writes:
+  - cache:idempotency
+  - cache:resolution
+  - fnb.table
+- operation: setServiceStage
+  verb: PUT
+  path: /table-visits/{visitId}/stage
+  scope: venue
+  permission: ORDER_MODIFY
+  audience:
+  - staff
+  offline: true
+  reads:
+  - cache:idempotency
+  - fnb.table_visit
+  writes:
+  - cache:idempotency
+  - fnb.table_visit
+- operation: setSubstitutionRules
+  verb: PUT
+  path: /substitution-rules
+  scope: venue
+  permission: PRODUCT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - fnb.substitution_rule
+  writes:
+  - cache:idempotency
+  - cache:resolution
+  - fnb.substitution_rule
+- operation: setTableCombinations
+  verb: PUT
+  path: /outlets/{outletId}/table-combinations
+  scope: venue
+  permission: PRODUCT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - fnb.table
+  writes:
+  - cache:idempotency
+  - cache:resolution
+  - fnb.table
+- operation: setTableLayout
+  verb: PUT
+  path: /outlets/{outletId}/tables
+  scope: venue
+  permission: PRODUCT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - fnb.table
+  writes:
+  - cache:idempotency
+  - fnb.table
+- operation: signCorrectiveAction
+  verb: POST
+  path: /food-safety/corrective-actions/{actionId}/sign
+  scope: venue
+  permission: INCIDENT_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - fnb.corrective_action
+  - identity.principal
+  writes:
+  - cache:idempotency
+  - fnb.corrective_action
+- operation: splitBill
+  verb: POST
+  path: /table-visits/{visitId}/bill/split
+  scope: venue
+  permission: ORDER_MODIFY
+  audience:
+  - staff
+  offline: true
+  reads:
+  - cache:idempotency
+  - fnb.bill_split
+  writes:
+  - cache:idempotency
+  - fnb.bill_split
+- operation: transferOrderItems
+  verb: POST
+  path: /table-visits/{visitId}/transfer-items
+  scope: venue
+  permission: ORDER_MODIFY
+  audience:
+  - staff
+  offline: true
+  reads:
+  - cache:idempotency
+  - fnb.table_visit
+  - orders.order_line
+  writes:
+  - cache:idempotency
+  - fnb.table_visit
+  - orders.order_line
+- operation: transferTableVisit
+  verb: POST
+  path: /table-visits/{visitId}/transfer
+  scope: venue
+  permission: FNB_SERVE
+  audience:
+  - staff
+  offline: true
+  reads:
+  - cache:idempotency
+  - fnb.table_visit
+  - identity.principal
+  writes:
+  - cache:idempotency
+  - fnb.table_visit
+- operation: updateMenu
+  verb: PATCH
+  path: /menus/{menuId}
+  scope: venue
+  permission: PRODUCT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - fnb.menu
+  - fnb.menu_item
+  - fnb.menu_section
+  writes:
+  - cache:idempotency
+  - fnb.menu
+  - fnb.menu_item
+  - fnb.menu_section
+- operation: updateTable
+  verb: PUT
+  path: /tables/{tableId}
+  scope: venue
+  permission: PRODUCT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - fnb.table
+  - fnb.table_visit
+  writes:
+  - cache:idempotency
+  - cache:resolution
+  - fnb.table
+- operation: updateTableReservation
+  verb: PATCH
+  path: /table-reservations/{reservationId}
+  scope: venue
+  permission: null
+  audience:
+  - guest
+  offline: false
+  reads:
+  - cache:idempotency
+  - fnb.table_reservation
+  writes:
+  - cache:idempotency
+  - fnb.table_reservation
+- operation: updateTableVisit
+  verb: PATCH
+  path: /table-visits/{visitId}
+  scope: venue
+  permission: ORDER_MODIFY
+  audience:
+  - staff
+  offline: true
+  reads:
+  - cache:idempotency
+  - fnb.fnb_order
+  - fnb.table_visit
+  writes:
+  - cache:idempotency
+  - fnb.fnb_order
+  - fnb.table_visit
+- operation: verifyAllergens
+  verb: POST
+  path: /menu-items/{menuItemId}/verify-allergens
+  scope: venue
+  permission: PRODUCT_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - fnb.menu_item
+  - fnb.modifier_group
+  - fnb.recipe
+  - fnb.substitution_rule
+  writes: []

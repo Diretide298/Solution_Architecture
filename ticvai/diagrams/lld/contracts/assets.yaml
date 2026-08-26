@@ -1,0 +1,136 @@
+id: LLD-assets
+title: assets — 10 operations
+generatedBy: tools/derive-diagrams.py
+index: diagrams/hld/03-contracts.yaml
+tier: satellite
+service: VenueOpsService
+operations:
+- operation: completeUpload
+  verb: POST
+  path: /media/uploads/{uploadId}/complete
+  scope: venue
+  permission: ASSET_LIBRARY_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - assets.media_asset
+  - cache:idempotency
+  writes:
+  - assets.media_asset
+  - cache:idempotency
+- operation: createCollection
+  verb: POST
+  path: /media/collections
+  scope: venue
+  permission: ASSET_LIBRARY_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - assets.media_collection
+  - cache:idempotency
+  writes:
+  - assets.media_collection
+  - cache:idempotency
+- operation: createUpload
+  verb: POST
+  path: /media/uploads
+  scope: venue
+  permission: ASSET_LIBRARY_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - assets.media_upload
+  - cache:idempotency
+  writes:
+  - assets.media_upload
+  - cache:idempotency
+- operation: deleteMediaAsset
+  verb: DELETE
+  path: /media/{mediaId}
+  scope: venue
+  permission: ASSET_LIBRARY_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - assets.media_usage
+  - cache:idempotency
+  writes:
+  - assets.media_usage
+  - cache:idempotency
+- operation: getExpiringRights
+  verb: GET
+  path: /media/rights-expiring
+  scope: venue
+  permission: ASSET_LIBRARY_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - assets.media_asset
+  writes: []
+- operation: getMediaAsset
+  verb: GET
+  path: /media/{mediaId}
+  scope: venue
+  permission: ASSET_LIBRARY_VIEW
+  audience:
+  - staff
+  offline: true
+  reads:
+  - assets.media_asset
+  - assets.media_usage
+  writes: []
+- operation: listCollections
+  verb: GET
+  path: /media/collections
+  scope: venue
+  permission: ASSET_LIBRARY_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - assets.media_collection
+  writes: []
+- operation: replaceMediaAsset
+  verb: POST
+  path: /media/{mediaId}/replace
+  scope: venue
+  permission: ASSET_LIBRARY_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - assets.media_asset
+  - cache:idempotency
+  writes:
+  - assets.media_asset
+  - cache:idempotency
+- operation: searchMedia
+  verb: GET
+  path: /media
+  scope: venue
+  permission: ASSET_LIBRARY_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - assets.media_asset
+  writes: []
+- operation: updateMediaAsset
+  verb: PATCH
+  path: /media/{mediaId}
+  scope: venue
+  permission: ASSET_LIBRARY_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - assets.media_asset
+  - cache:idempotency
+  writes:
+  - assets.media_asset
+  - cache:idempotency

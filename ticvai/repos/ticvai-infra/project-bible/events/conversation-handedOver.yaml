@@ -1,0 +1,63 @@
+# conversation.handedOver v1 — published by marketing-crm
+# Checked by tools/check-states.py.
+
+name: conversation.handedOver
+version: 1
+publisher: marketing
+description: An assistant conversation was passed to a human agent.
+aggregate: conversation
+emittedWhen: ConversationState withAssistant to queued
+payload:
+- field: conversationId
+  type: uuid
+- field: channel
+  type: string
+- field: subjectId
+  type: uuid
+  notes: Null where the guest was never identified
+- field: venueId
+  type: uuid
+- field: reason
+  type: string
+  notes: '**Why the assistant could not finish.** The single most useful signal about whether it is
+    bounded correctly'
+- field: handoverSummary
+  type: string
+  notes: The assistant’s account of what the guest wants, so the agent opens with context
+- field: sentiment
+  type: string
+- field: assistantMessageCount
+  type: integer
+  notes: '**How long the guest spent with a bot before asking for a person** — a rising number is a
+    worsening experience'
+- field: queueId
+  type: uuid
+- field: handedOverAt
+  type: timestamp
+consumers:
+- context: marketing
+  purpose: Route to a queue and notify available agents. **The critical consumer** — a handover nobody
+    is told about is a guest waiting for somebody who does not know
+  idempotencyKey: conversationId
+  onFailure: retryThenDeadLetter
+  isCritical: true
+- context: ai
+  purpose: Feed the refusal reason back. **A rising handover rate on one reason is the assistant being
+    asked something it should be allowed to answer**
+  idempotencyKey: conversationId
+  onFailure: retry
+  isCritical: false
+- context: reporting
+  purpose: Containment rate — the proportion the assistant finished alone
+  idempotencyKey: conversationId
+  onFailure: retry
+  isCritical: false
+retention: Two years with the conversation
+notes: '**Containment rate is the number this event exists to produce**: the proportion of conversations
+  the assistant finishes without a person. It is what decides whether the concierge pays for its tokens
+  (CF-14).
+
+
+  **`reason` matters more than the count.** A hundred handovers for `outOfScope` means the capability
+  scope is too narrow; a hundred for `assistantFailed` means something is broken; a hundred for `guestRequested`
+  means guests do not trust it.'

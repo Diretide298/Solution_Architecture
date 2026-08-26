@@ -1,0 +1,187 @@
+$schema: ./_schema.yaml
+id: F34
+name: A retail sale, from scan to return
+actor: cashier
+capability: Retail selling, tender and returns
+wave: 1
+frequency: 'Every basket in every shop. **The return half is one in twenty** — and it is the half where
+  the money goes back out, which is why it sits in the same flow rather than its own.
+
+  '
+criticality: revenue
+primaryContract: retail
+contracts:
+- retail
+- orders
+- catalogue
+- promotions
+- subscription
+- inventory
+platforms:
+- P04
+- P08
+trigger:
+  description: 'A guest brings items to a till. **No booking, no reservation, no account** — retail
+    is the one path in this platform that starts with a person holding something.
+
+    '
+  operations:
+  - lookupMerchandise
+offlineBehaviour: '**Selling works offline; returning does not.** ADR-0013 makes the till local-first,
+  and `setOfflinePolicy` lists what may happen with no network.
+
+  **A refund is not on that list** — the original sale cannot be verified, and **an offline refund against
+  a sale that never synced is money given away against nothing.**
+
+  '
+steps:
+- step: 1
+  screen: POS-002
+  action: The cashier scans each item.
+  operations:
+  - lookupMerchandise
+  - addCartLine
+  outcome: '**A barcode, an RFID tag and a typed SKU resolve the same way.** The board called this `scanItem`;
+    a separate scan endpoint would report a different truth from the one the catalogue holds.
+
+    '
+- step: 2
+  screen: POS-002
+  action: The guest offers a membership card.
+  operations:
+  - identifyGuest
+  - getLoyaltyPosition
+  - evaluatePromotions
+  outcome: 'Member pricing applies. **Stacking is resolved at evaluation, not per line** — a promotion
+    applied per line and one applied per basket give different totals, and only one of them is what
+    the shelf edge promised.
+
+    '
+- step: 3
+  screen: POS-002
+  action: One line needs a discount above the cashier's limit.
+  operations:
+  - applyManualDiscount
+  - createApprovalRequest
+  outcome: '**Held for approval rather than refused.** A cashier who cannot discount will call a manager
+    to the till; **one who can discount without limit is a till nobody audits** — and the override-rate
+    alert watches the middle.
+
+    '
+- step: 4
+  screen: POS-005
+  action: The guest pays — part on loyalty points, the rest on a card.
+  operations:
+  - redeemLoyaltyPoints
+  - createPayment
+  - createRetailSale
+  outcome: '**Split tender is the ordinary case in retail**, not the edge. The sale completes when the
+    tenders sum to the total, and each tender is its own payment row.
+
+    '
+- step: 5
+  screen: POS-002
+  action: Stock moves — as a consequence of the sale, not as an act of the till.
+  operations: []
+  outcome: The movement is written by the service that owns the sale. **`inventory.stock_level` is derived
+    from movements**, and the level follows without anybody writing it.
+  note: '**The till does not call `createStockMovement` and this flow said it did.** Caught 24 August
+    when authoring operations were stripped from `POS-002`. **`createRetailSale` is the cause; the movement
+    is the effect**, written server-side — a till that writes its own stock movements is a till whose
+    movements can disagree with its sales.'
+- step: 6
+  screen: POS-011
+  action: Three days later the guest returns one item.
+  operations:
+  - lookupRetailSale
+  - getReturnPolicy
+  outcome: '**The policy is checked before the goods are accepted, not after.** A cashier who takes
+    the item and then finds it is outside the window has already lost the argument.
+
+    '
+- step: 7
+  screen: POS-011
+  action: Inside the window. A refund is issued to the original tender.
+  operations:
+  - createRetailReturn
+  - createRefund
+  outcome: '**To the original tender, and that is not a courtesy.** A card sale refunded in cash is
+    a money-laundering control failure, and the restriction belongs in the model rather than in a training
+    note.
+
+    '
+- step: 8
+  screen: BO-082
+  action: The returned item is dispositioned — resaleable, damaged, or back to the supplier.
+  operations:
+  - createStockMovement
+  crossesDevice: true
+  note: '**A handover, not a navigation.** The till took the item; a stock controller decides what happens
+    to it, and nobody taps from one to the other.
+
+    '
+  outcome: '**Three different movements, and only one of them is saleable stock.** A damaged return
+    that goes back on the shelf is the shrinkage a count finds three weeks later.
+
+    '
+branches:
+- at: 4
+  condition: The network drops mid-basket.
+  behaviour: '**The sale completes offline and journals.** A card payment still reaches the terminal
+    — the gateway is not the platform (CF-131) — and the order posts on sync. **What the till refuses
+    offline is step 7**, because the original sale cannot be verified.
+
+    '
+  severity: high
+  resolvedBy: setOfflinePolicy
+- at: 6
+  condition: The guest has no receipt.
+  behaviour: '`lookupRetailSale` by card token, by member, or by item and date. **A no-receipt return
+    is a policy question rather than a lookup failure** — `getReturnPolicy` says whether the venue allows
+    it and at what value.
+
+    '
+  severity: medium
+  resolvedBy: lookupRetailSale
+- at: 7
+  condition: The item is serialised.
+  behaviour: '**The serial must match the sale.** `listSerialisedItems` links the exact unit to the
+    order line it left on — which is the whole reason serialisation exists, and what stops a return
+    of an item bought somewhere else.
+
+    '
+  severity: medium
+  resolvedBy: listSerialisedItems
+- at: 2
+  condition: Two promotions apply and the venue forbids stacking.
+  behaviour: '**`evaluatePromotions` picks by priority and says which it applied and which it did not.**
+    A basket that silently drops the better offer is a complaint at the till.
+
+    '
+  severity: medium
+  resolvedBy: evaluatePromotions
+exitStates:
+- state: sold
+  description: Scanned, tendered, stock moved. **The ordinary basket.**
+- state: soldWithOverride
+  description: 'A discount above the cashier''s limit was approved. **A separate exit because the override
+    rate is the number a manager watches** — one till at 12% and the rest at 2% is a conversation.
+
+    '
+- state: returned
+  description: Refunded to the original tender and dispositioned.
+- state: refusedReturn
+  description: 'Outside the policy. **Recorded, because a refused return is a guest who may complain**
+    — and a venue with no record of refusing has no answer.
+
+    '
+notes: "**Written 24 August from the client Retail pack, boards 3 and 4.** 205 of the pack's 234 operations\
+  \ resolved to ones that already existed — retail sits on `catalogue`, `orders`, `inventory` and `promotions`,\
+  \ all built out for ticketing long before — **and no flow had walked a basket.**\n**Step 7 is the\
+  \ one to defend.** Refund to the original tender is not a convenience: a card sale refunded in cash\
+  \ is a laundering control failure, and putting it in the model means a venue cannot configure its\
+  \ way out of it.\n\n  **Corrected 24 August.** Step 5 named `createStockMovement` as an operation\
+  \ the till calls. It is not — the movement is a consequence of `createRetailSale`, written by the\
+  \ service. **Found by stripping authoring operations from the till while writing F58**, which is the\
+  \ second time this week that a flow and a screen disagreed and the screen was wrong."
+openQuestions: null

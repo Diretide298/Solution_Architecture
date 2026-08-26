@@ -1,0 +1,46 @@
+id: LLD-Fiscal period
+title: Fiscal period — 4 transitions
+generatedBy: tools/derive-diagrams.py
+index: diagrams/hld/04-lifecycles.yaml
+source: states/period.yaml
+entity: Fiscal period
+contract: finance
+enum: PeriodStatus
+enumKind: named
+enumSchema: PeriodStatus
+owner: ledger
+initial:
+- open
+terminal:
+- closed
+transitions:
+- from: open
+  to: closing
+  operation: closeFiscalPeriod
+  trigger: operation
+  guard: Close initiated. New postings to this period are refused from here
+- from: closing
+  to: open
+  operation: abandonPeriodClose
+  trigger: operation
+  guard: Close abandoned — an exception found that needs the period open
+  isReversal: true
+  requiresApproval: true
+- from: closing
+  to: closed
+  operation: closeFiscalPeriod
+  trigger: operation
+  guard: Reconciled, revalued, no open exceptions
+  requiresApproval: true
+  emits:
+  - ledger.periodClosed
+- from: closed
+  to: closing
+  operation: reopenPeriod
+  trigger: operation
+  guard: '**Rare and heavily controlled.** Reopening a closed period restates figures somebody has already
+    reported'
+  isReversal: true
+  requiresApproval: true
+notes: '`closing` exists so postings stop before reconciliation starts. Without it the balance moves
+  while being counted.'

@@ -1,0 +1,64 @@
+id: LLD-Message dispatch
+title: Message dispatch — 9 transitions
+generatedBy: tools/derive-diagrams.py
+index: diagrams/hld/04-lifecycles.yaml
+source: states/message-dispatch.yaml
+entity: Message dispatch
+contract: marketing-crm
+enum: MessageDispatch.status
+enumKind: inline
+enumSchema: MessageDispatch
+enumProperty: status
+owner: marketing-crm
+initial:
+- queued
+terminal:
+- clicked
+- bounced
+- failed
+- suppressed
+transitions:
+- from: queued
+  to: suppressed
+  trigger: job
+  guard: '**Checked before sending, not after.** Consent withdrawn, unsubscribed, or a hard bounce on
+    record — suppression after dispatch is a message already sent'
+- from: queued
+  to: sent
+  trigger: job
+  guard: Handed to the provider
+- from: sent
+  to: delivered
+  trigger: job
+  guard: The provider confirmed
+- from: sent
+  to: bounced
+  trigger: job
+  guard: '**Hard bounce suppresses the contact point permanently.** Continuing to send to a dead address
+    damages the sending domain for every other message'
+- from: delivered
+  to: opened
+  trigger: job
+  guard: Opened. Unreliable on email and honest about being so
+- from: opened
+  to: clicked
+  trigger: job
+  guard: Acted on. **The only reliable engagement signal**
+- from: delivered
+  to: clicked
+  trigger: job
+  guard: Clicked without a recorded open — normal where images are blocked
+- from: queued
+  to: failed
+  trigger: job
+  guard: The provider rejected it
+- from: sent
+  to: failed
+  trigger: job
+  guard: Never delivered and never bounced
+notes: '**`suppressed` is checked before dispatch.** A consent check that runs after sending is a compliance
+  record of a message that already arrived.
+
+
+  `opened` is unreliable by construction — image blocking means a real open often is not recorded. `clicked`
+  is the number to trust.'

@@ -1,0 +1,67 @@
+id: LLD-Invoice
+title: Invoice — 9 transitions
+generatedBy: tools/derive-diagrams.py
+index: diagrams/hld/04-lifecycles.yaml
+source: states/invoice.yaml
+entity: Invoice
+contract: subscription
+enum: InvoiceStatus
+enumKind: named
+enumSchema: InvoiceStatus
+owner: control
+initial:
+- draft
+terminal:
+- paid
+- cancelled
+transitions:
+- from: draft
+  to: issued
+  operation: generateInvoice
+  trigger: operation
+  guard: Sent to the tenant
+- from: issued
+  to: paid
+  operation: recordInvoicePayment
+  trigger: operation
+  guard: Settled
+- from: issued
+  to: overdue
+  trigger: timer
+  guard: Past terms. **Does not suspend anything by itself** — suspension is a commercial decision with
+    three modes, and access validation continues under all of them
+- from: overdue
+  to: paid
+  operation: recordInvoicePayment
+  trigger: operation
+  guard: Settled late
+- from: issued
+  to: disputed
+  operation: disputeInvoice
+  trigger: operation
+  guard: Tenant queried it. The clock stops
+- from: overdue
+  to: disputed
+  operation: disputeInvoice
+  trigger: operation
+  guard: Queried after falling overdue
+- from: disputed
+  to: issued
+  operation: resolveInvoiceDispute
+  trigger: operation
+  guard: Resolved in our favour
+  requiresApproval: true
+- from: disputed
+  to: cancelled
+  operation: cancelInvoice
+  trigger: operation
+  guard: Resolved in theirs. Credited, not deleted
+  isReversal: true
+  requiresApproval: true
+- from: draft
+  to: cancelled
+  operation: cancelInvoice
+  trigger: operation
+  guard: Raised in error
+notes: '`overdue` deliberately triggers nothing automatic. A venue whose gates stop because an invoice
+  slipped past terms over a weekend is a worse outcome than an unpaid week.'

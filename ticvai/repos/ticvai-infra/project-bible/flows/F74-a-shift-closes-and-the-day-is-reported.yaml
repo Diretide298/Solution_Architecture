@@ -1,0 +1,59 @@
+$schema: ./_schema.yaml
+id: F74
+name: A shift closes and the day is reported
+actor: venueManager
+capability: Till reporting
+wave: 2
+frequency: Routine.
+criticality: financial
+primaryContract: shift
+contracts:
+- shift
+- orders
+- reporting
+platforms:
+- P04
+trigger:
+  description: The venue is closing and somebody has to know what was taken.
+offlineBehaviour: '**Reporting needs the network.** A day report from one till is not a day.'
+steps:
+- step: 1
+  screen: POS-007
+  action: The shift closes and settles.
+  operations:
+  - closeShift
+  - acceptShiftVariance
+  - listDenominations
+  outcome: F32 walks this in detail; here it is the input to the day.
+- step: 2
+  screen: POS-008
+  action: The day is reported.
+  operations:
+  - runReport
+  outcome: '**`runReport` with a definition, not a bespoke endpoint.** `POS-008` declared `createReport`
+    and `updateReport` until 24 August — **a till that could author report definitions.**'
+  crossesDevice: true
+- step: 3
+  screen: POS-009
+  action: Staffing against takings is read.
+  operations:
+  - listRotaAssignments
+  - listShifts
+  outcome: '**Takings per staffed hour is the number a venue manager actually wants**, and it needs
+    both sides.'
+  crossesDevice: true
+branches:
+- at: 2
+  condition: A till has not closed yet.
+  behaviour: '**The day report says so rather than reporting a partial figure as a total.** A number
+    that quietly excludes a lane is worse than a number that is late.'
+  severity: high
+  resolvedBy: listShifts
+exitStates:
+- state: reported
+  description: All tills closed, day reported.
+- state: partial
+  description: '**Incomplete and labelled as such.**'
+notes: '**Written 24 August.** `POS-008` could create and update report definitions — removed. **A till
+  runs reports; it does not write them.**'
+openQuestions: null

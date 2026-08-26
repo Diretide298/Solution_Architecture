@@ -1,0 +1,159 @@
+$schema: ./_schema.yaml
+id: F32
+name: A till opens, trades and settles
+actor: cashier
+capability: Shift and cash lifecycle at a point of sale
+wave: 1
+frequency: >
+  Twice a day at every till in the venue. **The most-repeated journey in the platform after a
+  scan** — and the one where the money is counted.
+criticality: financial
+primaryContract: shift
+contracts: [shift, orders, tenancy, identity, approvals]
+platforms: [P04, P08]
+
+trigger:
+  description: >
+    A cashier arrives for a shift and signs into a till. **Nothing on this platform is navigated to
+    — a till is signed into**, which is why every entry state on P04 resolves from the session.
+  operations: [selectRole, openShift]
+
+offlineBehaviour: >
+  **Steps 3 to 6 work offline and the whole platform is built for it** (ADR-0013 local-first).
+  A till that stops selling because the network dropped is a queue at the door.
+
+  **Opening and settling do not.** An opening float declared offline is a float nobody can
+  reconcile against the safe, and **a settlement computed against a stale catalogue is a variance
+  that is not a variance.**
+
+steps:
+  - step: 1
+    screen: POS-001
+    action: The cashier signs in and picks their role for the shift.
+    operations: [selectRole, getWorkstationHealth]
+    outcome: >
+      **The readiness check runs before the float, not after.** A till with a dead printer or a
+      stale catalogue is a till that should not open — and finding that out after the cash is
+      counted means counting it twice.
+
+  - step: 2
+    screen: POS-001
+    action: They count the opening float into the drawer.
+    operations: [adjustDepositBoxFloat, listDenominations, openShift]
+    outcome: >
+      Shift `open`. **`listDenominations` orders the count for the drawer, not by value** — a
+      cashier counts notes highest first and coins as they sit in the tray, and a screen that
+      matches the physical drawer is counted faster and wrong less often.
+
+  - step: 3
+    screen: POS-002
+    action: The till pulls its catalogue and starts selling.
+    operations: [getLatestBundle, createOrder, createPayment]
+    outcome: >
+      **The bundle is the catalogue.** Wired to this screen on 24 August — ADR-0013 makes the POS
+      local-first and **no P04 screen polled for one**, so a published menu would have reached no
+      till.
+
+  - step: 4
+    screen: POS-013
+    action: A guest wants cash back and the drawer is heavy. A safe drop is recorded.
+    operations: [createCashMovement, withdrawFromDepositBox]
+    outcome: >
+      **The drawer never holds more than the venue's ceiling.** A safe drop mid-shift is a security
+      control, not bookkeeping, and it is recorded as a movement so the settlement adds up.
+
+  - step: 5
+    screen: POS-020
+    action: A no-sale is recorded — the drawer opened with nothing sold.
+    operations: [recordNoSale]
+    outcome: >
+      **Every drawer opening is accounted for.** A no-sale with no reason is the single most
+      reliable indicator of till theft, and it is recorded rather than prevented.
+
+  - step: 6
+    screen: POS-007
+    action: End of shift. The cashier counts the drawer.
+    operations: [listDenominations, listCashMovements]
+    outcome: >
+      Counted against expected. **Expected is float plus takings minus drops** — computed
+      server-side, never typed, because a cashier who can see the expected figure counts to it.
+
+  - step: 7
+    screen: POS-007
+    action: There is a variance of 40 dirhams short.
+    operations: [acceptShiftVariance, closeShift]
+    outcome: >
+      **The variance is accepted with a reason, not corrected.** A till that balances every night
+      is a till nobody is counting, and **a variance silently adjusted away is the shrinkage the
+      count exists to find.**
+
+  - step: 8
+    screen: BO-024
+    action: The supervisor reviews the shift and the deposit reconciles.
+    operations: [closeDepositBoxes, settleDeposit]
+    outcome: >
+      Cash to the safe, shift `closed`, and the ledger posted. **`shift` writes `ledger.entry`
+      here** — a till closing is a ledger act, which is why that cross-contract write is correct.
+
+branches:
+  - at: 1
+    condition: The workstation health check fails — a dead printer, a stale bundle.
+    behaviour: >
+      **The shift can still open with a manager's approval**, and the reason is recorded. A venue
+      with one working till on a Saturday opens it; **a system that refuses is a system somebody
+      works around by selling on paper.**
+    severity: medium
+    resolvedBy: approveShiftOpen
+
+  - at: 3
+    condition: The network drops mid-service.
+    behaviour: >
+      **The till keeps selling from its local journal** (ADR-0013). `setOfflinePolicy` bounds what
+      it may do and for how long: **a refund offline is refused because the original sale cannot be
+      verified**, and after `maxOfflineHours` it refuses new sales rather than keep journalling.
+    severity: high
+    resolvedBy: setOfflinePolicy
+
+  - at: 7
+    condition: The variance is above the venue's threshold.
+    behaviour: >
+      Routes through `createApprovalRequest` before the shift can close. **The same approval
+      mechanism as a stock write-off** — one path, different subjects.
+    severity: high
+    resolvedBy: createApprovalRequest
+
+  - at: 6
+    condition: The cashier's shift ends and the till stays open for the next one.
+    behaviour: >
+      `closeShift` on the operator, not the workstation. **A workstation runs three shifts a day
+      and each one settles its own drawer** — conflating them means one cashier answering for
+      another's variance.
+    severity: medium
+    resolvedBy: closeShift
+
+exitStates:
+  - state: settled
+    description: Counted, variance accepted, deposit reconciled, ledger posted. **The ordinary night.**
+  - state: settledWithVariance
+    description: >
+      Above threshold and approved. **A separate exit because it is a different conversation** —
+      the money reconciles either way and only one of the two gets looked at.
+  - state: forceClosed
+    description: >
+      A supervisor closed a shift the cashier did not. **Recorded as such** — a force-close is
+      sometimes right and it is never routine.
+  - state: openWithUnsynced
+    description: >
+      The shift closed while transactions were still journalled offline. **Settlement waits for the
+      sync**, and the exposure is visible rather than assumed away.
+
+notes: >
+  **Written 24 August from the client's POS pack, boards 2 and 3.** The operations were almost all
+  already there — 125 of the pack's 137 resolved to existing ones — but **no flow walked a till
+  from sign-in to settlement**, and that is where the money is.
+
+  **Step 1 is the ordering that matters.** The readiness check runs before the float. Every real
+  POS puts it there and the obvious design puts it after, because a health check reads like a
+  diagnostic rather than a gate.
+
+openQuestions: null

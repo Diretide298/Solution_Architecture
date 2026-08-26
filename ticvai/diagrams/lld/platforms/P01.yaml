@@ -1,0 +1,1305 @@
+id: LLD-P01
+title: P01 Guest Web — Storefront — 46 screens
+generatedBy: tools/derive-diagrams.py
+index: diagrams/hld/00-platform.yaml
+audience: guest
+operator: guest
+app: guest-web
+formFactor: web
+runtime: reactWeb
+offlineCapable: false
+deployment:
+  target: browser
+  distribution: CDN + edge
+  bundleUpdate: immediate on deploy
+  hosting: static build served from the cell region
+  storeReview: false
+  deviceOwnership: guest device
+  networkAssumption: public internet, unmanaged
+  releaseCadence: continuous
+why: null
+modulesUsed:
+- module: ticketing
+  screens: 19
+- module: marketing
+  screens: 10
+- module: core
+  screens: 4
+- module: queue
+  screens: 3
+- module: retail
+  screens: 3
+- module: fnb
+  screens: 3
+- module: access
+  screens: 2
+- module: seating
+  screens: 1
+- module: ai
+  screens: 1
+servicesCalled:
+- service: MarketingService
+  operationCalls: 45
+- service: CatalogueService
+  operationCalls: 29
+- service: OrderService
+  operationCalls: 28
+- service: IdentityService
+  operationCalls: 19
+- service: FnbService
+  operationCalls: 13
+- service: VenueOpsService
+  operationCalls: 11
+- service: RetailService
+  operationCalls: 10
+- service: AccessService
+  operationCalls: 8
+- service: WhiteLabelService
+  operationCalls: 7
+- service: AiService
+  operationCalls: 3
+- service: LedgerService
+  operationCalls: 1
+coverage:
+  screens: 46
+  inAFlow: 14
+  drawn: 35
+  note: '**A screen in no flow has been specified and never walked.** Every flow written in this package
+    has found a defect.'
+screens:
+- screen: WEB-001
+  name: Home / Landing
+  module: Discovery & Browse
+  requiresModule: ticketing
+  wave: 1
+  density: compact
+  operations:
+  - getTenantAppStatus
+  - getTenantConfig
+  - listProducts
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - WEB-002
+  - WEB-003
+  - WEB-004
+  - WEB-016
+  - WEB-036
+  - WEB-037
+  - WEB-038
+  - WEB-039
+  - WEB-040
+  - WEB-041
+  - WEB-042
+  - WEB-043
+  - WEB-044
+  - WEB-045
+  - WEB-046
+  boardFrames: null
+  wireframe: wireframes/P01 Guest Web.dc.html#web-001
+  inFlows:
+  - F01 Guest buys a ticket online
+- screen: WEB-002
+  name: Event & Attraction Listing
+  module: Discovery & Browse
+  requiresModule: ticketing
+  wave: 1
+  density: compact
+  operations:
+  - listPerformances
+  - listProducts
+  - searchCatalogue
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - eventId<-deepLink
+  goesTo:
+  - WEB-001
+  - WEB-003
+  - WEB-004
+  boardFrames: null
+  wireframe: wireframes/P01 Guest Web.dc.html#web-002
+  inFlows: null
+- screen: WEB-003
+  name: Search Results
+  module: Discovery & Browse
+  requiresModule: ticketing
+  wave: 1
+  density: compact
+  operations:
+  - listProducts
+  - searchCatalogue
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - WEB-001
+  - WEB-002
+  - WEB-004
+  boardFrames: null
+  wireframe: wireframes/P01 Guest Web.dc.html#web-003
+  inFlows: null
+- screen: WEB-004
+  name: Event / Attraction Detail
+  module: Discovery & Browse
+  requiresModule: ticketing
+  wave: 1
+  density: compact
+  operations:
+  - getProduct
+  - listPerformances
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - eventId<-WEB-002
+  - productId<-WEB-001
+  goesTo:
+  - WEB-001
+  - WEB-002
+  - WEB-003
+  - WEB-005
+  boardFrames: null
+  wireframe: wireframes/P01 Guest Web.dc.html#web-004
+  inFlows:
+  - F01 Guest buys a ticket online
+- screen: WEB-005
+  name: Ticket Type Selection
+  module: Booking & Selection
+  requiresModule: ticketing
+  wave: 1
+  density: compact
+  operations:
+  - evaluatePromotions
+  - listProductVariants
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - productId<-WEB-004
+  goesTo:
+  - WEB-001
+  - WEB-006
+  - WEB-007
+  - WEB-008
+  - WEB-010
+  boardFrames: null
+  wireframe: wireframes/P01 Guest Web.dc.html#web-005
+  inFlows:
+  - F01 Guest buys a ticket online
+- screen: WEB-006
+  name: Date & Session Selection
+  module: Booking & Selection
+  requiresModule: ticketing
+  wave: 1
+  density: compact
+  operations:
+  - acquireLease
+  - getAvailability
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - WEB-001
+  - WEB-005
+  - WEB-007
+  - WEB-008
+  - WEB-010
+  boardFrames: null
+  wireframe: wireframes/P01 Guest Web.dc.html#web-006
+  inFlows:
+  - F01 Guest buys a ticket online
+  - F02 Guest buys seated tickets
+- screen: WEB-007
+  name: Seat Map Selection
+  module: Booking & Selection
+  requiresModule: seating
+  wave: 2
+  density: compact
+  operations:
+  - createSeatHold
+  - getSeatAvailability
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - performanceId<-deepLink
+  goesTo:
+  - WEB-001
+  - WEB-005
+  - WEB-006
+  - WEB-008
+  - WEB-010
+  boardFrames: null
+  wireframe: wireframes/P01 Guest Web.dc.html#web-007
+  inFlows:
+  - F02 Guest buys seated tickets
+- screen: WEB-008
+  name: Add-ons & Upsell
+  module: Booking & Selection
+  requiresModule: ticketing
+  wave: 2
+  density: compact
+  operations:
+  - addCartLine
+  - getUpsellSuggestions
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - cartId<-session
+  goesTo:
+  - WEB-001
+  - WEB-005
+  - WEB-006
+  - WEB-007
+  boardFrames: null
+  wireframe: wireframes/P01 Guest Web.dc.html#web-008
+  inFlows: null
+- screen: WEB-009
+  name: Wishlist
+  module: Booking & Selection
+  requiresModule: marketing
+  wave: 3
+  density: compact
+  operations:
+  - addToWishlist
+  - getWishlist
+  - removeFromWishlist
+  states:
+  - emptyFirstRun
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - itemId<-deepLink
+  - subjectId<-session
+  goesTo:
+  - WEB-001
+  - WEB-005
+  - WEB-006
+  - WEB-007
+  boardFrames: null
+  wireframe: wireframes/P01 Guest Web.dc.html#web-009
+  inFlows: null
+- screen: WEB-010
+  name: Shopping Cart
+  module: Cart & Checkout
+  requiresModule: ticketing
+  wave: 1
+  density: compact
+  operations:
+  - abandonCart
+  - addCartLine
+  - checkoutCart
+  - evaluatePromotions
+  - extendCart
+  - getCart
+  - getCouponCode
+  - removeCartLine
+  - updateCartLine
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - cartId<-WEB-008
+  - code<-deepLink
+  - lineId<-deepLink
+  goesTo:
+  - WEB-001
+  - WEB-011
+  - WEB-012
+  - WEB-013
+  boardFrames: null
+  wireframe: wireframes/P01 Guest Web.dc.html#web-010
+  inFlows:
+  - F01 Guest buys a ticket online
+  - F02 Guest buys seated tickets
+  - F55 A guest buys on the web and transfers to a friend
+- screen: WEB-011
+  name: Guest Details & Attendee Forms
+  module: Cart & Checkout
+  requiresModule: marketing
+  wave: 1
+  density: compact
+  operations:
+  - addToWishlist
+  - getGuestProfile
+  - getWishlist
+  - listConsentPurposes
+  - listGuestDevices
+  - recordConsent
+  - registerGuestDevice
+  - removeFromWishlist
+  - revokeGuestDevice
+  - updateMyProfile
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - deviceId<-deepLink
+  - itemId<-deepLink
+  - subjectId<-session
+  goesTo:
+  - WEB-001
+  - WEB-010
+  - WEB-012
+  - WEB-013
+  boardFrames: null
+  wireframe: wireframes/P01 Guest Web.dc.html#web-011
+  inFlows:
+  - F01 Guest buys a ticket online
+  - F02 Guest buys seated tickets
+  - F55 A guest buys on the web and transfers to a friend
+- screen: WEB-012
+  name: Checkout — Payment
+  module: Cart & Checkout
+  requiresModule: ticketing
+  wave: 1
+  density: compact
+  operations:
+  - createOrder
+  - createPayment
+  - getOrder
+  - transferOrderTickets
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - orderId<-deepLink
+  goesTo:
+  - WEB-001
+  - WEB-010
+  - WEB-011
+  - WEB-013
+  boardFrames: null
+  wireframe: wireframes/P01 Guest Web.dc.html#web-012
+  inFlows:
+  - F01 Guest buys a ticket online
+  - F02 Guest buys seated tickets
+- screen: WEB-013
+  name: Order Confirmation
+  module: Cart & Checkout
+  requiresModule: ticketing
+  wave: 1
+  density: compact
+  operations:
+  - getOrder
+  - reprintOrder
+  - transferOrderTickets
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - orderId<-WEB-012
+  goesTo:
+  - WEB-001
+  - WEB-010
+  - WEB-011
+  - WEB-012
+  - WEB-018
+  boardFrames: null
+  wireframe: wireframes/P01 Guest Web.dc.html#web-013
+  inFlows:
+  - F01 Guest buys a ticket online
+- screen: WEB-014
+  name: Pay for a Booking
+  module: Cart & Checkout
+  requiresModule: ticketing
+  wave: 1
+  density: compact
+  operations:
+  - getPaymentLink
+  - payByLink
+  states:
+  - alreadyPaid
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - expired
+  - loading
+  - superseded
+  offlineState: false
+  entryParams:
+  - token<-deepLink
+  goesTo:
+  - WEB-013
+  boardFrames: null
+  wireframe: wireframes/P01 Guest Web.dc.html#web-014
+  inFlows: null
+- screen: WEB-015
+  name: Virtual Waiting Room
+  module: High-Demand Access
+  requiresModule: queue
+  wave: 2
+  density: compact
+  operations:
+  - getQueueEntry
+  - getWaitTimes
+  - joinQueue
+  states:
+  - emptyFirstRun
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - entryId<-deepLink
+  goesTo:
+  - WEB-001
+  boardFrames: null
+  wireframe: wireframes/P01 Guest Web.dc.html#web-015
+  inFlows: null
+- screen: WEB-016
+  name: Login / Register
+  module: Account & Self-Service
+  requiresModule: ticketing
+  wave: 1
+  density: compact
+  operations:
+  - claimCart
+  - completeSsoAuthorization
+  - enrolMfaMethod
+  - getGuestSession
+  - guestLogout
+  - guestSocialLogin
+  - guestUaePassLogin
+  - linkGuestCheckout
+  - listMfaMethods
+  - listSsoProviders
+  - login
+  - refreshToken
+  - registerGuest
+  - removeMfaMethod
+  - requestGuestOtp
+  - startSsoAuthorization
+  - verifyGuestOtp
+  - verifyMfaChallenge
+  - verifyMfaEnrolment
+  states:
+  - emptyFirstRun
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - cartId<-session
+  - challengeId<-deepLink
+  - methodId<-deepLink
+  - providerId<-deepLink
+  goesTo:
+  - WEB-001
+  - WEB-017
+  - WEB-018
+  - WEB-019
+  boardFrames: null
+  wireframe: wireframes/P01 Guest Web.dc.html#web-016
+  inFlows:
+  - F56 A guest registers, verifies and sets preferences
+- screen: WEB-017
+  name: My Account Dashboard
+  module: Account & Self-Service
+  requiresModule: marketing
+  wave: 1
+  density: compact
+  operations:
+  - addToWishlist
+  - getWishlist
+  - listGuestDevices
+  - recordConsent
+  - registerGuestDevice
+  - removeFromWishlist
+  - revokeGuestDevice
+  states:
+  - emptyFirstRun
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - deviceId<-deepLink
+  - itemId<-deepLink
+  - subjectId<-session
+  goesTo:
+  - WEB-001
+  - WEB-016
+  - WEB-018
+  - WEB-019
+  boardFrames: null
+  wireframe: wireframes/P01 Guest Web.dc.html#web-017
+  inFlows: null
+- screen: WEB-018
+  name: My Tickets
+  module: Account & Self-Service
+  requiresModule: access
+  wave: 1
+  density: compact
+  operations:
+  - getEntitlement
+  - getEntitlementCredential
+  - getEntitlementHistory
+  - listEntitlements
+  - listMyEntitlements
+  states:
+  - emptyFirstRun
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - entitlementId<-deepLink
+  goesTo:
+  - WEB-001
+  - WEB-016
+  - WEB-017
+  - WEB-019
+  boardFrames: null
+  wireframe: wireframes/P01 Guest Web.dc.html#web-018
+  inFlows: null
+- screen: WEB-019
+  name: Order History
+  module: Account & Self-Service
+  requiresModule: ticketing
+  wave: 1
+  density: compact
+  operations:
+  - listMyOrders
+  - transferOrderTickets
+  states:
+  - emptyFirstRun
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - orderId<-deepLink
+  goesTo:
+  - WEB-001
+  - WEB-016
+  - WEB-017
+  - WEB-018
+  boardFrames: null
+  wireframe: wireframes/P01 Guest Web.dc.html#web-019
+  inFlows: null
+- screen: WEB-020
+  name: Profile & Preferences
+  module: Account & Self-Service
+  requiresModule: marketing
+  wave: 1
+  density: compact
+  operations:
+  - getGuestProfile
+  - listConsentPurposes
+  - recordConsent
+  - updateMyProfile
+  - verifyGuestEmail
+  states:
+  - emptyFirstRun
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - subjectId<-session
+  goesTo:
+  - WEB-001
+  - WEB-016
+  - WEB-017
+  - WEB-018
+  boardFrames: null
+  wireframe: wireframes/P01 Guest Web.dc.html#web-020
+  inFlows: null
+- screen: WEB-021
+  name: Wallet & Gift Cards
+  module: Membership, Loyalty & Value
+  requiresModule: retail
+  wave: 2
+  density: compact
+  operations:
+  - getGiftCard
+  - getWallet
+  - listWalletTransactions
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - cardCode<-deepLink
+  - subjectId<-session
+  goesTo:
+  - WEB-001
+  - WEB-022
+  - WEB-023
+  - WEB-024
+  boardFrames: null
+  wireframe: wireframes/P01 Guest Web.dc.html#web-021
+  inFlows: null
+- screen: WEB-022
+  name: Membership Plans
+  module: Membership, Loyalty & Value
+  requiresModule: ticketing
+  wave: 2
+  density: compact
+  operations:
+  - getMyMemberships
+  - getProduct
+  - listGuestMemberships
+  - listProducts
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - productId<-WEB-001
+  goesTo:
+  - WEB-001
+  - WEB-021
+  - WEB-023
+  - WEB-024
+  boardFrames: null
+  wireframe: wireframes/P01 Guest Web.dc.html#web-022
+  inFlows: null
+- screen: WEB-023
+  name: Membership Management
+  module: Membership, Loyalty & Value
+  requiresModule: ticketing
+  wave: 2
+  density: compact
+  operations:
+  - getMyMemberships
+  - listGuestMemberships
+  - transferOrderTickets
+  states:
+  - emptyFirstRun
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - orderId<-deepLink
+  goesTo:
+  - WEB-001
+  - WEB-021
+  - WEB-022
+  - WEB-024
+  boardFrames: null
+  wireframe: wireframes/P01 Guest Web.dc.html#web-023
+  inFlows: null
+- screen: WEB-024
+  name: Loyalty & Rewards
+  module: Membership, Loyalty & Value
+  requiresModule: marketing
+  wave: 3
+  density: compact
+  operations:
+  - addToWishlist
+  - getWishlist
+  - listGuestDevices
+  - recordConsent
+  - registerGuestDevice
+  - removeFromWishlist
+  - revokeGuestDevice
+  states:
+  - emptyFirstRun
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - deviceId<-deepLink
+  - itemId<-deepLink
+  - subjectId<-session
+  goesTo:
+  - WEB-001
+  - WEB-021
+  - WEB-022
+  - WEB-023
+  boardFrames: null
+  wireframe: wireframes/P01 Guest Web.dc.html#web-024
+  inFlows:
+  - F53 A guest earns, sees and spends loyalty
+- screen: WEB-025
+  name: Help Centre / FAQ
+  module: Engagement & Support
+  requiresModule: core
+  wave: 1
+  density: compact
+  operations:
+  - getTenantAppStatus
+  states:
+  - emptyFirstRun
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - WEB-001
+  - WEB-026
+  - WEB-027
+  - WEB-028
+  boardFrames: null
+  wireframe: wireframes/P01 Guest Web.dc.html#web-025
+  inFlows: null
+- screen: WEB-026
+  name: Survey & Feedback
+  module: Engagement & Support
+  requiresModule: marketing
+  wave: 3
+  density: compact
+  operations:
+  - submitReview
+  states:
+  - emptyFirstRun
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - WEB-001
+  - WEB-025
+  - WEB-027
+  - WEB-028
+  boardFrames: null
+  wireframe: wireframes/P01 Guest Web.dc.html#web-026
+  inFlows: null
+- screen: WEB-027
+  name: Newsletter Subscription
+  module: Engagement & Support
+  requiresModule: marketing
+  wave: 2
+  density: compact
+  operations:
+  - addToWishlist
+  - getWishlist
+  - listGuestDevices
+  - recordConsent
+  - registerGuestDevice
+  - removeFromWishlist
+  - revokeGuestDevice
+  states:
+  - emptyFirstRun
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - deviceId<-deepLink
+  - itemId<-deepLink
+  - subjectId<-session
+  goesTo:
+  - WEB-001
+  - WEB-025
+  - WEB-026
+  - WEB-028
+  boardFrames: null
+  wireframe: wireframes/P01 Guest Web.dc.html#web-027
+  inFlows: null
+- screen: WEB-028
+  name: Contact & Venue Information
+  module: Engagement & Support
+  requiresModule: core
+  wave: 1
+  density: compact
+  operations:
+  - getTenantAppStatus
+  states:
+  - emptyFirstRun
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - WEB-001
+  - WEB-025
+  - WEB-026
+  - WEB-027
+  boardFrames: null
+  wireframe: wireframes/P01 Guest Web.dc.html#web-028
+  inFlows: null
+- screen: WEB-029
+  name: Error / Sold Out / Maintenance
+  module: System States
+  requiresModule: core
+  wave: 1
+  density: compact
+  operations:
+  - getTenantAppStatus
+  states:
+  - emptyFirstRun
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - WEB-001
+  boardFrames: null
+  wireframe: wireframes/P01 Guest Web.dc.html#web-029
+  inFlows: null
+- screen: WEB-030
+  name: Ticket Transfer
+  module: Ticketing
+  requiresModule: ticketing
+  wave: 1
+  density: compact
+  operations:
+  - claimTicketTransfer
+  - listOrders
+  - transferOrderTickets
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - orderId<-deepLink
+  - transferId<-deepLink
+  goesTo:
+  - WEB-001
+  - WEB-031
+  - WEB-035
+  boardFrames: null
+  wireframe: wireframes/P01 Guest Web.dc.html#web-030
+  inFlows:
+  - F55 A guest buys on the web and transfers to a friend
+- screen: WEB-031
+  name: My Reservations
+  module: Ticketing
+  requiresModule: ticketing
+  wave: 2
+  density: compact
+  operations:
+  - cancelReservation
+  - getReservation
+  - listReservations
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - reservationId<-deepLink
+  goesTo:
+  - WEB-001
+  - WEB-030
+  - WEB-035
+  boardFrames: null
+  wireframe: wireframes/P01 Guest Web.dc.html#web-031
+  inFlows: null
+- screen: WEB-032
+  name: Offers & Promotions
+  module: Promotions
+  requiresModule: ticketing
+  wave: 2
+  density: compact
+  operations:
+  - evaluatePromotions
+  - getPromotion
+  - listPromotions
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - promotionId<-deepLink
+  goesTo:
+  - WEB-001
+  boardFrames: null
+  wireframe: wireframes/P01 Guest Web.dc.html#web-032
+  inFlows: null
+- screen: WEB-033
+  name: Shop
+  module: Retail
+  requiresModule: retail
+  wave: 2
+  density: compact
+  operations:
+  - addCartLine
+  - listMerchandise
+  - lookupMerchandise
+  - reserveMerchandise
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - cartId<-session
+  - outletId<-deepLink
+  goesTo:
+  - WEB-001
+  boardFrames: null
+  wireframe: wireframes/P01 Guest Web.dc.html#web-033
+  inFlows:
+  - F51 A guest shops in the venue and collects on the way out
+- screen: WEB-034
+  name: Lost & Found
+  module: Support
+  requiresModule: marketing
+  wave: 3
+  density: compact
+  operations:
+  - listMyCases
+  - raiseMyCase
+  - replyToMyCase
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - caseId<-deepLink
+  goesTo:
+  - WEB-001
+  boardFrames: null
+  wireframe: wireframes/P01 Guest Web.dc.html#web-034
+  inFlows:
+  - F54 Something goes wrong in the venue
+- screen: WEB-035
+  name: Multi-Currency & Pricing
+  module: Ticketing
+  requiresModule: ticketing
+  wave: 1
+  density: compact
+  operations:
+  - listFxRates
+  - listProducts
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - WEB-001
+  - WEB-030
+  - WEB-031
+  boardFrames: null
+  wireframe: wireframes/P01 Guest Web.dc.html#web-035
+  inFlows: null
+- screen: WEB-036
+  name: F&B — Browse & Order
+  module: In-venue Services
+  requiresModule: fnb
+  wave: 2
+  density: compact
+  operations:
+  - claimLocationSession
+  - claimTableSession
+  - createGuestFnbOrder
+  - getGuestMenu
+  - listDeliveryLocations
+  - listDiningOutlets
+  - listModifierGroups
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - outletId<-deepLink
+  - venueId<-session
+  goesTo:
+  - WEB-001
+  boardFrames: null
+  wireframe: null
+  inFlows: null
+- screen: WEB-037
+  name: Menu Item Detail
+  module: In-venue Services
+  requiresModule: fnb
+  wave: 2
+  density: compact
+  operations:
+  - getGuestMenu
+  - listModifierGroups
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - outletId<-deepLink
+  goesTo:
+  - WEB-001
+  boardFrames: null
+  wireframe: null
+  inFlows: null
+- screen: WEB-038
+  name: F&B — Order Tracking
+  module: In-venue Services
+  requiresModule: fnb
+  wave: 2
+  density: compact
+  operations:
+  - claimTableSession
+  - getGuestBill
+  - getGuestOrderStatus
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - orderId<-deepLink
+  - sessionId<-deepLink
+  - venueId<-session
+  goesTo:
+  - WEB-001
+  boardFrames: null
+  wireframe: null
+  inFlows: null
+- screen: WEB-039
+  name: Venue Map & Wait Times
+  module: In-venue Services
+  requiresModule: queue
+  wave: 2
+  density: compact
+  operations:
+  - getVenueMap
+  - getVenueMapGraph
+  - getWaitTimes
+  - listQueues
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - mapId<-deepLink
+  - venueId<-session
+  goesTo:
+  - WEB-001
+  boardFrames: null
+  wireframe: null
+  inFlows: null
+- screen: WEB-040
+  name: Virtual Queue
+  module: In-venue Services
+  requiresModule: queue
+  wave: 2
+  density: compact
+  operations:
+  - getQueueEntry
+  - getWaitTimes
+  - joinQueue
+  - leaveQueue
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - entryId<-deepLink
+  goesTo:
+  - WEB-001
+  boardFrames: null
+  wireframe: null
+  inFlows: null
+- screen: WEB-041
+  name: Parking — Reserve & Pay
+  module: In-venue Services
+  requiresModule: access
+  wave: 2
+  density: compact
+  operations:
+  - createParkingEntitlement
+  - listParkingFacilities
+  - updateParkingEntitlement
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - entitlementId<-deepLink
+  - venueId<-session
+  goesTo:
+  - WEB-001
+  boardFrames: null
+  wireframe: null
+  inFlows: null
+- screen: WEB-042
+  name: Retail & Shop and Drop
+  module: Retail
+  requiresModule: retail
+  wave: 2
+  density: compact
+  operations:
+  - listMerchandise
+  - lookupMerchandise
+  - lookupShopAndDrop
+  - reserveMerchandise
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - outletId<-deepLink
+  goesTo:
+  - WEB-001
+  boardFrames: null
+  wireframe: null
+  inFlows: null
+- screen: WEB-043
+  name: Loyalty & Rewards
+  module: Membership, Loyalty & Value
+  requiresModule: marketing
+  wave: 2
+  density: compact
+  operations:
+  - evaluatePromotions
+  - getLoyaltyPosition
+  - listLoyaltyProgrammes
+  - listPromotions
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - WEB-001
+  boardFrames: null
+  wireframe: null
+  inFlows: null
+- screen: WEB-044
+  name: AI Concierge
+  module: Engagement & Support
+  requiresModule: ai
+  wave: 2
+  density: compact
+  operations:
+  - createAiConversation
+  - handoverToAgent
+  - requestSuggestion
+  - sendAiMessage
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - conversationId<-deepLink
+  goesTo:
+  - WEB-001
+  boardFrames: null
+  wireframe: null
+  inFlows: null
+- screen: WEB-045
+  name: Help Centre & Accessibility
+  module: Support
+  requiresModule: core
+  wave: 2
+  density: compact
+  operations:
+  - listContentPages
+  - listFaqs
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - WEB-001
+  boardFrames: null
+  wireframe: null
+  inFlows: null
+- screen: WEB-046
+  name: In-Venue Notifications
+  module: Engagement & Support
+  requiresModule: marketing
+  wave: 2
+  density: compact
+  operations:
+  - claimLocationSession
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - WEB-001
+  boardFrames: null
+  wireframe: null
+  inFlows: null

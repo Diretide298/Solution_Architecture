@@ -1,0 +1,385 @@
+id: LLD-P16
+title: P16 Venue Analytics — Cross-Domain Reporting — 10 screens
+generatedBy: tools/derive-diagrams.py
+index: diagrams/hld/00-platform.yaml
+audience: staff
+operator: venue
+app: venue-management-web
+formFactor: web
+runtime: reactWeb
+offlineCapable: false
+deployment:
+  target: browser
+  distribution: served from the cell
+  bundleUpdate: immediate on deploy
+  hosting: in-cell, in-region
+  storeReview: false
+  deviceOwnership: venue-owned workstation
+  networkAssumption: venue LAN
+  releaseCadence: fortnightly
+why: '**26 board screens collapsed to nine.** F&B, Retail and POS each ended their set with an executive
+  command centre, a sales and revenue view, a performance view, a forecasting view and an AI centre
+  — and **two of them are word-for-word identical across domains.**
+
+
+  **A domain is a filter on an analytics screen, not a copy of it.** Building three sets means maintaining
+  one screen three times and watching them drift, and the drift is invisible until two dashboards disagree
+  about last month.
+
+
+  **Its own platform rather than a P08 section** because it is read rather than operated: opened on
+  a Monday morning, never during service, by somebody asking about a period rather than doing a job.
+
+
+  **Shares the `venue-management-web` app.** A separate platform is a navigation and permission boundary,
+  not necessarily a separate codebase.'
+modulesUsed:
+- module: analytics
+  screens: 9
+- module: ai
+  screens: 1
+servicesCalled:
+- service: ReportingService
+  operationCalls: 23
+- service: AiService
+  operationCalls: 5
+- service: InventoryService
+  operationCalls: 3
+- service: MarketingService
+  operationCalls: 3
+- service: TenancyService
+  operationCalls: 1
+- service: IdentityService
+  operationCalls: 1
+- service: CatalogueService
+  operationCalls: 1
+- service: OrderService
+  operationCalls: 1
+coverage:
+  screens: 10
+  inAFlow: 5
+  drawn: 10
+  note: '**A screen in no flow has been specified and never walked.** Every flow written in this package
+    has found a defect.'
+screens:
+- screen: ANL-001
+  name: Executive Command Center
+  module: Analytics
+  requiresModule: analytics
+  wave: 3
+  density: compact
+  operations:
+  - getDashboard
+  - listAlerts
+  - requestSuggestion
+  - runReport
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  - partial
+  offlineState: false
+  entryParams:
+  - venueId<-session
+  - domain<-session
+  - dashboardId<-deepLink
+  - reportId<-deepLink
+  goesTo:
+  - ANL-002
+  - ANL-003
+  - ANL-004
+  - ANL-005
+  - ANL-006
+  - ANL-007
+  - ANL-008
+  - ANL-009
+  - ANL-010
+  boardFrames:
+  - FNB-6A
+  - POS-6A
+  - RET-6A
+  wireframe: wireframes/P16 Venue Analytics.dc.html#anl-001
+  inFlows: null
+- screen: ANL-002
+  name: Sales, Revenue & Channel
+  module: Analytics
+  requiresModule: analytics
+  wave: 3
+  density: compact
+  operations:
+  - getDashboard
+  - runReport
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  - partial
+  offlineState: false
+  entryParams:
+  - venueId<-session
+  - domain<-session
+  - dashboardId<-deepLink
+  - reportId<-deepLink
+  goesTo: []
+  boardFrames:
+  - FNB-6B
+  - RET-6L
+  wireframe: wireframes/P16 Venue Analytics.dc.html#anl-002
+  inFlows: null
+- screen: ANL-003
+  name: Operational Performance
+  module: Analytics
+  requiresModule: analytics
+  wave: 3
+  density: compact
+  operations:
+  - getDashboard
+  - listAlerts
+  - listDevices
+  - listPrincipals
+  - runReport
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  - partial
+  offlineState: false
+  entryParams:
+  - venueId<-session
+  - domain<-session
+  - dashboardId<-deepLink
+  - reportId<-deepLink
+  goesTo: []
+  boardFrames:
+  - FNB-4K
+  - FNB-6C
+  - FNB-6G
+  - POS-6B
+  - POS-6C
+  - POS-6D
+  - RET-6B
+  wireframe: wireframes/P16 Venue Analytics.dc.html#anl-003
+  inFlows: null
+- screen: ANL-004
+  name: Product Performance
+  module: Analytics
+  requiresModule: analytics
+  wave: 3
+  density: compact
+  operations:
+  - getDashboard
+  - listProducts
+  - runReport
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  - partial
+  offlineState: false
+  entryParams:
+  - venueId<-session
+  - domain<-session
+  - dashboardId<-deepLink
+  - reportId<-deepLink
+  goesTo: []
+  boardFrames:
+  - FNB-6D
+  - RET-6C
+  wireframe: wireframes/P16 Venue Analytics.dc.html#anl-004
+  inFlows:
+  - F82 A month is analysed from incrementality to a scheduled report
+- screen: ANL-005
+  name: Cost, Margin & Profitability
+  module: Analytics
+  requiresModule: analytics
+  wave: 3
+  density: compact
+  operations:
+  - getDashboard
+  - getStockValuation
+  - runReport
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  - partial
+  offlineState: false
+  entryParams:
+  - venueId<-session
+  - domain<-session
+  - dashboardId<-deepLink
+  - reportId<-deepLink
+  goesTo: []
+  boardFrames:
+  - FNB-6E
+  - RET-6F
+  wireframe: wireframes/P16 Venue Analytics.dc.html#anl-005
+  inFlows:
+  - F82 A month is analysed from incrementality to a scheduled report
+- screen: ANL-006
+  name: Inventory & Waste Intelligence
+  module: Analytics
+  requiresModule: analytics
+  wave: 3
+  density: compact
+  operations:
+  - getCountVariance
+  - getDashboard
+  - listExpiringBatches
+  - runReport
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  - partial
+  offlineState: false
+  entryParams:
+  - venueId<-session
+  - domain<-session
+  - countId<-deepLink
+  - dashboardId<-deepLink
+  - reportId<-deepLink
+  goesTo: []
+  boardFrames:
+  - FNB-6F
+  - RET-6D
+  wireframe: wireframes/P16 Venue Analytics.dc.html#anl-006
+  inFlows:
+  - F82 A month is analysed from incrementality to a scheduled report
+- screen: ANL-007
+  name: Guest & Conversion Intelligence
+  module: Analytics
+  requiresModule: analytics
+  wave: 3
+  density: compact
+  operations:
+  - createSegment
+  - getDashboard
+  - listSegments
+  - previewSegment
+  - runReport
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  - partial
+  offlineState: false
+  entryParams:
+  - venueId<-session
+  - domain<-session
+  - dashboardId<-deepLink
+  - reportId<-deepLink
+  - segmentId<-deepLink
+  goesTo: []
+  boardFrames:
+  - RET-6E
+  wireframe: wireframes/P16 Venue Analytics.dc.html#anl-007
+  inFlows:
+  - F82 A month is analysed from incrementality to a scheduled report
+- screen: ANL-008
+  name: Demand Forecasting
+  module: Analytics
+  requiresModule: analytics
+  wave: 3
+  density: compact
+  operations:
+  - askReportingQuestion
+  - getDashboard
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  - partial
+  offlineState: false
+  entryParams:
+  - venueId<-session
+  - domain<-session
+  - dashboardId<-deepLink
+  goesTo: []
+  boardFrames:
+  - FNB-6H
+  - RET-6G
+  wireframe: wireframes/P16 Venue Analytics.dc.html#anl-008
+  inFlows: null
+- screen: ANL-009
+  name: AI Assistant & Action Center
+  module: Analytics
+  requiresModule: analytics
+  wave: 3
+  density: compact
+  operations:
+  - acknowledgeAlert
+  - askReportingQuestion
+  - decideProposedAction
+  - listAlerts
+  - listOrders
+  - listProposedActions
+  - runReport
+  - setAlertRule
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  - partial
+  offlineState: false
+  entryParams:
+  - venueId<-session
+  - domain<-session
+  - alertId<-deepLink
+  - reportId<-deepLink
+  - actionId<-deepLink
+  goesTo: []
+  boardFrames:
+  - FNB-5K
+  - FNB-6J
+  - FNB-6K
+  - POS-6E
+  - RET-5K
+  - RET-6K
+  wireframe: wireframes/P16 Venue Analytics.dc.html#anl-009
+  inFlows:
+  - F77 A promotion is built, bundled, published and measured
+  - F90 An audience is built, offered to, and the result is judged
+- screen: ANL-010
+  name: Suggestions & Advice
+  module: Analytics
+  requiresModule: ai
+  wave: 3
+  density: compact
+  operations:
+  - recordSuggestionOutcome
+  - requestSuggestion
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  - shadowRunning
+  offlineState: false
+  entryParams:
+  - venueId<-session
+  - suggestionId<-deepLink
+  goesTo: []
+  boardFrames:
+  - POS-6F
+  wireframe: wireframes/P16 Venue Analytics.dc.html#anl-010
+  inFlows: null

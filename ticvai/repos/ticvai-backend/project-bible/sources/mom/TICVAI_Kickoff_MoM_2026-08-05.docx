@@ -1,0 +1,181 @@
+**Minutes of Meeting**
+
+*TICVAI Kick-off Meeting — Ticketing Code **&** Venue Operations*
+
+| **Date** | 5 August 2026 | **Project** | TICVAI |
+| --- | --- | --- | --- |
+| **Meeting Type** | Kick-off Workshop — Ticketing Code & Venue Operations | **Prepared by** | Chitrangi Mestry |
+
+**Primary Objective**
+
+To walk through the ticketing code and venue operations in detail — the system architecture, ticket/product classification, B2B distribution models, QR code and entitlement architecture, offline selling rules, seat mapping, and event/resource management for the TICVAI ticketing platform.
+
+**Participants**
+
+- TICVAI Team
+
+- Softlabs Team
+
+**Agenda**
+
+1. Session framing and workshop cadence
+
+2. B2B ticket distribution models
+
+3. Infrastructure & server architecture
+
+4. Ticket catalog & product types
+
+5. Multi-venue / multi-tenant ticketing
+
+6. Entitlement, QR codes & encryption architecture
+
+7. Sales channels, pricing & cart
+
+8. Offline selling rules
+
+9. Seat mapping & venue builder
+
+10. Event & resource management
+
+11. Queue management
+
+12. Hardware & third-party integrations
+
+13. Mobile / POS app design references
+
+**Discussion Summary**
+
+**1. Session Framing**
+
+Chinmay proposed that Qossai's team lead a review workshop of the topics covered so far, so that content originates from Qossai's side rather than being framed entirely by Chinmay's team's understanding. Qossai agreed and suggested demonstrating the back-end configuration of another ticketing solution to help the team understand backend concepts more concretely. Allam requested that Chinmay's team review the functionality requirement matrix before each workshop so that clarifications can be discussed live.
+
+**2. B2B Ticket Distribution Models**
+
+Allam outlined three B2B integration models for partners (OTAs/agencies):
+
+- Option 1 — API Consumption: partner consumes the platform's API for products, prices, and availability, and sells on their own platform. Bookings flow into TICVAI; the platform earns commission per ticket sold. Partner profiles store pricing, discounts, and product access, with settlement via credit limit, advance payment, or card (e.g., Stripe).
+
+- Option 2 — B2B Portal: partner uses a TICVAI-developed B2B platform (structured like B2C, but with login credentials), with pre-configured pricing/products and the same commission tracking.
+
+- Option 3 — Bulk QR Code Generation: for partners without technical capability, the platform generates a bulk batch of tickets (e.g., 5,000) with a validity window, delivered as QR codes (e.g., CSV) for the partner to import and resell.
+
+- All three options follow the same downstream processes for pricing, commission calculation, and reporting.
+
+- Certified integrations (e.g., BookMyShow, Platinum List, Ticketmaster) will be surfaced via a marketplace module that clients can activate after purchasing the core solution.
+
+**3. Infrastructure ****&**** Server Architecture**
+
+Chinmay flagged that server infrastructure must scale for high-volume, API-driven bulk sales (e.g., large concerts routed through partner APIs). Allam confirmed dedicated, segregated resources are needed per channel — on-site operations, B2C, B2B, and OTA/API traffic — so load on one channel does not degrade the others.
+
+**4. Ticket Catalog****ue**** ****&**** Product Types**
+
+The team reviewed and refined the ticket/product classification:
+
+- Admission, Admission + Dated, Admission + Dated + Timed, and Admission + Dated + Timed + Seated as the core progression.
+
+- Event/Resource — a flexible category for any bookable experience; can be dated, timed, seated or non-seated, and may or may not require a resource. Agreed to merge "event," "seated," and "resource" into this single category.
+
+- Regular, group (shared or individual QR codes, partial check-in tracking), family (bundled adult/child pricing), and package tickets (combining multiple products into one).
+
+- Membership / Season Pass — non-dated, defined by start/end date rather than quantity; requires customer profile capture and supports renew, upgrade, cancel, and extend workflows.
+
+- Gift Voucher — value-based or product-based, redeemable online or in-venue.
+
+Identity (purchaser data) and entitlement (access rights) will be stored as separate entities, since binding identity directly to the ticket would complicate vouchers and group/multi-person bookings.
+
+**5. Multi-venue / Multi-tenant Ticketing**
+
+Allam demonstrated an example (Ferrari World / Miral Experiences) with single-park tickets, multi-park combo tickets, and tiered annual passes with configurable blackout dates. The system must support a single QR code granting conditional access across multiple attractions, tracking usage per attraction.
+
+**6. Entitlement, QR Codes ****&**** Encryption Architecture**
+
+Chinmay proposed a private-key-on-server / public-key-on-turnstile signing model so turnstiles can validate offline. Discussion clarified that a ticket is fundamentally a virtual entitlement (an ID in the system), not a physical object, and can be linked to any medium — QR code, NFC/RFID wristband, bank card, or email — with multiple media per ticket or multiple ticket components per medium both supported. Access rights are granted at venue and zone/event level rather than via one universal key, and add-on purchases after entry can either issue a new QR code or extend the existing wristband/QR code ("entitlement add-on").
+
+**7. Sales Channels, Pricing ****&**** Cart**
+
+- Channels: web store, mobile app, kiosk, and walk-up/POS.
+
+- Pricing is configurable per channel via a centralized "price matrix"; each channel pulls its price automatically once published.
+
+- A single cart/order must support mixed purchases (e.g., family tickets plus gift vouchers) with unified checkout and identity capture.
+
+**8. Offline Selling Rules**
+
+- Inventory is pre-allocated across offline-capable nodes (e.g., 100 tickets per node) to prevent overselling; unused quota is reallocated once nodes reconnect and sync.
+
+- For seated/zoned venues, Qossai proposed network-based zoning — POS terminals sharing a network share real-time seat state; disconnected networks require their own offline zone.
+
+- Offline mode triggers automatically on connectivity loss; whether zoning is automatic or client-enabled should be configurable per venue.
+
+**9. Seat Mapping ****&**** Venue Builder**
+
+- A one-time, canvas-based venue/seat-map builder is required per venue.
+
+- Qossai proposed AI-assisted layout generation from AutoCAD/DXF (best) or PDF exports (fallback, via OCR), targeting ~90–95% automation with client-led correction of the remainder.
+
+- Dinesh raised concerns about client self-service risk (drawing on BookMyShow experience); Qossai clarified this is a licensed self-service product, distinct from BookMyShow's managed B2C model, so AI-assisted client-led configuration remains the core vision.
+
+- Allam shared a sample format: PDF seating diagram paired with an Excel manifest of section/row/seat numbers.
+
+**10. Event ****&**** Resource Management**
+
+- Confirmed an "event" is not a distinct entity — it is simply another product category, seated/non-seated, dated/timed, with or without an associated resource.
+
+- Each product is configured with venue/zone-level access permissions (e.g., Zone 1 = main entrance, Zone 2 = auditorium), each potentially covered by its own access-control hardware.
+
+- For large multi-attraction venues, each internal experience is its own product with its own capacity, time slots, and access model (scheduled/paid, first-come-first-served/free, or pay-on-the-spot).
+
+- A venue reconfigured for a special event (e.g., a stadium hosting a concert) is treated the same as standard operations at the system level — no structural distinction is needed.
+
+**11. Queue Management**
+
+Queue management will be scoped once the high-level architecture is finalized, with Dinesh's team owning this area; no further discussion was needed at this stage.
+
+**12. Hardware ****&**** Third-Party Integrations**
+
+- Turnstile SDK/API documentation requested now, ahead of a thick-client integration approach; printer/POS integrations assumed to use a universal SDK.
+
+- Qossai to confirm and share hardware specification documents; procurement timing (rental vs. Mumbai-based local sourcing) to be revisited at ~80% development completion.
+
+- Banking/payment gateway (e.g., DCT) documentation can follow during the discovery phase.
+
+- WhatsApp/SMS integration to be discussed in a dedicated follow-up session.
+
+**13. Mobile / POS App Design References**
+
+Qossai shared reference apps (Al Qadiya/Six Flags Saudi Arabia, and "The District" by Zomato), citing their use of video over static images as a design inspiration. Aishwarya confirmed she is building mockups for the food-ordering/counter app using these and the previously shared POS PDF as references, to be shared once complete.
+
+**Action Items**
+
+| **Action Item** | **Owner** | **Status** |
+| --- | --- | --- |
+| Document the finalized ticket classification (product types, incl. Membership, Event/Resource) as a diagram and circulate for confirmation | Chinmay Parab | **In Progress** |
+| Test AI-based seat-layout generation using available sample layouts (screenshots/PDFs) as a worst-case baseline | Chinmay Parab | **Pending** |
+| Locate and share the AutoCAD/PDF seating drawing from the Bahrain project (also to be shared with 3D vendor "3DDV") | Allam | **Pending** |
+| Prepare and schedule a demo session on multi-tenant configuration and event/access management | Allam | **Pending** |
+| Confirm and share turnstile and other hardware SDK/specification documents | Qossai / Allam | **Pending** |
+| Share the previously created weekly open-items tracker | Chinmay Parab | **Pending** |
+| Complete and share mock-ups for the food ordering / POS counter app | Aishwarya More | **In Progress** |
+| Share banking (DCT) and communications (WhatsApp/SMS) integration documentation ahead of a dedicated session | Qossai | **Pending** |
+
+**Next Meeting**
+
+**Date: **Tomorrow or Friday (7 August 2026) — to be confirmed via WhatsApp
+
+**Time: **To be confirmed
+
+**Planned Topics**
+
+- Demonstration of multi-tenant configuration and event/access management
+
+- Review of the finalized ticket classification diagram
+
+- Follow-up on hardware documentation and AI seat-layout testing
+
+**Closing Remarks**
+
+This session provided a deep, screen-shared walkthrough of TICVAI's ticketing architecture — covering ticket classification, B2B distribution models, entitlement and QR code design, offline selling rules, seat mapping, and event/resource management. Both teams aligned on treating events strictly as a product category, on identity/entitlement separation, and on an AI-assisted, client-led approach to seat-map building. Next steps include a solution demo session, hardware and integration documentation, and setting up a recurring weekly tracker-review meeting.
+
+|  |  |  |
+| --- | --- | --- |

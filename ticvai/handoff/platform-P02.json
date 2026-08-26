@@ -1,0 +1,880 @@
+{
+ "code": "P02",
+ "name": "Guest App \u2014 Mobile",
+ "shortName": "Guest App",
+ "app": "guest-app",
+ "operator": "guest",
+ "audience": "guest",
+ "formFactor": "mobileApp",
+ "offlineCapable": true,
+ "generated": "2026-08-26",
+ "note": "Derived by tools/derive-platform.py. **The gaps section is the point** \u2014 a page listing what exists is a directory; one listing what is missing is a worklist.",
+ "counts": {
+  "screens": 63,
+  "operations": 97,
+  "contracts": 15,
+  "modules": 4,
+  "undrawn": 0,
+  "operationsWithNoScreen": 28
+ },
+ "waves": {
+  "wave1": 20,
+  "wave2": 27,
+  "wave3": 16
+ },
+ "modules": [
+  {
+   "module": "TODO",
+   "screens": 59,
+   "waves": [
+    1,
+    2,
+    3
+   ]
+  },
+  {
+   "module": "In-Venue Experience",
+   "screens": 2,
+   "waves": [
+    2,
+    3
+   ]
+  },
+  {
+   "module": "Discovery",
+   "screens": 1,
+   "waves": [
+    1
+   ]
+  },
+  {
+   "module": "Marketing",
+   "screens": 1,
+   "waves": [
+    3
+   ]
+  }
+ ],
+ "contracts": [
+  {
+   "contract": "identity",
+   "operations": 20
+  },
+  {
+   "contract": "orders",
+   "operations": 14
+  },
+  {
+   "contract": "marketing-crm",
+   "operations": 14
+  },
+  {
+   "contract": "catalogue",
+   "operations": 9
+  },
+  {
+   "contract": "fnb",
+   "operations": 8
+  },
+  {
+   "contract": "access",
+   "operations": 7
+  },
+  {
+   "contract": "promotions",
+   "operations": 5
+  },
+  {
+   "contract": "queue",
+   "operations": 4
+  },
+  {
+   "contract": "retail",
+   "operations": 4
+  },
+  {
+   "contract": "white-label",
+   "operations": 3
+  },
+  {
+   "contract": "seating",
+   "operations": 3
+  },
+  {
+   "contract": "venue-map",
+   "operations": 2
+  },
+  {
+   "contract": "ai",
+   "operations": 2
+  },
+  {
+   "contract": "games",
+   "operations": 1
+  },
+  {
+   "contract": "finance",
+   "operations": 1
+  }
+ ],
+ "screens": [
+  {
+   "id": "GST-001",
+   "name": "Home \u2013 Default",
+   "module": "TODO",
+   "wave": 1,
+   "route": "/general/home-default",
+   "operations": 4,
+   "drawn": true
+  },
+  {
+   "id": "GST-002",
+   "name": "Explore Categories",
+   "module": "TODO",
+   "wave": 1,
+   "route": "/general/explore-categories",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "GST-003",
+   "name": "Attractions List",
+   "module": "TODO",
+   "wave": 1,
+   "route": "/general/attractions-list",
+   "operations": 2,
+   "drawn": true
+  },
+  {
+   "id": "GST-004",
+   "name": "Attraction Details",
+   "module": "TODO",
+   "wave": 1,
+   "route": "/general/attraction-details",
+   "operations": 3,
+   "drawn": true
+  },
+  {
+   "id": "GST-005",
+   "name": "What's On",
+   "module": "TODO",
+   "wave": 1,
+   "route": "/general/whats-on",
+   "operations": 2,
+   "drawn": true
+  },
+  {
+   "id": "GST-006",
+   "name": "Event / Exhibition Details",
+   "module": "TODO",
+   "wave": 1,
+   "route": "/general/event-exhibition-details",
+   "operations": 2,
+   "drawn": true
+  },
+  {
+   "id": "GST-007",
+   "name": "Select Date & Time",
+   "module": "TODO",
+   "wave": 1,
+   "route": "/general/select-date-and-time",
+   "operations": 2,
+   "drawn": true
+  },
+  {
+   "id": "GST-008",
+   "name": "Tickets & Add-ons",
+   "module": "TODO",
+   "wave": 1,
+   "route": "/general/tickets-and-add-ons",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "GST-009",
+   "name": "Review & Payment",
+   "module": "TODO",
+   "wave": 1,
+   "route": "/general/review-and-payment",
+   "operations": 5,
+   "drawn": true
+  },
+  {
+   "id": "GST-010",
+   "name": "Booking Confirmation",
+   "module": "TODO",
+   "wave": 1,
+   "route": "/general/booking-confirmation",
+   "operations": 2,
+   "drawn": true
+  },
+  {
+   "id": "GST-011",
+   "name": "Wallet Overview",
+   "module": "TODO",
+   "wave": 2,
+   "route": "/general/wallet-overview",
+   "operations": 2,
+   "drawn": true
+  },
+  {
+   "id": "GST-012",
+   "name": "My Tickets",
+   "module": "TODO",
+   "wave": 1,
+   "route": "/general/my-tickets",
+   "operations": 3,
+   "drawn": true
+  },
+  {
+   "id": "GST-013",
+   "name": "Ticket Details",
+   "module": "TODO",
+   "wave": 1,
+   "route": "/general/ticket-details",
+   "operations": 4,
+   "drawn": true
+  },
+  {
+   "id": "GST-014",
+   "name": "Ticket Transfer",
+   "module": "TODO",
+   "wave": 2,
+   "route": "/general/ticket-transfer",
+   "operations": 2,
+   "drawn": true
+  },
+  {
+   "id": "GST-015",
+   "name": "Memberships",
+   "module": "TODO",
+   "wave": 2,
+   "route": "/general/memberships",
+   "operations": 5,
+   "drawn": true
+  },
+  {
+   "id": "GST-016",
+   "name": "My Reservations",
+   "module": "TODO",
+   "wave": 2,
+   "route": "/general/my-reservations",
+   "operations": 3,
+   "drawn": true
+  },
+  {
+   "id": "GST-017",
+   "name": "Reservation Details",
+   "module": "TODO",
+   "wave": 2,
+   "route": "/general/reservation-details",
+   "operations": 2,
+   "drawn": true
+  },
+  {
+   "id": "GST-018",
+   "name": "Add to Calendar / Reminders",
+   "module": "TODO",
+   "wave": 3,
+   "route": "/general/add-to-calendar-reminders",
+   "operations": 3,
+   "drawn": true
+  },
+  {
+   "id": "GST-019",
+   "name": "Order History (Wallet)",
+   "module": "TODO",
+   "wave": 2,
+   "route": "/general/order-history-wallet",
+   "operations": 3,
+   "drawn": true
+  },
+  {
+   "id": "GST-020",
+   "name": "Saved Items / Wishlist",
+   "module": "TODO",
+   "wave": 3,
+   "route": "/general/saved-items-wishlist",
+   "operations": 3,
+   "drawn": true
+  },
+  {
+   "id": "GST-021",
+   "name": "Interactive Map",
+   "module": "TODO",
+   "wave": 2,
+   "route": "/general/interactive-map",
+   "operations": 4,
+   "drawn": true
+  },
+  {
+   "id": "GST-022",
+   "name": "Attraction Wait Times",
+   "module": "TODO",
+   "wave": 2,
+   "route": "/general/attraction-wait-times",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "GST-023",
+   "name": "Virtual Queue / Join Queue",
+   "module": "TODO",
+   "wave": 3,
+   "route": "/general/virtual-queue-join-queue",
+   "operations": 3,
+   "drawn": true
+  },
+  {
+   "id": "GST-024",
+   "name": "F&B \u2013 Browse & Order",
+   "module": "TODO",
+   "wave": 2,
+   "route": "/general/fandb-browse-and-order",
+   "operations": 6,
+   "drawn": true
+  },
+  {
+   "id": "GST-025",
+   "name": "F&B \u2013 Order Tracking",
+   "module": "TODO",
+   "wave": 2,
+   "route": "/general/fandb-order-tracking",
+   "operations": 3,
+   "drawn": true
+  },
+  {
+   "id": "GST-026",
+   "name": "Retail / Merchandise",
+   "module": "TODO",
+   "wave": 2,
+   "route": "/general/retail-merchandise",
+   "operations": 2,
+   "drawn": true
+  },
+  {
+   "id": "GST-027",
+   "name": "Parking \u2013 Reserve & Pay",
+   "module": "TODO",
+   "wave": 3,
+   "route": "/general/parking-reserve-and-pay",
+   "operations": 2,
+   "drawn": true
+  },
+  {
+   "id": "GST-028",
+   "name": "Parking \u2013 Reservation Confirmed",
+   "module": "TODO",
+   "wave": 3,
+   "route": "/general/parking-reservation-confirmed",
+   "operations": 2,
+   "drawn": true
+  },
+  {
+   "id": "GST-029",
+   "name": "Venue Info & Services",
+   "module": "TODO",
+   "wave": 2,
+   "route": "/general/venue-info-and-services",
+   "operations": 2,
+   "drawn": true
+  },
+  {
+   "id": "GST-030",
+   "name": "In-Venue Notifications",
+   "module": "TODO",
+   "wave": 2,
+   "route": "/general/in-venue-notifications",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "GST-031",
+   "name": "AI Concierge \u2013 Home",
+   "module": "TODO",
+   "wave": 2,
+   "route": "/general/ai-concierge-home",
+   "operations": 2,
+   "drawn": true
+  },
+  {
+   "id": "GST-032",
+   "name": "AI Concierge \u2013 Chat",
+   "module": "TODO",
+   "wave": 2,
+   "route": "/general/ai-concierge-chat",
+   "operations": 8,
+   "drawn": true
+  },
+  {
+   "id": "GST-033",
+   "name": "AI Concierge \u2013 Contextual Help",
+   "module": "TODO",
+   "wave": 2,
+   "route": "/general/ai-concierge-contextual-help",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "GST-034",
+   "name": "Lost & Found",
+   "module": "TODO",
+   "wave": 2,
+   "route": "/general/lost-and-found",
+   "operations": 3,
+   "drawn": true
+  },
+  {
+   "id": "GST-035",
+   "name": "Feedback & Ratings",
+   "module": "TODO",
+   "wave": 3,
+   "route": "/general/feedback-and-ratings",
+   "operations": 2,
+   "drawn": true
+  },
+  {
+   "id": "GST-036",
+   "name": "Loyalty & Rewards",
+   "module": "TODO",
+   "wave": 2,
+   "route": "/loyalty-rewards",
+   "operations": 2,
+   "drawn": true
+  },
+  {
+   "id": "GST-037",
+   "name": "Offers & Promotions",
+   "module": "TODO",
+   "wave": 2,
+   "route": "/general/offers-and-promotions",
+   "operations": 3,
+   "drawn": true
+  },
+  {
+   "id": "GST-038",
+   "name": "Digital Companion Mode",
+   "module": "TODO",
+   "wave": 3,
+   "route": "/general/digital-companion-mode",
+   "operations": 3,
+   "drawn": true
+  },
+  {
+   "id": "GST-039",
+   "name": "Profile",
+   "module": "TODO",
+   "wave": 1,
+   "route": "/general/profile",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "GST-040",
+   "name": "Help & Support",
+   "module": "TODO",
+   "wave": 2,
+   "route": "/general/help-and-support",
+   "operations": 5,
+   "drawn": true
+  },
+  {
+   "id": "GST-041",
+   "name": "Checkout Entry",
+   "module": "TODO",
+   "wave": 1,
+   "route": "/general/checkout-entry",
+   "operations": 2,
+   "drawn": true
+  },
+  {
+   "id": "GST-042",
+   "name": "Simple Registration & OTP",
+   "module": "TODO",
+   "wave": 1,
+   "route": "/general/simple-registration-and-otp",
+   "operations": 18,
+   "drawn": true
+  },
+  {
+   "id": "GST-043",
+   "name": "Arabic / RTL Experience",
+   "module": "TODO",
+   "wave": 1,
+   "route": "/general/arabic-rtl-experience",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "GST-044",
+   "name": "Multi-Currency & Pricing",
+   "module": "TODO",
+   "wave": 2,
+   "route": "/general/multi-currency-and-pricing",
+   "operations": 2,
+   "drawn": true
+  },
+  {
+   "id": "GST-045",
+   "name": "Ticket Delivery & Sharing",
+   "module": "TODO",
+   "wave": 2,
+   "route": "/general/ticket-delivery-and-sharing",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "GST-046",
+   "name": "Branded Queue / Waiting Room",
+   "module": "TODO",
+   "wave": 1,
+   "route": "/general/branded-queue-waiting-room",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "GST-047",
+   "name": "Maintenance / Upgrade Page",
+   "module": "TODO",
+   "wave": 1,
+   "route": "/general/maintenance-page",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "GST-048",
+   "name": "Upsell / Cross-Sell",
+   "module": "TODO",
+   "wave": 2,
+   "route": "/general/upsell-cross-sell",
+   "operations": 2,
+   "drawn": true
+  },
+  {
+   "id": "GST-049",
+   "name": "Interactive Seat Selection",
+   "module": "TODO",
+   "wave": 2,
+   "route": "/general/interactive-seat-selection",
+   "operations": 3,
+   "drawn": true
+  },
+  {
+   "id": "GST-050",
+   "name": "Resource Booking \u2013 Cabana",
+   "module": "TODO",
+   "wave": 3,
+   "route": "/general/resource-booking-cabana",
+   "operations": 3,
+   "drawn": true
+  },
+  {
+   "id": "GST-051",
+   "name": "Plan Your Adventure \u2013 Start",
+   "module": "TODO",
+   "wave": 3,
+   "route": "/general/plan-your-adventure-start",
+   "operations": 2,
+   "drawn": true
+  },
+  {
+   "id": "GST-052",
+   "name": "Suggested Itineraries",
+   "module": "TODO",
+   "wave": 3,
+   "route": "/general/suggested-itineraries",
+   "operations": 3,
+   "drawn": true
+  },
+  {
+   "id": "GST-053",
+   "name": "Build Your Own Itinerary",
+   "module": "TODO",
+   "wave": 3,
+   "route": "/general/build-your-own-itinerary",
+   "operations": 4,
+   "drawn": true
+  },
+  {
+   "id": "GST-054",
+   "name": "AI Optimized Itinerary",
+   "module": "TODO",
+   "wave": 3,
+   "route": "/general/ai-optimized-itinerary",
+   "operations": 4,
+   "drawn": true
+  },
+  {
+   "id": "GST-055",
+   "name": "Dynamic QR Ticket",
+   "module": "TODO",
+   "wave": 1,
+   "route": "/general/dynamic-qr-ticket",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "GST-056",
+   "name": "Bundle Package",
+   "module": "TODO",
+   "wave": 2,
+   "route": "/general/bundle-package",
+   "operations": 3,
+   "drawn": true
+  },
+  {
+   "id": "GST-057",
+   "name": "Accessibility Information",
+   "module": "TODO",
+   "wave": 2,
+   "route": "/general/accessibility-information",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "GST-058",
+   "name": "Resource Availability (Cabana)",
+   "module": "TODO",
+   "wave": 3,
+   "route": "/general/resource-availability-cabana",
+   "operations": 2,
+   "drawn": true
+  },
+  {
+   "id": "GST-059",
+   "name": "Plan My Day \u2013 In Progress",
+   "module": "TODO",
+   "wave": 3,
+   "route": "/general/plan-my-day-in-progress",
+   "operations": 3,
+   "drawn": true
+  },
+  {
+   "id": "GST-061",
+   "name": "Menu Item Detail",
+   "module": "In-Venue Experience",
+   "wave": 2,
+   "route": "/in-venue-experience/menu-item-detail",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "GST-062",
+   "name": "Shop & Drop Collection",
+   "module": "In-Venue Experience",
+   "wave": 3,
+   "route": "/in-venue-experience/shop-and-drop-collection",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "GST-063",
+   "name": "Search",
+   "module": "Discovery",
+   "wave": 1,
+   "route": "/search",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "GST-065",
+   "name": "Newsletter & Preferences",
+   "module": "Marketing",
+   "wave": 3,
+   "route": "/newsletter-preferences",
+   "operations": 2,
+   "drawn": true
+  }
+ ],
+ "gaps": {
+  "operationsWithNoScreen": [
+   {
+    "operation": "enrolFacePass",
+    "contract": "access",
+    "verb": "POST",
+    "summary": "Register a facial profile against an entitlement"
+   },
+   {
+    "operation": "getFacePassEnrolment",
+    "contract": "access",
+    "verb": "GET",
+    "summary": "Whether a pass has a face registered, and when"
+   },
+   {
+    "operation": "revokeFacePass",
+    "contract": "access",
+    "verb": "DELETE",
+    "summary": "Remove a facial profile"
+   },
+   {
+    "operation": "freezeEntitlement",
+    "contract": "catalogue",
+    "verb": "POST",
+    "summary": "Pause a membership at the guest's request"
+   },
+   {
+    "operation": "joinWaitlist",
+    "contract": "catalogue",
+    "verb": "POST",
+    "summary": "Ask to be told if capacity frees up"
+   },
+   {
+    "operation": "leaveWaitlist",
+    "contract": "catalogue",
+    "verb": "DELETE",
+    "summary": "Stop waiting"
+   },
+   {
+    "operation": "updateTableReservation",
+    "contract": "fnb",
+    "verb": "PATCH",
+    "summary": "Change or cancel a booking"
+   },
+   {
+    "operation": "createMfaChallenge",
+    "contract": "identity",
+    "verb": "POST",
+    "summary": "Step-up authentication for a sensitive action"
+   },
+   {
+    "operation": "deleteGuestAccount",
+    "contract": "identity",
+    "verb": "DELETE",
+    "summary": "Self-service account deletion"
+   },
+   {
+    "operation": "exportSubjectData",
+    "contract": "identity",
+    "verb": "POST",
+    "summary": "Everything the platform holds about one guest"
+   },
+   {
+    "operation": "createReferral",
+    "contract": "marketing-crm",
+    "verb": "POST",
+    "summary": "Issue a referral code"
+   },
+   {
+    "operation": "getMyChallenges",
+    "contract": "marketing-crm",
+    "verb": "GET",
+    "summary": "Active challenges and how far along I am"
+   },
+   {
+    "operation": "getWaiverStatus",
+    "contract": "marketing-crm",
+    "verb": "GET",
+    "summary": "Whether this guest may be issued a ticket that requires a waiver"
+   },
+   {
+    "operation": "recordLostItem",
+    "contract": "marketing-crm",
+    "verb": "POST",
+    "summary": "Report something lost, or hand something in"
+   },
+   {
+    "operation": "respondToInvitation",
+    "contract": "marketing-crm",
+    "verb": "POST",
+    "summary": "Accept or decline"
+   },
+   {
+    "operation": "submitForm",
+    "contract": "marketing-crm",
+    "verb": "POST",
+    "summary": "Sign a waiver, answer a survey, capture details"
+   },
+   {
+    "operation": "updateGuestPreferences",
+    "contract": "marketing-crm",
+    "verb": "PUT",
+    "summary": "The things a regular should not have to say twice"
+   },
+   {
+    "operation": "uploadGuestDocument",
+    "contract": "marketing-crm",
+    "verb": "POST",
+    "summary": "Store a guest photo, ID or signed document"
+   },
+   {
+    "operation": "convertToTermProduct",
+    "contract": "orders",
+    "verb": "POST",
+    "summary": "Turn a visit into a membership or season pass"
+   },
+   {
+    "operation": "createCart",
+    "contract": "orders",
+    "verb": "POST",
+    "summary": "Start a cart"
+   },
+   {
+    "operation": "createResaleListing",
+    "contract": "orders",
+    "verb": "POST",
+    "summary": "List an entitlement for resale"
+   },
+   {
+    "operation": "getGroupBooking",
+    "contract": "orders",
+    "verb": "GET",
+    "summary": ""
+   },
+   {
+    "operation": "listPaymentTokens",
+    "contract": "orders",
+    "verb": "GET",
+    "summary": "A guest's saved payment methods"
+   },
+   {
+    "operation": "quoteUpgrade",
+    "contract": "orders",
+    "verb": "POST",
+    "summary": "What an upgrade costs, pro-rata"
+   },
+   {
+    "operation": "shareEntitlement",
+    "contract": "orders",
+    "verb": "POST",
+    "summary": "Let somebody else use this, without giving it away"
+   },
+   {
+    "operation": "storePaymentToken",
+    "contract": "orders",
+    "verb": "POST",
+    "summary": "Save a payment method for future use"
+   },
+   {
+    "operation": "transferWalletBalance",
+    "contract": "retail",
+    "verb": "POST",
+    "summary": "Send balance to another guest"
+   },
+   {
+    "operation": "assignSeats",
+    "contract": "seating",
+    "verb": "POST",
+    "summary": "Pick and hold the best available seats"
+   }
+  ],
+  "modulesSplitAcrossWaves": [
+   {
+    "module": "In-Venue Experience",
+    "waves": [
+     2,
+     3
+    ]
+   },
+   {
+    "module": "TODO",
+    "waves": [
+     1,
+     2,
+     3
+    ]
+   }
+  ],
+  "screensNotDrawn": [],
+  "flowsNamingAMissingScreen": []
+ }
+}

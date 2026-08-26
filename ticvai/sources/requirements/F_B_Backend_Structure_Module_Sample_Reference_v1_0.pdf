@@ -1,0 +1,5096 @@
+FUNCTIONAL REFERENCE MANUAL
+F&B Backend Structure Module
+Master Configuration, Recipes, Kitchen, Service, Inventory and Analytics
+Six-board functional architecture with standard POS coverage
+VERSION 1.0
+August 2026
+
+TICVAI / F&B BACKEND STRUCTURE MODULE
+CONFIDENTIAL | 2
+Contents
+F&B — Board 1: Master & Outlet Configuration
+ Screen 1 — F&B Command Center
+ Screen 2 — Outlet Management
+ Screen 3 — Create / Edit Outlet
+ Screen 4 — Outlet Types & Templates
+ Screen 5 — Operating Hours & Service Periods
+ Screen 6 — POS & Device Assignment
+ Screen 7 — Service Channel Configuration
+ Screen 8 — Kitchen & Preparation Stations
+ Screen 9 — Order Routing & KDS/Printer Rules
+ Screen 10 — F&B Global Settings & Controls
+REVISED F&B — BOARD 2
+ SCREEN 1 — Menu & Product Command Center
+ SCREEN 2 — Menu Builder & POS Layout Designer
+ SCREEN 3 — Product / PLU Master
+ SCREEN 4 — Variants, Modifiers & Special Selling Rules
+ SCREEN 5 — Combo & Meal Builder
+ SCREEN 6 — Recipe & BOM Management
+ SCREEN 7 — Ingredient Substitution, Allergen & Nutrition
+ SCREEN 8 — Production Planning & Production Sheets
+ SCREEN 9 — Central Kitchen & Commissary Management
+ SCREEN 10 — Availability, Pricing, Channels & Publishing
+TICVAI F&B — BOARD 3
+ SCREEN 1 — Kitchen Operations Command Center
+ SCREEN 2 — Kitchen Display System (KDS)
+ SCREEN 3 — Order Firing & Course Management
+ SCREEN 4 — Active Order Management & Fulfilment Journey
+ SCREEN 5 — Kitchen Station Workload & Dynamic Routing
+ SCREEN 6 — Expeditor & Order Assembly
+ SCREEN 7 — Guest Collection, Buzzer & Digital Notification
+ SCREEN 8 — Exceptions, Re-Fire & Unavailable Items
+ SCREEN 9 — SLA, Priority & Service Rules
+ SCREEN 10 — Kitchen Performance, AI & Operational Optimization
+TICVAI F&B — BOARD 4
+ Screen 1 — Restaurant Service Command Center
+ Screen 2 — Floor Plan & Table Map
+ Screen 3 — Table & Seating Configuration
+ Screen 4 — Reservation Calendar & Timeline
+ Screen 5 — Create / Edit Reservation
+ Screen 6 — Walk-In & Waitlist Management
+ Screen 7 — Guest Profile & Dining History
+ Screen 8 — Live Table & Service Management
+ Screen 9 — Table Order, Bill & Payment Management
+ Screen 10 — Reservation & Table Performance
+TICVAI F&B — BOARD 5
+ SCREEN 1 — F&B Stock & Operations Command Center
+ SCREEN 2 — Outlet Stock & Ingredient Availability
+
+TICVAI / F&B BACKEND STRUCTURE MODULE
+CONFIDENTIAL | 3
+ SCREEN 3 — Recipe Consumption & Theoretical Inventory
+ SCREEN 4 — Production Execution & Batch Management
+ SCREEN 5 — Wastage, Spoilage, Returns & Write-Off
+ SCREEN 6 — Requisition & Smart Replenishment
+ SCREEN 7 — Transfers, Distribution & Outlet Receiving
+ SCREEN 8 — Stock Count, Reconciliation & Variance
+ SCREEN 9 — Product Availability, 86 & Operational Food Safety
+ SCREEN 10 — Operational Alerts, AI Replenishment & Action Center
+TICVAI F&B — BOARD 6
+ SCREEN 1 — F&B Executive Command Center
+ SCREEN 2 — Sales, Revenue & Channel Analytics
+ SCREEN 3 — Outlet, Service & Guest Performance
+ SCREEN 4 — Product Performance & Menu Engineering
+ SCREEN 5 — Food Cost, Margin & Profitability Intelligence
+ SCREEN 6 — Inventory, Waste & Production Intelligence
+ SCREEN 7 — Kitchen, Service & Fulfilment Performance
+ SCREEN 8 — Demand Forecasting & Operational Planning
+ SCREEN 9 — AI Recommendation, Simulation & Optimization Center
+ SCREEN 10 — AI Assistant, Alerts & Management Action Center
+AMENDMENT — STANDARD F&B POS FUNCTIONAL COVERAGE
+ A. Functional Gap Summary
+ B. Board 1 Additions — User Access, Shift and Till Controls
+ C. Board 1 and Board 4 Additions — Check and Order Lifecycle
+ D. Board 1 and Board 3 Additions — KOT Management
+ E. Board 1 and Board 4 Additions — Void and Item Transfer Controls
+ F. Board 3 and Board 4 Additions — Cover, Course and Service Status
+ G. Board 4 Additions — Delivery Outlet and Guest Profile Functions
+ H. Board 1 and Board 4 Additions — Happy Hour, Discounts, Tips, Tax and Settlement
+ I. Board 4 Addition — Standard Split-Check Behaviour
+ J. Board 6 Additions — Standard POS Report Catalogue
+
+TICVAI / F&B BACKEND STRUCTURE MODULE
+CONFIDENTIAL | 4
+F&B — Board 1: Master & Outlet Configuration
+Purpose: Give the F&B administrator one place to configure the operational structure before menus, recipes, 
+kitchen operations, tables, or inventory are configured.
+Screen 1 — F&B Command Center
+Top KPI cards
+ Today's Sales
+ Orders Today
+ Average Order Value
+ Open Outlets
+ Active POS
+ Orders in Preparation
+ Average Preparation Time
+ Unavailable Items
+ Critical Stock Alerts
+ Operational Alerts
+Main widgets
+ Sales by Outlet
+ Orders by Channel
+ Live Outlet Status
+ Kitchen Load
+ Top Selling Items
+ Recent Alerts
+
+TICVAI / F&B BACKEND STRUCTURE MODULE
+CONFIDENTIAL | 5
+AI Insight panel
+Main Restaurant is 22% busier than a typical Wednesday.
+Grill Station preparation time has increased from 8 to 14 minutes.
+5 menu items may become unavailable within 3 hours.
+Quick actions
++ Outlet | + POS | + Kitchen | View Live Operations
+This screen should be operational rather than purely financial.
+Screen 2 — Outlet Management
+This is the master list of all F&B outlets.
+Filters
+Tenant | Company | Park | Venue | Outlet Type | Status | Service Channel
+Table
+Outlet Type Venue Menu Kitchen POS Status
+Main 
+Restaurant
+Restaurant Park A Main Menu Kitchen A 4 Open
+Coffee House Café Park A Café Menu Café Station 2 Open
+Beach Kiosk Kiosk Waterpark Kiosk Menu Kitchen B 1 Closed
+VIP Lounge Lounge Park A VIP Menu Kitchen A 2 Open
+Actions:
+View | Edit | Duplicate | Suspend | Archive
+Important feature
+I would include Duplicate Outlet.
+If a customer operates 20 almost-identical kiosks, they shouldn't configure all 20 manually.
+Screen 3 — Create / Edit Outlet
+This is the detailed configuration screen.
+I would use tabs.
+Tab 1 — General
+ Outlet Name
+ Outlet Code
+ Outlet Type
+ Description
+ Company
+ Business Unit
+ Park
+ Venue
+ Facility
+ Zone
+ Cost Center
+ Revenue Center
+
+TICVAI / F&B BACKEND STRUCTURE MODULE
+CONFIDENTIAL | 6
+ Currency
+ Status
+Tab 2 — Operations
+ Opening Hours
+ Service Periods
+ Capacity
+ Dine-In
+ Takeaway
+ Mobile Ordering
+ QR Ordering
+ Delivery
+ Reservations
+Tab 3 — Commerce
+ Default Menu
+ Price Book
+ Tax Profile
+ Service Charge
+ Accepted Payment Methods
+ Promotion Rules
+ Loyalty Rules
+Tab 4 — Kitchen
+ Primary Kitchen
+ Preparation Stations
+ KDS
+ Kitchen Printers
+ Routing Profile
+Tab 5 — POS
+Assigned terminals and devices.
+Tab 6 — Inventory
+ Inventory Location
+ Stock Location
+ Replenishment Source
+ Default Warehouse
+Notice that this only links the outlet to Shared Inventory. It does not create another inventory engine.
+Tab 7 — Audit
+Created by
+Modified by
+Approved by
+Version history
+The matrix requires configuration changes and sensitive actions to be auditable, so this should be standard 
+throughout the module.
+
+TICVAI / F&B BACKEND STRUCTURE MODULE
+CONFIDENTIAL | 7
+Screen 4 — Outlet Types & Templates
+This is one of the screens I think will make TICVAI considerably easier to configure.
+Templates
+Full-Service Restaurant
+✓ Dine-In
+✓ Reservations
+✓ Tables
+✓ Kitchen
+✓ KDS
+✓ Waitlist
+✓ Recipes
+Quick-Service Restaurant
+✓ Counter Order
+✓ Kitchen
+✓ KDS
+✓ Takeaway
+✕ Reservations
+Café
+✓ Counter Order
+✓ Modifiers
+✓ Beverage Station
+✓ Takeaway
+✓ Optional Tables
+Kiosk
+✓ Quick POS
+✓ Small Menu
+✓ Takeaway
+✕ Tables
+✕ Reservations
+VIP Lounge
+✓ Guest Verification
+✓ Complimentary Items
+✓ Table Service
+✓ Membership/Entitlement Validation
+Buttons
++ Create Template
+Duplicate
+Edit
+Assign to Outlets
+This is especially useful for TICVAI's multi-venue/multi-tenant model.
+Screen 5 — Operating Hours & Service Periods
+This screen manages when the outlet and menus operate.
+Weekly calendar
+
+TICVAI / F&B BACKEND STRUCTURE MODULE
+CONFIDENTIAL | 8
+Day Opening Closing Service Periods
+Monday 10:00 22:00 Lunch / Dinner
+Tuesday 10:00 22:00 Lunch / Dinner
+Friday 10:00 00:00 Lunch / Dinner / Late 
+Night
+Service periods
+Breakfast
+08:00–11:00
+Lunch
+11:00–16:00
+Dinner
+16:00–22:00
+Late Night
+22:00–00:00
+But I would add something important:
+Exception Calendar
+Ramadan
+Eid
+Christmas
+Special Event
+Private Event
+Maintenance
+Venue Closure
+Example:
+31 December
+Normal: 10:00–22:00
+Override: 10:00–02:00
+Menus, prices and availability can later reference these periods.
+Screen 6 — POS & Device Assignment
+This screen connects physical POS infrastructure to F&B.
+Device cards/table
+Terminal Outlet Type Cashier Payment Printer Status
+POS-01 Main 
+Restaurant
+Fixed Ahmed Online Printer 01 Online
+POS-02 Main 
+Restaurant
+Fixed Sara Online Printer 02 Online
+MPOS-04 VIP Lounge Mobile Omar Online — Online
+Terminal configuration
+ Terminal ID
+ Device Name
+ Outlet
+ Default Menu
+
+TICVAI / F&B BACKEND STRUCTURE MODULE
+CONFIDENTIAL | 9
+ Price Book
+ Cash Drawer
+ Payment Terminal
+ Receipt Printer
+ Kitchen Printer
+ Customer Display
+ Default Language
+ Offline Mode
+ Cashier Assignment
+ Concurrent Login Rules
+The original matrix specifically requires POS/back-office login controls, supervisor override and configurable 
+concurrent terminal access.
+Device health
+I would also display:
+ Online
+ Sync Pending
+ Offline
+plus:
+Last Sync
+Software Version
+Last Transaction
+Screen 7 — Service Channel Configuration
+This controls how customers can order.
+Channels
+POS Counter
+Dine-In
+QR Table Order
+Mobile App
+B2C Web
+Self-Service Kiosk
+Takeaway
+Delivery
+VIP / Hospitality
+Event Catering
+Clicking a channel opens its rules.
+Example — QR Table Ordering
+Status: Active
+Available Outlets:
+Main Restaurant
+Menu:
+Main Restaurant Digital Menu
+
+TICVAI / F&B BACKEND STRUCTURE MODULE
+CONFIDENTIAL | 10
+Price Book:
+Standard
+Payment:
+Pay Online / Pay at Table
+Guest login:
+Optional
+Operating hours:
+11:00–22:00
+Maximum items/order:
+30
+Minimum order:
+AED 20
+This architecture also allows a product to be available in one channel but not another, consistent with the matrix's 
+channel/product assignment concept.
+Screen 8 — Kitchen & Preparation Stations
+Now we configure the physical production environment.
+Kitchen hierarchy
+Main Kitchen
+→ Grill Station
+→ Fry Station
+→ Cold Kitchen
+→ Dessert Station
+→ Beverage Station
+→ Expeditor
+Each station shows:
+Status
+Current Orders
+Average Preparation Time
+KDS Device
+Printer
+Staff Assigned
+Create Station
+Fields:
+ Station Name
+ Station Code
+ Kitchen
+ Outlet(s)
+ Product Categories
+ Preparation Capacity
+ Target Preparation Time
+ KDS
+ Backup Station
+ Printer
+ Operating Hours
+Important feature — shared kitchen
+
+TICVAI / F&B BACKEND STRUCTURE MODULE
+CONFIDENTIAL | 11
+One kitchen must be able to support multiple outlets.
+Example:
+Main Kitchen
+ │
+┌───┼─────────┐
+ │ │ │
+Restaurant VIP Lounge Kiosk
+Screen 9 — Order Routing & KDS/Printer Rules
+Screen 8 creates the stations.
+Screen 9 determines where orders go.
+Visual Routing Builder
+For example:
+Category = Burger
+→ Grill Station
+→ Grill KDS
+Category = Fries
+→ Fry Station
+→ Fry KDS
+Category = Coffee
+→ Beverage Station
+→ Beverage KDS
+More advanced rules
+IF:
+Outlet = VIP Lounge
+AND Product Category = Dessert
+THEN:
+→ VIP Kitchen Station
+Or:
+IF Grill Station = Offline
+THEN:
+→ Backup Grill Station
+This should be a no-code rule builder.
+Routing priority
+1. Product-specific rule
+2. Category rule
+3. Outlet rule
+4. Kitchen default
+That prevents configuration conflicts.
+Screen 10 — F&B Global Settings & Controls
+The final screen controls F&B-wide behavior.
+
+TICVAI / F&B BACKEND STRUCTURE MODULE
+CONFIDENTIAL | 12
+I would divide it into tabs.
+Orders
+ Allow Hold Order
+ Allow Reopen
+ Allow Split Bill
+ Allow Merge Bill
+ Allow Item Transfer
+ Allow Table Transfer
+ Allow Void
+ Allow Refund
+ Maximum Open Order Duration
+Pricing & Tax
+ Tax Inclusive / Exclusive
+ Default VAT
+ Service Charge
+ Municipality Fee
+ Rounding
+ Gratuity
+Approvals
+This is particularly important for TICVAI.
+Configure approval thresholds:
+Void
+Under AED 50 Supervisor →
+Above AED 50 Manager →
+Refund
+Manager Approval
+Manual Price Change
+Finance Approval
+Complimentary Item
+Manager Approval
+Discount Override
+Supervisor Approval
+The matrix explicitly requires configurable approval requirements and separation of duties around refunds, 
+promotions, price changes and manual overrides.
+Offline
+ Allow Offline Sales
+ Maximum Offline Transaction Value
+ Offline Payment Rules
+ Synchronization Rules
+Receipt
+ Logo
+ Header
+ Footer
+ VAT Number
+
+TICVAI / F&B BACKEND STRUCTURE MODULE
+CONFIDENTIAL | 13
+ QR
+ Language
+ Digital Receipt
+How I would visually organize Board 1
+The left navigation could look like:
+FOOD & BEVERAGE
+▣ Overview
+MASTER & CONFIGURATION
+ Outlets
+ Outlet Templates
+ Operating Hours
+SALES & SERVICE
+ POS & Devices
+ Service Channels
+KITCHEN
+ Kitchens & Stations
+ Routing Rules
+CONFIGURATION
+ Global Settings
+And the header should always contain:
+Tenant Company Park/Venue Outlet → → →
+This hierarchy is critical because TICVAI is multi-tenant and multi-venue.
+One AI feature I would add to Board 1
+I don't want AI only appearing in Board 6.
+Put an AI Configuration Assistant directly into Board 1.
+For example, the administrator writes:
+Create a quick-service burger restaurant in Park A. Opening hours are 10 AM–11 PM. It has four POS terminals, 
+one grill station, one fryer station and one beverage station. It supports dine-in, takeaway and QR ordering.
+TICVAI generates a proposed configuration:
+Outlet: Burger House
+Template: Quick Service
+Hours: 10:00–23:00
+POS: 4
+Kitchen Stations: 3
+Channels: Dine-In / Takeaway / QR
+Suggested routing: Generated
+Then:
+Review Configuration Submit for Approval Publish → →
+That aligns much more strongly with TICVAI's AI-first positioning than simply adding an AI chatbot later.
+Board 1 workflow
+The complete configuration workflow becomes:
+Create Outlet
+→ Choose Template
+
+TICVAI / F&B BACKEND STRUCTURE MODULE
+CONFIDENTIAL | 14
+→ Configure Operating Hours
+→ Assign Menu/Price Book
+→ Assign POS
+→ Enable Service Channels
+→ Configure Kitchen
+→ Configure Routing
+→ Configure Controls
+→ Validate Configuration
+→ Approval
+→ Publish
+I would also use the lifecycle:
+Draft Review Approved Published Suspended Archived → → → → →
+so administrators aren't making live F&B changes accidentally.
+With this structure, Board 1 establishes the entire F&B operating environment, while Board 2 can focus 
+completely on Menu, Product, Modifier & Recipe Management without duplicating outlet configuration.
+
+TICVAI / F&B BACKEND STRUCTURE MODULE
+CONFIDENTIAL | 15
+REVISED F&B — BOARD 2
+Menu, Product, Recipe & Production Configuration
+Board 2 should manage four connected layers:
+What we sell Menu & Product →
+How guests customize it Variants & Modifiers →
+How we make it Recipe & Ingredients →
+What we need to prepare Production & Commissary →
+Revised 10 Screens
+# Screen Main Function
+1 Menu & Product Command Center
+Overall 
+menu/product/recipe/production 
+status
+2 Menu Builder & POS Layout Designer Menus + POS button layouts + channel 
+presentation
+3 Product / PLU Master Central F&B product configuration
+4
+Variants, Modifiers & Special Selling 
+Rules
+Sizes, choices, modifiers, limits, special
+products
+5 Combo & Meal Builder Meals, bundles and choice-based 
+combinations
+
+TICVAI / F&B BACKEND STRUCTURE MODULE
+CONFIDENTIAL | 16
+# Screen Main Function
+6 Recipe & BOM Management Recipes, ingredients, yields, costing, 
+versions
+7
+Ingredient Substitution, Allergen & 
+Nutrition
+Controlled substitutions and food 
+information
+8
+Production Planning & Production 
+Sheets
+Demand-based kitchen preparation 
+planning
+9
+Central Kitchen & Commissary 
+Management
+Central production supplying multiple 
+outlets
+10 Availability, Pricing, Channels & 
+Publishing
+Where/when/how products are sold 
+and published
+SCREEN 1 — Menu & Product Command Center
+It should become the control center for Board 2.
+KPI cards
+ Active Menus
+ Active Products / PLUs
+ Active Recipes
+ Products Without Recipes
+ Products Without Kitchen Routing
+ Pending Recipe Approvals
+ Low-Margin Products
+ Products Unavailable
+ Production Runs Today
+ Production Alerts
+Menu status
+Show:
+Main Restaurant Menu — Published
+VIP Menu — Published
+Ramadan Menu — Scheduled
+Summer Menu — Draft
+Configuration health
+TICVAI should automatically identify:
+12 products missing recipes
+7 products missing allergens
+4 products missing kitchen routing
+3 recipes awaiting approval
+18 products not assigned to digital channels
+
+TICVAI / F&B BACKEND STRUCTURE MODULE
+CONFIDENTIAL | 17
+Production summary
+Today's Planned Production:
+1,450 Burger Patties
+680 Pizza Dough
+42 L Special Sauce
+Production completion:
+68%
+Quick actions
++ Menu | + Product | + Recipe | + Production Plan | AI Configure
+SCREEN 2 — Menu Builder & POS Layout Designer
+This screen contain two related but separate modes.
+Mode A — Menu Structure
+Example:
+Main Restaurant Menu
+Burgers
+→ Classic Burger
+→ Chicken Burger
+→ Veggie Burger
+Pizza
+→ Margherita
+→ Pepperoni
+Beverages
+→ Soft Drinks
+→ Coffee
+→ Juice
+Administrators can drag and drop products and categories.
+Mode B — POS Layout Designer
+The additional matrix explicitly requires authorized users to remotely control product visibility and placement on 
+POS screens, apply changes immediately or at a future time, and reuse menu layouts across locations.
+So we need a genuine visual POS designer:
+┌────────────── ──────────────┐ POS LAYOUT 
+ [BURGERS] [PIZZA] [SALADS] [DRINKS]
+ [Classic] [Chicken] [Veggie] [Combo]
+ [Fries] [Water] [Coke] [Coffee]
+ + ADD BUTTON
+
+TICVAI / F&B BACKEND STRUCTURE MODULE
+CONFIDENTIAL | 18
+└─────────────────────────────────────────┘
+Admin can:
+ Drag buttons
+ Resize buttons
+ Change product position
+ Create category pages
+ Hide products
+ Highlight featured products
+ Copy layouts
+Copy layout
+Main Restaurant POS
+→ Copy to:
+☑ Restaurant 2
+☑ Restaurant 3
+☑ VIP Lounge
+Publication
+Publish Now
+or
+Schedule: 01 Sep 2026 — 06:00
+This needs version control and rollback.
+SCREEN 3 — Product / PLU Master
+Product information
+ Product Name
+ Product Code
+ PLU
+ Barcode
+ Product Type
+ Category
+ Subcategory
+ Brand
+ Description
+ POS Short Name
+ Image
+ Status
+The earlier matrix also specifies predefined naming schemas/code formats, which should be configurable rather 
+than manually enforced.
+Example:
+DXB-FNB-BURGER-001
+
+TICVAI / F&B BACKEND STRUCTURE MODULE
+CONFIDENTIAL | 19
+Commercial
+ Base Price
+ Cost
+ Currency
+ VAT
+ Service Charge
+ Revenue Center
+ Cost Center
+ Accounting Mapping
+Operations
+ Preparation Required
+ Recipe
+ Preparation Time
+ Kitchen
+ Station
+ Inventory Tracked
+ Stock Consumption Method
+Selling
+ Outlet
+ Menu
+ Channel
+ Service Period
+ Customer Segment
+ Membership
+ Group Type
+Product status
+Draft
+Review
+Approved
+Published
+Temporarily Unavailable
+Suspended
+Archived
+SCREEN 4 — Variants, Modifiers & Special Selling Rules
+Variants
+Example:
+Pizza
+Small — AED 35
+Medium — AED 45
+Large — AED 58
+Family — AED 72
+Each can have separate:
+
+TICVAI / F&B BACKEND STRUCTURE MODULE
+CONFIDENTIAL | 20
+PLU
+Price
+Recipe
+Cost
+Preparation Time
+Availability.
+Modifier groups
+Cheese
+No Cheese
+Cheddar + AED 4
+Swiss + AED 6
+Sides
+Fries
+Salad
+Sweet Potato + AED 5
+Modifier controls
+Mandatory / Optional
+Minimum Selection
+Maximum Selection
+Default
+Additional Price
+Ingredient Consumption
+Kitchen Instruction.
+The additional matrix explicitly requires mandatory/optional modifiers and free-text special requests where 
+modifiers are insufficient.
+So add:
+Special Request
+"No salt, sauce separately."
+Selling limits
+This is also where I would configure:
+Maximum per Order
+Maximum per Day
+Maximum per Time Slot
+Maximum per Customer
+Group-Only Product
+School Product
+
+TICVAI / F&B BACKEND STRUCTURE MODULE
+CONFIDENTIAL | 21
+Event Product
+Happy Hour
+Example:
+School Meal
+Customer Segment:
+School Group
+Available:
+10:00–14:00
+Maximum:
+500/day
+SCREEN 5 — Combo & Meal Builder
+Example
+Family Burger Meal — AED 189
+Choose:
+4 Burgers
+4 Sides
+4 Drinks
+Component groups
+Main
+Side
+Drink
+Dessert
+Add-On
+Rules
+Required quantity
+Minimum
+Maximum
+Substitution allowed
+Upgrade allowed
+Price difference
+Modifier eligibility.
+Pricing
+Fixed Price
+Component Price
+Bundle Discount
+
+TICVAI / F&B BACKEND STRUCTURE MODULE
+CONFIDENTIAL | 22
+Upgrade Price
+Promotional Price.
+Inventory
+The actual components selected must drive inventory consumption.
+So if the customer chooses:
+3 Beef Burgers
+1 Chicken Burger
+TICVAI consumes the corresponding recipes—not a generic "Family Meal" inventory item.
+SCREEN 6 — Recipe & BOM Management
+The new matrix explicitly requires recipe creation/change tracking, approval before changes become active, 
+production planning, batch preparation and production runs.
+Recipe header
+Classic Beef Burger
+Version:
+V4
+Yield:
+1 Portion
+Preparation:
+12 min
+Cost:
+AED 13.42
+Selling:
+AED 49
+Margin:
+72.6%
+Ingredients
+Ingredient Qty UOM Cost Waste/Yield
+Beef Patty 180 g 7.20 95%
+Bun 1 pc 1.30 100%
+Cheese 1 slice 1.10 100%
+Sauce 20 ml 0.82 98%
+Recipe versions
+
+TICVAI / F&B BACKEND STRUCTURE MODULE
+CONFIDENTIAL | 23
+V1
+V2
+V3
+V4 Current
+Compare:
+V3 V4 ↔
+Workflow
+Draft
+→ Testing
+→ Cost Review
+→ F&B Approval
+→ Finance/Cost Approval if required
+→ Active
+Yield & shrinkage
+Raw Beef:
+10 kg
+Usable after preparation:
+9.2 kg
+Yield:
+92%
+TICVAI should calculate the real usable cost.
+Recipe Cost Revaluation
+Authorized users shall be able to revalue every ingredient in a recipe using either the Last Receipt Rate or the Last 
+Issue Rate.
+Last Receipt Rate: the latest approved procurement rate at which the ingredient was received from a supplier.
+Last Issue Rate: the latest approved rate at which the ingredient was issued from the store or warehouse to the 
+kitchen or production location.
+The selected valuation basis may be configured at company, outlet, recipe or ingredient level, subject to rolebased permissions and approval controls.
+Before applying a revaluation, the system shall show the previous rate, proposed rate, effective date, source 
+receipt or issue transaction, revised recipe cost, revised margin and affected products.
+Revaluation shall support preview, approval, effective dating and bulk recalculation, while retaining the previous 
+value and a complete audit trail. It shall not rewrite historical closed transactions unless an authorized financial 
+adjustment process is used.
+
+TICVAI / F&B BACKEND STRUCTURE MODULE
+CONFIDENTIAL | 24
+Nested Recipes / Sub-Recipes
+A recipe shall be allowed as an ingredient or component within another recipe. For example, a Special Sauce 
+recipe may be linked as a sub-recipe within a Burger recipe.
+The parent recipe shall reference the approved sub-recipe version, required quantity and unit of measure, and 
+shall automatically roll up the sub-recipe's ingredient cost, yield, wastage, allergens, nutrition and theoretical 
+inventory consumption.
+Changes to an active sub-recipe shall identify all affected parent recipes and products, recalculate their costs and 
+margins, and follow the configured approval and effective-date workflow before publication.
+The system shall prevent circular recipe links and provide a multi-level recipe-explosion view from the finished 
+product down to the lowest-level ingredients.
+Open Item Recipe and Receipt Linkage
+The system shall provide an Open Item Recipe option for POS items that are not selected from a predefined 
+product/PLU master record.
+When an open item is sold, the cashier shall be able—or, where configured, be required—to link the sale to an 
+approved open-item recipe or recipe template before settlement.
+The open-item receipt line shall retain the entered item description, quantity, unit of measure, selling price, tax, 
+linked recipe, calculated cost and margin, subject to permissions and approval thresholds.
+The linked recipe shall drive ingredient-level theoretical consumption, costing, stock deduction, reporting and 
+audit history. If no recipe is linked, the transaction shall be flagged as an exception for authorized review and 
+reconciliation.
+SCREEN 7 — Ingredient Substitution, Allergen & Nutrition
+The matrix requires approved substitutions to automatically update recipe cost, allergens, nutrition, inventory 
+consumption and audit logs.
+Example
+Recipe:
+Classic Pizza
+Current Ingredient:
+Mozzarella A
+Proposed substitute:
+Mozzarella B
+Impact Analysis
+Cost:
+AED 12.40 → AED 12.85
+
+TICVAI / F&B BACKEND STRUCTURE MODULE
+CONFIDENTIAL | 25
+Margin:
+68.0% → 66.7%
+Calories:
+820 → 834
+Allergens:
+Milk ✓
+No new allergen
+Inventory Mapping:
+INV-MOZ-A
+→
+INV-MOZ-B
+Approval
+Reason:
+Supplier unavailable
+Effective:
+Temporary — 14–20 Aug
+Approval:
+F&B Manager Cost Controller →
+Buttons:
+Approve | Reject | Modify
+Allergens
+Contains:
+Milk
+Egg
+Wheat
+May contain:
+Nuts
+Dietary
+Vegetarian
+Vegan
+Halal
+
+TICVAI / F&B BACKEND STRUCTURE MODULE
+CONFIDENTIAL | 26
+Gluten-Free
+Dairy-Free etc.
+Every approved change should propagate to POS, mobile, QR and kiosk product information.
+SCREEN 8 — Production Planning & Production Sheets
+.
+The matrix specifically requires production quantities, AI forecasting, production sheets and schedules using 
+reservations, attendance forecasts, events and inventory availability.
+Production forecast
+Tomorrow — Dubai Park
+Expected Attendance:
+14,800
+Restaurant Reservations:
+720
+Expected F&B Orders:
+5,328
+Recommended production
+Prep Item Forecast
+Demand Safety Required Available Produce
+Burger Patty 1,480 70 1,550 320 1,230
+Pizza Dough 680 40 720 180 540
+Special Sauce 38 L 4 L 42 L 12 L 30 L
+Inputs
+TICVAI should show WHY:
+Ticket Forecast
+Reservations
+Historical Demand
+Event Schedule
+Current Stock
+Incoming Stock.
+Production Sheet
+Click:
+
+TICVAI / F&B BACKEND STRUCTURE MODULE
+CONFIDENTIAL | 27
+Generate Production Sheet
+creates:
+Kitchen
+Station
+Prep Item
+Quantity
+Start Time
+Required By
+Batch
+Staff/Team
+Status.
+Lifecycle
+Planned Approved Released In Production Completed Variance Review → → → → →
+SCREEN 9 — Central Kitchen & Commissary Management
+The additional matrix explicitly calls for central kitchen/commissary operations supplying multiple outlets with 
+production batches, transfers, yields and planning.
+Central Kitchen Dashboard
+Today:
+Production Runs:
+18
+Planned:
+2,840 units
+Completed:
+1,920
+Variance:
+-2.4%
+Outbound Transfers:
+14
+Production run
+RUN-2026-0814-042
+Item:
+Special Sauce
+Planned:
+100 L
+Actual:
+96 L
+
+TICVAI / F&B BACKEND STRUCTURE MODULE
+CONFIDENTIAL | 28
+Yield:
+96%
+Batch:
+SAUCE-140826-A
+Expiry:
+17 Aug 2026
+Distribution
+Main Restaurant:
+40 L
+VIP Lounge:
+15 L
+Beach Kiosk:
+20 L
+Event Kitchen:
+21 L
+Workflow
+Demand Forecast
+→ Production Plan
+→ Central Kitchen
+→ Batch Production
+→ Quality/Release
+→ Shared Inventory
+→ Outlet Transfer
+→ Outlet Receiving
+Important boundary
+Board 2 manages the production requirement and commissary operation.
+The actual enterprise stock ledger and warehouse transfer remain within Shared Inventory.
+SCREEN 10 — Availability, Pricing, Channels & Publishing
+Product
+Classic Burger
+Outlets
+
+TICVAI / F&B BACKEND STRUCTURE MODULE
+CONFIDENTIAL | 29
+Main Restaurant ✓
+VIP Lounge ✓
+Beach Kiosk ✓
+Coffee House ✕
+Channels
+POS ✓
+QR ✓
+Mobile ✓
+Kiosk ✓
+B2C ✓
+Delivery ✕
+Service periods
+Lunch ✓
+Dinner ✓
+Late Night ✕
+Pricing
+Standard:
+AED 49
+VIP:
+AED 49
+Member:
+AED 44
+Employee:
+AED 35
+Happy Hour:
+AED 42
+Availability rules
+Stock-Based ✓
+Recipe-Based ✓
+Kitchen Capacity ✓
+Date/Time ✓
+Publishing
+Current Version:
+V18
+Proposed:
+V19
+
+TICVAI / F&B BACKEND STRUCTURE MODULE
+CONFIDENTIAL | 30
+Changes:
+14 Products
+3 Prices
+2 Recipes
+1 Layout
+Affected:
+6 Outlets
+28 POS
+4 Digital Channels
+Pre-Publish Validation
+TICVAI checks:
+✓ All products have prices
+✓ All prepared items have recipes
+✓ All allergens completed
+✓ Kitchen routing valid
+⚠ 2 products have margin below threshold
+⚠ 1 outlet lacks sufficient stock
+Then:
+Submit for Approval
+→ Schedule
+→ Publish
+AI Configuration Assistant
+AI now needs to understand the entire Board 2 configuration.
+For example:
+Create a new Ramadan Iftar menu for Main Restaurant and VIP Lounge from 1 March to 30 March, 5:30 PM–10 
+PM. Include three meal packages, route grills to Main Kitchen, generate the required recipes and estimate 
+tomorrow's production from our reservations and ticket forecast.
+TICVAI can create a draft proposal, not publish automatically:
+Menu
+Products
+Combos
+Modifiers
+Recipes
+Kitchen routing
+
+TICVAI / F&B BACKEND STRUCTURE MODULE
+CONFIDENTIAL | 31
+Availability
+POS layout
+Production requirements.
+Then:
+Review Validate Approval Publish → → →
+Board 2 architecture
+This is now much more complete:
+MENU
+↓
+PRODUCT / PLU
+↓
+VARIANT + MODIFIER + COMBO
+↓
+RECIPE
+↓
+INGREDIENT + SUBSTITUTION + ALLERGEN
+↓
+DEMAND
+↓
+PRODUCTION PLAN
+↓
+CENTRAL KITCHEN / COMMISSARY
+↓
+AVAILABILITY + PRICE + CHANNEL
+↓
+POS / QR / MOBILE / KIOSK / B2C
+
+TICVAI / F&B BACKEND STRUCTURE MODULE
+CONFIDENTIAL | 32
+TICVAI F&B — BOARD 3
+Kitchen, KDS & Order Fulfilment Management — Scope of Work
+1. Purpose
+The Kitchen, KDS & Order Fulfilment Board shall provide a centralized, real-time operational platform for 
+managing the complete lifecycle of Food & Beverage orders from the moment an order is confirmed until 
+preparation, assembly, guest notification, collection/service, and completion.
+The solution shall support orders originating from:
+ Fixed POS
+ Mobile POS
+ Self-Service Kiosk
+ QR Table Ordering
+ Mobile Application
+ B2C Web
+ Dine-In
+ Takeaway
+ VIP / Hospitality
+ Group / School Orders
+ Event Catering
+ Pre-Orders
+ Future third-party delivery integrations
+All channels shall feed into a single F&B Order & Fulfilment Engine.
+The operational lifecycle shall support:
+
+TICVAI / F&B BACKEND STRUCTURE MODULE
+CONFIDENTIAL | 33
+Order Received Validation Firing Decision Kitchen Routing Station Queue Preparation → → → → → →
+Expediting Ready Guest/Staff Notification Served/Collected Completed → → → →
+The module shall support advanced kitchen operations including Hold & Fire, Fire Now, phased/course firing, 
+timed firing, dynamic kitchen routing, KDS, kitchen printers, preparation SLAs, priority orders, buzzers, 
+digital collection notifications, exception management and AI-assisted kitchen optimization.
+SCREEN 1 — Kitchen Operations Command Center
+Purpose
+Provide kitchen supervisors, restaurant managers and F&B management with a real-time overview of all kitchen 
+and fulfilment operations.
+Global Filters
+ Tenant
+ Company
+ Park
+ Venue
+ Outlet
+ Kitchen
+ Station
+ Service Period
+ Order Channel
+KPI Cards
+ New Orders
+ Orders Awaiting Fire
+ Orders Preparing
+ Orders Ready
+ Delayed Orders
+ Average Preparation Time
+ Average Fulfilment Time
+ Kitchen SLA %
+ Re-Fire Orders
+ Active Stations
+ Offline Stations
+ Current Kitchen Load
+Kitchen Status
+Kitchen / Station Queue Avg. Prep SLA Load Status
+Grill Station 34 14 min 82% 92% High Load
+Fry Station 18 8 min 94% 68% Normal
+Beverage 11 4 min 98% 42% Normal
+Dessert 7 6 min 96% 31% Normal
+Live Alerts
+Examples:
+
+TICVAI / F&B BACKEND STRUCTURE MODULE
+CONFIDENTIAL | 34
+Grill Station has exceeded 90% capacity.
+12 orders are approaching their SLA limit.
+Beverage KDS-02 is offline.
+7 main courses are currently held awaiting Fire instruction.
+Order #A1843 has been waiting for collection for 8 minutes.
+Quick Actions
+Open KDS | Delayed Orders | Held Orders | Activate Backup Station | Collection Queue | AI Operations 
+Assistant
+SCREEN 2 — Kitchen Display System (KDS)
+Purpose
+Provide kitchen teams with a fast, touch-optimized operational interface for receiving and preparing orders.
+The KDS shall support both touch displays and compatible physical bump-bar controls.
+Order Card
+Each KDS order card shall display:
+ Order Number
+ Outlet
+ Order Channel
+ Table / Collection Number
+ Order Time
+ Fire Time
+ Elapsed Preparation Time
+ Target Preparation Time
+ Priority
+ Course
+ Products
+ Quantity
+ Variants
+ Modifiers
+ Special Instructions
+ Allergy Alerts
+ Guest / Service Notes
+ Current Status
+Example:
+ORDER #A1843 — TABLE 12
+MAIN COURSE — FIRED 19:42
+2 × Classic Beef Burger
+• Medium Well
+
+TICVAI / F&B BACKEND STRUCTURE MODULE
+CONFIDENTIAL | 35
+• Cheddar
+• No Onion
+1 × Chicken Burger
+• No Sauce
+ALLERGY ALERT: PEANUT
+Target: 10 min
+Elapsed: 07:34
+KDS Statuses
+ New
+ Accepted
+ Held
+ Fired
+ Preparing
+ Near SLA
+ Delayed
+ Ready
+ Re-Fire
+ Cancelled
+KDS Actions
+Kitchen staff shall be able to:
+Accept
+Start Preparation
+Hold
+Mark Ready
+Recall
+Re-Fire
+Escalate
+Add Note
+Report Ingredient Unavailable
+Request Supervisor
+KDS Views
+The interface should support:
+Order View
+Item View
+
+TICVAI / F&B BACKEND STRUCTURE MODULE
+CONFIDENTIAL | 36
+Station View
+Course View
+Priority View
+SCREEN 3 — Order Firing & Course Management
+Purpose
+Provide advanced control over when kitchen preparation should begin.
+This is particularly important for full-service restaurants, VIP dining, hospitality and event dining.
+The system shall support four primary firing modes:
+1. Fire & Forget
+The complete order is automatically sent to the kitchen immediately after confirmation.
+Example:
+Quick-service restaurant order
+→ Payment Confirmed
+→ Automatically Fired
+2. Hold & Fire
+The order is received but preparation does not begin until an authorized employee releases it.
+Example:
+Main Course:
+HELD
+Waiter selects:
+FIRE NOW
+↓
+Kitchen receives order.
+3. Phased / Course Firing
+Different courses are fired separately.
+Example:
+
+TICVAI / F&B BACKEND STRUCTURE MODULE
+CONFIDENTIAL | 37
+Starter
+Fire Now ✓
+Main Course
+Held
+Dessert
+Held
+When the guest finishes the starter:
+Waiter selects:
+Fire Main Course
+4. Timed / Delayed Firing
+Preparation begins automatically at a configured future time.
+Example:
+Pre-Order:
+Guest Pickup:
+13:00
+Preparation Time:
+15 minutes
+TICVAI automatically fires:
+12:45
+Course Types
+Configurable course types may include:
+Drinks
+Starter
+Soup
+Main Course
+Side
+Dessert
+Coffee
+Custom Course
+Fire Controls
+Authorized users shall be able to:
+ Fire Course
+ Fire Item
+ Fire Entire Order
+ Hold Course
+ Delay Fire
+ Schedule Fire
+
+TICVAI / F&B BACKEND STRUCTURE MODULE
+CONFIDENTIAL | 38
+ Cancel Fire
+ Re-Fire Item
+All manual firing actions shall be audited.
+SCREEN 4 — Active Order Management & Fulfilment Journey
+Purpose
+Provide supervisors with centralized management of all active F&B orders regardless of originating channel.
+Order List
+Display:
+ Order #
+ Outlet
+ Channel
+ Table / Pickup #
+ Order Time
+ Fire Status
+ Kitchen
+ Station(s)
+ Current Stage
+ Elapsed Time
+ Target Time
+ SLA
+ Priority
+ Payment Status
+ Collection Method
+ Status
+Filters
+Outlet
+Kitchen
+Station
+Channel
+Course
+Fire Status
+Order Status
+Priority
+SLA
+Table
+Collection Number.
+Order Detail
+Selecting an order opens the complete fulfilment journey.
+Example:
+19:32:10
+Order Submitted
+↓
+
+TICVAI / F&B BACKEND STRUCTURE MODULE
+CONFIDENTIAL | 39
+19:32:11
+Payment Confirmed
+↓
+19:32:12
+Starter Fired
+↓
+19:32:14
+Starter Routed Cold Kitchen →
+↓
+19:38:22
+Starter Ready
+↓
+19:46:00
+Main Course Fired by Waiter Ahmed
+↓
+19:46:02
+Burger Grill →
+19:46:02
+Fries Fryer →
+↓
+19:57:30
+All Main Course Items Ready
+↓
+19:58:12
+Expeditor Confirmed
+↓
+19:59:08
+Served
+Every event shall record:
+Timestamp + User/System + Device + Location + Action + Status
+SCREEN 5 — Kitchen Station Workload & Dynamic Routing
+Purpose
+Provide live operational management of kitchen stations and intelligently route work according to configuration 
+and real-time capacity.
+
+TICVAI / F&B BACKEND STRUCTURE MODULE
+CONFIDENTIAL | 40
+Station Cards
+Example:
+GRILL STATION
+Status: Active
+Staff:
+4
+Active Items:
+32
+Queue:
+18
+Average Prep:
+12.8 min
+Target:
+10 min
+Utilization:
+91%
+SLA:
+82%
+Station Status
+ Available
+ Active
+ Busy
+ Overloaded
+ Paused
+ Offline
+ Maintenance
+ Closed
+Routing Inputs
+The routing engine shall consider:
+ Product
+ Product Category
+ Modifier
+ Outlet
+ Service Type
+ Service Period
+ Kitchen
+ Station Eligibility
+ Station Status
+ Queue Length
+ Station Capacity
+ Preparation Time
+ Staff Availability
+ Equipment Availability
+
+TICVAI / F&B BACKEND STRUCTURE MODULE
+CONFIDENTIAL | 41
+ Priority
+ SLA
+The additional F&B requirements specifically call for configurable kitchen routing by product, category, modifier, 
+outlet, service type and time period, as well as priority handling for VIP/Fast Pass/SLA scenarios.
+Dynamic Routing Example
+Grill A
+Load: 97%
+Grill B
+Load: 48%
+TICVAI recommends:
+Route the next 10 eligible grill items to Grill B.
+Supervisor Actions
+ Reassign Item
+ Reassign Order
+ Pause Routing
+ Activate Backup Station
+ Redirect Product Category
+ Open / Close Station
+ Temporarily Adjust Capacity
+All overrides shall be logged.
+SCREEN 6 — Expeditor & Order Assembly
+Purpose
+Provide a centralized fulfilment screen where items prepared by different kitchen stations are consolidated into a 
+complete customer order.
+Example:
+ORDER #A1843
+Grill
+2 × Burgers
+✓ READY
+Fryer
+2 × Fries
+✓ READY
+Beverage
+
+TICVAI / F&B BACKEND STRUCTURE MODULE
+CONFIDENTIAL | 42
+2 × Drinks
+✓ READY
+Dessert
+1 × Cake
+ PREPARING
+Overall Progress
+3 of 4 Stations Complete
+The order shall not become fully Ready until all required components for the applicable course/order have been 
+completed.
+Expeditor Actions
+ Confirm Item
+ Confirm Course
+ Confirm Full Order
+ Mark Missing
+ Hold Assembly
+ Request Re-Fire
+ Prioritize
+ Add Note
+ Request Runner
+ Mark Ready
+ Send to Collection
+Partial Fulfilment
+The system shall support configurable rules for:
+Serve When Complete
+or
+Serve by Course
+or
+Serve Individual Items When Ready
+depending on outlet/service model.
+Handover Methods
+ Waiter
+ Food Runner
+ Counter Pickup
+ Table Delivery
+ Takeaway
+ Mobile Pickup
+ VIP Service
+ Event Delivery
+
+TICVAI / F&B BACKEND STRUCTURE MODULE
+CONFIDENTIAL | 43
+SCREEN 7 — Guest Collection, Buzzer & Digital Notification
+Purpose
+Manage the guest collection journey once an order or course is ready.
+The system shall support both traditional physical buzzers and modern digital notification channels.
+Collection Methods
+Physical Buzzer
+Digital Order Number
+SMS
+WhatsApp
+Mobile Push Notification
+QR Order Status
+Digital Pickup Board
+Waiter / Runner Notification
+Buzzer Assignment
+Example:
+Order:
+#A1843
+Buzzer:
+B-042
+Status:
+Assigned
+Battery:
+86%
+Guest:
+Counter Pickup
+When the order becomes Ready:
+Trigger Buzzer
+Buzzer Lifecycle
+Available
+→ Assigned
+
+TICVAI / F&B BACKEND STRUCTURE MODULE
+CONFIDENTIAL | 44
+→ Guest Waiting
+→ Alerted
+→ Returned
+→ Available
+The matrix specifically requires the ability to assign buzzers to guests and notify them when orders are ready.
+Digital Notification
+Example:
+Your order #A1843 is ready. Please collect it from Counter 2.
+Pickup Board
+Guest-facing display:
+PREPARING
+A1844
+A1846
+A1848
+READY
+A1841
+A1843
+A1845
+The display should support tenant branding and multilingual presentation.
+SCREEN 8 — Exceptions, Re-Fire & Unavailable Items
+Purpose
+Provide one operational workspace for resolving kitchen and fulfilment exceptions.
+Exception Types
+ Delayed Order
+ Missing Item
+ Incorrect Item
+ Re-Fire
+ Product Unavailable
+ Ingredient Unavailable
+ Modifier Unavailable
+ Kitchen Offline
+ Station Offline
+ Printer/KDS Failure
+ Equipment Failure
+ Allergy Escalation
+ Guest Modification
+
+TICVAI / F&B BACKEND STRUCTURE MODULE
+CONFIDENTIAL | 45
+ Cancellation Request
+ Payment Issue
+ Collection Delay
+Exception Queue
+Order Exception Station Delay Severity Owner Status
+A1843 Re-Fire Grill 4 min High Chef Omar Open
+A1848 Ingredient 
+OOS Fryer 7 min Critical Supervisor Open
+Re-Fire Workflow
+Example:
+Guest reports:
+Burger overcooked
+↓
+Server creates:
+Re-Fire Request
+↓
+Reason:
+Quality Issue
+↓
+Priority:
+Recovery / Urgent
+↓
+Kitchen receives:
+RE-FIRE — PRIORITY
+The replacement should retain linkage to the original order and item.
+Unavailable Ingredient
+Kitchen employee selects:
+Beef Patty — Unavailable
+TICVAI identifies affected products and sends the event to Board 5's 86 / Availability Engine.
+
+TICVAI / F&B BACKEND STRUCTURE MODULE
+CONFIDENTIAL | 46
+SCREEN 9 — SLA, Priority & Service Rules
+Purpose
+Configure preparation targets, operational priorities and escalation rules.
+SLA Configuration
+Targets may be configured by:
+ Product
+ Category
+ Course
+ Kitchen
+ Station
+ Outlet
+ Channel
+ Service Type
+ Service Period
+ Event
+ Guest/Service Entitlement
+Example:
+Classic Burger:
+10 min
+Coffee:
+4 min
+VIP Burger:
+7 min
+Event Meal:
+12 min
+Priority Levels
+ Normal
+ High
+ VIP
+ Fast Service
+ Urgent
+ Re-Fire / Recovery
+ Event Priority
+ Accessibility Service Priority
+Priority Rule Example
+IF
+Guest Entitlement = VIP
+THEN
+Priority = High
+
+TICVAI / F&B BACKEND STRUCTURE MODULE
+CONFIDENTIAL | 47
+IF
+Order = Re-Fire
+THEN
+Priority = Urgent
+IF
+Elapsed Time > SLA
+THEN
+Escalate Priority.
+SLA Warning Rules
+70%
+→ Monitor
+80%
+→ Warning
+100%
+→ Delayed
+120%
+→ Supervisor Alert
+150%
+→ F&B Manager Escalation
+Thresholds must be tenant-configurable.
+SCREEN 10 — Kitchen Performance, AI & Operational Optimization
+Purpose
+Provide real-time and shift-level kitchen intelligence and AI-assisted optimization.
+KPI Cards
+ Orders Completed
+ Average Preparation Time
+ Median Preparation Time
+ SLA Compliance
+ Delayed Orders
+ Re-Fire Rate
+ Items per Hour
+ Station Utilization
+ Peak Load
+
+TICVAI / F&B BACKEND STRUCTURE MODULE
+CONFIDENTIAL | 48
+ Collection Wait Time
+Station Performance
+Station Orders Avg Prep Target SLA Utilization
+Grill 1,284 13.4 min 10 79% 91%
+Fryer 940 8.2 min 8 94% 73%
+Beverage 1,820 4.1 min 4 97% 62%
+Firing Analysis
+Measure:
+ Average Hold Time
+ Fire-to-Ready Time
+ Course Gaps
+ Delayed Fires
+ Manual Fire Overrides
+ Timed Fire Accuracy
+Collection Analysis
+Measure:
+ Ready-to-Collection Time
+ Buzzer Response Time
+ Digital Notification Response
+ Orders Waiting Too Long After Ready
+AI KITCHEN OPERATIONS ASSISTANT
+Authorized supervisors should be able to ask:
+Why is Grill Station delayed?
+Which orders are likely to miss SLA?
+Which station should handle the next burger orders?
+Why did preparation time increase after 7 PM?
+Should I activate the backup kitchen?
+Which items are creating bottlenecks?
+Which held courses should be fired soon?
+Example AI Response
+Grill Station is operating at 96% capacity.
+27 grill items are currently active and average preparation time has increased from 9.8 to 13.7 minutes.
+
+TICVAI / F&B BACKEND STRUCTURE MODULE
+CONFIDENTIAL | 49
+Recommended action: Route eligible burger orders to Grill B for the next 35 minutes.
+Actions:
+Simulate
+Approve Rerouting
+Ignore
+AI — Predictive Firing
+For timed dining experiences, AI may recommend when to fire a course.
+Example:
+Table 18
+Main Course:
+Held
+Starter status:
+75% complete
+Historical service gap:
+8 minutes
+Main Course preparation:
+14 minutes
+TICVAI recommends:
+Fire Main Course in approximately 4 minutes to maintain the target service interval.
+The waiter or supervisor remains in control unless automated firing has been explicitly enabled.
+AI — Delay Prevention
+TICVAI should identify orders likely to become late before SLA is breached.
+Example:
+ORDER A1843
+Probability of missing SLA:
+84%
+Reason:
+Grill Load:
+96%
+
+TICVAI / F&B BACKEND STRUCTURE MODULE
+CONFIDENTIAL | 50
+Queue:
+18 items
+Current Prep Variance:
++31%
+Recommendation:
+Reroute Burger Grill B →
+This supports proactive rather than reactive kitchen management.
+AI — Kitchen Load Forecasting
+Because TICVAI also manages ticketing, reservations, events and visitor demand, Board 3 should consume 
+forecasts from the broader platform.
+Example:
+18:00–20:00
+Expected Park Attendance:
+8,300
+Expected F&B Orders:
+2,650
+Forecast:
+Grill:
+108%
+Fryer:
+94%
+Beverage:
+81%
+Recommendation:
+ Open Backup Grill at 17:30
+ Add 2 Grill Staff
+ Add 1 Expeditor
+ Prepare peak service mode
+Staff recommendations should integrate with TICVAI Resource Management.
+CROSS-BOARD REQUIREMENTS
+Unified Order Engine
+POS, QR, mobile, kiosk, dine-in and other channels must not have independent kitchen workflows.
+All orders shall normalize into:
+
+TICVAI / F&B BACKEND STRUCTURE MODULE
+CONFIDENTIAL | 51
+Unified F&B Order
+→ Fulfilment Rules
+→ Firing
+→ Routing
+→ Kitchen
+→ Expeditor
+→ Collection/Service.
+Real-Time Synchronization
+Order statuses shall synchronize across:
+ POS
+ KDS
+ Waiter interface
+ Expeditor
+ Guest App
+ QR Ordering
+ Collection Display
+ Employee App
+The additional requirements call for synchronized operational statuses such as New, In Preparation, Ready, 
+Served and Completed.
+Offline Resilience
+Kitchen operations shall support appropriate offline resilience including:
+ Local queue retention
+ Order caching
+ Automatic synchronization
+ Duplicate prevention
+ Reconnection handling
+ Device health monitoring
+No confirmed kitchen order should disappear because of a temporary connectivity interruption.
+Multi-Kitchen / Multi-Outlet
+The architecture shall support:
+One Outlet Multiple Kitchens →
+and
+One Kitchen Multiple Outlets →
+
+TICVAI / F&B BACKEND STRUCTURE MODULE
+CONFIDENTIAL | 52
+and
+One Order Multiple Stations →
+This is mandatory for enterprise parks, attractions, resorts and multi-outlet environments.
+Audit Trail
+The system shall audit:
+ Fire
+ Hold
+ Scheduled Fire
+ Re-Fire
+ Routing
+ Reassignment
+ Priority Change
+ Cancellation
+ Station Closure
+ Manual Override
+ SLA Change
+ Buzzer Assignment
+ Ready Status
+ Collection Confirmation
+Audit records shall include:
+User + Timestamp + Device + Location + Previous Value/Status + New Value/Status + Reason
+Employee App Integration
+Board 3 shall integrate with the TICVAI Employee App.
+Examples of alerts:
+Grill Station overloaded.
+VIP Order #1843 approaching SLA.
+KDS-04 offline.
+Buzzer B-042 has not been returned.
+9 orders waiting for collection.
+Main Course for Table 18 ready.
+Authorized supervisors may:
+ Approve Rerouting
+ Fire Course
+ Activate Backup Station
+ Acknowledge Alert
+ Assign Staff
+
+TICVAI / F&B BACKEND STRUCTURE MODULE
+CONFIDENTIAL | 53
+ Report Equipment Issue
+ Escalate Incident
+Board 3 — Final 10 Screens
+# Screen
+1 Kitchen Operations Command Center
+2 Kitchen Display System (KDS)
+3 Order Firing & Course Management
+4 Active Order Management & Fulfilment Journey
+5 Kitchen Station Workload & Dynamic Routing
+6 Expeditor & Order Assembly
+7 Guest Collection, Buzzer & Digital Notification
+8 Exceptions, Re-Fire & Unavailable Items
+9 SLA, Priority & Service Rules
+10 Kitchen Performance, AI & Operational Optimization
+Complete Board 3 Operational Flow
+Order Confirmed
+↓
+Unified F&B Order Engine
+↓
+Determine:
+Immediate Fire / Hold / Course Fire / Timed Fire
+↓
+Routing Engine
+↓
+Kitchen + Preparation Station
+↓
+KDS
+↓
+Accept + Prepare
+↓
+
+TICVAI / F&B BACKEND STRUCTURE MODULE
+CONFIDENTIAL | 54
+Real-Time SLA Monitoring
+↓
+Station Items Ready
+↓
+Expeditor
+↓
+Course / Order Assembled
+↓
+Ready
+↓
+Determine Fulfilment:
+Waiter / Runner / Buzzer / Digital Notification / Pickup Board
+↓
+Served / Collected
+↓
+Completed
+↓
+Analytics + Inventory + CRM + Finance updated.
+Architectural Requirement
+The solution shall use a common F&B Fulfilment Engine rather than creating separate backend processes for 
+different channels or outlet types.
+The architecture shall follow:
+Order Source
+POS / QR / Mobile / Kiosk / B2C / Table / VIP / Event
+↓
+Unified F&B Order
+↓
+Firing Engine
+↓
+Routing & Priority Engine
+
+TICVAI / F&B BACKEND STRUCTURE MODULE
+CONFIDENTIAL | 55
+↓
+Kitchen / KDS
+↓
+Preparation Stations
+↓
+Expeditor
+↓
+Collection / Service Engine
+↓
+Completion
+↓
+Analytics & AI
+Hold & Fire, phased courses, timed preparation, priority, buzzer management and guest notifications should 
+therefore be configurable capabilities of the same fulfilment engine—not separate systems.
+
+TICVAI / F&B BACKEND STRUCTURE MODULE
+CONFIDENTIAL | 56
+TICVAI F&B — BOARD 4
+Tables, Reservations & Service Management — Scope of Work
+1. Purpose
+The module shall provide centralized management of:
+Restaurant Floor/Zone Table Capacity Reservation Guest Seating Order Service Payment → → → → → → → → →
+→ Turnover
+It shall support:
+ Full-service restaurants
+ Cafés
+ VIP lounges
+ Hospitality areas
+ Event dining
+ Walk-in restaurants
+ Reservation-only restaurants
+ Mixed reservation/walk-in operations
+The system must integrate with TICVAI CRM, POS, F&B ordering, loyalty/membership, ticketing, Resource 
+Management, Employee App and Finance.
+Screen 1 — Restaurant Service Command Center
+This is the live operational dashboard for the restaurant manager.
+KPI cards
+ Total Tables
+
+TICVAI / F&B BACKEND STRUCTURE MODULE
+CONFIDENTIAL | 57
+ Available Tables
+ Occupied Tables
+ Reserved Tables
+ Tables Cleaning
+ Guests Seated
+ Reservations Today
+ Walk-ins Today
+ Current Waitlist
+ Average Wait Time
+ Average Table Turn Time
+ No-Show Rate
+Live restaurant status
+Example:
+Area Tables Occupied Reserved Available Guests
+Main Hall 28 18 4 6 71
+Terrace 16 11 2 3 39
+VIP 8 4 3 1 22
+Alerts
+Table 18 has exceeded expected dining time by 24 minutes.
+7:30 PM reservation for 8 guests has arrived.
+VIP reservation arriving in 15 minutes.
+Current walk-in wait time is approximately 28 minutes.
+Quick actions
++ Reservation | + Walk-In | Seat Guest | Open Floor Plan | Waitlist | Live Service
+Screen 2 — Floor Plan & Table Map
+This should be one of the strongest visual screens in Board 4.
+The system shall provide an interactive 2D restaurant floor plan.
+Example
+MAIN RESTAURANT
+Window Area
+[T01]
+4
+Available
+[T02]
+4
+Occupied
+[T03]
+6
+Reserved
+
+TICVAI / F&B BACKEND STRUCTURE MODULE
+CONFIDENTIAL | 58
+19:30
+ BAR
+[T04] [T05] [T06]
+ MAIN HALL
+[T07] [T08] [T09]
+ VIP SECTION
+[V01] [V02] [V03]
+Tables should display live status.
+Statuses
+Available
+Reserved
+Guest Arrived
+Occupied
+Ordering
+Order Preparing
+Dining
+Bill Requested
+Payment Pending
+Cleaning
+Blocked
+Out of Service
+Floor plan actions
+Authorized staff should be able to:
+ Drag tables
+ Move tables
+ Combine tables
+ Split tables
+ Block tables
+ Assign reservation
+ Seat walk-in
+ Transfer guest
+ Open order
+ View bill
+ Mark cleaning
+ Release table
+Heatmap mode
+Managers should be able to switch the floor plan into:
+Occupancy Heatmap
+or
+Revenue Heatmap
+
+TICVAI / F&B BACKEND STRUCTURE MODULE
+CONFIDENTIAL | 59
+or
+Turnover Heatmap
+This becomes very useful operationally.
+Screen 3 — Table & Seating Configuration
+Screen 2 operates the tables.
+Screen 3 configures them.
+Table master
+Each table shall contain:
+ Table Name
+ Table Code
+ Restaurant
+ Floor
+ Zone
+ Minimum Capacity
+ Standard Capacity
+ Maximum Capacity
+ Table Shape
+ Table Type
+ Accessible
+ Outdoor / Indoor
+ Smoking / Non-Smoking where applicable
+ VIP
+ Status
+Table types
+Examples:
+Standard
+High Top
+Booth
+Bar Seat
+VIP Table
+Private Dining
+Terrace
+Family Table
+Combination rules
+Example:
+T10 + T11
+Can combine to create:
+8-seat table
+T11 + T12
+Can combine.
+But:
+T10 + T15
+Cannot combine.
+
+TICVAI / F&B BACKEND STRUCTURE MODULE
+CONFIDENTIAL | 60
+This allows the reservation engine to understand physical seating possibilities.
+Screen 4 — Reservation Calendar & Timeline
+This is the primary reservation-planning interface.
+The screen should provide:
+Day | Week | Timeline
+Timeline example
+Time T01 T02 T03 T04
+18:00 Smith 4 — — Ahmed 2
+18:30 Smith 4 — — Ahmed 2
+19:00 — Ali 6 — —
+19:30 John 4 Ali 6 VIP 8 —
+20:00 John 4 — VIP 8 Sara 2
+Filters
+ Restaurant
+ Zone
+ Table
+ Party Size
+ Reservation Status
+ Guest Type
+ VIP
+ Membership
+ Channel
+ Service Period
+Reservation statuses
+Pending
+Confirmed
+Arriving Soon
+Arrived
+Seated
+Completed
+Cancelled
+No-Show
+Screen 5 — Create / Edit Reservation
+This is the detailed reservation workflow.
+Step 1 — Guest
+Search existing guest by:
+ Mobile
+
+TICVAI / F&B BACKEND STRUCTURE MODULE
+CONFIDENTIAL | 61
+ Email
+ Membership
+ Ticket
+ Name
+Or:
++ Create Guest
+Step 2 — Reservation
+Fields:
+ Date
+ Time
+ Party Size
+ Restaurant
+ Zone Preference
+ Table Preference
+ Duration
+ Occasion
+Occasion
+Birthday
+Anniversary
+Business Dinner
+VIP Visit
+Family
+Corporate Event
+Other
+Step 3 — Guest preferences
+ Indoor / Outdoor
+ Smoking / Non-Smoking
+ Accessibility requirement
+ High chair
+ Wheelchair space
+ Dietary requirements
+ Allergies
+ Special request
+Step 4 — Table suggestion
+TICVAI should recommend:
+Best Match
+Table T14
+Capacity: 6
+Party: 5
+Available: 19:30–21:30
+Preference Match: 96%
+Step 5 — Confirmation
+Send confirmation via:
+ Email
+ SMS
+
+TICVAI / F&B BACKEND STRUCTURE MODULE
+CONFIDENTIAL | 62
+ WhatsApp
+ Mobile App
+Optional:
+Add to Wallet / Calendar.
+Screen 6 — Walk-In & Waitlist Management
+This is essential for restaurants that do not operate exclusively by reservation.
+Walk-in entry
+Capture:
+ Guest Name
+ Mobile
+ Party Size
+ Arrival Time
+ Preferred Area
+ Accessibility
+ Special Requirement
+Waitlist
+Guest Party Waiting Est. Wait Suggested Table Status
+Ahmed 4 8 min 12 min T14 Waiting
+Sara 2 14 min 5 min T05 Next
+John 6 5 min 24 min T18+T19 Waiting
+Guest communication
+Guest receives:
+You're currently #3 on the waitlist.
+Later:
+Your table will be ready in approximately 10 minutes.
+Then:
+Your table is ready. Please proceed to the restaurant host.
+Waitlist statuses
+Waiting
+Notified
+Arrived
+Seated
+Cancelled
+Left
+Screen 7 — Guest Profile & Dining History
+This is where F&B connects properly to the TICVAI CRM.
+It should not create a separate restaurant customer database.
+Guest profile
+Show:
+
+TICVAI / F&B BACKEND STRUCTURE MODULE
+CONFIDENTIAL | 63
+John Smith
+CRM ID: G-10392
+Membership:
+Gold
+Visits:
+18
+F&B Spend:
+AED 7,850
+Average Spend:
+AED 436
+No-Shows:
+1
+Preferences
+Preferred:
+Terrace
+Favorite:
+Steak
+Drink:
+Sparkling Water
+Dietary:
+Gluten-Free
+Allergy:
+Peanuts
+Preferred seating:
+Window
+History
+Show previous:
+ Reservations
+ Orders
+ Restaurants
+ Spend
+ Promotions
+ Complaints
+ Feedback
+Important architecture
+This data should come from the shared TICVAI Guest Profile / CRM.
+F&B simply extends it with dining preferences.
+Screen 8 — Live Table & Service Management
+This screen manages the restaurant after guests have been seated.
+Table detail
+Example:
+TABLE 12
+Guests: 4
+Server: Ahmed
+
+TICVAI / F&B BACKEND STRUCTURE MODULE
+CONFIDENTIAL | 64
+Seated: 19:14
+Dining Duration: 48 min
+Current Stage:
+Main Course
+Order:
+AED 428
+Service timeline
+19:14 — Seated
+19:18 — Drinks Ordered
+19:22 — Drinks Served
+19:25 — Food Ordered
+19:26 — Sent to Kitchen
+19:39 — Starter Served
+19:58 — Main Course Served
+20:14 — Dessert Offered
+Actions
+ Add Guest
+ Remove Guest
+ Change Server
+ Transfer Table
+ Combine Table
+ Move Order
+ Request Kitchen
+ Add Note
+ Request Manager
+ Request Bill
+ Close Table
+Screen 9 — Table Order, Bill & Payment Management
+This connects Board 4 directly with POS and Finance.
+Table order
+Example:
+Table 12
+Guest 1:
+Burger
+Coke
+Guest 2:
+Steak
+Water
+Guest 3:
+Salad
+Juice
+
+TICVAI / F&B BACKEND STRUCTURE MODULE
+CONFIDENTIAL | 65
+Guest 4:
+Pizza
+Coffee
+Split bill
+The system should support:
+Split by Guest
+Split by Item
+Split Equally
+Custom Amount
+Example
+Total:
+AED 428
+Split:
+Guest 1 AED 105 →
+Guest 2 AED 150 →
+Guest 3 AED 78 →
+Guest 4 AED 95 →
+Payment methods
+Cash
+Card
+Mobile Wallet
+Gift Card
+Voucher
+Membership Credit
+Room Charge, where integrated
+Corporate Account
+Mixed tender
+Example:
+AED 200 Card
+AED 100 Cash
+AED 128 Gift Card
+Service charge / gratuity
+Support:
+ Fixed
+ Percentage
+ Optional
+ Automatic
+ Manual
+Refund, discount, complimentary and override actions must use TICVAI's shared approval and audit framework.
+Screen 10 — Reservation & Table Performance
+This page provides operational analytics for restaurant managers.
+KPIs
+ Reservations
+ Walk-Ins
+
+TICVAI / F&B BACKEND STRUCTURE MODULE
+CONFIDENTIAL | 66
+ Guests Served
+ Covers
+ Occupancy %
+ Average Wait Time
+ Average Dining Time
+ Table Turnover
+ Revenue per Table
+ Revenue per Cover
+ No-Show %
+ Cancellation %
+Table utilization
+Example:
+Table Occupancy Turns Revenue Avg. Spend
+T01 84% 5 AED 3,420 AED 684
+T02 72% 4 AED 2,860 AED 715
+T03 91% 6 AED 4,210 AED 702
+Analytics dimensions
+Analyze by:
+Restaurant
+Zone
+Table
+Hour
+Day
+Service Period
+Party Size
+Guest Segment
+Reservation Channel
+Reservation Capacity Engine
+I strongly recommend adding this capability.
+TICVAI shouldn't simply ask:
+Is Table 10 free at 7 PM?
+It should calculate:
+Table Capacity + Party Size + Reservation Duration + Combination Rules + Current Occupancy + Future 
+Reservations + Turnaround Buffer
+Example:
+Reservation:
+6 guests
+7:30 PM
+Expected duration: 120 min
+TICVAI determines:
+T12 capacity = 4 
+T14 capacity = 6 ✓
+T18 + T19 = 8 ✓
+TICVAI recommends:
+
+TICVAI / F&B BACKEND STRUCTURE MODULE
+CONFIDENTIAL | 67
+T14 — Best Match
+rather than wasting an eight-seat combined table.
+Configurable Reservation Duration
+Duration should depend on:
+Party size
+Restaurant
+Service period
+Day
+Guest type
+Example:
+2 guests 90 min →
+4 guests 120 min →
+6–8 guests 150 min →
+VIP 180 min →
+The venue must be able to override these rules.
+Turnaround / Cleaning Buffer
+The reservation engine must consider cleaning time.
+Example:
+Reservation:
+19:00–21:00
+Cleaning buffer:
+15 minutes
+Next available:
+21:15
+Not 21:00.
+This also connects later to Employee/Resource Management if cleaning tasks need assignment.
+Deposit & Reservation Guarantee
+I recommend including optional reservation deposits.
+Restaurants may configure:
+No Deposit
+or
+Fixed Deposit
+AED 100
+or
+Per Guest
+AED 50 × guest
+or
+Percentage
+20%
+or
+Card Guarantee
+Rules can depend on:
+Restaurant
+Party Size
+
+TICVAI / F&B BACKEND STRUCTURE MODULE
+CONFIDENTIAL | 68
+VIP Area
+Date
+Event
+Peak Period
+Example:
+New Year's Eve
+Reservation deposit:
+AED 250 per guest
+Cancellation policy:
+Free cancellation until 48 hours before.
+This should use TICVAI's shared payment engine.
+No-Show & Cancellation Rules
+The system should support configurable:
+ Cancellation Window
+ Cancellation Fee
+ No-Show Fee
+ Deposit Forfeiture
+ Refund Rules
+ Grace Period
+Example:
+Reservation: 19:30
+Grace Period: 15 min
+At 19:45:
+Late
+At 20:00:
+No-Show
+Rules remain configurable.
+Ticketing + F&B Reservation Integration
+This is particularly important for TICVAI.
+Because TICVAI is primarily an attraction/ticketing platform, restaurants should be able to link reservations to:
+Ticket
+Membership
+Experience Booking
+Event
+VIP Package
+Example:
+Guest purchases:
+Theme Park VIP Package
+Includes:
+Park Admission
+Fast Track
+Lunch Reservation at 13:00
+VIP Lounge Access
+
+TICVAI / F&B BACKEND STRUCTURE MODULE
+CONFIDENTIAL | 69
+The F&B reservation should be automatically created from the package.
+This is a significant advantage compared with a standalone restaurant POS.
+Membership & Loyalty Integration
+Example:
+Gold Member:
+Priority Reservation ✓
+Priority Waitlist ✓
+10% F&B Discount ✓
+Complimentary Dessert ✓
+VIP Table Access ✓
+The reservation engine should recognize the guest's membership automatically.
+AI — SMART TABLE ASSIGNMENT
+AI should recommend the optimal table rather than simply showing availability.
+It should consider:
+ Party Size
+ Table Capacity
+ Guest Preference
+ Accessibility
+ VIP Status
+ Reservation Duration
+ Upcoming Reservations
+ Current Table Status
+ Historical Dining Time
+ Table Combination
+ Restaurant Load
+Example:
+Recommended: Table 14 — 96% Match
+Reason:
+Capacity fits party exactly.
+Guest previously requested window seating.
+No conflicting reservation until 22:00.
+AI — WAIT TIME PREDICTION
+Instead of:
+Estimated wait: 30 minutes
+TICVAI should predict wait time based on live operations.
+Example:
+Predicted wait: 18–24 minutes
+Based on:
+4 tables currently requesting bills.
+2 tables currently cleaning.
+Historical turnover.
+Current kitchen/service load.
+
+TICVAI / F&B BACKEND STRUCTURE MODULE
+CONFIDENTIAL | 70
+AI — NO-SHOW PREDICTION
+For appropriate business use, TICVAI may flag reservations with elevated operational no-show risk based on nonsensitive booking behavior such as:
+ Reservation lead time
+ Confirmation status
+ Historical reservation attendance
+ Deposit status
+Example:
+Reservation #R1842 has an elevated no-show risk.
+Recommended operational action:
+Send confirmation reminder.
+The system should avoid using sensitive personal characteristics for this prediction.
+AI — DEMAND & CAPACITY FORECASTING
+AI should forecast:
+Expected covers tonight: 486
+Peak period:
+19:00–20:30
+Expected occupancy:
+96%
+Predicted walk-in demand:
+72 guests
+Recommendation:
+Keep Tables T12–T16 available for walk-ins between 18:30 and 19:30.
+This can use:
+Ticket sales
+Event attendance
+Historical restaurant data
+Reservations
+Seasonality
+Day/time.
+Employee App Integration
+Restaurant staff should be able to receive operational tasks on the TICVAI Employee App.
+Examples:
+VIP guest arrived — Reservation R-1842.
+Table 14 requires cleaning.
+Table 8 requested bill.
+Table 12 waiting 8 minutes for service.
+Party of 6 ready to be seated.
+Staff can acknowledge and complete tasks.
+Approval & Audit Controls
+Sensitive actions must follow TICVAI's shared approval framework.
+Examples:
+Complimentary Item
+
+TICVAI / F&B BACKEND STRUCTURE MODULE
+CONFIDENTIAL | 71
+→ Supervisor approval
+Large Discount
+→ Manager approval
+Reservation Deposit Refund
+→ Finance / Manager approval
+VIP Override
+→ Authorized role
+Manual Table Block
+→ Restaurant Manager
+All significant actions must capture:
+User
+Date/Time
+Action
+Reason
+Old Value
+New Value
+Device
+Approval
+Board 4 — Final 10 Screens
+# Screen
+1 Restaurant Service Command Center
+2 Interactive Floor Plan & Table Map
+3 Table & Seating Configuration
+4 Reservation Calendar & Timeline
+5 Create / Edit Reservation
+6 Walk-In & Waitlist Management
+7 Guest Profile & Dining History
+8 Live Table & Service Management
+9 Table Order, Bill & Payment Management
+10 Reservation & Table Performance
+Complete Board 4 workflow
+Reservation / Walk-In
+→ Guest Identified
+→ Availability & Capacity Check
+→ Table Recommended
+→ Reservation Confirmed / Added to Waitlist
+→ Guest Arrives
+→ Host Checks In
+→ Table Assigned
+→ Guest Seated
+→ Server Assigned
+
+TICVAI / F&B BACKEND STRUCTURE MODULE
+CONFIDENTIAL | 72
+→ Order Created
+→ Board 3 Kitchen Fulfilment
+→ Food Served
+→ Dining
+→ Bill Requested
+→ Split / Payment
+→ Table Closed
+→ Cleaning
+→ Available Again
+→ CRM + Finance + Analytics Updated
+Architectural requirement
+Development team should not create separate reservation engines for restaurants, VIP lounges, dining 
+packages and event dining.
+There should be a common Reservation & Capacity Engine:
+Bookable Entity Capacity Availability Time Slot Guest Rules Reservation Payment/Deposit → → → → → → → →
+Status
+The F&B layer then adds:
+Table Party Size Seating Preference Dining Duration Waitlist Service Table Turnover → → → → → →
+This also aligns very well with the common Resource Engine architecture: restaurant tables can behave as 
+bookable resources while the F&B module provides the specialized restaurant rules.
+That approach will make it much easier later for TICVAI to support restaurant reservations bundled with tickets, 
+events, memberships, VIP packages and experiences without creating separate booking logic for every product
+type.
+
+TICVAI / F&B BACKEND STRUCTURE MODULE
+CONFIDENTIAL | 73
+TICVAI F&B — BOARD 5
+F&B Stock, Production, Replenishment & Operational Control — Scope of Work
+1. Purpose
+The F&B Stock, Production, Replenishment & Operational Control Board shall provide real-time management of 
+ingredients, prepared items, consumables, production stock, outlet stock, wastage, stock counts, replenishment, 
+internal transfers, availability, and operational food-safety controls across all Food & Beverage operations.
+The Board shall connect F&B sales and production activities with TICVAI's shared Inventory & Procurement 
+architecture without creating a separate inventory system inside the F&B module.
+The core operational lifecycle shall be:
+Sale / Forecast Recipe Consumption Theoretical Stock Actual Stock Variance Production → → → → →
+Requirement Replenishment Outlet Availability → →
+The module shall support:
+ Restaurants
+ Cafés
+ Kiosks
+ Food Trucks
+ Bars
+ VIP Lounges
+ Event Catering
+ Central Kitchens
+ Commissaries
+ Temporary Event Outlets
+
+TICVAI / F&B BACKEND STRUCTURE MODULE
+CONFIDENTIAL | 74
+ Mobile F&B Operations
+The Board shall support both outlet-level operations and central-kitchen production flows.
+SCREEN 1 — F&B Stock & Operations Command Center
+Purpose
+Provide F&B managers with a centralized real-time view of stock health, consumption, production, wastage, 
+replenishment and operational availability across all outlets.
+Global Filters
+ Tenant
+ Company
+ Park
+ Venue
+ Outlet
+ Central Kitchen
+ Stock Location
+ Date
+ Service Period
+KPI Cards
+ Total F&B Stock Value
+ Available Ingredients
+ Low Stock Items
+ Critical Stock Items
+ Out-of-Stock Items
+ Products 86'd
+ Today's Consumption
+ Today's Production
+ Today's Waste
+ Waste Value
+ Pending Requisitions
+ Incoming Transfers
+ Expiring Soon
+ Production Shortfalls
+Outlet Health
+Outlet Stock Health Low Critical 86'd Waste Production
+Risk
+Main 
+Restaurant
+92% 4 1 1 AED 184 Low
+Coffee House 88% 7 2 2 AED 72 Medium
+Beach Kiosk 73% 11 4 5 AED 126 High
+VIP Lounge 96% 2 0 0 AED 58 Low
+Live Alerts
+
+TICVAI / F&B BACKEND STRUCTURE MODULE
+CONFIDENTIAL | 75
+Examples:
+Beef Patty stock at Main Restaurant is forecast to run out within 2.3 hours.
+Central Kitchen production of Special Sauce is 18 litres below today's requirement.
+24 litres of milk expire tomorrow.
+Beach Kiosk has five products unavailable due to ingredient shortages.
+Main Restaurant requisition REQ-1842 is awaiting approval.
+Quick Actions
+Count Stock | Record Waste | Create Requisition | Request Transfer | Production Status | Manage 86 | 
+View Alerts
+SCREEN 2 — Outlet Stock & Ingredient Availability
+Purpose
+Provide real-time visibility of ingredients, prepared items and consumables available at each F&B operational 
+location.
+Stock Dimensions
+The system shall distinguish between:
+ On Hand
+ Reserved
+ Available
+ In Preparation
+ In Transit
+ Incoming
+ Blocked
+ Damaged
+ Expiring
+ Unavailable
+Stock Table
+Ingredient On Hand Reserved Available Par Min Forecast
+Need Status
+Beef Patty 84 12 72 100 40 96 Low
+Burger Bun 132 18 114 150 50 88 Healthy
+Cheddar 65 8 57 80 30 42 Healthy
+Milk 18 L 2 L 16 L 40 L 20 L 38 L Critical
+Stock Drill-Down
+Selecting an ingredient shall display:
+
+TICVAI / F&B BACKEND STRUCTURE MODULE
+CONFIDENTIAL | 76
+ Current Stock
+ Available Stock
+ Reserved Stock
+ Batch / Lot
+ Expiry Date
+ Storage Location
+ Last Receipt
+ Last Issue
+ Last Transfer
+ Today's Consumption
+ Historical Consumption
+ Forecast Consumption
+ Current Par Level
+ Reorder Level
+ Expected Depletion Time
+Multi-Location Visibility
+Authorized users shall be able to see the same ingredient across locations.
+Example:
+Beef Patty
+Main Restaurant — 72 available
+Beach Kiosk — 18 available
+VIP Lounge — 44 available
+Central Kitchen — 480 available
+TICVAI should therefore be able to recommend internal redistribution before external procurement.
+SCREEN 3 — Recipe Consumption & Theoretical Inventory
+Purpose
+Automatically convert F&B sales and production activities into ingredient-level consumption using the approved 
+recipes configured in Board 2.
+Consumption Flow
+Product Sold
+↓
+Recipe Identified
+↓
+Variant / Modifier Applied
+↓
+
+TICVAI / F&B BACKEND STRUCTURE MODULE
+CONFIDENTIAL | 77
+Ingredient Quantities Calculated
+↓
+Inventory Consumption Event
+↓
+Shared Inventory Ledger Updated
+Example
+250 Classic Burgers sold.
+Approved recipe requires:
+ 1 Beef Patty
+ 1 Burger Bun
+ 1 Cheese Slice
+ 20g Lettuce
+ 30g Tomato
+ 20ml Sauce
+Theoretical consumption:
+ 250 Beef Patties
+ 250 Buns
+ 250 Cheese Slices
+ 5 kg Lettuce
+ 7.5 kg Tomato
+ 5 L Sauce
+Theoretical vs Actual
+Ingredient Opening Received Theoretical
+Use
+Expected Actual Variance
+Beef Patty 300 100 250 150 142 -8
+Burger Bun 320 100 250 170 168 -2
+Cheese 290 80 250 120 116 -4
+Consumption Sources
+The system shall distinguish between:
+ Sale
+ Modifier
+ Combo Component
+ Production
+ Sample
+ Staff Meal
+ Complimentary Item
+ Waste
+ Spoilage
+ Re-Fire
+ Manual Adjustment
+
+TICVAI / F&B BACKEND STRUCTURE MODULE
+CONFIDENTIAL | 78
+ Transfer
+This is essential for explaining stock variance rather than simply reporting it.
+SCREEN 4 — Production Execution & Batch Management
+Purpose
+Execute the production plans and production sheets created from Board 2 and manage actual preparation 
+quantities, yields, batches and completed production.
+Board 2 determines:
+What should be produced.
+Board 5 records:
+What was actually produced.
+Production Run
+Example:
+RUN-2026-0814-042
+Production Item:
+Special Sauce
+Central Kitchen
+Planned Quantity:
+100 L
+Actual Quantity:
+96 L
+Yield:
+96%
+Batch:
+SAUCE-140826-A
+Production Start:
+06:10
+Completed:
+07:35
+Expiry:
+17 Aug 2026
+Production Lifecycle
+
+TICVAI / F&B BACKEND STRUCTURE MODULE
+CONFIDENTIAL | 79
+Planned
+→ Released
+→ Ingredients Allocated
+→ In Production
+→ Quality Check
+→ Completed
+→ Released to Stock
+→ Distributed / Consumed
+Production Consumption
+When production begins, TICVAI shall consume the raw ingredients according to the approved production recipe.
+Example:
+100 L Special Sauce requires:
+Mayonnaise — 55 L
+Ketchup — 30 L
+Mustard — 8 L
+Seasoning — 7 kg
+Actual production:
+96 L
+The system calculates:
+Expected Yield vs Actual Yield
+and identifies production variance.
+Production Batch Information
+Capture:
+ Batch Number
+ Production Item
+ Recipe Version
+ Planned Quantity
+ Actual Quantity
+ UOM
+ Yield
+ Production Date
+ Expiry
+ Production Kitchen
+ Production Team
+ Quality Status
+ Storage Location
+
+TICVAI / F&B BACKEND STRUCTURE MODULE
+CONFIDENTIAL | 80
+SCREEN 5 — Wastage, Spoilage, Returns & Write-Off
+Purpose
+Provide controlled recording and approval of F&B operational losses.
+Waste Categories
+ Expired
+ Spoiled
+ Overproduction
+ Preparation Waste
+ Trim / Yield Loss
+ Cooking Error
+ Burned
+ Dropped
+ Guest Return
+ Re-Fire
+ Quality Failure
+ Temperature Failure
+ Damaged Packaging
+ Sample / Tasting
+ Staff Meal
+ Other
+Waste Entry
+Capture:
+ Outlet / Kitchen
+ Ingredient / Product
+ Batch
+ Quantity
+ UOM
+ Unit Cost
+ Total Cost
+ Reason
+ Employee
+ Date / Time
+ Photo, optional
+ Notes
+Example
+Beef Patty
+Quantity:
+8 pcs
+Cost:
+AED 68
+Reason:
+Cooking Error
+
+TICVAI / F&B BACKEND STRUCTURE MODULE
+CONFIDENTIAL | 81
+Related Station:
+Grill
+Related Order:
+Optional
+Approval Workflow
+Example:
+Waste AED 100 ≤
+→ Supervisor
+AED 101–500
+→ F&B Manager
+Above AED 500
+→ F&B Director / Finance
+Thresholds shall be configurable.
+Waste Analytics
+The screen should immediately show:
+Today's Waste
+Waste %
+Waste vs Target
+Top Waste Item
+Top Waste Reason
+Waste Cost by Outlet
+SCREEN 6 — Requisition & Smart Replenishment
+Purpose
+Allow outlets and production kitchens to request replenishment from warehouses, central kitchens or other 
+approved stock locations.
+Requisition Information
+ Requisition Number
+ Requesting Location
+ Supply Location
+ Required Date / Time
+ Priority
+ Item
+ Current Available
+ Par Level
+
+TICVAI / F&B BACKEND STRUCTURE MODULE
+CONFIDENTIAL | 82
+ Minimum Level
+ Forecast Requirement
+ Requested Quantity
+ Recommended Quantity
+ UOM
+ Reason
+ Requested By
+Example
+Milk
+Current:
+16 L
+Par:
+40 L
+Forecast Requirement:
+52 L
+Incoming:
+10 L
+Recommended Replenishment:
+36 L
+Requisition Lifecycle
+Draft
+→ Submitted
+→ Approval
+→ Approved
+→ Picking
+→ Dispatched
+→ In Transit
+→ Received
+→ Closed
+Automatic Requisition Recommendation
+The system shall be able to create a suggested requisition based on:
+ Current Available Stock
+ Par Level
+ Minimum Stock
+ Forecast Demand
+
+TICVAI / F&B BACKEND STRUCTURE MODULE
+CONFIDENTIAL | 83
+ Reservations
+ Expected Attendance
+ Production Plan
+ Incoming Stock
+ Safety Stock
+ Lead Time
+The system should initially generate a recommendation, with authorized users able to approve, modify or reject 
+it.
+SCREEN 7 — Transfers, Distribution & Outlet Receiving
+Purpose
+Manage movement of F&B inventory and prepared production between operational locations.
+Supported Transfers
+Warehouse Outlet →
+Central Kitchen Outlet →
+Outlet Outlet →
+Outlet Event Location →
+Outlet Central Kitchen →
+Temporary Outlet Main Outlet →
+Central Kitchen Distribution
+Example:
+Production Batch:
+SAUCE-140826-A
+Available:
+96 L
+Distribution:
+Main Restaurant 40 L →
+Beach Kiosk 20 L →
+VIP Lounge 15 L →
+Event Kitchen 21 L →
+Transfer Status
+
+TICVAI / F&B BACKEND STRUCTURE MODULE
+CONFIDENTIAL | 84
+ Requested
+ Approved
+ Picking
+ Packed
+ Dispatched
+ In Transit
+ Partially Received
+ Received
+ Discrepancy
+ Rejected
+ Closed
+Receiving
+Outlet employee verifies:
+Sent
+100 units
+Received
+98
+Damaged
+2
+TICVAI creates:
+Receiving discrepancy — 2 units
+Transfer Traceability
+The system shall retain:
+Source Location
+Destination
+Batch
+Quantity
+Sender
+Receiver
+Dispatch Time
+Receipt Time
+Discrepancy
+Reason.
+
+TICVAI / F&B BACKEND STRUCTURE MODULE
+CONFIDENTIAL | 85
+SCREEN 8 — Stock Count, Reconciliation & Variance
+Purpose
+Support operational stock counts and reconciliation between physical and system inventory.
+Count Types
+ Opening Count
+ Closing Count
+ Shift Count
+ Spot Count
+ Cycle Count
+ Full Count
+ Investigation Count
+Count Screen
+Ingredient System Physical Variance Variance % Value
+Beef Patty 142 138 -4 -2.8% -AED 34
+Burger Bun 168 166 -2 -1.2% -AED 3
+Milk 16 L 15.4 L -0.6 L -3.8% -AED 4
+Blind Count
+The solution shall support:
+Blind Count = ON
+When enabled, employees performing the count shall not see the expected system quantity before submitting 
+their physical count.
+Variance Workflow
+Count Submitted
+↓
+Variance Detected
+↓
+Tolerance Check
+↓
+If within tolerance:
+Auto-process according to policy
+If outside tolerance:
+Supervisor Review
+
+TICVAI / F&B BACKEND STRUCTURE MODULE
+CONFIDENTIAL | 86
+↓
+Recount / Explanation
+↓
+Approval
+↓
+Inventory Adjustment
+Variance Investigation
+TICVAI should help identify possible sources:
+Sales Consumption
+Unrecorded Waste
+Production Variance
+Transfer Difference
+Receiving Difference
+Recipe Change
+Re-Fire
+Manual Adjustment.
+SCREEN 9 — Product Availability, 86 & Operational Food Safety
+Purpose
+Provide centralized operational control over F&B product availability while also surfacing food-safety conditions 
+that may affect whether products can be sold.
+86 Management
+A product, variant, modifier or ingredient may become unavailable because of:
+ Out of Stock
+ Ingredient Shortage
+ Kitchen Issue
+ Equipment Failure
+ Quality Issue
+ Food Safety
+ Temporary Management Decision
+Automatic 86
+Example:
+
+TICVAI / F&B BACKEND STRUCTURE MODULE
+CONFIDENTIAL | 87
+Burger Bun = 0
+Affected:
+Classic Burger
+Chicken Burger
+Veggie Burger
+TICVAI identifies:
+3 products affected by Burger Bun shortage.
+Recommended:
+Mark Unavailable
+Channel Synchronization
+When confirmed, availability shall update across applicable:
+ POS
+ Mobile POS
+ Kiosk
+ QR Ordering
+ Mobile App
+ B2C
+ Digital Menu
+Outlet-Level Availability
+Classic Burger:
+Main Restaurant — Available
+Beach Kiosk — Unavailable
+VIP Lounge — Available
+Automatic Restoration
+When stock arrives:
+Burger Bun:
+0 120 →
+TICVAI identifies:
+Stock restored. Three products may now be made available again.
+Action:
+Restore Products
+
+TICVAI / F&B BACKEND STRUCTURE MODULE
+CONFIDENTIAL | 88
+Food Safety Operational Controls
+The system should support configurable food-safety checks including:
+ Refrigerator Temperature
+ Freezer Temperature
+ Hot Holding
+ Cold Holding
+ Receiving Temperature
+ Cooking Temperature
+ Cleaning Check
+ Storage Check
+Example
+Freezer 02
+Target:
+≤ -18°C
+Reading:
+-14°C
+Status:
+Critical
+TICVAI may automatically identify potentially affected stock batches and place them into:
+Quality Hold
+until an authorized employee resolves the issue.
+Future IoT Integration
+The architecture should allow future temperature sensors and IoT devices to submit readings automatically.
+Manual readings must also be supported.
+SCREEN 10 — Operational Alerts, AI Replenishment & Action Center
+Purpose
+Provide one centralized workspace for identifying F&B stock and production risks and converting them into 
+controlled operational actions.
+Alert Categories
+Stock
+ Low Stock
+ Critical Stock
+ Out of Stock
+ Overstock
+
+TICVAI / F&B BACKEND STRUCTURE MODULE
+CONFIDENTIAL | 89
+Production
+ Production Behind Plan
+ Yield Variance
+ Batch Failure
+ Production Shortfall
+Expiry
+ Expiring Soon
+ Expiring Today
+ Expired
+Consumption
+ Abnormal Consumption
+ Recipe Variance
+ Unexpected Usage
+Waste
+ High Waste
+ Repeated Waste
+ Abnormal Waste Cost
+Replenishment
+ Requisition Pending
+ Transfer Delayed
+ Receiving Discrepancy
+ Forecast Shortfall
+Availability
+ Product 86'd
+ Modifier Unavailable
+ Ingredient Unavailable
+Food Safety
+ Temperature Breach
+ Quality Hold
+ Failed Check
+Severity
+Information | Warning | High | Critical
+AI — Smart Replenishment
+TICVAI should not rely only on:
+Stock < Minimum Reorder →
+The recommendation engine should consider:
+
+TICVAI / F&B BACKEND STRUCTURE MODULE
+CONFIDENTIAL | 90
+ Current Stock
+ Available Stock
+ Reserved Stock
+ Incoming Stock
+ Production Requirements
+ Historical Consumption
+ Forecast Demand
+ Ticket Sales
+ Reservations
+ Events
+ Safety Stock
+ Supplier / Internal Lead Time
+Example
+Beef Patty
+Available:
+980
+Tomorrow Forecast:
+1,320
+Safety Stock:
+80
+Incoming:
+100
+Projected Shortfall:
+320
+AI Recommendation:
+Transfer 200 units from Central Kitchen and request an additional 120 units from Warehouse before 10:00 
+tomorrow.
+Actions:
+Simulate | Create Requisition | Request Transfer | Ignore
+AI — Production Shortfall Detection
+Example:
+Tomorrow Production Requirement:
+Special Sauce:
+42 L
+Available:
+12 L
+Planned Production:
+30 L
+
+TICVAI / F&B BACKEND STRUCTURE MODULE
+CONFIDENTIAL | 91
+Current production yield trend:
+94%
+Expected Actual Production:
+28.2 L
+Projected Available:
+40.2 L
+Shortfall:
+1.8 L
+TICVAI should identify this before production is completed.
+Recommendation:
+Increase today's production batch by approximately 3 L.
+AI — Stock Redistribution
+Before recommending new procurement, TICVAI should look across internal stock locations.
+Example:
+Beach Kiosk:
+Water:
+Critical
+Central Warehouse:
+High Stock
+VIP Lounge:
+Overstock
+TICVAI recommendation:
+Transfer 120 units from VIP Lounge to Beach Kiosk rather than requesting additional stock.
+This can reduce emergency purchasing and unnecessary stock holding.
+AI — Waste & Consumption Anomaly Detection
+Example:
+Chicken Breast
+Theoretical Consumption:
+184 kg
+Actual Reduction:
+
+TICVAI / F&B BACKEND STRUCTURE MODULE
+CONFIDENTIAL | 92
+201 kg
+Variance:
++17 kg / 9.2%
+Estimated Value:
+AED 1,445
+AI identifies:
+Consumption variance is significantly above the normal range.
+Potential operational causes:
+ Unrecorded Waste
+ Portion Variance
+ Recipe Configuration
+ Production Yield
+ Stock Count Error
+Recommended:
+Review Grill Station + Run Spot Count
+The AI should support investigation and should not automatically attribute discrepancies to employee 
+misconduct.
+AI — Expiry Optimization
+TICVAI should use expiry information to recommend stock movement.
+Example:
+Milk
+Main Restaurant:
+40 L expires tomorrow
+Beach Kiosk:
+Projected requirement tomorrow:
+28 L
+TICVAI recommendation:
+Transfer 28 L from Main Restaurant to Beach Kiosk and prioritize this batch for consumption.
+The inventory system should support:
+FEFO — First Expired, First Out
+for expiry-sensitive items.
+
+TICVAI / F&B BACKEND STRUCTURE MODULE
+CONFIDENTIAL | 93
+AI — Production vs Demand
+Board 5 should consume the production forecast created through Boards 2 and 6 and continuously compare:
+Forecast Demand
+vs
+Production Plan
+vs
+Actual Production
+vs
+Actual Consumption
+Example:
+Burger Patties:
+Forecast:
+1,480
+Planned:
+1,550
+Produced:
+1,510
+Consumed:
+1,462
+Remaining:
+48
+This provides the feedback loop required to improve future forecasts.
+EMPLOYEE APP INTEGRATION
+Board 5 shall integrate directly with the TICVAI Employee App.
+Authorized employees should be able to perform:
+ Stock Count
+ Waste Entry
+ Production Confirmation
+ Batch Recording
+ Transfer Dispatch
+ Transfer Receipt
+ Requisition
+ 86 Product
+ Restore Product
+
+TICVAI / F&B BACKEND STRUCTURE MODULE
+CONFIDENTIAL | 94
+ Temperature Check
+ Quality Check
+ Receiving Confirmation
+Example Alert
+Critical Stock — Beef Patty
+Current:
+32 units
+Expected depletion:
+1.4 hours
+Nearby stock:
+Central Kitchen:
+240
+Action:
+Request Transfer
+BARCODE / RFID SUPPORT
+Where supported by the Shared Inventory Engine, Board 5 should allow employees to use:
+ Barcode
+ QR
+ RFID
+for:
+Receiving
+Stock Count
+Transfer
+Batch Identification
+Waste Recording
+Production Issue
+Inventory Lookup.
+The physical scanning capability should use the same inventory identifiers as the Shared Inventory module.
+BATCH, LOT & EXPIRY TRACEABILITY
+Every relevant F&B ingredient and prepared product should support traceability.
+Example:
+
+TICVAI / F&B BACKEND STRUCTURE MODULE
+CONFIDENTIAL | 95
+Beef Patty
+Batch:
+BP-140826-04
+Supplier Batch:
+SUP-48292
+Received:
+14 Aug
+Expiry:
+18 Aug
+Used in:
+Main Restaurant
+Production Batch:
+BURGER-PREP-0814
+If a batch is placed on hold or recalled, TICVAI should be able to identify:
+Where it is
+Which outlet received it
+Which production batch used it
+and, where transaction data permits,
+which orders/products were affected.
+APPROVAL & AUDIT CONTROLS
+Sensitive actions shall use TICVAI's shared Approval Engine.
+Examples:
+Large Waste
+→ Manager Approval
+Inventory Adjustment
+→ Inventory Supervisor
+Emergency Transfer
+→ Authorized Role
+Production Variance
+→ Kitchen Supervisor
+
+TICVAI / F&B BACKEND STRUCTURE MODULE
+CONFIDENTIAL | 96
+Quality Hold Release
+→ Authorized Food Safety / Management Role
+Manual 86 Override
+→ Authorized F&B Role
+All actions shall record:
+User
+Timestamp
+Location
+Device
+Action
+Old Value
+New Value
+Reason
+Approval
+SHARED INVENTORY & PROCUREMENT BOUNDARY
+This architectural separation is mandatory.
+F&B BOARD 5 SHALL OWN
+ F&B Operational Stock Visibility
+ Recipe Consumption
+ Theoretical Consumption
+ Production Execution
+ Production Yield
+ F&B Batch Usage
+ Waste / Spoilage
+ Outlet Stock Counts
+ Operational Requisitions
+ F&B Transfer Requests
+ Outlet Receiving
+ Product 86 / Availability
+ Food-Safety Operational Checks
+ F&B Stock Alerts
+ AI F&B Replenishment Recommendations
+SHARED INVENTORY SHALL OWN
+ Inventory Item Master
+ Enterprise Stock Ledger
+ Warehouse Master
+
+TICVAI / F&B BACKEND STRUCTURE MODULE
+CONFIDENTIAL | 97
+ Storage Locations / Bins
+ Enterprise Batch / Lot Records
+ Inventory Valuation
+ Enterprise Goods Receipt
+ Enterprise Transfer Transactions
+ Inventory Adjustments
+ Inventory Reconciliation
+ Stock Valuation Methods
+PROCUREMENT SHALL OWN
+ Supplier Master
+ Supplier Contracts
+ Purchase Requisition
+ RFQ
+ Supplier Quotations
+ Quotation Comparison
+ Purchase Order
+ Supplier Delivery
+ Purchasing Approval
+ Supplier Invoice Matching
+ Supplier Performance
+Therefore, if an F&B outlet needs stock:
+F&B identifies requirement
+↓
+Board 5 creates operational replenishment request
+↓
+Check Internal Availability
+↓
+If available:
+Shared Inventory Transfer
+↓
+If not available:
+Procurement Process
+↓
+Goods Received
+↓
+Shared Inventory Updated
+↓
+F&B Availability Updated
+
+TICVAI / F&B BACKEND STRUCTURE MODULE
+CONFIDENTIAL | 98
+This prevents duplicate inventory and purchasing systems.
+BOARD 5 — FINAL 10 SCREENS
+# Screen
+1 F&B Stock & Operations Command Center
+2 Outlet Stock & Ingredient Availability
+3 Recipe Consumption & Theoretical Inventory
+4 Production Execution & Batch Management
+5 Wastage, Spoilage, Returns & Write-Off
+6 Requisition & Smart Replenishment
+7 Transfers, Distribution & Outlet Receiving
+8 Stock Count, Reconciliation & Variance
+9 Product Availability, 86 & Operational Food Safety
+10 Operational Alerts, AI Replenishment & Action Center
+COMPLETE BOARD 5 FLOW
+F&B Sales + Reservations + Attendance Forecast
+↓
+Board 2 Recipe & Production Plan
+↓
+Board 5 calculates operational requirements
+↓
+Production Execution
+↓
+Raw Ingredients Consumed
+↓
+Prepared Stock Created
+↓
+Distributed to Outlets
+↓
+Sales
+↓
+
+TICVAI / F&B BACKEND STRUCTURE MODULE
+CONFIDENTIAL | 99
+Recipe Explosion
+↓
+Theoretical Consumption
+↓
+Shared Inventory Updated
+↓
+Actual Stock Compared
+↓
+Variance / Waste / Expiry / Shortage Detection
+↓
+TICVAI determines:
+Healthy Stock
+or
+Replenishment Required
+↓
+Check other internal locations
+↓
+Transfer Recommendation
+or
+Requisition
+↓
+Shared Inventory / Procurement
+↓
+Stock Received
+↓
+Outlet Availability Updated
+↓
+Previously 86'd products identified
+↓
+
+TICVAI / F&B BACKEND STRUCTURE MODULE
+CONFIDENTIAL | 100
+Restore Product Availability
+↓
+POS + Kiosk + QR + Mobile + B2C synchronized
+↓
+Board 6 Analytics & AI receives operational results.
+ARCHITECTURAL REQUIREMENT
+Board 5 shall not maintain a separate F&B inventory ledger.
+There shall be one TICVAI inventory source of truth:
+F&B Operational Event
+↓
+Recipe / Production Consumption Engine
+↓
+Shared Inventory Ledger
+↓
+Availability & Forecasting
+↓
+Replenishment
+↓
+Warehouse / Procurement
+This same Shared Inventory Engine should later support F&B, Retail, Rental, operational supplies and other 
+applicable TICVAI modules.
+That gives TICVAI a clean architecture while Board 5 remains specialized enough to handle the operational 
+realities of F&B: recipes, production, batches, yield, waste, expiry, 86 management and food safety.
+
+TICVAI / F&B BACKEND STRUCTURE MODULE
+CONFIDENTIAL | 101
+TICVAI F&B — BOARD 6
+F&B Intelligence, Analytics, Forecasting & AI Optimization — Scope of Work
+1. Purpose
+The F&B Intelligence, Analytics, Forecasting & AI Optimization Board shall provide a centralized management and 
+decision-intelligence layer across all Food & Beverage operations.
+The Board shall consolidate operational, commercial and financial information from:
+ POS and Mobile POS
+ QR Ordering
+ Self-Service Kiosks
+ B2C / Mobile Ordering
+ Menus and Products
+ Recipes and Ingredients
+ Kitchen Display System (KDS)
+ Kitchen Stations
+ Tables and Reservations
+ Guest Profiles / CRM
+ Membership and Loyalty
+ F&B Stock and Consumption
+ Production and Central Kitchen
+ Waste and Write-Offs
+ Shared Inventory
+ Procurement
+ Resource Management
+
+TICVAI / F&B BACKEND STRUCTURE MODULE
+CONFIDENTIAL | 102
+ Ticketing and Attendance
+ Events and Experiences
+ Payments
+ Finance
+The objective shall be to move beyond traditional reporting and provide a continuous intelligence cycle:
+Measure Compare Detect Explain Forecast Recommend Simulate Approve Act Measure → → → → → → → → →
+Results Learn →
+TICVAI shall help management answer:
+What happened?
+Why did it happen?
+What is likely to happen next?
+What should we do about it?
+SCREEN 1 — F&B Executive Command Center
+Purpose
+Provide executives and F&B management with a real-time consolidated view of commercial performance, 
+profitability, operations, inventory, production, kitchen performance and emerging risks.
+Global Filters
+ Tenant
+ Company
+ Park
+ Venue
+ Outlet
+ Outlet Type
+ Date / Period
+ Service Period
+ Channel
+Primary KPI Cards
+ Gross Sales
+ Net Sales
+ Orders
+ Covers / Guests
+ Average Order Value
+ Revenue per Guest
+ Food Cost %
+ Gross Margin %
+ Waste %
+ Kitchen SLA %
+ Average Preparation Time
+ Product Availability %
+ Stock-Out Events
+ Forecast Accuracy
+
+TICVAI / F&B BACKEND STRUCTURE MODULE
+CONFIDENTIAL | 103
+ Guest Satisfaction
+Comparisons
+Every applicable KPI shall support:
+ Today vs Yesterday
+ Week vs Previous Week
+ Month vs Previous Month
+ Year vs Previous Year
+ Actual vs Budget
+ Actual vs Forecast
+ Outlet vs Outlet
+ Venue vs Venue
+Operational Health
+Example:
+Main Restaurant — Healthy
+Coffee House — Healthy
+Beach Kiosk — Stock Risk
+VIP Lounge — Margin Warning
+Central Kitchen — Production Risk
+AI Executive Summary
+TICVAI shall automatically summarize significant developments.
+Example:
+F&B net sales are 8.4% above forecast today. Main Restaurant is the primary contributor, while Beach Kiosk 
+is 11.2% below forecast due primarily to product unavailability between 16:40 and 19:10. Grill SLA has 
+declined to 82%, and Central Kitchen has a projected sauce-production shortfall for tomorrow.
+Quick Actions
+View Revenue | View Risks | Forecast Tomorrow | AI Recommendations | Compare Outlets | Ask TICVAI
+SCREEN 2 — Sales, Revenue & Channel Analytics
+Purpose
+Provide detailed commercial analysis across all F&B sales channels.
+KPI Cards
+ Gross Sales
+ Net Sales
+ Tax
+ Service Charges
+ Discounts
+ Promotions
+ Refunds
+ Complimentary Value
+ Orders
+ Items Sold
+ Average Order Value
+ Items per Order
+
+TICVAI / F&B BACKEND STRUCTURE MODULE
+CONFIDENTIAL | 104
+Revenue Analysis
+Analyze by:
+ Outlet
+ Venue
+ Product
+ Product Category
+ Menu
+ Service Period
+ Hour
+ Day
+ Channel
+ Payment Method
+ Guest Segment
+ Membership Tier
+ Promotion
+ Event
+Channel Performance
+Compare:
+ Fixed POS
+ Mobile POS
+ QR Ordering
+ Kiosk
+ Mobile App
+ B2C
+ Table Ordering
+ Other Integrated Channels
+Example:
+Channel Revenue Orders AOV Growth Margin
+POS AED 235K 4,820 48.8 +6% 67%
+QR AED 92K 1,540 59.7 +18% 70%
+Mobile AED 71K 1,130 62.8 +24% 72%
+Kiosk AED 58K 1,410 41.1 +9% 65%
+Drill-Down
+Users shall be able to navigate:
+Venue
+→ Outlet
+→ Category
+→ Product
+→ Channel
+→ Transaction
+without leaving the analytical workflow.
+
+TICVAI / F&B BACKEND STRUCTURE MODULE
+CONFIDENTIAL | 105
+SCREEN 3 — Outlet, Service & Guest Performance
+Purpose
+Benchmark outlets and service models while connecting commercial performance with guest behavior.
+Outlet Scorecard
+Outlet Sales Orders AOV Margin SLA Availability Waste
+Main 
+Restaurant
+AED 184K 3,420 53.8 68% 94% 98% 2.1%
+Coffee House AED 82K 2,910 28.2 74% 97% 99% 1.4%
+Beach Kiosk AED 61K 1,860 32.8 64% 88% 91% 4.7%
+VIP Lounge AED 93K 620 150.0 72% 96% 99% 2.8%
+Outlet Performance Score
+TICVAI may calculate a configurable performance score based on:
+ Revenue Performance
+ Growth
+ Margin
+ Product Availability
+ Kitchen SLA
+ Waste
+ Guest Satisfaction
+ Service Performance
+Example:
+Main Restaurant — 92 / 100
+Guest Analytics
+Analyze:
+ Unique F&B Guests
+ Returning Guests
+ Spend per Guest
+ Orders per Guest
+ F&B Conversion Rate
+ Membership Spend
+ VIP Spend
+ Family Spend
+ Group Spend
+Guest information shall be consumed from TICVAI's shared CRM / Guest Profile rather than maintained separately 
+within F&B.
+Ticket-to-F&B Conversion
+A particularly important TICVAI metric:
+Park Attendance
+12,500
+↓
+F&B Customers
+
+TICVAI / F&B BACKEND STRUCTURE MODULE
+CONFIDENTIAL | 106
+4,625
+↓
+F&B Conversion = 37%
+Management should be able to compare conversion by:
+Venue
+Ticket Type
+Membership
+Event
+Time
+Guest Segment.
+SCREEN 4 — Product Performance & Menu Engineering
+Purpose
+Analyze products using sales, popularity, profitability, recipe cost, waste, preparation performance and availability.
+Product KPIs
+ Units Sold
+ Revenue
+ Product Cost
+ Gross Profit
+ Margin %
+ Popularity
+ Average Preparation Time
+ SLA %
+ Waste Contribution
+ Refund Rate
+ Modifier Revenue
+ Availability %
+ Stock-Out Frequency
+Menu Engineering Matrix
+Products shall be categorized using configurable profitability and popularity thresholds:
+STAR
+High Popularity + High Profitability
+PLOWHORSE
+High Popularity + Low Profitability
+PUZZLE
+Low Popularity + High Profitability
+DOG
+Low Popularity + Low Profitability
+Product Example
+Classic Beef Burger
+Units:
+4,820
+Revenue:
+AED 236,180
+
+TICVAI / F&B BACKEND STRUCTURE MODULE
+CONFIDENTIAL | 107
+Margin:
+52%
+Popularity:
+High
+Classification:
+PLOWHORSE
+AI Insight
+Classic Beef Burger remains one of the highest-volume products, but margin declined from 64% to 52%, primarily 
+due to increased beef cost and higher-than-normal consumption variance.
+Recommended Actions
+ Review Price
+ Review Recipe
+ Review Portion
+ Review Supplier Cost
+ Review Modifier Pricing
+ Review Waste
+ Simulate Price Change
+SCREEN 5 — Food Cost, Margin & Profitability Intelligence
+Purpose
+Provide management with detailed understanding of F&B profitability from product level through enterprise level.
+KPI Cards
+ Net F&B Revenue
+ Theoretical Food Cost
+ Actual Food Cost
+ Food Cost %
+ Gross Profit
+ Gross Margin %
+ Waste Cost
+ Consumption Variance
+ Discount Impact
+ Complimentary Impact
+Theoretical vs Actual Cost
+Example:
+Net Revenue:
+AED 480,000
+Theoretical Food Cost:
+AED 142,000
+Actual Food Cost:
+AED 158,500
+Variance:
+AED 16,500
+Profitability Dimensions
+
+TICVAI / F&B BACKEND STRUCTURE MODULE
+CONFIDENTIAL | 108
+Analyze by:
+ Tenant
+ Venue
+ Outlet
+ Product
+ Category
+ Recipe
+ Ingredient
+ Kitchen
+ Service Period
+ Channel
+ Promotion
+Margin Waterfall
+Gross Sales
+↓
+Discounts
+↓
+Refunds
+↓
+Net Revenue
+↓
+Theoretical Food Cost
+↓
+Consumption Variance
+↓
+Waste
+↓
+Contribution Margin
+Cost Change Impact
+When ingredient cost changes, TICVAI should identify affected products.
+Example:
+Beef Cost +18%
+Affected Products:
+12
+Average Margin Impact:
+-5.8%
+Potential Monthly Impact:
+AED 84,000
+This information should use cost and finance information from the shared Inventory, Procurement and Finance 
+layers.
+SCREEN 6 — Inventory, Waste & Production Intelligence
+Purpose
+Transform Board 5's operational stock, production, consumption and waste information into management 
+intelligence.
+KPI Cards
+
+TICVAI / F&B BACKEND STRUCTURE MODULE
+CONFIDENTIAL | 109
+ Inventory Consumption
+ Theoretical Consumption
+ Actual Consumption
+ Consumption Variance
+ Waste Value
+ Waste %
+ Expired Stock
+ Production Yield
+ Production Variance
+ Stock-Out Events
+ 86 Events
+ Estimated Lost Sales
+Production Analytics
+Compare:
+Forecast Demand
+vs
+Production Plan
+vs
+Actual Production
+vs
+Actual Consumption
+Example:
+Item Forecast Planned Produced Consumed Variance
+Burger Patty 1,480 1,550 1,510 1,462 +48
+Pizza Dough 680 720 704 676 +28
+Special Sauce 38 L 42 L 39 L 37 L +2 L
+Production Yield Analysis
+Example:
+Special Sauce
+Expected Yield:
+100 L
+Actual:
+94 L
+Yield:
+94%
+Historical:
+97%
+TICVAI should highlight abnormal yield.
+Waste Analysis
+Analyze by:
+ Ingredient
+ Product
+
+TICVAI / F&B BACKEND STRUCTURE MODULE
+CONFIDENTIAL | 110
+ Recipe
+ Outlet
+ Kitchen
+ Station
+ Reason
+ Shift
+ Service Period
+ Production Batch
+Lost Sales Analysis
+If a product is unavailable:
+Classic Burger unavailable:
+16:40–18:55
+Expected Units:
+148
+Actual Units:
+24
+Estimated Lost Sales:
+AED 6,076
+Estimated Lost Margin:
+AED 3,460
+This allows management to understand the commercial impact of stock and production problems.
+SCREEN 7 — Kitchen, Service & Fulfilment Performance
+Purpose
+Combine Board 3 kitchen information and Board 4 restaurant-service information into one managementperformance view.
+Kitchen KPIs
+ Orders Prepared
+ Average Preparation Time
+ Kitchen SLA %
+ Delayed Orders
+ Re-Fire %
+ Station Utilization
+ Peak Kitchen Load
+ Fire-to-Ready Time
+ Ready-to-Collection Time
+Service KPIs
+ Reservations
+ Walk-Ins
+ Covers
+ Average Wait Time
+ Seating Time
+ Dining Duration
+
+TICVAI / F&B BACKEND STRUCTURE MODULE
+CONFIDENTIAL | 111
+ Table Turnover
+ Revenue per Table
+ Revenue per Cover
+ No-Show %
+ Guest Satisfaction
+Kitchen Bottleneck Analysis
+Example:
+Grill Station
+Target:
+10 min
+Actual:
+14.8 min
+SLA:
+76%
+Peak Problem:
+18:30–20:15
+Course Firing Analytics
+Measure:
+ Average Hold Time
+ Fire-to-Ready
+ Course Gap
+ Late Fires
+ Manual Overrides
+ Timed-Fire Accuracy
+Collection Analytics
+Measure:
+ Ready-to-Collection Time
+ Buzzer Response
+ Digital Notification Response
+ Orders Waiting After Ready
+Guest Service Journey
+TICVAI should measure:
+Guest Arrival
+→ Wait
+→ Seating
+→ Order
+→ Fire
+→ Preparation
+→ Service
+→ Dining
+→ Bill Request
+→ Payment
+This allows management to identify exactly where service delays occur.
+
+TICVAI / F&B BACKEND STRUCTURE MODULE
+CONFIDENTIAL | 112
+SCREEN 8 — Demand Forecasting & Operational Planning
+Purpose
+Forecast future F&B demand and convert it into actionable plans for products, ingredients, production, stock, 
+kitchens and staffing.
+Forecast Inputs
+The forecasting engine should be capable of using:
+ Advance Ticket Sales
+ Attendance Forecast
+ Event Schedule
+ Restaurant Reservations
+ Historical F&B Sales
+ Historical Conversion
+ Membership Visits
+ Seasonality
+ Day of Week
+ Service Period
+ Promotions
+ Holidays
+ School / Group Bookings
+ Weather, where integrated
+ Current Stock
+ Incoming Stock
+Example Forecast
+Tomorrow — Dubai Park
+Expected Attendance:
+14,800
+Expected F&B Conversion:
+36%
+Expected Orders:
+5,328
+Expected Revenue:
+AED 312,000
+Product Forecast
+Classic Burger:
+1,480
+Chicken Burger:
+920
+Pizza:
+680
+Coffee:
+2,150
+Water:
+3,840
+
+TICVAI / F&B BACKEND STRUCTURE MODULE
+CONFIDENTIAL | 113
+Ingredient Requirement
+Beef Patties:
+1,550
+Burger Buns:
+2,620
+Milk:
+210 L
+Fries:
+420 kg
+Production Requirement
+Special Sauce:
+42 L
+Pizza Dough:
+720
+Marinated Chicken:
+280 kg
+Kitchen Capacity Forecast
+Grill:
+108%
+Fryer:
+94%
+Beverage:
+81%
+Staffing Requirement
+Recommended:
++2 Grill Staff
++1 Expeditor
++2 Cashiers
++1 Runner
+Staffing recommendations shall integrate with TICVAI Resource Management.
+SCREEN 9 — AI Recommendation, Simulation & Optimization Center
+Purpose
+Provide a centralized AI-driven recommendation engine that identifies commercial and operational opportunities 
+and allows management to simulate outcomes before taking action.
+Recommendation Categories
+ Revenue
+ Pricing
+ Margin
+ Menu
+ Product Availability
+ Production
+ Inventory
+ Waste
+ Kitchen
+
+TICVAI / F&B BACKEND STRUCTURE MODULE
+CONFIDENTIAL | 114
+ Staffing
+ Guest Experience
+Recommendation Card
+Each recommendation should display:
+Issue / Opportunity
+Business Impact
+Root Cause
+Recommended Action
+Confidence
+Expected Result
+Affected Locations
+Example — Revenue Opportunity
+Increase Classic Burger availability at Beach Kiosk between 17:00–20:00.
+Estimated additional daily revenue:
+AED 8,400
+Confidence:
+91%
+Reason:
+High demand combined with recurring stock-outs.
+Example — Production
+Increase tomorrow's Special Sauce production from 42 L to 46 L.
+Reason:
+Current production yield is averaging 94%, creating a forecast shortfall.
+Example — Staffing
+Grill Station is forecast to exceed 100% capacity between 18:00–20:30.
+Recommendation:
+Add 2 Grill Staff and activate Grill B at 17:45.
+What-If Simulation
+Authorized users shall be able to simulate changes before approval.
+Example:
+What happens if Beef Burger price changes from AED 45 to AED 49?
+Simulation
+Current Monthly Units:
+9,400
+Estimated Demand Change:
+-3.2%
+Current Revenue:
+AED 423,000
+Projected Revenue:
+AED 445,000
+Current Margin:
+52%
+
+TICVAI / F&B BACKEND STRUCTURE MODULE
+CONFIDENTIAL | 115
+Projected Margin:
+58%
+Estimated Contribution Improvement:
++AED 37,000/month
+Actions:
+Save Scenario | Modify | Submit for Approval
+Production Simulation
+Example:
+What if attendance tomorrow reaches 18,000 instead of 14,800?
+TICVAI recalculates:
+Orders
+Product Demand
+Ingredient Requirements
+Production Requirements
+Kitchen Capacity
+Staffing
+Replenishment.
+Recommendation Controls
+Actions:
+View Analysis
+Simulate
+Accept
+Modify
+Reject
+Assign
+Submit for Approval
+AI shall remain advisory for material commercial, financial or operational decisions unless an authorized tenant 
+explicitly configures an automated rule.
+SCREEN 10 — AI Assistant, Alerts & Management Action Center
+Purpose
+Provide a conversational management interface for querying F&B data, investigating issues and initiating 
+controlled business actions.
+Natural-Language Questions
+Authorized users should be able to ask:
+How did F&B perform yesterday?
+Why did our food cost increase this week?
+Which outlet has the highest waste?
+Which products are causing kitchen delays?
+Which products are likely to run out tomorrow?
+Why is Beach Kiosk underperforming?
+
+TICVAI / F&B BACKEND STRUCTURE MODULE
+CONFIDENTIAL | 116
+How much revenue did we lose because of 86'd products?
+Which production batches had poor yield?
+Which outlet has the lowest ticket-to-F&B conversion?
+What should Central Kitchen produce tomorrow?
+How many kitchen staff do we need this weekend?
+Example Response
+Yesterday F&B generated AED 486,250, 8.4% above forecast.
+Main Restaurant contributed most of the increase. Beach Kiosk underperformed by 11.3%, primarily because five 
+products were unavailable during peak service.
+Estimated revenue lost due to unavailable products was AED 7,850.
+Grill Station also missed SLA on 18% of orders between 18:30 and 20:00.
+Suggested Actions
+View Beach Kiosk
+Review Stock-Outs
+Create Replenishment
+Review Grill Performance
+NATURAL-LANGUAGE CONTROLLED ACTIONS
+The AI Assistant should also allow authorized users to propose actions conversationally.
+Example:
+Increase Classic Burger price to AED 49 next Monday.
+TICVAI shall not immediately execute the request.
+It should create:
+Proposed Change
+Product:
+Classic Burger
+Current Price:
+AED 45
+Proposed:
+AED 49
+Effective:
+Next Monday
+Affected:
+6 Outlets
+Channels:
+POS + QR + Mobile + Kiosk
+Current Margin:
+52%
+Projected:
+58%
+Then:
+Simulate | Edit | Submit for Approval | Cancel
+The action shall follow TICVAI's standard approval workflow.
+AI ROOT-CAUSE ANALYSIS
+
+TICVAI / F&B BACKEND STRUCTURE MODULE
+CONFIDENTIAL | 117
+TICVAI should correlate data across modules rather than only report symptoms.
+Example:
+Issue
+Beach Kiosk Revenue:
+-11.3% vs Forecast
+AI Analysis
+Primary Cause:
+Product Availability
+Five high-volume products unavailable for 2h 30m.
+Underlying Cause:
+Burger Bun shortage.
+Underlying Cause:
+Requisition submitted 3.2 hours late.
+Secondary Cause:
+Grill SLA deterioration during peak period.
+Estimated Impact
+Lost Revenue:
+AED 7,850
+Lost Margin:
+AED 4,210
+Recommended Actions
+1. Increase Burger Bun safety stock.
+2. Enable forecast-based replenishment.
+3. Move requisition trigger 4 hours earlier.
+4. Review Grill peak staffing.
+This cross-module analysis should be a major TICVAI capability.
+AI EXPLAINABILITY
+Every significant AI recommendation shall provide an explanation.
+Example:
+Recommendation
+Increase Classic Burger:
+AED 45 AED 49 →
+Why?
+Ingredient Cost:
++18%
+Current Margin:
+52%
+Target Margin:
+60%
+Demand Trend:
+Strong
+Price Sensitivity Estimate:
+Low–Moderate
+Confidence
+
+TICVAI / F&B BACKEND STRUCTURE MODULE
+CONFIDENTIAL | 118
+87%
+Data Used
+ Product Sales History
+ Recipe Cost
+ Ingredient Cost
+ Promotion History
+ Historical Price Changes
+ Current Demand
+Managers must be able to understand the basis of significant recommendations.
+FORECAST ACCURACY & MODEL PERFORMANCE
+TICVAI shall measure the performance of its own forecasts.
+Forecast Predicted Actual Accuracy
+Orders 5,200 5,340 97.4%
+Burger Sales 1,450 1,510 96.0%
+Revenue AED 305K AED 312K 97.7%
+Sauce Requirement 40 L 42 L 95.2%
+Users should be able to analyze forecast accuracy by:
+ Outlet
+ Product
+ Day
+ Forecast Horizon
+ Service Period
+ Event
+The system should retain forecast versions so management can compare what was predicted at the time
+against actual results.
+RECOMMENDATION OUTCOME TRACKING
+TICVAI shall measure whether accepted recommendations produced the expected outcome.
+Example:
+Recommendation
+Add 2 Grill Staff from 18:00–20:00.
+Before
+Average Prep:
+14.2 min
+Kitchen SLA:
+78%
+After
+Average Prep:
+10.8 min
+Kitchen SLA:
+93%
+Result
+Preparation Time:
+
+TICVAI / F&B BACKEND STRUCTURE MODULE
+CONFIDENTIAL | 119
+Improved 24%
+The intelligence loop becomes:
+Detect Recommend Approve Execute Measure Learn → → → → →
+ANOMALY DETECTION
+TICVAI should proactively identify unusual operational or commercial patterns.
+Examples:
+ Unusual Sales Drop
+ Unusual Refund Increase
+ Abnormal Discounting
+ Abnormal Complimentary Items
+ Consumption Variance
+ Waste Spike
+ Production Yield Drop
+ Kitchen SLA Deterioration
+ Stock-Out Pattern
+ Unusual Product Demand
+ Unexpected Margin Change
+Example:
+Waste Alert — Chicken Breast
+Current:
+8.2%
+Historical:
+3.1%
+Deviation:
++164%
+Most affected:
+Main Restaurant — Grill Station — Dinner Shift
+The system should support investigation without automatically attributing anomalies to employee misconduct.
+PRODUCTION & CENTRAL KITCHEN INTELLIGENCE
+Board 6 shall provide specific analytics for central kitchens and commissaries.
+KPIs
+ Production Plan Completion %
+ Planned vs Actual Production
+ Production Yield
+ Batch Failure Rate
+ Cost per Production Unit
+ Production Waste
+ Outlet Demand Fulfilment
+ On-Time Production
+ Transfer Fulfilment
+AI Example
+Central Kitchen is forecast to miss tomorrow's pizza dough requirement by approximately 8%.
+Reason:
+
+TICVAI / F&B BACKEND STRUCTURE MODULE
+CONFIDENTIAL | 120
+Current yield below target + higher-than-forecast event demand.
+Recommendation:
+Increase production run by 60 units.
+CROSS-SELL & UPSELL INTELLIGENCE
+TICVAI should analyze product combinations to identify commercial opportunities.
+Example:
+Guests purchasing:
+Classic Burger
+also purchase:
+Fries — 78%
+Soft Drink — 72%
+Dessert — 18%
+AI recommendation:
+Create a Burger + Fries + Drink combo at AED 62.
+Estimated attach-rate improvement:
++14%
+Estimated monthly revenue impact:
++AED 42,000
+The recommendation should proceed through simulation and approval before menu publication.
+TICKETING + F&B INTELLIGENCE
+This should be a major differentiator for TICVAI.
+The F&B intelligence layer should correlate food demand with attraction activity.
+Example:
+Waterpark
+Expected Attendance:
+8,400
+Historical F&B Conversion:
+41%
+Expected F&B Guests:
+3,444
+Expected Peak:
+13:00–15:30
+TICVAI recommends:
+ Increase Beach Kiosk stock
+ Prepare additional cold beverages
+ Increase lunch production
+ Add 2 cashiers
+ Activate second fryer
+A standalone restaurant system generally does not have the same direct access to ticketing, attendance, 
+experience and attraction demand signals.
+ROLE-BASED INTELLIGENCE
+Board 6 shall use TICVAI's common RBAC/PBAC framework.
+Executive / CEO
+
+TICVAI / F&B BACKEND STRUCTURE MODULE
+CONFIDENTIAL | 121
+ Revenue
+ Margin
+ Growth
+ Forecast
+ Business Risks
+ AI Opportunities
+F&B Director
+ Outlet Performance
+ Menu
+ Margin
+ Waste
+ Production
+ Kitchen
+ Forecast
+Restaurant Manager
+ Sales
+ Kitchen
+ Tables
+ Guest Service
+ Stock
+ Staff
+Executive Chef
+ Kitchen
+ Recipes
+ Production
+ Yield
+ Food Cost
+ Waste
+ Ingredient Availability
+Finance
+ Revenue
+ Margin
+ Discounts
+ Refunds
+ Cost
+ Variance
+Inventory Manager
+ Consumption
+ Stock
+ Production Requirements
+ Waste
+ Forecast
+ Replenishment
+
+TICVAI / F&B BACKEND STRUCTURE MODULE
+CONFIDENTIAL | 122
+Users shall only see data and actions permitted by their role and context.
+CONFIGURABLE DASHBOARD BUILDER
+Authorized users shall be able to configure dashboards without software development.
+Widget Library
+Examples:
+ Revenue
+ Orders
+ Average Order Value
+ Food Cost
+ Margin
+ Waste
+ Kitchen SLA
+ Stock
+ 86 Events
+ Table Occupancy
+ Production
+ Forecast
+ AI Insight
+ Alerts
+Users shall be able to:
+Add Widget
+Drag
+Resize
+Filter
+Save
+Share
+Dashboards may be:
+ Private
+ Role-Based
+ Outlet-Based
+ Venue-Based
+ Shared
+ Executive
+REPORTING, EXPORT & SCHEDULING
+Reports and analytical views shall support appropriate:
+ Excel Export
+ CSV Export
+ PDF Export
+ Scheduled Reports
+ Email Distribution
+ Saved Filters
+ Saved Views
+
+TICVAI / F&B BACKEND STRUCTURE MODULE
+CONFIDENTIAL | 123
+Example:
+Weekly F&B Executive Report
+Schedule:
+Every Monday — 08:00
+Recipients:
+CEO
+F&B Director
+Finance Director
+Contents:
+Revenue
+Margin
+Food Cost
+Waste
+Kitchen SLA
+Production
+Forecast
+Top Risks
+AI Recommendations.
+All reports shall respect tenant, venue and role permissions.
+APPROVAL CENTER INTEGRATION
+AI and analytical recommendations that result in controlled changes shall integrate with TICVAI's common 
+Approval Engine.
+Examples:
+Product Price Change
+→ Commercial / Finance Approval
+Production Increase
+→ F&B / Kitchen Approval
+Emergency Stock Transfer
+→ Inventory Approval
+Large Waste Adjustment
+→ Management Approval
+Staffing Recommendation
+→ Resource / Operations Approval
+Menu Change
+→ F&B Approval
+Actions:
+Approve | Reject | Request Changes | Delegate
+Board 6 shall not create a separate F&B approval engine.
+AUDITABILITY
+The platform shall maintain audit records for significant analytical and AI-driven actions.
+Records should include:
+ Recommendation ID
+ Recommendation Date
+ AI / Rule Version where applicable
+ Data Context
+
+TICVAI / F&B BACKEND STRUCTURE MODULE
+CONFIDENTIAL | 124
+ User
+ Decision
+ Simulation
+ Approval
+ Executed Action
+ Previous Value
+ New Value
+ Result
+ Timestamp
+This allows management to understand not only what changed, but also why the change was proposed and 
+who approved it.
+BOARD 6 — FINAL 10 SCREENS
+# Screen
+1 F&B Executive Command Center
+2 Sales, Revenue & Channel Analytics
+3 Outlet, Service & Guest Performance
+4 Product Performance & Menu Engineering
+5 Food Cost, Margin & Profitability Intelligence
+6 Inventory, Waste & Production Intelligence
+7 Kitchen, Service & Fulfilment Performance
+8 Demand Forecasting & Operational Planning
+9 AI Recommendation, Simulation & Optimization Center
+10 AI Assistant, Alerts & Management Action Center
+COMPLETE BOARD 6 INTELLIGENCE FLOW
+Operational Data
+POS + QR + Mobile + Kiosk
+↓
+Menus + Products + Recipes
+↓
+Kitchen + KDS + Course Firing
+↓
+Tables + Reservations + Guest Service
+↓
+Production + Stock + Consumption + Waste
+↓
+Ticketing + Attendance + Events
+↓
+CRM + Loyalty + Membership
+↓
+Resource Management + Finance
+↓
+TICVAI F&B INTELLIGENCE LAYER
+Collect
+
+TICVAI / F&B BACKEND STRUCTURE MODULE
+CONFIDENTIAL | 125
+↓
+Normalize
+↓
+Analyze
+↓
+Compare
+↓
+Detect Anomalies
+↓
+Explain Root Cause
+↓
+Forecast
+↓
+Recommend
+↓
+Simulate
+↓
+Approval
+↓
+Execute through Source Module
+↓
+Measure Outcome
+↓
+Improve Future Recommendations
+ARCHITECTURAL REQUIREMENT
+Board 6 shall be implemented using TICVAI's common Analytics, Forecasting & AI Intelligence Layer, rather 
+than as an isolated collection of F&B reports.
+The architecture shall follow:
+Operational Systems
+F&B + Retail + Ticketing + Inventory + Procurement + CRM + Resource Management + Finance
+↓
+Unified Data & Analytics Layer
+↓
+KPI / Reporting Engine
+↓
+Forecasting Engine
+↓
+Anomaly & Root-Cause Engine
+↓
+AI Recommendation Engine
+↓
+Simulation / What-If Engine
+↓
+Approval & Action Engine
+↓
+Operational Systems
+↓
+
+TICVAI / F&B BACKEND STRUCTURE MODULE
+CONFIDENTIAL | 126
+Outcome Measurement
+This shared architecture shall later allow Retail, Shared Inventory & Procurement and other TICVAI modules to
+use the same intelligence infrastructure, while Board 6 provides the specialized F&B KPIs, forecasts, 
+recommendations and management workflows required for Food & Beverage operations.
+The F&B module is therefore completed through six connected boards:
+Board 1 — Outlet & Operational Configuration
+Board 2 — Menu, Product, Recipe & Production Configuration
+Board 3 — Kitchen, KDS & Order Fulfilment
+Board 4 — Tables, Reservations & Service Management
+Board 5 — Stock, Production, Replenishment & Operational Control
+Board 6 — Intelligence, Analytics, Forecasting & AI Optimization.
+
+TICVAI / F&B BACKEND STRUCTURE MODULE
+CONFIDENTIAL | 127
+ADDITIONAL — STANDARD F&B POS 
+FUNCTIONAL COVERAGE
+Purpose. This amendment adds the POS operational functions identified in the F&B POS Standard Functions 
+document that were missing or not stated explicitly in the backend structure. These requirements extend the 
+existing six-board architecture and do not replace the more advanced capabilities already defined in the 
+document.
+Implementation principle. The functions below shall use the existing shared services for identity and access, 
+payments, finance, CRM, inventory, approvals, audit, analytics and device management. Configuration belongs 
+mainly to Board 1; kitchen execution to Board 3; table and guest service to Board 4; and reporting and intelligence
+to Board 6.
+A. Functional Summary
+Function Group Functions Added / Clarified Primary Placement
+Access and shifts
+Opening float, cashier cash-in/cashout, suspend/resume and explicit 
+shift controls
+Board 1
+Check lifecycle
+Check numbering, recall/inquiry, 
+open-check list, preview and 
+customer-check printing
+Boards 1 and 4
+Order and KOT
+Incremental KOT printing, KOT 
+history/reprint and detailed itementry behaviourBoards 1 and 3
+Corrections Detailed item/check void and itemtransfer transaction rules Boards 1 and 4
+Table service
+Cover-wise ordering, service-status 
+marking and configurable visual 
+table states
+Boards 3 and 4
+Delivery guests
+Telephone-led delivery profiles, 
+addresses, preferences and order 
+history
+Board 4 / Shared CRM
+Pricing and payment
+Manual happy hour, detailed 
+tenders, tips, discounts, account 
+charges and tax exemption
+Boards 1 and 4
+Reporting Cashier, master, daily operational 
+and legacy MIS report catalogue Board 6
+POS usability
+Touch/mouse operation, shortcut 
+areas, keypad, prompts and checkheader configurationBoard 1
+B. Board 1 Additions — User Access, Shift and Till Controls
+Board 1 shall add a Cashier, Shift and Till Configuration area with the following standard functions:
+ Configure mandatory opening cash balance/imprest by outlet, till, cashier and shift.
+ Support cashier cash-in and cash-out with date/time, outlet, terminal, shift, opening balance, closing 
+declaration and approval status.
+
+TICVAI / F&B BACKEND STRUCTURE MODULE
+CONFIDENTIAL | 128
+ Track all transactions by cashier and shift and retain the applicable terminal and outlet context.
+ Allow an authenticated cashier to suspend a POS session temporarily and resume it using password or 
+approved authentication.
+ Configure automatic return to the cashiering screen and timeout/session-lock rules.
+ Configure a default outlet for authorized users while allowing permitted users to display and switch 
+between available outlets.
+ Display the active outlet, cashier, terminal and shift in the POS header.
+ Provide user-level and shift-level reporting and a complete audit trail of opening, suspension, resumption 
+and cash-out events.
+C. Board 1 and Board 4 Additions — Check and Order Lifecycle
+The Unified F&B Order Engine shall explicitly support the complete standard check lifecycle:
+ Create a check with an automatically generated unique check number.
+ Capture table number, cover count and server/waiter; allow configured defaults for quick-service and fastfood operations.
+ Support table-service, counter, takeaway and delivery checks using the same order engine.
+ Save an open check and retain all unsaved, saved, fired, printed and settled states.
+ Recall a check by check number, table number or server number and show a selection list where several 
+checks match.
+ List all open checks for the current cashier and outlet, with permission-based access to other cashiers' 
+checks.
+ Preview the customer check before printing and support check inquiry by outlet and check number.
+ Recall printed checks from the settlement workflow without duplicating or losing the original transaction 
+reference.
+ Print customer checks to configured continuous-feed, cut-sheet or receipt printers and prompt for 
+manual paper insertion where required.
+ Add individual items or numeric quantities, display description and price, scroll through the order and 
+recalculate totals immediately.
+ Support menu lists, category/submenu navigation, menu-item shortcut keys and configurable POS 
+layouts already defined in Board 2.
+D. Board 1 and Board 3 Additions — KOT Management
+The existing KDS and printer-routing architecture shall include the following Kitchen Order Ticket controls:
+ Automatically print or transmit a KOT when a check is saved or fired, according to the configured routing 
+policy.
+ On subsequent saves, send only newly added, changed or previously unsent items unless an authorized 
+full reprint is requested.
+ Maintain KOT history against the check and allow users to view all KOTs associated with a check or table.
+ Display multiple KOTs separately, including sequence, station, print/fire time, user, status and reprint 
+indicator.
+ Reprint a KOT by outlet and check number, subject to permission, reason capture and audit logging.
+ Print or display course-fire and course-hold instructions and reflect kitchen preparation status in the live 
+table layout.
+E. Board 1 and Board 4 Additions — Void and Item Transfer Controls
+Void and transfer actions shall extend the existing approval and audit framework with explicit transaction 
+behaviour:
+
+TICVAI / F&B BACKEND STRUCTURE MODULE
+CONFIDENTIAL | 129
+ Void selected items, require a configured void reason and retain the original item plus a linked 
+reversal/negative entry.
+ Display a clear void indicator, recalculate the check balance and save or print the correction as configured.
+ Void an entire check by reversing every original item, reducing the balance to zero and retaining the 
+original and reversal audit chain.
+ Report item voids and check voids by outlet, cashier, server, terminal, reason, approver, date and value.
+ Move selected items from a source check to an existing or newly created destination check.
+ Locate the destination by table, check or server and display all matches where the reference is not 
+unique.
+ Update both source and destination totals atomically and retain user, reason, approval and crossreferenced check numbers.
+F. Board 3 and Board 4 Additions — Cover, Course and Service Status
+The existing course, kitchen and table-service functionality shall be expanded or clarified as follows:
+ Assign ordered items to individual covers/guests and show the cover number against each item.
+ Allow cover-wise and course-wise ordering within the same check.
+ Create multiple courses, tag items by course, prompt for the first course and manually fire or hold later 
+courses.
+ Mark one or more items as serviced and display the service status against each item and in the table 
+layout.
+ Provide configurable colour-coded table states including vacant, opened/no order, preparing, partially 
+ready, ready/serviced and cleaning.
+ Provide a visible status legend and permit authorized configuration of table-state colours.
+ Open the check and KOT history directly from the table map, including separate views for multiple KOTs.
+G. Board 4 Additions — Delivery Outlet and Guest Profile Functions
+Delivery outlets shall use the shared TICVAI Guest Profile/CRM while supporting the following POS workflow:
+ Configure an outlet as delivery-enabled and permit telephone number to act as the primary order lookup 
+instead of table number.
+ Search existing guests by telephone number and prompt to create a profile when no match is found.
+ Capture guest name, full address, multiple contact numbers, birthday, anniversary, guest class and 
+preferences.
+ Edit the guest profile subject to CRM permissions and data-protection controls.
+ Automatically retrieve returning-guest details and display previous orders and the items within a selected 
+order.
+ Filter or group order history by outlet and other permitted dimensions.
+ Use the standard order, KOT, settlement and reporting workflows for delivery checks.
+H. Board 1 and Board 4 Additions — Happy Hour, Discounts, Tips, Tax 
+and Settlement
+The pricing and settlement design shall explicitly include these standard operational controls:
+ Permit authorized manual start/end of happy-hour pricing, display a header indicator and apply 
+configured happy-hour prices only to subsequently posted items.
+ Configure whether manual happy-hour switching is allowed and report normal-hour and happy-hour 
+sales separately.
+ Support cash settlement with exact payment, over-tender and automatic change calculation.
+
+TICVAI / F&B BACKEND STRUCTURE MODULE
+CONFIDENTIAL | 130
+ Display configured card types and capture only PCI-compliant payment references or masked/tokenized 
+details required by the payment integration.
+ Support room, guest, special, group, corporate and city-ledger account charges where integrated, 
+including room/account inquiry and advanced search.
+ Support partial and mixed-tender settlement, with the outstanding balance recalculated after each 
+tender.
+ Add, confirm and remove a manual tip before final settlement and include it in the check total and tip 
+reporting.
+ Apply predefined or ad hoc percentage discounts to the entire check, all revenue heads or selected 
+heads/categories.
+ Capture guest and membership references where required, remove an applied discount and recalculate 
+the balance.
+ Apply configured full or partial tax-exemption categories and recalculate the check balance while 
+retaining approval and audit details.
+I. Board 4 Addition — Standard Split-Check Behaviour
+In addition to split-by-guest and split-by-item, the system shall support the following standard split-check controls:
+ Split one check into multiple independent checks, with a configurable limit that may be restricted to the 
+number of covers.
+ Divide the balance equally by default and allow authorized custom amounts.
+ Validate that the total of all split checks exactly equals the original balance.
+ Recall and settle each split check independently using different payment methods.
+ Maintain split-check lineage and separate reporting while preventing unsupported changes to the 
+original check after completion of the split.
+J. Board 6 Additions — Standard POS Report Catalogue
+Board 6 shall include, or source through the common reporting layer, the following standard operational reports:
+ Cashier reports: Shift End, Daily Summary, Item Sales, Open Checks, Check Inquiry, Reprint KOT and 
+Reprint Check.
+ Daily reports: Day Summary, Settlement, Item Sales, Open Checks, Sales by Check, Settlement by Check 
+and Covers.
+ Control reports: Void Items, Void Checks, Discounts, Shift End Summary, Tax-Exempted Checks, 100% 
+Discounted Checks, Discounts by Category, Authorization, Cash Drop, Tax Scroll, Tips Scroll and Reprint 
+Check Logs.
+ MIS reports: Charge Summary, Covers Summary, Item Sales Summary, Top 10 Best/Worst Selling Items, 
+Item Sales by Day of Week, Contact List, MIS Void Items, NC Check Detail and Loyalty Card Details.
+ To-date MIS summaries: Item Sales, Charge, Covers, Settlement, Discount and Tax, with MTD and YTD 
+values where applicable.
+ Report filters: date/date range, time range, tenant, company, venue, outlet, cashier, server, shift, terminal,
+settlement method, item group, item, product type, menu, channel, normal/happy hour and 
+inclusion/exclusion of open checks.
+ Report output to screen, configured printer and approved export formats, subject to role-based 
+permissions.
+ Item Sales reporting shall include quantity, sales value and potential/theoretical cost.

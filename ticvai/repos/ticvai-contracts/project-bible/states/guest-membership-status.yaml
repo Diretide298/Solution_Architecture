@@ -1,0 +1,46 @@
+# Guest membership — state model
+# Contract: catalogue.GuestMembership.status
+
+entity: Guest membership
+contract: catalogue
+enum: GuestMembership.status
+enumKind: inline
+enumSchema: GuestMembership
+enumProperty: status
+owner: catalogue
+initial:
+- active
+terminal:
+- expired
+- cancelled
+transitions:
+- from: active
+  to: frozen
+  trigger: operation
+  guard: '**A guest pausing, not a sanction.** `freezeEntitlement` — consumption stops and validity
+    extends'
+- from: frozen
+  to: active
+  trigger: operation
+  guard: Unfrozen, with the days added back
+  isReversal: true
+- from: active
+  to: suspended
+  trigger: operation
+  guard: '**A sanction** — fraud, a chargeback, a behavioural ban. Validity does not extend'
+- from: suspended
+  to: active
+  trigger: operation
+  guard: Reinstated. The time lost stays lost
+  isReversal: true
+- from: active
+  to: expired
+  trigger: timer
+  guard: Validity ended
+- from: active
+  to: cancelled
+  trigger: operation
+  guard: Ended early
+notes: '**This is a view over the entitlement lifecycle, not a second one.** It is modelled because
+  the checker asks for it and because the freeze-versus-suspend distinction is the one an operator gets
+  wrong — **a guest pausing an annual pass has done nothing wrong.**'

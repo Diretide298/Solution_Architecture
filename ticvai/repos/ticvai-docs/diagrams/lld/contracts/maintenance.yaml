@@ -1,0 +1,447 @@
+id: LLD-maintenance
+title: maintenance — 36 operations
+generatedBy: tools/derive-diagrams.py
+index: diagrams/hld/03-contracts.yaml
+tier: satellite
+service: VenueOpsService
+operations:
+- operation: acceptWorkOrder
+  verb: POST
+  path: /work-orders/{workOrderId}/accept
+  scope: venue
+  permission: MAINTENANCE_EXECUTE
+  audience: null
+  offline: true
+  reads:
+  - cache:idempotency
+  - maintenance.work_order
+  writes:
+  - cache:idempotency
+  - maintenance.work_order
+- operation: attachWorkOrderEvidence
+  verb: POST
+  path: /work-orders/{workOrderId}/attachments
+  scope: venue
+  permission: MAINTENANCE_EXECUTE
+  audience: null
+  offline: true
+  reads:
+  - assets.media_asset
+  - cache:idempotency
+  - maintenance.work_order
+  writes:
+  - cache:idempotency
+  - maintenance.work_order_attachment
+- operation: cancelWorkOrder
+  verb: POST
+  path: /work-orders/{workOrderId}/cancel
+  scope: venue
+  permission: WORK_ORDER_MANAGE
+  audience: null
+  offline: false
+  reads:
+  - cache:idempotency
+  - maintenance.work_order
+  writes:
+  - cache:idempotency
+  - maintenance.work_order
+- operation: closeWorkOrder
+  verb: POST
+  path: /work-orders/{workOrderId}/close
+  scope: venue
+  permission: MAINTENANCE_APPROVE
+  audience: null
+  offline: false
+  reads:
+  - cache:idempotency
+  - maintenance.asset
+  - maintenance.work_order
+  writes:
+  - cache:idempotency
+  - maintenance.work_order
+- operation: completeWorkOrder
+  verb: POST
+  path: /work-orders/{workOrderId}/complete
+  scope: venue
+  permission: WORK_ORDER_MANAGE
+  audience: null
+  offline: true
+  reads:
+  - cache:idempotency
+  - maintenance.work_order
+  writes:
+  - cache:idempotency
+  - maintenance.work_order
+- operation: createAsset
+  verb: POST
+  path: /assets
+  scope: venue
+  permission: ASSET_MANAGE
+  audience: null
+  offline: false
+  reads:
+  - cache:idempotency
+  - maintenance.asset
+  writes:
+  - cache:idempotency
+  - maintenance.asset
+- operation: createInspectionTemplate
+  verb: POST
+  path: /inspection-templates
+  scope: tenant
+  permission: INSPECTION_MANAGE
+  audience: null
+  offline: false
+  reads:
+  - cache:idempotency
+  - maintenance.inspection_template
+  writes:
+  - cache:idempotency
+  - maintenance.inspection_template
+- operation: createMaintenancePlan
+  verb: POST
+  path: /maintenance-plans
+  scope: venue
+  permission: ASSET_MANAGE
+  audience: null
+  offline: false
+  reads:
+  - cache:idempotency
+  - maintenance.maintenance_plan
+  writes:
+  - cache:idempotency
+  - maintenance.maintenance_plan
+- operation: createWorkOrder
+  verb: POST
+  path: /work-orders
+  scope: venue
+  permission: WORK_ORDER_MANAGE
+  audience: null
+  offline: true
+  reads:
+  - cache:idempotency
+  - maintenance.work_order
+  writes:
+  - cache:idempotency
+  - maintenance.work_order
+- operation: getAsset
+  verb: GET
+  path: /assets/{assetId}
+  scope: venue
+  permission: ASSET_VIEW
+  audience: null
+  offline: true
+  reads:
+  - maintenance.asset
+  - maintenance.maintenance_plan
+  - maintenance.work_order
+  writes: []
+- operation: getAssetHistory
+  verb: GET
+  path: /assets/{assetId}/history
+  scope: venue
+  permission: ASSET_VIEW
+  audience: null
+  offline: false
+  reads:
+  - maintenance.asset
+  writes: []
+- operation: getDueMaintenance
+  verb: GET
+  path: /maintenance-plans/due
+  scope: venue
+  permission: ASSET_VIEW
+  audience: null
+  offline: false
+  reads:
+  - maintenance.asset
+  - maintenance.maintenance_plan
+  writes: []
+- operation: getIncident
+  verb: GET
+  path: /incidents/{incidentId}
+  scope: venue
+  permission: INCIDENT_VIEW
+  audience: null
+  offline: false
+  reads:
+  - maintenance.incident
+  writes: []
+- operation: getWorkOrder
+  verb: GET
+  path: /work-orders/{workOrderId}
+  scope: venue
+  permission: WORK_ORDER_VIEW
+  audience: null
+  offline: true
+  reads:
+  - maintenance.work_order
+  writes: []
+- operation: listAssets
+  verb: GET
+  path: /assets
+  scope: venue
+  permission: ASSET_VIEW
+  audience: null
+  offline: true
+  reads:
+  - maintenance.asset
+  writes: []
+- operation: listIncidents
+  verb: GET
+  path: /incidents
+  scope: venue
+  permission: INCIDENT_VIEW
+  audience: null
+  offline: false
+  reads:
+  - maintenance.incident
+  writes: []
+- operation: listInspectionTemplates
+  verb: GET
+  path: /inspection-templates
+  scope: venue
+  permission: INSPECTION_VIEW
+  audience: null
+  offline: true
+  reads:
+  - maintenance.inspection_template
+  writes: []
+- operation: listInspections
+  verb: GET
+  path: /inspections
+  scope: venue
+  permission: INSPECTION_VIEW
+  audience: null
+  offline: false
+  reads:
+  - maintenance.inspection
+  writes: []
+- operation: listMaintenancePlans
+  verb: GET
+  path: /maintenance-plans
+  scope: venue
+  permission: ASSET_VIEW
+  audience: null
+  offline: false
+  reads:
+  - maintenance.maintenance_plan
+  writes: []
+- operation: listWorkOrders
+  verb: GET
+  path: /work-orders
+  scope: venue
+  permission: WORK_ORDER_VIEW
+  audience: null
+  offline: true
+  reads:
+  - maintenance.work_order
+  writes: []
+- operation: lookupAsset
+  verb: GET
+  path: /assets/lookup
+  scope: venue
+  permission: ASSET_VIEW
+  audience: null
+  offline: true
+  reads:
+  - maintenance.asset
+  - maintenance.maintenance_plan
+  - maintenance.work_order
+  writes: []
+- operation: pauseWorkOrder
+  verb: POST
+  path: /work-orders/{workOrderId}/pause
+  scope: venue
+  permission: MAINTENANCE_EXECUTE
+  audience: null
+  offline: true
+  reads:
+  - cache:idempotency
+  - maintenance.work_order
+  writes:
+  - cache:idempotency
+  - inventory.requisition
+  - maintenance.work_order
+- operation: recordAuthorityNotification
+  verb: POST
+  path: /incidents/{incidentId}/notify-authority
+  scope: venue
+  permission: INCIDENT_MANAGE
+  audience: null
+  offline: false
+  reads:
+  - cache:idempotency
+  - maintenance.incident
+  writes:
+  - cache:idempotency
+  - maintenance.incident
+- operation: recordWorkOrderParts
+  verb: POST
+  path: /work-orders/{workOrderId}/parts
+  scope: venue
+  permission: WORK_ORDER_MANAGE
+  audience: null
+  offline: false
+  reads:
+  - cache:idempotency
+  - maintenance.work_order
+  writes:
+  - cache:idempotency
+  - maintenance.work_order
+- operation: recordWorkOrderTime
+  verb: POST
+  path: /work-orders/{workOrderId}/time
+  scope: venue
+  permission: WORK_ORDER_MANAGE
+  audience: null
+  offline: true
+  reads:
+  - cache:idempotency
+  - maintenance.work_order
+  writes:
+  - cache:idempotency
+  - maintenance.work_order
+- operation: rejectWorkOrder
+  verb: POST
+  path: /work-orders/{workOrderId}/reject
+  scope: venue
+  permission: MAINTENANCE_EXECUTE
+  audience: null
+  offline: true
+  reads:
+  - cache:idempotency
+  - maintenance.work_order
+  writes:
+  - cache:idempotency
+  - maintenance.work_order
+- operation: reportIncident
+  verb: POST
+  path: /incidents
+  scope: venue
+  permission: INCIDENT_REPORT
+  audience: null
+  offline: true
+  reads:
+  - cache:idempotency
+  - maintenance.incident
+  writes:
+  - cache:idempotency
+  - maintenance.incident
+- operation: resumeWorkOrder
+  verb: POST
+  path: /work-orders/{workOrderId}/resume
+  scope: venue
+  permission: MAINTENANCE_EXECUTE
+  audience: null
+  offline: true
+  reads:
+  - cache:idempotency
+  - maintenance.work_order
+  writes:
+  - cache:idempotency
+  - maintenance.work_order
+- operation: setAssetStatus
+  verb: PUT
+  path: /assets/{assetId}/status
+  scope: venue
+  permission: ASSET_MANAGE
+  audience: null
+  offline: true
+  reads:
+  - cache:idempotency
+  - maintenance.asset
+  writes:
+  - cache:idempotency
+  - maintenance.asset
+- operation: startWorkOrder
+  verb: POST
+  path: /work-orders/{workOrderId}/start
+  scope: venue
+  permission: MAINTENANCE_EXECUTE
+  audience: null
+  offline: true
+  reads:
+  - cache:idempotency
+  - maintenance.work_order
+  writes:
+  - cache:idempotency
+  - maintenance.work_order
+- operation: submitInspection
+  verb: POST
+  path: /inspections
+  scope: venue
+  permission: INSPECTION_SUBMIT
+  audience: null
+  offline: true
+  reads:
+  - cache:idempotency
+  - maintenance.inspection
+  writes:
+  - cache:idempotency
+  - maintenance.inspection
+- operation: updateAsset
+  verb: PATCH
+  path: /assets/{assetId}
+  scope: venue
+  permission: ASSET_MANAGE
+  audience: null
+  offline: false
+  reads:
+  - cache:idempotency
+  - maintenance.asset
+  writes:
+  - cache:idempotency
+  - maintenance.asset
+- operation: updateIncident
+  verb: PATCH
+  path: /incidents/{incidentId}
+  scope: venue
+  permission: INCIDENT_MANAGE
+  audience: null
+  offline: false
+  reads:
+  - cache:idempotency
+  - maintenance.incident
+  writes:
+  - cache:idempotency
+  - maintenance.incident
+- operation: updateMaintenancePlan
+  verb: PATCH
+  path: /maintenance-plans/{planId}
+  scope: venue
+  permission: ASSET_MANAGE
+  audience: null
+  offline: false
+  reads:
+  - cache:idempotency
+  - maintenance.maintenance_plan
+  writes:
+  - cache:idempotency
+  - maintenance.maintenance_plan
+- operation: updateWorkOrder
+  verb: PATCH
+  path: /work-orders/{workOrderId}
+  scope: venue
+  permission: WORK_ORDER_MANAGE
+  audience: null
+  offline: true
+  reads:
+  - cache:idempotency
+  - maintenance.work_order
+  writes:
+  - cache:idempotency
+  - maintenance.work_order
+- operation: verifyWorkOrder
+  verb: POST
+  path: /work-orders/{workOrderId}/verify
+  scope: venue
+  permission: WORK_ORDER_VERIFY
+  audience: null
+  offline: false
+  reads:
+  - cache:idempotency
+  - maintenance.work_order
+  writes:
+  - cache:idempotency
+  - maintenance.work_order

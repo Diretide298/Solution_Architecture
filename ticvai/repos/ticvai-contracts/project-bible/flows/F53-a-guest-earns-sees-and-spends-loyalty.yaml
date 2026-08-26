@@ -1,0 +1,83 @@
+$schema: ./_schema.yaml
+id: F53
+name: A guest earns, sees and spends loyalty
+actor: guest
+capability: Loyalty and offers
+wave: 3
+frequency: Routine.
+criticality: revenue
+primaryContract: subscription
+contracts:
+- subscription
+- marketing-crm
+- promotions
+- retail
+platforms:
+- P02
+- P01
+trigger:
+  description: A guest who comes back. **Loyalty is the mechanism a venue uses to make that happen and
+    twelve of its operations were unwalked.**
+offlineBehaviour: '**A balance reads from cache; spending does not.** A balance spent twice offline
+  is a balance the venue honours once and argues about.'
+steps:
+- step: 1
+  screen: GST-036
+  action: They check their points.
+  operations:
+  - getLoyaltyPosition
+  - listLoyaltyProgrammes
+  outcome: '**Position, not balance.** Tier, points, and what the next tier needs — a number alone tells
+    a guest nothing about whether to come back.'
+- step: 2
+  screen: WEB-024
+  action: They see rewards and manage their devices.
+  operations:
+  - getWishlist
+  - addToWishlist
+  - recordConsent
+  - listGuestDevices
+  outcome: '**Consent sits here deliberately.** A rewards screen is where a guest is most willing to
+    opt in, and CF-160 keeps the merge from ever widening it.'
+  crossesDevice: true
+- step: 3
+  screen: GST-037
+  action: Offers are shown against what they hold.
+  operations:
+  - listPromotions
+  - evaluatePromotions
+  outcome: '**Evaluated, not listed.** An offer a guest cannot use is an offer that teaches them to
+    ignore the screen.'
+  crossesDevice: true
+- step: 4
+  screen: GST-011
+  action: Their wallet shows stored value.
+  operations:
+  - getWallet
+  - listWalletTransactions
+  outcome: '**Wallet and points are different things** — one is money the venue owes, the other is a
+    discount it might give.'
+  crossesDevice: true
+- step: 5
+  screen: GST-020
+  action: Saved items carry across sessions.
+  operations:
+  - getWishlist
+  - addToWishlist
+  - removeFromWishlist
+  outcome: A wishlist is the cheapest re-marketing signal a venue has.
+  crossesDevice: true
+exitStates:
+- state: redeemed
+  description: Points or an offer used.
+- state: viewed
+  description: '**Looked and did nothing — the common case, and worth recording.**'
+branches:
+- at: 3
+  condition: An offer expired between showing and using.
+  behaviour: '**Refused at use with the reason.** A guest who was shown something they cannot have needs
+    to know it was time, not eligibility.'
+  severity: medium
+  resolvedBy: evaluatePromotions
+notes: '**Written 24 August.** Twelve unwalked operations, the most of any guest flow.'
+openQuestions: null

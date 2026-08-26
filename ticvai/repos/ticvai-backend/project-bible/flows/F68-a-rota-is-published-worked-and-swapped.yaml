@@ -1,0 +1,86 @@
+$schema: ./_schema.yaml
+id: F68
+name: A rota is published, worked and swapped
+actor: supervisor
+capability: Workforce scheduling
+wave: 2
+frequency: Routine.
+criticality: operational
+primaryContract: workforce
+contracts:
+- workforce
+- identity
+- approvals
+platforms:
+- P06
+trigger:
+  description: Next week needs covering, and somebody will want to swap a shift once it is published.
+offlineBehaviour: '**Clocking in works offline; publishing does not.** A rota published from a device
+  with no signal is a rota nobody else can see.'
+steps:
+- step: 1
+  screen: EMP-021
+  action: The steward reads the published rota.
+  operations:
+  - listRotaAssignments
+  outcome: '**Read, not authored.** `createRotaAssignment` and `updateRotaAssignment` were on this screen
+    until 24 August — **a handheld that could write the rota it is showing.** The rota is published
+    from the back office; the app reads it.'
+- step: 2
+  screen: EMP-022
+  action: A steward reads their own shifts.
+  operations:
+  - listRotaAssignments
+  outcome: '**Read-only, deliberately.** `createRotaAssignment` was on this screen until 24 August —
+    **a rota a steward can rewrite is not a rota.**'
+  crossesDevice: true
+- step: 3
+  screen: EMP-023
+  action: They ask to swap one.
+  operations:
+  - requestShiftSwap
+  outcome: '**A request, not a swap.** The other person has to agree and a supervisor has to allow it
+    — two consents, and the approval path is the one mechanism CF-132 settled.'
+  crossesDevice: true
+- step: 4
+  screen: EMP-024
+  action: On the day, they clock in.
+  operations:
+  - recordAttendance
+  - listAttendance
+  outcome: '**Attendance is not the shift.** A rota says who should be there; attendance says who was,
+    and the gap is the number a venue manages.'
+  crossesDevice: true
+- step: 5
+  screen: EMP-025
+  action: They take a break and come back.
+  operations:
+  - recordAttendance
+  outcome: '**Breaks are attendance events.** `amendAttendance` is a supervisor act and was on this
+    screen — removed.'
+  crossesDevice: true
+branches:
+- at: 3
+  condition: Nobody accepts the swap.
+  behaviour: '**The original assignment stands.** An unaccepted swap that silently vacates a shift leaves
+    a lane unstaffed.'
+  severity: high
+  resolvedBy: requestShiftSwap
+- at: 4
+  condition: They clock in at the wrong venue.
+  behaviour: Refused against the rota. **A steward at the wrong site is a steward the right site is
+    waiting for.**
+  severity: medium
+  resolvedBy: recordAttendance
+exitStates:
+- state: worked
+  description: Rota published, shift worked, attendance recorded.
+- state: swapped
+  description: '**Both consents and an approval recorded.**'
+- state: noShow
+  description: '**Recorded rather than inferred from silence.**'
+notes: '**Written 24 August.** `EMP-021`, `EMP-022` and `EMP-023` carried identical four-operation sets
+  — publish, read and swap all able to do each other. Corrected. **Corrected 24 August.** Step 1 called
+  `createRotaAssignment` from `EMP-021`, which is a rota *view*. **A steward reads their rota; a manager
+  writes it** — and the two were the same screen because of the 18 August bulk attach.'
+openQuestions: null

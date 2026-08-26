@@ -1,0 +1,1144 @@
+openapi: 3.1.0
+info:
+  title: TICVAI — Venue map
+  version: 1.0.0
+  x-ticvai-screen-count: 11
+  x-ticvai-tier: satellite
+  x-ticvai-module: "21 — Seat Management & Venue Mapping"
+  x-ticvai-platforms:
+    - P02 Guest App
+    - P06 Venue Staff App
+    - P08 Venue Management
+  # Derived from screens/*.yaml on 18 August — every platform with a screen that calls an
+  # operation in this contract. **Six contracts declared none**, which the viewer reports as
+  # missing taxonomy and no package checker tested for.
+  description: >
+    **A venue map is not a seat map, and conflating them is the mistake this contract exists to
+    avoid.**
+
+    A seat map is an auditorium: sections, rows, numbered seats, each one sellable inventory. A
+    venue map is a park: rides, restaurants, shops, toilets, first aid, exits, parking. **Nothing on
+    a venue map is sold** — it is what a guest navigates by and what an operator watches.
+
+    `seating` already does the first. This does the second, and they share exactly one thing: both
+    are drawn by an architect and arrive as a file nobody wants to retype.
+
+    ---
+
+    ## The pipeline
+
+        upload ──► extract ──► propose ──► place ──► publish
+        (venue)   (deterministic)  (AI)   (venue)   (venue)
+
+    **The split between extract and propose is deliberate and is the load-bearing decision here.**
+
+    `importVenueGeometry` reads the file and produces shapes with layer names. It is deterministic,
+    it handles the four defects CF-122 found — layer roles as lists, Arabic-Indic digits, UTF-16BE
+    names, native CAD — and **it fails loudly**: a file that yields nothing reports `nothingFound`
+    rather than success.
+
+    `proposeVenueLabels` reads those shapes and suggests what each is: *this polygon by the entrance
+    with the toilet layer is a restroom; this one is a ride.* It writes a proposal and stops.
+
+    **Two failure modes, kept apart.** A mis-parsed layer and a bad suggestion look identical to a
+    user if one operation does both — *"the map is wrong"* with no way to tell whether the file was
+    misread or the labelling was. Separated, the extraction reports which layers it found and the
+    proposal reports its confidence.
+
+    ---
+
+    ## Publishing
+
+    **A map is published, not saved.** Editing a live map under a guest standing in front of it is
+    how a wayfinding route ends at a wall.
+
+    A draft is worked on freely. Publishing makes it the version guests see, and the previous
+    version stays readable — a guest mid-route on version 3 finishes on version 3.
+
+    ---
+
+    ## What it does not do
+
+    **No turn-by-turn routing engine.** 19.2.56 asks for venue navigation, and the map supplies the
+    graph — points, paths, and which paths are step-free. **Routing over that graph is a client
+    concern**, because a phone with the map cached routes offline and a server round-trip per step
+    does not.
+
+    **No indoor positioning.** Where a venue has beacons, `access.setAccessPointGeofence` already
+    carries them (CF-51).
+
+    ---
+
+    ## What a venue sends
+
+    **`handoff/venue-map-input-spec.md` is the venue-facing document** and this contract enforces
+    it. Every rule in it exists because its absence produced a named failure, and every failure
+    comes back as a `code` on `VenueMapImportJob.findings` pointing at the section that covers it.
+
+    **The short version.** Native CAD if you have it, PDF if not, raster accepted and degrading
+    gracefully. Layers named for what a thing *is* — `VC-Seats` is right. Western digits in codes,
+    Arabic anywhere else. A manifest of Description, Section, Row, Seat with the header on row 3.
+    Two georeference points far apart. The illustrated map separately, with four alignment points.
+
+    **Each part is independently useful and none blocks the next**, which is the property that
+    matters: a venue that can only send a manifest still gets sellable seats.
+
+servers:
+  - url: https://api.ticvai.com/v1
+
+paths:
+  /venue-maps:
+    get:
+      operationId: listVenueMaps
+      x-ticvai-consumed-by:
+        - "P08 BO-092 Venue Maps"
+      summary: Maps for this venue
+      tags: [venueMap]
+      x-ticvai-permission: VENUE_MAP_VIEW
+      x-ticvai-audience: [staff]
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '200':
+          description: Maps
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/VenueMap' }
+    post:
+      operationId: createVenueMap
+      x-ticvai-consumed-by:
+        - "P08 BO-092 Venue Maps"
+      summary: Start a map
+      description: >
+        A venue may have several — **a park map and a floor plan per building are different maps,
+        not layers of one**, because a guest on the second floor should not be shown the ground
+        floor's toilets.
+      tags: [venueMap]
+      x-ticvai-permission: VENUE_MAP_MANAGE
+      x-ticvai-audience: [staff]
+      x-ticvai-scope-level: venue
+      x-ticvai-config-scope: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/VenueMap' }
+      responses:
+        '201':
+          description: Created as a draft
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/VenueMap' }
+
+  /venue-maps/{mapId}:
+    parameters:
+      - name: mapId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    get:
+      operationId: getVenueMap
+      x-ticvai-consumed-by:
+        - "P01 WEB-039 Venue Map & Wait Times"
+        - "P02 GST-021 Interactive Map"
+        - "P06 EMP-030 Venue map"
+        - "P08 BO-094 Map Editor & Publish"
+      summary: A map with its points and paths
+      description: >
+        19.2.55. **The whole map in one call.** A guest app opening the map should not make one
+        request per category — it caches the map and filters locally, which is also what makes it
+        work with no signal in the middle of a park.
+      tags: [venueMap]
+      x-ticvai-permission: VENUE_MAP_VIEW
+      x-ticvai-guest-callable: true
+      x-ticvai-audience: [staff, guest]
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      x-ticvai-offline-capable: true
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - name: version
+          in: query
+          schema: { type: integer }
+          description: >
+            Absent means the published version. **A guest mid-route on version 3 finishes on
+            version 3**, so the client sends the version it cached.
+      responses:
+        '200':
+          description: Map
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/VenueMapDetail' }
+
+  /venue-maps/{mapId}/import:
+    parameters:
+      - name: mapId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    post:
+      operationId: importVenueGeometry
+      x-ticvai-consumed-by:
+        - "P08 BO-093 Map Import & Labelling"
+      summary: Read a drawing into shapes
+      description: >
+        21.2.1 to 21.2.4 and 1.4.24. **Deterministic, and it fails loudly.**
+
+        Accepts what a venue's drawing office actually holds: PDF, SVG, DWG, DXF and raster.
+        **Converting CAD to PDF loses the layer names this depends on**, which is why native
+        formats are accepted rather than requested as exports.
+
+        Carries every lesson CF-122 taught on the seat importer, because it is the same problem:
+        **layer roles are lists** — one real file had two distinct layers both named `Layer 1`;
+        **section codes are digit-normalised** — `A١` and `A1` are one place to a person and two to
+        a comparison; **layer names are decoded before matching** — PDF strings arrive UTF-16BE and
+        read as mojibake taken as bytes.
+
+        **A file that yields no shapes reports `nothingFound`, not success.**
+      tags: [venueMap]
+      x-ticvai-permission: VENUE_MAP_MANAGE
+      x-ticvai-audience: [staff]
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [format, sourceRef]
+              properties:
+                format: { type: string, enum: [pdfPlan, svgPlan, dwgPlan, dxfPlan, rasterPlan] }
+                sourceRef: { type: string }
+                layerMapping:
+                  type: object
+                  description: >
+                    **Each role takes a list.** A drawing office names layers by habit, not by
+                    convention, and a single string keeps one and drops the rest silently.
+
+                    **Optional.** Absent, the platform matches against the accepted names in
+                    `handoff/venue-map-input-spec.md` — case-insensitive, `VC-` prefix ignored, so
+                    `VC-Seats`, `seats` and `Seating` all resolve. Supply this only to override a
+                    match that went wrong.
+                  properties:
+                    buildingLayer: { type: array, items: { type: string } }
+                    pathLayer:
+                      type: array
+                      items: { type: string }
+                      description: >
+                        **Optional, and the platform derives paths without it.** Where a drawing has
+                        no walkway layer — which is most drawings prepared for ticketing — walkable
+                        space is the **negative space**: the site boundary minus buildings, seating,
+                        water and anything on a `keepOut` layer.
+
+                        **That is geometry, not intelligence, and it is better than intelligence
+                        here.** Subtraction is exact and repeatable; a model asked to guess where
+                        people walk will eventually route somebody into a lake.
+
+                        Supply the layer where you have it — an explicit walkway beats a derived
+                        one, because it knows about a path across a lawn that subtraction would
+                        merge into open ground.
+                    zoneLayer: { type: array, items: { type: string } }
+                    labelLayer: { type: array, items: { type: string } }
+                    boundaryLayer: { type: array, items: { type: string } }
+                    exitLayer: { type: array, items: { type: string } }
+                    emergencyExitLayer:
+                      type: array
+                      items: { type: string }
+                      description: >
+                        **Separate from `exitLayer`, and drawings usually blur them.** An exit is
+                        where a guest leaves; an emergency exit is where they are sent. Merged, a
+                        map routes a normal departure through a fire door.
+                    poiLayers:
+                      type: object
+                      description: >
+                        Where a drawing already marks toilets, first aid and the rest. Keyed by
+                        `VenuePoint.kind`. **Absent is normal** — points are placed on screen after
+                        import, and the assistant proposes most of them.
+                    keepOutLayer:
+                      type: array
+                      items: { type: string }
+                      description: >
+                        Water, planting, back-of-house, plant rooms. **Subtracted from the walkable
+                        space along with buildings**, and the difference between a usable derived
+                        path network and one that routes across a lake.
+                digitNormalisation:
+                  type: boolean
+                  default: true
+                  description: >
+                    **`A١` and `A1` are one section to a person and two to a computer**, and the
+                    failure is silent — the seats simply do not join, and you get geometry with no
+                    seats or seats with no geometry.
+
+                    Normalised before the join. Arabic in *names* is expected and untouched; only
+                    codes are normalised.
+                georeference:
+                  type: object
+                  nullable: true
+                  description: >
+                    19.2.56. **Two known points turn drawing coordinates into real ones**, and
+                    without it the map is a picture rather than something a guest can be located
+                    on. A venue that cannot supply them still gets a usable map — it just cannot
+                    show a blue dot.
+                  properties:
+                    originLat: { type: number }
+                    originLng: { type: number }
+                    scaleMetresPerUnit: { type: number }
+                    rotationDegrees: { type: number, default: 0 }
+                    anchors:
+                      type: array
+                      minItems: 2
+                      maxItems: 4
+                      description: >
+                        **Two points far apart.** Two close together give an accurate scale and a
+                        rotation that drifts across the site — which reads as a map that is right
+                        near the entrance and wrong at the far end.
+                      items:
+                        type: object
+                        properties:
+                          label: { type: string }
+                          planX: { type: number }
+                          planY: { type: number }
+                          lat: { type: number }
+                          lng: { type: number }
+                manifestRef:
+                  type: string
+                  nullable: true
+                  description: >
+                    The seating manifest, where this map has seats. **One sheet per section, header
+                    on row 3, four columns: Description, Section, Row, Seat** — the shape the sample
+                    file already uses.
+
+                    **`Section` must match the drawing character for character**, which is what §4
+                    of the spec is about.
+      responses:
+        '202':
+          description: Extracted to a draft
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/VenueMapImportJob' }
+
+  /venue-maps/{mapId}/proposals:
+    parameters:
+      - name: mapId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    post:
+      operationId: acceptVenueLabelProposals
+      x-ticvai-consumed-by:
+        - "P08 BO-093 Map Import & Labelling"
+      summary: Accept, edit or reject what the assistant suggested
+      description: >
+        1.4.24. **The human half of the pair.** `ai.proposeVenueLabels` writes proposals and stops;
+        this is what turns an accepted one into a point.
+
+        **The proposing operation lives in `ai` and this one lives here**, because ADR-0020 says
+        only the AI contract writes AI tables — and the boundary caught this contract trying to
+        write `ai.proposed_action` on the day it was drafted.
+
+        **Accepting writes a point and does not touch the proposal.** 
+        closes it, because ADR-0020 holds in both directions — this contract may read an AI table and
+        may not write one, and the isolation check caught that on the second attempt as well.
+
+        Accepting is per proposal, not per map. **An operator who must take all four hundred or
+        none will take all four hundred**, and a map with a mislabelled fire exit is worse than one
+        that took an afternoon.
+      tags: [venueMap]
+      x-ticvai-permission: VENUE_MAP_MANAGE
+      x-ticvai-audience: [staff]
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [decisions]
+              properties:
+                decisions:
+                  type: array
+                  items:
+                    type: object
+                    required: [proposalId, decision]
+                    properties:
+                      proposalId: { type: string, format: uuid }
+                      decision: { type: string, enum: [accept, edit, reject] }
+                      point: { $ref: '#/components/schemas/VenuePoint' }
+      responses:
+        '200':
+          description: Applied
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/VenuePoint' }
+
+  /venue-maps/{mapId}/points:
+    parameters:
+      - name: mapId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    post:
+      operationId: setVenuePoint
+      x-ticvai-consumed-by:
+        - "P08 BO-094 Map Editor & Publish"
+      summary: Place or amend a point of interest
+      description: >
+        19.2.57 to 19.2.60. **The screen a venue actually uses** — placing booths, toilets, exits,
+        rides, restaurants, shops, parking, first aid, ATMs, prayer rooms and baby-care rooms on the
+        map.
+
+        **A point may link to the thing it represents.** A restaurant point carries its outlet id,
+        a ride point its product id, a gate its access point. That link is what makes the map
+        useful rather than decorative: **tapping a restaurant on the map should open its menu, and
+        that only works if the map knows which outlet it is.**
+
+        Unlinked points are fine and expected — a toilet is a toilet.
+      tags: [venueMap]
+      x-ticvai-permission: VENUE_MAP_MANAGE
+      x-ticvai-audience: [staff]
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/VenuePoint' }
+      responses:
+        '200':
+          description: Placed
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/VenuePoint' }
+
+  /venue-maps/{mapId}/walkway-proposals:
+    parameters:
+      - name: mapId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    post:
+      operationId: acceptWalkwayProposals
+      summary: Accept or reject proposed walkways
+      description: >
+        The human half of `ai.proposeWalkways`, and **a stricter gate than label acceptance.**
+
+        A mislabelled toilet is a cosmetic error somebody notices and fixes. **A wrongly accepted
+        walkway routes a guest into a lake or a service yard**, and they find out by walking there.
+
+        **Accepted segments become paths and run through graph validation immediately**, so a
+        network that leaves something unreachable is caught here rather than at publish.
+      tags: [venueMap]
+      x-ticvai-permission: VENUE_MAP_MANAGE
+      x-ticvai-audience: [staff]
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [decisions]
+              properties:
+                decisions:
+                  type: array
+                  items:
+                    type: object
+                    required: [proposalId, decision]
+                    properties:
+                      proposalId: { type: string, format: uuid }
+                      decision: { type: string, enum: [accept, edit, reject] }
+                      path: { $ref: '#/components/schemas/VenuePath' }
+      responses:
+        '200':
+          description: Applied, with graph validation
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/GraphValidation' }
+
+  /venue-maps/{mapId}/graph:
+    parameters:
+      - name: mapId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    get:
+      operationId: getVenueMapGraph
+      x-ticvai-consumed-by:
+        - "P01 WEB-039 Venue Map & Wait Times"
+        - "P02 GST-021 Interactive Map"
+        - "P08 BO-094 Map Editor & Publish"
+      summary: The navigation graph, ready to route over
+      description: >
+        19.2.56. **The platform guarantees the graph; the client routes over it.** That division
+        was stated when this contract was written and it left a gap — *"routing is a client
+        concern"* is only true if somebody guarantees the graph is worth routing over.
+
+        Returns nodes, edges, precomputed distances and **the connected components**. A client
+        finding two components knows immediately that half the park is unreachable, without
+        walking the graph itself.
+
+        **Ships in the offline package.** A guest standing in the middle of a park with no signal
+        is the guest who most needs directions, so the graph is small, versioned and cached — and
+        a route computed offline must not silently use a path that closed this morning, which is
+        what `version` is for.
+      tags: [venueMap]
+      x-ticvai-permission: VENUE_MAP_VIEW
+      x-ticvai-guest-callable: true
+      x-ticvai-audience: [staff, guest]
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      x-ticvai-offline-capable: true
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - name: stepFreeOnly
+          in: query
+          schema: { type: boolean, default: false }
+          description: >
+            **Returns the step-free subgraph, not a filtered copy of the whole one.** Filtering
+            after the fact produces routes that cross a staircase to reach a ramp.
+      responses:
+        '200':
+          description: Graph
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/VenueMapGraph' }
+
+  /venue-maps/{mapId}/validate-graph:
+    parameters:
+      - name: mapId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    post:
+      operationId: validateVenueMapGraph
+      x-ticvai-consumed-by:
+        - "P08 BO-094 Map Editor & Publish"
+      summary: What is unreachable, before anyone publishes it
+      description: >
+        **Run before publishing, and `publishVenueMap` runs it too.** A map that publishes with an
+        unreachable toilet is a map that fails the first guest who needs one.
+
+        Reports four things, and the second is the one venues get wrong:
+
+        **Unreachable points** — no path at all. Usually a point placed after the paths were drawn.
+
+        **Points reachable only by steps** — the map works perfectly until a wheelchair user opens
+        it, and nothing in the drawing makes this visible. **This is why the check exists.**
+
+        **Dead-end paths** — an edge to a node with no other edge, which is normally a mis-drawn
+        line rather than a real cul-de-sac.
+
+        **Orphan components** — two parts of the venue with no route between them. Legitimate for a
+        map covering two buildings, and an error for one covering a park.
+      tags: [venueMap]
+      x-ticvai-permission: VENUE_MAP_MANAGE
+      x-ticvai-audience: [staff]
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '200':
+          description: Findings
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/GraphValidation' }
+
+  /venue-maps/{mapId}/paths/{pathId}/closure:
+    parameters:
+      - name: mapId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+      - name: pathId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    post:
+      operationId: setPathClosure
+      x-ticvai-consumed-by:
+        - "P08 BO-094 Map Editor & Publish"
+      summary: Close a route during works or an incident
+      description: >
+        **A closure is an operational act, not a map edit.** Closing a walkway for maintenance must
+        not require republishing the map, and it must take effect in seconds.
+
+        **Bumps the graph version**, which is how a cached client learns its route is stale. A
+        guest holding an offline route across a path that closed this morning is the case this
+        exists for.
+
+        Refuses a closure that would strand a point, unless forced — **and a forced closure that
+        strands a first-aid point warns by name.** Sometimes an incident makes stranding
+        unavoidable, and the operator should know what they just cut off.
+      tags: [venueMap]
+      x-ticvai-permission: VENUE_MAP_MANAGE
+      x-ticvai-audience: [staff]
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [isClosed]
+              properties:
+                isClosed: { type: boolean }
+                reason: { type: string, enum: [maintenance, incident, event, weather, crowding, other] }
+                force:
+                  type: boolean
+                  default: false
+                  description: Close it even though something becomes unreachable.
+                expectedReopenAt: { type: string, format: date-time, nullable: true }
+      responses:
+        '200':
+          description: Closed or reopened
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/VenuePath' }
+        '409':
+          description: >
+            **Closing this strands a point, and the response names which.** *"Cannot close"* on a
+            park with two hundred paths is not actionable.
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /venue-maps/{mapId}/publish:
+    parameters:
+      - name: mapId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    post:
+      operationId: publishVenueMap
+      x-ticvai-consumed-by:
+        - "P08 BO-094 Map Editor & Publish"
+      summary: Make the draft the one guests see
+      description: >
+        21.2.16. **A map is published, not saved.** Editing a live map under a guest standing in
+        front of it is how a wayfinding route ends at a wall.
+
+        Publishing creates a version. **The previous version stays readable** so a guest mid-route
+        finishes on the version they started with.
+
+        Refuses a draft with unresolved proposals or a point linked to something that no longer
+        exists — **a restaurant point pointing at a closed outlet is worse than no point**, because
+        a guest walks there.
+      tags: [venueMap]
+      x-ticvai-permission: VENUE_MAP_PUBLISH
+      x-ticvai-audience: [staff]
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                note: { type: string, maxLength: 300 }
+      responses:
+        '200':
+          description: Published
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/VenueMap' }
+        '409':
+          description: >
+            Unresolved proposals, or a broken link. **The reason names which point**, because
+            *"cannot publish"* on a map with four hundred points is not actionable.
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /venue-maps/{mapId}/live:
+    parameters:
+      - name: mapId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    get:
+      operationId: getVenueMapLive
+      x-ticvai-consumed-by:
+        - "P06 EMP-030 Venue map"
+      summary: The map with live operational state on it
+      description: >
+        3.2.64. **An access-control map presenting statistics in real time**, and the same view
+        serves wait times, queue lengths and closed rides.
+
+        The map is the published one; only the state is live. **Separated from `getVenueMap` because
+        the map changes monthly and the state changes every few seconds** — caching them together
+        means caching neither.
+      tags: [venueMap]
+      x-ticvai-permission: VENUE_MAP_VIEW
+      x-ticvai-audience: [staff]
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '200':
+          description: Map with live state
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+
+components:
+  schemas:
+    VenueMap:
+      type: object
+      x-ticvai-persistence: "venuemap.map"
+      description: >
+        A park map, or a floor plan. **Several per venue** — a guest on the second floor should not
+        be shown the ground floor's toilets.
+      required: [id, name, venueId, status]
+      properties:
+        id: { type: string, format: uuid }
+        name: { type: string }
+        venueId: { type: string, format: uuid }
+        scopePath: { type: string }
+        kind: { type: string, enum: [park, floor, zone, parking] }
+        floorLevel: { type: integer, nullable: true }
+        status: { type: string, enum: [draft, published, archived] }
+        publishedVersion: { type: integer, nullable: true }
+        isGeoreferenced:
+          type: boolean
+          readOnly: true
+          description: >
+            **Whether a guest can be located on it.** Without a georeference the map is a picture —
+            useful, and not navigable.
+        baseAssetId:
+          type: string
+          format: uuid
+          nullable: true
+          description: >
+            **The illustrated map a guest actually sees**, held in `assets` like any other media.
+
+            **This is not the CAD drawing.** The drawing gives geometry — where things are, and how
+            they connect. The base image is a designed illustration with the venue's own styling,
+            and the two are different artefacts that happen to describe the same place. A park hands
+            you an architect's plan and a beautiful painted map, and **the guest wants the second
+            while the platform needs the first.**
+
+            Null is valid. A map with geometry and no illustration renders as shapes — plain, and
+            navigable.
+          x-ticvai-references: assets.MediaAsset
+        baseImageAlignment:
+          type: object
+          nullable: true
+          description: >
+            **How the illustration lines up with the geometry.** They are drawn at different scales
+            by different people, and a point placed on the plan lands in the wrong place on the
+            painting unless something reconciles them.
+
+            Two known points is enough. **Without this the illustration is a picture behind the
+            map rather than the map itself.**
+          properties:
+            imageWidthPx: { type: integer }
+            imageHeightPx: { type: integer }
+            anchors:
+              type: array
+              minItems: 2
+              maxItems: 4
+              items:
+                type: object
+                properties:
+                  planX: { type: number }
+                  planY: { type: number }
+                  imageX: { type: number }
+                  imageY: { type: number }
+        tileSetRef:
+          type: string
+          nullable: true
+          description: >
+            Where a base image is large enough to need zoom levels. **A 12,000-pixel park map is
+            not something a phone downloads on arrival**, and a guest opening the map on venue wifi
+            at the gate is the worst moment to send twenty megabytes.
+
+            Generated from the base asset. Null means the image is small enough to serve whole.
+        boundsGeoJson: { type: string, nullable: true }
+        graphStatus:
+          type: string
+          readOnly: true
+          enum: [notBuilt, connected, disconnected, partial]
+          description: >
+            **Whether every public point can actually be reached.** Computed at publish.
+
+            `disconnected` means a point has no path to it at all — a toilet nobody can walk to is
+            a toilet that does not exist. `partial` means every point is reachable and at least one
+            only by steps, which is a different and quieter failure: **the map works until a
+            wheelchair user opens it.**
+
+    VenueMapDetail:
+      type: object
+      description: 19.2.55. **The whole map in one call**, so a client caches it and filters locally.
+      properties:
+        map: { $ref: '#/components/schemas/VenueMap' }
+        points:
+          type: array
+          items: { $ref: '#/components/schemas/VenuePoint' }
+        paths:
+          type: array
+          items: { $ref: '#/components/schemas/VenuePath' }
+
+    VenuePoint:
+      type: object
+      x-ticvai-persistence: "venuemap.point"
+      description: >
+        19.2.57 to 19.2.60. **What a venue places on the map**, and what a guest taps.
+      required: [id, mapId, kind, name, position]
+      properties:
+        id: { type: string, format: uuid }
+        mapId: { type: string, format: uuid }
+        kind:
+          type: string
+          enum: [ride, attraction, show, restaurant, cafe, shop, kiosk, toilet, babyCare,
+                 prayerRoom, firstAid, atm, lockers, entrance, exit, emergencyExit, assemblyPoint,
+                 parking, guestServices, smokingArea, waterFountain, chargingPoint, photoSpot,
+                 junction, other]
+          description: >
+            **A closed set, and `emergencyExit` is separate from `exit` on purpose.** An exit is
+            where a guest leaves; an emergency exit is where they are sent, and a map that cannot
+            tell them apart is a map that routes a normal departure through a fire door.
+
+            **`junction` is the one that is not a point of interest.** A path connects two points,
+            so a fork in a walkway with nothing at it still needs a node — otherwise every bend has
+            to be named as a destination, and a guest browsing the map sees forty entries called
+            *Path junction 12*.
+
+            **Junctions are hidden from guests and present in the graph.** Generated by extraction
+            where paths meet; a venue never places one by hand.
+        name: { type: string }
+        nameLocalised:
+          type: object
+          nullable: true
+          additionalProperties: { type: string }
+        position:
+          type: object
+          required: [x, y]
+          description: >
+            Drawing coordinates. **Latitude and longitude are derived from the georeference**, not
+            stored, so a map that is re-georeferenced does not need every point moved.
+          properties:
+            x: { type: number }
+            y: { type: number }
+        outletId:
+          type: string
+          format: uuid
+          nullable: true
+          description: >
+            For a restaurant, cafe, shop or kiosk. **Tapping it should open the menu**, and that
+            only works if the map knows which outlet it is.
+        productId:
+          type: string
+          format: uuid
+          nullable: true
+          description: For a ride or show — links to wait times and to booking.
+        accessPointId:
+          type: string
+          format: uuid
+          nullable: true
+          description: >
+            For an entrance or exit. **This is what makes 3.2.64 work** — live admission statistics
+            drawn on the point they came from.
+        isAccessible:
+          type: boolean
+          default: true
+          description: >
+            Step-free. **Placed on the point rather than inferred from the path**, because a
+            step-free route to a building with steps at the door is not a step-free route.
+        openingHours: { type: string, nullable: true }
+        iconRef: { type: string, nullable: true }
+        isActive: { type: boolean, default: true }
+        isNavigable:
+          type: boolean
+          default: true
+          description: >
+            Whether a route may pass through it. **False for a point that marks a place without
+            being reachable** — a stage a guest cannot walk onto, a zone label.
+        isDestination:
+          type: boolean
+          default: true
+          description: >
+            **Whether a guest may be routed *to* it, and whether it appears in a list of places.**
+            False for a `junction`, which exists in the graph and nowhere else.
+
+            Separate from `isNavigable` because the two differ: a junction is navigable and not a
+            destination, and a fenced landmark is a destination you can be shown but not walked
+            into.
+
+    VenuePath:
+      type: object
+      x-ticvai-persistence: "venuemap.path"
+      description: >
+        19.2.56. **The navigation graph.** The map supplies it; routing over it is a client concern,
+        because a phone with the map cached routes offline and a server round-trip per step does
+        not.
+      required: [id, mapId, fromPointId, toPointId]
+      properties:
+        id: { type: string, format: uuid }
+        mapId: { type: string, format: uuid }
+        fromPointId: { type: string, format: uuid }
+        toPointId: { type: string, format: uuid }
+        geometry:
+          type: string
+          nullable: true
+          description: >
+            The centreline this edge follows, as an encoded polyline. **A walkway in a drawing is a
+            polygon and a route is a line down the middle of it**, so extraction thins the polygon
+            to a centreline and splits it at every fork.
+
+            Null where the path was drawn on screen as a straight connection, which is normal for a
+            venue with no walkway layer.
+        distanceMetres:
+          type: number
+          nullable: true
+          description: >
+            **Along the centreline, not point to point.** A path that curves round a lake is longer
+            than the distance between its ends, and a guest told 80 metres who walks 200 stops
+            trusting the map.
+
+            Requires a georeference for real units; without one, distances are in drawing units and
+            routing still works because **only the ratios matter to a shortest path.**
+        isStepFree:
+          type: boolean
+          default: true
+          description: >
+            **The single most important attribute on this object.** A wheelchair user routed up a
+            staircase has been failed by the map, not by the venue.
+        isIndoor: { type: boolean, default: false }
+        restrictedByPointId:
+          type: string
+          format: uuid
+          nullable: true
+          description: >
+            **Where a path is one-way, it is because of a thing on it — not because of the path.**
+            Removed `isOneWay` on 18 August: a pedestrian walkway has no direction, and the three
+            cases that look one-way are all a gate or a queue.
+
+            A turnstile is one-way and `access.AccessPoint.direction` already says so. A queue line
+            is one-way and `queue` owns it. **Putting the restriction on the path duplicated both
+            and would have drifted from them** — a gate reconfigured to bidirectional would leave a
+            path still marked one-way, and nothing would have noticed.
+
+            Set where a path passes through an access point. The router reads the direction from
+            the point.
+        closedReason:
+          type: string
+          nullable: true
+          description: >
+            Set during works or an incident. **A closed path removes routes rather than hiding the
+            path**, so a guest sees why rather than wondering where it went.
+
+    PointProposal:
+      type: object
+      description: >
+        1.4.24. **What the assistant suggests, before anyone accepts it.** Written to
+        `ai.proposed_action` under ADR-0020.
+      required: [shapeRef, proposedKind, confidence]
+      properties:
+        shapeRef: { type: string }
+        proposedKind: { type: string }
+        proposedName: { type: string, nullable: true }
+        confidence:
+          type: number
+          description: >
+            **Shown to the operator, and low confidence is not filtered out.** A shape the assistant
+            is unsure about is the one most worth a human looking at.
+        sourceLayer: { type: string, nullable: true }
+        reasoning:
+          type: string
+          nullable: true
+          description: 8.1.5b. Why it thinks so, so an operator can disagree with the reason rather than the answer.
+
+
+    VenueMapGraph:
+      type: object
+      description: >
+        19.2.56. **What a client needs to route, and nothing more.** Small enough to cache, versioned
+        so a stale route is detectable.
+      required: [mapId, version, nodes, edges]
+      properties:
+        mapId: { type: string, format: uuid }
+        version:
+          type: integer
+          description: >
+            **Bumped by a publish or a closure.** A client holding an older version knows its route
+            may cross something that closed, and asking for the graph is cheaper than asking whether
+            the graph changed.
+        generatedAt: { type: string, format: date-time }
+        nodes:
+          type: array
+          items:
+            type: object
+            properties:
+              pointId: { type: string, format: uuid }
+              x: { type: number }
+              y: { type: number }
+              kind: { type: string }
+              isAccessible: { type: boolean }
+        edges:
+          type: array
+          items:
+            type: object
+            properties:
+              from: { type: string, format: uuid }
+              to: { type: string, format: uuid }
+              distanceMetres: { type: number }
+              isStepFree: { type: boolean }
+              throughPointId:
+                type: string
+                nullable: true
+                description: >
+                  Where an access point restricts this edge. **The direction lives on that point**,
+                  not here, so a gate reconfigured to bidirectional changes routing without a map
+                  edit.
+              isClosed: { type: boolean }
+        components:
+          type: integer
+          description: >
+            How many disconnected parts. **One is the answer for a park.** More than one on a map
+            that should be a single site means something is unreachable and the client can say so
+            without walking the graph.
+
+    GraphValidation:
+      type: object
+      description: >
+        **What breaks before a guest finds it.** Run at publish and on demand.
+      required: [isValid, components]
+      properties:
+        isValid: { type: boolean }
+        components: { type: integer }
+        unreachablePoints:
+          type: array
+          description: No path at all. **Usually a point placed after the paths were drawn.**
+          items:
+            type: object
+            properties:
+              pointId: { type: string, format: uuid }
+              name: { type: string }
+              kind: { type: string }
+        stepOnlyPoints:
+          type: array
+          description: >
+            Reachable, and only by steps. **The map works perfectly until a wheelchair user opens
+            it**, and nothing in the drawing makes this visible — which is the whole reason for
+            this list.
+          items:
+            type: object
+            properties:
+              pointId: { type: string, format: uuid }
+              name: { type: string }
+        deadEndPaths:
+          type: array
+          items: { type: string, format: uuid }
+        criticalUnreachable:
+          type: array
+          description: >
+            **First aid, emergency exits and assembly points that cannot be reached.** Separated
+            from the rest because an unreachable gift shop is a defect and an unreachable assembly
+            point is a safety finding, and a single list of two hundred items buries it.
+          items:
+            type: object
+            properties:
+              pointId: { type: string, format: uuid }
+              name: { type: string }
+              kind: { type: string }
+
+    VenueMapImportJob:
+      type: object
+      x-ticvai-persistence: "venuemap.import_job"
+      description: >
+        **Two-phase, following `seating.ImportJob`**, and carrying its lesson: a job that finds
+        nothing is not a successful job.
+      required: [id, status, outcome]
+      properties:
+        id: { type: string, format: uuid }
+        mapId: { type: string, format: uuid }
+        status: { type: string, enum: [parsing, previewReady, committed, failed] }
+        outcome: { type: string, enum: [parsed, parsedWithFindings, nothingFound, noLayersMatched, unreadable] }
+        shapesFound: { type: integer }
+        layersFound:
+          type: array
+          description: >
+            **Every layer name in the source, decoded.** Shown whether or not extraction worked, so
+            an operator maps a role by reading rather than guessing.
+          items: { type: string }
+        unmappedLayers:
+          type: array
+          items: { type: string }
+        manifestRowsRead: { type: integer, nullable: true }
+        manifestRowsJoined:
+          type: integer
+          nullable: true
+          description: >
+            **The number to check against your own count.** A manifest of 396 seats that joins 220
+            is the digit problem in §4, or a section code that differs by a space — and both look
+            like success without this figure.
+        findings:
+          type: array
+          description: >
+            **Named against the spec**, so a finding maps to a section of
+            `handoff/venue-map-input-spec.md` rather than to a stack trace.
+          items:
+            type: object
+            required: [code, severity, message]
+            properties:
+              code:
+                type: string
+                enum: [duplicateLayerName, geometryOnLayerZero, unmappedLayer, mixedLayerContent,
+                       sectionCodeMismatch, digitScriptMismatch, mergedCells, totalRowDetected,
+                       manifestSectionMissingFromPlan, planSectionMissingFromManifest,
+                       exitLayerNotSplit, noGeoreference, layerNameUndecodable, rasterOnly]
+                description: >
+                  **A closed set, and each one names a rule in the spec.** Free-text findings are
+                  findings a drawing office cannot act on.
+              severity:
+                type: string
+                enum: [error, warning, info]
+                description: >
+                  **`warning` is the important level here.** `rasterOnly` and `noGeoreference` are
+                  warnings — the map still works, with less — and treating them as errors would
+                  refuse a venue that sent everything it had.
+              message: { type: string }
+              specSection:
+                type: string
+                nullable: true
+                description: Which part of the spec covers it — `§2 Layers`, `§4 Digits`.
+              affected:
+                type: array
+                description: The layers, sections or rows involved. **Named, not counted.**
+                items: { type: string }

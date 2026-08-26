@@ -1,0 +1,111 @@
+$schema: ./_schema.yaml
+id: F75
+name: A kiosk serves itself and calls for help
+actor: guest
+capability: Self-service at a kiosk
+wave: 2
+frequency: Routine.
+criticality: revenue
+primaryContract: orders
+contracts:
+- orders
+- catalogue
+- identity
+platforms:
+- P05
+trigger:
+  description: A guest walks up to an unattended machine. **Nobody is there to explain anything.**
+offlineBehaviour: '**A kiosk offline shows out-of-service rather than selling.** Unlike a till, there
+  is no cashier to judge — an unattended machine taking money it cannot reconcile is a refund queue
+  in the morning.'
+steps:
+- step: 1
+  screen: KSK-001
+  action: The kiosk attracts and a guest touches it.
+  operations: []
+  outcome: '**No operation.** The attract loop is a local asset — a kiosk that needs the network to
+    show its own screensaver looks broken when it is not.'
+- step: 2
+  screen: KSK-002
+  action: They pick a language.
+  operations:
+  - getTenantConfig
+  - getTenantAppStatus
+  outcome: '**First choice, before anything else.** A guest who cannot read the first screen cannot
+    reach a language button placed later. `getTenantAppStatus` is what shows the out-of-service screen
+    instead.'
+- step: 3
+  screen: KSK-003
+  action: They choose what they are buying.
+  operations:
+  - listProducts
+  outcome: '**Three or four options, not a catalogue.** A kiosk that presents everything is a kiosk
+    with a queue behind it.'
+- step: 4
+  screen: KSK-006
+  action: They review the basket.
+  operations:
+  - getCart
+  - addCartLine
+  - evaluatePromotions
+  - checkoutCart
+  outcome: '**The only chance to correct anything without a member of staff.** Promotions are shown
+    here rather than at payment — a discount a guest discovers on the receipt is a discount they did
+    not choose.'
+- step: 5
+  screen: KSK-007
+  action: They pay.
+  operations:
+  - createPayment
+  outcome: Card only. **A kiosk taking cash is a kiosk somebody has to empty**, which is a different
+    machine and a different flow.
+- step: 6
+  screen: KSK-009
+  action: The ticket is issued.
+  operations:
+  - getOrder
+  - transferOrderTickets
+  outcome: '**Printed, or sent to a phone.** `transferOrderTickets` is how a guest with no printer still
+    leaves with a ticket.'
+- step: 7
+  screen: KSK-013
+  action: Something goes wrong and they call staff.
+  operations:
+  - endKioskAssist
+  outcome: '**One button, always visible.** A guest stuck at a kiosk with no way to summon help is a
+    guest who leaves.'
+branches:
+- at: 5
+  condition: The payment does not resolve.
+  behaviour: '`KSK-008` holds it and calls `inquirePaymentStatus` rather than retrying. **An unattended
+    machine that retries a payment charges twice**, and nobody is there to notice.'
+  severity: high
+  resolvedBy: inquirePaymentStatus
+- at: 6
+  condition: The ticket cannot be printed.
+  behaviour: '`KSK-010` transfers the tickets to the guest instead. **The sale stands** — a paid guest
+    with no ticket must never be told to pay again.'
+  severity: high
+  resolvedBy: transferOrderTickets
+- at: 3
+  condition: The guest wants help choosing.
+  behaviour: '`KSK-015` is an assistant that can hand over to a person. **`handoverToAgent` exists because
+    an AI that cannot escalate at an unattended machine is an AI that traps the guest.**'
+  severity: medium
+  resolvedBy: handoverToAgent
+exitStates:
+- state: served
+  description: Bought and issued, unattended.
+- state: paymentUnresolved
+  description: '**Held, not retried.**'
+- state: printFailed
+  description: Paid, media delivered another way.
+- state: staffCalled
+  description: A person came.
+notes: '**Written 24 August.** The kiosk is the only platform where **no member of staff is present
+  to exercise judgement**, and every branch here is a decision a cashier would otherwise make. **The
+  first draft skipped `KSK-007` and the flow bound only two operations** — which is how it surfaced
+  that `KSK-006` checks out and a separate screen takes the money. The kiosk is the only platform where
+  **no member of staff is present to exercise judgement**, and every branch here is a decision a cashier
+  would otherwise make.'
+openQuestions: null

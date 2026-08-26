@@ -1,0 +1,2313 @@
+openapi: 3.1.0
+info:
+  title: TICVAI Order & Payment
+  version: 0.1.0
+  x-ticvai-screen-count: 17
+  x-ticvai-tier: spine
+  x-ticvai-module: "2 — Ticketing Sales"
+  x-ticvai-requirements: 343
+  x-ticvai-capabilities: [C02, C03, C04, C34, C47]
+  x-ticvai-platforms:
+    - "P04 POS"
+    - "P01 Guest Web"
+    - "P02 Guest App"
+    - "P03 Kiosk"
+    - "P10 Partner Portal"
+    - "P12 Support Console"
+  description: >
+    ## What this contract covers
+
+    **Money moves here. One atomic transaction with entitlement and ledger.**
+
+    | | |
+    |---|---|
+    | **Tier** | spine |
+    | **Matrix domain** | 2 — Ticketing Sales |
+    | **Requirements** | ~343 |
+    | **Capabilities** | C02, C03, C04, C34, C47 |
+    | **Consumed by** | P04 POS · P01 Guest Web · P02 Guest App · P03 Kiosk · P10 Partner Portal · P12 Support Console |
+
+    ## How to read this file
+
+    **This file is a contract.** It is hand-authored and it is the source of truth for one
+    bounded context: server code, client code and mock servers are generated from it, never
+    the other way round. If a field is not here, it does not exist.
+
+    **Contracts are split into two tiers.**
+
+    - **Spine** — the eight contexts everything else depends on: tenancy, identity,
+      catalogue, orders, shift, access, finance, cross-cell. Frozen first. A change here
+      requires a formal change request, because every satellite has pinned against it.
+    - **Satellite** — a domain that builds on the spine and can move independently.
+      Cheaper to change.
+
+    **`paths` are operations.** Each one declares four TICVAI extensions, and Redocly
+    rejects any that does not:
+
+    | Extension | Answers |
+    |---|---|
+    | `x-ticvai-permission` | Which permission the caller needs. From one enum in `shared/permissions.yaml` — never hand-typed |
+    | `x-ticvai-scope-level` | Where in the seven-level hierarchy that permission must be held |
+    | `x-ticvai-offline-capable` | Whether a disconnected terminal may queue this |
+    | `x-ticvai-conflict-policy` | How a replayed operation resolves — `append`, `serverWins`, `manual` |
+
+    Where `x-ticvai-permission` is null, one of these says why: `x-ticvai-auth: service`
+    (cell-to-cell), `x-ticvai-self-scoped` (acts only on the caller's own resources), or
+    `security: []` (genuinely public).
+
+    **`components.schemas` are API schemas — the shape of data on the wire.** They are not
+    database tables. One API schema may become three columns (`Money`) or five tables
+    (`Order`); some have no table at all (`ValidationResult`, `TrialBalance`). Roughly 70%
+    of the DDL derives from these, and the rest — partitioning, RLS, the PII split — is
+    storage design that lives in the migration scripts.
+
+    **Where a schema maps to storage, `x-ticvai-persistence` says so.** The value is a table
+    name, a list of tables, or `none` with a reason. It is documentation of the mapping, not
+    a generator input — the DDL lives in versioned SQL migrations, because partitioning, RLS
+    policies, `ltree` indexes and partial indexes have no expression in OpenAPI.
+
+    **`security` arrays hold OAuth scopes.** Empty means "this scheme, no scopes" — for
+    bearer tokens there is nothing to list. Empty is not the same as absent: absent means
+    unauthenticated.
+
+
+    ## This context
+
+    Orders, payments, refunds, voids and reservations. Shift and till are separate
+    (`shift.yaml`).
+
+    Positions this encodes:
+
+    - **The server re-prices every line on ingest** (ADR-0013). The local price is the
+      guest's answer; the server is authoritative for the ledger. Where they disagree the
+      quoted price is honoured and a variance is posted — the guest has already paid and
+      left, so the ledger records what happened rather than what should have.
+    - **Refund thresholds are venue policy, not permission scope** (CF-36). `ORDER_REFUND`
+      is binary. How much a holder may refund without a second authoriser is configured per
+      venue, because venues run different policies.
+    - **Dual-authorisation, not escalation** (2.12.3). Above threshold a second user — cashier
+      or supervisor — names themselves as audit control. That is a different mechanism from
+      escalating to a higher permission.
+    - **Orders never span cells** (ADR-0010). The selling cell owns the order; redemption
+      rights propagate.
+    - Payment recovery matters more than the happy path. A terminal that charged a card and
+      never received a response is the normal failure, not the exotic one.
+
+servers:
+  - url: https://{cellHost}/api/v1
+    variables:
+      cellHost:
+        default: cell.ticvai.local
+
+security:
+  - bearerAuth: []
+
+tags:
+  - name: order
+  - name: b2b
+  - name: payment
+  - name: refund
+  - name: reservation
+  - name: policy
+  - name: sync
+
+paths:
+  /orders:
+    get:
+      operationId: listOrders
+      x-ticvai-consumed-by:
+        - "P01 WEB-018 My Tickets"
+        - "P01 WEB-019 Order History"
+        - "P02 GST-019 Order History (Wallet)"
+        - "P04 POS-006 Held Orders"
+        - "P10 PTR-002 Partner Dashboard"
+        - "P10 PTR-015 Order History"
+      x-ticvai-read-routing: replica
+      summary: List orders
+      tags: [order]
+      x-ticvai-permission: ORDER_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: true
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - name: venueId
+          in: query
+          schema: { type: string, format: uuid }
+        - name: principalId
+          in: query
+          description: Requires ORDER_VIEW_OTHER when not the caller.
+          schema: { type: string, format: uuid }
+        - name: shiftId
+          in: query
+          schema: { type: string }
+        - name: status
+          in: query
+          schema: { $ref: '#/components/schemas/OrderStatus' }
+        - name: createdFrom
+          in: query
+          schema: { type: string, format: date-time }
+        - name: createdTo
+          in: query
+          schema: { type: string, format: date-time }
+        - $ref: '../shared/common.yaml#/components/parameters/PageSize'
+        - $ref: '../shared/common.yaml#/components/parameters/PageCursor'
+      responses:
+        '200':
+          description: Orders
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '../shared/common.yaml#/components/schemas/Page'
+                  - type: object
+                    properties:
+                      items:
+                        type: array
+                        items: { $ref: '#/components/schemas/OrderSummary' }
+        '403': { $ref: '../shared/common.yaml#/components/responses/Forbidden' }
+
+    post:
+      operationId: createOrder
+      x-ticvai-consumed-by:
+        - "P01 WEB-012 Checkout — Payment"
+        - "P02 GST-009 Review & Payment"
+        - "P10 PTR-008 Booking Creation"
+      summary: Create an order
+      description: >
+        The client submits lines with the prices it quoted from its local bundle. **The
+        server re-prices every line** and returns both figures.
+
+        Where they differ the order is still accepted at the quoted price and
+        `priceVariance` is populated. The client shows nothing; the variance is a finance
+        concern, not a cashier concern.
+
+        Offline-capable. The client writes to its local journal, acknowledges the cashier,
+        and replays through `/sync/orders` on reconnect.
+      tags: [order]
+      x-ticvai-permission: ORDER_CREATE
+      x-ticvai-scope-level: workstation
+      x-ticvai-offline-capable: true
+      x-ticvai-conflict-policy: append
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/CreateOrderRequest' }
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Order' }
+          headers:
+            X-Consistency-Token:
+              schema: { type: string }
+        '400': { $ref: '../shared/common.yaml#/components/responses/BadRequest' }
+        '403': { $ref: '../shared/common.yaml#/components/responses/Forbidden' }
+        '409':
+          description: >
+            A lease covering a line has expired, capacity is exhausted, or the catalogue
+            bundle the client priced from is beyond its staleness bound.
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /orders/{orderId}:
+    parameters:
+      - name: orderId
+        in: path
+        required: true
+        schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+    get:
+      operationId: getOrder
+      x-ticvai-consumed-by:
+        - "P01 WEB-013 Order Confirmation"
+        - "P02 GST-010 Booking Confirmation"
+      x-ticvai-read-routing: primary
+      summary: Read an order
+      tags: [order]
+      x-ticvai-permission: ORDER_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: true
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '200':
+          description: Order
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Order' }
+        '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
+
+  /orders/{orderId}/hold:
+    parameters:
+      - name: orderId
+        in: path
+        required: true
+        schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+    post:
+      operationId: holdOrder
+      x-ticvai-consumed-by:
+        - "P04 POS-002 Sell — Ticket Catalogue"
+      summary: Park a sale and free the till
+      description: >
+        The guest has gone to fetch a wallet, or wants to add something after checking with
+        someone. The cashier parks the sale and serves the next person.
+
+        **Not a reservation.** Nothing is held against inventory — a parked sale that reserved
+        capacity would let a queue of parked sales exhaust a session. Prices are re-evaluated
+        on resume, and a price that moved is surfaced rather than silently applied.
+
+        Held orders expire. A till that accumulates parked sales across a shift cannot be
+        closed, and the cashier who parked them has gone home.
+      tags: [order]
+      x-ticvai-permission: ORDER_MODIFY
+      x-ticvai-scope-level: workstation
+      x-ticvai-offline-capable: true
+      x-ticvai-conflict-policy: lastWriterWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [recordedAt]
+              properties:
+                label:
+                  type: string
+                  maxLength: 60
+                  description: >
+                    How the cashier will find it again — a name, a description, a party size.
+                    A list of unlabelled parked sales is unusable at a busy counter.
+                holdUntil: { type: string, format: date-time }
+                recordedAt: { type: string, format: date-time }
+      responses:
+        '200':
+          description: Held
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Order' }
+        '409':
+          description: Order is already paid, voided, or contains a seat hold about to expire
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /orders/{orderId}/resume:
+    parameters:
+      - name: orderId
+        in: path
+        required: true
+        schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+    post:
+      operationId: resumeOrder
+      x-ticvai-consumed-by:
+        - "P04 POS-006 Held Orders"
+      summary: Bring a parked sale back to a till
+      description: >
+        Any till, not only the one that parked it — the cashier who took it may be on a break.
+
+        Prices are re-evaluated. Where a price, a promotion or an availability has moved since
+        the hold, the response says so and the cashier decides. Silently charging the old price
+        loses money; silently charging the new one loses the guest.
+      tags: [order]
+      x-ticvai-permission: ORDER_MODIFY
+      x-ticvai-scope-level: workstation
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      responses:
+        '200':
+          description: Resumed, with any change since the hold reported
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/OrderResumeResult' }
+        '409':
+          description: Held order expired, or already resumed at another till
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /orders/{orderId}/discounts:
+    parameters:
+      - name: orderId
+        in: path
+        required: true
+        schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+    post:
+      operationId: applyManualDiscount
+      x-ticvai-consumed-by:
+        - "P04 POS-002 Sell — Ticket Catalogue"
+      summary: Apply a discount a cashier chose
+      description: >
+        Distinct from a promotion, which is a rule the platform evaluates. This is a person
+        deciding — service recovery, a damaged item, a manager's judgement.
+
+        **Always requires a reason, and above the venue threshold an approver who is not the
+        requester.** Manual discount is the most common internal fraud in retail, and the
+        control is that every one is attributable and reviewable rather than that they are
+        forbidden.
+
+        Posts to a discount account, never as a price change. A line sold at a reduced price
+        and a line discounted are different facts, and margin reporting needs both.
+      tags: [order]
+      x-ticvai-permission: ORDER_DISCOUNT
+      x-ticvai-scope-level: workstation
+      x-ticvai-offline-capable: true
+      x-ticvai-conflict-policy: append
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/ManualDiscountRequest' }
+      responses:
+        '200':
+          description: Applied
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Order' }
+        '403':
+          description: >
+            Above the cashier's limit and no approver supplied, or the approver is the
+            requester.
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /orders/{orderId}/voids:
+    parameters:
+      - name: orderId
+        in: path
+        required: true
+        schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+    post:
+      operationId: voidOrder
+      summary: Void an order
+      description: >
+        Only before settlement and only within the same shift. After that it is a refund —
+        the money has moved.
+      tags: [order]
+      x-ticvai-permission: ORDER_VOID
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: true
+      x-ticvai-conflict-policy: append
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [id, reason, recordedAt]
+              properties:
+                id: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+                reason: { type: string, minLength: 3, maxLength: 500 }
+                recordedAt: { type: string, format: date-time }
+      responses:
+        '200':
+          description: Voided
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Order' }
+        '409':
+          description: Settled, or from a closed shift. Use a refund.
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /orders/{orderId}/refunds:
+    parameters:
+      - name: orderId
+        in: path
+        required: true
+        schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+    get:
+      operationId: listOrderRefunds
+      x-ticvai-read-routing: replica
+      summary: List refunds against an order
+      tags: [refund]
+      x-ticvai-permission: ORDER_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: true
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '200':
+          description: Refunds
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/Refund' }
+
+    post:
+      operationId: createRefund
+      summary: Refund an order, wholly or in part
+      description: >
+        **Not offline-capable.** A refund touches the gateway and the ledger; both need the
+        network.
+
+        The venue's refund policy determines whether a second authoriser is required. Call
+        `/venues/{venueId}/refund-policy` first, or submit without `secondaryAuthorisation`
+        and handle the 409 that names the threshold.
+
+        Sequencing is ledger-first: the ledger entry is written, then the gateway is called,
+        then the outcome is reconciled. A gateway call that succeeds against an unwritten
+        ledger entry is money that left with no record.
+      tags: [refund]
+      x-ticvai-permission: ORDER_REFUND
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/CreateRefundRequest' }
+      responses:
+        '202':
+          description: >
+            Accepted. May be `pendingApproval` where policy requires an approver, or
+            `pendingGateway` while the provider is called.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Refund' }
+        '400': { $ref: '../shared/common.yaml#/components/responses/BadRequest' }
+        '403': { $ref: '../shared/common.yaml#/components/responses/Forbidden' }
+        '409':
+          description: >
+            Second authorisation required and absent, refund window closed, or the amount
+            exceeds what remains refundable. The problem detail names the threshold and the
+            policy that set it.
+          content:
+            application/problem+json:
+              schema: { $ref: '#/components/schemas/RefundPolicyProblem' }
+
+  /refunds/{refundId}/approve:
+    parameters:
+      - name: refundId
+        in: path
+        required: true
+        schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+    post:
+      operationId: approveRefund
+      summary: Approve a refund held for approval
+      tags: [refund]
+      x-ticvai-permission: ORDER_REFUND_APPROVE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                note: { type: string, maxLength: 500 }
+                overridePercentage:
+                  type: number
+                  minimum: 0
+                  maximum: 100
+                  description: >
+                    Approver may override the time-banded refund percentage. Recorded
+                    against the approving principal.
+      responses:
+        '200':
+          description: Approved; gateway call proceeds
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Refund' }
+        '403': { $ref: '../shared/common.yaml#/components/responses/Forbidden' }
+
+  /refunds/bulk:
+    post:
+      operationId: createBulkRefund
+      summary: Refund every order against an event, performance or date
+      description: >
+        Cancellation handling. Always requires approval regardless of individual thresholds —
+        the aggregate is what matters, not each line.
+      tags: [refund]
+      x-ticvai-permission: ORDER_REFUND_BULK
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [scope, reason]
+              properties:
+                scope:
+                  type: object
+                  properties:
+                    performanceId: { type: string, format: uuid }
+                    eventId: { type: string, format: uuid }
+                    venueId: { type: string, format: uuid }
+                    dateFrom: { type: string, format: date }
+                    dateTo: { type: string, format: date }
+                percentage:
+                  type: number
+                  minimum: 0
+                  maximum: 100
+                  default: 100
+                reason: { type: string, minLength: 3, maxLength: 500 }
+      responses:
+        '202':
+          description: Queued for approval
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [batchId, affectedOrders, estimatedTotal, status]
+                properties:
+                  batchId: { type: string }
+                  affectedOrders: { type: integer }
+                  estimatedTotal: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+                  status:
+                    type: string
+                    enum: [pendingApproval, processing, completed, failed]
+
+  /refund-requests:
+    post:
+      operationId: createRefundRequest
+      security:
+        - guestAuth: []
+      x-ticvai-self-scoped: subject
+      summary: Guest-initiated refund request
+      description: >
+        Raised from the guest app. Enters the operations approval queue rather than
+        refunding directly — a guest cannot self-serve money out of the ledger.
+
+        **The order must belong to the authenticated subject.** A request against another
+        guest's order is rejected with 403, not queued for someone to notice later.
+      tags: [refund]
+      x-ticvai-permission: null
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [orderId, reason]
+              properties:
+                orderId: { type: string }
+                lineIds:
+                  type: array
+                  items: { type: string }
+                reason: { type: string, minLength: 3, maxLength: 1000 }
+      responses:
+        '403':
+          description: Order does not belong to the authenticated subject
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+        '202':
+          description: Submitted to the approval queue
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  requestId: { type: string }
+                  status:
+                    type: string
+                    enum: [submitted, moreInfoRequested, approved, declined]
+
+  /venues/{venueId}/refund-policy:
+    parameters:
+      - name: venueId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    get:
+      operationId: getRefundPolicy
+      x-ticvai-read-routing: replica
+      summary: Read a venue's refund policy
+      description: >
+        Thresholds and time bands are venue configuration, not permission scope (CF-36).
+        Cached locally so a terminal can present the right prompt before it calls.
+      tags: [policy]
+      x-ticvai-permission: ORDER_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: true
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '200':
+          description: Policy
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/RefundPolicy' }
+        '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
+    put:
+      operationId: setRefundPolicy
+      x-ticvai-config-scope: venue
+      summary: Set a venue's refund policy
+      tags: [policy]
+      x-ticvai-permission: REGION_CONFIGURE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/RefundPolicy' }
+      responses:
+        '200':
+          description: Set
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/RefundPolicy' }
+
+  # ---------------------------------------------------------------- payment
+  /payments:
+    post:
+      operationId: createPayment
+      x-ticvai-consumed-by:
+        - "P01 WEB-012 Checkout — Payment"
+        - "P01 WEB-014 Payment Link Landing"
+        - "P04 POS-005 Payment"
+        - "P10 PTR-012 Checkout / Credit Purchase"
+      summary: Take a payment against an order
+      description: >
+        Cash is offline-capable. Card, wallet and voucher are not — they need the gateway.
+
+        A card payment returns `pendingConfirmation` when the terminal has been instructed
+        but no result has arrived. **Do not assume failure.** Poll `/payments/{id}/inquiry`.
+      tags: [payment]
+      x-ticvai-permission: ORDER_CREATE
+      x-ticvai-scope-level: workstation
+      x-ticvai-offline-capable: true
+      x-ticvai-conflict-policy: append
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/CreatePaymentRequest' }
+      responses:
+        '201':
+          description: Recorded
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Payment' }
+        '402':
+          description: Declined by the provider
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+        '409':
+          description: Tender unavailable offline, or amount exceeds the balance due
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /payments/{paymentId}/inquiry:
+    parameters:
+      - name: paymentId
+        in: path
+        required: true
+        schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+    post:
+      operationId: inquirePaymentStatus
+      x-ticvai-consumed-by:
+        - "P01 WEB-012 Checkout — Payment"
+        - "P04 POS-005 Payment"
+      summary: Ask the provider what actually happened
+      description: >
+        The recovery path (12 Aug §12). A terminal charged the card and the response never
+        arrived — the guest has been charged and the order shows unpaid.
+
+        This queries the provider directly and reconciles. A background reconciler runs the
+        same operation for payments left unconfirmed past a threshold, so recovery does not
+        depend on an operator noticing.
+      tags: [payment]
+      x-ticvai-permission: ORDER_CREATE
+      x-ticvai-scope-level: workstation
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '200':
+          description: Reconciled against the provider
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Payment' }
+        '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
+        '503':
+          description: Provider unreachable. Retry; do not assume an outcome.
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /payments/{paymentId}/tip:
+    parameters:
+      - name: paymentId
+        in: path
+        required: true
+        schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+    post:
+      operationId: addTip
+      x-ticvai-consumed-by:
+        - "P04 POS-005 Payment"
+      summary: Record a tip against a payment
+      description: >
+        A separate operation rather than a line on the order, because a tip is not revenue —
+        it is money held for staff and posts to a liability, not to sales. Treating it as a
+        line inflates takings and understates what is owed.
+
+        Where the terminal captured the tip, this records what it reported. Where the guest
+        wrote it on a slip, a cashier enters it, and that path needs the same attribution as
+        a manual discount.
+      tags: [payment]
+      x-ticvai-permission: ORDER_MODIFY
+      x-ticvai-scope-level: workstation
+      x-ticvai-offline-capable: true
+      x-ticvai-conflict-policy: append
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [amount, source, recordedAt]
+              properties:
+                amount: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+                source:
+                  type: string
+                  enum: [terminalPrompt, cashierEntered, guestApp, serviceCharge]
+                  description: >
+                    `serviceCharge` is not a tip and is separated deliberately — it is revenue
+                    in most jurisdictions, and pooling it with tips is how a payroll dispute
+                    starts.
+                allocateToPrincipalId:
+                  type: string
+                  format: uuid
+                  description: Where the venue allocates rather than pools.
+                recordedAt: { type: string, format: date-time }
+      responses:
+        '200':
+          description: Recorded
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Payment' }
+        '409':
+          description: Payment not settled, or a tip is already recorded against it
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /payments/{paymentId}/capture:
+    parameters:
+      - name: paymentId
+        in: path
+        required: true
+        schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+    post:
+      operationId: capturePayment
+      summary: Capture a previously authorised payment
+      tags: [payment]
+      x-ticvai-permission: ORDER_CREATE
+      x-ticvai-scope-level: workstation
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [amount]
+              properties:
+                amount: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+      responses:
+        '200':
+          description: Captured
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Payment' }
+
+  # ---------------------------------------------------------------- reservations
+  /reservations/{reservationId}/convert:
+    parameters:
+      - name: reservationId
+        in: path
+        required: true
+        schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+    post:
+      operationId: convertReservation
+      summary: Convert a reservation into an order
+      tags: [reservation]
+      x-ticvai-permission: ORDER_CREATE
+      x-ticvai-scope-level: workstation
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      responses:
+        '201':
+          description: Converted
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Order' }
+        '409':
+          description: Expired or already converted
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  # ---------------------------------------------------------------- sync
+  /sync/orders:
+    post:
+      operationId: syncOrders
+      summary: Replay orders recorded offline
+      description: >
+        Ordered batch, processed in `sequence` order, stopping at the first entry that
+        cannot be accepted. A void must never be evaluated before the sale it voids.
+
+        Every line is re-priced on ingest. Variances are returned per order and posted to
+        the variance account; the client surfaces nothing to the cashier.
+      tags: [sync]
+      x-ticvai-permission: ORDER_CREATE
+      x-ticvai-scope-level: workstation
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: append
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [deviceId, orders]
+              properties:
+                deviceId: { type: string, format: uuid }
+                orders:
+                  type: array
+                  minItems: 1
+                  maxItems: 200
+                  items: { $ref: '#/components/schemas/OfflineOrder' }
+      responses:
+        '200':
+          description: Batch processed, wholly or up to the first rejection
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/OrderSyncResult' }
+
+  /sync/rejections:
+    get:
+      operationId: listSyncRejections
+      x-ticvai-read-routing: replica
+      summary: Entries the server refused
+      description: >
+        Needs operator attention. These will not retry — surfacing them is the difference
+        between a reconciliation task and silent data loss behind an "all synced" indicator.
+      tags: [sync]
+      x-ticvai-permission: ORDER_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - name: workstationId
+          in: query
+          schema: { type: string, format: uuid }
+        - $ref: '../shared/common.yaml#/components/parameters/PageSize'
+        - $ref: '../shared/common.yaml#/components/parameters/PageCursor'
+      responses:
+        '200':
+          description: Rejections
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '../shared/common.yaml#/components/schemas/Page'
+                  - type: object
+                    properties:
+                      items:
+                        type: array
+                        items: { $ref: '#/components/schemas/SyncRejection' }
+
+  /orders/{orderId}/modify:
+    parameters:
+      - name: orderId
+        in: path
+        required: true
+        schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+    post:
+      operationId: modifyOrder
+      x-ticvai-consumed-by:
+        - "P01 WEB-023 Membership Management"
+      summary: Add or remove lines on an existing order
+      description: >
+        Adding a line charges the difference; removing one refunds it under the venue's refund
+        policy. **A modification is not a void and re-sale** — the order number, the guest's
+        booking reference and the entitlements already issued all survive.
+
+        Lines whose entitlement has been redeemed cannot be removed. The guest has used it.
+      tags: [order]
+      x-ticvai-permission: ORDER_MODIFY
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/ModifyOrderRequest' }
+      responses:
+        '200':
+          description: Modified, with the balance to settle
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/OrderModificationResult' }
+        '409':
+          description: >
+            A targeted line's entitlement has been redeemed, or the order is voided.
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /media/{mediaCode}/entitlements:
+    parameters:
+      - name: mediaCode
+        in: path
+        required: true
+        schema: { type: string }
+        description: The QR, wristband or card the guest is already carrying.
+    get:
+      operationId: getMediaEntitlements
+      x-ticvai-consumed-by:
+        - "P04 POS-010 Add to Existing Ticket"
+      summary: What is already on this media
+      description: >
+        Scanned at a counter before adding something. Shows what the guest holds so a cashier
+        does not sell a locker to someone who already has one.
+      tags: [order]
+      x-ticvai-permission: ORDER_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-read-routing: primary
+      responses:
+        '200':
+          description: What the media carries
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/MediaEntitlements' }
+        '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
+
+    post:
+      operationId: appendEntitlementToMedia
+      x-ticvai-consumed-by:
+        - "P04 POS-010 Add to Existing Ticket"
+      summary: Add something to a ticket the guest already holds
+      description: >
+        A guest arrives, buys admission, and an hour later wants a locker. They scan the QR
+        they are already carrying and the locker attaches to it. **No second QR.**
+
+        Named as important on 14 August: *"I don't need to give another QR code for the locker.
+        I will use the same QR code and I can go and scan it in the locker."*
+
+        This creates a **new order** that issues entitlements onto **existing media**. The
+        original order is untouched — it was paid, receipted and possibly reported on, and
+        editing it to add a later purchase would make yesterday's revenue move.
+
+        The media is the join, not the order. That is why this operation is keyed on
+        `mediaCode` rather than on an order id: the guest has the wristband in their hand and
+        may not know which order issued it.
+      tags: [order]
+      x-ticvai-permission: ORDER_CREATE
+      x-ticvai-scope-level: workstation
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/AppendEntitlementRequest' }
+      responses:
+        '201':
+          description: >
+            Appended. Returns the new order and the media's full entitlement set, so the
+            cashier can tell the guest what their QR now does.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/AppendEntitlementResult' }
+        '409':
+          description: >
+            Media expired, blocked, already surrendered at exit, or the entitlement cannot
+            share media — a single-entry ticket surrendered at the gate is not a claim token
+            for anything bought afterwards.
+          content:
+            application/problem+json:
+              schema: { $ref: '#/components/schemas/AppendRefusedProblem' }
+        '404':
+          description: Media not recognised at this venue
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /orders/{orderId}/exchanges:
+    parameters:
+      - name: orderId
+        in: path
+        required: true
+        schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+    post:
+      operationId: exchangeOrderLines
+      summary: Exchange lines for different products or dates
+      description: >
+        A date change, a tier upgrade, a different performance. **Settles only the
+        difference** — modelled as separate refund and sale, a guest exchanging a date can end
+        up refunded and then unable to rebook when the new date turns out to be full.
+
+        The replacement is held before the original is released, never the other way round.
+      tags: [order]
+      x-ticvai-permission: ORDER_EXCHANGE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/ExchangeOrderRequest' }
+      responses:
+        '200':
+          description: Exchanged
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/OrderExchangeResult' }
+        '409':
+          description: >
+            Replacement unavailable, outside the exchange window, or the original is redeemed.
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /orders/{orderId}/reschedule:
+    parameters:
+      - name: orderId
+        in: path
+        required: true
+        schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+    post:
+      operationId: rescheduleOrder
+      summary: Move an order to another performance
+      description: >
+        The common case of an exchange, and worth its own operation because it is what a call
+        centre agent does forty times a day. Same product, different date or time.
+
+        Where the new performance is priced differently, the balance settles as for an
+        exchange. Where the venue charges a rescheduling fee, it appears as a line.
+      tags: [order]
+      x-ticvai-permission: ORDER_RESCHEDULE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [targetPerformanceId, recordedAt]
+              properties:
+                targetPerformanceId: { type: string, format: uuid }
+                lineIds:
+                  type: array
+                  description: Omit to move the whole order.
+                  items: { type: string }
+                waiveFee: { type: boolean, default: false }
+                reason: { type: string, maxLength: 500 }
+                recordedAt: { type: string, format: date-time }
+      responses:
+        '200':
+          description: Rescheduled
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/OrderExchangeResult' }
+        '409':
+          description: Target performance is unavailable or outside the reschedule window
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /orders/{orderId}/reprints:
+    parameters:
+      - name: orderId
+        in: path
+        required: true
+        schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+    post:
+      operationId: reprintOrder
+      x-ticvai-consumed-by:
+        - "P01 WEB-013 Order Confirmation"
+        - "P10 PTR-016 Voucher / Ticket Download"
+      summary: Reprint or resend tickets
+      description: >
+        Reprint count is recorded per line. Repeated reprints on one order is a signal worth
+        surfacing — usually a printer fault, occasionally something else.
+      tags: [order]
+      x-ticvai-permission: ORDER_REPRINT
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: true
+      x-ticvai-conflict-policy: append
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [delivery]
+              properties:
+                delivery:
+                  type: string
+                  enum: [print, email, sms, whatsapp, wallet]
+                destination: { type: string }
+                lineIds:
+                  type: array
+                  items: { type: string }
+                reason:
+                  type: string
+                  enum: [printerFault, guestRequest, lostTicket, notReceived, other]
+      responses:
+        '200':
+          description: Reissued
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  reprintCount: { type: integer }
+                  reissuedTicketIds:
+                    type: array
+                    items: { type: string }
+        '400': { $ref: '../shared/common.yaml#/components/responses/BadRequest' }
+
+  /orders/{orderId}/transfer:
+    parameters:
+      - name: orderId
+        in: path
+        required: true
+        schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+    post:
+      operationId: transferOrderTickets
+      summary: Transfer tickets to another guest
+      description: >
+        Per-ticket, not whole-order — a family splitting tickets between two phones is the
+        normal case.
+
+        The recipient receives a claim link. **Ownership moves only when they claim it**, so a
+        transfer to a mistyped address expires rather than stranding the ticket somewhere
+        nobody can reach.
+      tags: [order]
+      x-ticvai-permission: null
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-self-scoped: subject
+      security:
+        - guestAuth: []
+        - bearerAuth: []
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [ticketIds, recipient]
+              properties:
+                ticketIds:
+                  type: array
+                  minItems: 1
+                  items: { type: string }
+                recipient:
+                  type: object
+                  required: [channel, address]
+                  properties:
+                    channel:
+                      type: string
+                      enum: [email, sms, whatsapp]
+                    address: { type: string }
+                message: { type: string, maxLength: 500 }
+      responses:
+        '202':
+          description: Transfer offered, pending claim
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/TicketTransfer' }
+        '409':
+          description: >
+            Ticket already redeemed, already offered, or the product forbids transfer.
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /ticket-transfers/{transferId}/claim:
+    parameters:
+      - name: transferId
+        in: path
+        required: true
+        schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+    post:
+      operationId: claimTicketTransfer
+      summary: Claim transferred tickets
+      tags: [order]
+      x-ticvai-permission: null
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-self-scoped: subject
+      security:
+        - guestAuth: []
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [claimToken]
+              properties:
+                claimToken: { type: string }
+      responses:
+        '200':
+          description: Claimed. Ownership moves now, not at offer
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/TicketTransfer' }
+        '410':
+          description: Offer expired or already claimed
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /orders/{orderId}/statement:
+    parameters:
+      - name: orderId
+        in: path
+        required: true
+        schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+    get:
+      operationId: getOrderStatement
+      x-ticvai-consumed-by:
+        - "P01 WEB-019 Order History"
+        - "P10 PTR-015 Order History"
+      x-ticvai-read-routing: primary
+      summary: Full financial history of an order
+      description: >
+        Every payment, refund, void, modification and exchange in sequence, with the running
+        balance. What a call centre agent reads to a guest asking why they were charged twice.
+      tags: [order]
+      x-ticvai-permission: ORDER_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '200':
+          description: Statement
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/OrderStatement' }
+        '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
+
+  /reservations:
+    get:
+      operationId: listReservations
+      x-ticvai-consumed-by:
+        - "P02 GST-016 My Reservations"
+      x-ticvai-read-routing: replica
+      summary: List reservations
+      tags: [reservation]
+      x-ticvai-permission: ORDER_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - name: status
+          in: query
+          schema: { type: string, enum: [held, converted, expired, cancelled] }
+        - name: expiringWithinMinutes
+          in: query
+          schema: { type: integer }
+        - $ref: '../shared/common.yaml#/components/parameters/PageSize'
+        - $ref: '../shared/common.yaml#/components/parameters/PageCursor'
+      responses:
+        '200':
+          description: Reservations
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '../shared/common.yaml#/components/schemas/Page'
+                  - type: object
+                    properties:
+                      items:
+                        type: array
+                        items: { $ref: '#/components/schemas/Reservation' }
+
+    post:
+      operationId: createReservation
+      summary: Hold without payment
+      description: >
+        A reservation is not an order. It holds capacity, expires, creates no entitlement
+        and posts nothing to the ledger.
+      tags: [reservation]
+      x-ticvai-permission: ORDER_CREATE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/CreateReservationRequest' }
+      responses:
+        '201':
+          description: Held
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Reservation' }
+        '409':
+          description: Capacity unavailable
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+  /reservations/{reservationId}:
+    parameters:
+      - name: reservationId
+        in: path
+        required: true
+        schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+    get:
+      operationId: getReservation
+      x-ticvai-consumed-by:
+        - "P02 GST-017 Reservation Details"
+      x-ticvai-read-routing: primary
+      summary: Read a reservation
+      tags: [reservation]
+      x-ticvai-permission: ORDER_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '200':
+          description: Reservation
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Reservation' }
+        '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
+
+    delete:
+      operationId: cancelReservation
+      summary: Cancel a reservation
+      description: Releases held capacity immediately rather than waiting for expiry.
+      tags: [reservation]
+      x-ticvai-permission: ORDER_CANCEL
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '204': { description: Cancelled }
+        '409':
+          description: Already converted
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /reservations/{reservationId}/extend:
+    parameters:
+      - name: reservationId
+        in: path
+        required: true
+        schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+    post:
+      operationId: extendReservation
+      summary: Extend a reservation
+      description: >
+        Bounded by the venue's maximum, so a reservation cannot be renewed indefinitely
+        against a busy performance.
+      tags: [reservation]
+      x-ticvai-permission: ORDER_CREATE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      responses:
+        '200':
+          description: Extended
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Reservation' }
+        '409':
+          description: Expired, or the extension limit is reached
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /b2b-accounts/{accountId}/credit:
+    parameters:
+      - name: accountId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    get:
+      operationId: getB2bCredit
+      x-ticvai-consumed-by:
+        - "P10 PTR-002 Partner Dashboard"
+        - "P10 PTR-013 Credit Limit & Balance"
+      x-ticvai-read-routing: replica
+      summary: Partner credit position
+      description: >
+        Limit, used, available, and orders outstanding. Checked before a partner order is
+        accepted on credit terms.
+      tags: [b2b]
+      x-ticvai-permission: ORDER_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '200':
+          description: Credit position
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/CreditPosition' }
+        '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
+
+    put:
+      operationId: setB2bCreditLimit
+      summary: Set a partner credit limit
+      description: >
+        Reducing a limit below the amount already used is permitted — it stops further
+        drawdown without unwinding orders that exist. Refusing it would mean a partner in
+        trouble keeps their full limit.
+      tags: [b2b]
+      x-ticvai-permission: CREDIT_MANAGE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [creditLimit, reason]
+              properties:
+                creditLimit: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+                paymentTermsDays: { type: integer, minimum: 0 }
+                isSuspended: { type: boolean }
+                reason: { type: string, minLength: 3, maxLength: 500 }
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/CreditPosition' }
+
+  /b2b-accounts/{accountId}/credit/override:
+    parameters:
+      - name: accountId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    post:
+      operationId: overrideCreditLimit
+      summary: Authorise an order beyond the credit limit
+      description: >
+        Supervisor override for a single order (2.7.39). Records the authorising principal,
+        the amount and a reason — a partner allowed past their limit is a decision someone
+        owns.
+      tags: [b2b]
+      x-ticvai-permission: CREDIT_OVERRIDE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [orderId, amount, reason]
+              properties:
+                orderId: { type: string }
+                amount: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+                reason: { type: string, minLength: 3, maxLength: 500 }
+                expiresAt: { type: string, format: date-time }
+      responses:
+        '200':
+          description: Override recorded
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/CreditPosition' }
+
+components:
+  schemas:
+    ModifyOrderRequest:
+      type: object
+      required: [id, recordedAt]
+      properties:
+        id: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+        addLines:
+          type: array
+          items: { $ref: '#/components/schemas/CreateOrderLine' }
+        removeLineIds:
+          type: array
+          items: { type: string }
+        reason: { type: string, maxLength: 500 }
+        recordedAt: { type: string, format: date-time }
+
+    OrderModificationResult:
+      x-ticvai-persistence: "none — computed"
+      type: object
+      required: [order, balanceDue]
+      properties:
+        order: { $ref: '#/components/schemas/Order' }
+        addedValue: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+        removedValue: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+        balanceDue:
+          allOf:
+            - $ref: '../shared/common.yaml#/components/schemas/Money'
+          description: Positive means the guest pays; negative means a refund is due.
+        refundId: { type: string, nullable: true }
+        revokedEntitlementIds:
+          type: array
+          items: { type: string }
+        issuedEntitlementIds:
+          type: array
+          items: { type: string }
+
+    ExchangeOrderRequest:
+      type: object
+      required: [id, outgoingLineIds, incomingLines, recordedAt]
+      properties:
+        id: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+        outgoingLineIds:
+          type: array
+          minItems: 1
+          items: { type: string }
+        incomingLines:
+          type: array
+          minItems: 1
+          items: { $ref: '#/components/schemas/CreateOrderLine' }
+        waiveFee: { type: boolean, default: false }
+        reason: { type: string, maxLength: 500 }
+        recordedAt: { type: string, format: date-time }
+
+    OrderExchangeResult:
+      x-ticvai-persistence: "none — computed"
+      type: object
+      required: [orderId, outgoingValue, incomingValue, difference]
+      properties:
+        orderId: { type: string }
+        outgoingValue: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+        incomingValue: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+        exchangeFee: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+        difference:
+          allOf:
+            - $ref: '../shared/common.yaml#/components/schemas/Money'
+          description: >
+            Only the difference settles. The replacement is held before the original is
+            released, never the other way round.
+        newLineIds:
+          type: array
+          items: { type: string }
+        revokedEntitlementIds:
+          type: array
+          items: { type: string }
+        issuedEntitlementIds:
+          type: array
+          items: { type: string }
+
+    TicketTransfer:
+      x-ticvai-persistence: "orders.ticket_transfer"
+      type: object
+      required: [id, orderId, ticketIds, status, offeredAt, expiresAt]
+      properties:
+        id: { type: string }
+        orderId: { type: string }
+        ticketIds:
+          type: array
+          items: { type: string }
+        fromSubjectId: { type: string, format: uuid }
+        toSubjectId:
+          type: string
+          format: uuid
+          nullable: true
+          description: Set only on claim. Ownership moves then, not at offer.
+        recipientAddressMasked: { type: string }
+        status:
+          type: string
+          enum: [offered, claimed, expired, cancelled]
+        claimUrl: { type: string, nullable: true }
+        offeredAt: { type: string, format: date-time }
+        claimedAt: { type: string, format: date-time, nullable: true }
+        expiresAt:
+          type: string
+          format: date-time
+          description: >
+            An unclaimed transfer expires and the tickets return. A transfer to a mistyped
+            address must not strand a ticket somewhere nobody can reach.
+
+    OrderStatement:
+      x-ticvai-persistence: "none — computed from order, payment, refund and ledger"
+      type: object
+      required: [orderId, orderNumber, currency, entries, currentBalance]
+      properties:
+        orderId: { type: string }
+        orderNumber: { type: string }
+        currency: { type: string, pattern: '^[A-Z]{3}$' }
+        currencyScale: { type: integer }
+        entries:
+          type: array
+          description: Sequential. What an agent reads to a guest asking about a charge.
+          items:
+            type: object
+            required: [kind, amount, runningBalance, occurredAt]
+            properties:
+              kind:
+                type: string
+                enum: [sale, payment, refund, void, modification, exchange, fee, variance, chargeback]
+              description: { type: string }
+              amount: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+              runningBalance: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+              referenceId: { type: string, nullable: true }
+              principalId: { type: string, format: uuid, nullable: true }
+              occurredAt: { type: string, format: date-time }
+        totalPaid: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+        totalRefunded: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+        currentBalance:
+          allOf:
+            - $ref: '../shared/common.yaml#/components/schemas/Money'
+          description: Positive means the guest owes; negative means a refund is outstanding.
+
+    CreditPosition:
+      x-ticvai-persistence: "orders.b2b_credit + orders.credit_override"
+      type: object
+      required: [accountId, creditLimit, used, available, isSuspended]
+      properties:
+        accountId: { type: string, format: uuid }
+        accountName: { type: string }
+        creditLimit: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+        used: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+        available: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+        isOverLimit: { type: boolean }
+        isSuspended: { type: boolean }
+        paymentTermsDays: { type: integer }
+        oldestUnpaidInvoiceAt: { type: string, format: date-time, nullable: true }
+        daysOverdue: { type: integer }
+        activeOverrides:
+          type: array
+          items:
+            type: object
+            properties:
+              orderId: { type: string }
+              amount: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+              authorisedByPrincipalId: { type: string, format: uuid }
+              reason: { type: string }
+              expiresAt: { type: string, format: date-time, nullable: true }
+
+    MediaEntitlements:
+      type: object
+      x-ticvai-persistence: "none — projection over entitlement and scan history"
+      required: [mediaCode, isValid, entitlements]
+      properties:
+        mediaCode: { type: string }
+        mediaKind:
+          type: string
+          enum: [qr, wristband, card, nfc, mobilePass]
+        subjectId: { type: string, format: uuid, nullable: true }
+        isValid: { type: boolean }
+        invalidReason: { type: string, nullable: true }
+        canAcceptMore:
+          type: boolean
+          description: >
+            False where the media has been surrendered, expired or blocked. A cashier should
+            know before taking money, not after.
+        entitlements:
+          type: array
+          items:
+            type: object
+            properties:
+              entitlementId: { type: string }
+              name: { type: string }
+              kind:
+                type: string
+                enum: [admission, locker, fnb, retail, parking, rental, experience, membership]
+              orderId: { type: string }
+              addedAt: { type: string, format: date-time }
+              isRedeemed: { type: boolean }
+              redeemedAt: { type: string, format: date-time, nullable: true }
+              validTo: { type: string, format: date-time, nullable: true }
+
+    AppendEntitlementRequest:
+      type: object
+      x-ticvai-persistence: "none — request only"
+      required: [id, lines, recordedAt]
+      properties:
+        id: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+        lines:
+          type: array
+          minItems: 1
+          items:
+            type: object
+            required: [variantId, quantity]
+            properties:
+              variantId: { type: string, format: uuid }
+              quantity: { type: integer, minimum: 1 }
+              performanceId: { type: string, format: uuid, nullable: true }
+        paymentMethod:
+          type: string
+          enum: [card, cash, wallet, giftCard, chargeToAccount]
+        note: { type: string, maxLength: 300 }
+        recordedAt: { type: string, format: date-time }
+
+    AppendEntitlementResult:
+      type: object
+      x-ticvai-persistence: "none — computed"
+      required: [order, media]
+      properties:
+        order:
+          allOf:
+            - $ref: '#/components/schemas/Order'
+          description: >
+            A **new** order. The original is untouched — it was paid, receipted and possibly
+            reported on, and editing it would move yesterday's revenue.
+        media:
+          allOf:
+            - $ref: '#/components/schemas/MediaEntitlements'
+          description: The full set now on the media, so the cashier can say what the QR does.
+        addedEntitlementIds:
+          type: array
+          items: { type: string }
+
+    AppendRefusedProblem:
+      allOf:
+        - $ref: '../shared/common.yaml#/components/schemas/Problem'
+        - type: object
+          x-ticvai-persistence: "none — error shape"
+          properties:
+            refusedReason:
+              type: string
+              enum:
+                - mediaExpired
+                - mediaBlocked
+                - mediaSurrendered
+                - entitlementCannotShareMedia
+                - venueMismatch
+                - guestAlreadyDeparted
+            mediaCode: { type: string }
+            detail: { type: string }
+
+    OrderResumeResult:
+      type: object
+      x-ticvai-persistence: "none — computed"
+      required: [order, hasChanged]
+      properties:
+        order: { $ref: '#/components/schemas/Order' }
+        hasChanged:
+          type: boolean
+          description: >
+            True where anything moved while the sale was parked. The cashier decides — silently
+            charging the old price loses money, silently charging the new one loses the guest.
+        changes:
+          type: array
+          items:
+            type: object
+            properties:
+              kind:
+                type: string
+                enum: [priceChanged, promotionExpired, promotionNowApplies, soldOut, seatHoldExpired, productWithdrawn]
+              lineId: { type: string }
+              detail: { type: string }
+              wasAmount: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+              nowAmount: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+
+    ManualDiscountRequest:
+      type: object
+      x-ticvai-persistence: "none — request only"
+      required: [id, reason, recordedAt]
+      properties:
+        id: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+        lineId:
+          type: string
+          nullable: true
+          description: Omit to discount the order rather than a line.
+        amount: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+        percentage: { type: number, minimum: 0, maximum: 100 }
+        reason:
+          type: string
+          minLength: 3
+          maxLength: 300
+          description: >
+            Required, and free text rather than a code list. A cashier forced to pick the
+            nearest reason picks the first one, and the register stops meaning anything.
+        reasonCode:
+          type: string
+          nullable: true
+          description: Optional alongside the free text, where the venue maintains a list.
+        approverPrincipalId:
+          type: string
+          format: uuid
+          nullable: true
+          description: Required above the venue threshold. May not be the requester.
+        recordedAt: { type: string, format: date-time }
+
+    OrderChannel:
+      type: string
+      description: >
+        Where the order originated. Added when guest self-ordering was contracted — an order a
+        guest placed on their own phone is commercially and operationally different from one a
+        cashier typed, and reporting that cannot separate them cannot answer whether
+        self-ordering is working.
+      enum: [pos, kiosk, guestApp, guestWeb, callCentre, partner, api, backOffice]
+
+    OrderStatus:
+      type: string
+      enum: [pending, held, paid, partiallyPaid, completed, voided, refunded, partiallyRefunded, failed]
+      description: >
+        `held` is a parked sale — the cashier freed the till and the guest will return. It
+        holds no inventory and expires, because a till that accumulates parked sales across a
+        shift cannot be closed.
+
+    Channel:
+      type: string
+      enum: [pos, kiosk, web, mobile, b2b, ota, callCentre]
+
+    TenderKind:
+      type: string
+      enum: [cash, card, wallet, voucher, bankTransfer, hotelCharge, installment, giftCard, complimentary]
+
+    CreateOrderRequest:
+      type: object
+      required: [id, venueId, channel, lines, recordedAt]
+      properties:
+        id:
+          type: string
+          pattern: '^[0-9A-HJKMNP-TV-Z]{26}$'
+          description: Client-generated ULID. Also the idempotency key.
+        venueId: { type: string, format: uuid }
+        channel: { $ref: '#/components/schemas/Channel' }
+        shiftId: { type: string }
+        subjectId:
+          type: string
+          format: uuid
+          nullable: true
+          description: Null for an anonymous sale. Identity and entitlement are separate.
+        guestLinkId:
+          type: string
+          nullable: true
+          description: Present where the guest is linked across cells.
+        catalogueBundleVersion:
+          type: string
+          description: >
+            The bundle the client priced from. Lets the server explain a variance rather than
+            merely report one.
+        lines:
+          type: array
+          minItems: 1
+          items: { $ref: '#/components/schemas/CreateOrderLine' }
+        recordedAt: { type: string, format: date-time }
+
+    CreateOrderLine:
+      x-ticvai-persistence: "none — request only"
+      type: object
+      required: [id, variantId, quantity, quotedUnitPrice]
+      properties:
+        id: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+        variantId: { type: string, format: uuid }
+        performanceId: { type: string, format: uuid }
+        leaseId:
+          type: string
+          nullable: true
+          description: Lease the units were drawn from. Absent for uncontended products.
+        seatIds:
+          type: array
+          items: { type: string }
+          description: Seated products only. Not available offline.
+        quantity: { type: integer, minimum: 1 }
+        quotedUnitPrice:
+          allOf:
+            - $ref: '../shared/common.yaml#/components/schemas/Money'
+          description: What the client charged, from its local bundle.
+        holderName: { type: string, nullable: true }
+        dataMaskValues:
+          type: object
+          additionalProperties: true
+
+    OrderLine:
+      x-ticvai-persistence: "orders.order_line"
+      allOf:
+        - $ref: '#/components/schemas/CreateOrderLine'
+        - type: object
+          required: [serverUnitPrice, taxAmount, netAmount, grossAmount]
+          properties:
+            serverUnitPrice:
+              allOf:
+                - $ref: '../shared/common.yaml#/components/schemas/Money'
+              description: What the server computed on ingest.
+            priceVariance:
+              allOf:
+                - $ref: '../shared/common.yaml#/components/schemas/Money'
+              description: >
+                Server minus quoted. Non-zero means the quoted price was honoured and the
+                difference posted to the variance account.
+            taxAmount: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+            netAmount: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+            grossAmount: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+            entitlementIds:
+              type: array
+              items: { type: string }
+            crossCellRightIds:
+              type: array
+              items: { type: string }
+              description: Redemption rights propagated to other cells for this line.
+
+    Order:
+      x-ticvai-persistence: "orders.sales_order + orders.order_line"
+      type: object
+      required: [id, venueId, scopePath, channel, status, currency, currencyScale, grossAmount, taxAmount, netAmount, lines, createdAt, recordedAt]
+      properties:
+        id: { type: string }
+        orderNumber: { type: string }
+        channel:
+          allOf:
+            - $ref: '#/components/schemas/OrderChannel'
+          description: >
+            Where it came from. Drives revenue attribution, promotion eligibility and the
+            self-service adoption figures the operator will ask for within a month of launch.
+        venueId: { type: string, format: uuid }
+        scopePath: { type: string }
+        channel: { $ref: '#/components/schemas/Channel' }
+        status: { $ref: '#/components/schemas/OrderStatus' }
+        currency: { type: string, pattern: '^[A-Z]{3}$' }
+        currencyScale: { type: integer, minimum: 0, maximum: 4 }
+        grossAmount: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+        taxAmount: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+        netAmount: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+        refundedAmount: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+        totalPriceVariance:
+          allOf:
+            - $ref: '../shared/common.yaml#/components/schemas/Money'
+          description: Sum across lines. Zero on a normal order.
+        lines:
+          type: array
+          items: { $ref: '#/components/schemas/OrderLine' }
+        payments:
+          type: array
+          items: { $ref: '#/components/schemas/Payment' }
+        principalId: { type: string, format: uuid }
+        workstationId: { type: string, format: uuid }
+        shiftId: { type: string, nullable: true }
+        subjectId: { type: string, format: uuid, nullable: true }
+        createdAt: { type: string, format: date-time }
+        recordedAt: { type: string, format: date-time }
+        syncedAt: { type: string, format: date-time, nullable: true }
+
+    OrderSummary:
+      x-ticvai-persistence: "none — projection"
+      type: object
+      required: [id, orderNumber, status, grossAmount, createdAt]
+      properties:
+        id: { type: string }
+        orderNumber: { type: string }
+        status: { $ref: '#/components/schemas/OrderStatus' }
+        grossAmount: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+        refundedAmount: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+        channel: { $ref: '#/components/schemas/Channel' }
+        lineCount: { type: integer }
+        createdAt: { type: string, format: date-time }
+
+    RefundPolicy:
+      x-ticvai-persistence: "orders.refund_policy"
+      type: object
+      description: >
+        Venue-configured. Thresholds are policy, not permission scope — venues run different
+        policies and the permission model should not encode commercial rules.
+      required: [venueId, selfAuthoriseLimit, requiresApprovalAbove]
+      properties:
+        venueId: { type: string, format: uuid }
+        selfAuthoriseLimit:
+          allOf:
+            - $ref: '../shared/common.yaml#/components/schemas/Money'
+          description: >
+            Up to this, a holder of ORDER_REFUND refunds alone. Zero means every refund
+            needs a second authoriser.
+        requiresSecondUserAbove:
+          allOf:
+            - $ref: '../shared/common.yaml#/components/schemas/Money'
+          description: >
+            Above this, a second user — cashier OR supervisor — names themselves as audit
+            control. Dual-authorisation, not escalation (2.12.3).
+        requiresApprovalAbove:
+          allOf:
+            - $ref: '../shared/common.yaml#/components/schemas/Money'
+          description: Above this, an ORDER_REFUND_APPROVE holder must approve.
+        timeBands:
+          type: array
+          description: >
+            Refundable percentage by time before the performance. Evaluated most-specific
+            first.
+          items:
+            type: object
+            required: [hoursBefore, percentage]
+            properties:
+              hoursBefore: { type: integer, minimum: 0 }
+              percentage: { type: number, minimum: 0, maximum: 100 }
+        allowPartial: { type: boolean, default: true }
+        refundWindowDays: { type: integer, nullable: true }
+        varianceThreshold:
+          allOf:
+            - $ref: '../shared/common.yaml#/components/schemas/Money'
+          description: >
+            Price variance above this is an exception requiring review rather than a routine
+            posting (CF-38). Venue-configured.
+
+    RefundPolicyProblem:
+      allOf:
+        - $ref: '../shared/common.yaml#/components/schemas/Problem'
+        - type: object
+          properties:
+            requiredAuthorisation:
+              type: string
+              enum: [secondUser, approval]
+            threshold: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+            policyVenueId: { type: string, format: uuid }
+
+    CreateRefundRequest:
+      type: object
+      required: [id, amount, reason, recordedAt]
+      properties:
+        id: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+        lineIds:
+          type: array
+          items: { type: string }
+          description: Omit to refund the whole order.
+        amount: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+        reason: { type: string, minLength: 3, maxLength: 500 }
+        secondaryAuthorisation:
+          type: object
+          description: >
+            Required above the venue's `requiresSecondUserAbove`. A second user — cashier or
+            supervisor — names themselves. This is dual-authorisation, not escalation.
+          required: [principalId, credential]
+          properties:
+            principalId: { type: string, format: uuid }
+            credential: { type: string, maxLength: 512 }
+        refundToOriginalTender: { type: boolean, default: true }
+        alternateTender: { $ref: '#/components/schemas/TenderKind' }
+        recordedAt: { type: string, format: date-time }
+
+    Refund:
+      x-ticvai-persistence: "orders.refund"
+      type: object
+      required: [id, orderId, amount, status, createdAt]
+      properties:
+        id: { type: string }
+        orderId: { type: string }
+        amount: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+        appliedPercentage:
+          type: number
+          description: From the venue's time bands, or an approver override.
+        status:
+          type: string
+          enum: [pendingApproval, pendingGateway, completed, declined, failed]
+        reason: { type: string }
+        requestedByPrincipalId: { type: string, format: uuid }
+        secondaryPrincipalId: { type: string, format: uuid, nullable: true }
+        approvedByPrincipalId: { type: string, format: uuid, nullable: true }
+        ledgerEntryId:
+          type: string
+          nullable: true
+          description: Written before the gateway is called.
+        gatewayReference: { type: string, nullable: true }
+        createdAt: { type: string, format: date-time }
+        completedAt: { type: string, format: date-time, nullable: true }
+
+    CreatePaymentRequest:
+      type: object
+      required: [id, orderId, tender, amount, recordedAt]
+      properties:
+        id: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+        orderId: { type: string }
+        tender: { $ref: '#/components/schemas/TenderKind' }
+        amount: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+        tenderedAmount:
+          allOf:
+            - $ref: '../shared/common.yaml#/components/schemas/Money'
+          description: Cash only. Change is the difference.
+        walletAuthorisationId:
+          type: string
+          nullable: true
+          description: Cross-cell wallet hold, where the guest's home cell is elsewhere.
+        deviceId: { type: string, format: uuid, nullable: true }
+        recordedAt: { type: string, format: date-time }
+
+    Payment:
+      x-ticvai-persistence: "orders.payment"
+      type: object
+      required: [id, orderId, tender, amount, status, recordedAt]
+      properties:
+        id: { type: string }
+        orderId: { type: string }
+        tender: { $ref: '#/components/schemas/TenderKind' }
+        amount: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+        changeAmount: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+        status:
+          type: string
+          enum: [authorised, captured, pendingConfirmation, declined, failed, voided, refunded]
+        providerName: { type: string, nullable: true }
+        providerReference: { type: string, nullable: true }
+        lastInquiryAt: { type: string, format: date-time, nullable: true }
+        recordedAt: { type: string, format: date-time }
+        syncedAt: { type: string, format: date-time, nullable: true }
+
+    CreateReservationRequest:
+      type: object
+      required: [id, venueId, lines, expiresAt]
+      properties:
+        id: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+        venueId: { type: string, format: uuid }
+        subjectId: { type: string, format: uuid }
+        lines:
+          type: array
+          minItems: 1
+          items: { $ref: '#/components/schemas/CreateOrderLine' }
+        expiresAt: { type: string, format: date-time }
+
+    Reservation:
+      x-ticvai-persistence: "orders.reservation"
+      type: object
+      required: [id, venueId, status, expiresAt, createdAt]
+      properties:
+        id: { type: string }
+        venueId: { type: string, format: uuid }
+        status:
+          type: string
+          enum: [held, converted, expired, cancelled]
+        lines:
+          type: array
+          items: { $ref: '#/components/schemas/CreateOrderLine' }
+        expiresAt: { type: string, format: date-time }
+        createdAt: { type: string, format: date-time }
+        convertedOrderId: { type: string, nullable: true }
+
+    OfflineOrder:
+      x-ticvai-persistence: "none — client-side journal, not server storage"
+      allOf:
+        - $ref: '#/components/schemas/CreateOrderRequest'
+        - type: object
+          required: [sequence, payments]
+          properties:
+            sequence:
+              type: integer
+              minimum: 1
+              description: Monotonic per device. Processed in this order.
+            payments:
+              type: array
+              items: { $ref: '#/components/schemas/CreatePaymentRequest' }
+
+    OrderSyncResult:
+      x-ticvai-persistence: "none — computed"
+      type: object
+      required: [accepted, results]
+      properties:
+        accepted: { type: integer }
+        stoppedAtSequence:
+          type: integer
+          nullable: true
+          description: >
+            First entry that could not be processed. Null when the batch succeeded. The
+            client retries from here and never past it.
+        results:
+          type: array
+          items:
+            type: object
+            required: [id, sequence, status]
+            properties:
+              id: { type: string }
+              sequence: { type: integer }
+              status:
+                type: string
+                enum: [accepted, duplicate, rejected]
+              orderNumber: { type: string, nullable: true }
+              priceVariance:
+                allOf:
+                  - $ref: '../shared/common.yaml#/components/schemas/Money'
+                description: Posted to the variance account. Not surfaced to the cashier.
+              varianceExceedsThreshold:
+                type: boolean
+                description: True when review is required per the venue's variance threshold.
+              error: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+    SyncRejection:
+      x-ticvai-persistence: "sync.rejection"
+      type: object
+      required: [id, workstationId, kind, rejectedAt, problem]
+      properties:
+        id: { type: string }
+        workstationId: { type: string, format: uuid }
+        kind:
+          type: string
+          enum: [order, payment, refund, void, scan]
+        recordedAt: { type: string, format: date-time }
+        rejectedAt: { type: string, format: date-time }
+        problem: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+        payload:
+          type: object
+          additionalProperties: true
+        resolvedAt: { type: string, format: date-time, nullable: true }
+        resolvedByPrincipalId: { type: string, format: uuid, nullable: true }
+
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

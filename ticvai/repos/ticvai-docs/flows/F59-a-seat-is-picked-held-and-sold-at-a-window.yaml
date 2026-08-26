@@ -1,0 +1,76 @@
+$schema: ./_schema.yaml
+id: F59
+name: A seat is picked, held and sold at a window
+actor: cashier
+capability: Reserved seating at a point of sale
+wave: 2
+frequency: Routine.
+criticality: revenue
+primaryContract: seating
+contracts:
+- seating
+- orders
+- catalogue
+platforms:
+- P04
+trigger:
+  description: A guest wants a specific seat and is standing at a window while somebody else may be
+    buying it online.
+offlineBehaviour: '**A seat hold needs the network.** Contended inventory cannot be leased from a device
+  that cannot see the contention — offline, the till sells unreserved admission only.'
+steps:
+- step: 1
+  screen: POS-004
+  action: The cashier opens the seat map for a performance.
+  operations:
+  - getPerformance
+  - getSeatAvailability
+  outcome: Live availability. **A seat map cached for even a minute is a map that sells a seat twice.**
+- step: 2
+  screen: POS-004
+  action: A seat is picked and held while the guest decides.
+  operations:
+  - createSeatHold
+  - getSeatHold
+  outcome: '**A hold, not a reservation.** It expires — a guest who walks away does not take the seat
+    with them.'
+- step: 3
+  screen: POS-004
+  action: The guest is slow. The hold is extended.
+  operations:
+  - extendSeatHold
+  outcome: '**Extended rather than re-taken.** Releasing and re-acquiring loses the seat to whoever
+    is refreshing the web page.'
+- step: 4
+  screen: POS-005
+  action: They pay.
+  operations:
+  - createOrder
+  - createPayment
+  outcome: '**The hold converts server-side on payment success.** A till that converts locally has sold
+    a seat the platform may already have given away.'
+branches:
+- at: 2
+  condition: Another till or the web holds the seat first.
+  behaviour: '`createSeatHold` fails and the map refreshes. **Failure is the correct outcome** — the
+    alternative is two guests with the same seat number.'
+  severity: high
+  resolvedBy: createSeatHold
+- at: 3
+  condition: The hold expires while the guest is paying.
+  behaviour: '**The payment is refused rather than the seat taken back.** A guest mid-transaction losing
+    their seat is worse than a guest asked to pick again before paying.'
+  severity: high
+  resolvedBy: getSeatHold
+exitStates:
+- state: sold
+  description: Seat held, paid, entitlement issued.
+- state: holdExpired
+  description: The guest took too long. **Recorded** — expiry rate is a queue signal.
+- state: contended
+  description: Another channel won the seat.
+notes: '**Written 24 August.** `POS-004` declared `cancelPerformance` until this flow was written —
+  **a till that can cancel a performance.** Removed. **Wave 2, not 1.**  refused it at wave 1 and was
+  right:  is a wave-2 screen because **reserved seating ships after general admission** — a venue opens
+  selling entry and adds a seat map later.'
+openQuestions: null

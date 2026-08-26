@@ -1,0 +1,123 @@
+id: LLD-Work order
+title: Work order — 16 transitions
+generatedBy: tools/derive-diagrams.py
+index: diagrams/hld/04-lifecycles.yaml
+source: states/work-order.yaml
+entity: Work order
+contract: maintenance
+enum: WorkOrderStatus
+enumKind: named
+enumSchema: WorkOrderStatus
+owner: maintenance
+initial:
+- open
+terminal:
+- cancelled
+- closed
+- verified
+transitions:
+- from: open
+  to: assigned
+  operation: updateWorkOrder
+  trigger: operation
+  guard: Technician assigned
+- from: assigned
+  to: inProgress
+  operation: startWorkOrder
+  trigger: operation
+  guard: Work started
+- from: inProgress
+  to: paused
+  operation: pauseWorkOrder
+  trigger: operation
+  guard: Interrupted
+- from: paused
+  to: inProgress
+  operation: resumeWorkOrder
+  trigger: operation
+  guard: Resumed
+- from: inProgress
+  to: awaitingParts
+  operation: pauseWorkOrder
+  trigger: operation
+  guard: Blocked on a part. Distinct from paused — one is a person, the other is supply
+- from: awaitingParts
+  to: inProgress
+  operation: resumeWorkOrder
+  trigger: operation
+  guard: Part received
+- from: inProgress
+  to: completed
+  operation: completeWorkOrder
+  trigger: operation
+  guard: Work done, findings recorded
+  emits:
+  - maintenance.workOrderCompleted
+- from: completed
+  to: verified
+  operation: verifyWorkOrder
+  trigger: operation
+  guard: Verified by someone other than the person who did it. **Safety-critical assets cannot return
+    to service without this**
+  requiresApproval: true
+  emits:
+  - maintenance.assetReturnedToService
+- from: completed
+  to: inProgress
+  operation: updateWorkOrder
+  trigger: operation
+  guard: Verification failed and it goes back
+  isReversal: true
+- from: open
+  to: cancelled
+  operation: cancelWorkOrder
+  trigger: operation
+  guard: Raised in error
+- from: assigned
+  to: cancelled
+  operation: cancelWorkOrder
+  trigger: operation
+  guard: No longer required
+- from: assigned
+  to: assigned
+  operation: acceptWorkOrder
+  trigger: operation
+  guard: '**The assignee takes the job.** Distinct from being assigned — the gap between the two is
+    where a job sits unread on a phone in a locker'
+- from: assigned
+  to: open
+  operation: rejectWorkOrder
+  trigger: operation
+  guard: Declined with a reason. **Returns to the pool rather than cancelling** — the job still needs
+    doing
+  isReversal: true
+- from: verified
+  to: closed
+  operation: closeWorkOrder
+  trigger: operation
+  guard: Administratively closed. Distinct from completing or verifying
+  requiresApproval: true
+- from: completed
+  to: closed
+  operation: closeWorkOrder
+  trigger: operation
+  guard: Closed without verification where the outcome makes verification moot
+  requiresApproval: true
+- from: open
+  to: closed
+  operation: closeWorkOrder
+  trigger: operation
+  guard: '**Overtaken by events** — asset replaced, fault not reproducible, area closed. A work order
+    that can only end by being completed stays open forever when the answer is "never mind"'
+  requiresApproval: true
+notes: '`verified` is terminal and `completed` is not. A safety-critical asset returning to service
+  on the word of the person who worked on it is the failure this separation prevents.
+
+
+  **`updateWorkOrder` used to do six jobs.** Assign, start, pause, resume, block on parts and reopen
+  were all one PATCH, so the state model could not say which operation caused which move and neither
+  could an audit. Seven named operations replaced it on 17 August (CF-71).'
+offlineReachable:
+- inProgress
+- paused
+- completed

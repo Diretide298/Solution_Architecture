@@ -1,0 +1,302 @@
+**Minutes of Meeting**
+
+*TICVAI Technical Discovery Workshop — Security, Non-Functional Requirements **&** UI/UX Planning*
+
+| **Date** | 31 July 2026 | **Project** | TICVAI |
+| --- | --- | --- | --- |
+| **Meeting Type** | Technical Discovery Workshop — Security, NFRs & UI/UX Planning | **Prepared by** | Chitrangi Mestry |
+| **Duration** | Approx. 1 hour 7 minutes | **Session** | Part of ongoing series |
+
+## **Primary Objective**
+
+To finalize outstanding security and non-functional requirements — including scalability, availability, disaster recovery, offline architecture, payments, and localization — and to align on the plan for the upcoming dedicated UI/UX session.
+
+## **Participants**
+
+- TICVAI Team
+
+- Softlabs Team
+
+## **Agenda**
+
+- Session scope adjustment & UI/UX session scheduling
+
+- Reference UI flow & application vision alignment
+
+- Recap of security features
+
+- Non-functional requirements: scalability & availability
+
+- Consistency, replication & disaster recovery
+
+- Cost planning & cloud provider evaluation
+
+- Ticket validation & offline architecture
+
+- Point-of-sale data sync strategy
+
+- Capacity estimates & case studies
+
+- Compliance & data protection
+
+- Offline functionality scope
+
+- Payments & regional preferences
+
+- Internationalization & localization
+
+- Observability & dashboards
+
+- Monday UI/UX session planning
+
+- Email communication protocol
+
+# **Discussion Summary**
+
+**1. Session Scope Adjustment ****&**** UI/UX Scheduling**
+
+Chinmay Parab opened by noting that multi-tenancy had already been covered in a previous session and would not need to be revisited, making today's session comparatively shorter. He proposed holding a dedicated UI/UX session on Monday. Qossai agreed, and Chinmay clarified that wireframe development should start in parallel as the sessions progress, rather than waiting for the UI/UX session to begin — both agreed to keep Monday for the dedicated UI/UX walkthrough while wireframing starts in the background.
+
+**2. Reference UI Flow ****&**** Application Vision**
+
+Aishwarya More, Softlabs' designer, joined and asked whether the new platform's UI flow would follow the same structure as a reference system Qossai had shared from a prior project, or whether changes were expected. Qossai clarified that the shared link was only a starting point/baseline, not something to copy directly — the intent is to enhance it, and he asked for Softlabs' design experience and suggestions on what could be improved for the user. He explained the reference was originally a point-of-sale system for cashier-led ticket sales, built roughly four to five months earlier with AI assistance, and that a similar approach might also serve TICVAI's B2B customers.
+
+Aishwarya confirmed her question was specifically about navigation/flow consistency rather than visual design. Qossai responded that the flow is largely similar but varies by ticket type — the team has admission tickets, time-slot tickets, and seat-assignment tickets, each with a distinct flow. For example, the admission flow goes straight to a quantity selector, while the seat-assignment flow requires selecting the day, then the time, then the seat. He proposed walking through this in more detail during Monday's session. Chinmay added that Sahil is also expected to join from Monday, and noted that Nilesh had confirmed the shared reference and platform structures would serve as the team's baseline — isolating each platform's UI and starting wireframes early would give a strong boost to the discovery phase and speed up front-end development later.
+
+**3. Recap of Security Features**
+
+Chinmay confirmed that most security features had already been covered in a previous session, including JWT-based authentication as part of the multi-tenancy design, a policy-based SSO system, RBAC (role-based access control) permissions, and a seven-year audit trail requirement. With this confirmed, the discussion moved on to non-functional requirements.
+
+**4. Non-Functional Requirements: Scalability ****&**** Availability**
+
+Chinmay outlined the non-functional requirement areas: scalability, availability, ticket validation latency, web page load time, mobile app load time, peak concurrent users, and peak API throughput — noting most of these had already been discussed in detail previously, so this would be a shorter pass focused on availability.
+
+Qossai stressed the importance of availability, sharing a real example from a previous project: a ticketing platform his team installed for a theatre in Bahrain went down when approximately 30,000 people tried to purchase tickets simultaneously for a concert by a very popular regional singer. The outage took several days to resolve and ultimately cost the team the client relationship. He emphasized that TICVAI's infrastructure, auto-scaling, and overall resilience need to be strong enough to avoid a similar failure.
+
+Allam reinforced the reputational risk, noting that an outage during a high-profile event could spread rapidly on social media and damage the brand. Chinmay acknowledged the point and confirmed the team is treating this as a benchmark to design around. He noted Softlabs is bringing in outside expertise for this specific concern — a consultant referred to as "Geo," who has over 15 years of deployment experience at Reliance Jio, one of the largest telecom/ISP networks in the world, with combined concurrent-user scale exceeding major US providers.
+
+Chinmay also noted that Softlabs' own past experience has generally been at an enterprise scale of around 2,000–3,000 concurrent users, and that the company's CTO, Dinesh Jadhav, has broader experience across multiple large-scale projects. Qossai added context: only a small fraction of TICVAI's clients (attractions, museums, exhibitions) will see this kind of extreme traffic — it mainly applies to live events such as concerts or football matches — but that segment still needs to be handled well, since it's disproportionately high-risk.
+
+- Allam proposed building a queue management capability directly into the system rather than relying on a third-party tool, so that traffic entering the site can be throttled from the back office itself.
+
+- Chinmay confirmed platforms like Terraform are already used to monitor server load, and that dashboards will also need to respect the tenancy model — so a venue manager can view traffic specific to their own venue.
+
+**5. Consistency, Replication ****&**** Disaster Recovery**
+
+Dinesh Jadhav, joining partway through, asked whether high availability should take priority over strict consistency. A confirmed availability is the priority, and described the intended queue mechanism in more detail: guests are placed in a queue to preserve their connection, informed of an estimated wait time, and let through in controlled batches (e.g., 200–300 guests per minute) as load allows; completed transactions must reliably trigger email confirmations and ticket delivery, and payments must be processed correctly.
+
+Dinesh raised the need for heavy replication to support both scaling and disaster recovery (DR) across regions. Allam clarified DR would be an optional, tenant-selectable module rather than a default for all clients, since it carries additional cost — some tenants may be comfortable keeping data within a single region (e.g., UAE only) without DR. Dinesh noted that even without DR, read replicas would likely be needed to support scalable architecture, implying eventual consistency rather than strict consistency, alongside liveliness checks/observability so a standby system can take over if a component fails.
+
+Allam confirmed the high-availability model: if one SQL instance or web service goes down, another takes over; DR (in a separate region, replicating the full stack including SQL) is a distinct, separately configured capability. Dinesh shared that in his prior experience at BookMyShow, caching was distributed via Redis clusters deployed across regions to support performance, and suggested a similar approach here — Allam agreed this should be implemented. The team aligned on a target uptime of 99.99%, and agreed that performance/load testing (deliberately pushing traffic to observe system behavior) should be built into the implementation plan.
+
+Dinesh flagged that, since this is being built from scratch and is a new scale of project for the team, cost needs to be considered carefully alongside scalability — the team will need firm estimations of expected users to correctly size components such as replica counts and load balancing, particularly for the higher-cost components.
+
+**6. Cost Planning ****&**** Cloud Provider Evaluation**
+
+Allam proposed that the team first complete the HLD/LLD design to identify every required component, since different cloud providers offer different equivalent services — a plan should then be prepared separately for both AWS and Azure so cost and fit can be compared once the design is in place.
+
+Qossai asked for Softlabs' advice on AWS vs. Azure, noting TICVAI would look to negotiate favorable pricing with whichever provider is selected. Dinesh gave an initial view: AWS, Azure, and Google Cloud generally offer comparable or equivalent services, so provider choice mainly comes down to resource availability and cost for the specific services required — noting AWS resources tend to be very readily available — but confirmed a final recommendation should wait until the HLD/LLD and component list are complete, in case a specific required service is only available on one platform. Allam agreed, reiterating that provider comparison (including which region/scenario each performs best in) should follow the design work, not precede it.
+
+Separately, Qossai clarified TICVAI's two deployment approaches for context:
+
+- Approach 1 — Shared multi-tenant server: Smaller clients (e.g., individual museums/exhibitions) connect to TICVAI/Softlabs' own shared server infrastructure. This server needs to be built for long-term scalability — starting with perhaps five or six clients but designed to reach 100–200+ over a few years.
+
+- Approach 2 — Dedicated client-hosted server: Larger clients (e.g., large venues or stadiums) host on their own Azure/AWS server, built to a minimum specification that TICVAI/Softlabs provides.
+
+To illustrate the scale difference, Qossai gave two contrasting examples: a stadium such as Real Madrid's (~60,000 seats) could sell out within a few hours of tickets going live for a major event, generating extremely high concurrent load, whereas a client like a water park or museum might see a maximum of around 2,000 visitors per day — a much lower and steadier load (roughly five people per minute). The system therefore needs a plan that can fit both extremes without over- or under-provisioning either type of client, which points to an auto-scaling architecture rather than a fixed one. Dinesh summarized this back as an auto-scaling architecture requirement, which Qossai confirmed.
+
+Dinesh flagged that auto-scaling has direct cost implications on cloud billing, and the team should be comfortable with and aware of these costs as usage scales. Qossai confirmed TICVAI already has some experience with this on Azure — currently, scaling for known high-traffic events (e.g., an upcoming concert) is done manually: resources are scaled up ahead of the event and back down once it concludes. For the new platform, the goal is to automate this process rather than rely on manual intervention. Allam proposed that once Dinesh has the HLD/LLD ready (prepared per cloud provider), the teams hold a dedicated follow-up session to work through both deployment scenarios in detail.
+
+**7. Ticket Validation ****&**** Offline Architecture**
+
+Chinmay walked through the team's current thinking on ticket validation, noting the architecture has largely been settled: validation must work completely offline, and should optionally integrate local BLE (Bluetooth) verification — requiring Bluetooth to be enabled on the validating device — as a way of confirming the staff member is physically present at the entry gate while scanning. This BLE requirement would be configurable, since not all venues will need it.
+
+- The QR code on a ticket regenerates every 15–30 seconds (configurable), secured through two-way key encryption generated at ticket-creation time.
+
+- The point-of-sale/scanning device validates and confirms the key offline, storing the result in a local SQLite database in case of lost connectivity.
+
+- Once connectivity returns, the device syncs stored records to the central servers in batches, in the sequential order the events actually occurred, tagged with both the original recorded time and the sync time.
+
+- Because this typically runs on a capable, multi-core thick client, the sync process is planned to run on an isolated thread/process separate from scanning, validation, and cryptography — so syncing does not add latency to gate entry.
+
+Chinmay invited further input on additional functionality for these devices; no further additions were raised at this point.
+
+**8. Point-of-Sale Data Sync Strategy**
+
+Allam raised a related question: whether point-of-sale product configuration, pricing, and rules should be stored locally (SQLite) for performance, rather than fetched from the server on every transaction. His suggestion was that configuration should sync to the local device in real time whenever it changes, so that a sale checks the local copy first (for speed) while the resulting transaction is sent to the server in real time. Qossai noted he wasn't certain which approach is better from a performance standpoint, since many competitive ticketing solutions today don't rely on a local database and still perform well — Softlabs' advice was requested on this point.
+
+Qossai also asked whether a cashier without a dedicated POS device (e.g., using a tablet) could access the system via a browser URL rather than installing the app. Chinmay confirmed the core application is React Native and requires installation, but a lightweight web version could be built as an alternative — with the tradeoff that the web version would not support offline functionality, which requires the installed "thick" client with its own local ledger/database that later syncs to the server.
+
+Qossai shared a cautionary example: a previous client site with poor internet connectivity ran an online-first architecture without a local database, which caused tickets to intermittently fail to reach the server. Allam acknowledged that some sites do rely on 4G SIM connections with weaker connectivity, though Qossai noted such cases are relatively rare compared to the overall client base, and suggested giving clients the choice between approaches. Chinmay agreed a comparative case study was warranted and committed to including a pros/cons comparison of online-first vs. offline-first architecture — particularly for POS — alongside the HLD/LLD diagrams he is preparing. He also proposed a middle-ground approach: default to an online, real-time product catalogue, but fall back to the last-synced catalogue automatically if connectivity is lost, so browsing performance stays fast without fully sacrificing offline resilience.
+
+Allam separately confirmed the platform must be device-agnostic — able to run on both Android and iOS (and by extension, web) — so that sales can continue on any available device even where full offline capability isn't required.
+
+**9. Capacity Estimates ****&**** Case Studies**
+
+Chinmay shared initial target figures for launch: approximately 15,000 peak concurrent customer users, 300 peak concurrent staff users, 1,000 API requests per second, and support for 70+ different venue locations. He acknowledged these are ambitious starting numbers and proposed refining them with more granular client-tier segmentation (e.g., small / mid-tier / large clients) rather than a simple two-way split, including cost ceilings for horizontal scaling and base requirements per tier — to be delivered as a follow-up case study once TICVAI shares more specific numbers.
+
+**10. Compliance ****&**** Data Protection**
+
+Allam confirmed he had already shared two documents relating to data-protection ('DES') compliance; Chinmay acknowledged he had not yet reviewed them and committed to doing so. Allam noted he is also sourcing additional supporting documentation on his end. On PCI DSS specifically, Allam advised that TICVAI should be able to obtain relevant certification support from their payment provider, and offered to assist further if needed.
+
+On card data handling, Allam was clear that full card numbers must never be stored — only a masked representation (e.g., last four digits) should be retained, and it must be encrypted, sufficient only to let a user identify which card was used for reference purposes.
+
+**11. Offline Functionality Scope**
+
+Chinmay confirmed the offline requirement applies to POS terminals, handheld/ticket-validation devices (turnstiles, scanners), and staff and customer mobile apps — all of which will maintain a local SQLite database and sync to the server in sequential order (with both recorded and synced timestamps) once connectivity returns.
+
+Allam added one refinement: the system should detect the loss of connectivity automatically and switch to offline mode on its own, without requiring manual intervention from the cashier — and should automatically restore online mode and sync all pending transactions once connectivity returns. Chinmay agreed, adding that the offline state should also be clearly visible in the UI (e.g., a visible mode indicator or greyed-out unavailable functionality), with the exact visual treatment to be worked out during Monday's UI/UX session. Qossai added that the POS should also raise an alert when a venue goes offline.
+
+***Capacity-based products***
+
+Allam raised a specific edge case: products with a managed capacity (e.g., seat-assigned tickets) rely on inventory that is tracked centrally across all sales channels, so they cannot be reliably sold while offline. He proposed that any attempt to sell a capacity-based product while offline should be blocked with a clear notification, rather than allowed through or silently failing — since allowing it risks overlap/double-selling once the device reconnects. Non-capacity products remain sellable offline without this restriction.
+
+***Food ******&****** beverage vs. retail inventory***
+
+Allam distinguished food & beverage (F&B) products from retail: F&B stock depletion is typically calculated at day's end based on recipe/ingredient usage rather than in real time, so F&B items can continue to be sold while offline. Retail items, by contrast, need real-time inventory tracking since stock is finite and centrally maintained across store and warehouse — without real-time depletion, overselling becomes a risk.
+
+***Kitchen display system (KDS)***
+
+Chinmay described the intended model as closer to a café than a fast-food chain — a single POS handling both order-taking and payment, without a separate kitchen-facing system feeding live orders. Allam clarified TICVAI does not need Softlabs to build a full kitchen display system, only an integration point to send order information to an existing KDS for display. Qossai confirmed this integration requirement is already listed in the requirement matrix; Chinmay agreed to double-check and revisit it later, noting that full offline support for such an integration would be non-trivial since orders need to reach the kitchen system in real time.
+
+**12. Payments ****&**** Regional Preferences**
+
+Chinmay confirmed that, as previously agreed, only cash payments are supported while offline, since card payment processing requires connectivity. On regional payment habits, Allam noted that in this market, customers primarily use Apple Pay or Google Pay via stored cards on their phone wallets and tap to pay, rather than scanning a QR code as is more common in India via UPI. Chinmay confirmed UPI-style QR payments could be considered as a later addition rather than part of the initial scope.
+
+**13. Internationalization ****&**** Localization**
+
+Chinmay confirmed the platform needs to support English and Arabic at minimum, with Russian, Spanish, and Mandarin also discussed as likely additional languages. He raised the question of translation quality assurance — whether Softlabs would provide native-language validation, or whether TICVAI's own team would review translated content.
+
+Allam proposed an AI-assisted workflow: source text is entered in English, machine-translated into the target language, and then reviewed/validated by the tenant's own team via the back office/CMS before publishing — noting that translation is typically owned by the tenant since they understand their own brand voice and marketing style best. This should apply consistently everywhere text appears: the website, the point-of-sale interface (e.g., Arabic-only product names/menus for certain regions), and the mobile app.
+
+Qossai added that the broader goal is to make the system genuinely multi-language and easy to extend — allowing a new language to be added as a configuration change rather than a development effort. He described a prior project where a translation spreadsheet (with columns per language) was distributed to native speakers for review, then fed back through an AI translation pass — a similar table-driven, low-effort workflow for adding new languages is desired here.
+
+**14. Observability ****&**** Dashboards**
+
+Chinmay closed the core technical discussion by reiterating the need for dashboards and observability, including tenant-level visibility for venue managers, which will directly support scaling decisions. He noted this will be finalized as part of the HLD/LLD work, including a recommended observability platform, and invited TICVAI to share any platform preferences at that stage.
+
+**15. Monday UI/UX Session Planning**
+
+Chinmay confirmed that Monday's session would primarily be a presentation from TICVAI's side, since Softlabs wants to understand TICVAI's product vision directly. He committed to sharing the full list of application pages/screens that same day, structured by device, tenant, and sub-screen, so the TICVAI team could start reviewing UI component requirements in advance.
+
+Qossai clarified the application landscape for context: there is a POS/tablet-facing application that will carry TICVAI's own branding and UI direction, and separate B2C and B2B mobile applications that are white-label by design. For the white-label apps, Qossai proposed showing examples from prior B2C/B2B implementations his team has delivered, to establish a similar flow — the key point for Monday is understanding which elements are customizable per client (e.g., header, footer, colour scheme, calendar) rather than redesigning the flow itself, with the same logic applying to the mobile application.
+
+Qossai reiterated that TICVAI does not have hands-on UI/UX design experience and is relying on Softlabs' advice on which elements to adjust. He again highlighted that the product involves three to four distinct flows — for example, the admission ticket flow versus the seat assignment flow (which requires selecting a time before a seat) — and confirmed TICVAI would walk Softlabs through their vision and intended experience for each flow on Monday.
+
+Chinmay reconfirmed Aishwarya (Softlabs' designer) would be part of Monday's session, and that he would send a follow-up email to Qossai outlining specifically what additional information Softlabs needs from TICVAI ahead of that session.
+
+**16. Email Communication Protocol**
+
+Allam raised a process concern: emails from Chinmay had been arriving under the same recurring subject line, making it difficult for the TICVAI team to locate the content of a specific email later. He asked that future emails use a clear, distinct subject line per topic, with separate threads for separate matters, so the team can follow up on and close out specific items more easily.
+
+Chinmay agreed this made sense, noting he had previously been instructed by Makrand to keep all communication within a single thread — but confirmed that going forward he would create separate, clearly subject-lined threads for topic-specific items, such as UI/UX-related or architecture-related matters.
+
+Allam reinforced the reasoning: distinct, clearly labelled threads would let the team follow up on and close a specific email once resolved, rather than having to search and drill back through a long, mixed thread — something that had been difficult for them so far. Chinmay reconfirmed he would use a separate subject line per topic as requested, thanked the group, and closed the session, noting he was looking forward to involving Makrand going forward. 
+
+# **Decisions Made**
+
+**Session Planning**
+
+- Multi-tenancy will not be revisited, as it was already covered in a previous session
+
+- A dedicated UI/UX walkthrough is scheduled for Monday, 3 August 2026, to be led primarily by TICVAI's side
+
+- Wireframe development will begin in parallel with ongoing sessions, rather than waiting for the UI/UX session
+
+**Architecture ****&**** Scalability**
+
+- The platform will use an auto-scaling architecture capable of serving both very high-traffic clients (e.g., stadiums, concerts) and low, steady-traffic clients (e.g., museums, water parks)
+
+- Two deployment approaches are confirmed: a shared multi-tenant server for smaller clients, and dedicated client-hosted servers (to a minimum spec) for large clients
+
+- Built-in queue management will be developed in-house rather than sourced from a third party
+
+- Target uptime is 99.99%; load/performance testing will be included in the implementation plan
+
+- Cloud provider selection (AWS vs. Azure, potentially GCP) will be finalized only after HLD/LLD component planning is complete, with a plan prepared for each major provider
+
+**Data, Consistency ****&**** Disaster Recovery**
+
+- High availability takes priority over strict consistency; eventual consistency (via read replicas) is acceptable
+
+- Disaster recovery will be an optional, tenant-selectable module rather than a default, due to cost
+
+- Distributed Redis caching will be implemented, based on prior team experience at BookMyShow
+
+- Card data will never be stored in full — only a masked/last-four-digit representation, encrypted, per PCI DSS guidance
+
+**Offline ****&**** Point-of-Sale**
+
+- Ticket validation will work fully offline, with optional BLE-based proximity verification, QR codes refreshing every 15–30 seconds, two-way encryption, and local SQLite storage synced to the server once online
+
+- Data sync will run on an isolated thread/process, separate from scanning and validation, to avoid added latency
+
+- Offline/online mode switching will be automatic, with a clearly visible indicator in the UI (exact treatment to be defined in the UI/UX session)
+
+- Capacity-based products (e.g., seat-assigned tickets) cannot be sold while offline; non-capacity products can
+
+- F&B items can be sold while offline (stock isn't depleted in real time); retail items require real-time inventory tracking
+
+- A full kitchen display system will not be built — only an integration point to an existing KDS
+
+- The platform must be device-agnostic (Android, iOS, and web), and a lightweight web-accessible version will be considered for devices without the installed app — with the caveat that offline support requires the installed thick client
+
+**Payments ****&**** Localization**
+
+- Only cash payments are supported offline; card payments require connectivity
+
+- Apple Pay / Google Pay (tap-to-pay) are the primary regional digital payment methods; UPI/QR-style payments may be added later
+
+- The platform will support English, Arabic, Russian, Spanish, and Mandarin, with translations AI-assisted and validated by the tenant's own team
+
+- New languages should be addable via configuration, without requiring development effort
+
+**Process**
+
+- Chinmay will share the application page/screen list with TICVAI ahead of Monday's session
+
+- Going forward, all emails will use clear, topic-specific subject lines with separate threads per topic — a change from the previous single-thread approach
+
+# **Action Items**
+
+| **Action Item** | **Owner** | **Status** |
+| --- | --- | --- |
+| Prepare HLD & LLD architecture diagrams, covering both client-hosted and Softlabs-hosted deployment scenarios | Chinmay Parab | **In Progress** |
+| Prepare a case study comparing online-first vs. offline-first POS architecture (pros/cons, incl. scanner & POS data-sync approach) | Chinmay Parab | **Pending** |
+| Prepare a client-tiered case study (small/medium/large) with scaling ceilings and cost implications | Chinmay Parab | **Pending** |
+| Review compliance documentation shared by Softlabs (DES compliance, PCI DSS) | Chinmay Parab | **Pending** |
+| Double-check requirement matrix for kitchen display system (KDS) integration scope | Chinmay Parab | **Pending** |
+| Share the full list of application pages/screens (structured by device, tenant, and sub-screens) with TICVAI | Chinmay Parab | **Pending** |
+| Send follow-up email detailing information required from TICVAI for the UI/UX session | Chinmay Parab | **Pending** |
+| Prepare HLD & LLD design documentation for each major cloud provider (AWS, Azure) | Dinesh Jadhav | **Pending** |
+| Hold a dedicated follow-up session once HLD/LLD are ready to finalize cloud provider approach per deployment scenario | Softlabs & TICVAI | **Pending** |
+| Source and share any additional compliance documentation | Allam Allam | **In Progress** |
+| Provide expected user/traffic numbers segmented by client tier | TICVAI Team | **Pending** |
+| Provide input on cloud provider preference (AWS/Azure) ahead of the design review | TICVAI Team | **Pending** |
+| Prepare and present TICVAI's UI/UX vision, including B2C/B2B examples and flow walkthroughs (admission ticket, seat assignment, etc.) | TICVAI Team | **Pending** |
+| Use clear, topic-specific subject lines and separate threads for future email communication | Both Teams | **Ongoing** |
+
+# **Next Meeting**
+
+**Date:  **Monday, 3 August 2026
+
+**Time:  **To be confirmed
+
+**Planned Topics**
+
+- UI/UX walkthrough, led primarily by the TICVAI team
+
+- TICVAI's vision for application flows (admission ticket, seat assignment, and related flows)
+
+- B2C/B2B white-label examples and customizable UI elements (header, footer, colour, calendar, etc.)
+
+- Review of the application page/screen list shared by Softlabs
+
+- Wireframe review
+
+# **Closing Remarks**
+
+This session moved through the remaining security and non-functional requirements — availability, scalability, disaster recovery, offline architecture, payments, and localization — building on prior sessions and closing out most open items in these areas. Both teams aligned on an auto-scaling, tenant-aware architecture with optional disaster recovery, a fully offline-capable validation and POS model, and a configuration-driven approach to multi-language support. The session concluded with agreement to shift focus to a dedicated UI/UX walkthrough on Monday, led by TICVAI, alongside parallel wireframe development, and to adopt clearer, topic-specific email communication going forward.
+
+|  |  |  |
+| --- | --- | --- |

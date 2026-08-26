@@ -1,0 +1,946 @@
+id: LLD-P04
+title: P04 Venue POS — Terminal and Tablet — 24 screens
+generatedBy: tools/derive-diagrams.py
+index: diagrams/hld/00-platform.yaml
+audience: staff
+operator: venue
+app: venue-pos
+formFactor: posTerminal
+runtime: reactNativeTablet
+offlineCapable: true
+deployment:
+  target: POS terminal — Windows or Android
+  distribution: device management push
+  bundleUpdate: catalogue bundle applies at shift open; app on a scheduled window
+  hosting: local, offline-first (ADR-0013)
+  storeReview: false
+  deviceOwnership: venue-owned, staffed
+  networkAssumption: venue LAN with expected outages
+  releaseCadence: monthly, never during trading
+why: null
+modulesUsed:
+- module: ticketing
+  screens: 9
+- module: core
+  screens: 8
+- module: fnb
+  screens: 3
+- module: analytics
+  screens: 2
+- module: seating
+  screens: 1
+- module: retail
+  screens: 1
+servicesCalled:
+- service: OrderService
+  operationCalls: 114
+- service: CatalogueService
+  operationCalls: 31
+- service: TenancyService
+  operationCalls: 17
+- service: RetailService
+  operationCalls: 17
+- service: FnbService
+  operationCalls: 13
+- service: ReportingService
+  operationCalls: 9
+- service: MarketingService
+  operationCalls: 4
+- service: VenueOpsService
+  operationCalls: 3
+- service: IdentityService
+  operationCalls: 2
+- service: AccessService
+  operationCalls: 2
+- service: LedgerService
+  operationCalls: 1
+- service: InventoryService
+  operationCalls: 1
+coverage:
+  screens: 24
+  inAFlow: 19
+  drawn: 20
+  note: '**A screen in no flow has been specified and never walked.** Every flow written in this package
+    has found a defect.'
+screens:
+- screen: POS-001
+  name: Begin Shift
+  module: Shift
+  requiresModule: core
+  wave: 1
+  density: touchLarge
+  operations:
+  - acceptShiftVariance
+  - adjustDepositBoxFloat
+  - approveShiftOpen
+  - closeShift
+  - createCashMovement
+  - getCurrentShift
+  - getShift
+  - getWorkstationHealth
+  - listCashMovements
+  - listDenominations
+  - listShifts
+  - openShift
+  - recordNoSale
+  - reopenShift
+  - resumeShift
+  - selectRole
+  - suspendShift
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams:
+  - workstationId<-session
+  - boxId<-session
+  - shiftId<-deepLink
+  goesTo:
+  - POS-002
+  - POS-007
+  - POS-009
+  - POS-021
+  - POS-022
+  - POS-023
+  - POS-024
+  boardFrames:
+  - POS-2A
+  - POS-3D
+  wireframe: wireframes/TICVAI Boards v2.dc.html#pos-2a
+  inFlows:
+  - F32 A till opens, trades and settles
+- screen: POS-002
+  name: Sell — Ticket Catalogue
+  module: Sell
+  requiresModule: ticketing
+  wave: 1
+  density: touchLarge
+  operations:
+  - addCartLine
+  - analysePromotionConflicts
+  - applyManualDiscount
+  - createApprovalRequest
+  - createOrder
+  - createPayment
+  - createRefund
+  - createRetailReturn
+  - createRetailSale
+  - evaluateApprovalRequirement
+  - evaluatePromotions
+  - exchangeOrderLines
+  - getLatestBundle
+  - getLoyaltyPosition
+  - getOrder
+  - getOrderStatement
+  - getProduct
+  - getPromotion
+  - getPromotionUsage
+  - holdOrder
+  - identifyGuest
+  - issueGameCard
+  - listAlternativeCodes
+  - listMerchandise
+  - listMyEntitlements
+  - listOrderRefunds
+  - listOrders
+  - listProductVariants
+  - listProducts
+  - listPromotions
+  - listSaleBoards
+  - loadGameCredits
+  - lookupMerchandise
+  - modifyOrder
+  - redeemLoyaltyPoints
+  - reprintOrder
+  - rescheduleOrder
+  - resolveProductByCode
+  - resumeOrder
+  - syncOrders
+  - voidOrder
+  states:
+  - catalogueStale
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams:
+  - workstationId<-session
+  - cardCode<-deepLink
+  - cartId<-session
+  - orderId<-deepLink
+  - productId<-deepLink
+  - promotionId<-deepLink
+  goesTo:
+  - POS-001
+  - POS-003
+  - POS-004
+  - POS-005
+  - POS-006
+  - POS-007
+  - POS-010
+  - POS-011
+  - POS-013
+  - POS-020
+  boardFrames:
+  - RET-3B
+  - RET-3C
+  - RET-3D
+  wireframe: wireframes/Retail Board 3.dc.html#ret-3b
+  inFlows:
+  - F14 A discount needs a manager
+  - F17 A guest buys merchandise and collects later
+  - F18 A guest plays an arcade game
+  - F31 A menu is drafted, scheduled and rolled back
+  - F32 A till opens, trades and settles
+  - F33 A till goes offline and comes back
+  - F34 A retail sale, from scan to return
+  - F58 A ticket is sold at a till, added to, and refunded
+  - F81 A retail sale runs from overview to tender
+- screen: POS-003
+  name: Sell — Timed Entry
+  module: Sell
+  requiresModule: ticketing
+  wave: 1
+  density: touchLarge
+  operations:
+  - acquireLease
+  - getAvailability
+  - getProduct
+  - listAlternativeCodes
+  - listLeases
+  - listProductVariants
+  - listProducts
+  - releaseLease
+  - renewLease
+  - resolveProductByCode
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams:
+  - leaseId<-deepLink
+  - productId<-POS-002
+  goesTo:
+  - POS-001
+  - POS-002
+  - POS-004
+  - POS-005
+  - POS-006
+  boardFrames: null
+  wireframe: wireframes/P04 Venue POS.dc.html#pos-003
+  inFlows:
+  - F58 A ticket is sold at a till, added to, and refunded
+- screen: POS-004
+  name: Sell — Seat Map
+  module: Sell
+  requiresModule: seating
+  wave: 2
+  density: touchLarge
+  operations:
+  - createOrder
+  - createPayment
+  - createSeatHold
+  - evaluateApprovalRequirement
+  - extendSeatHold
+  - getPerformance
+  - getSeatAvailability
+  - getSeatHold
+  - recommendSeats
+  - releaseSeatHold
+  - updatePerformance
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams:
+  - holdId<-deepLink
+  - performanceId<-deepLink
+  goesTo:
+  - POS-001
+  - POS-002
+  - POS-003
+  - POS-005
+  - POS-006
+  boardFrames: null
+  wireframe: wireframes/P04 Venue POS.dc.html#pos-004
+  inFlows:
+  - F59 A seat is picked, held and sold at a window
+- screen: POS-005
+  name: Payment
+  module: Payment
+  requiresModule: ticketing
+  wave: 1
+  density: touchLarge
+  operations:
+  - addTip
+  - capturePayment
+  - createOrder
+  - createPayment
+  - createRetailSale
+  - getRetailSale
+  - inquirePaymentStatus
+  - listRetailSales
+  - lookupRetailSale
+  - redeemLoyaltyPoints
+  - reprintReceipt
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams:
+  - paymentId<-deepLink
+  - saleId<-deepLink
+  goesTo:
+  - POS-001
+  - POS-002
+  - POS-010
+  - POS-021
+  - POS-022
+  - POS-023
+  boardFrames:
+  - RET-3E
+  wireframe: wireframes/Retail Board 3.dc.html#ret-3e
+  inFlows:
+  - F108 A guest orders food at a counter and collects it
+  - F14 A discount needs a manager
+  - F17 A guest buys merchandise and collects later
+  - F34 A retail sale, from scan to return
+  - F58 A ticket is sold at a till, added to, and refunded
+  - F59 A seat is picked, held and sold at a window
+  - F81 A retail sale runs from overview to tender
+- screen: POS-006
+  name: Held Orders
+  module: Sell
+  requiresModule: ticketing
+  wave: 1
+  density: touchLarge
+  operations:
+  - applyManualDiscount
+  - createOrder
+  - createRefund
+  - exchangeOrderLines
+  - getOrder
+  - getOrderStatement
+  - holdOrder
+  - listOrderRefunds
+  - listOrders
+  - modifyOrder
+  - reprintOrder
+  - rescheduleOrder
+  - resumeOrder
+  - voidOrder
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams:
+  - orderId<-POS-002
+  goesTo:
+  - POS-001
+  - POS-002
+  - POS-003
+  - POS-004
+  boardFrames:
+  - RET-3F
+  wireframe: wireframes/Retail Board 3.dc.html#ret-3f
+  inFlows: null
+- screen: POS-007
+  name: Close Shift
+  module: Shift
+  requiresModule: core
+  wave: 1
+  density: touchLarge
+  operations:
+  - acceptShiftVariance
+  - adjustDepositBoxFloat
+  - approveShiftOpen
+  - closeDepositBoxes
+  - closeShift
+  - createCashMovement
+  - getCurrentShift
+  - getShift
+  - listCashMovements
+  - listDenominations
+  - listShifts
+  - openShift
+  - recordNoSale
+  - reopenShift
+  - reprintReceipt
+  - resumeShift
+  - suspendShift
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams:
+  - shiftId<-session
+  - boxId<-session
+  - saleId<-deepLink
+  goesTo:
+  - POS-001
+  - POS-002
+  - POS-009
+  boardFrames:
+  - POS-2F
+  - POS-3F
+  wireframe: wireframes/TICVAI Boards v2.dc.html#pos-2f
+  inFlows:
+  - F32 A till opens, trades and settles
+  - F74 A shift closes and the day is reported
+  - F87 A till handles a return, a collection and a safe drop
+- screen: POS-008
+  name: Reports
+  module: Reports
+  requiresModule: analytics
+  wave: 2
+  density: touchLarge
+  operations:
+  - askReportingQuestion
+  - deleteReport
+  - getFinancialReport
+  - getReport
+  - listReports
+  - runReport
+  - saveNaturalLanguageQuery
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams:
+  - conversationId<-deepLink
+  - reportId<-deepLink
+  goesTo:
+  - POS-001
+  - POS-002
+  boardFrames: null
+  wireframe: wireframes/P04 Venue POS.dc.html#pos-008
+  inFlows:
+  - F74 A shift closes and the day is reported
+- screen: POS-009
+  name: Staff Roster
+  module: Shift
+  requiresModule: core
+  wave: 2
+  density: touchLarge
+  operations:
+  - acceptShiftVariance
+  - approveShiftOpen
+  - closeShift
+  - createRotaAssignment
+  - getCurrentShift
+  - getShift
+  - listAlerts
+  - listCashMovements
+  - listRotaAssignments
+  - listShifts
+  - listWorkstations
+  - openShift
+  - recordNoSale
+  - reopenShift
+  - resumeShift
+  - suspendShift
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams:
+  - shiftId<-session
+  goesTo:
+  - POS-001
+  - POS-002
+  - POS-007
+  boardFrames:
+  - POS-3A
+  wireframe: wireframes/POS Board 3.dc.html#pos-3a
+  inFlows:
+  - F74 A shift closes and the day is reported
+- screen: POS-010
+  name: Add to Existing Ticket
+  module: Sell
+  requiresModule: ticketing
+  wave: 1
+  density: touchLarge
+  operations:
+  - appendEntitlementToMedia
+  - exchangeOrderLines
+  - getCart
+  - getMediaAsset
+  - getMediaEntitlements
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams:
+  - mediaCode<-deepLink
+  - mediaId<-deepLink
+  - cartId<-session
+  - orderId<-deepLink
+  goesTo:
+  - POS-001
+  - POS-002
+  - POS-003
+  - POS-004
+  - POS-005
+  - POS-011
+  boardFrames: null
+  wireframe: wireframes/P04 Venue POS.dc.html#pos-010
+  inFlows:
+  - F58 A ticket is sold at a till, added to, and refunded
+- screen: POS-011
+  name: Returns, Refunds & Exchanges
+  module: Sell
+  requiresModule: ticketing
+  wave: 1
+  density: touchLarge
+  operations:
+  - adjustDepositBoxFloat
+  - createRefund
+  - createRetailReturn
+  - exchangeOrderLines
+  - getReturnPolicy
+  - listDenominations
+  - listOutlets
+  - listSerialisedItems
+  - lookupRetailSale
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams:
+  - workstationId<-session
+  - orderId<-deepLink
+  - outletId<-deepLink
+  - boxId<-session
+  goesTo:
+  - POS-002
+  boardFrames:
+  - POS-2B
+  - RET-3G
+  wireframe: wireframes/POS Frontline Board 2.dc.html#pos-2b
+  inFlows:
+  - F34 A retail sale, from scan to return
+  - F58 A ticket is sold at a till, added to, and refunded
+  - F87 A till handles a return, a collection and a safe drop
+- screen: POS-012
+  name: Omnichannel Order & Fulfilment Center
+  module: Sell
+  requiresModule: ticketing
+  wave: 1
+  density: touchLarge
+  operations:
+  - adjustDepositBoxFloat
+  - getCurrentShift
+  - listDenominations
+  - listOrders
+  - openShift
+  - recordOrderHandover
+  - reserveMerchandise
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams:
+  - workstationId<-session
+  - orderId<-deepLink
+  - outletId<-deepLink
+  - boxId<-session
+  goesTo: []
+  boardFrames:
+  - POS-2C
+  - RET-3H
+  wireframe: wireframes/POS Frontline Board 2.dc.html#pos-2c
+  inFlows:
+  - F60 An online order is collected at the counter
+  - F87 A till handles a return, a collection and a safe drop
+- screen: POS-013
+  name: Mobile POS, Event Sales & Offline Operations
+  module: Sell
+  requiresModule: ticketing
+  wave: 1
+  density: touchLarge
+  operations:
+  - adjustDepositBoxFloat
+  - createCashMovement
+  - createOrder
+  - getOfflinePackage
+  - listCashMovements
+  - listDenominations
+  - syncOrders
+  - withdrawFromDepositBox
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams:
+  - workstationId<-session
+  - boxId<-session
+  - shiftId<-session
+  goesTo:
+  - POS-002
+  - POS-020
+  boardFrames:
+  - POS-2D
+  - POS-2E
+  wireframe: wireframes/POS Frontline Board 2.dc.html#pos-2d
+  inFlows:
+  - F32 A till opens, trades and settles
+  - F87 A till handles a return, a collection and a safe drop
+- screen: POS-014
+  name: Sales Exceptions, Controls & Operational Actions
+  module: Sell
+  requiresModule: ticketing
+  wave: 1
+  density: touchLarge
+  operations:
+  - applyManualDiscount
+  - recordNoSale
+  - voidOrder
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams:
+  - workstationId<-session
+  - orderId<-deepLink
+  - shiftId<-deepLink
+  goesTo: []
+  boardFrames: null
+  wireframe: wireframes/P04 Venue POS.dc.html#pos-014
+  inFlows: null
+- screen: POS-015
+  name: Cash Operations Dashboard
+  module: Sell
+  requiresModule: core
+  wave: 1
+  density: touchLarge
+  operations:
+  - listCashMovements
+  - listDepositBoxes
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams:
+  - workstationId<-session
+  - shiftId<-deepLink
+  goesTo: []
+  boardFrames: null
+  wireframe: wireframes/P04 Venue POS.dc.html#pos-015
+  inFlows:
+  - F73 A till is configured and its cash rules set
+- screen: POS-016
+  name: Till Configuration
+  module: Sell
+  requiresModule: core
+  wave: 1
+  density: touchLarge
+  operations:
+  - allocateDepositBox
+  - configureWorkstation
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams:
+  - workstationId<-session
+  goesTo: []
+  boardFrames: null
+  wireframe: wireframes/P04 Venue POS.dc.html#pos-016
+  inFlows:
+  - F73 A till is configured and its cash rules set
+- screen: POS-017
+  name: Cash In / Cash Out Operations
+  module: Sell
+  requiresModule: core
+  wave: 1
+  density: touchLarge
+  operations:
+  - createCashMovement
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams:
+  - workstationId<-session
+  - shiftId<-deepLink
+  goesTo: []
+  boardFrames: null
+  wireframe: wireframes/P04 Venue POS.dc.html#pos-017
+  inFlows: null
+- screen: POS-018
+  name: Safe Drop & Cash Transfer Management
+  module: Sell
+  requiresModule: core
+  wave: 1
+  density: touchLarge
+  operations:
+  - createCashMovement
+  - createRotaAssignment
+  - listPrincipals
+  - listRotaAssignments
+  - withdrawFromDepositBox
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams:
+  - workstationId<-session
+  - boxId<-deepLink
+  - shiftId<-deepLink
+  goesTo: []
+  boardFrames:
+  - POS-3B
+  wireframe: wireframes/POS Board 3.dc.html#pos-3b
+  inFlows:
+  - F73 A till is configured and its cash rules set
+- screen: POS-019
+  name: Shift Templates & Policies
+  module: Sell
+  requiresModule: core
+  wave: 1
+  density: touchLarge
+  operations:
+  - getVenueSettings
+  - listShifts
+  - setVenueSettings
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams:
+  - workstationId<-session
+  - venueId<-deepLink
+  goesTo: []
+  boardFrames:
+  - POS-3C
+  wireframe: wireframes/POS Board 3.dc.html#pos-3c
+  inFlows:
+  - F73 A till is configured and its cash rules set
+- screen: POS-020
+  name: Shift Exceptions & Alerts
+  module: Sell
+  requiresModule: analytics
+  wave: 1
+  density: touchLarge
+  operations:
+  - createApprovalRequest
+  - decideApprovalRequest
+  - listAlerts
+  - recordNoSale
+  - runReport
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams:
+  - workstationId<-session
+  - shiftId<-deepLink
+  - reportId<-deepLink
+  - requestId<-deepLink
+  goesTo:
+  - POS-002
+  - POS-007
+  boardFrames:
+  - POS-3E
+  wireframe: wireframes/POS Board 3.dc.html#pos-3e
+  inFlows:
+  - F32 A till opens, trades and settles
+- screen: POS-021
+  name: Sell — Food & Drink
+  module: Sell
+  requiresModule: fnb
+  wave: 1
+  density: touchLarge
+  operations:
+  - addCartLine
+  - evaluatePromotions
+  - getGuestMenu
+  - listMenus
+  - listModifierGroups
+  - setItemAvailability
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams:
+  - workstationId<-session
+  - outletId<-session
+  - cartId<-session
+  - itemId<-deepLink
+  goesTo:
+  - POS-002
+  - POS-005
+  boardFrames: null
+  wireframe: null
+  inFlows:
+  - F108 A guest orders food at a counter and collects it
+- screen: POS-022
+  name: Send to Kitchen
+  module: Sell
+  requiresModule: fnb
+  wave: 1
+  density: touchLarge
+  operations:
+  - createFnbOrder
+  - listKitchenTickets
+  - markOrderCollected
+  - setKitchenTicketStatus
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams:
+  - workstationId<-session
+  - outletId<-session
+  - orderId<-deepLink
+  - ticketId<-deepLink
+  goesTo:
+  - POS-002
+  - POS-005
+  boardFrames: null
+  wireframe: null
+  inFlows:
+  - F108 A guest orders food at a counter and collects it
+- screen: POS-023
+  name: Sell — Merchandise
+  module: Sell
+  requiresModule: retail
+  wave: 1
+  density: touchLarge
+  operations:
+  - addCartLine
+  - createRetailSale
+  - evaluatePromotions
+  - listMerchandise
+  - lookupMerchandise
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams:
+  - workstationId<-session
+  - outletId<-session
+  - cartId<-session
+  goesTo:
+  - POS-002
+  - POS-005
+  boardFrames: null
+  wireframe: null
+  inFlows: null
+- screen: POS-024
+  name: Outlet Setup
+  module: Sell
+  requiresModule: fnb
+  wave: 1
+  density: touchLarge
+  operations:
+  - listMenus
+  - listOutlets
+  - setItemAvailability
+  - setTableCombinations
+  - setTableLayout
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams:
+  - workstationId<-session
+  - outletId<-session
+  - itemId<-deepLink
+  goesTo:
+  - POS-002
+  - POS-005
+  boardFrames: null
+  wireframe: null
+  inFlows: null

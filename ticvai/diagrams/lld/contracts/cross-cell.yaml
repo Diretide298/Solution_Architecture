@@ -1,0 +1,217 @@
+id: LLD-cross-cell
+title: cross-cell — 16 operations
+generatedBy: tools/derive-diagrams.py
+index: diagrams/hld/03-contracts.yaml
+tier: spine
+service: CrossCellService
+operations:
+- operation: authoriseWalletSpend
+  verb: POST
+  path: /wallet-authorisations
+  scope: workstation
+  permission: ORDER_CREATE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - platform.wallet_authorisation
+  writes:
+  - cache:idempotency
+  - platform.wallet_authorisation
+- operation: captureWalletAuthorisation
+  verb: POST
+  path: /wallet-authorisations/{authorisationId}/capture
+  scope: workstation
+  permission: ORDER_CREATE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - platform.wallet_authorisation
+  writes:
+  - cache:idempotency
+  - platform.wallet_authorisation
+- operation: consumeRedemptionRight
+  verb: POST
+  path: /redemption-rights/{rightId}/consume
+  scope: workstation
+  permission: ACCESS_VALIDATE
+  audience:
+  - staff
+  offline: true
+  reads:
+  - cache:idempotency
+  - platform.redemption_right
+  writes:
+  - cache:idempotency
+  - platform.redemption_right
+- operation: createDsarRequest
+  verb: POST
+  path: /dsar/requests
+  scope: tenant
+  permission: null
+  audience:
+  - service
+  offline: false
+  reads:
+  - cache:idempotency
+  - platform.dsar_request
+  writes:
+  - cache:idempotency
+  - platform.dsar_request
+- operation: createGuestLink
+  verb: POST
+  path: /guest-links
+  scope: tenant
+  permission: null
+  audience:
+  - service
+  offline: false
+  reads:
+  - cache:idempotency
+  - platform.guest_link
+  writes:
+  - cache:idempotency
+  - platform.guest_link
+- operation: getDsarRequest
+  verb: GET
+  path: /dsar/requests/{requestId}
+  scope: tenant
+  permission: null
+  audience:
+  - service
+  offline: false
+  reads:
+  - platform.dsar_request
+  writes: []
+- operation: getGuestLink
+  verb: GET
+  path: /guest-links/{guestLinkId}
+  scope: tenant
+  permission: null
+  audience:
+  - service
+  offline: false
+  reads:
+  - platform.guest_link
+  writes: []
+- operation: getRedemptionRight
+  verb: GET
+  path: /redemption-rights/{rightId}
+  scope: venue
+  permission: TICKET_LOOKUP
+  audience:
+  - staff
+  offline: true
+  reads:
+  - platform.redemption_right
+  writes: []
+- operation: getWalletAllocation
+  verb: GET
+  path: /wallet-allocations
+  scope: venue
+  permission: ORDER_VIEW
+  audience:
+  - staff
+  offline: true
+  reads:
+  - platform.wallet_authorisation
+  writes: []
+- operation: propagateRedemptionRight
+  verb: POST
+  path: /redemption-rights
+  scope: tenant
+  permission: null
+  audience:
+  - service
+  offline: false
+  reads:
+  - cache:idempotency
+  - platform.redemption_right
+  writes:
+  - cache:idempotency
+  - platform.redemption_right
+- operation: reconcileRedemptions
+  verb: POST
+  path: /redemption-rights/reconcile
+  scope: tenant
+  permission: null
+  audience:
+  - service
+  offline: false
+  reads:
+  - access.scan_event
+  - cache:idempotency
+  - platform.redemption_right
+  writes:
+  - cache:idempotency
+  - platform.redemption_right
+- operation: releaseWalletAuthorisation
+  verb: POST
+  path: /wallet-authorisations/{authorisationId}/release
+  scope: workstation
+  permission: ORDER_CREATE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - platform.wallet_authorisation
+  writes:
+  - cache:idempotency
+  - platform.wallet_authorisation
+- operation: resolveGuestLink
+  verb: GET
+  path: /guest-links/resolve
+  scope: tenant
+  permission: null
+  audience:
+  - service
+  offline: false
+  reads:
+  - platform.guest_link
+  writes: []
+- operation: revokeGuestLink
+  verb: DELETE
+  path: /guest-links/{guestLinkId}
+  scope: tenant
+  permission: null
+  audience:
+  - service
+  offline: false
+  reads:
+  - cache:idempotency
+  - platform.guest_link
+  writes:
+  - cache:idempotency
+  - platform.guest_link
+- operation: revokeRedemptionRight
+  verb: DELETE
+  path: /redemption-rights/{rightId}
+  scope: tenant
+  permission: null
+  audience:
+  - service
+  offline: false
+  reads:
+  - cache:idempotency
+  - platform.redemption_right
+  writes:
+  - cache:idempotency
+  - platform.redemption_right
+- operation: setWalletAllocationPolicy
+  verb: PUT
+  path: /wallet-allocations
+  scope: region
+  permission: REGION_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - platform.wallet_authorisation
+  writes:
+  - cache:idempotency
+  - platform.wallet_authorisation

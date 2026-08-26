@@ -1,0 +1,159 @@
+$schema: ./_schema.yaml
+id: F31
+name: A menu is drafted, scheduled and rolled back
+actor: venueManager
+capability: Menu lifecycle and price change
+wave: 2
+frequency: >
+  A price change every few weeks; a seasonal menu two or three times a year. **Rare, and each one
+  touches every till in the venue at once** — which is why the rollback path matters more than the
+  frequency suggests.
+criticality: revenue
+primaryContract: fnb
+contracts: [fnb, catalogue, approvals]
+platforms: [P08, P04, P15]
+
+trigger:
+  description: >
+    Costs moved, a season changed, or a supplier stopped carrying an item. **Until 24 August
+    `updateMenu` was the only operation and a menu edited was a menu live** — no draft, no schedule,
+    no rollback, and a venue changing prices for next Monday had to do it on Monday.
+  operations: [getMenu]
+
+offlineBehaviour: >
+  **None of this works offline and none of it should.** Publishing a menu changes what every till
+  in the venue charges — **an offline publish is a price change that reaches some workstations and
+  not others**, which is the one outcome worse than not publishing at all.
+
+  The tills receive it through the catalogue bundle they already poll.
+
+steps:
+  - step: 1
+    screen: BO-045
+    action: The manager opens the live menu and starts a draft.
+    operations: [getMenu, updateMenu]
+    outcome: >
+      A new version in `draft`. **The live version keeps selling** — an edit that takes effect as it
+      is typed is an edit made under pressure at 11am on a Saturday.
+
+  - step: 2
+    screen: BO-045
+    action: They reprice a category rather than forty items.
+    operations: [applyMenuActions]
+    outcome: >
+      **Previewed before applied, always.** The preview names how many items each action touches,
+      because *reprice all* and *reprice all in this category* differ by four hundred dirhams a day.
+
+  - step: 3
+    screen: BO-111
+    action: An item's recipe changed, so its allergens are re-verified.
+    operations: [updateMenu]
+    outcome: >
+      **A substituted ingredient changes the allergen claim.** BL-127 built allergens without
+      linking substitution, and `verifyAllergens` is the one remaining gap this step names.
+
+  - step: 4
+    screen: BO-045
+    action: The draft is scheduled for Monday rather than published now.
+    operations: [scheduleMenuPublish]
+    outcome: >
+      **Takes effect at the outlet's local midnight, not the tenant's.** A venue in Dubai and one in
+      London do not change menu at the same instant.
+
+  - step: 5
+    screen: BO-045
+    action: Monday arrives. The schedule fires and the version goes live.
+    operations: [publishMenu]
+    outcome: >
+      **The previous version stays readable**, which is what makes step 7 possible — and a price
+      change that cannot be undone is a price change nobody makes on a Friday.
+
+  - step: 6
+    screen: POS-002
+    action: The till picks it up in its next catalogue bundle.
+    operations: [getLatestBundle]
+    crossesDevice: true
+    note: >
+      **A handover, not a navigation.** Nobody taps from the back office to a till — the bundle
+      arrives. `ADR-0013` local-first: the till holds the catalogue and polls for a new one.
+    outcome: >
+      Every workstation on the new prices. **A till mid-sale finishes at the old price** — a
+      catalogue that changes under an open cart is a guest charged something they were not shown.
+
+  - step: 7
+    screen: BO-045
+    action: The new price is wrong on eleven items. The manager rolls back.
+    operations: [rollbackMenu]
+    outcome: >
+      **The restored version becomes a new version rather than deleting the bad one.** A menu
+      history that can be edited cannot answer *what were we charging at noon*, and that is exactly
+      what a refund dispute asks.
+
+branches:
+  - at: 2
+    condition: The repricing crosses the venue's approval threshold.
+    behaviour: >
+      `createApprovalRequest` before publish. **The same mechanism as a stock write-off** — one
+      approval path, different subjects.
+    severity: medium
+    resolvedBy: createApprovalRequest
+
+  - at: 4
+    condition: A schedule already exists for that date.
+    behaviour: >
+      **Refused, with the existing schedule named.** Two publishes on one date is a race, and the
+      loser is silently discarded — a venue with three pending changes and no way to see them is
+      the state `scheduleMenuPublish` was built to end.
+    severity: high
+    resolvedBy: scheduleMenuPublish
+
+  - at: 6
+    condition: A workstation is offline when the bundle publishes.
+    behaviour: >
+      **It keeps the old catalogue and takes the new one on reconnect.** That is correct and it is
+      also a real exposure: **a till offline across a price change sells at yesterday's prices and
+      nobody knows until the sync.** `maxOfflineHours` bounds how long that can last.
+    severity: high
+    resolvedBy: setOfflinePolicy
+
+  - at: 7
+    condition: Orders were taken at the wrong price before the rollback.
+    behaviour: >
+      **Rolling back does not correct them.** The orders stand at what they were charged, and the
+      correction is a refund or a goodwill comp — **a system that silently reprices settled orders
+      is a system that changes the past.**
+    severity: high
+    resolvedBy: createRefund
+
+exitStates:
+  - state: published
+    description: Drafted, scheduled, live on every till. **The ordinary outcome.**
+  - state: rolledBack
+    description: >
+      Published and reverted as a new version. **The history shows both**, which is the only way to
+      answer what was being charged at any moment.
+  - state: heldForApproval
+    description: Repricing above threshold, drafted and waiting on a signature.
+  - state: scheduledPending
+    description: >
+      Drafted and dated, not yet live. **Visible as pending rather than invisible** — the state a
+      venue could not see before `scheduleMenuPublish`.
+
+notes: >
+  **Written 24 August, and it walks a path that did not exist a week ago.** `updateMenu` was the
+  whole lifecycle: **a menu edited was a menu live.**
+
+  **Step 7 is the reason to version a menu at all.** A price published wrong at 11am on a Saturday
+  needs one action, not a re-edit of forty items under pressure — and the rollback rolls *forward*,
+  because a menu history that can be edited cannot answer the question a refund dispute asks.
+
+  **Step 6 crosses a device boundary**, marked as a handover: the till is not navigated to, the
+  bundle arrives. That distinction was added to the flow model on 24 August after `check-flows`
+  correctly refused F29 for the same shape.
+
+openQuestions: >
+  **What happens to a scheduled publish when the menu it drafts is edited again before the date?**
+  The obvious answer is that the schedule carries the version rather than the menu, so a later edit
+  makes a new draft and leaves the schedule alone — but it is not stated anywhere, and a venue that
+  edits a scheduled draft expecting the change to land is a venue publishing something it did not
+  review.

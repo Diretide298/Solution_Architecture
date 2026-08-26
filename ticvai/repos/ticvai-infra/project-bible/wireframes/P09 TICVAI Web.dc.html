@@ -1,0 +1,672 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>P09 TICVAI Web — wireframe board</title>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#0B1324;--mut:#6B7280;--dim:#8494A8;--line:#DCE3ED;--soft:#E5E7EB;
+--brand:#0D6EFD;--brand2:#00B8FF;--navy:#0C2340;--paper:#FFF;--wash:#F6F8FB}
+*{box-sizing:border-box}
+body{margin:0;background:var(--wash);color:var(--ink);
+font-family:Manrope,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:13px;line-height:1.5}
+a{color:inherit}
+.wrap{max-width:1680px;margin:0 auto;padding:22px 34px 90px}
+.home{font-size:11.5px;color:var(--mut);text-decoration:none;letter-spacing:.02em}
+.head{display:flex;align-items:baseline;justify-content:space-between;gap:20px;
+margin:14px 0 6px;padding-bottom:16px;border-bottom:2px solid var(--ink)}
+.mark{font-size:13px;font-weight:800;letter-spacing:.16em;
+background:linear-gradient(90deg,var(--brand),var(--brand2));-webkit-background-clip:text;
+background-clip:text;color:transparent}
+h1{font-size:19px;font-weight:800;letter-spacing:-.015em;margin:0}
+.meta{font-size:11px;color:var(--mut);font-family:'IBM Plex Mono',ui-monospace,monospace}
+.lede{font-size:12px;color:var(--mut);max-width:74ch;margin:14px 0 0}
+.grp{font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:11px;font-weight:600;
+letter-spacing:.14em;color:var(--dim);text-transform:uppercase;margin:48px 0 16px;
+padding-bottom:9px;border-bottom:1px solid var(--line)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(342px,1fr));gap:30px}
+.scr{display:flex;flex-direction:column;gap:11px;scroll-margin-top:24px}
+.ttl{font-size:15.5px;font-weight:800;letter-spacing:-.01em}
+.pur{font-size:11.5px;color:var(--mut);margin-top:2px}
+.frame{background:var(--paper);border:1px solid var(--soft);border-radius:14px;overflow:hidden;
+height:440px;display:flex;flex-direction:column;box-shadow:0 10px 26px rgba(12,35,64,.07)}
+.frame.dark{background:var(--navy);border-color:#1E3A5F}
+.bar{flex:none;height:30px;display:flex;align-items:center;gap:8px;padding:0 12px;
+border-bottom:1px solid var(--soft);font-size:10.5px;color:var(--mut)}
+.dark .bar{border-color:#1E3A5F;color:#7FA3C9}
+.strip{flex:none;height:20px;display:flex;align-items:center;padding:0 12px;font-size:9.5px;
+letter-spacing:.08em;text-transform:uppercase;background:#FFF7E6;color:#8A6D00;
+border-bottom:1px solid #F0E0B8}
+.body{flex:1;display:flex;min-height:0}
+.rail{flex:none;width:74px;background:var(--navy);display:flex;flex-direction:column;gap:6px;padding:10px 8px}
+.rail i{display:block;height:9px;border-radius:3px;background:#1E3A5F}
+.rail i.on{background:linear-gradient(90deg,var(--brand),var(--brand2))}
+.main{flex:1;padding:12px;display:flex;flex-direction:column;gap:9px;overflow:hidden}
+.side{flex:none;width:96px;border-left:1px solid var(--soft);padding:12px 10px;
+display:flex;flex-direction:column;gap:8px}
+.dark .side{border-color:#1E3A5F}
+.act{flex:none;height:38px;border-top:1px solid var(--soft);display:flex;align-items:center;
+gap:8px;padding:0 12px}
+.dark .act{border-color:#1E3A5F}
+.cmp{border:1px dashed #C7D0DC;border-radius:7px;padding:7px 9px;font-size:10px;color:var(--mut);background:#FAFBFD}
+.dark .cmp{border-color:#264a75;background:#0E2A4C;color:#9FC0E0}
+.cmp b{display:block;font-size:9.5px;letter-spacing:.09em;text-transform:uppercase;
+color:#94A3B4;font-weight:700;margin-bottom:3px}
+.cmp .why{margin-top:5px;font-size:9.5px;color:#7C8899;font-style:italic;line-height:1.45}
+.btn{height:22px;border-radius:6px;padding:0 12px;display:inline-flex;align-items:center;
+font-size:10px;font-weight:700;background:linear-gradient(90deg,var(--brand),var(--brand2));color:#FFF}
+.btn.sec{background:none;border:1px solid var(--soft);color:var(--mut);font-weight:600}
+.foot{font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:9.5px;line-height:1.75;color:#7C8899}
+.foot b{color:#4A5566;font-weight:600}
+.foot .off{color:#8A6D00}
+.tag{display:inline-block;font-size:9px;letter-spacing:.06em;text-transform:uppercase;
+padding:1px 6px;border-radius:4px;background:#EEF2F7;color:#64748B;margin-left:6px}
+.tag.named{background:#FFF1E6;color:#9A5B00}
+.bottom{margin-top:64px;padding-top:16px;border-top:1px solid var(--line);
+display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
+</style></head><body>
+<div class="wrap">
+  <a class="home" href="TICVAI%20Wireframe%20Boards.dc.html">&larr; All boards</a>
+  <div class="head">
+    <div><span class="mark">TICVAI</span>
+      <h1>P09 · TICVAI Web — Platform Console <span style="font-weight:600;color:#6B7280">(37 screens)</span></h1></div>
+    <div class="meta">platformAdmin · web · ticvai-web</div>
+  </div>
+  <p class="lede"></p>
+  <div class="grp">01 — TODO · 36 screens</div><div class="grid">
+      <div id="adm-001" class="scr">
+        <div><div class="ttl">ADM-001 · Platform Login / MFA</div>
+        <div class="pur">Get someone into the app, fast, on a device that may be shared.</div></div>
+        <div class="frame">
+          <div class="bar">TODO · wave 1 · compact</div>
+          
+          <div class="body"><div class="main"><div class="cmp"><b>searchField</b>searchField</div><div class="cmp"><b>dataTable</b>dataTable</div></div></div>
+          
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> · login · forceLogout · getCurrentSession · getGuestSession +4</div>
+          <div><b>STATES</b> · <span class="">loading · emptyFirstRun · emptyNoResults · emptyNoAccess · error</span></div>
+          <div><b>ARRIVES WITH</b> · sessionId←session</div>
+          <div><b>GOES TO</b> · ADM-002 · ADM-003 · ADM-004</div>
+        </div>
+      </div>
+      <div id="adm-002" class="scr">
+        <div><div class="ttl">ADM-002 · Platform Dashboard</div>
+        <div class="pur">The screen this app sits on. Everything else is entered from here and returns to it.</div></div>
+        <div class="frame">
+          <div class="bar">TODO · wave 1 · compact</div>
+          
+          <div class="body"><div class="main"><div class="cmp"><b>metricTile</b>metricTile</div><div class="cmp"><b>chart</b>chart</div></div></div>
+          
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> · listTenants · addLicenceAddOn · createTenant · generateInvoice +17</div>
+          <div><b>STATES</b> · <span class="">loading · emptyFirstRun · emptyNoAccess · error</span></div>
+          <div><b>ARRIVES WITH</b> · tenantId←session</div>
+          <div><b>GOES TO</b> · entry point · ADM-001 · ADM-003 · ADM-004 · ADM-005</div>
+        </div>
+      </div>
+      <div id="adm-003" class="scr">
+        <div><div class="ttl">ADM-003 · Cross-Tenant Health Dashboard</div>
+        <div class="pur">The screen this app sits on. Everything else is entered from here and returns to it.</div></div>
+        <div class="frame">
+          <div class="bar">TODO · wave 2 · compact</div>
+          
+          <div class="body"><div class="main"><div class="cmp"><b>metricTile</b>metricTile</div><div class="cmp"><b>chart</b>chart</div></div></div>
+          
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> · getCellHealth · cancelDecommission · decommissionCell · getCell +6</div>
+          <div><b>STATES</b> · <span class="">loading · emptyFirstRun · emptyNoAccess · error</span></div>
+          <div><b>ARRIVES WITH</b> · cellId←deepLink, rightId←deepLink</div>
+          <div><b>GOES TO</b> · ADM-001 · ADM-002 · ADM-004 · SCN-003</div>
+        </div>
+      </div>
+      <div id="adm-004" class="scr">
+        <div><div class="ttl">ADM-004 · Platform Audit Log</div>
+        <div class="pur">Find platform audit log for this venue.</div></div>
+        <div class="frame">
+          <div class="bar">TODO · wave 2 · compact</div>
+          
+          <div class="body"><div class="main"><div class="cmp"><b>searchField</b>searchField</div><div class="cmp"><b>dataTable</b>dataTable</div></div></div>
+          
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> · listAiInteractions</div>
+          <div><b>STATES</b> · <span class="">loading · emptyFirstRun · emptyNoResults · emptyNoAccess · error</span></div>
+          
+          <div><b>GOES TO</b> · ADM-001 · ADM-002 · ADM-003</div>
+        </div>
+      </div>
+      <div id="adm-005" class="scr">
+        <div><div class="ttl">ADM-005 · Tenant Directory</div>
+        <div class="pur">Find the right one quickly, and act on it without opening it.</div></div>
+        <div class="frame">
+          <div class="bar">TODO · wave 1 · compact</div>
+          
+          <div class="body"><div class="main"><div class="cmp"><b>searchField</b>searchField</div><div class="cmp"><b>dataTable</b>dataTable</div></div></div>
+          
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> · listTenants · addLicenceAddOn · createTenant · generateInvoice +17</div>
+          <div><b>STATES</b> · <span class="">loading · emptyFirstRun · emptyNoResults · emptyNoAccess · error</span></div>
+          <div><b>ARRIVES WITH</b> · tenantId←ADM-002</div>
+          <div><b>GOES TO</b> · ADM-001 · ADM-002 · ADM-003 · ADM-012</div>
+        </div>
+      </div>
+      <div id="adm-006" class="scr">
+        <div><div class="ttl">ADM-006 · Tenant Hierarchy Explorer</div>
+        <div class="pur">See tenant hierarchy explorer for this venue.</div></div>
+        <div class="frame">
+          <div class="bar">TODO · wave 1 · compact</div>
+          
+          <div class="body"><div class="main"><div class="cmp"><b>searchField</b>searchField</div><div class="cmp"><b>dataTable</b>dataTable</div></div></div>
+          
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> · getSsoConfig · listTenants · setSsoConfig · addLicenceAddOn +19</div>
+          <div><b>STATES</b> · <span class="">loading · emptyFirstRun · emptyNoResults · emptyNoAccess · error</span></div>
+          <div><b>ARRIVES WITH</b> · tenantId←ADM-002</div>
+          <div><b>GOES TO</b> · ADM-001 · ADM-002 · ADM-003 · ADM-007</div>
+        </div>
+      </div>
+      <div id="adm-007" class="scr">
+        <div><div class="ttl">ADM-007 · Module &amp; Feature Entitlement</div>
+        <div class="pur">See module &amp; feature entitlement for this venue.</div></div>
+        <div class="frame">
+          <div class="bar">TODO · wave 1 · compact</div>
+          
+          <div class="body"><div class="main"><div class="cmp"><b>detailPanel</b>detailPanel</div></div></div>
+          
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> · getTenantLicences · addLicenceAddOn · createTenant · generateInvoice +17</div>
+          <div><b>STATES</b> · <span class="">loading · emptyFirstRun · emptyNoAccess · error</span></div>
+          <div><b>ARRIVES WITH</b> · tenantId←ADM-002</div>
+          <div><b>GOES TO</b> · ADM-001 · ADM-002 · ADM-003 · BO-074</div>
+        </div>
+      </div>
+      <div id="adm-008" class="scr">
+        <div><div class="ttl">ADM-008 · Subscription &amp; Plan Management</div>
+        <div class="pur">Find subscription &amp; plan management for this venue.</div></div>
+        <div class="frame">
+          <div class="bar">TODO · wave 1 · compact</div>
+          
+          <div class="body"><div class="main"><div class="cmp"><b>textField</b>textField</div><div class="cmp"><b>primaryButton</b>primaryButton</div></div></div>
+          
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> · listPlans · setSubscription · addLicenceAddOn · createPlan +24</div>
+          <div><b>STATES</b> · <span class="">loading · emptyFirstRun · emptyNoAccess · error</span></div>
+          <div><b>ARRIVES WITH</b> · agreementId←deepLink, planId←deepLink, tenantId←ADM-002</div>
+          <div><b>GOES TO</b> · ADM-001 · ADM-002 · ADM-003</div>
+        </div>
+      </div>
+      <div id="adm-009" class="scr">
+        <div><div class="ttl">ADM-009 · Tenant Billing &amp; Invoicing</div>
+        <div class="pur">Find tenant billing &amp; invoicing for this venue.</div></div>
+        <div class="frame">
+          <div class="bar">TODO · wave 2 · compact</div>
+          
+          <div class="body"><div class="main"><div class="cmp"><b>detailPanel</b>detailPanel</div></div></div>
+          
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> · listSubscriptionInvoices · addLicenceAddOn · createTenant · generateInvoice +17</div>
+          <div><b>STATES</b> · <span class="">loading · emptyFirstRun · emptyNoAccess · error</span></div>
+          <div><b>ARRIVES WITH</b> · tenantId←ADM-002</div>
+          <div><b>GOES TO</b> · ADM-001 · ADM-002 · ADM-003</div>
+        </div>
+      </div>
+      <div id="adm-010" class="scr">
+        <div><div class="ttl">ADM-010 · Usage Metering</div>
+        <div class="pur">See usage metering for this venue.</div></div>
+        <div class="frame">
+          <div class="bar">TODO · wave 2 · compact</div>
+          
+          <div class="body"><div class="main"><div class="cmp"><b>detailPanel</b>detailPanel</div></div></div>
+          
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> · getUsageMetering · addLicenceAddOn · createTenant · generateInvoice +17</div>
+          <div><b>STATES</b> · <span class="">loading · emptyFirstRun · emptyNoAccess · error</span></div>
+          <div><b>ARRIVES WITH</b> · tenantId←ADM-002</div>
+          <div><b>GOES TO</b> · ADM-001 · ADM-002 · ADM-003</div>
+        </div>
+      </div>
+      <div id="adm-011" class="scr">
+        <div><div class="ttl">ADM-011 · Licence &amp; Seat Management</div>
+        <div class="pur">See licence &amp; seat management for this venue.</div></div>
+        <div class="frame">
+          <div class="bar">TODO · wave 2 · compact</div>
+          
+          <div class="body"><div class="main"><div class="cmp"><b>textField</b>textField</div><div class="cmp"><b>primaryButton</b>primaryButton</div></div></div>
+          
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> · getEntitlementUsage · addLicenceAddOn · createTenant · generateInvoice +17</div>
+          <div><b>STATES</b> · <span class="">loading · emptyFirstRun · emptyNoAccess · error</span></div>
+          <div><b>ARRIVES WITH</b> · tenantId←ADM-002</div>
+          <div><b>GOES TO</b> · ADM-001 · ADM-002 · ADM-003</div>
+        </div>
+      </div>
+      <div id="adm-012" class="scr">
+        <div><div class="ttl">ADM-012 · Tenant Isolation &amp; Resource Pool</div>
+        <div class="pur">Work with tenant isolation &amp; resource pool for this venue.</div></div>
+        <div class="frame">
+          <div class="bar">TODO · wave 1 · compact</div>
+          
+          <div class="body"><div class="main"><div class="cmp"><b>detailPanel</b>detailPanel</div></div></div>
+          
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> · provisionCell · addLicenceAddOn · createTenant · generateInvoice +18</div>
+          <div><b>STATES</b> · <span class="">loading · emptyFirstRun · emptyNoAccess · error</span></div>
+          <div><b>ARRIVES WITH</b> · cellId←deepLink, tenantId←ADM-002</div>
+          <div><b>GOES TO</b> · ADM-001 · ADM-002 · ADM-003 · ADM-006</div>
+        </div>
+      </div>
+      <div id="adm-013" class="scr">
+        <div><div class="ttl">ADM-013 · Tenant Performance Monitor</div>
+        <div class="pur">See tenant performance monitor for this venue.</div></div>
+        <div class="frame">
+          <div class="bar">TODO · wave 2 · compact</div>
+          
+          <div class="body"><div class="main"><div class="cmp"><b>metricTile</b>metricTile</div><div class="cmp"><b>chart</b>chart</div></div></div>
+          
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> · getCellHealth · cancelDecommission · decommissionCell · getCell +3</div>
+          <div><b>STATES</b> · <span class="">loading · emptyFirstRun · emptyNoAccess · error</span></div>
+          <div><b>ARRIVES WITH</b> · cellId←deepLink</div>
+          <div><b>GOES TO</b> · ADM-001 · ADM-002 · ADM-003</div>
+        </div>
+      </div>
+      <div id="adm-014" class="scr">
+        <div><div class="ttl">ADM-014 · Auto-Scaling Configuration</div>
+        <div class="pur">Change how auto-scaling behaves here, and see which level the current value came from.</div></div>
+        <div class="frame">
+          <div class="bar">TODO · wave 3 · compact</div>
+          
+          <div class="body"><div class="main"><div class="cmp"><b>textField</b>textField</div><div class="cmp"><b>primaryButton</b>primaryButton</div></div></div>
+          
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> · getCellCapacity · cancelDecommission · decommissionCell · getCell +3</div>
+          <div><b>STATES</b> · <span class="">loading · emptyFirstRun · emptyNoAccess · error</span></div>
+          <div><b>ARRIVES WITH</b> · cellId←deepLink</div>
+          <div><b>GOES TO</b> · ADM-001 · ADM-002 · ADM-003</div>
+        </div>
+      </div>
+      <div id="adm-015" class="scr">
+        <div><div class="ttl">ADM-015 · API Rate Limit &amp; Quota Management</div>
+        <div class="pur">See api rate limit &amp; quota management for this venue.</div></div>
+        <div class="frame">
+          <div class="bar">TODO · wave 3 · compact</div>
+          
+          <div class="body"><div class="main"><div class="cmp"><b>textField</b>textField</div><div class="cmp"><b>primaryButton</b>primaryButton</div></div></div>
+          
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> · getTenantLicences · addLicenceAddOn · createTenant · generateInvoice +17</div>
+          <div><b>STATES</b> · <span class="">loading · emptyFirstRun · emptyNoAccess · error</span></div>
+          <div><b>ARRIVES WITH</b> · tenantId←ADM-002</div>
+          <div><b>GOES TO</b> · ADM-001 · ADM-002 · ADM-003</div>
+        </div>
+      </div>
+      <div id="adm-016" class="scr">
+        <div><div class="ttl">ADM-016 · White-Label Branding Management</div>
+        <div class="pur">See white-label branding management for this venue.</div></div>
+        <div class="frame">
+          <div class="bar">TODO · wave 2 · compact</div>
+          
+          <div class="body"><div class="main"><div class="cmp"><b>textField</b>textField</div><div class="cmp"><b>primaryButton</b>primaryButton</div></div></div>
+          
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> · getTenantConfig · createBanner · createContentPage · createPreview +37</div>
+          <div><b>STATES</b> · <span class="">loading · emptyFirstRun · emptyNoAccess · error</span></div>
+          <div><b>ARRIVES WITH</b> · bannerId←deepLink, pageId←deepLink, policyKind←deepLink</div>
+          <div><b>GOES TO</b> · ADM-001 · ADM-002 · ADM-003</div>
+        </div>
+      </div>
+      <div id="adm-017" class="scr">
+        <div><div class="ttl">ADM-017 · Domain &amp; Certificate Management</div>
+        <div class="pur">See domain &amp; certificate management for this venue.</div></div>
+        <div class="frame">
+          <div class="bar">TODO · wave 2 · compact</div>
+          
+          <div class="body"><div class="main"><div class="cmp"><b>textField</b>textField</div><div class="cmp"><b>primaryButton</b>primaryButton</div></div></div>
+          
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> · getTenantConfig · createBanner · createContentPage · createPreview +37</div>
+          <div><b>STATES</b> · <span class="">loading · emptyFirstRun · emptyNoAccess · error</span></div>
+          <div><b>ARRIVES WITH</b> · bannerId←deepLink, pageId←deepLink, policyKind←deepLink</div>
+          <div><b>GOES TO</b> · ADM-001 · ADM-002 · ADM-003</div>
+        </div>
+      </div>
+      <div id="adm-018" class="scr">
+        <div><div class="ttl">ADM-018 · Localisation &amp; Language Pack</div>
+        <div class="pur">Configure localisation &amp; language pack for this venue.</div></div>
+        <div class="frame">
+          <div class="bar">TODO · wave 2 · compact</div>
+          
+          <div class="body"><div class="main"><div class="cmp"><b>detailPanel</b>detailPanel</div></div></div>
+          
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> · setLanguages · createBanner · createContentPage · createPreview +37</div>
+          <div><b>STATES</b> · <span class="">loading · emptyFirstRun · emptyNoAccess · error</span></div>
+          <div><b>ARRIVES WITH</b> · bannerId←deepLink, pageId←deepLink, policyKind←deepLink</div>
+          <div><b>GOES TO</b> · ADM-001 · ADM-002 · ADM-003</div>
+        </div>
+      </div>
+      <div id="adm-019" class="scr">
+        <div><div class="ttl">ADM-019 · Global Configuration &amp; Defaults</div>
+        <div class="pur">Change how global behaves here, and see which level the current value came from.</div></div>
+        <div class="frame">
+          <div class="bar">TODO · wave 2 · compact</div>
+          
+          <div class="body"><div class="main"><div class="cmp"><b>textField</b>textField</div><div class="cmp"><b>primaryButton</b>primaryButton</div></div></div>
+          
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> · listPlans · createPlan · createPlanVersion · getPlan</div>
+          <div><b>STATES</b> · <span class="">loading · emptyFirstRun · emptyNoAccess · error</span></div>
+          <div><b>ARRIVES WITH</b> · planId←deepLink</div>
+          <div><b>GOES TO</b> · ADM-001 · ADM-002 · ADM-003</div>
+        </div>
+      </div>
+      <div id="adm-020" class="scr">
+        <div><div class="ttl">ADM-020 · Platform User Directory</div>
+        <div class="pur">Find the right one quickly, and act on it without opening it.</div></div>
+        <div class="frame">
+          <div class="bar">TODO · wave 1 · compact</div>
+          
+          <div class="body"><div class="main"><div class="cmp"><b>searchField</b>searchField</div><div class="cmp"><b>dataTable</b>dataTable</div></div></div>
+          
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> · listPrincipals · createPrincipal · getPrincipal · updatePrincipal</div>
+          <div><b>STATES</b> · <span class="">loading · emptyFirstRun · emptyNoResults · emptyNoAccess · error</span></div>
+          <div><b>ARRIVES WITH</b> · principalId←session</div>
+          <div><b>GOES TO</b> · ADM-001 · ADM-002 · ADM-003</div>
+        </div>
+      </div>
+      <div id="adm-021" class="scr">
+        <div><div class="ttl">ADM-021 · Platform Role Management</div>
+        <div class="pur">Find platform role management for this venue.</div></div>
+        <div class="frame">
+          <div class="bar">TODO · wave 1 · compact</div>
+          
+          <div class="body"><div class="main"><div class="cmp"><b>textField</b>textField</div><div class="cmp"><b>primaryButton</b>primaryButton</div></div></div>
+          
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> · listRoles · createRole</div>
+          <div><b>STATES</b> · <span class="">loading · emptyFirstRun · emptyNoAccess · error</span></div>
+          
+          <div><b>GOES TO</b> · ADM-001 · ADM-002 · ADM-003</div>
+        </div>
+      </div>
+      <div id="adm-022" class="scr">
+        <div><div class="ttl">ADM-022 · Release &amp; Version Management</div>
+        <div class="pur">Find release &amp; version management for this venue.</div></div>
+        <div class="frame">
+          <div class="bar">TODO · wave 2 · compact</div>
+          
+          <div class="body"><div class="main"><div class="cmp"><b>textField</b>textField</div><div class="cmp"><b>primaryButton</b>primaryButton</div></div></div>
+          
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> · listReleases · getRelease · getReleaseReadiness · createRelease +3</div>
+          <div><b>STATES</b> · <span class="">loading · emptyFirstRun · emptyNoAccess · error</span></div>
+          <div><b>ARRIVES WITH</b> · releaseId←deepLink</div>
+          <div><b>GOES TO</b> · ADM-001 · ADM-002 · ADM-003 · ADM-027</div>
+        </div>
+      </div>
+      <div id="adm-023" class="scr">
+        <div><div class="ttl">ADM-023 · Staging Promotion &amp; Approval</div>
+        <div class="pur">Work with staging promotion &amp; approval for this venue.</div></div>
+        <div class="frame">
+          <div class="bar">TODO · wave 2 · compact</div>
+          
+          <div class="body"><div class="main"><div class="cmp"><b>detailPanel</b>detailPanel</div><div class="cmp"><b>primaryButton</b>primaryButton</div></div></div>
+          
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> · promoteRelease · getReleaseReadiness · createRelease · getRelease +3</div>
+          <div><b>STATES</b> · <span class="">loading · emptyFirstRun · emptyNoAccess · error</span></div>
+          <div><b>ARRIVES WITH</b> · releaseId←deepLink</div>
+          <div><b>GOES TO</b> · ADM-001 · ADM-002 · ADM-003 · ADM-029</div>
+        </div>
+      </div>
+      <div id="adm-024" class="scr">
+        <div><div class="ttl">ADM-024 · Release Notification Composer</div>
+        <div class="pur">Push live release notification composer for this venue.</div></div>
+        <div class="frame">
+          <div class="bar">TODO · wave 3 · compact</div>
+          
+          <div class="body"><div class="main"><div class="cmp"><b>textField</b>textField</div><div class="cmp"><b>primaryButton</b>primaryButton</div></div></div>
+          
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> · publishSupportNotice · listSupportNotices</div>
+          <div><b>STATES</b> · <span class="">loading · emptyFirstRun · emptyNoAccess · error</span></div>
+          
+          <div><b>GOES TO</b> · ADM-001 · ADM-002 · ADM-003</div>
+        </div>
+      </div>
+      <div id="adm-025" class="scr">
+        <div><div class="ttl">ADM-025 · Tenant Upgrade Scheduler</div>
+        <div class="pur">Find tenant upgrade scheduler for this venue.</div></div>
+        <div class="frame">
+          <div class="bar">TODO · wave 2 · compact</div>
+          
+          <div class="body"><div class="main"><div class="cmp"><b>textField</b>textField</div><div class="cmp"><b>primaryButton</b>primaryButton</div></div></div>
+          
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> · listUpgradeSchedules · scheduleTenantUpgrade</div>
+          <div><b>STATES</b> · <span class="">loading · emptyFirstRun · emptyNoAccess · error</span></div>
+          
+          <div><b>GOES TO</b> · ADM-001 · ADM-002 · ADM-003</div>
+        </div>
+      </div>
+      <div id="adm-026" class="scr">
+        <div><div class="ttl">ADM-026 · End-of-Support Notice Management</div>
+        <div class="pur">Answer a question without needing a person.</div></div>
+        <div class="frame">
+          <div class="bar">TODO · wave 3 · compact</div>
+          
+          <div class="body"><div class="main"><div class="cmp"><b>textField</b>textField</div><div class="cmp"><b>primaryButton</b>primaryButton</div></div></div>
+          
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> · listSupportNotices · publishSupportNotice</div>
+          <div><b>STATES</b> · <span class="">loading · emptyFirstRun · emptyNoAccess · error</span></div>
+          
+          <div><b>GOES TO</b> · ADM-001 · ADM-002 · ADM-003</div>
+        </div>
+      </div>
+      <div id="adm-027" class="scr">
+        <div><div class="ttl">ADM-027 · Database Migration Console</div>
+        <div class="pur">Find database migration console for this venue.</div></div>
+        <div class="frame">
+          <div class="bar">TODO · wave 1 · compact</div>
+          
+          <div class="body"><div class="main"><div class="cmp"><b>detailPanel</b>detailPanel</div></div></div>
+          
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> · listMigrations · planMigration · applyMigration · getVersionSkew +2</div>
+          <div><b>STATES</b> · <span class="">loading · emptyFirstRun · emptyNoAccess · error</span></div>
+          <div><b>ARRIVES WITH</b> · runId←deepLink</div>
+          <div><b>GOES TO</b> · ADM-001 · ADM-002 · ADM-003 · ADM-023</div>
+        </div>
+      </div>
+      <div id="adm-028" class="scr">
+        <div><div class="ttl">ADM-028 · Environment Registry</div>
+        <div class="pur">Find environment registry for this venue.</div></div>
+        <div class="frame">
+          <div class="bar">TODO · wave 2 · compact</div>
+          
+          <div class="body"><div class="main"><div class="cmp"><b>detailPanel</b>detailPanel</div></div></div>
+          
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> · listEnvironments · registerEnvironment</div>
+          <div><b>STATES</b> · <span class="">loading · emptyFirstRun · emptyNoAccess · error</span></div>
+          
+          <div><b>GOES TO</b> · ADM-001 · ADM-002 · ADM-003</div>
+        </div>
+      </div>
+      <div id="adm-029" class="scr">
+        <div><div class="ttl">ADM-029 · Deployment Monitor</div>
+        <div class="pur">Find deployment monitor for this venue.</div></div>
+        <div class="frame">
+          <div class="bar">TODO · wave 2 · compact</div>
+          
+          <div class="body"><div class="main"><div class="cmp"><b>metricTile</b>metricTile</div><div class="cmp"><b>chart</b>chart</div></div></div>
+          
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> · listCellJobs · listRollouts · getRollout · pauseRollout +8</div>
+          <div><b>STATES</b> · <span class="">loading · emptyFirstRun · emptyNoAccess · error</span></div>
+          <div><b>ARRIVES WITH</b> · cellId←deepLink, rolloutId←deepLink</div>
+          <div><b>GOES TO</b> · ADM-001 · ADM-002 · ADM-003</div>
+        </div>
+      </div>
+      <div id="adm-030" class="scr">
+        <div><div class="ttl">ADM-030 · Infrastructure Sizing &amp; Scaling Policy</div>
+        <div class="pur">See infrastructure sizing &amp; scaling policy for this venue.</div></div>
+        <div class="frame">
+          <div class="bar">TODO · wave 3 · compact</div>
+          
+          <div class="body"><div class="main"><div class="cmp"><b>textField</b>textField</div><div class="cmp"><b>primaryButton</b>primaryButton</div></div></div>
+          
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> · getCellCapacity · cancelDecommission · decommissionCell · getCell +3</div>
+          <div><b>STATES</b> · <span class="">loading · emptyFirstRun · emptyNoAccess · error</span></div>
+          <div><b>ARRIVES WITH</b> · cellId←deepLink</div>
+          <div><b>GOES TO</b> · ADM-001 · ADM-002 · ADM-003</div>
+        </div>
+      </div>
+      <div id="adm-031" class="scr">
+        <div><div class="ttl">ADM-031 · Security &amp; Compliance Dashboard</div>
+        <div class="pur">The screen this app sits on. Everything else is entered from here and returns to it.</div></div>
+        <div class="frame">
+          <div class="bar">TODO · wave 3 · compact</div>
+          
+          <div class="body"><div class="main"><div class="cmp"><b>metricTile</b>metricTile</div><div class="cmp"><b>chart</b>chart</div></div></div>
+          
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> · listDashboards · getDashboard · createDashboard · updateDashboard</div>
+          <div><b>STATES</b> · <span class="">loading · emptyFirstRun · emptyNoAccess · error</span></div>
+          <div><b>ARRIVES WITH</b> · dashboardId←deepLink</div>
+          <div><b>GOES TO</b> · ADM-001 · ADM-002 · ADM-003</div>
+        </div>
+      </div>
+      <div id="adm-032" class="scr">
+        <div><div class="ttl">ADM-032 · WAF &amp; Security Policy View</div>
+        <div class="pur">See waf &amp; security policy view for this venue.</div></div>
+        <div class="frame">
+          <div class="bar">TODO · wave 3 · compact</div>
+          
+          <div class="body"><div class="main"><div class="cmp"><b>textField</b>textField</div><div class="cmp"><b>primaryButton</b>primaryButton</div></div></div>
+          
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> · getCellHealth · cancelDecommission · decommissionCell · getCell +3</div>
+          <div><b>STATES</b> · <span class="">loading · emptyFirstRun · emptyNoAccess · error</span></div>
+          <div><b>ARRIVES WITH</b> · cellId←deepLink</div>
+          <div><b>GOES TO</b> · ADM-001 · ADM-002 · ADM-003</div>
+        </div>
+      </div>
+      <div id="adm-033" class="scr">
+        <div><div class="ttl">ADM-033 · Backup &amp; DR Status</div>
+        <div class="pur">See backup &amp; dr status for this venue.</div></div>
+        <div class="frame">
+          <div class="bar">TODO · wave 2 · compact</div>
+          
+          <div class="body"><div class="main"><div class="cmp"><b>metricTile</b>metricTile</div><div class="cmp"><b>chart</b>chart</div></div></div>
+          
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> · getCellHealth · cancelDecommission · decommissionCell · getCell +3</div>
+          <div><b>STATES</b> · <span class="">loading · emptyFirstRun · emptyNoAccess · error</span></div>
+          <div><b>ARRIVES WITH</b> · cellId←deepLink</div>
+          <div><b>GOES TO</b> · ADM-001 · ADM-002 · ADM-003</div>
+        </div>
+      </div>
+      <div id="adm-034" class="scr">
+        <div><div class="ttl">ADM-034 · Archival Job Monitor</div>
+        <div class="pur">Find archival job monitor for this venue.</div></div>
+        <div class="frame">
+          <div class="bar">TODO · wave 3 · compact</div>
+          
+          <div class="body"><div class="main"><div class="cmp"><b>metricTile</b>metricTile</div><div class="cmp"><b>chart</b>chart</div></div></div>
+          
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> · listCellJobs · cancelDecommission · decommissionCell · getCell +3</div>
+          <div><b>STATES</b> · <span class="">loading · emptyFirstRun · emptyNoAccess · error</span></div>
+          <div><b>ARRIVES WITH</b> · cellId←deepLink</div>
+          <div><b>GOES TO</b> · ADM-001 · ADM-002 · ADM-003</div>
+        </div>
+      </div>
+      <div id="adm-035" class="scr">
+        <div><div class="ttl">ADM-035 · Support &amp; Escalation Console</div>
+        <div class="pur">Answer a question without needing a person.</div></div>
+        <div class="frame">
+          <div class="bar">TODO · wave 3 · compact</div>
+          
+          <div class="body"><div class="main"><div class="cmp"><b>detailPanel</b>detailPanel</div></div></div>
+          
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> · listSupportNotices · publishSupportNotice</div>
+          <div><b>STATES</b> · <span class="">loading · emptyFirstRun · emptyNoAccess · error</span></div>
+          
+          <div><b>GOES TO</b> · ADM-001 · ADM-002 · ADM-003</div>
+        </div>
+      </div>
+      <div id="adm-036" class="scr">
+        <div><div class="ttl">ADM-036 · Platform Notification Broadcast</div>
+        <div class="pur">Push live platform notification broadcast for this venue.</div></div>
+        <div class="frame">
+          <div class="bar">TODO · wave 3 · compact</div>
+          
+          <div class="body"><div class="main"><div class="cmp"><b>textField</b>textField</div><div class="cmp"><b>primaryButton</b>primaryButton</div></div></div>
+          
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> · publishSupportNotice · listSupportNotices</div>
+          <div><b>STATES</b> · <span class="">loading · emptyFirstRun · emptyNoAccess · error</span></div>
+          
+          <div><b>GOES TO</b> · ADM-001 · ADM-002 · ADM-003</div>
+        </div>
+      </div></div><div class="grp">02 — AI · 1 screens</div><div class="grid">
+      <div id="adm-037" class="scr">
+        <div><div class="ttl">ADM-037 · AI Provider &amp; Credentials</div>
+        <div class="pur">Configure which model a tenant uses, hold the key, and prove it works before anyone relies on it.</div></div>
+        <div class="frame">
+          <div class="bar">AI · wave 1 · compact</div>
+          
+          <div class="body"><div class="main"><div class="cmp"><b>detailPanel</b>detailPanel</div></div></div>
+          
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> · listAiProviders · setAiProvider · setAiCredential · testAiProvider</div>
+          <div><b>STATES</b> · <span class="">loading · emptyFirstRun · emptyNoAccess · error</span></div>
+          <div><b>ARRIVES WITH</b> · providerId←deepLink</div>
+          <div><b>GOES TO</b> · ADM-001</div>
+        </div>
+      </div></div>
+  <div class="bottom">
+    <span>Generated by tools/derive-wireframes.py from screens/P09-platform-admin-console.yaml — do not hand-edit</span>
+    <span>P09 · 37 screens · 2 groups</span>
+  </div>
+</div></body></html>

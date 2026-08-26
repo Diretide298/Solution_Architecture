@@ -1,0 +1,261 @@
+id: LLD-shift
+title: shift — 19 operations
+generatedBy: tools/derive-diagrams.py
+index: diagrams/hld/03-contracts.yaml
+tier: spine
+service: OrderService
+operations:
+- operation: acceptShiftVariance
+  verb: POST
+  path: /shifts/{shiftId}/accept-variance
+  scope: venue
+  permission: OVERSHORT_ACCEPT
+  audience: null
+  offline: false
+  reads:
+  - cache:idempotency
+  - orders.shift
+  writes:
+  - cache:idempotency
+  - orders.shift
+- operation: adjustDepositBoxFloat
+  verb: POST
+  path: /deposit-boxes/{boxId}/adjust-float
+  scope: venue
+  permission: CASH_ADD
+  audience: null
+  offline: false
+  reads:
+  - cache:idempotency
+  - orders.deposit_box
+  writes:
+  - cache:idempotency
+  - orders.cash_movement
+  - orders.deposit_box
+- operation: allocateDepositBox
+  verb: POST
+  path: /deposit-boxes
+  scope: venue
+  permission: SHIFT_OPEN
+  audience: null
+  offline: true
+  reads:
+  - cache:idempotency
+  - identity.principal
+  - platform.workstation
+  writes:
+  - cache:idempotency
+  - orders.cash_movement
+  - orders.deposit_box
+- operation: approveShiftOpen
+  verb: POST
+  path: /shifts/{shiftId}/approve-open
+  scope: venue
+  permission: SHIFT_APPROVE_OPEN
+  audience: null
+  offline: false
+  reads:
+  - cache:idempotency
+  - orders.shift
+  writes:
+  - cache:idempotency
+  - orders.shift
+- operation: closeDepositBoxes
+  verb: POST
+  path: /deposit-boxes/close
+  scope: venue
+  permission: SHIFT_CLOSE
+  audience: null
+  offline: false
+  reads:
+  - cache:idempotency
+  - ledger.fx_rate
+  - orders.cash_count_line
+  - orders.deposit_box
+  writes:
+  - cache:idempotency
+  - ledger.entry
+  - orders.deposit_box
+- operation: closeShift
+  verb: POST
+  path: /shifts/{shiftId}/close
+  scope: workstation
+  permission: SHIFT_CLOSE
+  audience: null
+  offline: true
+  reads:
+  - cache:idempotency
+  - ledger.fx_rate
+  - orders.cash_count_line
+  - orders.cash_movement
+  - orders.payment
+  - orders.shift
+  - platform.venue_settings
+  writes:
+  - cache:idempotency
+  - ledger.journal_entry
+  - orders.cash_count_line
+  - orders.shift
+- operation: createCashMovement
+  verb: POST
+  path: /shifts/{shiftId}/cash-movements
+  scope: venue
+  permission: CASH_LIFT
+  audience: null
+  offline: true
+  reads:
+  - cache:idempotency
+  - orders.cash_count_line
+  - orders.cash_movement
+  writes:
+  - cache:idempotency
+  - orders.cash_count_line
+  - orders.cash_movement
+- operation: getCurrentShift
+  verb: GET
+  path: /shifts/current
+  scope: workstation
+  permission: SHIFT_OPEN
+  audience: null
+  offline: true
+  reads:
+  - orders.shift
+  writes: []
+- operation: getShift
+  verb: GET
+  path: /shifts/{shiftId}
+  scope: venue
+  permission: REPORT_VIEW_WORKSTATION
+  audience: null
+  offline: true
+  reads:
+  - orders.shift
+  writes: []
+- operation: listCashMovements
+  verb: GET
+  path: /shifts/{shiftId}/cash-movements
+  scope: venue
+  permission: REPORT_VIEW_WORKSTATION
+  audience: null
+  offline: true
+  reads:
+  - orders.cash_count_line
+  - orders.cash_movement
+  writes: []
+- operation: listDenominations
+  verb: GET
+  path: /denominations
+  scope: venue
+  permission: SHIFT_OPEN
+  audience:
+  - staff
+  offline: true
+  reads:
+  - platform.denomination
+  - platform.region_settings
+  writes: []
+- operation: listDepositBoxes
+  verb: GET
+  path: /deposit-boxes
+  scope: venue
+  permission: SHIFT_OPEN
+  audience: null
+  offline: true
+  reads:
+  - identity.principal
+  - orders.deposit_box
+  writes: []
+- operation: listShifts
+  verb: GET
+  path: /shifts
+  scope: venue
+  permission: REPORT_VIEW_WORKSTATION
+  audience: null
+  offline: false
+  reads:
+  - orders.shift
+  writes: []
+- operation: openShift
+  verb: POST
+  path: /shifts
+  scope: workstation
+  permission: SHIFT_OPEN
+  audience: null
+  offline: true
+  reads:
+  - cache:idempotency
+  - identity.principal
+  - orders.cash_count_line
+  - orders.shift
+  - platform.venue_settings
+  - platform.workstation
+  writes:
+  - cache:idempotency
+  - orders.cash_count_line
+  - orders.shift
+- operation: recordNoSale
+  verb: POST
+  path: /shifts/{shiftId}/no-sale
+  scope: workstation
+  permission: SHIFT_SUSPEND
+  audience: null
+  offline: true
+  reads:
+  - cache:idempotency
+  - orders.no_sale_event
+  writes:
+  - cache:idempotency
+  - orders.no_sale_event
+- operation: reopenShift
+  verb: POST
+  path: /shifts/{shiftId}/reopen
+  scope: venue
+  permission: SHIFT_REOPEN
+  audience: null
+  offline: false
+  reads:
+  - cache:idempotency
+  - orders.shift
+  writes:
+  - cache:idempotency
+  - orders.shift
+- operation: resumeShift
+  verb: POST
+  path: /shifts/{shiftId}/resume
+  scope: workstation
+  permission: SHIFT_OPEN
+  audience: null
+  offline: true
+  reads:
+  - cache:idempotency
+  - orders.shift
+  writes:
+  - cache:idempotency
+  - orders.shift
+- operation: suspendShift
+  verb: POST
+  path: /shifts/{shiftId}/suspend
+  scope: workstation
+  permission: SHIFT_SUSPEND
+  audience: null
+  offline: true
+  reads:
+  - cache:idempotency
+  - orders.shift
+  writes:
+  - cache:idempotency
+  - orders.shift
+- operation: withdrawFromDepositBox
+  verb: POST
+  path: /deposit-boxes/{boxId}/withdraw
+  scope: venue
+  permission: CASH_LIFT
+  audience: null
+  offline: true
+  reads:
+  - cache:idempotency
+  - orders.deposit_box
+  writes:
+  - cache:idempotency
+  - orders.cash_movement
+  - orders.deposit_box

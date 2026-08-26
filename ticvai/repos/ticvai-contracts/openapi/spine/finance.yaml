@@ -1,0 +1,2326 @@
+openapi: 3.1.0
+info:
+  title: TICVAI Finance & Ledger
+  version: 0.1.0
+  x-ticvai-screen-count: 1
+  x-ticvai-tier: spine
+  x-ticvai-module: "5 — F&B & Guest Management (accounting and revenue recognition)"
+  x-ticvai-requirements: 327
+  x-ticvai-capabilities: [C41, C42, C43, C44, C45, C46, C47, C48, C49, C50]
+  x-ticvai-platforms:
+    - "P08 Venue Back Office"
+  description: >
+    ## What this contract covers
+
+    **The append-only record of everything. Corrections are entries, never edits.**
+
+    | | |
+    |---|---|
+    | **Tier** | spine |
+    | **Matrix domain** | 5 — F&B & Guest Management (accounting and revenue recognition) |
+    | **Requirements** | ~327 |
+    | **Capabilities** | C41, C42, C43, C44, C45, C46, C47, C48, C49, C50 |
+    | **Consumed by** | P08 Venue Back Office |
+
+    ## How to read this file
+
+    **This file is a contract.** It is hand-authored and it is the source of truth for one
+    bounded context: server code, client code and mock servers are generated from it, never
+    the other way round. If a field is not here, it does not exist.
+
+    **Contracts are split into two tiers.**
+
+    - **Spine** — the eight contexts everything else depends on: tenancy, identity,
+      catalogue, orders, shift, access, finance, cross-cell. Frozen first. A change here
+      requires a formal change request, because every satellite has pinned against it.
+    - **Satellite** — a domain that builds on the spine and can move independently.
+      Cheaper to change.
+
+    **`paths` are operations.** Each one declares four TICVAI extensions, and Redocly
+    rejects any that does not:
+
+    | Extension | Answers |
+    |---|---|
+    | `x-ticvai-permission` | Which permission the caller needs. From one enum in `shared/permissions.yaml` — never hand-typed |
+    | `x-ticvai-scope-level` | Where in the seven-level hierarchy that permission must be held |
+    | `x-ticvai-offline-capable` | Whether a disconnected terminal may queue this |
+    | `x-ticvai-conflict-policy` | How a replayed operation resolves — `append`, `serverWins`, `manual` |
+
+    Where `x-ticvai-permission` is null, one of these says why: `x-ticvai-auth: service`
+    (cell-to-cell), `x-ticvai-self-scoped` (acts only on the caller's own resources), or
+    `security: []` (genuinely public).
+
+    **`components.schemas` are API schemas — the shape of data on the wire.** They are not
+    database tables. One API schema may become three columns (`Money`) or five tables
+    (`Order`); some have no table at all (`ValidationResult`, `TrialBalance`). Roughly 70%
+    of the DDL derives from these, and the rest — partitioning, RLS, the PII split — is
+    storage design that lives in the migration scripts.
+
+    **Where a schema maps to storage, `x-ticvai-persistence` says so.** The value is a table
+    name, a list of tables, or `none` with a reason. It is documentation of the mapping, not
+    a generator input — the DDL lives in versioned SQL migrations, because partitioning, RLS
+    policies, `ltree` indexes and partial indexes have no expression in OpenAPI.
+
+    **`security` arrays hold OAuth scopes.** Empty means "this scheme, no scopes" — for
+    bearer tokens there is nothing to list. Empty is not the same as absent: absent means
+    unauthenticated.
+
+
+    ## This context
+
+    Chart of accounts, tax, revenue recognition, journals, settlement and financial
+    reporting. Settled by the 12 August finance deep-dive.
+
+    Positions this encodes:
+
+    - **The ledger is append-only.** Nothing is deleted or edited; corrections are new
+      entries. Every endpoint here obeys that, and the absence of DELETE is deliberate.
+    - **Dual ledger.** Transaction-level entries for reconciliation, journal entries for
+      trial balance, P&L and balance sheet.
+    - **Tax is computed per line item, not on the basket total**, with compound tax support
+      and per-country structures.
+    - **Multi-venue passes recognise on redemption**, not at sale. Gift cards recognise on
+      redemption, annual passes straight-line or per visit, unredeemed value as breakage on
+      expiry.
+    - **Price variance is a first-class posting** (CF-38). The server re-prices on ingest;
+      where it disagrees with the quoted price the quote is honoured and the difference
+      posted. Above the venue's threshold it becomes an exception requiring review.
+
+    DEFERRED pending CF-37 (FX policy): cross-currency allocation splits, inter-company
+    settlement, FX revaluation at period close, and consolidated multi-currency reporting.
+    Those endpoints are listed in the repository README and are not in this version.
+
+servers:
+  - url: https://{cellHost}/api/v1
+    variables:
+      cellHost:
+        default: cell.ticvai.local
+
+security:
+  - bearerAuth: []
+
+tags:
+  - name: accounts
+  - name: tax
+  - name: recognition
+  - name: journal
+  - name: ledger
+  - name: settlement
+  - name: variance
+  - name: reporting
+  - name: fiscal
+
+paths:
+  # ---------------------------------------------------------------- accounts
+  /accounts:
+    get:
+      operationId: listAccounts
+      x-ticvai-read-routing: replica
+      summary: List the chart of accounts
+      tags: [accounts]
+      x-ticvai-permission: LEDGER_VIEW
+      x-ticvai-scope-level: region
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - name: legalEntityId
+          in: query
+          schema: { type: string, format: uuid }
+        - name: type
+          in: query
+          schema: { $ref: '#/components/schemas/AccountType' }
+        - name: isPostable
+          in: query
+          description: Leaf accounts only. Parent accounts aggregate and cannot be posted to.
+          schema: { type: boolean }
+        - $ref: '../shared/common.yaml#/components/parameters/PageSize'
+        - $ref: '../shared/common.yaml#/components/parameters/PageCursor'
+      responses:
+        '200':
+          description: Accounts
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '../shared/common.yaml#/components/schemas/Page'
+                  - type: object
+                    properties:
+                      items:
+                        type: array
+                        items: { $ref: '#/components/schemas/Account' }
+        '403': { $ref: '../shared/common.yaml#/components/responses/Forbidden' }
+
+    post:
+      operationId: createAccount
+      summary: Create an account
+      description: >
+        Accounts may be created natively or mapped to a chart maintained externally in the
+        client's ERP. Where `externalCode` is set, exports use it — the client's finance
+        team continues to see their own codes.
+      tags: [accounts]
+      x-ticvai-permission: ACCOUNT_CONFIGURE
+      x-ticvai-scope-level: region
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/CreateAccountRequest' }
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Account' }
+        '400': { $ref: '../shared/common.yaml#/components/responses/BadRequest' }
+        '409':
+          description: Code already in use within this legal entity
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /accounts/{accountId}:
+    parameters:
+      - name: accountId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    get:
+      operationId: getAccount
+      x-ticvai-read-routing: replica
+      summary: Read an account
+      tags: [accounts]
+      x-ticvai-permission: LEDGER_VIEW
+      x-ticvai-scope-level: region
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '200':
+          description: Account
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Account' }
+        '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
+    patch:
+      operationId: updateAccount
+      summary: Rename, remap or deactivate an account
+      description: >
+        The code is immutable once entries exist. Deactivation prevents new postings and
+        leaves history intact.
+      tags: [accounts]
+      x-ticvai-permission: ACCOUNT_CONFIGURE
+      x-ticvai-scope-level: region
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              minProperties: 1
+              properties:
+                name: { type: string, maxLength: 200 }
+                externalCode: { type: string, maxLength: 64 }
+                isActive: { type: boolean }
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Account' }
+        '409':
+          description: Attempt to change an immutable field after entries exist
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /account-mappings:
+    get:
+      operationId: listAccountMappings
+      x-ticvai-read-routing: replica
+      summary: Which account each transaction type posts to
+      description: >
+        Maps revenue, tax, payment, refund, variance and breakage events to accounts. This
+        is the table that makes posting deterministic rather than hard-coded.
+      tags: [accounts]
+      x-ticvai-permission: LEDGER_VIEW
+      x-ticvai-scope-level: region
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '200':
+          description: Mappings
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/AccountMapping' }
+    put:
+      operationId: setAccountMappings
+      x-ticvai-config-scope: region
+      summary: Set posting mappings
+      tags: [accounts]
+      x-ticvai-permission: ACCOUNT_CONFIGURE
+      x-ticvai-scope-level: region
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [mappings]
+              properties:
+                mappings:
+                  type: array
+                  items: { $ref: '#/components/schemas/AccountMapping' }
+      responses:
+        '200':
+          description: Applied
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/AccountMapping' }
+        '400':
+          description: A required event type has no mapping, or maps to a non-postable account
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /cost-centers:
+    get:
+      operationId: listCostCenters
+      x-ticvai-read-routing: replica
+      summary: List cost centres
+      tags: [accounts]
+      x-ticvai-permission: LEDGER_VIEW
+      x-ticvai-scope-level: region
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/PageSize'
+        - $ref: '../shared/common.yaml#/components/parameters/PageCursor'
+      responses:
+        '200':
+          description: Cost centres
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '../shared/common.yaml#/components/schemas/Page'
+                  - type: object
+                    properties:
+                      items:
+                        type: array
+                        items: { $ref: '#/components/schemas/CostCenter' }
+    post:
+      operationId: createCostCenter
+      summary: Create a cost centre
+      tags: [accounts]
+      x-ticvai-permission: ACCOUNT_CONFIGURE
+      x-ticvai-scope-level: region
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [code, name]
+              properties:
+                code: { type: string, maxLength: 64 }
+                name: { type: string, maxLength: 200 }
+                parentId: { type: string, format: uuid }
+                venueId: { type: string, format: uuid }
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/CostCenter' }
+
+  # ---------------------------------------------------------------- tax
+  /tax-codes:
+    get:
+      operationId: listTaxCodes
+      x-ticvai-read-routing: replica
+      summary: List tax codes
+      tags: [tax]
+      x-ticvai-permission: LEDGER_VIEW
+      x-ticvai-scope-level: region
+      x-ticvai-offline-capable: true
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - name: countryCode
+          in: query
+          schema: { type: string, pattern: '^[A-Z]{2}$' }
+        - $ref: '../shared/common.yaml#/components/parameters/PageSize'
+        - $ref: '../shared/common.yaml#/components/parameters/PageCursor'
+      responses:
+        '200':
+          description: Tax codes
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '../shared/common.yaml#/components/schemas/Page'
+                  - type: object
+                    properties:
+                      items:
+                        type: array
+                        items: { $ref: '#/components/schemas/TaxCode' }
+    post:
+      operationId: createTaxCode
+      summary: Create a tax code
+      description: >
+        Supports compound tax — a code may apply on top of another code's result rather than
+        on the net amount. Order matters, and `compoundOnTaxCodeId` makes it explicit rather
+        than implied by sequence.
+      tags: [tax]
+      x-ticvai-permission: TAX_CONFIGURE
+      x-ticvai-scope-level: region
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/CreateTaxCodeRequest' }
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/TaxCode' }
+        '400':
+          description: Compound reference is circular or crosses countries
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /tax-codes/{taxCodeId}:
+    parameters:
+      - name: taxCodeId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    patch:
+      operationId: updateTaxCode
+      summary: Amend a tax code
+      description: >
+        Rate changes are versioned with an effective date, never applied retrospectively.
+        Historic entries keep the rate that was in force when they were posted.
+      tags: [tax]
+      x-ticvai-permission: TAX_CONFIGURE
+      x-ticvai-scope-level: region
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              minProperties: 1
+              properties:
+                name: { type: string, maxLength: 200 }
+                rate: { type: number, minimum: 0, maximum: 100 }
+                effectiveFrom: { type: string, format: date }
+                isActive: { type: boolean }
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/TaxCode' }
+
+  /tax-exemptions:
+    get:
+      operationId: listTaxExemptions
+      x-ticvai-read-routing: replica
+      summary: List tax exemptions
+      description: Exemption by account, product class or channel — diplomatic, export, B2B.
+      tags: [tax]
+      x-ticvai-permission: LEDGER_VIEW
+      x-ticvai-scope-level: region
+      x-ticvai-offline-capable: true
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '200':
+          description: Exemptions
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/TaxExemption' }
+    post:
+      operationId: createTaxExemption
+      summary: Grant a tax exemption
+      tags: [tax]
+      x-ticvai-permission: TAX_CONFIGURE
+      x-ticvai-scope-level: region
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/TaxExemption' }
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/TaxExemption' }
+
+  /tax/calculate:
+    post:
+      operationId: calculateTax
+      summary: Compute tax for a set of lines
+      description: >
+        Per line item, not on the basket total. Returns the full computation — base, each
+        applied code in order, and whether it compounded — so a variance can be explained
+        rather than merely observed.
+
+        Discount treatment is explicit: `discountsAreTaxInclusive` determines whether a
+        discount reduces the taxable base or is applied after tax.
+      tags: [tax]
+      x-ticvai-permission: LEDGER_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: true
+      x-ticvai-conflict-policy: serverWins
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/CalculateTaxRequest' }
+      responses:
+        '200':
+          description: Computation
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/TaxCalculation' }
+        '400': { $ref: '../shared/common.yaml#/components/responses/BadRequest' }
+
+  # ---------------------------------------------------------------- recognition
+  /recognition-schedules:
+    get:
+      operationId: listRecognitionSchedules
+      x-ticvai-read-routing: replica
+      summary: List revenue recognition schedules
+      tags: [recognition]
+      x-ticvai-permission: LEDGER_VIEW
+      x-ticvai-scope-level: region
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/PageSize'
+        - $ref: '../shared/common.yaml#/components/parameters/PageCursor'
+      responses:
+        '200':
+          description: Schedules
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '../shared/common.yaml#/components/schemas/Page'
+                  - type: object
+                    properties:
+                      items:
+                        type: array
+                        items: { $ref: '#/components/schemas/RecognitionSchedule' }
+    post:
+      operationId: createRecognitionSchedule
+      summary: Define how a product class recognises revenue
+      tags: [recognition]
+      x-ticvai-permission: ACCOUNT_CONFIGURE
+      x-ticvai-scope-level: region
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/RecognitionSchedule' }
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/RecognitionSchedule' }
+
+  /deferred-revenue:
+    get:
+      operationId: getDeferredRevenue
+      x-ticvai-read-routing: analytical
+      summary: Deferred revenue balance and ageing
+      description: >
+        What has been paid for but not yet earned — unredeemed passes, gift cards, annual
+        passes mid-term. Aged by expected recognition date so the finance team can see when
+        it will unwind.
+      tags: [recognition]
+      x-ticvai-permission: LEDGER_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - name: asAt
+          in: query
+          schema: { type: string, format: date }
+        - name: venueId
+          in: query
+          schema: { type: string, format: uuid }
+      responses:
+        '200':
+          description: Balance and ageing
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/DeferredRevenueReport' }
+
+  /recognition/run:
+    post:
+      operationId: runRecognition
+      summary: Recognise earned revenue for a period
+      description: >
+        Moves earned amounts from deferred revenue to recognised revenue: redemptions since
+        the last run, straight-line accruals due, and breakage on entitlements that expired
+        unredeemed.
+
+        Idempotent per period. Running twice for the same period is a no-op, which matters
+        because it will be scheduled and schedules misfire.
+      tags: [recognition]
+      x-ticvai-permission: LEDGER_POST
+      x-ticvai-scope-level: region
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [fiscalPeriodId]
+              properties:
+                fiscalPeriodId: { type: string, format: uuid }
+                dryRun:
+                  type: boolean
+                  default: false
+                  description: Compute and return without posting.
+      responses:
+        '200':
+          description: Run complete
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/RecognitionRunResult' }
+        '409':
+          description: Period already closed, or a run is in progress
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  # ---------------------------------------------------------------- journals
+  /journal-entries:
+    get:
+      operationId: listJournalEntries
+      x-ticvai-read-routing: replica
+      summary: List journal entries
+      tags: [journal]
+      x-ticvai-permission: LEDGER_VIEW
+      x-ticvai-scope-level: region
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - name: fiscalPeriodId
+          in: query
+          schema: { type: string, format: uuid }
+        - name: status
+          in: query
+          schema: { $ref: '#/components/schemas/JournalStatus' }
+        - name: source
+          in: query
+          schema: { $ref: '#/components/schemas/JournalSource' }
+        - $ref: '../shared/common.yaml#/components/parameters/PageSize'
+        - $ref: '../shared/common.yaml#/components/parameters/PageCursor'
+      responses:
+        '200':
+          description: Entries
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '../shared/common.yaml#/components/schemas/Page'
+                  - type: object
+                    properties:
+                      items:
+                        type: array
+                        items: { $ref: '#/components/schemas/JournalEntry' }
+
+    post:
+      operationId: createJournalEntry
+      summary: Post a manual journal voucher
+      description: >
+        Created in `draft`. A finance user posts it; a finance manager or director approves
+        it; only then does it reach the ledger (12 Aug §15).
+
+        Lines must balance. An unbalanced entry is rejected rather than saved as a draft to
+        fix later — a half-formed journal in a list is an invitation to approve it by
+        accident.
+      tags: [journal]
+      x-ticvai-permission: LEDGER_POST
+      x-ticvai-scope-level: region
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/CreateJournalEntryRequest' }
+      responses:
+        '201':
+          description: Created in draft, awaiting approval
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/JournalEntry' }
+        '400':
+          description: Lines do not balance, or an account is not postable
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+        '409':
+          description: Fiscal period is closed
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /journal-entries/{entryId}:
+    parameters:
+      - name: entryId
+        in: path
+        required: true
+        schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+    get:
+      operationId: getJournalEntry
+      x-ticvai-read-routing: replica
+      summary: Read a journal entry
+      tags: [journal]
+      x-ticvai-permission: LEDGER_VIEW
+      x-ticvai-scope-level: region
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '200':
+          description: Entry
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/JournalEntry' }
+        '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
+
+  /journal-entries/{entryId}/approve:
+    parameters:
+      - name: entryId
+        in: path
+        required: true
+        schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+    post:
+      operationId: approveJournalEntry
+      summary: Approve a journal entry and post it
+      description: >
+        The approver may not be the poster. Segregation of duties is enforced here, not
+        assumed.
+      tags: [journal]
+      x-ticvai-permission: LEDGER_APPROVE
+      x-ticvai-scope-level: region
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                note: { type: string, maxLength: 500 }
+      responses:
+        '200':
+          description: Approved and posted
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/JournalEntry' }
+        '403':
+          description: Approver is the poster, or lacks LEDGER_APPROVE
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /journal-entries/{entryId}/reject:
+    parameters:
+      - name: entryId
+        in: path
+        required: true
+        schema: { type: string }
+    post:
+      operationId: rejectJournal
+      summary: Reject a journal awaiting approval
+      description: >
+        Returns it to draft with comments. Approval existed and rejection did not, which left a preparer whose entry could be approved and never refused.
+      tags: [ledger]
+      x-ticvai-permission: LEDGER_APPROVE
+      x-ticvai-scope-level: region
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [reason]
+              properties:
+                reason: { type: string }
+      responses:
+        '200':
+          description: Done
+        '409':
+          description: Not in a state that permits this
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /journal-entries/{entryId}/reverse:
+    parameters:
+      - name: entryId
+        in: path
+        required: true
+        schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+    post:
+      operationId: reverseJournalEntry
+      summary: Reverse a posted entry
+      description: >
+        Creates a mirror-image entry referencing the original. **The original is never
+        modified** — this is the only correction mechanism an append-only ledger offers, and
+        it is the reason there is no DELETE anywhere in this contract.
+      tags: [journal]
+      x-ticvai-permission: LEDGER_APPROVE
+      x-ticvai-scope-level: region
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [reason]
+              properties:
+                reason: { type: string, minLength: 3, maxLength: 500 }
+                fiscalPeriodId:
+                  type: string
+                  format: uuid
+                  description: Period to post the reversal into. Defaults to the current open period.
+      responses:
+        '201':
+          description: Reversal posted
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/JournalEntry' }
+        '409':
+          description: Already reversed, or the target period is closed
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  # ---------------------------------------------------------------- ledger
+  /fx-rates:
+    get:
+      operationId: listFxRates
+      summary: The rates in force
+      description: >
+        **Policy, settled 14 August: every transaction is stored in the base currency of the
+        region it was transacted in.**
+
+        A guest paying USD 100 in a UAE venue has the dirham equivalent stored at the
+        configured rate. The foreign amount is retained for the cashier's declaration and for
+        the foreign-tender report — it is never what the ledger holds.
+
+        The consequence is that most of the questions FX usually raises do not arise. There is
+        no rate to lock at redemption, none at expiry, and none at refund, because the stored
+        amount was never in a foreign currency. Allam: *"the value of the currency doesn't
+        matter whether it goes high or down. They are purchasing a product equivalent to that
+        currency… at the end they are paying that base currency value, and they get a refund
+        for the base currency value."*
+      tags: [ledger]
+      x-ticvai-permission: LEDGER_VIEW
+      x-ticvai-scope-level: region
+      x-ticvai-offline-capable: true
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-read-routing: replica
+      parameters:
+        - name: asAt
+          in: query
+          description: Rates in force at this instant. Defaults to now.
+          schema: { type: string, format: date-time }
+        - name: purpose
+          in: query
+          schema: { $ref: '#/components/schemas/FxRatePurpose' }
+      responses:
+        '200':
+          description: Rates
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/FxRate' }
+
+    put:
+      operationId: setFxRate
+      x-ticvai-config-scope: region
+      summary: Set a rate
+      description: >
+        Rates are **configured, not fetched live**. A published market rate moving mid-shift
+        would mean two guests paying different dirham amounts for the same product minutes
+        apart, and a cashier unable to explain either.
+
+        A rate change is a new row with its own effective window; the old one is never edited.
+        A transaction posted last Tuesday must still reconcile at last Tuesday's rate.
+
+        **Tender rates carry a spread.** The rate a venue accepts dollars at is not the
+        interbank rate, and pretending otherwise makes every foreign-tender sale look like a
+        small loss.
+      tags: [ledger]
+      x-ticvai-permission: LEDGER_APPROVE
+      x-ticvai-scope-level: region
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/FxRate' }
+      responses:
+        '201':
+          description: Set
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/FxRate' }
+        '409':
+          description: Effective window overlaps an existing rate for the same pair and purpose
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /fx/foreign-tender:
+    get:
+      operationId: getForeignTenderReport
+      summary: What was taken in which currency
+      description: >
+        Per cashier, per shift, per currency: the foreign amount taken, the rate applied, and
+        the base-currency equivalent posted.
+
+        Named explicitly on 14 August — *"a clear reporting that says foreign currency
+        transactions report, it will show you that this cashier has taken 100 dollars, 200
+        Qatari riyal."* A cashier declaring a drawer holding three currencies needs this to
+        reconcile, and without it the variance is unexplainable.
+      tags: [reporting]
+      x-ticvai-permission: LEDGER_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-read-routing: analytical
+      parameters:
+        - name: shiftId
+          in: query
+          schema: { type: string }
+        - name: from
+          in: query
+          schema: { type: string, format: date }
+        - name: to
+          in: query
+          schema: { type: string, format: date }
+      responses:
+        '200':
+          description: Foreign tender
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ForeignTenderReport' }
+
+  /fx/inter-entity:
+    get:
+      operationId: listInterEntityObligations
+      summary: What one entity owes another
+      description: >
+        A pass sold by the UAE entity and redeemed at a Qatari venue creates an obligation
+        between two legal entities holding two base currencies.
+
+        **The rule follows from the policy rather than extending it.** The sale was stored in
+        the selling entity's base currency, because that is where it was transacted. The
+        obligation arises **at redemption**, because that is when the consuming entity provides
+        the service, and it is denominated in the consuming entity's base currency at the rate
+        in force on that date.
+
+        Between the obligation arising and being settled, the rate moves. That movement is an
+        FX gain or loss on the **selling** entity's books — it holds the liability, so it
+        carries the exposure. Revalued at period close alongside every other monetary balance.
+
+        Neither entity ever holds a balance in a currency that is not its own. That is the
+        whole of the policy, applied twice.
+      tags: [ledger]
+      x-ticvai-permission: LEDGER_VIEW
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-read-routing: analytical
+      parameters:
+        - name: fromLegalEntityId
+          in: query
+          schema: { type: string, format: uuid }
+        - name: toLegalEntityId
+          in: query
+          schema: { type: string, format: uuid }
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [outstanding, settled, disputed]
+        - $ref: '../shared/common.yaml#/components/parameters/PageSize'
+        - $ref: '../shared/common.yaml#/components/parameters/PageCursor'
+      responses:
+        '200':
+          description: Obligations
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '../shared/common.yaml#/components/schemas/Page'
+                  - type: object
+                    properties:
+                      items:
+                        type: array
+                        items: { $ref: '#/components/schemas/InterEntityObligation' }
+
+  /fx/revaluation:
+    post:
+      operationId: runFxRevaluation
+      summary: Revalue monetary balances at close
+      description: >
+        Restates open inter-entity obligations and any foreign-denominated balance at the
+        closing rate, posting the movement to FX gain and loss.
+
+        Part of period close and refused outside one — revaluing mid-period produces a figure
+        that disagrees with itself the next day.
+      tags: [ledger]
+      x-ticvai-permission: LEDGER_APPROVE
+      x-ticvai-scope-level: region
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [fiscalPeriodId]
+              properties:
+                fiscalPeriodId: { type: string, format: uuid }
+                dryRun: { type: boolean, default: true }
+      responses:
+        '200':
+          description: Revaluation result
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/FxRevaluationResult' }
+        '409':
+          description: Period is not closing, or is already closed
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /ledger/entries:
+    get:
+      operationId: listLedgerEntries
+      x-ticvai-read-routing: analytical
+      summary: Query the ledger
+      tags: [ledger]
+      x-ticvai-permission: LEDGER_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - name: accountId
+          in: query
+          schema: { type: string, format: uuid }
+        - name: venueId
+          in: query
+          schema: { type: string, format: uuid }
+        - name: costCenterId
+          in: query
+          schema: { type: string, format: uuid }
+        - name: sourceType
+          in: query
+          schema: { $ref: '#/components/schemas/JournalSource' }
+        - name: sourceId
+          in: query
+          description: Trace every posting arising from one order, refund or run.
+          schema: { type: string }
+        - name: postedFrom
+          in: query
+          schema: { type: string, format: date }
+        - name: postedTo
+          in: query
+          schema: { type: string, format: date }
+        - $ref: '../shared/common.yaml#/components/parameters/PageSize'
+        - $ref: '../shared/common.yaml#/components/parameters/PageCursor'
+      responses:
+        '200':
+          description: Entries
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '../shared/common.yaml#/components/schemas/Page'
+                  - type: object
+                    properties:
+                      items:
+                        type: array
+                        items: { $ref: '#/components/schemas/LedgerEntry' }
+
+  /ledger/trial-balance:
+    get:
+      operationId: getTrialBalance
+      x-ticvai-read-routing: analytical
+      summary: Trial balance for a period
+      tags: [ledger]
+      x-ticvai-permission: LEDGER_VIEW
+      x-ticvai-scope-level: region
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - name: fiscalPeriodId
+          in: query
+          required: true
+          schema: { type: string, format: uuid }
+        - name: legalEntityId
+          in: query
+          schema: { type: string, format: uuid }
+      responses:
+        '200':
+          description: Trial balance
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/TrialBalance' }
+
+  # ---------------------------------------------------------------- variance
+  /price-variances:
+    get:
+      operationId: listPriceVariances
+      x-ticvai-read-routing: replica
+      summary: List price variances
+      description: >
+        Where the server's re-priced figure differed from the price quoted locally at point
+        of sale (CF-38). The quoted price was honoured; this is the record of the
+        difference.
+
+        Variances above the venue's threshold are flagged as exceptions requiring review.
+        Everything else is a routine posting nobody needs to look at.
+      tags: [variance]
+      x-ticvai-permission: LEDGER_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - name: venueId
+          in: query
+          schema: { type: string, format: uuid }
+        - name: exceptionsOnly
+          in: query
+          schema: { type: boolean, default: false }
+        - name: reviewStatus
+          in: query
+          schema: { $ref: '#/components/schemas/VarianceReviewStatus' }
+        - name: occurredFrom
+          in: query
+          schema: { type: string, format: date }
+        - name: occurredTo
+          in: query
+          schema: { type: string, format: date }
+        - $ref: '../shared/common.yaml#/components/parameters/PageSize'
+        - $ref: '../shared/common.yaml#/components/parameters/PageCursor'
+      responses:
+        '200':
+          description: Variances
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '../shared/common.yaml#/components/schemas/Page'
+                  - type: object
+                    properties:
+                      items:
+                        type: array
+                        items: { $ref: '#/components/schemas/PriceVariance' }
+
+  /price-variances/{varianceId}/review:
+    parameters:
+      - name: varianceId
+        in: path
+        required: true
+        schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+    post:
+      operationId: reviewPriceVariance
+      summary: Record a review decision on an exception variance
+      tags: [variance]
+      x-ticvai-permission: LEDGER_APPROVE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [outcome, note]
+              properties:
+                outcome:
+                  type: string
+                  enum: [accepted, investigated, catalogueCorrected]
+                note: { type: string, minLength: 3, maxLength: 1000 }
+      responses:
+        '200':
+          description: Reviewed
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/PriceVariance' }
+
+  # ---------------------------------------------------------------- settlement
+  /settlements:
+    get:
+      operationId: listSettlements
+      x-ticvai-consumed-by:
+        - "P10 PTR-014 Settlement & Payment History"
+      x-ticvai-read-routing: analytical
+      summary: List settlement batches
+      tags: [settlement]
+      x-ticvai-permission: SETTLEMENT_VIEW
+      x-ticvai-scope-level: region
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - name: providerName
+          in: query
+          schema: { type: string }
+        - name: status
+          in: query
+          schema: { $ref: '#/components/schemas/SettlementStatus' }
+        - $ref: '../shared/common.yaml#/components/parameters/PageSize'
+        - $ref: '../shared/common.yaml#/components/parameters/PageCursor'
+      responses:
+        '200':
+          description: Settlements
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '../shared/common.yaml#/components/schemas/Page'
+                  - type: object
+                    properties:
+                      items:
+                        type: array
+                        items: { $ref: '#/components/schemas/Settlement' }
+
+    post:
+      operationId: ingestSettlementFile
+      summary: Ingest a provider settlement file
+      description: >
+        Step one of five: ingest, parse, match, classify, auto-resolve. Monthly and
+        file-based, not per-transaction API comparison (12 Aug §17).
+      tags: [settlement]
+      x-ticvai-permission: SETTLEMENT_RECONCILE
+      x-ticvai-scope-level: region
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [providerName, periodStart, periodEnd, fileReference]
+              properties:
+                providerName: { type: string }
+                periodStart: { type: string, format: date }
+                periodEnd: { type: string, format: date }
+                fileReference:
+                  type: string
+                  description: Object storage reference. The file itself is not posted through this API.
+                format:
+                  type: string
+                  enum: [csv, fixedWidth, xml, json]
+      responses:
+        '202':
+          description: Accepted; parsing and matching proceed asynchronously
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Settlement' }
+
+  /settlements/{settlementId}:
+    parameters:
+      - name: settlementId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    get:
+      operationId: getSettlement
+      x-ticvai-read-routing: analytical
+      summary: Settlement detail with match results
+      tags: [settlement]
+      x-ticvai-permission: SETTLEMENT_VIEW
+      x-ticvai-scope-level: region
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '200':
+          description: Settlement
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Settlement' }
+        '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
+
+  /settlements/{settlementId}/exceptions:
+    parameters:
+      - name: settlementId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    get:
+      operationId: listSettlementExceptions
+      x-ticvai-read-routing: analytical
+      summary: Unmatched or mismatched settlement lines
+      description: >
+        What auto-resolution could not classify. This is the only part of settlement a human
+        should ever see — everything else matched.
+      tags: [settlement]
+      x-ticvai-permission: SETTLEMENT_VIEW
+      x-ticvai-scope-level: region
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/PageSize'
+        - $ref: '../shared/common.yaml#/components/parameters/PageCursor'
+      responses:
+        '200':
+          description: Exceptions
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '../shared/common.yaml#/components/schemas/Page'
+                  - type: object
+                    properties:
+                      items:
+                        type: array
+                        items: { $ref: '#/components/schemas/SettlementException' }
+
+    post:
+      operationId: resolveSettlementException
+      summary: Resolve a settlement exception
+      tags: [settlement]
+      x-ticvai-permission: SETTLEMENT_RECONCILE
+      x-ticvai-scope-level: region
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [exceptionId, resolution, note]
+              properties:
+                exceptionId: { type: string }
+                resolution:
+                  type: string
+                  enum: [matchedManually, writeOff, disputeRaised, providerError, timingDifference]
+                matchedPaymentId: { type: string }
+                note: { type: string, minLength: 3, maxLength: 1000 }
+      responses:
+        '200':
+          description: Resolved
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/SettlementException' }
+
+  # ---------------------------------------------------------------- fiscal
+  /legal-entities:
+    get:
+      operationId: listLegalEntities
+      x-ticvai-read-routing: replica
+      summary: List legal entities
+      description: >
+        One per country of operation. Carries the country, currency, tax registration and
+        fiscal calendar (12 Aug §14).
+      tags: [fiscal]
+      x-ticvai-permission: LEDGER_VIEW
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '200':
+          description: Entities
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/LegalEntity' }
+    post:
+      operationId: createLegalEntity
+      summary: Create a legal entity
+      tags: [fiscal]
+      x-ticvai-permission: ACCOUNT_CONFIGURE
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/LegalEntity' }
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/LegalEntity' }
+
+  /fiscal-periods:
+    get:
+      operationId: listFiscalPeriods
+      x-ticvai-read-routing: replica
+      summary: List fiscal periods
+      tags: [fiscal]
+      x-ticvai-permission: LEDGER_VIEW
+      x-ticvai-scope-level: region
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - name: legalEntityId
+          in: query
+          schema: { type: string, format: uuid }
+        - name: status
+          in: query
+          schema: { $ref: '#/components/schemas/PeriodStatus' }
+      responses:
+        '200':
+          description: Periods
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/FiscalPeriod' }
+
+  /fiscal-periods/{periodId}/begin-close:
+    parameters:
+      - name: periodId
+        in: path
+        required: true
+        schema: { type: string }
+    post:
+      operationId: beginPeriodClose
+      summary: Begin closing a period
+      description: >
+        **Postings to the period stop here**, before reconciliation starts. Without this step the balance moves while it is being counted, and the two never agree.
+      tags: [ledger]
+      x-ticvai-permission: LEDGER_APPROVE
+      x-ticvai-scope-level: region
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      responses:
+        '200':
+          description: Done
+        '409':
+          description: Not in a state that permits this
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /fiscal-periods/{periodId}/abandon-close:
+    parameters:
+      - name: periodId
+        in: path
+        required: true
+        schema: { type: string }
+    post:
+      operationId: abandonPeriodClose
+      summary: Abandon a close in progress
+      description: >
+        An exception was found that needs the period open again. Postings resume.
+      tags: [ledger]
+      x-ticvai-permission: LEDGER_APPROVE
+      x-ticvai-scope-level: region
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [reason]
+              properties:
+                reason: { type: string }
+      responses:
+        '200':
+          description: Done
+        '409':
+          description: Not in a state that permits this
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /fiscal-periods/{periodId}/reopen:
+    parameters:
+      - name: periodId
+        in: path
+        required: true
+        schema: { type: string }
+    post:
+      operationId: reopenPeriod
+      summary: Reopen a closed period
+      description: >
+        **Rare and heavily controlled.** Reopening restates figures somebody has already reported, so it requires an approver who is not the requester and records why.
+      tags: [ledger]
+      x-ticvai-permission: LEDGER_APPROVE
+      x-ticvai-scope-level: region
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [reason]
+              properties:
+                reason: { type: string }
+                approverPrincipalId: { type: string }
+      responses:
+        '200':
+          description: Done
+        '409':
+          description: Not in a state that permits this
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /fiscal-periods/{periodId}/close:
+    parameters:
+      - name: periodId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    post:
+      operationId: closeFiscalPeriod
+      summary: Close a period and lock postings
+      description: >
+        Runs the close checks and, if they pass, locks the period. Nothing may post to a
+        closed period; corrections go to the current open one as reversals.
+
+        **FX revaluation of open cross-currency balances is part of close and is not yet
+        implemented** — it depends on CF-37.
+      tags: [fiscal]
+      x-ticvai-permission: LEDGER_APPROVE
+      x-ticvai-scope-level: region
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                dryRun:
+                  type: boolean
+                  default: false
+                  description: Run the checks and report without locking.
+      responses:
+        '200':
+          description: Closed, or checks reported when dry run
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/PeriodCloseResult' }
+        '409':
+          description: >
+            Close checks failed — unapproved journals, unreconciled settlements, open
+            shifts, or a prior period still open.
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  # ---------------------------------------------------------------- reporting
+  /reports/financial:
+    get:
+      operationId: getFinancialReport
+      x-ticvai-read-routing: analytical
+      summary: P&L, balance sheet or cash flow
+      description: >
+        Served from the reporting replica, never the primary. A month-end report running
+        against the transactional database during a venue spike is the single most likely
+        cause of an outage.
+      tags: [reporting]
+      x-ticvai-permission: REPORT_VIEW_VENUE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - name: report
+          in: query
+          required: true
+          schema:
+            type: string
+            enum: [profitAndLoss, balanceSheet, cashFlow, revenueByVenue, revenueByProduct, taxSummary]
+        - name: fiscalPeriodId
+          in: query
+          required: true
+          schema: { type: string, format: uuid }
+        - name: legalEntityId
+          in: query
+          schema: { type: string, format: uuid }
+        - name: venueId
+          in: query
+          schema: { type: string, format: uuid }
+        - name: costCenterId
+          in: query
+          schema: { type: string, format: uuid }
+      responses:
+        '200':
+          description: Report
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/FinancialReport' }
+        '403': { $ref: '../shared/common.yaml#/components/responses/Forbidden' }
+
+components:
+  schemas:
+    AccountType:
+      type: string
+      enum: [asset, liability, equity, revenue, expense]
+
+    Account:
+      x-ticvai-persistence: "ledger.account"
+      type: object
+      required: [id, code, name, type, legalEntityId, isPostable, isActive]
+      properties:
+        id: { type: string, format: uuid }
+        code: { type: string, maxLength: 64 }
+        externalCode:
+          type: string
+          nullable: true
+          description: Code in the client's own chart. Used on export so their team sees their codes.
+        name: { type: string, maxLength: 200 }
+        type: { $ref: '#/components/schemas/AccountType' }
+        parentId: { type: string, format: uuid, nullable: true }
+        legalEntityId: { type: string, format: uuid }
+        currency: { type: string, pattern: '^[A-Z]{3}$' }
+        isPostable:
+          type: boolean
+          description: False for parent accounts, which aggregate only.
+        isActive: { type: boolean }
+        balance: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+
+    CreateAccountRequest:
+      type: object
+      required: [code, name, type, legalEntityId]
+      properties:
+        code: { type: string, maxLength: 64, pattern: '^[A-Za-z0-9._-]+$' }
+        externalCode: { type: string, maxLength: 64 }
+        name: { type: string, maxLength: 200 }
+        type: { $ref: '#/components/schemas/AccountType' }
+        parentId: { type: string, format: uuid }
+        legalEntityId: { type: string, format: uuid }
+        isPostable: { type: boolean, default: true }
+
+    PostingEventType:
+      type: string
+      description: Every event that generates a ledger posting.
+      enum:
+        - ticketRevenue
+        - fnbRevenue
+        - retailRevenue
+        - rentalRevenue
+        - taxPayable
+        - cashReceived
+        - cardReceived
+        - walletReceived
+        - refundIssued
+        - voidReversal
+        - deferredRevenue
+        - recognisedRevenue
+        - breakageRevenue
+        - priceVariance
+        - cashOverShort
+        - settlementFee
+        - settlementClearing
+
+    AccountMapping:
+      x-ticvai-persistence: "ledger.account_mapping"
+      type: object
+      required: [eventType, debitAccountId, creditAccountId]
+      properties:
+        eventType: { $ref: '#/components/schemas/PostingEventType' }
+        debitAccountId: { type: string, format: uuid }
+        creditAccountId: { type: string, format: uuid }
+        venueId:
+          type: string
+          format: uuid
+          nullable: true
+          description: Null applies the mapping to every venue in the region.
+
+    CostCenter:
+      x-ticvai-persistence: "ledger.cost_center"
+      type: object
+      required: [id, code, name]
+      properties:
+        id: { type: string, format: uuid }
+        code: { type: string }
+        name: { type: string }
+        parentId: { type: string, format: uuid, nullable: true }
+        venueId: { type: string, format: uuid, nullable: true }
+        isActive: { type: boolean }
+
+    TaxCode:
+      x-ticvai-persistence: "ledger.tax_code"
+      type: object
+      required: [id, code, name, countryCode, rate, effectiveFrom, isActive]
+      properties:
+        id: { type: string, format: uuid }
+        code: { type: string, maxLength: 64 }
+        name: { type: string, maxLength: 200 }
+        countryCode: { type: string, pattern: '^[A-Z]{2}$' }
+        rate: { type: number, minimum: 0, maximum: 100 }
+        compoundOnTaxCodeId:
+          type: string
+          format: uuid
+          nullable: true
+          description: >
+            When set, this tax applies to the base **plus** the referenced tax, not to the
+            base alone. Ordering is explicit rather than implied.
+        isInclusive:
+          type: boolean
+          description: True when the displayed price already contains this tax.
+        accountId: { type: string, format: uuid }
+        effectiveFrom: { type: string, format: date }
+        effectiveTo: { type: string, format: date, nullable: true }
+        isActive: { type: boolean }
+
+    CreateTaxCodeRequest:
+      type: object
+      required: [code, name, countryCode, rate, effectiveFrom, accountId]
+      properties:
+        code: { type: string, maxLength: 64 }
+        name: { type: string, maxLength: 200 }
+        countryCode: { type: string, pattern: '^[A-Z]{2}$' }
+        rate: { type: number, minimum: 0, maximum: 100 }
+        compoundOnTaxCodeId: { type: string, format: uuid }
+        isInclusive: { type: boolean, default: false }
+        accountId: { type: string, format: uuid }
+        effectiveFrom: { type: string, format: date }
+
+    TaxExemption:
+      x-ticvai-persistence: "ledger.tax_exemption"
+      type: object
+      required: [id, scope, taxCodeId, reason]
+      properties:
+        id: { type: string, format: uuid }
+        scope:
+          type: string
+          enum: [account, productKind, channel, legalEntity]
+        scopeRef:
+          type: string
+          description: Identifier of the exempt subject, matching `scope`.
+        taxCodeId: { type: string, format: uuid }
+        reason: { type: string, maxLength: 500 }
+        certificateReference: { type: string, nullable: true }
+        validFrom: { type: string, format: date }
+        validTo: { type: string, format: date, nullable: true }
+
+    CalculateTaxRequest:
+      type: object
+      required: [venueId, lines]
+      properties:
+        venueId: { type: string, format: uuid }
+        accountId:
+          type: string
+          format: uuid
+          nullable: true
+          description: For exemption evaluation.
+        discountsAreTaxInclusive:
+          type: boolean
+          default: true
+          description: >
+            True reduces the taxable base by the discount. False applies tax to the
+            undiscounted amount. Venue policy.
+        lines:
+          type: array
+          minItems: 1
+          items:
+            type: object
+            required: [lineId, netAmount, taxCodeIds]
+            properties:
+              lineId: { type: string }
+              netAmount: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+              discountAmount: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+              taxCodeIds:
+                type: array
+                items: { type: string, format: uuid }
+
+    TaxCalculation:
+      x-ticvai-persistence: "none — computed"
+      type: object
+      required: [lines, totalTax]
+      properties:
+        totalTax: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+        lines:
+          type: array
+          items:
+            type: object
+            required: [lineId, taxableBase, appliedTaxes, lineTax]
+            properties:
+              lineId: { type: string }
+              taxableBase: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+              appliedTaxes:
+                type: array
+                description: In application order, so a compound calculation can be traced.
+                items:
+                  type: object
+                  required: [taxCodeId, rate, base, amount, isCompound]
+                  properties:
+                    taxCodeId: { type: string, format: uuid }
+                    rate: { type: number }
+                    base: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+                    amount: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+                    isCompound: { type: boolean }
+                    exemptionApplied: { type: boolean }
+              lineTax: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+
+    RecognitionMethod:
+      type: string
+      enum:
+        - immediate          # POS sale of goods
+        - onRedemption       # gift cards, multi-venue passes
+        - straightLine       # annual passes over their term
+        - perVisit           # annual passes by usage
+        - onExpiry           # breakage
+
+    RecognitionSchedule:
+      x-ticvai-persistence: "ledger.recognition_schedule"
+      type: object
+      required: [id, name, method, productKinds]
+      properties:
+        id: { type: string, format: uuid }
+        name: { type: string, maxLength: 200 }
+        method: { $ref: '#/components/schemas/RecognitionMethod' }
+        productKinds:
+          type: array
+          items: { type: string }
+        deferredAccountId: { type: string, format: uuid }
+        recognisedAccountId: { type: string, format: uuid }
+        breakageAccountId: { type: string, format: uuid, nullable: true }
+        breakageAfterDays:
+          type: integer
+          nullable: true
+          description: Days after expiry at which unredeemed value becomes breakage.
+        isActive: { type: boolean }
+
+    DeferredRevenueReport:
+      x-ticvai-persistence: "none — computed"
+      type: object
+      required: [asAt, total, buckets]
+      properties:
+        asAt: { type: string, format: date }
+        total: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+        buckets:
+          type: array
+          items:
+            type: object
+            required: [label, amount, itemCount]
+            properties:
+              label:
+                type: string
+                description: Ageing band by expected recognition date.
+              amount: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+              itemCount: { type: integer }
+              method: { $ref: '#/components/schemas/RecognitionMethod' }
+
+    RecognitionRunResult:
+      x-ticvai-persistence: "none — computed"
+      type: object
+      required: [fiscalPeriodId, dryRun, recognisedTotal, breakageTotal, entryCount]
+      properties:
+        fiscalPeriodId: { type: string, format: uuid }
+        dryRun: { type: boolean }
+        recognisedTotal: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+        breakageTotal: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+        entryCount: { type: integer }
+        byMethod:
+          type: array
+          items:
+            type: object
+            properties:
+              method: { $ref: '#/components/schemas/RecognitionMethod' }
+              amount: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+              itemCount: { type: integer }
+        journalEntryIds:
+          type: array
+          items: { type: string }
+
+    JournalStatus:
+      type: string
+      enum: [draft, pendingApproval, posted, reversed]
+
+    JournalSource:
+      type: string
+      enum: [manual, order, refund, void, shift, recognition, settlement, variance, reversal]
+
+    JournalLine:
+      type: object
+      required: [accountId, debit, credit]
+      properties:
+        accountId: { type: string, format: uuid }
+        debit: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+        credit: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+        venueId: { type: string, format: uuid, nullable: true }
+        costCenterId: { type: string, format: uuid, nullable: true }
+        description: { type: string, maxLength: 500 }
+
+    CreateJournalEntryRequest:
+      type: object
+      required: [id, fiscalPeriodId, description, lines]
+      properties:
+        id: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+        fiscalPeriodId: { type: string, format: uuid }
+        postingDate: { type: string, format: date }
+        description: { type: string, minLength: 3, maxLength: 500 }
+        reference: { type: string, maxLength: 128 }
+        lines:
+          type: array
+          minItems: 2
+          items: { $ref: '#/components/schemas/JournalLine' }
+
+    JournalEntry:
+      x-ticvai-persistence: "ledger.journal_entry + ledger.journal_line"
+      type: object
+      required: [id, entryNumber, fiscalPeriodId, status, source, description, lines, totalDebit, totalCredit, createdAt]
+      properties:
+        id: { type: string }
+        entryNumber: { type: string }
+        fiscalPeriodId: { type: string, format: uuid }
+        status: { $ref: '#/components/schemas/JournalStatus' }
+        source: { $ref: '#/components/schemas/JournalSource' }
+        sourceId:
+          type: string
+          nullable: true
+          description: The order, refund or run that generated this entry.
+        description: { type: string }
+        reference: { type: string, nullable: true }
+        lines:
+          type: array
+          items: { $ref: '#/components/schemas/JournalLine' }
+        totalDebit: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+        totalCredit: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+        postedByPrincipalId: { type: string, format: uuid, nullable: true }
+        approvedByPrincipalId: { type: string, format: uuid, nullable: true }
+        reversalOfEntryId: { type: string, nullable: true }
+        reversedByEntryId: { type: string, nullable: true }
+        createdAt: { type: string, format: date-time }
+        postedAt: { type: string, format: date-time, nullable: true }
+
+    LedgerEntry:
+      x-ticvai-persistence: "ledger.entry"
+      type: object
+      required: [id, journalEntryId, accountId, debit, credit, postedAt]
+      properties:
+        id: { type: string }
+        journalEntryId: { type: string }
+        accountId: { type: string, format: uuid }
+        accountCode: { type: string }
+        debit: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+        credit: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+        venueId: { type: string, format: uuid, nullable: true }
+        costCenterId: { type: string, format: uuid, nullable: true }
+        source: { $ref: '#/components/schemas/JournalSource' }
+        sourceId: { type: string, nullable: true }
+        description: { type: string }
+        postedAt: { type: string, format: date-time }
+
+    TrialBalance:
+      x-ticvai-persistence: "none — computed"
+      type: object
+      required: [fiscalPeriodId, isBalanced, totalDebit, totalCredit, accounts]
+      properties:
+        fiscalPeriodId: { type: string, format: uuid }
+        isBalanced:
+          type: boolean
+          description: >
+            False indicates a defect, not a business condition. Double-entry cannot be
+            unbalanced by legitimate activity.
+        totalDebit: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+        totalCredit: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+        accounts:
+          type: array
+          items:
+            type: object
+            required: [accountId, accountCode, accountName, debit, credit, balance]
+            properties:
+              accountId: { type: string, format: uuid }
+              accountCode: { type: string }
+              accountName: { type: string }
+              type: { $ref: '#/components/schemas/AccountType' }
+              debit: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+              credit: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+              balance: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+
+    VarianceReviewStatus:
+      type: string
+      enum: [notRequired, pendingReview, reviewed]
+
+    PriceVariance:
+      x-ticvai-persistence: "ledger.price_variance"
+      type: object
+      required: [id, orderId, orderLineId, venueId, quotedPrice, serverPrice, variance, isException, occurredAt]
+      properties:
+        id: { type: string }
+        orderId: { type: string }
+        orderLineId: { type: string }
+        venueId: { type: string, format: uuid }
+        variantId: { type: string, format: uuid }
+        quotedPrice: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+        serverPrice: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+        variance: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+        catalogueBundleVersion:
+          type: string
+          nullable: true
+          description: >
+            The bundle the terminal priced from. Turns "the price was wrong" into "the
+            terminal was two bundles behind", which is actionable.
+        isException:
+          type: boolean
+          description: Above the venue's configured variance threshold.
+        reviewStatus: { $ref: '#/components/schemas/VarianceReviewStatus' }
+        reviewOutcome: { type: string, nullable: true }
+        reviewedByPrincipalId: { type: string, format: uuid, nullable: true }
+        journalEntryId: { type: string, nullable: true }
+        occurredAt: { type: string, format: date-time }
+
+    FxRatePurpose:
+      type: string
+      description: >
+        A venue does not accept dollars at the rate it books an intercompany balance at.
+        Separating them is what stops a spread on the counter appearing as a loss in the
+        accounts.
+      enum:
+        - tender          # what the counter accepts foreign cash at. Carries a spread
+        - interEntity     # obligations between legal entities
+        - reporting       # consolidation into a presentation currency
+        - revaluation     # period close
+
+    FxRate:
+      type: object
+      x-ticvai-persistence: "ledger.fx_rate"
+      required: [fromCurrency, toCurrency, rate, purpose, effectiveFrom]
+      properties:
+        id: { type: string, format: uuid, readOnly: true }
+        fromCurrency: { type: string, pattern: '^[A-Z]{3}$' }
+        toCurrency: { type: string, pattern: '^[A-Z]{3}$' }
+        rate:
+          type: number
+          description: >
+            Units of `toCurrency` per one `fromCurrency`. Six decimal places — a two-place
+            rate on a three-place currency loses money on every transaction, quietly.
+        purpose: { $ref: '#/components/schemas/FxRatePurpose' }
+        source:
+          type: string
+          enum: [manual, centralBank, provider]
+          description: >
+            Configured, not fetched live. A market rate moving mid-shift means two guests pay
+            different dirham amounts for the same product minutes apart.
+        effectiveFrom: { type: string, format: date-time }
+        effectiveTo:
+          type: string
+          format: date-time
+          nullable: true
+          description: >
+            A rate change is a new row. The old one is never edited — a transaction posted last
+            Tuesday must still reconcile at last Tuesday's rate.
+        setByPrincipalId: { type: string, format: uuid, readOnly: true }
+
+    ForeignTenderReport:
+      type: object
+      x-ticvai-persistence: "none — aggregated from payment"
+      required: [lines, asAt]
+      properties:
+        asAt: { type: string, format: date-time }
+        lines:
+          type: array
+          items:
+            type: object
+            properties:
+              shiftId: { type: string }
+              principalId: { type: string, format: uuid }
+              principalName: { type: string }
+              currency: { type: string, pattern: '^[A-Z]{3}$' }
+              foreignAmount:
+                type: number
+                description: What was physically taken. The cashier counts this in the drawer.
+              rateApplied: { type: number }
+              baseAmount:
+                allOf:
+                  - $ref: '../shared/common.yaml#/components/schemas/Money'
+                description: What the ledger holds. The only figure that reconciles.
+              transactionCount: { type: integer }
+
+    InterEntityObligation:
+      type: object
+      x-ticvai-persistence: "ledger.inter_entity_obligation"
+      required: [id, fromLegalEntityId, toLegalEntityId, arisingAmount, arisingAt, status]
+      properties:
+        id: { type: string }
+        fromLegalEntityId:
+          type: string
+          format: uuid
+          description: The selling entity. Holds the liability, and therefore the FX exposure.
+        toLegalEntityId:
+          type: string
+          format: uuid
+          description: The consuming entity, which provided the service at redemption.
+        entitlementId: { type: string }
+        orderId: { type: string }
+        arisingAmount:
+          allOf:
+            - $ref: '../shared/common.yaml#/components/schemas/Money'
+          description: >
+            In the **consuming** entity's base currency, at the rate in force on the redemption
+            date. Neither entity ever holds a balance in a currency that is not its own.
+        rateApplied: { type: number }
+        arisingAt:
+          type: string
+          format: date-time
+          description: Redemption. Not sale — the obligation exists when the service is given.
+        status:
+          type: string
+          enum: [outstanding, settled, disputed]
+        settledAt: { type: string, format: date-time, nullable: true }
+        settlementRate: { type: number, nullable: true }
+        fxMovement:
+          allOf:
+            - $ref: '../shared/common.yaml#/components/schemas/Money'
+          description: >
+            Rate movement between arising and settling. Posts to FX gain and loss on the
+            selling entity, which carried the balance.
+
+    FxRevaluationResult:
+      type: object
+      x-ticvai-persistence: "none — computed, posts a journal"
+      required: [fiscalPeriodId, obligationsRevalued, netMovement, isDryRun]
+      properties:
+        fiscalPeriodId: { type: string, format: uuid }
+        isDryRun: { type: boolean }
+        obligationsRevalued: { type: integer }
+        netMovement: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+        journalEntryId: { type: string, nullable: true }
+        byEntity:
+          type: array
+          items:
+            type: object
+            properties:
+              legalEntityId: { type: string, format: uuid }
+              openBalance: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+              movement: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+
+    SettlementStatus:
+      type: string
+      enum: [ingesting, parsing, matching, matched, hasExceptions, resolved, failed]
+
+    Settlement:
+      x-ticvai-persistence: "ledger.settlement"
+      type: object
+      required: [id, providerName, periodStart, periodEnd, status, ingestedAt]
+      properties:
+        id: { type: string, format: uuid }
+        providerName: { type: string }
+        periodStart: { type: string, format: date }
+        periodEnd: { type: string, format: date }
+        status: { $ref: '#/components/schemas/SettlementStatus' }
+        lineCount: { type: integer }
+        matchedCount: { type: integer }
+        exceptionCount: { type: integer }
+        providerGross: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+        providerFees: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+        providerNet: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+        ledgerGross: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+        difference: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+        ingestedAt: { type: string, format: date-time }
+        completedAt: { type: string, format: date-time, nullable: true }
+
+    SettlementException:
+      x-ticvai-persistence: "ledger.settlement_exception"
+      type: object
+      required: [id, settlementId, kind, providerReference, amount]
+      properties:
+        id: { type: string }
+        settlementId: { type: string, format: uuid }
+        kind:
+          type: string
+          enum: [unmatchedInProvider, unmatchedInLedger, amountMismatch, duplicateInProvider, feeUnexplained]
+        providerReference: { type: string, nullable: true }
+        paymentId: { type: string, nullable: true }
+        amount: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+        expectedAmount: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+        resolution: { type: string, nullable: true }
+        resolvedByPrincipalId: { type: string, format: uuid, nullable: true }
+        resolvedAt: { type: string, format: date-time, nullable: true }
+
+    LegalEntity:
+      x-ticvai-persistence: "ledger.legal_entity"
+      type: object
+      required: [id, code, name, countryCode, currency, currencyScale, fiscalYearStartMonth]
+      properties:
+        id: { type: string, format: uuid }
+        code: { type: string, maxLength: 64 }
+        name: { type: string, maxLength: 200 }
+        countryCode: { type: string, pattern: '^[A-Z]{2}$' }
+        currency: { type: string, pattern: '^[A-Z]{3}$' }
+        currencyScale: { type: integer, minimum: 0, maximum: 4 }
+        taxRegistrationNumber: { type: string, nullable: true }
+        fiscalYearStartMonth: { type: integer, minimum: 1, maximum: 12 }
+        regionIds:
+          type: array
+          items: { type: string, format: uuid }
+        isActive: { type: boolean }
+
+    PeriodStatus:
+      type: string
+      enum: [open, closing, closed]
+
+    FiscalPeriod:
+      x-ticvai-persistence: "ledger.fiscal_period"
+      type: object
+      required: [id, legalEntityId, name, startDate, endDate, status]
+      properties:
+        id: { type: string, format: uuid }
+        legalEntityId: { type: string, format: uuid }
+        name: { type: string }
+        startDate: { type: string, format: date }
+        endDate: { type: string, format: date }
+        status: { $ref: '#/components/schemas/PeriodStatus' }
+        closedByPrincipalId: { type: string, format: uuid, nullable: true }
+        closedAt: { type: string, format: date-time, nullable: true }
+
+    PeriodCloseResult:
+      x-ticvai-persistence: "none — computed"
+      type: object
+      required: [fiscalPeriodId, dryRun, passed, checks]
+      properties:
+        fiscalPeriodId: { type: string, format: uuid }
+        dryRun: { type: boolean }
+        passed: { type: boolean }
+        checks:
+          type: array
+          items:
+            type: object
+            required: [check, passed]
+            properties:
+              check:
+                type: string
+                enum:
+                  - trialBalanceBalances
+                  - noUnapprovedJournals
+                  - noOpenShifts
+                  - settlementsReconciled
+                  - recognitionRunComplete
+                  - priorPeriodClosed
+                  - varianceExceptionsReviewed
+              passed: { type: boolean }
+              detail: { type: string }
+              blockingCount: { type: integer }
+
+    FinancialReport:
+      x-ticvai-persistence: "none — computed from replica"
+      type: object
+      required: [report, fiscalPeriodId, currency, generatedAt, sections]
+      properties:
+        report: { type: string }
+        fiscalPeriodId: { type: string, format: uuid }
+        legalEntityId: { type: string, format: uuid, nullable: true }
+        currency: { type: string, pattern: '^[A-Z]{3}$' }
+        currencyScale: { type: integer }
+        generatedAt: { type: string, format: date-time }
+        sections:
+          type: array
+          items:
+            type: object
+            required: [name, lines, total]
+            properties:
+              name: { type: string }
+              lines:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    label: { type: string }
+                    accountCode: { type: string, nullable: true }
+                    amount: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+                    priorPeriodAmount: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+              total: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

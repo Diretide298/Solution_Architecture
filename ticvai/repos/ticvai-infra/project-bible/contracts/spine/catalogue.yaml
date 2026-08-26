@@ -1,0 +1,3791 @@
+openapi: 3.1.0
+info:
+  title: TICVAI Catalogue & Entitlement
+  version: 0.1.0
+  x-ticvai-screen-count: 49
+  x-ticvai-tier: spine
+  x-ticvai-module: "1 — Ticketing Catalogue"
+  x-ticvai-requirements: 312
+  x-ticvai-capabilities: [C20, C79, C80, C81, C84, C85, C102, C103, C104]
+  x-ticvai-platforms:
+    - "P08 Venue Management"
+    - "P04 POS"
+    - "P01 Guest Web"
+    - "P02 Guest App"
+    - "P05 Guest Kiosk"
+    - "P10 Partner Web"
+  description: >
+    ## What this contract covers
+
+    **Defines what can be sold and what it grants.**
+
+    | | |
+    |---|---|
+    | **Tier** | spine |
+    | **Matrix domain** | 1 — Ticketing Catalogue |
+    | **Requirements** | ~312 |
+    | **Capabilities** | C20, C79, C80, C81, C84, C85, C102, C103, C104 |
+    | **Consumed by** | P08 Venue Management · P04 POS · P01 Guest Web · P02 Guest App · P05 Guest Kiosk · P10 Partner Web |
+
+    ## How to read this file
+
+    **This file is a contract.** It is hand-authored and it is the source of truth for one
+    bounded context: server code, client code and mock servers are generated from it, never
+    the other way round. If a field is not here, it does not exist.
+
+    **Contracts are split into two tiers.**
+
+    - **Spine** — the eight contexts everything else depends on: tenancy, identity,
+      catalogue, orders, shift, access, finance, cross-cell. Frozen first. A change here
+      requires a formal change request, because every satellite has pinned against it.
+    - **Satellite** — a domain that builds on the spine and can move independently.
+      Cheaper to change.
+
+    **`paths` are operations.** Each one declares four TICVAI extensions, and Redocly
+    rejects any that does not:
+
+    | Extension | Answers |
+    |---|---|
+    | `x-ticvai-permission` | Which permission the caller needs. From one enum in `shared/permissions.yaml` — never hand-typed |
+    | `x-ticvai-scope-level` | Where in the seven-level hierarchy that permission must be held |
+    | `x-ticvai-offline-capable` | Whether a disconnected terminal may queue this |
+    | `x-ticvai-conflict-policy` | How a replayed operation resolves — `append`, `serverWins`, `manual` |
+
+    Where `x-ticvai-permission` is null, one of these says why: `x-ticvai-auth: service`
+    (cell-to-cell), `x-ticvai-self-scoped` (acts only on the caller's own resources), or
+    `security: []` (genuinely public).
+
+    **`components.schemas` are API schemas — the shape of data on the wire.** They are not
+    database tables. One API schema may become three columns (`Money`) or five tables
+    (`Order`); some have no table at all (`ValidationResult`, `TrialBalance`). Roughly 70%
+    of the DDL derives from these, and the rest — partitioning, RLS, the PII split — is
+    storage design that lives in the migration scripts.
+
+    **Where a schema maps to storage, `x-ticvai-persistence` says so.** The value is a table
+    name, a list of tables, or `none` with a reason. It is documentation of the mapping, not
+    a generator input — the DDL lives in versioned SQL migrations, because partitioning, RLS
+    policies, `ltree` indexes and partial indexes have no expression in OpenAPI.
+
+    **`security` arrays hold OAuth scopes.** Empty means "this scheme, no scopes" — for
+    bearer tokens there is nothing to list. Empty is not the same as absent: absent means
+    unauthenticated.
+
+
+    ## This context
+
+    Products, pricing, events, capacity — and the two mechanisms local-first point of sale
+    depends on: signed catalogue bundles and inventory leases.
+
+    Positions this encodes:
+
+    - Point of sale reads the catalogue from a local bundle, always (ADR-0013). The
+      endpoints here that a terminal calls are bundle pull and lease acquisition. It does
+      NOT call product or price endpoints on the transaction path.
+    - Contended inventory uses leases, not replication. A terminal holds N units for a TTL
+      and refuses the sale on exhaustion rather than overselling.
+    - Seated inventory is blocked offline. A seat map is not a count.
+    - Adding an attribute value generates sellable variants. The variant table is
+      materialised, not computed at read time.
+    - Identity and entitlement are separate. Ticket ID and Media Code are different things.
+
+    DEFERRED from this version: product lifecycle and approval (C79), ticket resale
+    marketplace (C80, no MoM coverage), portfolio management (C81), alternative codes for
+    third-party systems.
+
+servers:
+  - url: https://{cellHost}/api/v1
+    variables:
+      cellHost:
+        default: cell.ticvai.local
+
+security:
+  - bearerAuth: []
+
+tags:
+  - name: product
+  - name: entitlement
+  - name: pricing
+  - name: event
+  - name: capacity
+  - name: bundle
+  - name: lease
+  - name: entitlement
+
+paths:
+  # ---------------------------------------------------------------- products
+  /product-categories:
+    get:
+      operationId: listProductCategories
+      x-ticvai-consumed-by:
+        - "P08 BO-115 Category, Brand & Merchandise Hierarchy"
+      summary: The merchandise hierarchy — categories, brands, collections
+      description: >
+        Retail Board 2. **`listSeatCategories` existed and a product category did not** — a seat
+        category prices a seat; this groups a catalogue.
+
+        **Returned as a tree, not a flat list with parent ids.** A merchandiser reading a hierarchy
+        five levels deep should not have to reassemble it, and every caller that does will
+        reassemble it differently.
+      tags: [catalogue]
+      x-ticvai-permission: PRODUCT_VIEW
+      x-ticvai-guest-callable: true
+      x-ticvai-audience: [staff, guest]
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      x-ticvai-offline-capable: true
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '200':
+          description: The tree
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/ProductCategory' }
+    put:
+      operationId: setProductCategories
+      x-ticvai-consumed-by:
+        - "P08 BO-115 Category, Brand & Merchandise Hierarchy"
+      summary: Define the hierarchy, in the order a guest sees it
+      description: >
+        **The whole tree in one call.** A hierarchy edited node by node is a hierarchy that spends
+        time in states nobody intended — a category reparented before its new parent exists.
+
+        **Refuses a cycle**, and refuses deleting a category that names products: **a category with
+        a season behind it still names what was sold under it**, and removing it rewrites last
+        year's report. Deactivate instead.
+      tags: [catalogue]
+      x-ticvai-permission: PRODUCT_CONFIGURE
+      x-ticvai-audience: [staff]
+      x-ticvai-scope-level: venue
+      x-ticvai-config-scope: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [categories]
+              properties:
+                categories:
+                  type: array
+                  items: { $ref: '#/components/schemas/ProductCategory' }
+      responses:
+        '200':
+          description: Set
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/ProductCategory' }
+
+  /products/import/{jobId}/commit:
+    parameters:
+      - name: jobId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    post:
+      operationId: commitCatalogueImport
+      summary: Apply a parsed catalogue import
+      description: >
+        1.4.2. The second phase. **An operator has seen the findings and accepted them** — two-phase
+        exists so nobody commits 2,847 products sight-unseen.
+
+        Refuses a job whose `outcome` is `nothingFound` or `unreadable`. **A commit that applies
+        nothing and reports success is the defect CF-122 fixed in `seating`**, and it is not being
+        rebuilt here.
+      tags: [catalogue]
+      x-ticvai-permission: PRODUCT_CONFIGURE
+      x-ticvai-audience: [staff]
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      responses:
+        '200':
+          description: Applied
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/CatalogueImportJob' }
+        '409':
+          description: >
+            The job found nothing, or was already committed. **Partial application is reported
+            rather than rolled back** — three thousand products half-created is a state somebody has
+            to see to repair.
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /guests/me/memberships:
+    get:
+      operationId: getMyMemberships
+      x-ticvai-consumed-by:
+        - "P02 GST-015 Memberships"
+      summary: A guest's own memberships, benefits and history
+      description: >
+        19.2.26 to 19.2.28. **`membership` is a `ProductKind`, so purchase and renewal already ride
+        the order path — and nothing returned a guest their own membership.** No active list, no tier
+        benefits, no prior terms.
+
+        Three requirements and one operation, because they are one screen: **what I have, what it
+        gets me, and what I used to have.**
+
+        Includes lapsed terms. **A guest deciding whether to renew is comparing against what they
+        had**, and a membership that vanishes on expiry makes that impossible.
+      tags: [catalogue]
+      x-ticvai-permission: PRODUCT_VIEW
+      x-ticvai-guest-callable: true
+      x-ticvai-audience: [staff, guest]
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - name: includeLapsed
+          in: query
+          schema: { type: boolean, default: true }
+      responses:
+        '200':
+          description: Memberships
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/GuestMembership' }
+
+  /products/import:
+    post:
+      operationId: importProductCatalogue
+      x-ticvai-consumed-by:
+        - "P08 BO-117 Product Import, Governance & AI Configuration Assistant"
+      summary: Parse a catalogue file into a preview
+      description: >
+        1.4.2 and 1.4.3. **`seating` has a two-phase import built for exactly this shape of problem
+        and validated against real client files; `catalogue` had nothing**, so a venue with three
+        thousand products creates them one at a time.
+
+        Two-phase for the same reason it is in `seating`: **an operator should see "2,847 products,
+        14 with no price, 3 duplicate codes" before anything is written.**
+
+        Also the export half of 1.4.3 — the same file moves a catalogue between environments, which
+        is how a staging venue gets real data without hand-entry.
+      tags: [catalogue]
+      x-ticvai-permission: PRODUCT_CONFIGURE
+      x-ticvai-audience: [staff]
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [format, sourceRef]
+              properties:
+                format: { type: string, enum: [csv, xlsx, json] }
+                sourceRef: { type: string }
+                mode:
+                  type: string
+                  enum: [createOnly, upsert, replaceCategory]
+                  default: createOnly
+                  description: >
+                    **`replaceCategory` is the dangerous one and is named so it can be refused.**
+                    Replacing a category with live orders against it is not an import, it is a
+                    migration.
+      responses:
+        '202':
+          description: Parsed to a preview
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/CatalogueImportJob' }
+
+  /guest/memberships:
+    get:
+      operationId: listGuestMemberships
+      summary: A guest's memberships, benefits and history
+      description: >
+        19.2.26 to 19.2.28. **`membership` is a `ProductKind`, so purchase and renewal already ride
+        the order path — and nothing returned a guest their own memberships.**
+
+        Three requirements and one operation, because they are one screen: what I hold, what it
+        entitles me to, and what I held before.
+
+        **Tier benefits come from the product, not from a separate benefits table** (5.4.31). A
+        benefit nobody can trace to the thing that grants it is a benefit nobody can honour at a
+        gate.
+
+        Lapsed terms are included — **a guest who let a pass expire is the guest most worth showing
+        a renewal to**, and hiding the history hides the reason.
+      tags: [catalogue]
+      x-ticvai-permission: PRODUCT_VIEW
+      x-ticvai-guest-callable: true
+      x-ticvai-audience: [staff, guest]
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - name: includeLapsed
+          in: query
+          schema: { type: boolean, default: true }
+      responses:
+        '200':
+          description: Memberships, current first
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/GuestMembership' }
+
+  /products/{productId}/versions:
+    parameters:
+      - name: productId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    get:
+      operationId: listProductVersions
+      summary: What this product used to be
+      description: >
+        1.1.47, 1.4.9. **The fourth appearance of one mechanism** — product versioning at 1.1, event
+        templates at 1.3, version-restore at 1.4, and `white-label` already implements the whole
+        pattern for tenant configuration.
+
+        `ProductVariant` is never deleted because orders reference it, which is version discipline
+        without a version record. **This is the record.**
+      tags: [catalogue]
+      x-ticvai-permission: PRODUCT_VIEW
+      x-ticvai-audience: [staff]
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '200':
+          description: Versions, newest first
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/ProductVersion' }
+
+  /products/{productId}/versions/{version}/restore:
+    parameters:
+      - name: productId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+      - name: version
+        in: path
+        required: true
+        schema: { type: integer }
+    post:
+      operationId: restoreProductVersion
+      summary: Put a previous version back
+      description: >
+        1.4.10. **Restoring creates a new version rather than rewinding to an old one**, following
+        `restoreConfigVersion`. A price that was wrong for three days stays visible in the history,
+        because a finance query run next quarter has to reproduce what was charged.
+
+        **Orders are untouched.** They reference the variant they were sold against and always will.
+      tags: [catalogue]
+      x-ticvai-permission: PRODUCT_CONFIGURE
+      x-ticvai-audience: [staff]
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [note]
+              properties:
+                note: { type: string, maxLength: 300 }
+      responses:
+        '200':
+          description: Restored as a new version
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Product' }
+
+  /products/{productId}/change-impact:
+    parameters:
+      - name: productId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    post:
+      operationId: assessProductChange
+      summary: What a change would touch, before making it
+      description: >
+        1.4.4 and 1.4.16. **The package already knows how to do this and does it in four places** —
+        `PerformanceCancellationResult`, `RecognitionRunResult`, `FxRevaluationResult` and
+        `PeriodCloseResult` all carry a dry run with an impact count.
+
+        Changing a product that has sold is the same shape of act: **somebody needs to know how many
+        tickets are affected before they press the button, not after.**
+
+        Answers both halves of 1.4 — the impact, and **whether the change propagates to what has
+        already been sold.** A name correction should; a price change must not.
+      tags: [catalogue]
+      x-ticvai-permission: PRODUCT_CONFIGURE
+      x-ticvai-audience: [staff]
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [change]
+              properties:
+                change:
+                  type: object
+                  additionalProperties: true
+                  description: The proposed patch, in the shape `updateProduct` accepts.
+      responses:
+        '200':
+          description: Impact
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ProductChangeImpact' }
+
+  /products/bulk-price:
+    post:
+      operationId: bulkChangePrices
+      summary: Reprice a category or a whole catalogue
+      description: >
+        2.9.9. **`BulkUpdateSeatsRequest` is the only bulk operation in the package** and it takes a
+        selection plus the attribute to set — a usable precedent, applied here.
+
+        Repricing every adult admission before a season is routine and currently means one call per
+        product. **Runs as a dry run first**, for the reason `assessProductChange` exists.
+      tags: [catalogue]
+      x-ticvai-permission: PRODUCT_CONFIGURE
+      x-ticvai-permission-escalated: PRODUCT_CONFIGURE
+      x-ticvai-audience: [staff]
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [selection, adjustment]
+              properties:
+                dryRun: { type: boolean, default: true }
+                selection:
+                  type: object
+                  description: >
+                    **A selection, not a list of ids.** A category, a product kind, a channel or a
+                    price list — the same shape `BulkUpdateSeatsRequest` takes.
+                  properties:
+                    categoryId: { type: string, format: uuid, nullable: true }
+                    productKind: { type: string, nullable: true }
+                    priceListId: { type: string, format: uuid, nullable: true }
+                    channel: { $ref: '../shared/common.yaml#/components/schemas/SalesChannel' }
+                adjustment:
+                  type: object
+                  required: [mode, value]
+                  properties:
+                    mode: { type: string, enum: [percentage, absolute, setTo] }
+                    value: { type: number }
+                    roundTo:
+                      type: number
+                      nullable: true
+                      description: >
+                        **A 7% rise gives 53.61 and nobody prices a ticket at 53.61.** Rounding is
+                        part of the act, not a follow-up.
+                effectiveFrom: { type: string, format: date-time, nullable: true }
+      responses:
+        '200':
+          description: Impact, or the applied result
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/BulkPriceResult' }
+
+  /entitlements/{entitlementId}/reinstate:
+    parameters:
+      - name: entitlementId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    post:
+      operationId: reinstateEntitlement
+      summary: Lift a suspension
+      description: >
+        1.1.100. **`suspendEntitlement` had no inverse**, so a membership suspended for a chargeback
+        that was later resolved stayed suspended.
+
+        `retail.suspendWallet` and `reinstateWallet` are the precedent for a pair in this package.
+
+        **Validity is not extended.** A suspension is a sanction and the time lost is part of it —
+        that is what distinguishes this from `freezeEntitlement` below.
+      tags: [catalogue]
+      x-ticvai-permission: PRODUCT_CONFIGURE
+      x-ticvai-audience: [staff]
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [reason]
+              properties:
+                reason: { type: string, enum: [disputeResolved, chargebackReversed, banLifted, suspendedInError] }
+                note: { type: string, maxLength: 300 }
+      responses:
+        '200':
+          description: Reinstated
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+
+  /entitlements/{entitlementId}/freeze:
+    parameters:
+      - name: entitlementId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    post:
+      operationId: freezeEntitlement
+      summary: Pause a membership at the guest's request
+      description: >
+        2.14.13. **The opposite act to a suspension, and it needed its own operation.**
+        `suspendEntitlement` is a sanction — its own description names fraud, a chargeback and a
+        behavioural ban, and it denies at the gate with a reason an operator can read out.
+
+        A guest pausing an annual pass for three months abroad has done nothing wrong. **Consumption
+        stops and validity extends by the frozen days**, so they get the year they paid for.
+
+        A frozen entitlement is refused at a gate with a different message from a suspended one, and
+        the guest can unfreeze it themselves.
+      tags: [catalogue]
+      x-ticvai-permission: PRODUCT_CONFIGURE
+      x-ticvai-guest-callable: true
+      x-ticvai-audience: [staff, guest]
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [from]
+              properties:
+                from: { type: string, format: date }
+                to:
+                  type: string
+                  format: date
+                  nullable: true
+                  description: >
+                    Open-ended where absent. **A freeze with no end date needs a maximum**, or a
+                    membership is paused indefinitely and the venue carries the liability.
+                reason: { type: string, enum: [travelling, injury, personal, seasonal, other] }
+      responses:
+        '200':
+          description: Frozen, with the new validity window
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+
+  /products/{productId}/clone:
+    parameters:
+      - name: productId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    post:
+      operationId: cloneProduct
+      summary: Copy a product as a new draft
+      description: >
+        1.1.47 and 1.1.48. `copyPriceList` and `cloneSeatMap` are the precedents and **the product
+        equivalent did not exist**, so a seasonal variant was built by hand each year.
+
+        The clone starts as a draft with a new code. **Variants come with it; orders do not** — a
+        clone has no history, which is the point of it being a clone rather than a version.
+      tags: [catalogue]
+      x-ticvai-permission: PRODUCT_CONFIGURE
+      x-ticvai-audience: [staff]
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [code, name]
+              properties:
+                code: { type: string }
+                name: { type: string }
+                includeVariants: { type: boolean, default: true }
+                includePrices: { type: boolean, default: false }
+      responses:
+        '201':
+          description: Cloned as a draft
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Product' }
+
+  /search:
+    get:
+      operationId: searchCatalogue
+      x-ticvai-consumed-by:
+        - "P01 WEB-002 Event & Attraction Listing"
+        - "P01 WEB-003 Search Results"
+        - "P02 GST-001 Home – Default"
+        - "P02 GST-063 Search"
+      x-ticvai-audience: [guest]
+      summary: Find something by name
+      description: >
+        **The guest app browses by category and cannot search.** On a venue with two hundred
+        products that is the difference between finding a thing and giving up.
+
+        Distinct from `semanticSearch`, which is AI and retrieves from documents. This is a
+        keyword search over the sellable catalogue, and it works with no AI configured — a
+        venue without an assistant still needs a search box.
+
+        Scoped to what is on sale at the venue and channel, so a guest never finds a product
+        they cannot buy.
+      tags: [catalogue]
+      x-ticvai-permission: null   # anyone browsing
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: true
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-read-routing: replica
+      parameters:
+        - name: q
+          in: query
+          required: true
+          schema: { type: string, minLength: 2 }
+        - name: venueId
+          in: query
+          schema: { type: string, format: uuid }
+        - name: kind
+          in: query
+          schema: { type: string, enum: [product, event, attraction, bundle, membership, merchandise, menuItem] }
+        - $ref: '../shared/common.yaml#/components/parameters/PageSize'
+      responses:
+        '200':
+          description: Results
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id: { type: string, format: uuid }
+                    kind: { type: string }
+                    name: { type: string }
+                    summary: { type: string }
+                    fromPrice: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+                    isAvailable:
+                      type: boolean
+                      description: >
+                        **Shown rather than filtered out.** A guest searching for a sold-out
+                        attraction should learn it is sold out, not that it does not exist.
+
+  /donation-campaigns:
+    get:
+      operationId: listDonationCampaigns
+      x-ticvai-audience: [staff]
+      summary: Campaigns a guest can give to
+      description: >
+        1.1.128–1.1.133. **Multiple campaigns may run at once and a single transaction may give
+        to several** (1.1.131), which is why a donation is a line and not a flag on the order.
+      tags: [catalogue]
+      x-ticvai-permission: PRODUCT_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: true
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-read-routing: replica
+      responses:
+        '200':
+          description: Campaigns
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/DonationCampaign' }
+
+    post:
+      operationId: createDonationCampaign
+      x-ticvai-audience: [staff]
+      summary: Create a campaign
+      description: >
+        Fixed amounts, a free amount, or round-up (1.1.129). **The amounts are configuration, not
+        code** — a venue running a Ramadan appeal should not need a release.
+
+        **Donations post to a liability account, not revenue** (1.1.132). Money collected on
+        behalf of a charity is not the venue's to recognise, and getting that wrong is a
+        restatement.
+      tags: [catalogue]
+      x-ticvai-permission: PRODUCT_CONFIGURE
+      x-ticvai-scope-level: venue
+      x-ticvai-config-scope: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/DonationCampaign' }
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/DonationCampaign' }
+
+  /donation-campaigns/{campaignId}:
+    parameters:
+      - name: campaignId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    patch:
+      operationId: updateDonationCampaign
+      x-ticvai-audience: [staff]
+      summary: Amend or close a campaign
+      description: >
+        **Closing does not reverse donations already given.** A campaign that ended still has
+        money against it, and the balance is owed regardless.
+      tags: [catalogue]
+      x-ticvai-permission: PRODUCT_CONFIGURE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/DonationCampaign' }
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/DonationCampaign' }
+
+  /waitlist-entries:
+    get:
+      operationId: listWaitlistEntries
+      x-ticvai-audience: [staff]
+      summary: Who is waiting for capacity
+      description: >
+        1.1.25. **Not the same as a queue** (ADR-0012). A queue is people standing at a ride; a
+        waitlist is people who wanted a sold-out session and asked to be told if it frees up.
+      tags: [catalogue]
+      x-ticvai-permission: PRODUCT_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-read-routing: replica
+      parameters:
+        - name: performanceId
+          in: query
+          schema: { type: string, format: uuid }
+      responses:
+        '200':
+          description: Entries
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/WaitlistEntry' }
+
+    post:
+      operationId: joinWaitlist
+      x-ticvai-audience: [guest]
+      summary: Ask to be told if capacity frees up
+      description: >
+        1.1.25, 4.9.17. **Offered only where the session is genuinely sold out** — a waitlist on
+        something available is a worse experience than selling it.
+
+        **Joining reserves nothing.** The guest is told when capacity appears and buys like
+        anyone else, because holding capacity for a waitlist is the same as not releasing it.
+      tags: [catalogue]
+      x-ticvai-permission: null   # a guest, before or after signing in
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/WaitlistEntry' }
+      responses:
+        '201':
+          description: Joined
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/WaitlistEntry' }
+        '409':
+          description: >
+            The session is not sold out. **Refused rather than accepted**, because a waitlist
+            entry on available capacity will never be notified and the guest will wait forever.
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /waitlist-entries/{entryId}:
+    parameters:
+      - name: entryId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    delete:
+      operationId: leaveWaitlist
+      x-ticvai-audience: [guest]
+      summary: Stop waiting
+      tags: [catalogue]
+      x-ticvai-permission: null
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      responses:
+        '204':
+          description: Left
+
+  /waitlist-entries/{entryId}/offer:
+    parameters:
+      - name: entryId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    post:
+      operationId: offerWaitlistCapacity
+      x-ticvai-audience: [staff]
+      summary: Tell a waiting guest that capacity appeared
+      description: >
+        Triggered when a cart expires, an order is refunded, or capacity is added.
+
+        **The offer holds capacity for a stated window and then moves to the next person.**
+        Notifying everyone at once produces a race the fastest guest wins and the rest resent;
+        holding indefinitely for someone who is asleep means the seat goes unsold.
+      tags: [catalogue]
+      x-ticvai-permission: PRODUCT_CONFIGURE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      responses:
+        '200':
+          description: Offered, and held for the configured window
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/WaitlistEntry' }
+
+  /products:
+    get:
+      operationId: listProducts
+      x-ticvai-consumed-by:
+        - "P01 WEB-001 Home / Landing"
+        - "P01 WEB-002 Event & Attraction Listing"
+        - "P01 WEB-003 Search Results"
+        - "P01 WEB-022 Membership Plans"
+        - "P01 WEB-035 Multi-Currency & Pricing"
+        - "P02 GST-002 Explore Categories"
+        - "P02 GST-003 Attractions List"
+        - "P02 GST-005 What's On"
+        - "P02 GST-015 Memberships"
+        - "P02 GST-021 Interactive Map"
+        - "P02 GST-038 Digital Companion Mode"
+        - "P02 GST-044 Multi-Currency & Pricing"
+        - "P02 GST-050 Resource Booking – Cabana"
+        - "P02 GST-051 Plan Your Adventure – Start"
+        - "P02 GST-052 Suggested Itineraries"
+        - "P02 GST-053 Build Your Own Itinerary"
+        - "P02 GST-054 AI Optimized Itinerary"
+        - "P02 GST-058 Resource Availability (Cabana)"
+        - "P02 GST-059 Plan My Day – In Progress"
+        - "P04 POS-002 Sell — Ticket Catalogue"
+        - "P04 POS-003 Sell — Timed Entry"
+        - "P05 KSK-003 What are you buying"
+        - "P05 KSK-015 Assistant"
+        - "P06 EMP-034 Walk-up sale"
+        - "P08 BO-007 Product Directory"
+        - "P08 BO-012 Membership Products"
+        - "P08 BO-013 Channel & Distribution"
+        - "P08 BO-014 Catalogue Publishing"
+        - "P08 BO-125 Product & Category Button Configuration"
+        - "P10 PTR-006 Product Catalog (B2B Pricing)"
+        - "P16 ANL-004 Product Performance"
+      x-ticvai-audience: [staff, guest, partner]
+      x-ticvai-read-routing: replica
+      summary: List products
+      description: >
+        Back-office use. **A terminal does not call this** — it reads the local bundle.
+      tags: [product]
+      x-ticvai-permission: PRODUCT_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - name: venueId
+          in: query
+          schema: { type: string, format: uuid }
+        - name: kind
+          in: query
+          schema: { $ref: '#/components/schemas/ProductKind' }
+        - name: isSellable
+          in: query
+          schema: { type: boolean }
+        - $ref: '../shared/common.yaml#/components/parameters/PageSize'
+        - $ref: '../shared/common.yaml#/components/parameters/PageCursor'
+      responses:
+        '200':
+          description: Products
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '../shared/common.yaml#/components/schemas/Page'
+                  - type: object
+                    properties:
+                      items:
+                        type: array
+                        items: { $ref: '#/components/schemas/Product' }
+        '403': { $ref: '../shared/common.yaml#/components/responses/Forbidden' }
+
+    post:
+      operationId: createProduct
+      x-ticvai-consumed-by:
+        - "P08 BO-007 Product Directory"
+        - "P08 BO-012 Membership Products"
+        - "P08 BO-014 Catalogue Publishing"
+        - "P10 PTR-006 Product Catalog (B2B Pricing)"
+      x-ticvai-audience: [staff, partner]
+      summary: Create a product
+      tags: [product]
+      x-ticvai-permission: PRODUCT_CONFIGURE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/CreateProductRequest' }
+      responses:
+        '201':
+          description: Created. Not sellable until published in a bundle.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Product' }
+        '400': { $ref: '../shared/common.yaml#/components/responses/BadRequest' }
+        '403': { $ref: '../shared/common.yaml#/components/responses/Forbidden' }
+
+  /products/{productId}:
+    parameters:
+      - name: productId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    get:
+      operationId: getProduct
+      x-ticvai-consumed-by:
+        - "P01 WEB-004 Event / Attraction Detail"
+        - "P01 WEB-022 Membership Plans"
+        - "P02 GST-004 Attraction Details"
+        - "P02 GST-006 Event / Exhibition Details"
+        - "P04 POS-002 Sell — Ticket Catalogue"
+        - "P04 POS-003 Sell — Timed Entry"
+        - "P06 EMP-034 Walk-up sale"
+        - "P08 BO-007 Product Directory"
+        - "P08 BO-008 Product Detail & Variants"
+        - "P08 BO-012 Membership Products"
+        - "P08 BO-014 Catalogue Publishing"
+        - "P10 PTR-006 Product Catalog (B2B Pricing)"
+      x-ticvai-audience: [staff, guest, partner]
+      x-ticvai-read-routing: replica
+      summary: Read a product
+      tags: [product]
+      x-ticvai-permission: PRODUCT_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '200':
+          description: Product
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Product' }
+        '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
+    patch:
+      operationId: updateProduct
+      x-ticvai-consumed-by:
+        - "P08 BO-007 Product Directory"
+        - "P08 BO-008 Product Detail & Variants"
+        - "P08 BO-012 Membership Products"
+        - "P08 BO-014 Catalogue Publishing"
+        - "P10 PTR-006 Product Catalog (B2B Pricing)"
+      x-ticvai-audience: [staff, partner]
+      summary: Update a product
+      tags: [product]
+      x-ticvai-permission: PRODUCT_CONFIGURE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/UpdateProductRequest' }
+      responses:
+        '200':
+          description: Updated. Terminals see it after the next bundle.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Product' }
+        '403': { $ref: '../shared/common.yaml#/components/responses/Forbidden' }
+        '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
+
+  /products/{productId}/attributes:
+    parameters:
+      - name: productId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    put:
+      operationId: setProductAttributes
+      x-ticvai-consumed-by:
+        - "P06 EMP-034 Walk-up sale"
+        - "P08 BO-007 Product Directory"
+        - "P08 BO-008 Product Detail & Variants"
+        - "P08 BO-012 Membership Products"
+        - "P08 BO-014 Catalogue Publishing"
+        - "P10 PTR-006 Product Catalog (B2B Pricing)"
+      x-ticvai-audience: [staff, partner]
+      summary: Set the attribute axes for a product
+      description: >
+        Attributes are axes that generate sellable variants. Changing them triggers variant
+        regeneration; the response reports how many variants result.
+
+        Variants are **materialised**, not computed at read time — a static product table
+        cannot express the combinations, and runtime expansion makes pricing queries
+        unusable at catalogue scale.
+      tags: [product]
+      x-ticvai-permission: PRODUCT_CONFIGURE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [axes]
+              properties:
+                axes:
+                  type: array
+                  items: { $ref: '#/components/schemas/AttributeAxis' }
+      responses:
+        '200':
+          description: Axes set, variants regenerated
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [variantCount, addedCount, retiredCount]
+                properties:
+                  variantCount: { type: integer }
+                  addedCount: { type: integer }
+                  retiredCount:
+                    type: integer
+                    description: >
+                      Variants no longer reachable. Retired, never deleted — historic orders
+                      reference them.
+        '403': { $ref: '../shared/common.yaml#/components/responses/Forbidden' }
+        '409':
+          description: >
+            Regeneration would exceed the configured variant ceiling for this product.
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /products/{productId}/variants:
+    parameters:
+      - name: productId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    get:
+      operationId: listProductVariants
+      x-ticvai-consumed-by:
+        - "P01 WEB-005 Ticket Type Selection"
+        - "P04 POS-002 Sell — Ticket Catalogue"
+        - "P04 POS-003 Sell — Timed Entry"
+        - "P05 KSK-004 Choose tickets"
+        - "P06 EMP-034 Walk-up sale"
+        - "P08 BO-007 Product Directory"
+        - "P08 BO-008 Product Detail & Variants"
+        - "P08 BO-012 Membership Products"
+        - "P08 BO-014 Catalogue Publishing"
+        - "P10 PTR-006 Product Catalog (B2B Pricing)"
+      x-ticvai-audience: [staff, guest, partner]
+      x-ticvai-read-routing: replica
+      summary: List generated variants
+      tags: [product]
+      x-ticvai-permission: PRODUCT_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/PageSize'
+        - $ref: '../shared/common.yaml#/components/parameters/PageCursor'
+      responses:
+        '200':
+          description: Variants
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '../shared/common.yaml#/components/schemas/Page'
+                  - type: object
+                    properties:
+                      items:
+                        type: array
+                        items: { $ref: '#/components/schemas/ProductVariant' }
+
+  # ---------------------------------------------------------------- pricing
+  /price-lists:
+    get:
+      operationId: listPriceLists
+      x-ticvai-consumed-by:
+        - "P08 BO-009 Pricing Rules"
+        - "P10 PTR-006 Product Catalog (B2B Pricing)"
+      x-ticvai-audience: [staff, partner]
+      x-ticvai-read-routing: replica
+      summary: List price lists
+      tags: [pricing]
+      x-ticvai-permission: PRICE_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - name: channel
+          in: query
+          schema: { $ref: '#/components/schemas/Channel' }
+        - $ref: '../shared/common.yaml#/components/parameters/PageSize'
+        - $ref: '../shared/common.yaml#/components/parameters/PageCursor'
+      responses:
+        '200':
+          description: Price lists
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '../shared/common.yaml#/components/schemas/Page'
+                  - type: object
+                    properties:
+                      items:
+                        type: array
+                        items: { $ref: '#/components/schemas/PriceList' }
+    post:
+      operationId: createPriceList
+      x-ticvai-consumed-by:
+        - "P08 BO-009 Pricing Rules"
+        - "P10 PTR-006 Product Catalog (B2B Pricing)"
+      x-ticvai-audience: [staff, partner]
+      summary: Create a price list
+      tags: [pricing]
+      x-ticvai-permission: PRICE_CONFIGURE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/CreatePriceListRequest' }
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/PriceList' }
+        '400': { $ref: '../shared/common.yaml#/components/responses/BadRequest' }
+
+  /price-lists/{priceListId}/prices:
+    parameters:
+      - name: priceListId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    get:
+      operationId: listPrices
+      x-ticvai-consumed-by:
+        - "P08 BO-009 Pricing Rules"
+        - "P08 BO-014 Catalogue Publishing"
+        - "P10 PTR-006 Product Catalog (B2B Pricing)"
+      x-ticvai-audience: [staff, partner]
+      x-ticvai-read-routing: replica
+      summary: List prices in a list
+      tags: [pricing]
+      x-ticvai-permission: PRICE_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/PageSize'
+        - $ref: '../shared/common.yaml#/components/parameters/PageCursor'
+      responses:
+        '200':
+          description: Prices
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '../shared/common.yaml#/components/schemas/Page'
+                  - type: object
+                    properties:
+                      items:
+                        type: array
+                        items: { $ref: '#/components/schemas/Price' }
+    put:
+      operationId: setPrices
+      x-ticvai-consumed-by:
+        - "P08 BO-009 Pricing Rules"
+        - "P10 PTR-006 Product Catalog (B2B Pricing)"
+      x-ticvai-audience: [staff, partner]
+      summary: Set prices in bulk
+      description: >
+        Currency must match the region's currency and scale. A price in a currency the
+        region does not use is rejected — money carries its scale, and a mismatched scale
+        silently truncates.
+      tags: [pricing]
+      x-ticvai-permission: PRICE_CONFIGURE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [prices]
+              properties:
+                prices:
+                  type: array
+                  maxItems: 5000
+                  items: { $ref: '#/components/schemas/SetPriceRequest' }
+      responses:
+        '200':
+          description: Applied
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  applied: { type: integer }
+        '400':
+          description: Currency or scale mismatch against the region
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  # ---------------------------------------------------------------- events
+  /events:
+    get:
+      operationId: listEvents
+      x-ticvai-consumed-by:
+        - "P08 BO-001 Queue Directory"
+        - "P08 BO-015 Session Calendar"
+        - "P08 BO-016 Session Template"
+        - "P08 BO-019 Closures & Blackouts"
+        - "P08 BO-063 Opening Hours & Calendar"
+      x-ticvai-audience: [staff]
+      x-ticvai-read-routing: replica
+      summary: List events
+      tags: [event]
+      x-ticvai-permission: PRODUCT_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/PageSize'
+        - $ref: '../shared/common.yaml#/components/parameters/PageCursor'
+      responses:
+        '200':
+          description: Events
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '../shared/common.yaml#/components/schemas/Page'
+                  - type: object
+                    properties:
+                      items:
+                        type: array
+                        items: { $ref: '#/components/schemas/Event' }
+    post:
+      operationId: createEvent
+      x-ticvai-consumed-by:
+        - "P08 BO-001 Queue Directory"
+        - "P08 BO-015 Session Calendar"
+        - "P08 BO-016 Session Template"
+        - "P08 BO-019 Closures & Blackouts"
+        - "P08 BO-063 Opening Hours & Calendar"
+      x-ticvai-audience: [staff]
+      summary: Create an event
+      tags: [event]
+      x-ticvai-permission: EVENT_CONFIGURE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/CreateEventRequest' }
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Event' }
+
+  /events/{eventId}/performances:
+    parameters:
+      - name: eventId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    get:
+      operationId: listPerformances
+      x-ticvai-consumed-by:
+        - "P01 WEB-002 Event & Attraction Listing"
+        - "P01 WEB-004 Event / Attraction Detail"
+        - "P02 GST-005 What's On"
+        - "P02 GST-007 Select Date & Time"
+        - "P08 BO-001 Queue Directory"
+        - "P08 BO-015 Session Calendar"
+        - "P08 BO-016 Session Template"
+        - "P08 BO-019 Closures & Blackouts"
+        - "P08 BO-063 Opening Hours & Calendar"
+      x-ticvai-audience: [staff, guest]
+      x-ticvai-read-routing: replica
+      summary: List performances of an event
+      tags: [event]
+      x-ticvai-permission: PRODUCT_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - name: from
+          in: query
+          schema: { type: string, format: date-time }
+        - name: to
+          in: query
+          schema: { type: string, format: date-time }
+        - $ref: '../shared/common.yaml#/components/parameters/PageSize'
+        - $ref: '../shared/common.yaml#/components/parameters/PageCursor'
+      responses:
+        '200':
+          description: Performances
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '../shared/common.yaml#/components/schemas/Page'
+                  - type: object
+                    properties:
+                      items:
+                        type: array
+                        items: { $ref: '#/components/schemas/Performance' }
+    post:
+      operationId: createPerformances
+      x-ticvai-consumed-by:
+        - "P08 BO-001 Queue Directory"
+        - "P08 BO-015 Session Calendar"
+        - "P08 BO-016 Session Template"
+        - "P08 BO-019 Closures & Blackouts"
+        - "P08 BO-063 Opening Hours & Calendar"
+      x-ticvai-audience: [staff]
+      summary: Create performances, singly or by schedule
+      tags: [event]
+      x-ticvai-permission: PERFORMANCE_CONFIGURE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/CreatePerformancesRequest' }
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  created: { type: integer }
+                  performances:
+                    type: array
+                    items: { $ref: '#/components/schemas/Performance' }
+
+  # ---------------------------------------------------------------- capacity
+  /envelopes:
+    get:
+      operationId: listEnvelopes
+      x-ticvai-consumed-by:
+        - "P06 EMP-033 Capacity view"
+        - "P08 BO-013 Channel & Distribution"
+        - "P08 BO-017 Capacity Management"
+        - "P10 PTR-005 Inventory & Allocation View"
+      x-ticvai-audience: [staff, partner]
+      x-ticvai-read-routing: replica
+      summary: List capacity envelopes
+      tags: [capacity]
+      x-ticvai-permission: PRODUCT_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - name: performanceId
+          in: query
+          schema: { type: string, format: uuid }
+        - $ref: '../shared/common.yaml#/components/parameters/PageSize'
+        - $ref: '../shared/common.yaml#/components/parameters/PageCursor'
+      responses:
+        '200':
+          description: Envelopes
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '../shared/common.yaml#/components/schemas/Page'
+                  - type: object
+                    properties:
+                      items:
+                        type: array
+                        items: { $ref: '#/components/schemas/Envelope' }
+    post:
+      operationId: createEnvelope
+      x-ticvai-consumed-by:
+        - "P06 EMP-033 Capacity view"
+        - "P08 BO-013 Channel & Distribution"
+        - "P08 BO-017 Capacity Management"
+        - "P10 PTR-005 Inventory & Allocation View"
+      x-ticvai-audience: [staff, partner]
+      summary: Create a capacity envelope
+      tags: [capacity]
+      x-ticvai-permission: CAPACITY_CONFIGURE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/CreateEnvelopeRequest' }
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Envelope' }
+
+  /envelopes/{envelopeId}/channel-allocations:
+    parameters:
+      - name: envelopeId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    get:
+      operationId: getChannelAllocations
+      x-ticvai-consumed-by:
+        - "P06 EMP-033 Capacity view"
+        - "P08 BO-013 Channel & Distribution"
+        - "P08 BO-017 Capacity Management"
+        - "P10 PTR-005 Inventory & Allocation View"
+      x-ticvai-audience: [staff, partner]
+      x-ticvai-read-routing: primary
+      summary: Capacity allocated to each channel
+      description: >
+        How much of an envelope each selling channel may take. Revenue management sets this;
+        a lease draws from it.
+
+        Allocation is the commercial concern, a lease is the technical one, and they compose:
+        a lease is granted against a channel's remaining allocation rather than against raw
+        envelope capacity. Web cannot consume the counter's allocation, and an offline
+        terminal cannot oversell a channel it was never given.
+      tags: [capacity]
+      x-ticvai-permission: PRODUCT_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '200':
+          description: Allocations
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ChannelAllocationSet' }
+        '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
+
+    put:
+      operationId: setChannelAllocations
+      x-ticvai-consumed-by:
+        - "P06 EMP-033 Capacity view"
+        - "P08 BO-013 Channel & Distribution"
+        - "P08 BO-017 Capacity Management"
+        - "P10 PTR-005 Inventory & Allocation View"
+      x-ticvai-audience: [staff, partner]
+      summary: Allocate envelope capacity across channels
+      description: >
+        Allocations may not exceed envelope capacity in total. An unallocated remainder forms
+        a general pool any channel may draw from once its own allocation is exhausted.
+
+        Reducing an allocation below what a channel has already sold is refused — the seats
+        are gone.
+      tags: [capacity]
+      x-ticvai-permission: CAPACITY_CONFIGURE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [allocations]
+              properties:
+                allocations:
+                  type: array
+                  minItems: 1
+                  items: { $ref: '#/components/schemas/ChannelAllocation' }
+      responses:
+        '200':
+          description: Applied
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ChannelAllocationSet' }
+        '400':
+          description: Allocations exceed envelope capacity
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+        '409':
+          description: An allocation is below what that channel has already sold
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /envelopes/{envelopeId}/channel-allocations/release:
+    parameters:
+      - name: envelopeId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    post:
+      operationId: releaseChannelAllocation
+      x-ticvai-consumed-by:
+        - "P06 EMP-033 Capacity view"
+        - "P08 BO-013 Channel & Distribution"
+        - "P08 BO-017 Capacity Management"
+        - "P10 PTR-005 Inventory & Allocation View"
+      x-ticvai-audience: [staff, partner]
+      summary: Return unsold channel allocation to the general pool
+      description: >
+        The standard mechanism for freeing distribution holds close to a performance. May be
+        scheduled on the allocation itself, or triggered manually.
+      tags: [capacity]
+      x-ticvai-permission: CAPACITY_CONFIGURE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [channels]
+              properties:
+                channels:
+                  type: array
+                  minItems: 1
+                  items: { $ref: '#/components/schemas/Channel' }
+                reason: { type: string, maxLength: 500 }
+      responses:
+        '200':
+          description: Released to the general pool
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ChannelAllocationSet' }
+
+  # ---------------------------------------------------------------- bundles
+  /catalogue/bundles:
+    get:
+      operationId: listCatalogueBundles
+      x-ticvai-consumed-by:
+        - "P02 GST-052 Suggested Itineraries"
+        - "P02 GST-056 Bundle Package"
+        - "P06 EMP-018 Offline package"
+        - "P08 BO-011 Packages & Bundles"
+        - "P08 BO-037 Offline Package Status"
+      x-ticvai-audience: [staff, guest]
+      x-ticvai-read-routing: replica
+      summary: List published bundles
+      tags: [bundle]
+      x-ticvai-permission: PRODUCT_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '200':
+          description: Bundles, newest first
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/BundleSummary' }
+    post:
+      operationId: publishBundle
+      x-ticvai-consumed-by:
+        - "P08 BO-011 Packages & Bundles"
+        - "P08 BO-013 Channel & Distribution"
+        - "P08 BO-014 Catalogue Publishing"
+        - "P08 BO-037 Offline Package Status"
+      x-ticvai-audience: [staff]
+      summary: Compute, sign and publish a catalogue bundle
+      description: >
+        Snapshots current catalogue state for a venue, signs it, and publishes it for
+        terminals to pull.
+
+        Publishing is the act that makes a configuration change visible at point of sale.
+        Until a bundle is published, an edited price exists only in the back office.
+      tags: [bundle]
+      x-ticvai-permission: PRODUCT_CONFIGURE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [venueId]
+              properties:
+                venueId: { type: string, format: uuid }
+                note: { type: string, maxLength: 500 }
+                staleAfterHours:
+                  type: integer
+                  minimum: 1
+                  description: >
+                    How long a terminal may trade on this bundle before refusing. Defaults
+                    to the venue's configured bound. A terminal offline for a week must not
+                    sell last month's prices.
+      responses:
+        '201':
+          description: Published
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/BundleSummary' }
+        '403': { $ref: '../shared/common.yaml#/components/responses/Forbidden' }
+        '409':
+          description: A publish is already in progress for this venue
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /catalogue/bundles/latest:
+    get:
+      operationId: getLatestBundle
+      x-ticvai-consumed-by:
+        - "P04 POS-002 Sell — Ticket Catalogue"
+        - "P06 EMP-018 Offline package"
+        - "P08 BO-011 Packages & Bundles"
+        - "P08 BO-037 Offline Package Status"
+      x-ticvai-audience: [staff]
+      x-ticvai-read-routing: replica
+      summary: Pull the current bundle for this workstation's venue
+      description: >
+        The primary terminal-facing endpoint. Returns the full bundle, or 304 when the
+        supplied ETag matches.
+
+        Use `since` to request a delta instead of a full bundle — a terminal on a slow link
+        should not re-download an unchanged catalogue.
+      tags: [bundle]
+      x-ticvai-permission: PRODUCT_VIEW
+      x-ticvai-scope-level: workstation
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - name: since
+          in: query
+          description: Applied bundle version. When supplied and a delta exists, a delta is returned.
+          schema: { type: string }
+        - name: If-None-Match
+          in: header
+          schema: { type: string }
+      responses:
+        '200':
+          description: Full bundle or delta
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/CatalogueBundle' }
+          headers:
+            ETag:
+              schema: { type: string }
+        '304':
+          description: Unchanged
+        '403': { $ref: '../shared/common.yaml#/components/responses/Forbidden' }
+
+  /catalogue/bundles/{version}/applied:
+    parameters:
+      - name: version
+        in: path
+        required: true
+        schema: { type: string }
+    post:
+      operationId: reportBundleApplied
+      x-ticvai-consumed-by:
+        - "P06 EMP-018 Offline package"
+        - "P08 BO-011 Packages & Bundles"
+        - "P08 BO-037 Offline Package Status"
+      x-ticvai-audience: [staff]
+      summary: Report that a workstation applied a bundle
+      description: >
+        Lets the back office see which terminals are current and which are drifting toward
+        their staleness bound. A terminal that stops reporting is a terminal about to refuse
+        to trade.
+      tags: [bundle]
+      x-ticvai-permission: PRODUCT_VIEW
+      x-ticvai-scope-level: workstation
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: append
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [appliedAt, outcome]
+              properties:
+                appliedAt: { type: string, format: date-time }
+                outcome:
+                  type: string
+                  enum: [applied, rolledBack, signatureInvalid]
+                error: { type: string }
+      responses:
+        '204': { description: Recorded }
+
+  # ---------------------------------------------------------------- leases
+  /leases:
+    get:
+      operationId: listLeases
+      x-ticvai-consumed-by:
+        - "P04 POS-003 Sell — Timed Entry"
+        - "P08 BO-018 Allocation & Holds"
+      x-ticvai-audience: [staff]
+      x-ticvai-read-routing: primary   # a stale lease list oversells contended capacity
+      summary: List leases
+      description: >
+        Back-office monitoring. Surfaces stranded leases — capacity held by a terminal that
+        died and will not return it until TTL expiry. At a gate during peak that is visible
+        to a queue.
+      tags: [lease]
+      x-ticvai-permission: PRODUCT_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - name: envelopeId
+          in: query
+          schema: { type: string, format: uuid }
+        - name: holderWorkstationId
+          in: query
+          schema: { type: string, format: uuid }
+        - name: status
+          in: query
+          schema: { $ref: '#/components/schemas/LeaseStatus' }
+        - $ref: '../shared/common.yaml#/components/parameters/PageSize'
+        - $ref: '../shared/common.yaml#/components/parameters/PageCursor'
+      responses:
+        '200':
+          description: Leases
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '../shared/common.yaml#/components/schemas/Page'
+                  - type: object
+                    properties:
+                      items:
+                        type: array
+                        items: { $ref: '#/components/schemas/Lease' }
+
+    post:
+      operationId: acquireLease
+      x-ticvai-consumed-by:
+        - "P01 WEB-006 Date & Session Selection"
+        - "P04 POS-003 Sell — Timed Entry"
+        - "P05 KSK-005 Choose a session"
+        - "P08 BO-018 Allocation & Holds"
+      x-ticvai-audience: [staff, guest]
+      summary: Acquire an inventory lease
+      description: >
+        Grants the caller N units of a capacity envelope for a TTL. The holder may sell
+        against them without further server contact, including offline.
+
+        Unsold units return automatically on expiry. Requesting more than remains returns a
+        partial grant — the caller decides whether that is enough.
+
+        A `venueEdge` workstation acquires through its edge node, which holds the venue
+        lease and sub-leases to terminals.
+      tags: [lease]
+      x-ticvai-permission: ORDER_CREATE
+      x-ticvai-scope-level: workstation
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/AcquireLeaseRequest' }
+      responses:
+        '201':
+          description: >
+            Granted, wholly or partially. Always check `grantedUnits` against `requestedUnits`.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Lease' }
+        '403': { $ref: '../shared/common.yaml#/components/responses/Forbidden' }
+        '409':
+          description: >
+            No units remain, or the envelope is seated — seated inventory cannot be leased
+            because a seat map is not a count.
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /leases/{leaseId}:
+    parameters:
+      - name: leaseId
+        in: path
+        required: true
+        schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+    delete:
+      operationId: releaseLease
+      x-ticvai-consumed-by:
+        - "P04 POS-003 Sell — Timed Entry"
+        - "P08 BO-018 Allocation & Holds"
+      x-ticvai-audience: [staff]
+      summary: Return unsold units
+      description: >
+        Consumed units are reported and retained; the remainder returns to the pool
+        immediately rather than waiting for TTL expiry.
+      tags: [lease]
+      x-ticvai-permission: ORDER_CREATE
+      x-ticvai-scope-level: workstation
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [consumedUnits]
+              properties:
+                consumedUnits: { type: integer, minimum: 0 }
+      responses:
+        '200':
+          description: Released
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Lease' }
+        '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
+
+  /leases/{leaseId}/renew:
+    parameters:
+      - name: leaseId
+        in: path
+        required: true
+        schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+    post:
+      operationId: renewLease
+      x-ticvai-consumed-by:
+        - "P04 POS-003 Sell — Timed Entry"
+        - "P08 BO-018 Allocation & Holds"
+      x-ticvai-audience: [staff]
+      summary: Extend a lease TTL
+      description: >
+        Reports consumption so far and extends the hold. A holder renews while the link is
+        up; if the link drops, the lease expires naturally and the units return.
+      tags: [lease]
+      x-ticvai-permission: ORDER_CREATE
+      x-ticvai-scope-level: workstation
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [consumedUnits]
+              properties:
+                consumedUnits: { type: integer, minimum: 0 }
+                additionalUnits:
+                  type: integer
+                  minimum: 0
+                  description: Request more on top of the existing hold.
+      responses:
+        '200':
+          description: Renewed
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Lease' }
+        '409':
+          description: Lease already expired. Acquire a new one.
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /leases/{leaseId}/force-release:
+    parameters:
+      - name: leaseId
+        in: path
+        required: true
+        schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+    post:
+      operationId: forceReleaseLease
+      x-ticvai-consumed-by:
+        - "P08 BO-018 Allocation & Holds"
+      x-ticvai-audience: [staff]
+      summary: Reclaim a stranded lease
+      description: >
+        Supervisor action for a lease held by a terminal that has died. Reported consumption
+        is honoured; the remainder returns immediately.
+
+        Exists because TTL expiry alone can strand capacity for minutes in front of a queue.
+      tags: [lease]
+      x-ticvai-permission: CAPACITY_CONFIGURE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [reason]
+              properties:
+                reason: { type: string, minLength: 3, maxLength: 500 }
+      responses:
+        '200':
+          description: Reclaimed and audited
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Lease' }
+        '403': { $ref: '../shared/common.yaml#/components/responses/Forbidden' }
+
+  # ---------------------------------------------------------------- availability
+  /availability:
+    get:
+      operationId: getAvailability
+      x-ticvai-consumed-by:
+        - "P01 WEB-006 Date & Session Selection"
+        - "P02 GST-004 Attraction Details"
+        - "P02 GST-007 Select Date & Time"
+        - "P02 GST-050 Resource Booking – Cabana"
+        - "P02 GST-058 Resource Availability (Cabana)"
+        - "P04 POS-003 Sell — Timed Entry"
+        - "P05 KSK-004 Choose tickets"
+        - "P05 KSK-005 Choose a session"
+        - "P05 KSK-015 Assistant"
+        - "P10 PTR-007 Availability Search"
+      x-ticvai-audience: [staff, guest, partner]
+      x-ticvai-read-routing: primary
+      summary: Live remaining capacity
+      description: >
+        Display only. A terminal shows this to a guest but does not decide a sale on it —
+        that is what leases are for. Under load this value is already stale by the time it
+        renders.
+      tags: [capacity]
+      x-ticvai-permission: PRODUCT_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - name: performanceId
+          in: query
+          schema: { type: string, format: uuid }
+        - name: envelopeId
+          in: query
+          schema: { type: string, format: uuid }
+      responses:
+        '200':
+          description: Availability
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  required: [envelopeId, capacity, sold, leased, remaining]
+                  properties:
+                    envelopeId: { type: string, format: uuid }
+                    capacity: { type: integer }
+                    sold: { type: integer }
+                    leased:
+                      type: integer
+                      description: Held by terminals but not yet sold.
+                    remaining: { type: integer }
+                    byChannel:
+                      type: array
+                      description: >
+                        Per-channel position. A guest seeing sold out online while units
+                        remain at the counter is correct behaviour, not a defect.
+                      items:
+                        type: object
+                        properties:
+                          channel: { $ref: '#/components/schemas/Channel' }
+                          allocated: { type: integer }
+                          sold: { type: integer }
+                          remaining: { type: integer }
+
+  /products/{productId}/lifecycle:
+    parameters:
+      - name: productId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    post:
+      operationId: transitionProductLifecycle
+      x-ticvai-consumed-by:
+        - "P06 EMP-034 Walk-up sale"
+        - "P08 BO-007 Product Directory"
+        - "P08 BO-012 Membership Products"
+        - "P08 BO-014 Catalogue Publishing"
+        - "P10 PTR-006 Product Catalog (B2B Pricing)"
+      x-ticvai-audience: [staff, partner]
+      summary: Move a product through its lifecycle
+      description: >
+        Draft → review → approved → live → withdrawn → archived.
+
+        **Approval is separate from publication.** An approved product is not sellable until
+        a bundle carries it, which is why the two are different acts with different
+        permissions — a product manager approves, an operator publishes.
+
+        Withdrawal stops new sales and leaves existing entitlements intact. Archiving is
+        refused while entitlements remain unexpired.
+      tags: [product]
+      x-ticvai-permission: PRODUCT_CONFIGURE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [transition, reason]
+              properties:
+                transition:
+                  type: string
+                  enum: [submitForReview, approve, reject, publish, withdraw, archive, restore]
+                reason: { type: string, minLength: 3, maxLength: 500 }
+                effectiveAt: { type: string, format: date-time }
+      responses:
+        '200':
+          description: Transitioned
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Product' }
+        '403':
+          description: >
+            Approval attempted by the principal who submitted it. Segregation applies here as
+            it does to journals.
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+        '409':
+          description: >
+            Transition not valid from the current state, or archiving attempted while
+            unexpired entitlements exist.
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /products/{productId}/alternative-codes:
+    parameters:
+      - name: productId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    get:
+      operationId: listAlternativeCodes
+      x-ticvai-consumed-by:
+        - "P04 POS-002 Sell — Ticket Catalogue"
+        - "P04 POS-003 Sell — Timed Entry"
+        - "P06 EMP-034 Walk-up sale"
+        - "P08 BO-007 Product Directory"
+        - "P08 BO-012 Membership Products"
+        - "P08 BO-014 Catalogue Publishing"
+        - "P10 PTR-006 Product Catalog (B2B Pricing)"
+      x-ticvai-audience: [staff, partner]
+      x-ticvai-read-routing: replica
+      summary: External identifiers for a product
+      description: >
+        Partners and distributors use their own SKUs. Mapping them here means an inbound
+        order can be matched without asking a partner to change their catalogue.
+      tags: [product]
+      x-ticvai-permission: PRODUCT_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '200':
+          description: Codes
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/AlternativeCode' }
+
+    put:
+      operationId: setAlternativeCodes
+      x-ticvai-consumed-by:
+        - "P06 EMP-034 Walk-up sale"
+        - "P08 BO-007 Product Directory"
+        - "P08 BO-012 Membership Products"
+        - "P08 BO-014 Catalogue Publishing"
+        - "P10 PTR-006 Product Catalog (B2B Pricing)"
+      x-ticvai-audience: [staff, partner]
+      summary: Set external identifiers
+      tags: [product]
+      x-ticvai-permission: PRODUCT_CONFIGURE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [codes]
+              properties:
+                codes:
+                  type: array
+                  items: { $ref: '#/components/schemas/AlternativeCode' }
+      responses:
+        '200':
+          description: Set
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/AlternativeCode' }
+        '409':
+          description: Code already mapped to a different product for that partner
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /products/resolve:
+    get:
+      operationId: resolveProductByCode
+      x-ticvai-consumed-by:
+        - "P04 POS-002 Sell — Ticket Catalogue"
+        - "P04 POS-003 Sell — Timed Entry"
+        - "P06 EMP-034 Walk-up sale"
+        - "P08 BO-007 Product Directory"
+        - "P08 BO-012 Membership Products"
+        - "P08 BO-014 Catalogue Publishing"
+        - "P10 PTR-006 Product Catalog (B2B Pricing)"
+      x-ticvai-audience: [staff, partner]
+      x-ticvai-read-routing: replica
+      summary: Resolve a partner code to a product
+      description: >
+        Called on inbound distribution orders. Accepts a partner's own SKU and returns the
+        variant it maps to.
+      tags: [product]
+      x-ticvai-permission: PRODUCT_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - name: code
+          in: query
+          required: true
+          schema: { type: string }
+        - name: partnerId
+          in: query
+          schema: { type: string, format: uuid }
+      responses:
+        '200':
+          description: Resolved
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ProductVariant' }
+        '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
+
+  /price-lists/{priceListId}:
+    parameters:
+      - name: priceListId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    get:
+      operationId: getPriceList
+      x-ticvai-consumed-by:
+        - "P08 BO-009 Pricing Rules"
+        - "P10 PTR-006 Product Catalog (B2B Pricing)"
+      x-ticvai-audience: [staff, partner]
+      x-ticvai-read-routing: replica
+      summary: Read a price list
+      tags: [pricing]
+      x-ticvai-permission: PRICE_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '200':
+          description: Price list
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/PriceList' }
+        '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
+
+    patch:
+      operationId: updatePriceList
+      x-ticvai-consumed-by:
+        - "P08 BO-009 Pricing Rules"
+        - "P10 PTR-006 Product Catalog (B2B Pricing)"
+      x-ticvai-audience: [staff, partner]
+      summary: Amend a price list
+      description: >
+        Currency and scale are immutable once prices exist. Changing them would silently
+        reinterpret every price in the list.
+      tags: [pricing]
+      x-ticvai-permission: PRICE_CONFIGURE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              minProperties: 1
+              properties:
+                name: { type: string, maxLength: 200 }
+                validFrom: { type: string, format: date-time }
+                validTo: { type: string, format: date-time }
+                priority: { type: integer }
+                isActive: { type: boolean }
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/PriceList' }
+        '409':
+          description: Currency or scale change attempted after prices exist
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /price-lists/{priceListId}/copy:
+    parameters:
+      - name: priceListId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    post:
+      operationId: copyPriceList
+      x-ticvai-consumed-by:
+        - "P08 BO-009 Pricing Rules"
+        - "P10 PTR-006 Product Catalog (B2B Pricing)"
+      x-ticvai-audience: [staff, partner]
+      summary: Copy a price list, optionally with an adjustment
+      description: >
+        Next season's prices from this season's, uplifted by a percentage. The alternative is
+        editing thousands of prices by hand, which is how a decimal point goes missing.
+      tags: [pricing]
+      x-ticvai-permission: PRICE_CONFIGURE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [name, code]
+              properties:
+                code: { type: string, maxLength: 64 }
+                name: { type: string, maxLength: 200 }
+                adjustmentPercent:
+                  type: number
+                  description: Applied to every copied price. Negative reduces.
+                roundTo:
+                  type: number
+                  description: Round adjusted prices to this increment, e.g. 0.5 or 5.
+                validFrom: { type: string, format: date-time }
+                validTo: { type: string, format: date-time }
+      responses:
+        '201':
+          description: Copied
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  priceList: { $ref: '#/components/schemas/PriceList' }
+                  copiedPriceCount: { type: integer }
+
+  /events/{eventId}:
+    parameters:
+      - name: eventId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    get:
+      operationId: getEvent
+      x-ticvai-consumed-by:
+        - "P08 BO-001 Queue Directory"
+        - "P08 BO-015 Session Calendar"
+        - "P08 BO-016 Session Template"
+        - "P08 BO-019 Closures & Blackouts"
+        - "P08 BO-063 Opening Hours & Calendar"
+      x-ticvai-audience: [staff]
+      x-ticvai-read-routing: replica
+      summary: Read an event
+      tags: [event]
+      x-ticvai-permission: PRODUCT_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '200':
+          description: Event
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Event' }
+        '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
+
+    patch:
+      operationId: updateEvent
+      x-ticvai-consumed-by:
+        - "P08 BO-001 Queue Directory"
+        - "P08 BO-015 Session Calendar"
+        - "P08 BO-016 Session Template"
+        - "P08 BO-019 Closures & Blackouts"
+        - "P08 BO-063 Opening Hours & Calendar"
+      x-ticvai-audience: [staff]
+      summary: Amend an event
+      tags: [event]
+      x-ticvai-permission: EVENT_CONFIGURE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              minProperties: 1
+              properties:
+                name: { type: string, maxLength: 200 }
+                parentEventId: { type: string, format: uuid, nullable: true }
+                isActive: { type: boolean }
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Event' }
+
+  /performances/{performanceId}:
+    parameters:
+      - name: performanceId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    get:
+      operationId: getPerformance
+      x-ticvai-consumed-by:
+        - "P02 GST-006 Event / Exhibition Details"
+        - "P04 POS-004 Sell — Seat Map"
+        - "P08 BO-002 Queue Configuration"
+        - "P08 BO-015 Session Calendar"
+        - "P08 BO-016 Session Template"
+        - "P08 BO-019 Closures & Blackouts"
+        - "P08 BO-063 Opening Hours & Calendar"
+      x-ticvai-audience: [staff, guest]
+      x-ticvai-read-routing: replica
+      summary: Read a performance
+      tags: [event]
+      x-ticvai-permission: PRODUCT_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '200':
+          description: Performance
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Performance' }
+        '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
+
+    patch:
+      operationId: updatePerformance
+      x-ticvai-consumed-by:
+        - "P04 POS-004 Sell — Seat Map"
+        - "P08 BO-002 Queue Configuration"
+        - "P08 BO-015 Session Calendar"
+        - "P08 BO-016 Session Template"
+        - "P08 BO-019 Closures & Blackouts"
+        - "P08 BO-063 Opening Hours & Calendar"
+      x-ticvai-audience: [staff]
+      summary: Amend a performance
+      description: >
+        Moving a performance that has sold tickets is refused. Use cancellation, which
+        notifies holders and refunds them — silently relocating a guest's booking is not a
+        change, it is a surprise.
+      tags: [event]
+      x-ticvai-permission: PERFORMANCE_CONFIGURE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              minProperties: 1
+              properties:
+                startsAt: { type: string, format: date-time }
+                endsAt: { type: string, format: date-time }
+                status: { type: string, enum: [scheduled, onSale, suspended] }
+                admissionProfileId: { type: string, format: uuid }
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Performance' }
+        '409':
+          description: Timing change attempted on a performance with sold tickets
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /performances/{performanceId}/cancel:
+    parameters:
+      - name: performanceId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    post:
+      operationId: cancelPerformance
+      x-ticvai-consumed-by:
+        - "P08 BO-002 Queue Configuration"
+        - "P08 BO-015 Session Calendar"
+        - "P08 BO-016 Session Template"
+        - "P08 BO-019 Closures & Blackouts"
+        - "P08 BO-063 Opening Hours & Calendar"
+      x-ticvai-audience: [staff]
+      summary: Cancel a performance
+      description: >
+        Stops sales, notifies every holder, and queues a bulk refund for approval. The refund
+        is **not** issued automatically — a cancellation of any size is a financial event
+        someone signs off.
+
+        Returns the exposure before committing so the person cancelling sees what it costs.
+      tags: [event]
+      x-ticvai-permission: PERFORMANCE_CONFIGURE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [reason]
+              properties:
+                reason: { type: string, minLength: 3, maxLength: 1000 }
+                guestMessage:
+                  type: object
+                  additionalProperties: { type: string }
+                refundPercentage: { type: number, minimum: 0, maximum: 100, default: 100 }
+                offerAlternativePerformanceId: { type: string, format: uuid }
+                dryRun: { type: boolean, default: false }
+      responses:
+        '200':
+          description: Cancelled, or exposure reported when dry run
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/PerformanceCancellationResult' }
+
+  /envelopes/{envelopeId}:
+    parameters:
+      - name: envelopeId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    patch:
+      operationId: updateEnvelope
+      x-ticvai-consumed-by:
+        - "P06 EMP-033 Capacity view"
+        - "P08 BO-013 Channel & Distribution"
+        - "P08 BO-017 Capacity Management"
+        - "P10 PTR-005 Inventory & Allocation View"
+      x-ticvai-audience: [staff, partner]
+      summary: Amend an envelope
+      description: >
+        Capacity may be increased freely. Reducing it below what has already sold is refused —
+        the seats are gone, and pretending otherwise oversells the next guest.
+      tags: [capacity]
+      x-ticvai-permission: CAPACITY_CONFIGURE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              minProperties: 1
+              properties:
+                name: { type: string, maxLength: 200 }
+                capacity: { type: integer, minimum: 0 }
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Envelope' }
+        '409':
+          description: Capacity reduced below units already sold
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /entitlement-templates:
+    get:
+      operationId: listEntitlementTemplates
+      x-ticvai-consumed-by:
+        - "P08 BO-012 Membership Products"
+      x-ticvai-audience: [staff]
+      x-ticvai-read-routing: replica
+      summary: List entitlement templates
+      description: >
+        What a product grants — validity window, entry count, re-entry, admission profile,
+        transferability. Separate from the product, because several products may grant the
+        same right at different prices.
+      tags: [entitlement]
+      x-ticvai-permission: PRODUCT_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: true
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '200':
+          description: Templates
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/EntitlementTemplate' }
+
+    post:
+      operationId: createEntitlementTemplate
+      x-ticvai-consumed-by:
+        - "P08 BO-012 Membership Products"
+      x-ticvai-audience: [staff]
+      x-ticvai-config-scope: venue
+      summary: Create an entitlement template
+      tags: [entitlement]
+      x-ticvai-permission: PRODUCT_CONFIGURE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/EntitlementTemplate' }
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/EntitlementTemplate' }
+
+  /entitlements/{entitlementId}/suspend:
+    parameters:
+      - name: entitlementId
+        in: path
+        required: true
+        schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+    post:
+      operationId: suspendEntitlement
+      x-ticvai-audience: [staff]
+      summary: Suspend or reinstate an entitlement
+      description: >
+        Fraud, a chargeback, a behavioural ban. Denies at the gate with a stated reason rather
+        than a generic failure, so an operator facing the guest knows what to say.
+
+        Suspension is reversible; it does not revoke.
+      tags: [entitlement]
+      x-ticvai-permission: ORDER_MODIFY
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [isSuspended, reason]
+              properties:
+                isSuspended: { type: boolean }
+                reason: { type: string, minLength: 3, maxLength: 500 }
+                denyMessage:
+                  type: string
+                  maxLength: 200
+                  description: Shown to the operator at the gate.
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  entitlementId: { type: string }
+                  isSuspended: { type: boolean }
+                  propagatedToCells:
+                    type: array
+                    description: Cross-cell rights revoked alongside (ADR-0010).
+                    items: { type: string }
+
+components:
+  schemas:
+    ProductLifecycleState:
+      type: string
+      enum: [draft, inReview, approved, live, withdrawn, archived]
+
+    ProductCategory:
+      type: object
+      x-ticvai-persistence: "catalogue.product_category"
+      description: >
+        Retail Board 2 of the client's design set, 20 August. **`listSeatCategories` existed and a
+        product category did not** — a seat category prices a seat, and a merchandise hierarchy
+        groups a catalogue.
+
+        **Brand sits here rather than as its own entity.** A venue with four brands and a hierarchy
+        five levels deep can express that with a parent; a venue with one brand should not have to
+        maintain a table containing one row.
+
+        **`displayOrder` is not alphabetical and that is the point.** A retail category list runs in
+        the order the merchandiser wants a guest to see it, and sorting by name puts *Accessories*
+        above *Apparel* forever.
+      required: [id, name, kind]
+      properties:
+        id: { type: string, format: uuid }
+        name: { type: string }
+        nameLocalised:
+          type: object
+          additionalProperties: { type: string }
+        kind: { type: string, enum: [category, brand, collection, season, department] }
+        parentId:
+          type: string
+          format: uuid
+          nullable: true
+          description: >
+            **One tree, not four.** A brand under a department under a category is how a real
+            merchandise hierarchy runs, and separate tables for each level cannot express a venue
+            that nests them differently.
+        scopePath: { type: string }
+        displayOrder: { type: integer, default: 100 }
+        imageAssetId: { type: string, format: uuid, nullable: true }
+        isActive:
+          type: boolean
+          default: true
+          description: >
+            **Deactivated rather than deleted.** A category with a season behind it still names the
+            products sold under it, and removing it rewrites last year's report.
+
+
+    CatalogueImportJob:
+      type: object
+      x-ticvai-persistence: "catalogue.import_job"
+      description: >
+        1.4.2. **Two-phase, following `seating.ImportJob`** — and carrying the same lesson: a job
+        that parses zero products is not a parsed job.
+      required: [id, status, parsedCount]
+      properties:
+        id: { type: string, format: uuid }
+        status: { type: string, enum: [parsing, previewReady, committing, committed, failed] }
+        outcome: { type: string, enum: [parsed, parsedWithFindings, nothingFound, unreadable] }
+        parsedCount: { type: integer }
+        createCount: { type: integer }
+        updateCount: { type: integer }
+        findings:
+          type: array
+          description: >
+            **What an operator sees before committing** — missing prices, duplicate codes, unknown
+            categories, codes that do not match the tenant's schema.
+          items:
+            type: object
+            properties:
+              row: { type: integer }
+              severity: { type: string, enum: [error, warning] }
+              message: { type: string }
+
+
+    GuestMembership:
+      type: object
+      description: >
+        19.2.26 to 19.2.28. **A view, not a table** — assembled from the entitlement, the product
+        that granted it and the order that bought it.
+      required: [entitlementId, productId, name, status]
+      properties:
+        entitlementId: { type: string, format: uuid }
+        productId: { type: string, format: uuid }
+        name: { type: string }
+        tier: { type: string, nullable: true }
+        status:
+          type: string
+          enum: [active, frozen, suspended, expired, cancelled]
+          description: >
+            **Derived from the entitlement, not held here.** This schema is a view assembled from the
+            entitlement, the product that granted it and the order that bought it — the lifecycle
+            lives in `states/entitlement-status.yaml` and `frozen` is what `freezeEntitlement` sets.
+
+            No state model of its own, deliberately: **two models over one lifecycle drift.**
+        validFrom: { type: string, format: date }
+        validTo: { type: string, format: date }
+        frozenDays:
+          type: integer
+          description: >
+            Days lost to a freeze and added back to `validTo`. **Shown because a guest who paused a
+            pass will check the maths**, and a validity date that moved without explanation is a
+            support call.
+        benefits:
+          type: array
+          description: >
+            5.4.31. From the product's entitlement template. **Traceable to what grants them**, so a
+            gate can honour what the app promised.
+          items:
+            type: object
+            properties:
+              code: { type: string }
+              name: { type: string }
+              value: { type: string, nullable: true }
+        renewsOn: { type: string, format: date, nullable: true }
+        previousTerms:
+          type: array
+          description: Prior terms, including lapsed ones.
+          items:
+            type: object
+            properties:
+              validFrom: { type: string, format: date }
+              validTo: { type: string, format: date }
+              endedBecause: { type: string, enum: [expired, renewed, cancelled, upgraded] }
+
+
+    ProductVersion:
+      type: object
+      x-ticvai-persistence: "catalogue.product_version"
+      description: >
+        1.1.47, 1.4.9 to 1.4.11. **Follows `white-label.ConfigVersion`** — the same pattern for the
+        same reason, and the fourth place this mechanism was asked for.
+      required: [version, publishedAt, publishedByPrincipalId]
+      properties:
+        version: { type: integer }
+        productId: { type: string, format: uuid }
+        publishedAt: { type: string, format: date-time }
+        publishedByPrincipalId: { type: string, format: uuid }
+        note: { type: string, nullable: true }
+        isCurrent: { type: boolean }
+        contentHash:
+          type: string
+          description: >
+            **Lets a diff be cheap and a no-op change be recognised.** Republishing an unchanged
+            product should not create a version.
+        restoredFromVersion:
+          type: integer
+          nullable: true
+          description: >
+            Set where this version was created by a restore. **A restore is a new version, not a
+            rewind** — a price that was wrong for three days stays visible, because a finance query
+            run next quarter has to reproduce what was charged.
+
+    ProductChangeImpact:
+      type: object
+      description: >
+        1.4.4 and 1.4.16. What a proposed change would touch. **Modelled on
+        `PerformanceCancellationResult`**, which does this for a cancellation.
+      required: [entitlementsIssued, ordersAffected, propagates]
+      properties:
+        entitlementsIssued:
+          type: integer
+          description: How many live entitlements came from this product.
+        ordersAffected: { type: integer }
+        futurePerformances: { type: integer }
+        openCarts:
+          type: integer
+          description: >
+            **A guest with this product in a cart while its price changes underneath them** is the
+            case nobody thinks about until it happens.
+        propagates:
+          type: boolean
+          description: >
+            Whether the change reaches what has already been sold. **A name correction should; a
+            price change must not**, and the difference is the whole reason this operation exists.
+        blockedBy:
+          type: array
+          description: Reasons the change would be refused outright.
+          items: { type: string }
+
+    BulkPriceResult:
+      type: object
+      description: 2.9.9. Dry run or applied — the shape is the same, `applied` says which.
+      required: [applied, productsMatched]
+      properties:
+        applied: { type: boolean }
+        productsMatched: { type: integer }
+        pricesChanged: { type: integer }
+        skipped:
+          type: array
+          description: >
+            **Products the selection matched and the adjustment could not touch** — a fixed-price
+            bundle, a partner net rate, a product in an open period. Named rather than counted,
+            because whoever ran this will be asked why the total is short.
+          items:
+            type: object
+            properties:
+              productId: { type: string, format: uuid }
+              reason: { type: string }
+
+
+    AlternativeCode:
+      x-ticvai-persistence: "catalogue.alternative_code"
+      type: object
+      required: [code, partnerId]
+      properties:
+        code: { type: string, maxLength: 128 }
+        partnerId: { type: string, format: uuid }
+        partnerName: { type: string }
+        variantId: { type: string, format: uuid }
+        note: { type: string, maxLength: 200 }
+
+    PerformanceCancellationResult:
+      x-ticvai-persistence: "none — computed"
+      type: object
+      required: [performanceId, dryRun, affectedOrders, refundExposure]
+      properties:
+        performanceId: { type: string, format: uuid }
+        dryRun: { type: boolean }
+        affectedOrders: { type: integer }
+        affectedGuests: { type: integer }
+        refundExposure:
+          allOf:
+            - $ref: '../shared/common.yaml#/components/schemas/Money'
+          description: >
+            What the cancellation costs. Returned before committing, so the person cancelling
+            sees the number at the moment they decide.
+        bulkRefundBatchId:
+          type: string
+          nullable: true
+          description: Queued for approval. Refunds are not issued automatically.
+        notificationsQueued: { type: integer }
+
+    EntitlementTemplate:
+      x-ticvai-persistence: "catalogue.entitlement_template"
+      type: object
+      required: [id, code, name, validityKind]
+      properties:
+        id: { type: string, format: uuid }
+        code: { type: string, maxLength: 64 }
+        name: { type: string, maxLength: 200 }
+        validityKind:
+          type: string
+          enum: [singleUse, dated, dateRange, rolling, unlimited, countLimited]
+        validFromOffsetDays: { type: integer, nullable: true }
+        validForDays: { type: integer, nullable: true }
+        daysOfWeek:
+          type: array
+          nullable: true
+          description: >
+            1.1.7 and 1.1.82. **A camp ticket admits on Tuesdays and Thursdays for six weeks**, and
+            `validityKind` had six values with no day pattern among them.
+
+            The shape is settled elsewhere in the package — `fnb.MenuAvailability` and
+            `promotions.PromotionConditions` both carry it. **Null means every day**, which is what
+            every existing entitlement means today.
+          items:
+            type: string
+            enum: [mon, tue, wed, thu, fri, sat, sun]
+        expiryAnchor:
+          type: string
+          nullable: true
+          enum: [offsetDays, endOfMonth, endOfQuarter, endOfYear, fixedDate, seasonEnd]
+          description: >
+            1.1.90 to 1.1.92. **A pass bought on the 20th and expiring on the 31st cannot be expressed
+            by an offset in days.** `offsetDays` is the existing behaviour and stays the default.
+
+            `seasonEnd` anchors to the venue's own season rather than the calendar — a water park
+            closing in October is not a quarter boundary.
+        expiryDate:
+          type: string
+          format: date
+          nullable: true
+          description: Where `expiryAnchor` is `fixedDate`. Every pass expires the same day regardless of purchase.
+        carriesStoredValue:
+          type: boolean
+          default: false
+          description: >
+            BL-033. **A ticket that is also a wallet** — a resort pass with 200 dirhams of spend on
+            it, deducted at a gate or a till.
+
+            **The value is a `retail.Wallet` bound to the entitlement, not a balance on the
+            ticket.** One balance mechanism (CF-126), so it holds authorisations, expires by credit
+            type and appears in the same reports — a second balance on the entitlement would have
+            been the seventh implementation.
+        includedValue:
+          $ref: '../shared/common.yaml#/components/schemas/Money'
+        validTimeWindows:
+          type: array
+          nullable: true
+          description: >
+            BL-036, 1.1.81 and 1.1.83. **A time-window entitlement needed a performance to express**
+            — valid 09:00 to 13:00 on any day was a thing you built by creating performances.
+
+            **A window is a property of the entitlement and a performance is an occurrence**, and
+            conflating them means a morning pass generates 365 performances a year.
+          items:
+            type: object
+            properties:
+              from: { type: string }
+              to: { type: string }
+              daysOfWeek: { type: array, items: { type: string } }
+        blackoutDates:
+          type: array
+          nullable: true
+          description: >
+            **Calendar exceptions on the entitlement.** An annual pass excluding public holidays is
+            the normal case and had nowhere to live.
+          items: { type: string, format: date }
+        fastTrackTier:
+          type: string
+          nullable: true
+          enum: [none, priority, express, unlimited]
+          description: >
+            19.2.20, BL-015. **Fast track existed nowhere in the package** — not an enum value, not
+            a description, not a screen.
+
+            **An attribute of the entitlement rather than a queue class or a product kind**, because
+            the same ride serves standby and fast-track guests from one capacity: `queue` already
+            has `isFastPass` on an entry and needed something to read it from.
+        entriesAllowed:
+          type: integer
+          nullable: true
+          description: Null means unlimited. The Fast Pass consumption counter lives here.
+        reentryAllowed: { type: boolean, default: false }
+        purchaseEligibility:
+          type: object
+          nullable: true
+          description: >
+            1.1.38, 1.1.121, 1.1.125, 1.1.126. **`admissionProfileId` governs where an entitlement
+            admits, not who may buy it**, and `promotions.evaluatePromotions` gates a discount rather
+            than a sale. Neither refuses a purchase.
+
+            **Evaluated at add-to-cart, not at checkout.** A guest told at payment that they cannot
+            buy a resident rate has already entered a card.
+          properties:
+            minAgeYears: { type: integer, nullable: true }
+            maxAgeYears: { type: integer, nullable: true }
+            minHeightCm:
+              type: integer
+              nullable: true
+              description: >
+                **Height gates a ride and can gate a sale.** A ticket sold to somebody who cannot
+                ride it is a refund at the gate.
+            residencyRequired: { type: boolean, default: false }
+            nationalities:
+              type: array
+              nullable: true
+              items: { type: string }
+            minLoyaltyTier: { type: string, nullable: true }
+            requiresVerification:
+              type: boolean
+              default: false
+              description: >
+                **Whether the claim is checked or taken on trust.** A resident rate sold unverified
+                and refused at the gate is worse than one that could not be bought.
+        personType:
+          type: string
+          nullable: true
+          enum: [adult, child, infant, senior, student, resident, staff]
+          description: >
+            2.11.7. **Adult, child and senior existed only as `ProductVariant.axisValues` — a variant
+            axis rather than an attribute of the holder.** So changing a child ticket to an adult one
+            was an exchange to a different product, and an upgrade that should be a price difference
+            became a cancel-and-rebuy.
+
+            Recorded here as well as on the variant, because **the guest ages and the product does
+            not.**
+        admissionProfileId: { type: string, format: uuid, nullable: true }
+        isTransferable: { type: boolean, default: true }
+        canShareMedia:
+          type: boolean
+          default: true
+          description: >
+            Whether this entitlement may be appended to media a guest already holds (CF-58).
+            False for anything surrendered at use — a single-entry ticket taken at the gate is
+            not a claim token for a locker bought afterwards.
+        canClaimShopAndDrop:
+          type: boolean
+          default: false
+          description: >
+            Whether this entitlement may be scanned to claim goods left under 4.4.7. False for
+            a single-entry ticket that is surrendered at the gate — a claim token the guest no
+            longer holds is not a claim token.
+        isNameBound:
+          type: boolean
+          default: false
+          description: >
+            True requires a holder name at sale. Most entitlements carry none — identity and
+            entitlement are separate concerns.
+        crossesCells:
+          type: boolean
+          default: false
+          description: >
+            True propagates a redemption right to other cells on issue (ADR-0010).
+        isActive: { type: boolean }
+
+    ProductKind:
+      type: string
+      enum: [admission, timedAdmission, datedAdmission, seated, membership, bundle, fnb, retail, rental, addOn, giftCard]
+
+    Channel:
+      type: string
+      enum: [pos, kiosk, web, mobile, b2b, ota, callCentre]
+
+    DonationAmountMode:
+      type: string
+      enum: [fixedChoices, freeAmount, roundUp]
+
+    DonationCampaign:
+      type: object
+      x-ticvai-persistence: "catalogue.donation_campaign"
+      required: [name, amountMode, isActive]
+      properties:
+        id: { type: string, format: uuid, readOnly: true }
+        name: { type: string, maxLength: 200 }
+        description: { type: string, maxLength: 1000 }
+        beneficiary:
+          type: string
+          description: Who the money is for. Shown to the guest, and it is the reason they give.
+        venueIds:
+          type: array
+          items: { type: string, format: uuid }
+        amountMode: { $ref: '#/components/schemas/DonationAmountMode' }
+        fixedAmounts:
+          type: array
+          description: 1.1.129. Predefined values, e.g. 5, 10, 25.
+          items: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+        minAmount: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+        maxAmount: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+        liabilityAccountId:
+          type: string
+          format: uuid
+          description: >
+            **Donations post here, not to revenue** (1.1.132). Money collected for a charity is
+            not the venue's to recognise, and treating it as revenue is a restatement waiting to
+            happen.
+        channels:
+          type: array
+          description: 1.1.133. Where it may be solicited — POS, kiosk, web, app.
+          items: { $ref: '../shared/common.yaml#/components/schemas/SalesChannel' }
+        isActive: { type: boolean }
+        validFrom: { type: string, format: date-time }
+        validTo: { type: string, format: date-time, nullable: true }
+        raisedTotal:
+          allOf:
+            - $ref: '../shared/common.yaml#/components/schemas/Money'
+          readOnly: true
+          description: >
+            **Not reversed when the campaign closes.** The money is still owed.
+
+    WaitlistStatus:
+      type: string
+      enum: [waiting, offered, converted, expired, left]
+
+    WaitlistEntry:
+      type: object
+      x-ticvai-persistence: "catalogue.waitlist_entry"
+      required: [performanceId, partySize]
+      properties:
+        id: { type: string, format: uuid, readOnly: true }
+        performanceId: { type: string, format: uuid }
+        variantId: { type: string, format: uuid, nullable: true }
+        subjectId: { type: string, format: uuid, nullable: true }
+        contactPoint:
+          type: string
+          description: >
+            **Where the offer goes.** An entry with no way to reach the guest is an entry that
+            can never be honoured, so this is required even for an anonymous guest.
+        partySize: { type: integer, minimum: 1 }
+        status: { $ref: '#/components/schemas/WaitlistStatus' }
+        position:
+          type: integer
+          readOnly: true
+          description: First in, first offered. Shown to the guest, because not knowing is worse than waiting.
+        offeredAt: { type: string, format: date-time, nullable: true }
+        offerExpiresAt:
+          type: string
+          format: date-time
+          nullable: true
+          description: >
+            **The offer moves on when this passes.** Notifying everyone at once produces a race
+            the fastest guest wins; holding indefinitely for someone asleep leaves the seat
+            unsold.
+        joinedAt: { type: string, format: date-time, readOnly: true }
+
+    Product:
+      x-ticvai-persistence: "catalogue.product"
+      type: object
+      required: [id, code, name, kind, venueId, scopePath, isSellable, hasVariants]
+      properties:
+        id: { type: string, format: uuid }
+        code: { type: string, maxLength: 64 }
+        name: { type: string, maxLength: 200 }
+        description: { type: string }
+        kind: { $ref: '#/components/schemas/ProductKind' }
+        venueId: { type: string, format: uuid }
+        scopePath: { type: string }
+        createdByPrincipalId:
+          type: string
+          format: uuid
+          readOnly: true
+          description: >
+            1.4.18. **The approval gate refuses an approver who is the author, and nothing recorded
+            either.** `SeatBlock`, `Grant` and `ManualDiscountRequest` all carry this and the product
+            passing through approval did not.
+        approvedByPrincipalId:
+          type: string
+          format: uuid
+          nullable: true
+          readOnly: true
+        responsibleDepartmentId:
+          type: string
+          format: uuid
+          nullable: true
+          description: Who owns this product commercially. A scope node at `department` level.
+        onSaleFrom:
+          type: string
+          format: date-time
+          nullable: true
+          description: >
+            1.4.8. **A seasonal product should not need somebody awake at midnight.** Archiving already
+            runs on a timer in this contract, so the machinery exists; `effectiveFrom` appears on tax
+            codes, FX rates and white-label policies and not here.
+        onSaleTo:
+          type: string
+          format: date-time
+          nullable: true
+          description: >
+            Retires the product automatically. **Retirement is not deletion** — the product stops
+            selling and every order that referenced it still resolves.
+        lifecycleState: { $ref: '#/components/schemas/ProductLifecycleState' }
+        isSellable:
+          type: boolean
+          description: >
+            True only when live **and** carried by a published bundle. Approval and
+            publication are different acts.
+        hasVariants: { type: boolean }
+        variantCount: { type: integer }
+        segmentTags:
+          type: array
+          description: >
+            7.3.5. **A channel and a segment tag are mandatory and nothing required either.** A
+            catalogue that cannot be filtered by segment is a catalogue nobody can report on.
+
+            **Hierarchical, not flat** — `family/with-toddlers` narrows `family` without duplicating
+            it, which is how the promotions engine already treats scope.
+          items: { type: string }
+        codeSchema:
+          type: string
+          readOnly: true
+          description: >
+            7.3.4 specifies `[ParkCode]-[ProductType]-[Variant]`. **`Product.code` existed and
+            nothing required a format**, so a venue with three thousand products had three thousand
+            conventions.
+
+            The tenant sets the pattern and the platform generates against it. **Validation is the
+            point, not the string** — a code typed by hand is a code that will not sort.
+        channels:
+          type: array
+          items: { $ref: '#/components/schemas/Channel' }
+        entitlementTemplateId:
+          type: string
+          format: uuid
+          nullable: true
+          description: >
+            What the buyer receives. Null for products that grant nothing — F&B and retail.
+            Identity and entitlement are separate concerns.
+        blockedOffline:
+          type: boolean
+          description: >
+            True for seated and retail. Seated because a seat map is not a count; retail
+            because stock depletes in real time.
+        dataMaskValues:
+          type: object
+          additionalProperties: true
+          description: Custom fields. JSONB-backed, defined by the venue's data mask.
+
+    CreateProductRequest:
+      type: object
+      required: [code, name, kind, venueId]
+      properties:
+        code: { type: string, maxLength: 64, pattern: '^[A-Za-z0-9_-]+$' }
+        name: { type: string, maxLength: 200 }
+        description: { type: string }
+        kind: { $ref: '#/components/schemas/ProductKind' }
+        venueId: { type: string, format: uuid }
+        channels:
+          type: array
+          items: { $ref: '#/components/schemas/Channel' }
+        entitlementTemplateId: { type: string, format: uuid }
+        dataMaskValues:
+          type: object
+          additionalProperties: true
+
+    UpdateProductRequest:
+      type: object
+      minProperties: 1
+      properties:
+        name: { type: string, maxLength: 200 }
+        description: { type: string }
+        isSellable: { type: boolean }
+        channels:
+          type: array
+          items: { $ref: '#/components/schemas/Channel' }
+        dataMaskValues:
+          type: object
+          additionalProperties: true
+
+    AttributeAxis:
+      x-ticvai-persistence: "catalogue.attribute_axis"
+      type: object
+      required: [code, name, values]
+      properties:
+        code: { type: string, maxLength: 64 }
+        name: { type: string, maxLength: 200 }
+        values:
+          type: array
+          minItems: 1
+          items:
+            type: object
+            required: [code, label]
+            properties:
+              code: { type: string, maxLength: 64 }
+              label: { type: string, maxLength: 200 }
+              priceDelta: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+
+    ProductVariant:
+      x-ticvai-persistence: "catalogue.variant"
+      type: object
+      required: [id, productId, sku, axisValues, isActive]
+      properties:
+        id: { type: string, format: uuid }
+        productId: { type: string, format: uuid }
+        sku: { type: string }
+        axisValues:
+          type: object
+          additionalProperties: { type: string }
+        isActive:
+          type: boolean
+          description: False when retired. Retired variants are never deleted — orders reference them.
+
+    PriceList:
+      x-ticvai-persistence: "catalogue.price_list"
+      type: object
+      required: [id, code, name, venueId, currency, currencyScale, channels]
+      properties:
+        id: { type: string, format: uuid }
+        code: { type: string }
+        name: { type: string }
+        venueId: { type: string, format: uuid }
+        currency:
+          type: string
+          pattern: '^[A-Z]{3}$'
+          x-ticvai-persisted: false
+          description: >
+            **Resolved from the region, not stored** (ADR-0018, 24 August). Region-scoped and not overri
+            dable below, so a row in a UAE region is AED and cannot be anything else. **Kept on the wire
+            , removed from the table** — a client should not walk a hierarchy to read a figure, and the 
+            database should not hold nine million copies of AED. Four tables genuinely differ from their
+             region and keep a stored currency: `orders.payment.tender_currency`, `inventory.supplier`, 
+            `ledger.account`, `control.partner_agreement`.
+        currencyScale:
+          type: integer
+          minimum: 0
+          maximum: 4
+          x-ticvai-persisted: false
+          description: >
+            **Resolved from the region, not stored** (ADR-0018, 24 August). Region-scoped and not overri
+            dable below, so a row in a UAE region is AED and cannot be anything else — storing it per ro
+            w is a copy of a fact that cannot differ. **Kept on the wire, removed from the table**: a cl
+            ient reading a figure should not walk a hierarchy to know what it means, and the database sh
+            ould not hold nine million copies of AED. Four tables genuinely differ from their region and
+             keep a stored currency — `orders.payment.tender_currency`, `inventory.supplier`, `ledger.ac
+            count`, `control.partner_agreement`. **A guest paying USD at an AED venue is a real row; a w
+            orkstation with its own currency is a misconfiguration.**
+        channels:
+          type: array
+          items: { $ref: '#/components/schemas/Channel' }
+        validFrom: { type: string, format: date-time, nullable: true }
+        validTo: { type: string, format: date-time, nullable: true }
+        priority:
+          type: integer
+          description: Where lists overlap, higher priority wins.
+
+    CreatePriceListRequest:
+      type: object
+      required: [code, name, venueId, channels]
+      properties:
+        code: { type: string, maxLength: 64 }
+        name: { type: string, maxLength: 200 }
+        venueId: { type: string, format: uuid }
+        channels:
+          type: array
+          minItems: 1
+          items: { $ref: '#/components/schemas/Channel' }
+        validFrom: { type: string, format: date-time }
+        validTo: { type: string, format: date-time }
+        priority: { type: integer, default: 0 }
+
+    Price:
+      x-ticvai-persistence: "catalogue.price"
+      type: object
+      required: [priceListId, variantId, amount]
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+          description: >
+            **Added 20 August.** The schema reference derives table columns from API response schemas, and a response is not a table — this one returned everything a caller needs and not the row's own identity, so the table had no key and no row could be addressed, updated or deleted. Found by an audit of all 365 tables, not by a reader.
+        priceListId: { type: string, format: uuid }
+        variantId: { type: string, format: uuid }
+        amount: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+        taxCodeId: { type: string, format: uuid, nullable: true }
+
+    SetPriceRequest:
+      type: object
+      required: [variantId, amount]
+      properties:
+        variantId: { type: string, format: uuid }
+        amount: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+        taxCodeId: { type: string, format: uuid }
+
+    Event:
+      x-ticvai-persistence: "catalogue.event"
+      type: object
+      required: [id, code, name, venueId, scopePath]
+      properties:
+        id: { type: string, format: uuid }
+        code: { type: string }
+        name: { type: string }
+        venueId: { type: string, format: uuid }
+        scopePath: { type: string }
+        parentEventId:
+          type: string
+          format: uuid
+          nullable: true
+          description: For grouped events.
+        performanceCount: { type: integer }
+        isActive: { type: boolean }
+
+    CreateEventRequest:
+      type: object
+      required: [code, name, venueId]
+      properties:
+        code: { type: string, maxLength: 64 }
+        name: { type: string, maxLength: 200 }
+        venueId: { type: string, format: uuid }
+        parentEventId: { type: string, format: uuid }
+
+    Performance:
+      x-ticvai-persistence: "catalogue.performance"
+      type: object
+      required: [id, eventId, startsAt, endsAt, status]
+      properties:
+        id: { type: string, format: uuid }
+        eventId: { type: string, format: uuid }
+        startsAt: { type: string, format: date-time }
+        endsAt: { type: string, format: date-time }
+        approvalRequestId:
+          type: string
+          format: uuid
+          nullable: true
+          description: >
+            BL-048. **The approval chain and the occurrence lifecycle sat on different entities**, so
+            neither was complete: `states/performance.yaml` models scheduled, onSale, soldOut,
+            suspended, cancelled and completed properly, and nothing said which of those transitions
+            somebody had to sign.
+
+            **Set on the transition that needs it, not on the performance.** Publishing a
+            performance is routine; cancelling one that has sold is the act somebody signs — and
+            binding approval to the whole entity would have required a signature to reschedule a
+            wet Tuesday.
+        requiresApprovalToCancel:
+          type: boolean
+          default: true
+          description: >
+            **Cancelling a sold performance is the one transition that needs a name against it.**
+            `assessProductChange` already answers how many tickets are affected; this decides who
+            has to look at that number before the button works.
+        status:
+          type: string
+          enum: [scheduled, onSale, soldOut, suspended, cancelled, completed]
+        admissionProfileId: { type: string, format: uuid, nullable: true }
+        seatMapId: { type: string, format: uuid, nullable: true }
+
+    CreatePerformancesRequest:
+      type: object
+      required: [startsAt, endsAt]
+      properties:
+        startsAt: { type: string, format: date-time }
+        endsAt: { type: string, format: date-time }
+        admissionProfileId: { type: string, format: uuid }
+        seatMapId: { type: string, format: uuid }
+        recurrence:
+          type: object
+          description: Generate a series rather than a single performance.
+          properties:
+            intervalMinutes: { type: integer, minimum: 1 }
+            until: { type: string, format: date-time }
+            daysOfWeek:
+              type: array
+              items: { type: integer, minimum: 0, maximum: 6 }
+
+    Envelope:
+      x-ticvai-persistence: "catalogue.envelope"
+      type: object
+      required: [id, performanceId, capacity, sold, leased, remaining, isSeated]
+      properties:
+        id: { type: string, format: uuid }
+        performanceId: { type: string, format: uuid }
+        name: { type: string }
+        seatCategoryId: { type: string, format: uuid, nullable: true }
+        oversellAllowance:
+          type: integer
+          default: 0
+          description: >
+            BL-046, 1.3.13. **The guard existed in one direction** — an envelope could be raised
+            freely and refused reduction below what had sold.
+
+            **Free events oversell deliberately because no-show rates are known.** An allowance on
+            the envelope rather than an admission policy, because **the gate must still refuse when
+            actual capacity is reached** — overselling is a sales decision and admission is a safety
+            one, and they must not share a number.
+        oversellBasis:
+          type: string
+          nullable: true
+          enum: [fixedCount, historicNoShowRate, percentage]
+        capacity: { type: integer, minimum: 0 }
+        sold: { type: integer }
+        leased: { type: integer }
+        remaining: { type: integer }
+        hasChannelAllocations:
+          type: boolean
+          description: >
+            True where capacity is divided across channels. Leases then draw from a channel
+            allocation rather than from raw capacity.
+        isSeated:
+          type: boolean
+          description: >
+            Seated envelopes cannot be leased and are blocked offline. A seat map is not a
+            count.
+
+    CreateEnvelopeRequest:
+      type: object
+      required: [performanceId, name, capacity]
+      properties:
+        performanceId: { type: string, format: uuid }
+        name: { type: string, maxLength: 200 }
+        seatCategoryId: { type: string, format: uuid }
+        capacity: { type: integer, minimum: 0 }
+
+    ChannelAllocation:
+      x-ticvai-persistence: "catalogue.channel_allocation"
+      type: object
+      required: [channel, allocatedUnits]
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+          description: >
+            **Added 20 August.** The schema reference derives table columns from API response schemas, and a response is not a table — this one returned everything a caller needs and not the row's own identity, so the table had no key and no row could be addressed, updated or deleted. Found by an audit of all 365 tables, not by a reader.
+        channel: { $ref: '#/components/schemas/Channel' }
+        allocatedUnits: { type: integer, minimum: 0 }
+        soldUnits: { type: integer, readOnly: true }
+        leasedUnits:
+          type: integer
+          readOnly: true
+          description: Held by terminals on this channel but not yet sold.
+        remainingUnits: { type: integer, readOnly: true }
+        releaseAt:
+          type: string
+          format: date-time
+          nullable: true
+          description: >
+            Unsold units return to the general pool at this time. How distribution holds are
+            freed close to a performance without someone remembering to do it.
+
+    ChannelAllocationSet:
+      x-ticvai-persistence: "none — projection"
+      type: object
+      required: [envelopeId, capacity, allocations, generalPoolUnits]
+      properties:
+        envelopeId: { type: string, format: uuid }
+        capacity: { type: integer }
+        allocations:
+          type: array
+          items: { $ref: '#/components/schemas/ChannelAllocation' }
+        generalPoolUnits:
+          type: integer
+          description: >
+            Unallocated remainder. Any channel may draw from it once its own allocation is
+            exhausted.
+        totalSold: { type: integer }
+        totalRemaining: { type: integer }
+
+    BundleSummary:
+      x-ticvai-persistence: "none — projection over bundle"
+      type: object
+      required: [version, venueId, publishedAt, publishedBy, contentHash, staleAfter, sizeBytes]
+      properties:
+        version: { type: string }
+        venueId: { type: string, format: uuid }
+        publishedAt: { type: string, format: date-time }
+        publishedBy: { type: string, format: uuid }
+        contentHash: { type: string }
+        signatureKeyId:
+          type: string
+          description: >
+            Key that signed this bundle. A terminal offline across a key rotation needs a
+            grace window, or it cannot verify the next bundle.
+        staleAfter: { type: string, format: date-time }
+        sizeBytes: { type: integer }
+        note: { type: string }
+        appliedByWorkstations: { type: integer }
+
+    CatalogueBundle:
+      x-ticvai-persistence: "catalogue.published_bundle"
+      type: object
+      required: [version, venueId, isDelta, signature, signatureKeyId, contentHash, staleAfter, payload]
+      properties:
+        version: { type: string }
+        venueId: { type: string, format: uuid }
+        isDelta: { type: boolean }
+        baseVersion:
+          type: string
+          nullable: true
+          description: Present when `isDelta`. The version this delta applies to.
+        signature:
+          type: string
+          description: >
+            Detached signature over `contentHash`. The terminal verifies before applying and
+            rolls back on failure — a half-applied catalogue is never traded against.
+        signatureKeyId: { type: string }
+        contentHash: { type: string }
+        staleAfter: { type: string, format: date-time }
+        payload:
+          type: object
+          description: >
+            Products, variants, price lists, prices, tax codes, events, performances,
+            envelope definitions and data mask field definitions. Shape is versioned with
+            the bundle format, not with this API.
+          additionalProperties: true
+
+    LeaseStatus:
+      type: string
+      enum: [active, expired, released, forceReleased]
+
+    AcquireLeaseRequest:
+      type: object
+      required: [id, envelopeId, requestedUnits, ttlSeconds]
+      properties:
+        channel:
+          allOf:
+            - $ref: '#/components/schemas/Channel'
+          description: >
+            Which channel's allocation to draw from. Defaults to the session's channel.
+            A lease is granted against a channel allocation, not against raw capacity.
+        id:
+          type: string
+          pattern: '^[0-9A-HJKMNP-TV-Z]{26}$'
+          description: Client-generated ULID. Also the idempotency key.
+        envelopeId: { type: string, format: uuid }
+        requestedUnits: { type: integer, minimum: 1 }
+        ttlSeconds:
+          type: integer
+          minimum: 30
+          maximum: 3600
+          description: >
+            Short TTLs limit stranding when a terminal dies; long TTLs survive longer
+            outages. The venue's default balances the two.
+
+    Lease:
+      x-ticvai-persistence: "catalogue.inventory_lease"
+      type: object
+      required: [id, envelopeId, holderWorkstationId, grantedUnits, consumedUnits, status, acquiredAt, expiresAt]
+      properties:
+        id: { type: string }
+        envelopeId: { type: string, format: uuid }
+        holderWorkstationId: { type: string, format: uuid }
+        parentLeaseId:
+          type: string
+          nullable: true
+          description: Present when sub-leased from a venue edge node.
+        requestedUnits: { type: integer }
+        channel:
+          allOf:
+            - $ref: '#/components/schemas/Channel'
+          description: Allocation this lease draws from.
+        grantedUnits:
+          type: integer
+          description: >
+            May be less than requested — a partial grant is not an error. Constrained by the
+            channel's remaining allocation plus the general pool, never by raw capacity.
+        consumedUnits: { type: integer }
+        status: { $ref: '#/components/schemas/LeaseStatus' }
+        acquiredAt: { type: string, format: date-time }
+        expiresAt: { type: string, format: date-time }
+        releasedAt: { type: string, format: date-time, nullable: true }
+        forceReleasedByPrincipalId: { type: string, format: uuid, nullable: true }
+        forceReleaseReason: { type: string, nullable: true }
+
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

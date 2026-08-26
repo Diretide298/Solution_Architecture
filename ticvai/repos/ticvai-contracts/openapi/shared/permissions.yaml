@@ -1,0 +1,220 @@
+openapi: 3.1.0
+info:
+  x-ticvai-tier: shared
+  x-ticvai-module: "Cross-cutting — the single authorisation vocabulary"
+  x-ticvai-platforms: ["All platforms"]
+  title: TICVAI Permission Vocabulary
+  version: 1.0.0
+  description: >
+    ## How to read this file
+
+    **The single source of permission strings.** Backend authorisation, frontend navigation
+    filtering and AI capability scoping all consume the enum below through generated code.
+    It is never hand-typed anywhere.
+
+    Every `x-ticvai-permission` in every contract is validated against this enum in CI. If a
+    permission is not here, the contract does not build.
+
+    **Why one file rather than per-context enums:** if the frontend spells a permission
+    differently from the backend, a supervisor sees a button that returns 403 — invisible in
+    code review, obvious in production, and impossible if both generate from the same source.
+
+    ## What a permission is not
+
+    A permission says *what*. It does not say *where* — that is `x-ticvai-scope-level`, and
+    the two are resolved together against the seven-level hierarchy. Holding
+    `ORDER_REFUND` means nothing until it is held at a scope that contains the order.
+
+    ---
+
+    The single source of permission strings.
+
+    Backend authorisation, frontend navigation filtering and AI capability scoping all
+    consume the enum below via generated code. It is never hand-typed anywhere.
+
+    If the frontend spells a permission differently from the backend, a supervisor sees a
+    button that returns 403 — invisible in code review, obvious in production.
+
+    Format: <DOMAIN>_<ACTION>[_<QUALIFIER>]
+
+    Resolution semantics are normative and defined in
+    architecture/specs/permission-resolution.md: deny-overrides-allow, downward inheritance
+    only, default deny, resolved once at login.
+
+components:
+  schemas:
+    Permission:
+      type: string
+      enum:
+        # --- Session and identity ---------------------------------------------
+        - SESSION_FORCE_LOGOUT        # terminate another principal's session
+        - USER_MANAGE                 # create, edit, deactivate principals
+        - ROLE_MANAGE                 # create roles and attach grants
+        - PERMISSION_GRANT            # assign grants to a principal
+        - PERMISSION_VIEW             # view the grant set of others
+
+        # --- Control Plane ---
+        # Held by platform staff, never by tenant users. These operate outside any cell.
+        - PLATFORM_TENANT_VIEW
+        - PLATFORM_TENANT_MANAGE
+        - PLATFORM_TENANT_TERMINATE   # deliberately separate from MANAGE
+        - PLATFORM_PLAN_MANAGE
+        - PLATFORM_CELL_VIEW
+        - PLATFORM_CELL_MANAGE
+        - PLATFORM_BILLING_VIEW
+        - PLATFORM_BILLING_MANAGE
+        - PLATFORM_RELEASE_VIEW
+        - PLATFORM_RELEASE_MANAGE     # cut releases, register environments, schedule upgrades
+        - PLATFORM_RELEASE_PROMOTE    # promote, pause, roll back. Separate from MANAGE
+        - PLATFORM_MIGRATION_VIEW
+        - PLATFORM_MIGRATION_APPLY    # apply a plan. Requires step-up
+
+        # --- Tenant experience ---
+        - TENANT_CONFIGURE            # edit branding, content, navigation, modules
+        - TENANT_PUBLISH              # publish a configuration version, restore a prior one
+
+        # --- Organisation -----------------------------------------------------
+        - SCOPE_VIEW                  # read the hierarchy
+        - SCOPE_MANAGE                # create, move, deactivate scope nodes
+        - REGION_CONFIGURE            # currency, decimals, time zone, fiscal year
+        - WORKSTATION_CONFIGURE       # sale board, device bindings, access point
+
+        # --- Catalogue --------------------------------------------------------
+        - PRODUCT_VIEW
+        - PRODUCT_CONFIGURE
+        - PRICE_VIEW
+        - PRICE_CONFIGURE
+        - EVENT_CONFIGURE
+        - PERFORMANCE_CONFIGURE
+        - CAPACITY_CONFIGURE          # envelopes and allocation
+
+        # --- Selling ----------------------------------------------------------
+        - ORDER_VIEW
+        - ORDER_VIEW_OTHER            # orders raised by other principals
+        - ORDER_CREATE
+        - ORDER_MODIFY
+        - ORDER_DISCOUNT              # manual discount. Threshold and approver are venue policy
+        - ORDER_CANCEL
+        - ORDER_VOID
+        - ORDER_REFUND                # initiate, subject to threshold
+        - ORDER_REFUND_APPROVE        # authorise above threshold. See NOTE-1
+        - ORDER_REFUND_BULK           # event- or date-level bulk refund
+        - ORDER_EXCHANGE
+        - ORDER_RESCHEDULE
+        - ORDER_REPRINT
+        - PRICE_OVERRIDE              # manual price adjustment at point of sale
+        - DISCOUNT_APPLY
+        - CREDIT_MANAGE               # partner credit limits and terms
+        - CREDIT_OVERRIDE             # authorise one order beyond the limit. 2.7.39
+
+        # --- Shift and cash ---------------------------------------------------
+        - SHIFT_OPEN
+        - SHIFT_CLOSE
+        - SHIFT_SUSPEND
+        - SHIFT_CLOSE_OTHER           # close a shift opened by another principal
+        - SHIFT_APPROVE_OPEN          # where supervisor approval on open is configured
+        - SHIFT_APPROVE_CLOSE
+        - SHIFT_REOPEN                # after final close
+        - CASH_LIFT                   # traced mid-shift removal from an open float
+        - CASH_ADD
+        - DEPOSIT_BOX_MODIFY_OWN
+        - DEPOSIT_BOX_MODIFY_OTHER
+        - OVERSHORT_ACCEPT            # accept a variance beyond the configured threshold
+
+        # --- Access control ---------------------------------------------------
+        - ACCESS_VALIDATE             # scan and admit
+        - ACCESS_OVERRIDE             # admit against a failed validation, logged
+        - ACCESS_POINT_CONFIGURE
+        - TURNSTILE_MODE_SET          # entry, re-entry, crossover, exit, free, closed
+        - TICKET_LOOKUP               # read-only validity check, no admission
+
+        # --- Reporting --------------------------------------------------------
+        - REPORT_VIEW_OWN             # self-scoped. Not resolved against the tree
+        - REPORT_VIEW_WORKSTATION
+        - REPORT_VIEW_VENUE
+        - REPORT_VIEW_REGION
+        - REPORT_VIEW_TENANT
+        - REPORT_EXPORT
+        - REPORT_EXPORT_PII           # include personal data in an export. Audited
+        - REPORT_MANAGE               # create and amend report definitions and dashboards
+        - REPORT_SCHEDULE             # schedules run under the owner's permissions
+
+        # --- Finance ----------------------------------------------------------
+        - LEDGER_VIEW
+        - LEDGER_POST
+        - LEDGER_APPROVE              # journal voucher approval
+        - TAX_CONFIGURE
+        - ACCOUNT_CONFIGURE           # chart of accounts
+        - SETTLEMENT_VIEW
+        - SETTLEMENT_RECONCILE
+
+        # --- Guest engagement ---
+        - GUEST_VIEW                  # profiles, behavioural attributes, consent state
+        - GUEST_VIEW_PII              # personal fields. Distinct from GUEST_VIEW by design
+        - GUEST_MANAGE                # amend, merge, configure consent purposes
+        - MARKETING_VIEW              # segments, campaigns, loyalty, reviews
+        - MARKETING_MANAGE            # create and amend
+        - MARKETING_SEND              # launch or stop a campaign. Separate from MANAGE
+        - CASE_VIEW
+        - CASE_MANAGE
+
+        # --- Digital assets ---
+        - ASSET_LIBRARY_VIEW
+        - ASSET_LIBRARY_MANAGE        # upload, replace, delete, amend rights
+
+        # --- Queue ---
+        - QUEUE_VIEW
+        - QUEUE_MANAGE                # configure, open/pause/close, call next, set wait time
+        - QUEUE_REDEEM                # admit a party at the ride
+        - QUEUE_OVERRIDE              # admit against a failed redemption. Audited
+
+        # --- Maintenance & safety ---
+        - ASSET_VIEW
+        - ASSET_MANAGE                # register, amend, take out of / return to service
+        - WORK_ORDER_VIEW
+        - WORK_ORDER_MANAGE
+        - WORK_ORDER_VERIFY           # second pair of eyes. Never the completing technician
+        - INSPECTION_VIEW
+        - INSPECTION_SUBMIT
+        - INSPECTION_MANAGE           # author templates
+        - INCIDENT_REPORT             # deliberately wide. An unreported near-miss recurs
+        - INCIDENT_VIEW
+        - INCIDENT_MANAGE             # investigate, close, notify an authority
+
+        # --- Operations -------------------------------------------------------
+        - KIOSK_ATTEND                # attendant access on an unattended device
+        - DEVICE_VIEW
+        - DEVICE_CONFIGURE
+        - APPROVAL_ACT                # approve, reject, return, request info
+        - APPROVAL_DELEGATE
+
+    PermissionSet:
+      type: array
+      items: { $ref: '#/components/schemas/Permission' }
+      uniqueItems: true
+
+    ScopedPermissions:
+      type: object
+      description: >
+        Permissions effective at a given scope path, after deny resolution. Clients filter
+        navigation on this and never compute permissions themselves.
+      required: [scopePath, permissions]
+      properties:
+        scopePath:
+          type: string
+          pattern: '^[a-z0-9_]+(\.[a-z0-9_]+)*$'
+        permissions: { $ref: '#/components/schemas/PermissionSet' }
+
+# NOTE-1 — ORDER_REFUND_APPROVE and thresholds
+#
+# Requirement 2.12.3 describes a cashier refunding "up to a value", with a second user
+# naming themselves as audit control above it. That implies a monetary threshold, but the
+# grant model has no amount dimension.
+#
+# Two candidate designs:
+#   (a) grants carry an optional decimal constraint, evaluated during resolution
+#   (b) thresholds are separate role configuration, and the permission is binary
+#
+# (b) is recommended — a grant that carries a value stops being a boolean and every
+# resolution path has to reason about amounts. Unresolved: see the refund contract, which
+# is deferred pending this decision.

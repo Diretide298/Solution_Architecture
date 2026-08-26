@@ -1,0 +1,2786 @@
+openapi: 3.1.0
+info:
+  title: TICVAI Inventory & Procurement
+  version: 0.1.0
+  x-ticvai-screen-count: 49
+  x-ticvai-tier: satellite
+  x-ticvai-module: "15 — Inventory Management"
+  x-ticvai-requirements: 98
+  x-ticvai-capabilities: [C13, C14]
+  x-ticvai-platforms:
+    - "P06 Venue Staff App"
+    - "P08 Venue Management"
+  description: >
+    ## What this contract covers
+
+    **Stock is a ledger, not a number. Every change is a movement with a reason.**
+
+    | | |
+    |---|---|
+    | **Tier** | satellite |
+    | **Matrix domain** | 15 — Inventory Management |
+    | **Requirements** | ~98 |
+    | **Capabilities** | C13, C14 |
+    | **Consumed by** | P06 Venue Staff App · P08 Venue Management |
+
+    ## How to read this file
+
+    **This file is a contract.** It is hand-authored and it is the source of truth for one
+    bounded context: server code, client code and mock servers are generated from it, never
+    the other way round. If a field is not here, it does not exist.
+
+    **Contracts are split into two tiers.**
+
+    - **Spine** — the eight contexts everything else depends on: tenancy, identity,
+      catalogue, orders, shift, access, finance, cross-cell. Frozen first. A change here
+      requires a formal change request, because every satellite has pinned against it.
+    - **Satellite** — a domain that builds on the spine and can move independently.
+      Cheaper to change.
+
+    **`paths` are operations.** Each one declares four TICVAI extensions, and Redocly
+    rejects any that does not:
+
+    | Extension | Answers |
+    |---|---|
+    | `x-ticvai-permission` | Which permission the caller needs. From one enum in `shared/permissions.yaml` — never hand-typed |
+    | `x-ticvai-scope-level` | Where in the seven-level hierarchy that permission must be held |
+    | `x-ticvai-offline-capable` | Whether a disconnected terminal may queue this |
+    | `x-ticvai-conflict-policy` | How a replayed operation resolves — `append`, `serverWins`, `manual` |
+
+    Where `x-ticvai-permission` is null, one of these says why: `x-ticvai-auth: service`
+    (cell-to-cell), `x-ticvai-self-scoped` (acts only on the caller's own resources), or
+    `security: []` (genuinely public).
+
+    **`components.schemas` are API schemas — the shape of data on the wire.** They are not
+    database tables. One API schema may become three columns (`Money`) or five tables
+    (`Order`); some have no table at all (`ValidationResult`, `TrialBalance`). Roughly 70%
+    of the DDL derives from these, and the rest — partitioning, RLS, the PII split — is
+    storage design that lives in the migration scripts.
+
+    **`security` arrays hold OAuth scopes.** Empty means "this scheme, no scopes" — for
+    bearer tokens there is nothing to list. Empty is not the same as absent: absent means
+    unauthenticated.
+
+
+    ## This context
+
+    Stock items, movements, counts, transfers, requisitions, purchase orders and goods
+    receipt. Domain 13 — 98 requirements, plus the stock and waste surfaces that F&B recipes
+    depend on.
+
+    Positions this encodes:
+
+    - **Stock is a ledger, not a number.** Every change is a movement with a reason, a
+      principal and a timestamp. The on-hand figure is derived from movements, never edited
+      directly — an adjustable quantity field is where shrinkage goes to hide.
+    - **The procurement chain is fixed** (10 Aug §5.4): requisition → departmental approval →
+      purchase order with quotation comparison → goods receipt → issue. Each step has an
+      owner and none is skippable.
+    - **Counts are blind by default.** A counter who can see the expected figure will
+      reconcile to it rather than to the shelf.
+    - **Costing method is set per item and immutable once movements exist.** Switching from
+      weighted average to FIFO mid-life makes historic cost of goods meaningless.
+    - Stock lookups are offline-capable; **movements that deplete are not**. Real-time
+      depletion is why retail and recipe-linked F&B items are blocked offline.
+
+servers:
+  - url: https://{cellHost}/api/v1
+    variables:
+      cellHost:
+        default: cell.ticvai.local
+
+security:
+  - bearerAuth: []
+
+tags:
+  - name: item
+  - name: stock
+  - name: movement
+  - name: count
+  - name: transfer
+  - name: requisition
+  - name: purchaseOrder
+  - name: receipt
+  - name: supplier
+
+paths:
+  # ---------------------------------------------------------------- items
+  /suppliers/{supplierId}:
+    parameters:
+      - name: supplierId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    put:
+      operationId: updateSupplier
+      x-ticvai-consumed-by:
+        - "P08 BO-083 Suppliers"
+      summary: Change terms, or stop buying from them
+      description: >
+        Retail board 2G, 24 August. **`createSupplier` and `listSuppliers` existed and nothing
+        updated one** — a supplier could be created and never edited, so a payment term change or a
+        price agreement meant creating a second supplier.
+
+        **`status` is what the board actually wanted.** A supplier on hold stops appearing in
+        requisitions and purchase orders while **their history stays intact** — deactivating a
+        supplier that has delivered for two years must not orphan the receipts.
+
+        **Terms are versioned rather than overwritten.** A purchase order raised in March was raised
+        against March's terms, and a dispute in June is settled against those, not today's.
+      tags: [inventory]
+      x-ticvai-permission: PRODUCT_CONFIGURE
+      x-ticvai-permission-escalated: PRODUCT_CONFIGURE
+      x-ticvai-audience: [staff]
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name: { type: string }
+                status: { type: string, enum: [active, onHold, suspended, terminated] }
+                statusReason: { type: string, nullable: true }
+                paymentTermDays: { type: integer, nullable: true }
+                leadTimeDays: { type: integer, nullable: true }
+                minimumOrderValue: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+                contacts: { type: array, items: { type: object, additionalProperties: true } }
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+
+  /stock-transfers/{transferId}:
+    parameters:
+      - name: transferId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    get:
+      operationId: getStockTransfer
+      x-ticvai-consumed-by:
+        - "P06 EMP-065 Receiving & Store Put-Away"
+        - "P08 BO-052 Goods Receipt"
+        - "P08 BO-080 Stock Transfers"
+      summary: One transfer, its manifest and where it is
+      description: >
+        Retail board 4E. **`createStockTransfer`, `receiveStockTransfer` and `closeTransferShort`
+        existed and nothing read a transfer** — the receiving store could accept a delivery it could
+        not open first.
+
+        **The manifest is the point.** What was sent, what arrived, what was rejected and why, and
+        the temperature it arrived at where the cold chain applies.
+
+        **Discrepancies are returned with the transfer, not separately.** A store receiving a short
+        delivery asks one question — *what is missing* — and two calls to answer it is two chances
+        to answer it differently.
+      tags: [inventory]
+      x-ticvai-permission: PRODUCT_VIEW
+      x-ticvai-audience: [staff]
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      x-ticvai-offline-capable: true
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '200':
+          description: The transfer with its lines and discrepancies
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+
+  /requisitions/{requisitionId}/lines:
+    parameters:
+      - name: requisitionId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    put:
+      operationId: updateRequisitionLines
+      x-ticvai-consumed-by:
+        - "P08 BO-078 Requisitions"
+      summary: Change what an outlet is asking for, before it is approved
+      description: >
+        Board 5F, 24 August. **`getSuggestedRequisitions` drafts from reorder points and nothing
+        edited the draft** — so a suggestion was take-it-or-leave-it, and an outlet manager who
+        wanted 8 cases instead of 12 had to reject and start again.
+
+        **The suggested quantity is kept beside the changed one.** That difference is the training
+        signal the whole suggestion model depends on — **a requisition that overwrites the
+        suggestion destroys the only evidence that the reorder point is wrong.**
+
+        **Refused once approved.** An approved requisition edited afterwards is an approval for
+        something nobody approved.
+      tags: [inventory]
+      x-ticvai-permission: PRODUCT_CONFIGURE
+      x-ticvai-audience: [staff]
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: true
+      x-ticvai-conflict-policy: lastWriterWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [lines]
+              properties:
+                lines:
+                  type: array
+                  items:
+                    type: object
+                    required: [itemId, quantity]
+                    properties:
+                      itemId: { type: string, format: uuid }
+                      quantity: { type: number }
+                      suggestedQuantity:
+                        type: number
+                        nullable: true
+                        readOnly: true
+                        description: >
+                          **Kept, never overwritten.** The gap between what was suggested and what
+                          was asked for is what tells a venue its reorder points are wrong.
+                      reason: { type: string, nullable: true }
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+        '409':
+          description: >
+            **Already approved.** The correct act is a new requisition, which the response names.
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /stock-counts/daily:
+    put:
+      operationId: setDailyCount
+      x-ticvai-consumed-by:
+        - "P06 EMP-066 Stock Count & Cycle Count Management"
+      summary: Which items get counted every day
+      description: >
+        Board 2H. **A full count is a shift; a daily count is twenty items and ten minutes.** The
+        package had `startStockCount` for the first and nothing for the second, so venues either
+        counted everything weekly or nothing at all.
+
+        **High-value and high-variance items, not a rotation.** Counting spirits daily and napkins
+        monthly is the whole point — **a daily list that includes everything is a daily list nobody
+        completes.**
+
+        **Feeds the variance trend rather than posting an adjustment.** A daily count is a check,
+        not a correction; **a count that silently adjusts stock hides the shrinkage it was meant to
+        find.**
+      tags: [inventory]
+      x-ticvai-permission: PRODUCT_CONFIGURE
+      x-ticvai-audience: [staff]
+      x-ticvai-scope-level: venue
+      x-ticvai-config-scope: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [itemIds]
+              properties:
+                itemIds: { type: array, items: { type: string, format: uuid } }
+                locationId: { type: string, format: uuid, nullable: true }
+                dueBy: { type: string, nullable: true, description: 'Local time, e.g. 10:00' }
+                postsAdjustment:
+                  type: boolean
+                  default: false
+                  description: >
+                    **False, and it should stay false.** A daily count that adjusts stock removes
+                    the variance it exists to surface.
+      responses:
+        '200':
+          description: Set
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+
+  /products/bulk:
+    post:
+      operationId: bulkUpdateProducts
+      x-ticvai-consumed-by:
+        - "P08 BO-007 Product Directory"
+      summary: Change many products at once, with a preview
+      description: >
+        Board 2C. **Retire a season, reprice a category, change a tax class across two hundred
+        SKUs.** One at a time is two hundred edits and a mistake somewhere in the middle.
+
+        **Previewed by default, and the preview counts.** *Reprice all* and *reprice all in this
+        category* differ by a day's margin, and **a bulk action that cannot be seen before it runs
+        is one somebody runs twice.**
+
+        **Partial failure is reported, not rolled back.** A hundred and ninety succeeding and ten
+        failing on a validation rule is the useful outcome — rolling back the hundred and ninety
+        because ten had a bad tax code helps nobody.
+      tags: [inventory]
+      x-ticvai-permission: PRODUCT_CONFIGURE
+      x-ticvai-permission-escalated: PRODUCT_CONFIGURE
+      x-ticvai-audience: [staff]
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [selector, changes]
+              properties:
+                previewOnly: { type: boolean, default: true }
+                selector: { type: object, additionalProperties: true }
+                changes: { type: object, additionalProperties: true }
+      responses:
+        '200':
+          description: The preview, or the result with per-item outcomes
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  matched: { type: integer }
+                  succeeded: { type: integer }
+                  failed: { type: integer }
+                  failures:
+                    type: array
+                    items:
+                      type: object
+                      additionalProperties: true
+
+  /serialised-items:
+    get:
+      operationId: listSerialisedItems
+      x-ticvai-consumed-by:
+        - "P04 POS-011 Returns, Refunds & Exchanges"
+        - "P06 EMP-069 Barcode, RFID, Serialized Stock & Traceability"
+        - "P08 BO-114 Variants, Attributes, Barcode & RFID Management"
+      summary: Where each individual item is
+      description: >
+        Retail Board 4. **A lot number answers which delivery; a serial answers which one.**
+
+        **Searchable by serial first**, because the question is almost always asked with a serial in
+        hand — a guest at a counter with a broken phone, or an auditor with a stock list.
+      tags: [inventory]
+      x-ticvai-permission: PRODUCT_VIEW
+      x-ticvai-audience: [staff]
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      x-ticvai-offline-capable: true
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - name: serial
+          in: query
+          schema: { type: string }
+        - name: status
+          in: query
+          schema: { type: string }
+      responses:
+        '200':
+          description: Items
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/SerialisedItem' }
+
+  /stock-batches/expiring:
+    get:
+      operationId: listExpiringBatches
+      x-ticvai-consumed-by:
+        - "P08 BO-138 Production Execution & Batch Management"
+        - "P08 BO-140 Product Availability, 86 & Operational Food Safety"
+        - "P16 ANL-006 Inventory & Waste Intelligence"
+      summary: What is about to go out of date
+      description: >
+        BL-122. **The report a venue acts on daily**, and it needed batches to exist before it could
+        be written.
+
+        Ordered by expiry, not by value. **The cheapest thing expiring today matters more than the
+        most expensive thing expiring next month**, because only one of them is about to become
+        waste.
+      tags: [inventory]
+      x-ticvai-permission: PRODUCT_VIEW
+      x-ticvai-audience: [staff]
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      x-ticvai-offline-capable: true
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - name: withinDays
+          in: query
+          schema: { type: integer, default: 7 }
+      responses:
+        '200':
+          description: Batches, soonest first
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/StockBatch' }
+
+  /inventory-items:
+    get:
+      operationId: listInventoryItems
+      x-ticvai-consumed-by:
+        - "P08 BO-081 Inventory Items"
+      x-ticvai-audience: [staff]
+      x-ticvai-read-routing: replica
+      summary: List inventory items
+      tags: [item]
+      x-ticvai-permission: PRODUCT_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: true
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - name: venueId
+          in: query
+          schema: { type: string, format: uuid }
+        - name: categoryId
+          in: query
+          schema: { type: string, format: uuid }
+        - name: belowReorderPoint
+          in: query
+          description: The working set for a storekeeper starting a shift.
+          schema: { type: boolean }
+        - name: search
+          in: query
+          schema: { type: string }
+        - $ref: '../shared/common.yaml#/components/parameters/PageSize'
+        - $ref: '../shared/common.yaml#/components/parameters/PageCursor'
+      responses:
+        '200':
+          description: Items
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '../shared/common.yaml#/components/schemas/Page'
+                  - type: object
+                    properties:
+                      items:
+                        type: array
+                        items: { $ref: '#/components/schemas/InventoryItem' }
+        '403': { $ref: '../shared/common.yaml#/components/responses/Forbidden' }
+
+    post:
+      operationId: createInventoryItem
+      x-ticvai-consumed-by:
+        - "P08 BO-081 Inventory Items"
+      x-ticvai-audience: [staff]
+      summary: Create an inventory item
+      description: >
+        `costingMethod` is fixed at creation and cannot change once movements exist. Changing
+        it mid-life makes historic cost of goods incomparable and the ledger is append-only.
+      tags: [item]
+      x-ticvai-permission: PRODUCT_CONFIGURE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/CreateInventoryItemRequest' }
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/InventoryItem' }
+        '400': { $ref: '../shared/common.yaml#/components/responses/BadRequest' }
+        '409':
+          description: SKU already in use in this venue
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /inventory-items/{itemId}:
+    parameters:
+      - name: itemId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    get:
+      operationId: getInventoryItem
+      x-ticvai-consumed-by:
+        - "P08 BO-081 Inventory Items"
+      x-ticvai-audience: [staff]
+      x-ticvai-read-routing: replica
+      summary: Read an item with stock position
+      tags: [item]
+      x-ticvai-permission: PRODUCT_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: true
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '200':
+          description: Item
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/InventoryItem' }
+        '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
+
+    patch:
+      operationId: updateInventoryItem
+      x-ticvai-consumed-by:
+        - "P08 BO-081 Inventory Items"
+      x-ticvai-audience: [staff]
+      summary: Amend an item
+      tags: [item]
+      x-ticvai-permission: PRODUCT_CONFIGURE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              minProperties: 1
+              properties:
+                name: { type: string, maxLength: 200 }
+                categoryId: { type: string, format: uuid }
+                reorderPoint: { type: number, minimum: 0 }
+                reorderQuantity: { type: number, minimum: 0 }
+                parLevel: { type: number, minimum: 0 }
+                preferredSupplierId: { type: string, format: uuid }
+                isActive: { type: boolean }
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/InventoryItem' }
+        '409':
+          description: Attempt to change costing method or base unit after movements exist
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /inventory-items/lookup:
+    get:
+      operationId: lookupInventoryItem
+      x-ticvai-consumed-by:
+        - "P08 BO-081 Inventory Items"
+      x-ticvai-audience: [staff]
+      x-ticvai-read-routing: replica
+      summary: Look up by barcode or SKU
+      description: >
+        The scanner path. Offline-capable so a storekeeper can identify an item in a stock
+        room with no signal.
+      tags: [item]
+      x-ticvai-permission: PRODUCT_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: true
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - name: barcode
+          in: query
+          schema: { type: string }
+        - name: sku
+          in: query
+          schema: { type: string }
+      responses:
+        '200':
+          description: Item
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/InventoryItem' }
+        '400':
+          description: Neither barcode nor SKU supplied
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+        '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
+
+  # ---------------------------------------------------------------- stock
+  /stock:
+    get:
+      operationId: getStockPositions
+      x-ticvai-consumed-by:
+        - "P06 EMP-061 Retail Inventory Command Center"
+        - "P06 EMP-062 Store Stock & SKU Availability"
+        - "P06 EMP-068 Reservation, Allocation & Omnichannel Inventory"
+        - "P08 BO-049 Stock Levels"
+        - "P08 BO-050 Stock Position & Valuation"
+      x-ticvai-audience: [staff]
+      x-ticvai-read-routing: primary
+      summary: Stock on hand by item and location
+      tags: [stock]
+      x-ticvai-permission: PRODUCT_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: true
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - name: locationId
+          in: query
+          schema: { type: string, format: uuid }
+        - name: itemId
+          in: query
+          schema: { type: string, format: uuid }
+        - name: includeZero
+          in: query
+          schema: { type: boolean, default: false }
+        - $ref: '../shared/common.yaml#/components/parameters/PageSize'
+        - $ref: '../shared/common.yaml#/components/parameters/PageCursor'
+      responses:
+        '200':
+          description: Positions
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '../shared/common.yaml#/components/schemas/Page'
+                  - type: object
+                    properties:
+                      items:
+                        type: array
+                        items: { $ref: '#/components/schemas/StockPosition' }
+
+  /stock-locations:
+    get:
+      operationId: listStockLocations
+      x-ticvai-consumed-by:
+        - "P06 EMP-064 Store-to-Store & Warehouse Transfers"
+        - "P08 BO-049 Stock Levels"
+        - "P08 BO-078 Requisitions"
+        - "P08 BO-081 Inventory Items"
+      x-ticvai-audience: [staff]
+      x-ticvai-read-routing: replica
+      summary: List stock locations
+      description: Stores, bars, kitchens, retail floors, cellars.
+      tags: [stock]
+      x-ticvai-permission: PRODUCT_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: true
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '200':
+          description: Locations
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/StockLocation' }
+
+    post:
+      operationId: createStockLocation
+      x-ticvai-consumed-by:
+        - "P08 BO-081 Inventory Items"
+      x-ticvai-audience: [staff]
+      summary: Create a stock location
+      tags: [stock]
+      x-ticvai-permission: PRODUCT_CONFIGURE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [code, name, venueId, kind]
+              properties:
+                code: { type: string, maxLength: 64 }
+                name: { type: string, maxLength: 200 }
+                venueId: { type: string, format: uuid }
+                kind: { $ref: '#/components/schemas/LocationKind' }
+                parentLocationId: { type: string, format: uuid }
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/StockLocation' }
+
+  /stock/valuation:
+    get:
+      operationId: getStockValuation
+      x-ticvai-consumed-by:
+        - "P08 BO-049 Stock Levels"
+        - "P08 BO-050 Stock Position & Valuation"
+        - "P16 ANL-005 Cost, Margin & Profitability"
+      x-ticvai-audience: [staff]
+      x-ticvai-read-routing: analytical
+      summary: Stock value by location and category
+      description: >
+        Valued by each item's own costing method. Feeds the balance sheet, so it is served
+        from the reporting replica.
+      tags: [stock]
+      x-ticvai-permission: LEDGER_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - name: asAt
+          in: query
+          schema: { type: string, format: date }
+        - name: locationId
+          in: query
+          schema: { type: string, format: uuid }
+      responses:
+        '200':
+          description: Valuation
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/StockValuation' }
+
+  # ---------------------------------------------------------------- movements
+  /stock-movements:
+    get:
+      operationId: listStockMovements
+      x-ticvai-consumed-by:
+        - "P06 EMP-061 Retail Inventory Command Center"
+        - "P08 BO-082 Stock Movements"
+      x-ticvai-audience: [staff]
+      x-ticvai-read-routing: replica
+      summary: The movement ledger
+      description: >
+        Every change to stock, with reason and principal. On-hand is derived from this — it
+        is not a field anyone edits.
+      tags: [movement]
+      x-ticvai-permission: PRODUCT_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - name: itemId
+          in: query
+          schema: { type: string, format: uuid }
+        - name: locationId
+          in: query
+          schema: { type: string, format: uuid }
+        - name: kind
+          in: query
+          schema: { $ref: '#/components/schemas/MovementKind' }
+        - name: recordedFrom
+          in: query
+          schema: { type: string, format: date-time }
+        - name: recordedTo
+          in: query
+          schema: { type: string, format: date-time }
+        - $ref: '../shared/common.yaml#/components/parameters/PageSize'
+        - $ref: '../shared/common.yaml#/components/parameters/PageCursor'
+      responses:
+        '200':
+          description: Movements
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '../shared/common.yaml#/components/schemas/Page'
+                  - type: object
+                    properties:
+                      items:
+                        type: array
+                        items: { $ref: '#/components/schemas/StockMovement' }
+
+    post:
+      operationId: createStockMovement
+      x-ticvai-consumed-by:
+        - "P06 EMP-067 Damage, Loss, Shrinkage & Stock Adjustment"
+        - "P08 BO-049 Stock Levels"
+        - "P08 BO-082 Stock Movements"
+      x-ticvai-audience: [staff]
+      summary: Record an issue, return or adjustment
+      description: >
+        Depletion is real-time and therefore **not offline-capable**. An issue recorded
+        against stock that has already gone is a discrepancy discovered at count, which is
+        exactly what this module exists to prevent.
+
+        Adjustments require a reason and are surfaced separately in reporting. Frequent
+        adjustments on one item is the signal shrinkage produces.
+      tags: [movement]
+      x-ticvai-permission: PRODUCT_CONFIGURE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/CreateStockMovementRequest' }
+      responses:
+        '201':
+          description: Recorded
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/StockMovement' }
+        '400': { $ref: '../shared/common.yaml#/components/responses/BadRequest' }
+        '409':
+          description: Insufficient stock, and the item does not permit negative balances
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  # ---------------------------------------------------------------- counts
+  /stock-counts:
+    get:
+      operationId: listStockCounts
+      x-ticvai-consumed-by:
+        - "P08 BO-079 Stock Count"
+      x-ticvai-audience: [staff]
+      x-ticvai-read-routing: replica
+      summary: List stock counts
+      tags: [count]
+      x-ticvai-permission: PRODUCT_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - name: locationId
+          in: query
+          schema: { type: string, format: uuid }
+        - name: status
+          in: query
+          schema: { $ref: '#/components/schemas/CountStatus' }
+        - $ref: '../shared/common.yaml#/components/parameters/PageSize'
+        - $ref: '../shared/common.yaml#/components/parameters/PageCursor'
+      responses:
+        '200':
+          description: Counts
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '../shared/common.yaml#/components/schemas/Page'
+                  - type: object
+                    properties:
+                      items:
+                        type: array
+                        items: { $ref: '#/components/schemas/StockCount' }
+
+    post:
+      operationId: startStockCount
+      x-ticvai-consumed-by:
+        - "P06 EMP-066 Stock Count & Cycle Count Management"
+        - "P08 BO-079 Stock Count"
+      x-ticvai-audience: [staff]
+      summary: Start a stock count
+      description: >
+        **Blind by default.** The expected figure is not returned to the counting device — a
+        counter who can see it will reconcile to the number rather than to the shelf.
+
+        Full or cycle. A cycle count targets a category or location on rotation, which is how
+        a large store stays accurate without closing.
+      tags: [count]
+      x-ticvai-permission: PRODUCT_CONFIGURE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: true
+      x-ticvai-conflict-policy: append
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/StartStockCountRequest' }
+      responses:
+        '201':
+          description: Started. Expected quantities are withheld when blind
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/StockCount' }
+        '409':
+          description: A count is already open for this location
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /stock-counts/{countId}/lines:
+    parameters:
+      - name: countId
+        in: path
+        required: true
+        schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+    post:
+      operationId: submitCountLines
+      x-ticvai-audience: [staff]
+      summary: Submit counted quantities
+      description: >
+        Offline-capable and batched. A storekeeper counts a cellar with no signal and
+        submits on return.
+
+        Recounting an item replaces the prior figure for that count and is recorded — a line
+        counted three times is itself a finding.
+      tags: [count]
+      x-ticvai-permission: PRODUCT_CONFIGURE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: true
+      x-ticvai-conflict-policy: append
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [lines]
+              properties:
+                lines:
+                  type: array
+                  minItems: 1
+                  maxItems: 500
+                  items:
+                    type: object
+                    required: [itemId, countedQuantity, recordedAt]
+                    properties:
+                      itemId: { type: string, format: uuid }
+                      countedQuantity: { type: number, minimum: 0 }
+                      unit: { type: string }
+                      note: { type: string, maxLength: 200 }
+                      recordedAt: { type: string, format: date-time }
+      responses:
+        '200':
+          description: Submitted
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  accepted: { type: integer }
+                  recounted: { type: integer }
+
+  /stock-counts/{countId}/variance:
+    parameters:
+      - name: countId
+        in: path
+        required: true
+        schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+    get:
+      operationId: getCountVariance
+      x-ticvai-consumed-by:
+        - "P06 EMP-066 Stock Count & Cycle Count Management"
+        - "P08 BO-079 Stock Count"
+        - "P08 BO-137 Recipe Consumption & Theoretical Inventory"
+        - "P16 ANL-006 Inventory & Waste Intelligence"
+      x-ticvai-audience: [staff]
+      x-ticvai-read-routing: analytical
+      summary: Variance between counted and expected
+      description: >
+        Revealed only after counting closes. Lines beyond the configured tolerance are
+        flagged for review rather than posted silently.
+      tags: [count]
+      x-ticvai-permission: PRODUCT_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '200':
+          description: Variance
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/CountVariance' }
+        '409':
+          description: Count is still open. Variance is not available during counting
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /stock-counts/{countId}/cancel:
+    parameters:
+      - name: countId
+        in: path
+        required: true
+        schema: { type: string }
+    post:
+      operationId: cancelStockCount
+      x-ticvai-consumed-by:
+        - "P08 BO-079 Stock Count"
+      x-ticvai-audience: [staff]
+      summary: Abandon a count
+      description: >
+        Refused once counting has started — a partially counted location must be finished or recounted, because abandoning it leaves movements frozen.
+      tags: [count]
+      x-ticvai-permission: PRODUCT_CONFIGURE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [reason]
+              properties:
+                reason: { type: string }
+      responses:
+        '200':
+          description: Done
+        '409':
+          description: Not in a state that permits this
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /stock-counts/{countId}/recount:
+    parameters:
+      - name: countId
+        in: path
+        required: true
+        schema: { type: string }
+    post:
+      operationId: recountStockCount
+      x-ticvai-consumed-by:
+        - "P08 BO-079 Stock Count"
+      x-ticvai-audience: [staff]
+      summary: Send a count back to be recounted
+      description: >
+        The alternative to accepting a variance. A large discrepancy is more often a miscount than a loss, and recounting is cheaper than investigating.
+      tags: [count]
+      x-ticvai-permission: LEDGER_APPROVE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [reason]
+              properties:
+                reason: { type: string }
+      responses:
+        '200':
+          description: Done
+        '409':
+          description: Not in a state that permits this
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /stock-counts/{countId}/post:
+    parameters:
+      - name: countId
+        in: path
+        required: true
+        schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+    post:
+      operationId: postStockCount
+      x-ticvai-consumed-by:
+        - "P06 EMP-066 Stock Count & Cycle Count Management"
+        - "P08 BO-079 Stock Count"
+      x-ticvai-audience: [staff]
+      summary: Post a count and adjust stock
+      description: >
+        Generates adjustment movements for every variance and posts the value to the stock
+        loss or gain account. Requires approval where variance exceeds the venue's threshold.
+      tags: [count]
+      x-ticvai-permission: LEDGER_POST
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                note: { type: string, maxLength: 1000 }
+      responses:
+        '200':
+          description: Posted
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/StockCount' }
+        '409':
+          description: Unreviewed variance lines remain, or approval is required
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  # ---------------------------------------------------------------- transfers
+  /stock-transfers:
+    get:
+      operationId: listStockTransfers
+      x-ticvai-consumed-by:
+        - "P08 BO-080 Stock Transfers"
+      x-ticvai-audience: [staff]
+      x-ticvai-read-routing: replica
+      summary: List transfers
+      tags: [transfer]
+      x-ticvai-permission: PRODUCT_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - name: status
+          in: query
+          schema: { $ref: '#/components/schemas/TransferStatus' }
+        - $ref: '../shared/common.yaml#/components/parameters/PageSize'
+        - $ref: '../shared/common.yaml#/components/parameters/PageCursor'
+      responses:
+        '200':
+          description: Transfers
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '../shared/common.yaml#/components/schemas/Page'
+                  - type: object
+                    properties:
+                      items:
+                        type: array
+                        items: { $ref: '#/components/schemas/StockTransfer' }
+
+    post:
+      operationId: createStockTransfer
+      x-ticvai-consumed-by:
+        - "P06 EMP-064 Store-to-Store & Warehouse Transfers"
+        - "P08 BO-049 Stock Levels"
+        - "P08 BO-080 Stock Transfers"
+        - "P08 BO-082 Stock Movements"
+      x-ticvai-audience: [staff]
+      summary: Send stock to another location
+      description: >
+        Two-phase. Dispatch decrements the source and puts the quantity in transit; receipt
+        increments the destination. Stock in transit belongs to neither location and is
+        visible in valuation — a single-phase transfer loses a pallet somewhere between two
+        stores.
+      tags: [transfer]
+      x-ticvai-permission: PRODUCT_CONFIGURE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/CreateStockTransferRequest' }
+      responses:
+        '201':
+          description: Dispatched
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/StockTransfer' }
+        '409':
+          description: Insufficient stock at the source
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /stock-transfers/{transferId}/close-short:
+    parameters:
+      - name: transferId
+        in: path
+        required: true
+        schema: { type: string }
+    post:
+      operationId: closeTransferShort
+      x-ticvai-consumed-by:
+        - "P08 BO-052 Goods Receipt"
+        - "P08 BO-080 Stock Transfers"
+      x-ticvai-audience: [staff]
+      summary: Close a transfer accepting the balance will not arrive
+      description: >
+        **Writes off stock that left one location and reached no other.** Requires approval, because without this state a partially received transfer stays open and the stock figure is wrong at both ends.
+      tags: [transfer]
+      x-ticvai-permission: LEDGER_APPROVE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [reason]
+              properties:
+                reason: { type: string }
+      responses:
+        '200':
+          description: Done
+        '409':
+          description: Not in a state that permits this
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /stock-transfers/{transferId}/receive:
+    parameters:
+      - name: transferId
+        in: path
+        required: true
+        schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+    post:
+      operationId: receiveStockTransfer
+      x-ticvai-consumed-by:
+        - "P08 BO-080 Stock Transfers"
+      x-ticvai-audience: [staff]
+      summary: Receive a transfer
+      description: >
+        Received quantities may differ from dispatched. The difference is a transit
+        discrepancy, recorded against both locations rather than silently absorbed by one.
+      tags: [transfer]
+      x-ticvai-permission: PRODUCT_CONFIGURE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [lines]
+              properties:
+                lines:
+                  type: array
+                  minItems: 1
+                  items:
+                    type: object
+                    required: [itemId, receivedQuantity]
+                    properties:
+                      itemId: { type: string, format: uuid }
+                      receivedQuantity: { type: number, minimum: 0 }
+                      discrepancyReason: { type: string, maxLength: 500 }
+      responses:
+        '200':
+          description: Received
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/StockTransfer' }
+
+  # ---------------------------------------------------------------- requisitions
+  /requisitions:
+    get:
+      operationId: listRequisitions
+      x-ticvai-consumed-by:
+        - "P06 EMP-063 Requisition & Smart Store Replenishment"
+        - "P08 BO-078 Requisitions"
+      x-ticvai-audience: [staff]
+      x-ticvai-read-routing: replica
+      summary: List requisitions
+      tags: [requisition]
+      x-ticvai-permission: PRODUCT_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - name: status
+          in: query
+          schema: { $ref: '#/components/schemas/RequisitionStatus' }
+        - name: raisedByPrincipalId
+          in: query
+          schema: { type: string, format: uuid }
+        - $ref: '../shared/common.yaml#/components/parameters/PageSize'
+        - $ref: '../shared/common.yaml#/components/parameters/PageCursor'
+      responses:
+        '200':
+          description: Requisitions
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '../shared/common.yaml#/components/schemas/Page'
+                  - type: object
+                    properties:
+                      items:
+                        type: array
+                        items: { $ref: '#/components/schemas/Requisition' }
+
+    post:
+      operationId: createRequisition
+      x-ticvai-consumed-by:
+        - "P06 EMP-063 Requisition & Smart Store Replenishment"
+        - "P06 EMP-070 Inventory Exceptions, AI Replenishment & Action Center"
+        - "P08 BO-078 Requisitions"
+        - "P08 BO-141 Operational Alerts, AI Replenishment & Action Center"
+      x-ticvai-audience: [staff]
+      summary: Raise a requisition
+      description: >
+        Step one of the chain. Raised by a department, approved by its head, then converted
+        to a purchase order (10 Aug §5.4).
+      tags: [requisition]
+      x-ticvai-permission: ORDER_CREATE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: true
+      x-ticvai-conflict-policy: append
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/CreateRequisitionRequest' }
+      responses:
+        '201':
+          description: Raised, awaiting approval
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Requisition' }
+        '400': { $ref: '../shared/common.yaml#/components/responses/BadRequest' }
+
+  /requisitions/suggested:
+    get:
+      operationId: getSuggestedRequisitions
+      x-ticvai-consumed-by:
+        - "P08 BO-078 Requisitions"
+      x-ticvai-audience: [staff]
+      x-ticvai-read-routing: replica
+      summary: Draft requisitions from reorder points
+      description: >
+        Items below their reorder point, with suggested quantities from par level and recent
+        consumption. A draft for a storekeeper to review — **never raised automatically**,
+        because an automatic order against a miscounted item compounds the error.
+      tags: [requisition]
+      x-ticvai-permission: PRODUCT_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - name: locationId
+          in: query
+          schema: { type: string, format: uuid }
+      responses:
+        '200':
+          description: Suggestions
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [suggestions]
+                properties:
+                  suggestions:
+                    type: array
+                    items: { $ref: '#/components/schemas/RequisitionSuggestion' }
+
+  /requisitions/{requisitionId}/reject:
+    parameters:
+      - name: requisitionId
+        in: path
+        required: true
+        schema: { type: string }
+    post:
+      operationId: rejectRequisition
+      x-ticvai-consumed-by:
+        - "P08 BO-078 Requisitions"
+      x-ticvai-audience: [staff]
+      summary: Reject a requisition
+      description: >
+        Refused with a reason. The requester may copy it into a new draft rather than losing the detail.
+      tags: [procurement]
+      x-ticvai-permission: LEDGER_APPROVE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [reason]
+              properties:
+                reason: { type: string }
+      responses:
+        '200':
+          description: Done
+        '409':
+          description: Not in a state that permits this
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /requisitions/{requisitionId}/return:
+    parameters:
+      - name: requisitionId
+        in: path
+        required: true
+        schema: { type: string }
+    post:
+      operationId: returnRequisition
+      x-ticvai-consumed-by:
+        - "P08 BO-078 Requisitions"
+      x-ticvai-audience: [staff]
+      summary: Return a requisition for more information
+      description: >
+        **Not a rejection.** Sent back so the requester can amend rather than start again — without this state every incomplete request is a refusal and the requisition queue stops moving.
+      tags: [procurement]
+      x-ticvai-permission: LEDGER_APPROVE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [question]
+              properties:
+                question: { type: string }
+      responses:
+        '200':
+          description: Done
+        '409':
+          description: Not in a state that permits this
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /requisitions/{requisitionId}/cancel:
+    parameters:
+      - name: requisitionId
+        in: path
+        required: true
+        schema: { type: string }
+    post:
+      operationId: cancelRequisition
+      x-ticvai-consumed-by:
+        - "P08 BO-078 Requisitions"
+      x-ticvai-audience: [staff]
+      summary: Cancel a requisition
+      description: >
+        Withdrawn by the requester, or abandoned in draft.
+      tags: [procurement]
+      x-ticvai-permission: PRODUCT_CONFIGURE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [reason]
+              properties:
+                reason: { type: string }
+      responses:
+        '200':
+          description: Done
+        '409':
+          description: Not in a state that permits this
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /requisitions/{requisitionId}/approve:
+    parameters:
+      - name: requisitionId
+        in: path
+        required: true
+        schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+    post:
+      operationId: approveRequisition
+      x-ticvai-consumed-by:
+        - "P08 BO-078 Requisitions"
+      x-ticvai-audience: [staff]
+      summary: Approve or reject a requisition
+      description: >
+        Departmental approval. The approver may amend quantities downward but not upward —
+        raising a quantity at approval bypasses the request that justified it.
+      tags: [requisition]
+      x-ticvai-permission: APPROVAL_ACT
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [decision]
+              properties:
+                decision:
+                  type: string
+                  enum: [approved, rejected, returnedForInfo]
+                note: { type: string, maxLength: 1000 }
+                amendedLines:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      lineId: { type: string }
+                      approvedQuantity: { type: number, minimum: 0 }
+      responses:
+        '200':
+          description: Decision recorded
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Requisition' }
+        '400':
+          description: An amended quantity exceeds the requested quantity
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+        '403': { $ref: '../shared/common.yaml#/components/responses/Forbidden' }
+
+  # ---------------------------------------------------------------- suppliers
+  /suppliers:
+    get:
+      operationId: listSuppliers
+      x-ticvai-consumed-by:
+        - "P08 BO-083 Suppliers"
+      x-ticvai-audience: [staff]
+      x-ticvai-read-routing: replica
+      summary: List suppliers
+      tags: [supplier]
+      x-ticvai-permission: PRODUCT_VIEW
+      x-ticvai-scope-level: region
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/PageSize'
+        - $ref: '../shared/common.yaml#/components/parameters/PageCursor'
+      responses:
+        '200':
+          description: Suppliers
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '../shared/common.yaml#/components/schemas/Page'
+                  - type: object
+                    properties:
+                      items:
+                        type: array
+                        items: { $ref: '#/components/schemas/Supplier' }
+
+    post:
+      operationId: createSupplier
+      x-ticvai-consumed-by:
+        - "P08 BO-083 Suppliers"
+      x-ticvai-audience: [staff]
+      summary: Create a supplier
+      tags: [supplier]
+      x-ticvai-permission: PRODUCT_CONFIGURE
+      x-ticvai-scope-level: region
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/Supplier' }
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Supplier' }
+
+  /suppliers/{supplierId}/quotations:
+    parameters:
+      - name: supplierId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    post:
+      operationId: recordQuotation
+      x-ticvai-consumed-by:
+        - "P08 BO-083 Suppliers"
+      x-ticvai-audience: [staff]
+      summary: Record a supplier quotation
+      description: >
+        Quotations are compared before a purchase order is raised (10 Aug §5.4). Recording
+        them is what makes the comparison auditable — a decision without the alternatives on
+        record is not a comparison.
+      tags: [supplier]
+      x-ticvai-permission: PRODUCT_CONFIGURE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/CreateQuotationRequest' }
+      responses:
+        '201':
+          description: Recorded
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Quotation' }
+
+  /requisitions/{requisitionId}/quotations:
+    parameters:
+      - name: requisitionId
+        in: path
+        required: true
+        schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+    get:
+      operationId: compareQuotations
+      x-ticvai-consumed-by:
+        - "P08 BO-078 Requisitions"
+      x-ticvai-audience: [staff]
+      x-ticvai-read-routing: replica
+      summary: Compare quotations for a requisition
+      description: >
+        Side by side across suppliers, per line, with lead time and total. The comparison a
+        buyer defends afterwards.
+      tags: [supplier]
+      x-ticvai-permission: PRODUCT_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '200':
+          description: Comparison
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/QuotationComparison' }
+
+  # ---------------------------------------------------------------- purchase orders
+  /purchase-orders:
+    get:
+      operationId: listPurchaseOrders
+      x-ticvai-consumed-by:
+        - "P08 BO-052 Goods Receipt"
+      x-ticvai-audience: [staff]
+      x-ticvai-read-routing: replica
+      summary: List purchase orders
+      tags: [purchaseOrder]
+      x-ticvai-permission: PRODUCT_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - name: status
+          in: query
+          schema: { $ref: '#/components/schemas/PurchaseOrderStatus' }
+        - name: supplierId
+          in: query
+          schema: { type: string, format: uuid }
+        - $ref: '../shared/common.yaml#/components/parameters/PageSize'
+        - $ref: '../shared/common.yaml#/components/parameters/PageCursor'
+      responses:
+        '200':
+          description: Purchase orders
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '../shared/common.yaml#/components/schemas/Page'
+                  - type: object
+                    properties:
+                      items:
+                        type: array
+                        items: { $ref: '#/components/schemas/PurchaseOrder' }
+
+    post:
+      operationId: createPurchaseOrder
+      x-ticvai-consumed-by:
+        - "P08 BO-052 Goods Receipt"
+      x-ticvai-audience: [staff]
+      summary: Raise a purchase order
+      description: >
+        Requires an approved requisition and a selected quotation. Raising one without either
+        is refused — that is the control the chain exists to enforce.
+      tags: [purchaseOrder]
+      x-ticvai-permission: ORDER_CREATE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/CreatePurchaseOrderRequest' }
+      responses:
+        '201':
+          description: Raised
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/PurchaseOrder' }
+        '409':
+          description: Requisition is not approved, or the quotation does not match it
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /purchase-orders/{purchaseOrderId}:
+    parameters:
+      - name: purchaseOrderId
+        in: path
+        required: true
+        schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+    get:
+      operationId: getPurchaseOrder
+      x-ticvai-consumed-by:
+        - "P08 BO-052 Goods Receipt"
+      x-ticvai-audience: [staff]
+      x-ticvai-read-routing: replica
+      summary: Read a purchase order with receipt progress
+      tags: [purchaseOrder]
+      x-ticvai-permission: PRODUCT_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '200':
+          description: Purchase order
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/PurchaseOrder' }
+        '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
+
+  /purchase-orders/{purchaseOrderId}/send:
+    parameters:
+      - name: purchaseOrderId
+        in: path
+        required: true
+        schema: { type: string }
+    post:
+      operationId: sendPurchaseOrder
+      x-ticvai-consumed-by:
+        - "P08 BO-052 Goods Receipt"
+      x-ticvai-audience: [staff]
+      summary: Issue the order to the supplier
+      description: >
+        Raised and sent are different states because a raised order is still ours to change and a sent one is not.
+      tags: [procurement]
+      x-ticvai-permission: PRODUCT_CONFIGURE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      responses:
+        '200':
+          description: Done
+        '409':
+          description: Not in a state that permits this
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /purchase-orders/{purchaseOrderId}/acknowledge:
+    parameters:
+      - name: purchaseOrderId
+        in: path
+        required: true
+        schema: { type: string }
+    post:
+      operationId: acknowledgePurchaseOrder
+      x-ticvai-consumed-by:
+        - "P08 BO-052 Goods Receipt"
+      x-ticvai-audience: [staff]
+      summary: Record the supplier acknowledgement
+      description: >
+        Optional in practice — goods often arrive without one, which is not an error. Recorded when it happens because a supplier who never acknowledges is a supplier performance figure.
+      tags: [procurement]
+      x-ticvai-permission: PRODUCT_CONFIGURE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [supplierReference]
+              properties:
+                supplierReference: { type: string }
+      responses:
+        '200':
+          description: Done
+        '409':
+          description: Not in a state that permits this
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /purchase-orders/{purchaseOrderId}/close-short:
+    parameters:
+      - name: purchaseOrderId
+        in: path
+        required: true
+        schema: { type: string }
+    post:
+      operationId: closePurchaseOrderShort
+      x-ticvai-consumed-by:
+        - "P08 BO-052 Goods Receipt"
+      x-ticvai-audience: [staff]
+      summary: Close an order accepting the balance will not arrive
+      description: >
+        **Writes off a committed cost**, so it needs approval. Without this state a partially received order stays open indefinitely and the committed-cost figure is permanently wrong.
+      tags: [procurement]
+      x-ticvai-permission: LEDGER_APPROVE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [reason]
+              properties:
+                reason: { type: string }
+      responses:
+        '200':
+          description: Done
+        '409':
+          description: Not in a state that permits this
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /purchase-orders/{purchaseOrderId}/cancel:
+    parameters:
+      - name: purchaseOrderId
+        in: path
+        required: true
+        schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+    post:
+      operationId: cancelPurchaseOrder
+      x-ticvai-consumed-by:
+        - "P08 BO-052 Goods Receipt"
+      x-ticvai-audience: [staff]
+      summary: Cancel a purchase order
+      description: Partially received orders are closed short rather than cancelled.
+      tags: [purchaseOrder]
+      x-ticvai-permission: ORDER_CANCEL
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [reason]
+              properties:
+                reason: { type: string, minLength: 3, maxLength: 500 }
+      responses:
+        '200':
+          description: Cancelled or closed short
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/PurchaseOrder' }
+
+  # ---------------------------------------------------------------- receipts
+  /goods-receipts:
+    get:
+      operationId: listGoodsReceipts
+      x-ticvai-consumed-by:
+        - "P08 BO-052 Goods Receipt"
+      x-ticvai-audience: [staff]
+      x-ticvai-read-routing: replica
+      summary: List goods receipts
+      tags: [receipt]
+      x-ticvai-permission: PRODUCT_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - name: purchaseOrderId
+          in: query
+          schema: { type: string, format: uuid }
+        - $ref: '../shared/common.yaml#/components/parameters/PageSize'
+        - $ref: '../shared/common.yaml#/components/parameters/PageCursor'
+      responses:
+        '200':
+          description: Receipts
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '../shared/common.yaml#/components/schemas/Page'
+                  - type: object
+                    properties:
+                      items:
+                        type: array
+                        items: { $ref: '#/components/schemas/GoodsReceipt' }
+
+    post:
+      operationId: createGoodsReceipt
+      x-ticvai-consumed-by:
+        - "P06 EMP-065 Receiving & Store Put-Away"
+        - "P08 BO-052 Goods Receipt"
+        - "P08 BO-080 Stock Transfers"
+      x-ticvai-audience: [staff]
+      summary: Receive goods against a purchase order
+      description: >
+        Partial receipts are normal and expected. Over-receipt beyond the configured
+        tolerance is refused — a delivery larger than the order is a supplier error, not a
+        windfall.
+
+        Receipt increments stock and creates the accrual the invoice will later match
+        against.
+      tags: [receipt]
+      x-ticvai-permission: PRODUCT_CONFIGURE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: true
+      x-ticvai-conflict-policy: append
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/CreateGoodsReceiptRequest' }
+      responses:
+        '201':
+          description: Received; stock incremented
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/GoodsReceipt' }
+        '409':
+          description: Over-receipt beyond tolerance, or the purchase order is closed
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /goods-receipts/{receiptId}/reject:
+    parameters:
+      - name: receiptId
+        in: path
+        required: true
+        schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+    post:
+      operationId: rejectReceivedGoods
+      x-ticvai-consumed-by:
+        - "P06 EMP-065 Receiving & Store Put-Away"
+        - "P08 BO-052 Goods Receipt"
+      x-ticvai-audience: [staff]
+      summary: Reject received goods
+      description: >
+        Quality failure, damage, wrong item, expiry too near. Reverses the stock increment
+        and creates a supplier return.
+      tags: [receipt]
+      x-ticvai-permission: PRODUCT_CONFIGURE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [lines, reason]
+              properties:
+                lines:
+                  type: array
+                  minItems: 1
+                  items:
+                    type: object
+                    required: [itemId, quantity]
+                    properties:
+                      itemId: { type: string, format: uuid }
+                      quantity: { type: number, minimum: 0 }
+                reason:
+                  type: string
+                  enum: [damaged, wrongItem, qualityFailure, shortDated, overDelivery, other]
+                note: { type: string, maxLength: 1000 }
+      responses:
+        '200':
+          description: Rejected; stock reversed and a return raised
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/GoodsReceipt' }
+
+components:
+  schemas:
+    CostingMethod:
+      type: string
+      description: Fixed at item creation. Immutable once movements exist.
+      enum: [weightedAverage, fifo, standardCost, lastPurchasePrice]
+
+    CountLine:
+      type: object
+      x-ticvai-persistence: "inventory.count_line"
+      description: >
+        Board 5 of the client F&B pack, 24 August. **`startStockCount` and `postStockCount` existed
+        and this did not** — a count could be opened and posted and **nothing recorded what was
+        counted.**
+
+        **The theoretical quantity is captured at entry, not at post.** Stock moves during a count;
+        a variance computed at post time is measured against a different number from the one the
+        counter was standing in front of.
+
+        **A line may be entered twice and the second replaces the first.** A counter who miskeys and
+        re-counts is the normal case, and a model that refuses the second sends them to a supervisor
+        to undo the first.
+      required: [id, countId, itemId, countedQuantity]
+      properties:
+        id: { type: string, format: uuid }
+        countId: { type: string, format: uuid }
+        itemId: { type: string, format: uuid }
+        locationId: { type: string, format: uuid, nullable: true }
+        batchId: { type: string, format: uuid, nullable: true }
+        countedQuantity: { type: number }
+        theoreticalQuantity:
+          type: number
+          description: >
+            **Snapshotted at entry.** What the platform believed was there at the moment the counter
+            looked.
+        uom: { type: string }
+        variance: { type: number, readOnly: true }
+        variancePercent: { type: number, readOnly: true }
+        status: { type: string, enum: [entered, recountRequested, recounted, accepted, rejected] }
+        countedByPrincipalId: { type: string, format: uuid }
+        countedAt: { type: string, format: date-time }
+        note: { type: string, nullable: true }
+
+
+    SerialisedItem:
+      type: object
+      x-ticvai-persistence: "inventory.serialised_item"
+      description: >
+        Retail Board 4 of the client's design set, 20 August. **`StockBatch` was added on 18 August
+        with a lot number, and serialisation to the individual item is a step beyond it.**
+
+        A lot answers *which delivery did this come from*. A serial answers *where is this exact
+        one* — which is what a jewellery counter, a phone, a ticketed collectible or anything with a
+        warranty needs.
+
+        **Most stock is not serialised and should not be.** Turning it on for a 2 AED keyring
+        creates a row per keyring, so it is a per-item decision rather than a policy.
+      required: [id, itemId, serial, status]
+      properties:
+        id: { type: string, format: uuid }
+        itemId: { type: string, format: uuid }
+        batchId:
+          type: string
+          format: uuid
+          nullable: true
+          description: The batch it arrived in, where the item is both lotted and serialised.
+        serial:
+          type: string
+          description: >
+            **Unique within the item, not globally.** Two manufacturers reuse serial numbers and a
+            global constraint would refuse the second one.
+        locationId: { type: string, format: uuid }
+        status: { type: string, enum: [inStock, reserved, sold, returned, damaged, lost, inTransit, warranty] }
+        soldOnOrderLineId:
+          type: string
+          format: uuid
+          nullable: true
+          description: >
+            **The link that makes serialisation worth having.** A warranty claim, a recall and a
+            proof of purchase all start with *which sale was this exact item*.
+        warrantyUntil: { type: string, format: date, nullable: true }
+        receivedAt: { type: string, format: date-time }
+
+
+    StockBatch:
+      type: object
+      x-ticvai-persistence: "inventory.stock_batch"
+      description: >
+        BL-122. **`isPerishable` and `shelfLifeDays` are on the item, so a shelf life is declared
+        and never instantiated.** Two deliveries of the same milk arriving a week apart are one
+        stock level with one implied expiry, and the older one is invisible.
+
+        **A batch is the instance that actually expires.** Without it, first-expiry-first-out is not
+        computable and a venue discovers the problem by smell.
+      required: [id, itemId, locationId, quantity, receivedAt]
+      properties:
+        id: { type: string, format: uuid }
+        itemId: { type: string, format: uuid }
+        locationId: { type: string, format: uuid }
+        batchCode: { type: string, nullable: true }
+        lotNumber:
+          type: string
+          nullable: true
+          description: >
+            The supplier's own reference. **A recall names a lot number**, and an inventory that
+            cannot resolve one has to discard everything.
+        quantity: { type: number }
+        receivedAt: { type: string, format: date-time }
+        expiresAt: { type: string, format: date, nullable: true }
+        supplierId: { type: string, format: uuid, nullable: true }
+        status: { type: string, enum: [available, quarantined, expired, recalled, consumed, written-off] }
+
+
+    LocationKind:
+      type: string
+      enum: [mainStore, subStore, kitchen, bar, retailFloor, cellar, transit]
+
+    CreateInventoryItemRequest:
+      x-ticvai-persistence: "none — request only"
+      type: object
+      required: [sku, name, venueId, baseUnit, costingMethod]
+      properties:
+        sku: { type: string, maxLength: 64 }
+        barcode: { type: string, maxLength: 128 }
+        name: { type: string, maxLength: 200 }
+        venueId: { type: string, format: uuid }
+        categoryId: { type: string, format: uuid }
+        baseUnit:
+          type: string
+          description: The unit stock is held in. Immutable once movements exist.
+        purchaseUnit:
+          type: string
+          description: How the supplier sells it — a case of 24 against a base unit of one.
+        purchaseUnitFactor: { type: number, minimum: 0, default: 1 }
+        costingMethod: { $ref: '#/components/schemas/CostingMethod' }
+        reorderPoint: { type: number, minimum: 0 }
+        reorderQuantity: { type: number, minimum: 0 }
+        parLevel: { type: number, minimum: 0 }
+        preferredSupplierId: { type: string, format: uuid }
+        allowNegativeStock:
+          type: boolean
+          default: false
+          description: >
+            True permits issue beyond on-hand. Occasionally needed at a bar mid-service;
+            dangerous everywhere else.
+        isPerishable: { type: boolean, default: false }
+        shelfLifeDays: { type: integer, nullable: true }
+
+    InventoryItem:
+      x-ticvai-persistence: "inventory.item"
+      allOf:
+        - $ref: '#/components/schemas/CreateInventoryItemRequest'
+        - type: object
+          required: [id, onHand, isActive]
+          properties:
+            id: { type: string, format: uuid }
+            onHand:
+              type: number
+              description: Derived from movements. Not directly editable.
+            onOrder: { type: number }
+            inTransit: { type: number }
+            available: { type: number }
+            averageCost: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+            lastPurchasePrice: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+            isBelowReorderPoint: { type: boolean }
+            hasMovements:
+              type: boolean
+              description: True locks costing method and base unit.
+            isActive: { type: boolean }
+
+    StockLocation:
+      x-ticvai-persistence: "inventory.location"
+      type: object
+      required: [id, code, name, venueId, kind]
+      properties:
+        id: { type: string, format: uuid }
+        code: { type: string }
+        name: { type: string }
+        venueId: { type: string, format: uuid }
+        kind: { $ref: '#/components/schemas/LocationKind' }
+        parentLocationId: { type: string, format: uuid, nullable: true }
+        isActive: { type: boolean }
+
+    StockPosition:
+      x-ticvai-persistence: "none — derived from movements"
+      type: object
+      required: [itemId, locationId, onHand, unit]
+      properties:
+        itemId: { type: string, format: uuid }
+        itemName: { type: string }
+        sku: { type: string }
+        locationId: { type: string, format: uuid }
+        locationName: { type: string }
+        onHand: { type: number }
+        allocated:
+          type: number
+          description: Committed to a transfer or open requisition.
+        available: { type: number }
+        unit: { type: string }
+        value: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+        lastCountedAt: { type: string, format: date-time, nullable: true }
+        lastMovementAt: { type: string, format: date-time, nullable: true }
+
+    StockValuation:
+      x-ticvai-persistence: "none — computed"
+      type: object
+      required: [asAt, total, byLocation]
+      properties:
+        asAt: { type: string, format: date }
+        total: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+        byLocation:
+          type: array
+          items:
+            type: object
+            properties:
+              locationId: { type: string, format: uuid }
+              locationName: { type: string }
+              value: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+              itemCount: { type: integer }
+        byCategory:
+          type: array
+          items:
+            type: object
+            properties:
+              categoryId: { type: string, format: uuid }
+              categoryName: { type: string }
+              value: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+
+    MovementKind:
+      type: string
+      enum:
+        - receipt
+        - issue
+        - saleDepletion      # generated by a recipe-linked sale
+        - waste
+        - adjustment
+        - transferOut
+        - transferIn
+        - countAdjustment
+        - supplierReturn
+        - production
+
+    CreateStockMovementRequest:
+      x-ticvai-persistence: "none — request only"
+      type: object
+      required: [id, itemId, locationId, kind, quantity, recordedAt]
+      properties:
+        id: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+        itemId: { type: string, format: uuid }
+        locationId: { type: string, format: uuid }
+        kind: { $ref: '#/components/schemas/MovementKind' }
+        quantity:
+          type: number
+          description: Positive increases stock, negative decreases it.
+        unit: { type: string }
+        reason:
+          type: string
+          maxLength: 500
+          description: Required for adjustments, which are reported separately.
+        costCenterId: { type: string, format: uuid }
+        recordedAt: { type: string, format: date-time }
+
+    StockMovement:
+      x-ticvai-persistence: "inventory.movement"
+      allOf:
+        - $ref: '#/components/schemas/CreateStockMovementRequest'
+        - type: object
+          required: [balanceAfter, principalId, createdAt]
+          properties:
+            balanceAfter: { type: number }
+            unitCost: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+            totalCost: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+            principalId: { type: string, format: uuid }
+            sourceType:
+              type: string
+              nullable: true
+              description: What generated it — an order, a count, a transfer.
+            sourceId: { type: string, nullable: true }
+            journalEntryId: { type: string, nullable: true }
+            createdAt: { type: string, format: date-time }
+
+    CountStatus:
+      type: string
+      enum: [open, counting, closed, variancePending, posted, cancelled]
+
+    StartStockCountRequest:
+      x-ticvai-persistence: "none — request only"
+      type: object
+      required: [id, locationId, kind]
+      properties:
+        id: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+        locationId: { type: string, format: uuid }
+        kind:
+          type: string
+          enum: [full, cycle, spot]
+        categoryIds:
+          type: array
+          items: { type: string, format: uuid }
+          description: For cycle counts — restrict to these categories.
+        isBlind:
+          type: boolean
+          default: true
+          description: >
+            Expected quantities withheld from the counting device. Defaults true because a
+            counter who can see the figure reconciles to it rather than to the shelf.
+
+    StockCount:
+      x-ticvai-persistence: "inventory.count + inventory.count_line"
+      type: object
+      required: [id, locationId, kind, status, isBlind, lineCount, countedCount, startedAt]
+      properties:
+        id: { type: string }
+        locationId: { type: string, format: uuid }
+        locationName: { type: string }
+        kind: { type: string }
+        status: { $ref: '#/components/schemas/CountStatus' }
+        isBlind: { type: boolean }
+        lineCount: { type: integer }
+        countedCount: { type: integer }
+        varianceLineCount: { type: integer }
+        varianceValue: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+        startedByPrincipalId: { type: string, format: uuid }
+        postedByPrincipalId: { type: string, format: uuid, nullable: true }
+        journalEntryId: { type: string, nullable: true }
+        startedAt: { type: string, format: date-time }
+        closedAt: { type: string, format: date-time, nullable: true }
+        postedAt: { type: string, format: date-time, nullable: true }
+
+    CountVariance:
+      x-ticvai-persistence: "none — computed at close"
+      type: object
+      required: [countId, totalVarianceValue, lines]
+      properties:
+        countId: { type: string }
+        totalVarianceValue: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+        exceptionCount:
+          type: integer
+          description: Lines beyond tolerance, requiring review before posting.
+        lines:
+          type: array
+          items:
+            type: object
+            required: [itemId, expectedQuantity, countedQuantity, variance, isException]
+            properties:
+              itemId: { type: string, format: uuid }
+              itemName: { type: string }
+              sku: { type: string }
+              expectedQuantity: { type: number }
+              countedQuantity: { type: number }
+              variance: { type: number }
+              variancePercentage: { type: number }
+              varianceValue: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+              isException: { type: boolean }
+              recountCount:
+                type: integer
+                description: A line counted several times is itself a finding.
+              note: { type: string, nullable: true }
+
+    TransferStatus:
+      type: string
+      enum: [dispatched, inTransit, received, partiallyReceived, cancelled]
+
+    CreateStockTransferRequest:
+      x-ticvai-persistence: "none — request only"
+      type: object
+      required: [id, fromLocationId, toLocationId, lines, recordedAt]
+      properties:
+        id: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+        fromLocationId: { type: string, format: uuid }
+        toLocationId: { type: string, format: uuid }
+        lines:
+          type: array
+          minItems: 1
+          items:
+            type: object
+            required: [itemId, quantity]
+            properties:
+              itemId: { type: string, format: uuid }
+              quantity: { type: number, minimum: 0 }
+              unit: { type: string }
+        note: { type: string, maxLength: 500 }
+        recordedAt: { type: string, format: date-time }
+
+    StockTransfer:
+      x-ticvai-persistence: "inventory.transfer + inventory.transfer_line"
+      type: object
+      required: [id, fromLocationId, toLocationId, status, lines, dispatchedAt]
+      properties:
+        id: { type: string }
+        transferNumber: { type: string }
+        fromLocationId: { type: string, format: uuid }
+        toLocationId: { type: string, format: uuid }
+        status: { $ref: '#/components/schemas/TransferStatus' }
+        lines:
+          type: array
+          items:
+            type: object
+            properties:
+              itemId: { type: string, format: uuid }
+              itemName: { type: string }
+              dispatchedQuantity: { type: number }
+              receivedQuantity: { type: number, nullable: true }
+              discrepancy: { type: number, nullable: true }
+              discrepancyReason: { type: string, nullable: true }
+        dispatchedByPrincipalId: { type: string, format: uuid }
+        receivedByPrincipalId: { type: string, format: uuid, nullable: true }
+        dispatchedAt: { type: string, format: date-time }
+        receivedAt: { type: string, format: date-time, nullable: true }
+
+    RequisitionStatus:
+      type: string
+      enum: [draft, pendingApproval, approved, rejected, returnedForInfo, ordered, closed, cancelled]
+
+    CreateRequisitionRequest:
+      x-ticvai-persistence: "none — request only"
+      type: object
+      required: [id, venueId, lines, requiredBy]
+      properties:
+        id: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+        venueId: { type: string, format: uuid }
+        departmentId: { type: string, format: uuid }
+        costCenterId: { type: string, format: uuid }
+        lines:
+          type: array
+          minItems: 1
+          items:
+            type: object
+            required: [itemId, quantity]
+            properties:
+              itemId: { type: string, format: uuid }
+              quantity: { type: number, minimum: 0 }
+              unit: { type: string }
+              note: { type: string, maxLength: 200 }
+        requiredBy: { type: string, format: date }
+        justification: { type: string, maxLength: 1000 }
+
+    Requisition:
+      x-ticvai-persistence: "inventory.requisition + inventory.requisition_line"
+      type: object
+      required: [id, requisitionNumber, venueId, status, lines, raisedByPrincipalId, createdAt]
+      properties:
+        id: { type: string }
+        requisitionNumber: { type: string }
+        venueId: { type: string, format: uuid }
+        departmentId: { type: string, format: uuid, nullable: true }
+        status: { $ref: '#/components/schemas/RequisitionStatus' }
+        lines:
+          type: array
+          items:
+            type: object
+            properties:
+              lineId: { type: string }
+              itemId: { type: string, format: uuid }
+              itemName: { type: string }
+              requestedQuantity: { type: number }
+              approvedQuantity: { type: number, nullable: true }
+              orderedQuantity: { type: number, nullable: true }
+              unit: { type: string }
+              estimatedCost: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+        estimatedTotal: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+        raisedByPrincipalId: { type: string, format: uuid }
+        approvedByPrincipalId: { type: string, format: uuid, nullable: true }
+        approvalNote: { type: string, nullable: true }
+        requiredBy: { type: string, format: date }
+        createdAt: { type: string, format: date-time }
+        approvedAt: { type: string, format: date-time, nullable: true }
+
+    RequisitionSuggestion:
+      x-ticvai-persistence: "none — computed"
+      type: object
+      required: [itemId, onHand, reorderPoint, suggestedQuantity]
+      properties:
+        itemId: { type: string, format: uuid }
+        itemName: { type: string }
+        sku: { type: string }
+        onHand: { type: number }
+        reorderPoint: { type: number }
+        parLevel: { type: number }
+        suggestedQuantity: { type: number }
+        averageDailyConsumption: { type: number }
+        daysOfCoverRemaining: { type: number }
+        preferredSupplierId: { type: string, format: uuid, nullable: true }
+        leadTimeDays: { type: integer, nullable: true }
+
+    Supplier:
+      x-ticvai-persistence: "inventory.supplier"
+      type: object
+      required: [id, code, name]
+      properties:
+        id: { type: string, format: uuid }
+        code: { type: string, maxLength: 64 }
+        name: { type: string, maxLength: 200 }
+        contactName: { type: string, nullable: true }
+        contactEmail: { type: string, nullable: true }
+        contactPhone: { type: string, nullable: true }
+        taxRegistrationNumber: { type: string, nullable: true }
+        paymentTermsDays: { type: integer, nullable: true }
+        leadTimeDays: { type: integer, nullable: true }
+        currency: { type: string, pattern: '^[A-Z]{3}$' }
+        accountId: { type: string, format: uuid, nullable: true }
+        isActive: { type: boolean }
+
+    CreateQuotationRequest:
+      x-ticvai-persistence: "none — request only"
+      type: object
+      required: [requisitionId, lines, validUntil]
+      properties:
+        requisitionId: { type: string }
+        reference: { type: string, maxLength: 128 }
+        lines:
+          type: array
+          minItems: 1
+          items:
+            type: object
+            required: [itemId, unitPrice, quantity]
+            properties:
+              itemId: { type: string, format: uuid }
+              quantity: { type: number, minimum: 0 }
+              unitPrice: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+              unit: { type: string }
+        leadTimeDays: { type: integer }
+        validUntil: { type: string, format: date }
+        note: { type: string, maxLength: 1000 }
+
+    Quotation:
+      x-ticvai-persistence: "inventory.quotation + inventory.quotation_line"
+      allOf:
+        - $ref: '#/components/schemas/CreateQuotationRequest'
+        - type: object
+          required: [id, supplierId, total, receivedAt]
+          properties:
+            id: { type: string, format: uuid }
+            supplierId: { type: string, format: uuid }
+            supplierName: { type: string }
+            total: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+            isSelected: { type: boolean }
+            receivedAt: { type: string, format: date-time }
+
+    QuotationComparison:
+      x-ticvai-persistence: "none — computed"
+      type: object
+      required: [requisitionId, quotations, lowestTotalSupplierId]
+      properties:
+        requisitionId: { type: string }
+        quotations:
+          type: array
+          items: { $ref: '#/components/schemas/Quotation' }
+        lowestTotalSupplierId: { type: string, format: uuid, nullable: true }
+        shortestLeadTimeSupplierId: { type: string, format: uuid, nullable: true }
+        byLine:
+          type: array
+          description: Per-line comparison. The cheapest total is not always the cheapest line.
+          items:
+            type: object
+            properties:
+              itemId: { type: string, format: uuid }
+              itemName: { type: string }
+              prices:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    supplierId: { type: string, format: uuid }
+                    unitPrice: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+                    isLowest: { type: boolean }
+
+    PurchaseOrderStatus:
+      type: string
+      enum: [raised, sent, acknowledged, partiallyReceived, received, closedShort, cancelled]
+
+    CreatePurchaseOrderRequest:
+      x-ticvai-persistence: "none — request only"
+      type: object
+      required: [id, requisitionId, supplierId, quotationId, lines, expectedDelivery]
+      properties:
+        id: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+        requisitionId: { type: string }
+        supplierId: { type: string, format: uuid }
+        quotationId: { type: string, format: uuid }
+        deliverToLocationId: { type: string, format: uuid }
+        lines:
+          type: array
+          minItems: 1
+          items:
+            type: object
+            required: [itemId, quantity, unitPrice]
+            properties:
+              itemId: { type: string, format: uuid }
+              quantity: { type: number, minimum: 0 }
+              unit: { type: string }
+              unitPrice: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+        expectedDelivery: { type: string, format: date }
+        note: { type: string, maxLength: 1000 }
+
+    PurchaseOrder:
+      x-ticvai-persistence: "inventory.purchase_order + inventory.purchase_order_line"
+      type: object
+      required: [id, purchaseOrderNumber, supplierId, status, lines, total, createdAt]
+      properties:
+        id: { type: string }
+        purchaseOrderNumber: { type: string }
+        requisitionId: { type: string }
+        supplierId: { type: string, format: uuid }
+        supplierName: { type: string }
+        kind:
+          type: string
+          enum: [standard, blanket, release, rfqAward]
+          default: standard
+          description: >
+            BL-159. **A blanket order is a price and a commitment, not a delivery.** Releases draw
+            against it, and modelling each release as its own purchase order loses the contract that
+            makes the price valid.
+        blanketParentId:
+          type: string
+          format: uuid
+          nullable: true
+        contractPriceValidUntil:
+          type: string
+          format: date
+          nullable: true
+        rfqId:
+          type: string
+          format: uuid
+          nullable: true
+          description: >
+            Where this order came from a quotation round. **Keeping the link is what lets a venue
+            show it took the best of three**, which is usually the procurement rule rather than a
+            preference.
+        supplierInvoiceRef:
+          type: string
+          nullable: true
+          description: >
+            BL-123. **Purchase orders and goods receipts both existed — the third leg did not.**
+            A three-way match with two legs is a two-way match, and it is the supplier invoice that
+            carries the price nobody has checked yet.
+        matchStatus:
+          type: string
+          nullable: true
+          enum: [unmatched, matched, priceVariance, quantityVariance, bothVariance]
+          description: >
+            **The variance kinds are separated because they have different owners** — a price
+            variance is a buyer's problem and a quantity variance is a receiving one.
+        status: { $ref: '#/components/schemas/PurchaseOrderStatus' }
+        deliverToLocationId: { type: string, format: uuid }
+        lines:
+          type: array
+          items:
+            type: object
+            properties:
+              lineId: { type: string }
+              itemId: { type: string, format: uuid }
+              itemName: { type: string }
+              orderedQuantity: { type: number }
+              receivedQuantity: { type: number }
+              outstandingQuantity: { type: number }
+              unitPrice: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+              lineTotal: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+        subtotal: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+        taxAmount: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+        total: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+        expectedDelivery: { type: string, format: date }
+        raisedByPrincipalId: { type: string, format: uuid }
+        createdAt: { type: string, format: date-time }
+        closedAt: { type: string, format: date-time, nullable: true }
+
+    CreateGoodsReceiptRequest:
+      x-ticvai-persistence: "none — request only"
+      type: object
+      required: [id, purchaseOrderId, locationId, lines, recordedAt]
+      properties:
+        id: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+        purchaseOrderId: { type: string }
+        locationId: { type: string, format: uuid }
+        deliveryNoteReference: { type: string, maxLength: 128 }
+        lines:
+          type: array
+          minItems: 1
+          items:
+            type: object
+            required: [itemId, receivedQuantity]
+            properties:
+              itemId: { type: string, format: uuid }
+              receivedQuantity: { type: number, minimum: 0 }
+              unit: { type: string }
+              batchNumber: { type: string, maxLength: 64 }
+              expiryDate:
+                type: string
+                format: date
+                description: Required for perishable items.
+              note: { type: string, maxLength: 200 }
+        recordedAt: { type: string, format: date-time }
+
+    GoodsReceipt:
+      x-ticvai-persistence: "inventory.goods_receipt + inventory.goods_receipt_line"
+      type: object
+      required: [id, receiptNumber, purchaseOrderId, locationId, lines, receivedByPrincipalId, createdAt]
+      properties:
+        id: { type: string }
+        receiptNumber: { type: string }
+        purchaseOrderId: { type: string }
+        locationId: { type: string, format: uuid }
+        deliveryNoteReference: { type: string, nullable: true }
+        lines:
+          type: array
+          items:
+            type: object
+            properties:
+              itemId: { type: string, format: uuid }
+              itemName: { type: string }
+              orderedQuantity: { type: number }
+              receivedQuantity: { type: number }
+              rejectedQuantity: { type: number }
+              batchNumber: { type: string, nullable: true }
+              expiryDate: { type: string, format: date, nullable: true }
+              unitCost: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+        totalValue: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+        receivedByPrincipalId: { type: string, format: uuid }
+        journalEntryId:
+          type: string
+          nullable: true
+          description: The accrual the supplier invoice will later match against.
+        createdAt: { type: string, format: date-time }
+        recordedAt: { type: string, format: date-time }
+        syncedAt: { type: string, format: date-time, nullable: true }
+
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

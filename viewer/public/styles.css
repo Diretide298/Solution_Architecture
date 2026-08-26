@@ -1,0 +1,2933 @@
+/* ── tokens ─────────────────────────────────────────────────────────
+ *
+ * From the ui-design handoff (`ui-design/README.md`). One palette, two themes:
+ * day on :root, night behind [data-theme="dark"]. Nothing downstream of this
+ * block may write a literal colour.
+ *
+ * ── the surface model ──────────────────────────────────────────────
+ *
+ * The shell is dark in BOTH themes. That is the load-bearing idea of this
+ * design and the reason the two themes look more alike than a light/dark pair
+ * usually does: the chrome is a fixed dark frame, and what the toggle actually
+ * swaps is the page inside it.
+ *
+ *   --chrome-1     topbar row 1, the darkest band
+ *   --chrome-2     topbar row 2, one step lighter
+ *   --chrome-fill  inputs and off-state toggles inside the chrome
+ *   --chrome-text / --chrome-muted   prose on the chrome, which is its own
+ *                  scale — the body's --text is unreadable up there
+ *
+ *   --bg-canvas    the page behind the three columns
+ *   --bg-panel     a column or a title bar
+ *   --bg-card      a card; --bg-card-head is its filled header strip
+ *   --bg-raised    a tile, a state row, a tray
+ *
+ * ── the palette ────────────────────────────────────────────────────
+ *
+ * Teal, and a neutral grey ramp with no cast to it. Two teals: --accent is the
+ * one that carries text and --accent-bright is the one that carries fills and
+ * dots. The night theme brightens the accent on purpose — day's #229799 loses
+ * too much contrast on black.
+ *
+ * --amber and --red are signals, not decoration, and are the only other hues.
+ * The warm note and the finding badge are their own trio (fill / border / text)
+ * because they are a surface rather than a colour.
+ *
+ * Anything painted ON a saturated fill uses --ink-on-fill.
+ */
+/* The field, as a token, so the one thing that has to match it — the canvas
+   background in layers.css — can be checked against a name rather than against
+   a second copy of four hex values. */
+:root {
+  --field: radial-gradient(120% 92% at 50% 46%,
+    #16262C 0%, #111A1F 38%, #0D1113 72%, #0A0C0E 100%);
+  /* The day ground for the same surfaces. Warm rather than the neutral
+     --bg-canvas the chrome sits on: this is paper the picture is printed on,
+     and the graphite lanes and jewel bodies in galaxy.js are mixed for it. A
+     token, not four literals, because six canvases and two scrims have to
+     agree with it and a second copy is a second thing to forget. */
+  /* White, by request. This was a radial of pale teals mixed from the palette
+     — the argument being that a near-white ground gives the ink nothing to sit
+     against, so the picture reads washed out however saturated the ink is. That
+     argument still holds for the galaxy views, whose graphite lanes and jewel
+     bodies in galaxy.js were mixed against the tint; if they now look thin,
+     the fix is to deepen the ink there rather than to bring the tint back.
+     The night field is untouched, so dark theme is exactly as it was.
+
+     A gradient of one colour, and NOT the bare `#ffffff` it was first written
+     as. That is not decoration and it is not a stray edit — a flat `#ffffff`
+     is what produced the bug the reader reported as "switching night and day
+     the bg gets stuck on white".
+
+     Every surface that takes this token takes --field, a gradient, in the
+     other theme. Written as a bare colour, the day rule resolves to
+     `background-color: #ffffff; background-image: none`, and an element whose
+     whole background is one opaque colour is the case Chrome promotes to the
+     compositor's solid-colour fast path. Flipping to night then asks it to go
+     the other way — background-color to transparent, background-image to a
+     gradient — and the cached solid layer is not invalidated: the computed
+     style is the night gradient (verified) while the pixels stay white. It
+     sticks on the FIRST return to night and never recovers, and it is worst on
+     the galaxy views, where the whole main panel goes white under night ink.
+
+     Expressed as a gradient, both themes are the same kind of value, the fast
+     path is never entered, and the toggle repaints every time. Measured both
+     ways across all five views before this was written: bare colour sticks,
+     one-colour gradient does not. The rendered result is identical — a flat
+     #ffffff ground — so this costs the day scheme nothing.
+
+     If you are tempted to simplify this back to `#ffffff`: don't. That is the
+     bug. */
+  --field-day: linear-gradient(#ffffff, #ffffff);
+}
+
+:root {
+  color-scheme: light;
+
+  /* the dark chrome — the same idea in both themes, a shade apart */
+  --chrome-1: #333333;
+  --chrome-2: #3a3a3a;
+  --chrome-fill: #4a4a4a;
+  --chrome-border: #565656;
+  --chrome-text: #f7f7f7;
+  --chrome-muted: #adadad;
+
+  /* the page */
+  --bg-canvas: #f5f5f5;
+  --bg-panel: #ffffff;
+  --bg-card: #ffffff;
+  --bg-card-head: #f0f0f0;
+  --bg-raised: #fafafa;
+  --bg-hover: #f0f0f0;
+  --node-fill: #ffffff;
+
+  --border: #e4e4e4;
+  --divider: #f0f0f0;
+  --border-strong: #cfcfcf;
+
+  --text: #2e2e2e;
+  --text-dim: #6e6e6e;
+  --text-faint: #8a8a8a;
+
+  --accent: #229799;
+  --accent-bright: #48cfcb;
+  --accent-soft: #e5f7f6;
+  --accent-line: #a6e6e4;
+  --accent-text: #1c7e80;
+
+  --warm-fill: #fbf6ec;
+  --warm-line: #eadfc8;
+  --warm-text: #7a6534;
+  --finding-fill: #f1ede3;
+  --finding-text: #9a5a2a;
+
+  --amber: #c08a2e;
+  --red: #c0564f;
+  --dot-grid: #e2e2e2;
+
+  --ink-on-fill: #ffffff;
+  --ink-on-accent: #ffffff;
+
+  /* Diagram tiers, both themes. Named for what they are in the drawing rather
+     than for their hue, so a renderer asks for `spine` and not for `teal`. */
+  --spine: var(--accent);
+  --satellite: var(--accent-bright);
+  --shared: var(--amber);
+  --enum: #7c5fc0;
+  --external: var(--amber);
+
+  /* status. --ok is the accent doing double duty: in a palette this narrow a
+     separate green would be the only green on the page and would read as an
+     escapee from somewhere else. */
+  --ok: var(--accent);
+  --warning: var(--amber);
+  --error: var(--red);
+  --info: var(--accent);
+  --teal: var(--accent);
+  --orange: var(--amber);
+  --permission: var(--enum);
+  --patch: var(--enum);
+
+  --get: var(--accent);
+  --post: var(--accent-bright);
+  --put: var(--amber);
+  --delete: var(--red);
+
+  --label: var(--text-dim);
+  --boards: var(--enum);
+
+  --layer-frontend: var(--accent);
+  --layer-domain: var(--accent);
+  --layer-backend: var(--amber);
+  --layer-decisions: var(--enum);
+
+  --state-built: #4a7429;
+  --state-wired: var(--accent);
+  --state-answered: #3f5c7d;
+  --state-accepted: var(--amber);
+  --state-neutral: var(--text-dim);
+
+  --tint-1: rgba(46, 46, 46, 0.03);
+  --tint-2: rgba(46, 46, 46, 0.055);
+  --tint-3: rgba(46, 46, 46, 0.09);
+
+  --shadow-1: 0 1px 2px rgba(66, 66, 66, 0.06);
+  --shadow-2: 0 6px 18px rgba(66, 66, 66, 0.10), 0 2px 5px rgba(66, 66, 66, 0.05);
+  --shadow-3: 0 20px 48px rgba(66, 66, 66, 0.16), 0 5px 14px rgba(66, 66, 66, 0.07);
+  --scrim: rgba(30, 30, 30, 0.42);
+  --shadow-ink: rgba(66, 66, 66, 0.16);
+
+  /* Routing targets — categorical, held apart under protanopia and
+     deuteranopia, and checked for 3:1 on the surface in both themes. Each fill
+     carries its own ink because no single ink clears 4.5:1 on all four. */
+  --route-write: #2f6f9e;
+  --route-write-ink: #ffffff;
+  --route-primary: var(--accent);
+  --route-primary-ink: #ffffff;
+  --route-replica: #6b7a18;
+  --route-replica-ink: #ffffff;
+  --route-analytical: var(--enum);
+  --route-analytical-ink: #ffffff;
+
+  /* What a node is, in every graph that draws one — the galaxies, the force
+     layout, and the legends beside them. See kinds-css.py for why this exists
+     alongside the narrow chrome palette rather than inside it. */
+  /* The day scheme, checked at 3:1 against the white node fill and against the
+     pale middle of --field-day. Three of the palette's own values needed
+     darkening to get there — #00B7B5 in particular is too light to carry a
+     chip — so the graph draws the palette and the chrome draws these, a step
+     deeper at the same hue. */
+  --kind-contract: #218dae;
+  --kind-operation: #2bbbd7;
+  --kind-schema: #12566b;
+  --kind-enum: #6c4fa3;
+  --kind-permission: #c2255c;
+  --kind-param: #b07a24;
+  --kind-response: #d9541f;
+  --kind-security: #4a5c63;
+  --kind-screen: #a2603f;
+  --kind-table: #3a6fb5;
+  --kind-event: #7b3fa0;
+  --kind-decision: #159085;
+
+  /* And what a line between two of them is. A lane that carries an event and a
+     lane that is a $ref are drawn together in the Spine view and used to differ
+     only by whether the consumer was critical — so a critical event and a $ref
+     into shared/ were the same amber, saying two different things. */
+  --edge-event: #1f8d8f;
+  --edge-critical: #b07a24;
+  --edge-ref: #7c5fc0;
+  --edge-permission: #b04a84;
+  --edge-reads: #3a6fb5;
+  --edge-writes: #b0562a;
+  --edge-contains: #8a8a8a;
+
+  --sans: 'Plus Jakarta Sans', ui-sans-serif, -apple-system, 'Segoe UI', system-ui, sans-serif;
+  --mono: 'JetBrains Mono', ui-monospace, 'SF Mono', 'Cascadia Code', Menlo, Consolas, monospace;
+
+  /* Two rows of chrome rather than one. --topbar-h stays the total, because
+     every view measures its own inset from it. */
+  --chrome-1-h: 64px;
+  --chrome-2-h: 52px;
+  --topbar-h: 116px;
+
+  /* The brand bar, which every page has exactly one of — the first chrome row
+     on the viewer, the whole bar on the six standalone pages. It was 64px with
+     a 46px lockup here and 48px with a 28px lockup there, so moving between
+     them shifted the mark and moved every line below it. One height and one
+     lockup, named once, because the two numbers only look right together. */
+  --brand-bar-h: var(--chrome-1-h);
+  --brand-lockup-h: 46px;
+
+  --radius: 10px;
+  --radius-lg: 15px;
+
+  /* Wide enough for a two-level tree row without truncating every name, and
+     narrow enough that the content behind an open drawer is still readable —
+     which is what tells you the drawer is temporary. */
+  --drawer-w: 272px;
+  --links-w: 296px;
+  --drawer-ease: 0.22s cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+
+  --chrome-1: #111111;
+  --chrome-2: #333333;
+  --chrome-fill: #2e2e2e;
+  --chrome-border: #3a3a3a;
+  --chrome-text: #ededed;
+  --chrome-muted: #9a9a9a;
+
+  --bg-canvas: #1a1a1a;
+  --bg-panel: #1f1f1f;
+  --bg-card: #242424;
+  --bg-card-head: #2c2c2c;
+  --bg-raised: #202020;
+  --bg-hover: #2c2c2c;
+  --node-fill: #242424;
+
+  --border: #3a3a3a;
+  --divider: #333333;
+  --border-strong: #4d4d4d;
+
+  --text: #ededed;
+  --text-dim: #9a9a9a;
+  --text-faint: #787878;
+
+  --accent: #2bb3b0;
+  --accent-bright: #48cfcb;
+  --accent-soft: #123a3a;
+  --accent-line: #2c7c7d;
+  --accent-text: #48cfcb;
+
+  --warm-fill: #2b2418;
+  --warm-line: #463a24;
+  --warm-text: #d9bc7c;
+  --finding-fill: #2b2418;
+  --finding-text: #d99a5e;
+
+  --amber: #d9a143;
+  --red: #d96c63;
+  --dot-grid: #333333;
+
+  --ink-on-fill: #101010;
+  --ink-on-accent: #0d2020;
+
+  --tint-1: rgba(255, 255, 255, 0.035);
+  --tint-2: rgba(255, 255, 255, 0.06);
+  --tint-3: rgba(255, 255, 255, 0.11);
+
+  --shadow-1: 0 1px 2px rgba(0, 0, 0, 0.06);
+  --shadow-2: 0 8px 24px rgba(0, 0, 0, 0.4);
+  --shadow-3: 0 24px 60px rgba(0, 0, 0, 0.55);
+  --scrim: rgba(0, 0, 0, 0.6);
+  --shadow-ink: rgba(0, 0, 0, 0.5);
+
+  --route-write: #6ba6e8;
+  --route-write-ink: #101010;
+  --route-primary-ink: #101010;
+  --route-replica: #b8c74a;
+  --route-replica-ink: #101010;
+  --route-analytical-ink: #101010;
+
+  /* Lifted for the dark field. The galaxies draw these additively, so the day
+     values would come out muddy under 'lighter' compositing. */
+  --kind-contract: #48cfcb;
+  --kind-operation: #6aa5f5;
+  --kind-schema: #5fc28a;
+  --kind-enum: #a98ae0;
+  --kind-permission: #e07ab0;
+  --kind-param: #e0ae52;
+  --kind-response: #e0854f;
+  --kind-security: #9aa0a0;
+  --kind-screen: #ea8f72;
+  --kind-table: #6fb3e0;
+  --kind-event: #b79ae8;
+  --kind-decision: #7fc0d8;
+
+  --edge-event: #48cfcb;
+  --edge-critical: #e0ae52;
+  --edge-ref: #a98ae0;
+  --edge-permission: #e07ab0;
+  --edge-reads: #6aa5f5;
+  --edge-writes: #e0854f;
+  --edge-contains: #7a7a7a;
+
+  --state-built: #a9d08e;
+  --state-answered: #a8bcd8;
+}
+
+/* ── derived, once ──────────────────────────────────────────────────
+ *
+ * A var() inside a custom property resolves where the property is *used*, not
+ * where it is declared, so these are written once and still follow a theme
+ * swap: the theme redefines --border, and --line follows it.
+ *
+ * The aliases exist because a good deal of the sheet was already written
+ * against the short names, with a dark literal as the fallback —
+ * `var(--line, #2a2f3a)`. Nothing defined --line, so every one of those
+ * fallbacks fired, and the light theme rendered dark panels, dark rules and
+ * grey-on-white prose. Defining them here is what actually fixed it; the
+ * fallbacks are gone from the call sites.
+ *
+ * Status fills are still written out per rule rather than named here, because
+ * their strengths genuinely differ — a "nothing declared" wash is 6% and a
+ * live selection is 22%, and collapsing both to one --error-tint would flatten
+ * a distinction the views are making on purpose.
+ */
+:root {
+  --panel: var(--bg-panel);
+  --panel-2: var(--bg-raised);
+  --hover: var(--bg-hover);
+  --line: var(--border);
+  --line-soft: var(--divider);
+  --border-soft: var(--divider);
+  --muted: var(--text-dim);
+  --dim: var(--text-dim);
+  --code-bg: var(--bg-raised);
+  --bg-sunken: var(--bg-raised);
+  /* The page behind the columns. The handoff calls it the canvas and uses one
+     value for both the drawing surface and the page, so --bg is that too. */
+  --bg: var(--bg-canvas);
+}
+* { box-sizing: border-box; }
+
+/* Author display rules outrank the UA [hidden] rule, so state this explicitly —
+   several panels below set display and would otherwise never hide. */
+[hidden] { display: none !important; }
+
+html, body {
+  margin: 0;
+  height: 100%;
+  overflow: hidden;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font: 13px/1.5 var(--sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+kbd {
+  font: 11px/1 var(--mono);
+  white-space: nowrap;
+  padding: 3px 5px;
+  border: 1px solid var(--border);
+  border-bottom-width: 2px;
+  border-radius: 4px;
+  background: var(--bg-raised);
+  color: var(--text-dim);
+}
+
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 5px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+::-webkit-scrollbar-thumb:hover { background: var(--text-faint); background-clip: content-box; }
+::-webkit-scrollbar-track { background: transparent; }
+
+/* ── layout ─────────────────────────────────────────────────────── */
+/* Desktop-only by intent. Below 1180px the page scrolls sideways rather than
+   crushing the main column — a three-column tool with a canvas in the middle
+   has a width below which it stops being usable and starts being a demo. The
+   phone layout further down is the separate answer to that, not this one. */
+.app {
+  display: grid;
+  grid-template-columns: var(--drawer-w) minmax(440px, 1fr) var(--links-w);
+  grid-template-rows: var(--topbar-h) 1fr;
+  grid-template-areas:
+    "top top top"
+    "left main right";
+  height: 100vh;
+  min-width: 1180px;
+}
+body { overflow-x: auto; }
+
+/* Every screen on the same ground.
+ *
+ * Five views drew themselves on the deep field and the other fifteen sat on
+ * flat grey, so moving between them changed what kind of place this was. The
+ * field is what the viewer looks like, and the sheets and tables belong on it
+ * as much as the spheres do.
+ *
+ * `fixed` matches `.galaxy-field`, which is fixed for the same reason: a galaxy
+ * canvas and the page behind it become one painting from one origin, and the
+ * views stop having visible edges. See field.py.
+ *
+ * Both themes now. This was night-only for as long as there was only a night
+ * field — a dark gradient under the day theme would not have been the light
+ * theme, it would have been the dark one with the contrast broken. --field-day
+ * is the light cut of the same painting, so the argument for keeping the day
+ * pages on flat grey went with it: every screen sits on the scheme's ground,
+ * and the galaxies stop being the only surfaces that look like the product. */
+body {
+  background: var(--field-day) fixed;
+}
+:root[data-theme="dark"] body {
+  background: var(--field) fixed;
+}
+
+/* ── chrome ───────────────────────────────────────────────────────
+   Dark in both themes. The toggle swaps the page inside the frame, not the
+   frame — which is why the two themes look more alike than a light/dark pair
+   usually does, and is deliberate: the chrome is where the app talks about
+   itself and it should not move when you change how you are reading. */
+.chrome {
+  grid-area: top;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.chrome-row {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 0 22px;
+  min-width: 0;
+}
+.chrome-row-1 {
+  height: var(--chrome-1-h);
+  background: var(--chrome-1);
+}
+.chrome-row-2 {
+  height: var(--chrome-2-h);
+  gap: 0;
+  padding: 0 22px 0 12px;
+  background: var(--chrome-2);
+  border-bottom: 1px solid var(--chrome-border);
+}
+.chrome-spacer { flex: 1 1 auto; min-width: 12px; }
+.chrome-divider {
+  flex: none;
+  width: 1px; height: 26px;
+  background: color-mix(in srgb, var(--chrome-text) 13%, transparent);
+}
+.chrome-divider-sm { height: 22px; margin: 0 16px; }
+.chrome-right { display: flex; align-items: center; gap: 12px; flex: none; }
+
+/* ── brand ─────────────────────────────────────────────────────────
+   The client's mark, rendered white rather than served white — a filter is
+   worth one line here, and the moment a true white asset arrives the filter
+   comes off and nothing else changes. */
+/* Two brands, because there are two grounds it lands on. The standalone pages
+   — sign-in, invite, reviews, the admin tools — put it on a light bar and get
+   the page's own colours; only the chrome variant is white-on-dark and only it
+   carries the client logo. Writing the chrome one unscoped is what made the
+   wordmark white on a white bar everywhere else. */
+.brand { display: flex; align-items: center; gap: 8px; flex: none; text-decoration: none; }
+/* The real mark rather than a gradient square, in the ink the surface calls
+   for. Both are in the DOM and CSS picks one, same as the header lockup. */
+.brand-mark { width: 22px; height: 22px; flex: none; display: block; }
+.brand-mark-night { display: none; }
+:root[data-theme="dark"] .brand-mark-day { display: none; }
+:root[data-theme="dark"] .brand-mark-night { display: block; }
+.brand-name { font-weight: 800; letter-spacing: -0.01em; color: var(--text); }
+.brand-sub { color: var(--text-faint); font-size: 11px; }
+
+/* The chrome is dark in both themes, so the white-ink cut is correct in both
+   and its lockup has nothing to swap — it ships the one image, unclassed.
+
+   The page bars below (accounts, sign-off, reviews, domains, platforms) are a
+   different surface: they take the page's own background, which is pale in day.
+   The white lockup vanishes on that, so those carry both cuts and CSS picks
+   one, exactly as the small mark used to. */
+.chrome .brand { gap: 0; }
+/* The lockup goes home, on every page that has one.
+ *
+ * It was a bare <img> on the five standalone pages while the main view wrapped
+ * its own in an <a>, so the mark was clickable in the one place a reader was
+ * already home and inert everywhere they might want to leave. Nothing about a
+ * wordmark in the top-left says "not a link", so the click was being spent and
+ * swallowed rather than not attempted.
+ *
+ * The page's own name beside it stays outside the link: it is a label for where
+ * you are, and a label that navigates is a second, quieter surprise. */
+.brand-home {
+  display: block;
+  flex: none;
+  border-radius: 6px;
+  text-decoration: none;
+  /* the lockup carries its own weight; the link only has to not dim it */
+  opacity: 1;
+  transition: opacity 0.12s ease;
+}
+.brand-home:hover { opacity: 0.75; }
+.brand-home:focus-visible {
+  outline: 2px solid var(--accent, currentColor);
+  outline-offset: 3px;
+}
+
+.brand-lockup { height: var(--brand-lockup-h); width: auto; display: block; }
+.brand-lockup-night { display: none; }
+:root[data-theme="dark"] .brand-lockup-day { display: none; }
+:root[data-theme="dark"] .brand-lockup-night { display: block; }
+
+
+/* ── the loading curtain ─────────────────────────────────────────────
+   Every page opens behind this. The markup is inline in each of them so it is
+   painted by the first frame rather than by the first module; `loader.js` only
+   takes it down. See that file for why `window.load` is not what ends it.
+
+   The mark is drawn rather than served here — the two brand files are <img>
+   sources and CSS cannot reach inside one. This is the same geometry, lifted
+   from `brand/atlas-mark-light.svg`, with the ink as tokens so one copy serves
+   both themes.
+
+   The animation is a sweep, not a spin: the logo is a network on a sphere, so
+   it lights up round its own ring rather than rotating like a spinner. Each
+   element carries `--i`, its slot on that ring — computed from its angle round
+   the centre, not its order in the file, so the inner nodes join the same
+   rotation instead of reading as a second animation. */
+
+:root {
+  --loader-ink: #152B31;   /* the A, on a pale ground */
+  --loader-veil: #ffffff;
+}
+:root[data-theme="dark"] {
+  --loader-ink: #ffffff;
+  --loader-veil: #0f1113;
+}
+
+.atlas-loader {
+  position: fixed;
+  inset: 0;
+  z-index: 400;             /* over the chrome, the rails and every dialog */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 22px;
+  background: var(--bg, var(--loader-veil));
+  opacity: 1;
+  transition: opacity 0.42s ease;
+}
+.atlas-loader.is-done { opacity: 0; pointer-events: none; }
+
+.al-mark { width: 92px; height: 92px; display: block; overflow: visible; }
+
+/* One period for everything, so the ring reads as a single pass rather than
+   as several things each doing their own thing at their own rate. */
+.al-link, .al-node {
+  /* The slot is quantised to 24ths of a turn; the delay is negative so every
+     element starts already at its own phase and the first frame drawn is a
+     sweep in progress, not twenty-nine things waiting to begin. */
+  animation-delay: calc(var(--i) * -0.0667s);
+  animation-duration: 1.6s;
+  animation-iteration-count: infinite;
+  animation-timing-function: ease-in-out;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.al-link {
+  stroke: var(--accent);
+  stroke-width: 2;
+  stroke-linecap: round;
+  fill: none;
+  animation-name: al-link-sweep;
+}
+@keyframes al-link-sweep {
+  0%, 100% { opacity: 0.16; }
+  22%      { opacity: 0.8; }
+}
+
+.al-node {
+  fill: var(--accent-bright);
+  animation-name: al-node-sweep;
+}
+@keyframes al-node-sweep {
+  0%, 100% { opacity: 0.3; transform: scale(0.82); }
+  22%      { opacity: 1;   transform: scale(1.18); }
+}
+
+/* The identity, which does not animate. A wordmark that pulses is a wordmark
+   somebody has to wait for to read. */
+.al-glyph { fill: var(--loader-ink); }
+.al-stand {
+  stroke: var(--accent);
+  stroke-width: 2.2;
+  fill: none;
+  stroke-linecap: round;
+  opacity: 0.55;
+}
+
+.al-text {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  color: var(--text-faint);
+  text-align: center;
+  max-width: 30ch;
+  line-height: 1.5;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* Held at the top of the sweep rather than paused mid-fade: the mark is
+     still the mark, and this is the one frame of it worth showing. */
+  .al-link, .al-node { animation: none; opacity: 0.75; transform: none; }
+  .al-node { opacity: 1; }
+  .atlas-loader { transition: none; }
+}
+
+@media (max-width: 520px) {
+  .al-mark { width: 72px; height: 72px; }
+}
+
+/* ── the layer switch ──────────────────────────────────────────────
+   A tray one step darker than the bar, so the pills sit *in* the chrome rather
+   than on top of it. The count rides inside each pill: which layer is biggest
+   is a thing worth knowing before you open it. */
+.layer-tray {
+  display: flex;
+  gap: 2px;
+  flex: none;
+  padding: 4px;
+  border-radius: 11px;
+  background: color-mix(in srgb, #000 22%, var(--chrome-1));
+}
+.layer-tray button {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 8px 14px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--chrome-muted);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.layer-tray button:hover { color: var(--chrome-text); }
+.layer-tray button.active {
+  background: linear-gradient(135deg, var(--accent), var(--accent-bright));
+  color: #ffffff;
+  box-shadow: 0 4px 12px color-mix(in srgb, var(--accent-bright) 34%, transparent);
+}
+.layer-count {
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 500;
+  opacity: 0.7;
+}
+
+/* ── search ────────────────────────────────────────────────────────── */
+.search-trigger {
+  flex: 0 1 240px;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 9px 13px;
+  white-space: nowrap;
+  background: var(--chrome-fill);
+  border: 1px solid var(--chrome-border);
+  border-radius: 11px;
+  color: var(--chrome-muted);
+  font: inherit;
+  font-size: 13px;
+  cursor: pointer;
+  text-align: left;
+}
+.search-trigger:hover { border-color: var(--accent); color: var(--chrome-text); }
+.search-trigger-text { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.search-trigger kbd {
+  margin-left: auto;
+  background: color-mix(in srgb, #000 24%, var(--chrome-fill));
+  border-color: var(--chrome-border);
+  color: var(--chrome-muted);
+}
+
+/* ── view tabs ─────────────────────────────────────────────────────
+   Full-height items with a bottom border rather than pills, so the row reads
+   as tabs on the page below and not as a second switch competing with the
+   layer tray above it. */
+.view-tabs { display: flex; align-items: stretch; height: 100%; min-width: 0; overflow-x: auto; }
+.view-tabs::-webkit-scrollbar { height: 0; }
+.mode {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 0 14px;
+  border: 0;
+  border-bottom: 2.5px solid transparent;
+  background: transparent;
+  color: var(--chrome-muted);
+  font: inherit;
+  font-size: 13.5px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.mode:hover { color: var(--chrome-text); }
+.mode.active { color: var(--chrome-text); border-bottom-color: var(--accent-bright); }
+
+.layer-summary {
+  flex: none;
+  font-size: 11.5px; font-weight: 600;
+  color: var(--chrome-muted);
+  white-space: nowrap;
+}
+.view-toggles { display: flex; align-items: center; gap: 8px; flex: none; }
+.view-toggles button {
+  padding: 7px 12px;
+  border: 1px solid var(--chrome-border);
+  border-radius: 9px;
+  background: var(--chrome-fill);
+  color: var(--chrome-muted);
+  font: inherit; font-size: 12px; font-weight: 600;
+  cursor: pointer;
+}
+.view-toggles button:hover { color: var(--chrome-text); border-color: var(--chrome-muted); }
+.view-toggles button.on {
+  background: var(--accent-soft);
+  border-color: var(--accent-line);
+  color: var(--accent-text);
+}
+
+.audit-count {
+  display: none;
+  margin-left: 4px;
+  padding: 1px 5px;
+  border-radius: 8px;
+  background: var(--error);
+  color: var(--ink-on-fill);
+  font-size: 10px;
+  font-weight: 600;
+}
+.audit-count.show { display: inline-block; }
+
+.live-dot {
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: var(--accent-bright);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent-bright) 22%, transparent);
+}
+.live-dot.pulse { animation: pulse 0.8s ease-out; }
+.live-dot.stale { background: var(--text-faint); }
+@keyframes pulse {
+  from { box-shadow: 0 0 0 0 color-mix(in srgb, var(--ok) 60%, transparent); }
+  to { box-shadow: 0 0 0 10px transparent; }
+}
+.icon-btn {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text-dim);
+  border-radius: 6px;
+  width: 26px; height: 26px;
+  cursor: pointer;
+  font-size: 13px;
+}
+.icon-btn:hover { color: var(--text); border-color: var(--accent); }
+
+/* The bell, the account button and the theme toggle sit on the dark bar now,
+   where --border and --text-dim are page colours and read as nothing. They ask
+   the chrome for its scale instead. */
+.chrome .icon-btn {
+  width: 32px; height: 32px;
+  border-radius: 9px;
+  border-color: var(--chrome-border);
+  color: var(--chrome-muted);
+}
+.chrome .icon-btn:hover { color: var(--chrome-text); border-color: var(--chrome-muted); }
+.chrome .account-toggle.signed-in {
+  border-color: transparent;
+  background: linear-gradient(135deg, var(--accent), var(--accent-bright));
+  color: #ffffff;
+}
+.chrome kbd { border-color: var(--chrome-border); color: var(--chrome-muted); background: var(--chrome-fill); }
+.chrome .drawer-toggle { border-color: var(--chrome-border); color: var(--chrome-muted); }
+
+/* ── drawer toggles ─────────────────────────────────────────────── */
+/* Only meaningful once the rails are off-canvas, so they are absent from the
+   layout at every wider width rather than merely invisible. */
+.drawer-toggle { display: none; }
+
+.icon-menu {
+  position: relative;
+  display: block;
+  width: 15px; height: 2px;
+  border-radius: 1px;
+  background: currentColor;
+}
+.icon-menu::before, .icon-menu::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  width: 15px; height: 2px;
+  border-radius: 1px;
+  background: currentColor;
+}
+.icon-menu::before { top: -5px; }
+.icon-menu::after { top: 5px; }
+
+/* the links pane is a list of things pointing at the selection, so this is a
+   list — deliberately not another stack of bars, which would read as a second
+   menu rather than as a different pane */
+.icon-links {
+  position: relative;
+  display: block;
+  width: 15px; height: 11px;
+}
+.icon-links::before {
+  content: "";
+  position: absolute;
+  left: 0; top: 1px;
+  width: 3px; height: 3px;
+  border-radius: 50%;
+  background: currentColor;
+  box-shadow: 0 6px 0 currentColor;
+}
+.icon-links::after {
+  content: "";
+  position: absolute;
+  left: 7px; top: 2px;
+  width: 8px; height: 1.5px;
+  border-radius: 1px;
+  background: currentColor;
+  box-shadow: 0 6px 0 currentColor;
+}
+
+/* The palette icon. `<span class="icon-search">` has been in the chrome markup
+   since the palette shipped and has never had a rule anywhere — the class
+   appears in exactly one place in the whole tree, index.html:143, and in no
+   stylesheet. On the desktop bar that was invisible: the button also carries
+   "Search operations…" and a Ctrl-K hint, so an empty 0x0 span next to them
+   cost nothing and nobody saw it. It only becomes a bug on a phone, where the
+   label and the hint are hidden and the button is the icon — so the control
+   was a blank rounded box.
+
+   Drawn here rather than as an inline SVG in the markup because the two other
+   span icons in this bar, .icon-menu and .icon-links, are drawn the same way
+   and this is a circle and a stick; the SVG idiom next to it is for the shapes
+   that are actually shapes. currentColor throughout, so it follows the chrome
+   ink like its neighbours. */
+.icon-search {
+  position: relative;
+  display: block;
+  width: 15px; height: 15px;
+}
+.icon-search::before {
+  content: "";
+  position: absolute;
+  left: 0; top: 0;
+  width: 9px; height: 9px;
+  border: 1.6px solid currentColor;
+  border-radius: 50%;
+}
+.icon-search::after {
+  content: "";
+  position: absolute;
+  left: 9.5px; top: 9.5px;
+  width: 5px; height: 1.6px;
+  border-radius: 1px;
+  background: currentColor;
+  transform: rotate(45deg);
+  transform-origin: left center;
+}
+
+/* ── drawer backdrop ────────────────────────────────────────────── */
+.drawer-backdrop { display: none; }
+
+/* ── the powered-by strip ──────────────────────────────────────────
+   Pinned rather than scrolled with the list: it is a fact about the product,
+   not the last row of the tree. The mark is two overlapping rings in CSS
+   rather than an asset — it is two circles, and an image of two circles is a
+   file to keep in step for no gain. */
+.powered {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 11px 15px;
+  background: var(--chrome-1);
+}
+.powered-mark { display: flex; align-items: center; flex: none; }
+.powered-ring {
+  width: 14px; height: 14px;
+  border-radius: 50%;
+  border: 1.6px solid var(--accent-bright);
+}
+.powered-ring + .powered-ring { margin-left: -5px; border-color: var(--accent); }
+.powered-text { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.powered-label {
+  font-size: 8.5px; font-weight: 700; letter-spacing: 0.16em;
+  text-transform: uppercase; line-height: 1;
+  color: color-mix(in srgb, var(--chrome-text) 55%, transparent);
+}
+.powered-name {
+  font-size: 12.5px; font-weight: 700; line-height: 1;
+  color: var(--chrome-text);
+}
+.powered-name b { color: var(--accent-bright); font-weight: 700; }
+/* Rendered white rather than served white — one line, and the moment a true
+   white asset lands the filter comes off and nothing else changes. */
+.powered-partner {
+  margin-left: auto;
+  width: 74px;
+  flex: none;
+  filter: brightness(0) invert(1);
+  opacity: 0.62;
+}
+
+.sidebar-left { grid-area: left; border-right: 1px solid var(--border); }
+.sidebar-right { grid-area: right; border-left: 1px solid var(--border); }
+.sidebar-left, .sidebar-right {
+  background: var(--bg-panel);
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.pane-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 9px 12px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--label);
+  border-bottom: 1px solid var(--border-soft);
+  flex: none;
+}
+.pane-count { font-weight: 500; text-transform: none; letter-spacing: 0; }
+.pane-empty { padding: 16px 14px; color: var(--text-faint); font-size: 12px; }
+
+.main { grid-area: main; position: relative; min-width: 0; overflow: hidden; }
+.view { position: absolute; inset: 0; }
+
+/* ── sidebar grouping toggle ─────────────────────────────────────── */
+.pane-head:has(.seg-sm) { padding: 6px 8px; }
+.seg-sm { width: 100%; }
+.seg-sm button { flex: 1; padding: 4px 6px; font-size: 11px; }
+
+.side-filter-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 10px 8px;
+  border-bottom: 1px solid var(--border-soft);
+  flex: none;
+}
+.side-filter { flex: 1; width: auto; min-width: 0; }
+.side-filter-row .pane-count { font-size: 10.5px; color: var(--text-faint); white-space: nowrap; }
+
+.side-note {
+  margin: 8px 10px 0;
+  padding: 8px 10px;
+  border: 1px solid color-mix(in srgb, var(--warning) 45%, transparent);
+  border-radius: 6px;
+  background: color-mix(in srgb, var(--warning) 8%, transparent);
+  font-size: 10.5px;
+  line-height: 1.55;
+  color: var(--text-dim);
+  flex: none;
+}
+.side-note b { color: var(--text); }
+
+.tree-group-sub {
+  padding: 0 12px 4px 25px;
+  font-size: 10px;
+  color: var(--text-faint);
+  font-family: var(--mono);
+  margin-top: -3px;
+}
+
+/* ── left tree ──────────────────────────────────────────────────── */
+.filter-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--border-soft);
+  flex: none;
+}
+/* A resting fill rather than `transparent`. On the dark theme an outlined pill
+   on #1a1a21 still reads as a control; on white it is a hairline rectangle and
+   nothing else, which is what made rows of them — the verdict buttons, the
+   filter row, the toolbar — look like unrendered text. */
+.chip {
+  padding: 3px 8px;
+  border: 1px solid var(--border);
+  background: var(--bg-raised);
+  color: var(--text-dim);
+  border-radius: 20px;
+  font: inherit;
+  font-size: 11px;
+  cursor: pointer;
+}
+.chip:hover { background: var(--bg-hover); border-color: var(--text-faint); color: var(--text); }
+.chip.on { background: var(--accent-soft); border-color: var(--accent); color: var(--accent); }
+
+.tree { overflow-y: auto; padding: 6px 0 20px; flex: 1; min-height: 0; }
+.tree-group { margin-bottom: 2px; }
+.tree-group-head {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-faint);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  cursor: pointer;
+  user-select: none;
+}
+.tree-group-head:hover { color: var(--text); }
+/* The same fold the pane sections have, on the same handler. Twelve platforms
+   of up to 29 screens each meant reaching the kiosk was a scroll past the whole
+   of Guest Web; the marker is here so the head reads as a control before it is
+   clicked rather than after. */
+.tree-group-head { cursor: pointer; user-select: none; }
+.tree-group-head::before {
+  content: '';
+  flex: none;
+  width: 0; height: 0;
+  border-left: 4px solid currentColor;
+  border-top: 3.5px solid transparent;
+  border-bottom: 3.5px solid transparent;
+  transform: rotate(90deg);
+  transition: transform .13s ease;
+  opacity: .7;
+}
+.tree-group-head.collapsed::before { transform: rotate(0deg); }
+.tree-group-head:focus-visible { outline: 1px solid var(--accent); outline-offset: -1px; }
+/* a group with nothing under it is not a control */
+.tree-group-head.empty-section { cursor: default; pointer-events: none; }
+.tree-group-head.empty-section::before { visibility: hidden; }
+.tree-group-dot { width: 7px; height: 7px; border-radius: 2px; flex: none; }
+.tree-group-count { margin-left: auto; font-weight: 500; letter-spacing: 0; }
+
+.tree-file {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 1px 6px;
+  padding: 5px 10px 5px 18px;
+  cursor: pointer;
+  border-radius: var(--radius);
+  font-size: 12.5px;
+}
+.tree-file:hover { background: var(--bg-hover); }
+/* The stripe down the left edge went with the full-bleed row. On a pill it
+   follows the corner radius and lands as a curved sliver, and the fill plus
+   the weight already say "this one" without it. */
+.tree-file.selected {
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-weight: 550;
+}
+.tree-file-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.tree-file-count { margin-left: auto; color: var(--text-faint); font-size: 11px; font-variant-numeric: tabular-nums; }
+
+.tree-children { display: none; }
+.tree-file.expanded + .tree-children { display: block; }
+.tree-child {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 12px 3px 34px;
+  cursor: pointer;
+  font-size: 12px;
+  color: var(--text-dim);
+  border-left: 2px solid transparent;
+}
+.tree-child:hover { background: var(--bg-hover); color: var(--text); }
+.tree-child.selected { background: var(--accent-soft); border-left-color: var(--accent); color: var(--accent); }
+.tree-child-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.tree-section {
+  padding: 6px 12px 3px 26px;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-faint);
+}
+
+.method {
+  font: 600 9.5px/1 var(--mono);
+  padding: 3px 4px;
+  border-radius: 3px;
+  flex: none;
+  width: 38px;
+  text-align: center;
+  letter-spacing: 0.02em;
+}
+.method.GET { background: color-mix(in srgb, var(--info) 16%, transparent); color: var(--get); }
+.method.POST { background: color-mix(in srgb, var(--ok) 16%, transparent); color: var(--post); }
+.method.PUT { background: color-mix(in srgb, var(--warning) 16%, transparent); color: var(--put); }
+.method.DELETE { background: color-mix(in srgb, var(--error) 16%, transparent); color: var(--delete); }
+.method.PATCH { background: color-mix(in srgb, var(--patch) 16%, transparent); color: var(--patch); }
+
+/* ── canvases and toolbars ──────────────────────────────────────── */
+.graph-toolbar {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 12px;
+  background: linear-gradient(var(--bg) 60%, transparent);
+}
+/* The toolbar floats over whatever the view is showing, and the gradient is
+   the scrim that keeps its controls readable against it. A canvas view draws
+   on the field rather than on the page, so the scrim has to fade from that
+   colour — fading from --bg instead lays a pale band across the top of the
+   drawing, which is the one place it is most obvious. Warm by day now that the
+   six canvases share --field-day, and the night value stays --bg-canvas's
+   neighbour by way of the override below. */
+.view:has(> canvas) .graph-toolbar {
+  background: linear-gradient(#EDF4F8 60%, transparent);
+}
+:root[data-theme="dark"] .view:has(> canvas) .graph-toolbar {
+  background: linear-gradient(#0E171B 60%, transparent);
+}
+.seg { display: flex; background: var(--bg-raised); border: 1px solid var(--border); border-radius: var(--radius); padding: 3px; }
+.seg button {
+  border: 0; background: transparent; color: var(--text-dim);
+  font: inherit; font-size: 11.5px; padding: 4px 10px; border-radius: 4px; cursor: pointer;
+}
+.seg button:hover { color: var(--text); }
+.seg button.active { background: var(--bg-hover); color: var(--text); }
+
+.toggle { display: flex; align-items: center; gap: 5px; color: var(--text-dim); font-size: 11.5px; cursor: pointer; }
+.toggle input { accent-color: var(--accent); margin: 0; }
+.graph-hint { color: var(--text-faint); font-size: 11.5px; }
+
+/* The toolbar is one absolutely-positioned row whose background fades to
+   transparent, so anything that makes it taller does not push the view down —
+   it spills over the drawing and over the right-hand panel.
+   
+   Which is what happened: the row is nowrap, and the hint was the only child
+   with no width of its own, so once the controls filled the bar the hint took
+   whatever was left. At a narrow viewport that is a forty-pixel column, and a
+   sentence about 378 tables wraps into fifteen lines of it.
+
+   The controls hold their size and the hint yields, to one line, with an
+   ellipsis. It is the only child here that can be cut without losing a
+   control, and a truncated sentence is recoverable — the full text is the
+   tooltip — where a clipped <select> is not. */
+.graph-toolbar > * { flex: 0 0 auto; }
+.graph-hint {
+  flex: 0 1 auto;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-align: right;
+}
+/* Past this there is no width left worth spending on prose, and half a
+   sentence is worse than none. The controls are the point of the bar. */
+@media (max-width: 1180px) {
+  .graph-hint { display: none; }
+}
+.spacer { flex: 1 1 auto; min-width: 0; }
+.ghost-btn {
+  border: 1px solid var(--border);
+  background: var(--bg-raised);
+  color: var(--text-dim);
+  font: inherit; font-size: 11.5px;
+  padding: 4px 10px; border-radius: 6px; cursor: pointer;
+}
+.ghost-btn:hover { color: var(--text); border-color: var(--accent); }
+
+.scope-select {
+  padding: 4px 8px;
+  background: var(--bg-raised);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text);
+  font: inherit;
+  font-size: 11.5px;
+  max-width: 260px;
+  cursor: pointer;
+}
+.scope-select:focus { outline: none; border-color: var(--accent); }
+
+#graph-canvas, #struct-canvas, #er-canvas, #data-canvas, #flow-canvas, #states-canvas,
+#er-services-canvas {
+  position: absolute; inset: 0; width: 100%; height: 100%; display: block; cursor: grab;
+  background: var(--field-day) fixed;
+  /* the canvases pan and pinch themselves. Without this the browser claims the
+     gesture first and scrolls the page instead, and the handler never sees it. */
+  touch-action: none;
+}
+#graph-canvas.dragging { cursor: grabbing; }
+
+/* At night these sit on the same field as the five galaxy views. They were
+   the last surfaces still on flat --bg-canvas, which is what made moving from
+   the Graph to the Structure feel like leaving the app and entering a different
+   one. All six clear to transparent and draw their ink on top, so this is the
+   whole change — no renderer knows about it.
+
+   `fixed` for the same reason .galaxy-field is: these are different widths in
+   different views, and a gradient centred on each would move the light every
+   time the reader switched. Fixed, they are one painting with the page. */
+:root[data-theme="dark"] :is(#graph-canvas, #struct-canvas, #er-canvas,
+  #data-canvas, #flow-canvas, #states-canvas, #er-services-canvas) {
+  background: var(--field) fixed;
+}
+
+.struct-file {
+  font-family: var(--mono);
+  font-size: 11.5px;
+  color: var(--text-dim);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 280px;
+}
+.struct-filter {
+  width: 190px;
+  padding: 4px 9px;
+  background: var(--bg-raised);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text);
+  font: inherit;
+  font-size: 11.5px;
+  outline: none;
+}
+.struct-filter:focus { border-color: var(--accent); }
+
+/* The canvas is the whole view, so the legend is always over live content —
+   there is no corner to move it to that is not part of the diagram. What it can
+   stop doing is competing with what it covers: an opaque panel with a hairline
+   and a blur reads as a thing sitting on top rather than as nodes tangled with
+   text, and the smaller it is the less of the diagram it costs. The blur is
+   what keeps the edges underneath visible enough to follow past it. */
+.graph-legend {
+  position: absolute;
+  left: 10px; bottom: 10px;
+  /* under the tooltip, which is the one thing that should cover the legend */
+  z-index: 4;
+  display: flex; flex-direction: column; gap: 3px;
+  max-width: 250px;
+  padding: 6px 8px;
+  background: color-mix(in srgb, var(--bg-chrome) 94%, transparent);
+  backdrop-filter: blur(8px);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  box-shadow: var(--shadow-2);
+  font-size: 10.5px;
+  line-height: 1.35;
+  color: var(--text-dim);
+  pointer-events: none;
+}
+.legend-row { display: flex; align-items: center; gap: 7px; }
+/* a dot that shrinks when its label wraps is no longer the colour it stands for */
+.legend-dot { flex: none; width: 8px; height: 8px; border-radius: 50%; }
+
+.graph-legend .legend-row { gap: 6px; }
+.graph-legend .legend-dot { width: 7px; height: 7px; }
+/* A relationship is a line, so its swatch is one. Still .legend-dot, because
+   the note rule below keys off the absence of one. */
+.legend-dot.bar { width: 14px; height: 2px; border-radius: 1px; }
+.graph-legend .legend-dot.bar { width: 13px; height: 2px; }
+/* The rule that opens a second column in the key — kinds above, lines below. */
+.legend-split { margin-top: 5px; padding-top: 5px; border-top: 1px solid var(--line); }
+/* The rows without a dot are the trailing note, not part of the key. They are
+   the widest thing in the box, so they wrap and step back instead of setting
+   the width of everything above them. */
+.graph-legend .legend-row:not(:has(.legend-dot)) {
+  margin-top: 2px;
+  color: var(--text-faint);
+  font-size: 10px;
+  text-wrap: pretty;
+}
+
+.graph-tooltip {
+  position: absolute;
+  z-index: 5;
+  pointer-events: none;
+  max-width: 320px;
+  padding: 8px 10px;
+  background: var(--bg-raised);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  box-shadow: var(--shadow-2);
+  font-size: 12px;
+}
+.graph-tooltip .tt-title { font-weight: 600; margin-bottom: 3px; }
+.graph-tooltip .tt-sub { color: var(--text-dim); font-size: 11px; font-family: var(--mono); }
+.graph-tooltip .tt-stat { color: var(--text-faint); font-size: 11px; margin-top: 4px; }
+
+/* ── journey ────────────────────────────────────────────────────── */
+.journey { overflow: hidden; }
+.journey-body {
+  position: absolute;
+  inset: 46px 0 0 0;
+  overflow: auto;
+  padding: 8px 20px 40px;
+}
+
+.journey-head { margin-bottom: 16px; max-width: 1000px; }
+.journey-title { font-size: 19px; font-weight: 650; margin: 0 0 8px; }
+.journey-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
+.jchip {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 3px 9px;
+  border: 1px solid var(--border);
+  background: var(--bg-raised);
+  border-radius: 20px;
+  font-size: 11px;
+  color: var(--text-dim);
+}
+.jchip b { color: var(--text); font-weight: 600; }
+.jchip.revenue { border-color: color-mix(in srgb, var(--satellite) 55%, transparent); }
+.jchip.revenue b { color: var(--satellite); }
+.jchip.safety, .jchip.compliance { border-color: color-mix(in srgb, var(--error) 55%, transparent); }
+.jchip.safety b, .jchip.compliance b { color: var(--error); }
+
+.journey-trigger {
+  padding: 9px 12px;
+  border-left: 3px solid var(--accent);
+  background: var(--bg-panel);
+  border-radius: 0 6px 6px 0;
+  font-size: 12.5px;
+  color: var(--text-dim);
+  line-height: 1.6;
+  margin-bottom: 18px;
+}
+.journey-trigger b { color: var(--text); font-weight: 600; }
+
+/* the step track scrolls sideways; branches hang under their own step */
+.journey-track {
+  display: flex;
+  align-items: flex-start;
+  gap: 0;
+  padding-bottom: 12px;
+  min-width: min-content;
+}
+.journey-col { display: flex; flex-direction: column; gap: 10px; width: 268px; flex: none; }
+/* The chevrons between journey steps are the only other arrows in the viewer
+   that are not canvas. Text rather than a path, so they drift along their own
+   axis instead of carrying a dash — the same statement, in the medium available.
+   Same trigger as everywhere else: the arrow belongs to the step behind it, so
+   hovering a step moves the arrow leaving it. */
+@keyframes journey-drift {
+  0%, 100% { transform: translateX(-2px); }
+  50%      { transform: translateX(2px); }
+}
+.journey-col:hover + .journey-arrow {
+  animation: journey-drift 1600ms ease-in-out infinite;
+}
+.journey-arrow {
+  flex: none;
+  width: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-faint);
+  font-size: 15px;
+  margin-top: 46px;
+}
+
+.step-card {
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  border-top: 3px solid var(--accent);
+  border-radius: 8px;
+  padding: 11px 12px;
+  cursor: pointer;
+}
+.step-card:hover { border-color: var(--accent); }
+.step-top { display: flex; align-items: center; gap: 8px; margin-bottom: 7px; }
+.step-num {
+  flex: none;
+  width: 20px; height: 20px;
+  border-radius: 50%;
+  background: var(--accent-soft);
+  color: var(--accent);
+  font: 600 11px/20px var(--mono);
+  text-align: center;
+}
+.step-screen { font-family: var(--mono); font-size: 11px; color: var(--accent); }
+.step-platform { margin-left: auto; font-size: 10px; color: var(--text-faint); }
+.step-screen-name { font-size: 12.5px; font-weight: 600; margin-bottom: 5px; }
+.step-action { font-size: 12px; color: var(--text-dim); line-height: 1.55; }
+.step-outcome {
+  margin-top: 7px; padding-top: 7px;
+  border-top: 1px solid var(--border-soft);
+  font-size: 11.5px; color: var(--text-faint); line-height: 1.5;
+}
+.step-outcome::before { content: "→ "; color: var(--satellite); }
+.step-duration {
+  display: inline-block; margin-top: 6px;
+  padding: 1px 6px; border-radius: 4px;
+  background: var(--bg-raised); color: var(--text-faint);
+  font-family: var(--mono); font-size: 10px;
+}
+
+.step-ops { margin-top: 8px; display: flex; flex-direction: column; gap: 3px; }
+.step-op {
+  display: flex; align-items: center; gap: 6px;
+  padding: 3px 6px;
+  border-radius: 4px;
+  background: var(--bg-raised);
+  font-family: var(--mono);
+  font-size: 10.5px;
+  color: var(--text-dim);
+  cursor: pointer;
+}
+.step-op:hover { background: var(--bg-hover); color: var(--accent); }
+.step-op.unknown { color: var(--error); }
+.step-op-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--spine); flex: none; }
+
+.branch-card {
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--text-faint);
+  border-radius: 6px;
+  padding: 8px 10px;
+  background: var(--bg-panel);
+  font-size: 11.5px;
+}
+.branch-card.recoverable { border-left-color: var(--satellite); }
+.branch-card.requiresStaff { border-left-color: var(--warning); }
+.branch-card.abandonsFlow { border-left-color: var(--error); }
+.branch-card.dataLoss { border-left-color: var(--error); background: color-mix(in srgb, var(--error) 8%, var(--bg-panel)); }
+.branch-cond { font-weight: 600; color: var(--text); margin-bottom: 4px; line-height: 1.45; }
+.branch-behaviour { color: var(--text-dim); line-height: 1.5; }
+.branch-sev {
+  display: inline-block; margin-top: 6px;
+  padding: 1px 6px; border-radius: 4px;
+  background: var(--bg-raised);
+  font-family: var(--mono); font-size: 9.5px;
+  color: var(--text-faint);
+  text-transform: uppercase; letter-spacing: .04em;
+}
+.branch-resolved { margin-top: 5px; font-size: 10.5px; color: var(--text-faint); font-family: var(--mono); }
+
+.journey-exits { display: flex; flex-direction: column; gap: 8px; width: 210px; flex: none; margin-left: 18px; }
+.exit-card {
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 9px 11px;
+  background: var(--bg-panel);
+  font-size: 11.5px;
+}
+.exit-state {
+  font-family: var(--mono); font-size: 11px; font-weight: 600;
+  margin-bottom: 4px;
+}
+.exit-card.completed .exit-state { color: var(--satellite); }
+.exit-card.abandoned .exit-state, .exit-card.failed .exit-state { color: var(--error); }
+.exit-card.deferred .exit-state, .exit-card.escalated .exit-state { color: var(--warning); }
+.exit-desc { color: var(--text-dim); line-height: 1.5; }
+
+.journey-section-label {
+  font-size: 10px; text-transform: uppercase; letter-spacing: .07em;
+  color: var(--label); margin: 2px 0 -2px;
+}
+
+/* Every section heading folds its own content away. The marker is part of the
+   heading rather than a separate button, so the whole label is the target —
+   which is what makes it usable with a thumb. */
+.journey-section-label {
+  display: flex; align-items: center; gap: 6px;
+  cursor: pointer; user-select: none;
+  padding: 3px 0;
+  min-height: 20px;
+}
+.journey-section-label::before {
+  content: '';
+  flex: none;
+  width: 0; height: 0;
+  border-left: 4px solid currentColor;
+  border-top: 3.5px solid transparent;
+  border-bottom: 3.5px solid transparent;
+  transform: rotate(90deg);
+  transition: transform .13s ease;
+  opacity: .75;
+}
+.journey-section-label.collapsed::before { transform: rotate(0deg); }
+.journey-section-label:hover { color: var(--text-dim); }
+.journey-section-label:focus-visible {
+  outline: 1px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 3px;
+}
+/* a heading with nothing under it is not a control */
+.journey-section-label.empty-section {
+  cursor: default;
+  pointer-events: none;
+}
+.journey-section-label.empty-section::before { visibility: hidden; }
+.journey-questions {
+  margin-top: 22px; max-width: 900px;
+  padding: 11px 13px;
+  border: 1px solid color-mix(in srgb, var(--warning) 45%, transparent);
+  background: color-mix(in srgb, var(--warning) 7%, transparent);
+  border-radius: 6px;
+  font-size: 12px; color: var(--text-dim); line-height: 1.65;
+}
+.journey-questions b { color: var(--text); }
+.journey-questions li { margin: 3px 0; }
+
+/* ── reader ─────────────────────────────────────────────────────── */
+.reader { overflow-y: auto; }
+.reader-empty { display: grid; place-items: center; height: 100%; color: var(--text-faint); }
+.reader-empty-inner { text-align: center; max-width: 320px; }
+.reader-empty h2 { font-size: 15px; font-weight: 600; color: var(--text-dim); margin: 0 0 6px; }
+.reader-empty p { margin: 0; font-size: 12.5px; line-height: 1.7; }
+
+.reader-body { padding: 22px 28px 60px; max-width: 1100px; }
+.reader-head { margin-bottom: 14px; }
+.reader-kicker {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 11px; color: var(--text-faint);
+  text-transform: uppercase; letter-spacing: 0.07em;
+  margin-bottom: 7px;
+}
+.reader-title { font-size: 21px; font-weight: 650; margin: 0 0 6px; letter-spacing: -0.01em; }
+.reader-path { font-family: var(--mono); font-size: 13px; color: var(--text-dim); word-break: break-all; }
+/* No `white-space: pre-wrap` and no fixed line-height: this is a rendered
+   document now, and the .md rules own its rhythm. The measure is capped because
+   a contract description is prose and 1100px of it is a wall — the tables
+   inside it are free to be wider and scroll themselves. */
+.reader-desc { margin-top: 14px; max-width: 78ch; }
+.reader-desc .md-table-wrap { max-width: none; }
+
+.reader-meta { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 18px; }
+.badge {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 3px 8px;
+  background: var(--bg-raised);
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  font-size: 11px;
+  color: var(--text-dim);
+}
+.badge b { color: var(--text); font-weight: 600; font-family: var(--mono); font-size: 11px; }
+.badge.perm { border-color: color-mix(in srgb, var(--permission) 45%, transparent); cursor: pointer; }
+.badge.perm b { color: var(--permission); }
+.badge.perm:hover { background: color-mix(in srgb, var(--permission) 14%, transparent); }
+.badge.warn { border-color: color-mix(in srgb, var(--warning) 50%, transparent); }
+.badge.warn b { color: var(--warning); }
+
+/* Where the contract lands in the database. Sits between the badges and the
+   source, so the trail is read before the YAML rather than after it. Empty for
+   every node type that has no such trail, hence :empty rather than a margin
+   the block would carry whether or not it drew anything. */
+.reader-trace:not(:empty) { margin-bottom: 18px; }
+
+.reader-source {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg-panel);
+  overflow: hidden;
+}
+.source-head {
+  display: flex; align-items: center; gap: 10px;
+  padding: 7px 12px;
+  border-bottom: 1px solid var(--border-soft);
+  font-size: 11px;
+  color: var(--text-faint);
+  font-family: var(--mono);
+}
+.source-head .spacer { flex: 1; }
+pre.code {
+  margin: 0;
+  padding: 12px 0;
+  overflow-x: auto;
+  font: 12px/1.65 var(--mono);
+  tab-size: 2;
+}
+.code-line { display: flex; padding: 0 12px; white-space: pre; }
+.code-line:hover { background: var(--bg-raised); }
+.code-line.highlight { background: var(--accent-soft); }
+.ln {
+  flex: none;
+  width: 44px;
+  text-align: right;
+  padding-right: 14px;
+  color: var(--text-faint);
+  opacity: .55;
+  user-select: none;
+  font-variant-numeric: tabular-nums;
+}
+.code-body { flex: 1; min-width: 0; }
+
+.tok-key { color: var(--spine); }
+.tok-str { color: var(--satellite); }
+.tok-num { color: var(--put); }
+.tok-bool { color: var(--patch); }
+.tok-comment { color: var(--text-faint); font-style: italic; }
+.tok-ext { color: var(--permission); }
+.tok-perm { color: var(--permission); font-weight: 600; }
+.ref-link {
+  color: var(--accent);
+  text-decoration: underline;
+  text-decoration-style: dotted;
+  text-underline-offset: 2px;
+  cursor: pointer;
+}
+.ref-link:hover { background: var(--accent-soft); }
+.ref-link.broken { color: var(--error); text-decoration-style: wavy; }
+
+/* ── right links pane ───────────────────────────────────────────── */
+.links-pane { overflow-y: auto; flex: 1; min-height: 0; padding-bottom: 24px; }
+.links-section-head {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 10px 12px 5px;
+  font-size: 11px; font-weight: 600;
+  color: var(--label);
+  text-transform: uppercase; letter-spacing: 0.05em;
+}
+.links-section-head b { color: var(--text-dim); font-weight: 600; }
+.link-item {
+  display: flex; align-items: center; gap: 7px;
+  padding: 5px 12px;
+  cursor: pointer;
+  border-left: 2px solid transparent;
+  font-size: 12px;
+}
+.link-item:hover { background: var(--bg-hover); border-left-color: var(--accent); }
+.link-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.link-file { margin-left: auto; color: var(--text-faint); font-size: 10.5px; flex: none; }
+.link-weight {
+  flex: none; padding: 0 5px; border-radius: 8px;
+  background: var(--bg-raised); color: var(--text-faint);
+  font-size: 10px; font-variant-numeric: tabular-nums;
+}
+.type-dot { width: 7px; height: 7px; border-radius: 50%; flex: none; }
+
+/* ── audit ──────────────────────────────────────────────────────── */
+.audit { overflow-y: auto; padding: 22px 28px 60px; }
+.audit-head h2 { margin: 0 0 4px; font-size: 19px; font-weight: 650; }
+.audit-summary { margin: 0 0 16px; color: var(--text-dim); font-size: 12.5px; }
+.audit-filters { display: flex; gap: 6px; margin-bottom: 14px; flex-wrap: wrap; }
+.audit-list { display: flex; flex-direction: column; gap: 7px; max-width: 900px; }
+.audit-item {
+  display: flex; gap: 11px;
+  padding: 11px 13px;
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  border-left-width: 3px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+.audit-item:hover { border-color: var(--accent); }
+.audit-item.error { border-left-color: var(--error); }
+.audit-item.warning { border-left-color: var(--warning); }
+.audit-item.info { border-left-color: var(--info); }
+.audit-icon { flex: none; font-size: 13px; line-height: 1.4; }
+.audit-body { min-width: 0; flex: 1; }
+.audit-message { font-size: 12.5px; line-height: 1.6; }
+.audit-where { margin-top: 4px; font-family: var(--mono); font-size: 11px; color: var(--text-faint); }
+.audit-kind {
+  flex: none; align-self: flex-start;
+  padding: 2px 7px; border-radius: 4px;
+  background: var(--bg-raised);
+  font-size: 10px; color: var(--text-faint);
+  font-family: var(--mono);
+}
+.audit-clean { padding: 30px; text-align: center; color: var(--text-faint); }
+
+/* ── palette ────────────────────────────────────────────────────── */
+.palette-backdrop {
+  position: fixed; inset: 0; z-index: 50;
+  background: var(--scrim);
+  display: grid;
+  place-items: start center;
+  padding-top: 12vh;
+  backdrop-filter: blur(2px);
+}
+.palette {
+  width: min(660px, 92vw);
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  box-shadow: var(--shadow-3);
+  overflow: hidden;
+}
+.palette-input {
+  width: 100%;
+  padding: 15px 18px;
+  border: 0;
+  border-bottom: 1px solid var(--border-soft);
+  background: transparent;
+  color: var(--text);
+  font: 15px var(--sans);
+  outline: none;
+}
+.palette-results { max-height: 52vh; overflow-y: auto; padding: 6px; }
+.palette-item {
+  display: flex; align-items: center; gap: 9px;
+  padding: 8px 11px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+.palette-item.active { background: var(--accent-soft); }
+.palette-item-main { min-width: 0; flex: 1; }
+.palette-item-title { font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.palette-item-sub {
+  font-family: var(--mono); font-size: 11px; color: var(--text-faint);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.palette-item-kind { flex: none; font-size: 10px; color: var(--text-faint); text-transform: uppercase; letter-spacing: .05em; }
+.palette-item mark { background: transparent; color: var(--accent); font-weight: 600; }
+.palette-empty { padding: 26px; text-align: center; color: var(--text-faint); font-size: 12.5px; }
+.palette-foot {
+  display: flex; align-items: center; gap: 12px;
+  padding: 8px 14px;
+  border-top: 1px solid var(--border-soft);
+  font-size: 11px; color: var(--text-faint);
+}
+.palette-foot kbd { margin-right: 2px; }
+
+/* ── toast ──────────────────────────────────────────────────────── */
+.toast {
+  position: fixed;
+  bottom: 18px; left: 50%;
+  transform: translateX(-50%);
+  z-index: 60;
+  padding: 9px 16px;
+  background: var(--bg-raised);
+  border: 1px solid var(--accent);
+  border-radius: 20px;
+  font-size: 12px;
+  box-shadow: var(--shadow-2);
+}
+
+/* ── responsive ─────────────────────────────────────────────────── */
+/* Two breakpoints, both measured off this layout rather than copied from a
+   device table.
+     1100px  The topbar's own children need 1074px on the Contracts layer —
+             six modes, the widest of the five. Below that the bar and two
+             fixed rails cannot share the width. The right pane goes first
+             because it is a reverse index, not navigation: everything in it
+             is reachable another way.
+      760px  With the 220px tree rail still in place .main falls under 540px,
+             and the widest fixed content (the 330px app card, the 290px wave
+             card, the 210px lineage label column) stops fitting. No amount of
+             narrowing the rail recovers that, so the rails leave the grid. */
+
+/* The tablet band. This used to start at 1100px while `.app` kept its
+   1180px floor all the way down to 760px, so between 761px and 1180px the
+   two-column layout was laid out inside a box wider than the window and the
+   right of the chrome — the layer switch included — sat past the edge with
+   nothing to scroll it back. Starting the band at the same 1180px the floor
+   names, and clearing the floor here, closes it: three columns above 1180,
+   two that fit between 1180 and 760, one below. */
+@media (max-width: 1180px) {
+  .app {
+    grid-template-columns: 220px 1fr;
+    grid-template-areas: "top top" "left main";
+    min-width: 0;
+  }
+  body { overflow-x: hidden; }
+  .sidebar-right { display: none; }
+
+  /* The bar is now narrower than its contents. Scrolling the two rails keeps
+     every destination reachable; wrapping would cost a whole row to spare the
+     user a swipe, and the active button is scrolled into view on change.
+
+     `.layer-tray` and `.view-tabs`, NOT `.seg-layer` and `.modes`. This block
+     was written against those two names and neither has ever existed in the
+     markup — the layer rail is `<div class="layer-tray" id="layers">` and the
+     mode rail is `<nav class="view-tabs" id="modes">`, and `seg-layer`/`modes`
+     appear nowhere in any HTML or JS file. So this rule matched nothing and
+     the whole tablet band was dead: measured at 900px the layer rail stayed
+     `flex: 0 0 auto` at its full 670px, which pushed `.chrome-right` — the
+     search box, the bell, the home link, the account button and the theme
+     toggle — out to x=1252 in a 900px window, past the edge, with `body`
+     already at `overflow-x: hidden` so there was nothing to scroll it back.
+     Every width from 761px to 1180px lost the right-hand third of the chrome.
+     The names are the only thing that changed here; the intent was right. */
+  .layer-tray, .view-tabs {
+    flex: 1 1 auto;
+    min-width: 0;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scrollbar-width: none;
+  }
+  .layer-tray::-webkit-scrollbar, .view-tabs::-webkit-scrollbar { display: none; }
+  .layer-tray button, .mode { flex: none; white-space: nowrap; }
+
+  /* same argument for the per-view toolbars, which are just as dense */
+  .graph-toolbar {
+    overflow-x: auto;
+    overflow-y: hidden;
+    scrollbar-width: none;
+  }
+  .graph-toolbar::-webkit-scrollbar { display: none; }
+}
+
+@media (max-width: 760px) {
+  :root {
+    /* three rows: the small controls, then the layer rail, then the mode rail.
+       Neither rail can share a row with anything and stay wide enough to read
+       a label in, and the bar must be tall enough to hold all three — a row
+       that overflows this box lands somewhere nobody can reach.
+
+       124px was the figure for a layout that never ran: with `.seg-layer` and
+       `.modes` both dead (see the notes above) the rails were never given rows
+       of their own, so nothing here was ever measured against the real thing.
+       With them live the three rows come to 133px at every width from 414px to
+       760px — controls 88px, mode rail 45px — so 136px is that plus a couple of
+       pixels of slack for the row-2 border. This is not a free number: it is
+       also where the off-canvas drawers and their backdrop start, further down
+       this block, so a value smaller than the chrome puts the chrome over the
+       drawer and a value larger leaves a dead strip above it. If you change a
+       row's height, re-measure this. */
+    --topbar-h: 136px;
+    --safe-top: env(safe-area-inset-top, 0px);
+    --safe-bottom: env(safe-area-inset-bottom, 0px);
+    --safe-left: env(safe-area-inset-left, 0px);
+    --safe-right: env(safe-area-inset-right, 0px);
+  }
+
+  .app {
+    grid-template-columns: 100%;
+    grid-template-rows: calc(var(--topbar-h) + var(--safe-top)) 1fr;
+    grid-template-areas:
+      "top"
+      "main";
+  }
+
+  /* the three-column minimum is a desktop rule; the phone gets one column */
+  .app { min-width: 0; }
+  body { overflow-x: hidden; }
+
+  /* above the drawers, and never covered by the backdrop, so the button that
+     opened a drawer is always the button that closes it */
+  .chrome,
+  .chrome-row {
+    position: relative;
+    z-index: 42;
+    /* Not `center`: if the children ever wrap to more rows than --topbar-h
+       allows, centring pushes the first row above the top edge, where it is
+       unreachable — the toggle that opens the tree included. Starting at the
+       top makes the failure visible instead of invisible. */
+    align-content: flex-start;
+    gap: 6px 8px;
+    padding: 4px calc(10px + var(--safe-right)) 4px calc(10px + var(--safe-left));
+    padding-top: calc(4px + var(--safe-top));
+  }
+
+  /* Only the rows wrap. `.chrome` itself is `flex-direction: column`, and
+     `flex-wrap: wrap` on a column whose height is pinned to --topbar-h does
+     not push the overflow down — it starts a second *column* beside the first.
+     It was in the rule above, so the moment row 1 grew past 124px (which it
+     did, as soon as the layer rail took a line of its own) row 2 was laid out
+     to the right of it: measured at 600px, `.chrome-row-2` sat at x=598 in a
+     600px window, so the entire mode rail was off-screen with no way back.
+     The rows still wrap; the column must not. */
+  .chrome-row { flex-wrap: wrap; }
+
+  .drawer-toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: none;
+    width: 34px; height: 34px;
+    padding: 0;
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    background: transparent;
+    color: var(--text-dim);
+    cursor: pointer;
+  }
+  .drawer-toggle[aria-expanded="true"] {
+    border-color: var(--layer, var(--accent));
+    color: var(--layer, var(--accent));
+    background: var(--layer-soft, var(--accent-soft));
+  }
+
+  /* "contract graph" is a subtitle for a window with room for one */
+  .brand { flex: none; gap: 6px; }
+  .brand-sub { display: none; }
+
+  /* the icon alone still opens the palette, and the shortcut hint is a lie on
+     a device with no Ctrl key */
+  /* `.chrome` on the front, and that is the whole point of it: layers.css:19
+     sets `.search-trigger { min-width: 120px }`, loads after this file and has
+     the same specificity, so a bare `.search-trigger` here loses on order and
+     the 34px below never took — min-width beats width, and the control stayed
+     a 120px box with nothing in it once the label and the kbd hint were
+     hidden. That is 86px of a 340px row, and it was most of what pushed the
+     icon cluster onto a line of its own. A media query adds no specificity, so
+     the qualifier is the fix. Cleared here rather than edited in layers.css:
+     the 120px floor is right for the desktop bar that rule is about, and this
+     band is the exception to it. */
+  .chrome .search-trigger {
+    flex: none;
+    width: 34px; height: 34px;
+    min-width: 0;
+    justify-content: center;
+    padding: 0;
+    gap: 0;
+  }
+  .search-trigger-text, .search-trigger kbd { display: none; }
+
+  /* Decoration between the wordmark and the layer rail. It separates two things
+     that no longer share a line down here, so it is spending a gap and a pixel
+     on a distinction the layout already makes. */
+  .chrome-divider { display: none; }
+
+  /* The layer rail takes a row of its own, as the mode rail does. Sharing the
+     first row leaves it 126px, which is one layer of five visible and four
+     behind a swipe — no way to learn the window has five layers at all.
+
+     `.layer-tray`, not `.seg-layer`: see the note in the 1180px band above —
+     `seg-layer` is a name that has never been in the markup, so this rule and
+     the `.modes` one below had never applied and the phone layout had never
+     actually happened.
+
+     The claim that "a whole row is 365px, which is exactly what the five
+     buttons need, so nothing scrolls" was measured against a rule that was not
+     running. There are six layers now, not five, and the rail measures 670px —
+     so it does scroll, and it keeps the `overflow-x: auto` it inherits from the
+     tablet band rather than wrapping. Wrapping is what made the row taller than
+     --topbar-h, which is what sent the second chrome row off the side. */
+  .layer-tray { order: 1; flex: 1 0 100%; min-width: 0; }
+  .layer-tray button { padding: 6px 9px; min-height: 30px; }
+
+  /* the wordmark is the first thing to give up its width to the layer rail;
+     the mark alone still says which window this is */
+  .brand-name { display: none; }
+
+  /* the mode rail takes the second row whole — six labels have nowhere else
+     to go, and it is the control used most. `.view-tabs`, not `.modes`: same
+     rename as the layer rail above, and for the same reason. */
+  .view-tabs {
+    order: 2;
+    flex: 1 0 100%;
+    min-width: 0;
+  }
+  .mode { min-height: 30px; display: inline-flex; align-items: center; }
+  .chrome-row-1, .chrome-row-2 { height: auto; }
+  /* `.brand-logo { width: 92px }` was here and was the third dead name in this
+     block, after `.seg-layer` and `.modes`: the element is
+     `<img class="brand-lockup">` and `brand-logo` appears in no HTML or JS
+     file. So the lockup kept its full desktop 144x46 on a 360px phone, which
+     is most of a row. Sized by height because the image sets `width: auto` and
+     --brand-lockup-h is what the desktop rule uses; 30px is the same height as
+     the icon buttons beside it, so the first line is one consistent row.
+     Do not "restore" the old name — it never matched anything. */
+  .brand-lockup { height: 30px; }
+
+  /* The layer summary — "30 contracts · 1019 operations" — is prose, and this
+     is the same call already made for .graph-hint at 1180px: past a certain
+     width there is nothing left worth spending a whole line on, and the line
+     it costs here is one the chrome does not have. The counts are still on the
+     layer buttons themselves and on /home.html. Hidden rather than truncated
+     because it shares its row with the mode rail, and a rail that has to share
+     is a rail that scrolls when it did not need to. */
+  .layer-summary { display: none; }
+  /* `.layer-tray { flex-wrap: wrap }` was here. It was the only rule in this
+     block that actually matched, and with the real rail rules dead it was the
+     whole phone treatment of the rail: six buttons wrapping to three lines,
+     which is how the row grew past --topbar-h. Now that the rail is a scroll
+     rail again it must stay on one line, so the wrap is gone rather than
+     overridden — two rules disagreeing about the same box is what this
+     stylesheet has been paying for. */
+
+  .chrome-right { flex: none; gap: 8px; }
+  .icon-btn { width: 34px; height: 34px; }
+
+  /* ── off-canvas rails ─────────────────────────────────────────── */
+  .sidebar-left, .sidebar-right {
+    position: fixed;
+    top: calc(var(--topbar-h) + var(--safe-top));
+    bottom: 0;
+    z-index: 41;
+    display: flex;
+    width: min(var(--drawer-w), 86vw);
+    border: 0;
+    box-shadow: 0 0 30px var(--shadow-ink);
+    /* a closed drawer is out of the tab order as well as off screen, so tab
+       does not walk into a pane nobody can see */
+    visibility: hidden;
+    transition: transform var(--drawer-ease), visibility 0s linear 0.22s;
+  }
+  .sidebar-left {
+    left: 0;
+    padding-left: var(--safe-left);
+    border-right: 1px solid var(--border);
+    transform: translateX(calc(-100% - 32px));
+  }
+  .sidebar-right {
+    right: 0;
+    padding-right: var(--safe-right);
+    border-left: 1px solid var(--border);
+    transform: translateX(calc(100% + 32px));
+  }
+  body[data-drawer="left"] .sidebar-left,
+  body[data-drawer="right"] .sidebar-right {
+    transform: none;
+    visibility: visible;
+    transition: transform var(--drawer-ease);
+  }
+
+  /* stops below the topbar, so a tap on the backdrop dismisses and a tap on
+     the toggle still toggles */
+  .drawer-backdrop {
+    display: block;
+    position: fixed;
+    inset: calc(var(--topbar-h) + var(--safe-top)) 0 0 0;
+    z-index: 40;
+    background: var(--scrim);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity var(--drawer-ease), visibility 0s linear 0.22s;
+  }
+  body[data-drawer] .drawer-backdrop {
+    opacity: 1;
+    visibility: visible;
+    transition: opacity var(--drawer-ease);
+  }
+
+  /* the home indicator sits over the last row of whatever is scrolled here */
+  .tree { padding-bottom: calc(20px + var(--safe-bottom)); }
+  .links-pane { padding-bottom: calc(24px + var(--safe-bottom)); }
+
+  /* ── views ────────────────────────────────────────────────────── */
+  .graph-toolbar { gap: 8px; padding: 8px 10px; }
+  .graph-toolbar > * { flex: none; }
+  /* nothing is right-aligned once the row scrolls */
+  .graph-toolbar .spacer { display: none; }
+  .struct-filter, .side-filter { width: 140px; }
+  .scope-select { max-width: 190px; }
+  /* the hint carries counts, so it stays and takes its turn in the scroll
+     rather than being dropped */
+  .struct-file { max-width: 150px; }
+  .graph-hint { white-space: nowrap; }
+
+  .graph-legend {
+    left: 8px;
+    bottom: calc(8px + var(--safe-bottom));
+    max-width: min(250px, calc(100vw - 16px));
+    font-size: 10px;
+  }
+  .graph-tooltip { max-width: min(320px, calc(100vw - 24px)); }
+
+  .reader-body { padding: 16px 14px calc(60px + var(--safe-bottom)); }
+  .reader-title { font-size: 18px; }
+  .audit { padding: 16px 14px calc(60px + var(--safe-bottom)); }
+  .audit-head h2 { font-size: 17px; }
+  .journey-body { padding: 8px 12px calc(40px + var(--safe-bottom)); }
+  .journey-title { font-size: 17px; }
+  .journey-exits { margin-left: 0; width: 100%; }
+
+  /* line numbers cost a seventh of a 390px viewport and are only useful next
+     to a line long enough to need them */
+  .ln { width: 30px; padding-right: 8px; }
+  .code-line { padding: 0 10px; }
+
+  .palette { width: calc(100vw - 20px); }
+  .palette-backdrop { padding-top: calc(6vh + var(--safe-top)); }
+  .palette-foot { flex-wrap: wrap; gap: 6px 10px; }
+  .toast { bottom: calc(18px + var(--safe-bottom)); max-width: calc(100vw - 24px); }
+
+  /* Segmented switches are fixed-width pills that do not shrink, so on the
+     narrowest phones the last option sat past the right edge of the document
+     with nothing to scroll it back — measured on validation.html (#kind-tabs)
+     and domains.html (#reach-filter) at 360px. Same answer as the chrome
+     rails: the strip scrolls and every option stays reachable. */
+  .seg {
+    max-width: 100%;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scrollbar-width: none;
+  }
+  .seg::-webkit-scrollbar { display: none; }
+  .seg button, .seg-btn { flex: none; white-space: nowrap; }
+}
+
+/* ── touch targets ──────────────────────────────────────────────────
+   A separate band from the phone layout above, and deliberately not the same
+   question. 760px is where the *layout* changes — where three columns stop
+   fitting. Whether a control is big enough is about the thing pointing at it,
+   not about how wide the window is, and the two do not line up: an iPad in
+   portrait is 768px, so it gets the tablet layout and a finger, and it fell in
+   the eight-pixel gap between the two numbers where every rule below was off.
+
+   Hence the pair. `(pointer: coarse)` is the real test and catches a touch
+   device at any width; the 768px arm is the fallback for the browsers and the
+   headless runs that report no pointer at all, and 768 rather than 760 because
+   768 is the portrait tablet this is written for.
+
+   Everything in this stylesheet is sized for a pointer, and a pointer can hit
+   a 24px chip. A finger cannot reliably, and every one of these controls sits
+   in a row of its identical neighbours — a filter strip, a segmented switch —
+   so a miss is not a miss, it is the wrong answer selected.
+
+   32px rather than the 44px the platform guidelines ask for. 44 is right for a
+   control standing on its own; applied to a nine-chip filter row in a 280px
+   drawer it is three rows of chrome before any content, and this is a reading
+   tool whose phone layout is already spending 136px on the bar. 32 clears the
+   threshold with room over, and it is what the chrome's icon buttons already
+   are.
+
+   Padding is left alone and min-height does the work, so nothing here changes
+   a control's width or its type scale — the rows stay the shape they were
+   designed as, they just stop being thin. */
+@media (max-width: 768px), (pointer: coarse) {
+  .chip,
+  .seg button,
+  .seg-btn,
+  .scope-select,
+  .ghost-btn,
+  .struct-filter,
+  .tree-group-head {
+    min-height: 32px;
+  }
+  /* the segmented rows put their buttons in a pill, so the pill has to grow
+     with them or it clips what it contains */
+  .seg { align-items: stretch; }
+  .seg button, .seg-btn { display: inline-flex; align-items: center; justify-content: center; }
+
+  /* A 13px checkbox is the smallest target on any of these pages. The box
+     itself is what the browser draws and 20px is as far as accent-color will
+     take it without replacing the control, so the label around it carries the
+     rest — it is already the thing a reader aims at, and it has always been
+     clickable. */
+  input[type="checkbox"] { width: 20px; height: 20px; }
+  /* Both label classes. `.toggle` is the viewer's; `.signoff-toggle` is
+     validation.html's own and wraps its checkbox the same way, so leaving it
+     out gave that page a 26px row while every other checkbox on the site had
+     a 32px one. */
+  .toggle,
+  .signoff-toggle { min-height: 32px; }
+}
+
+/* 380px, and the only new breakpoint in this pass — the rest of the sweep kept
+   to the existing 760/1180 ladder.
+   
+   It exists because the first chrome row is content-measured and there is one
+   width in the supported range where it stops fitting. That row holds the tree
+   toggle (34) + the wordmark (94) + the palette icon (34) + the icon cluster
+   (167), plus four 8px gaps and 20px of padding: 373px. At 414px that fits on
+   one line and the chrome is three rows; at 360px it does not, the cluster
+   wraps, and the chrome is four rows and 171px tall. 380 is where the two
+   cases part, and it is a measurement rather than a taste.
+
+   Only the height changes. Everything else about the phone layout is already
+   right at 360px — both rails scroll, nothing sits past the edge — and the
+   alternative to this rule was giving every phone the taller bar to spare the
+   narrowest one a rule, which costs 38px of a 640px screen on the common size
+   to save four lines here. */
+@media (max-width: 380px) {
+  :root { --topbar-h: 176px; }
+}
+
+/* A drawer that slides is telling you where it came from. Somebody who has
+   asked for less of that still needs it to open. */
+@media (prefers-reduced-motion: reduce) {
+  .sidebar-left, .sidebar-right, .drawer-backdrop {
+    transition-duration: 0.01ms;
+    transition-delay: 0s;
+  }
+}
+
+/* ── domain lenses ───────────────────────────────────────────────────
+   The "within" half. An artefact keeps its place in its own kind's tree
+   and wears a mark saying it is also part of a subject that crosses all
+   five layers. Deliberately quiet: a lens is an extra fact about a row,
+   not a reclassification of it, so the mark sits after the count and
+   never displaces the name. */
+.lens-mark {
+  display: inline-flex;
+  gap: 3px;
+  margin-left: 6px;
+  flex: 0 0 auto;
+}
+.lens-dot {
+  font-size: 9px;
+  line-height: 1;
+  letter-spacing: .04em;
+  padding: 2px 4px;
+  border-radius: 3px;
+  font-family: var(--mono, ui-monospace, monospace);
+  border: 1px solid transparent;
+  opacity: .78;
+}
+.tree-file:hover .lens-dot,
+.tree-file.active .lens-dot { opacity: 1; }
+
+.lens-ai {
+  color: var(--patch);
+  background: color-mix(in srgb, var(--patch) 18%, transparent);
+  border-color: color-mix(in srgb, var(--patch) 42%, transparent);
+}
+
+.lens-filters { margin-top: 2px; }
+.lens-chip.on {
+  border-color: color-mix(in srgb, var(--accent) 60%, transparent);
+  background: color-mix(in srgb, var(--accent) 22%, transparent);
+  color: var(--accent);
+}
+.lens-chip-count {
+  margin-left: 5px;
+  opacity: .62;
+  font-variant-numeric: tabular-nums;
+}
+
+
+/* ── focus ──────────────────────────────────────────────────────────
+ *
+ * Several inputs below say `:focus { outline: none }` and lean on a border
+ * colour change instead. That is fine for a mouse and useless for a keyboard —
+ * a 1px border shifting hue is not a focus indicator. This puts a real ring
+ * back on everything focusable, drawn outside the element so it never moves
+ * layout, and only for keyboard focus so clicking a chip does not light up.
+ */
+:where(a, button, input, select, textarea, summary, [tabindex]):focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+/* elements already carrying their own inset ring keep it */
+.tree-group-head:focus-visible { outline: 1px solid var(--accent); outline-offset: -1px; }
+
+/* ── elevation on the light theme ───────────────────────────────────
+ *
+ * On #14141a a card separates from the page by being lighter than it. On a
+ * light page that trick is gone — a white card on a grey canvas is only a
+ * border away from a rectangle drawn on the background. A single hairline
+ * shadow does the work the surface difference used to, and it is scoped to the
+ * light theme because in dark it would just be a black smudge on black.
+ */
+:root:not([data-theme="dark"]) :is(
+  .region-card, .state-card, .impl-card, .app-card, .ddl-card, .migration-card,
+  .board-card, .event-card, .wave-card, .adr-card, .vector-card, .reach-card,
+  .stat-card, .signoff-card, .step-card, .branch-card, .exit-card,
+  .lineage-service-card, .journey-frame-card, .plat-card
+) {
+  box-shadow: var(--shadow-1);
+}
+
+/* The chrome sits above the canvas rather than beside it, so it gets the same
+   treatment — otherwise the topbar's only edge is a 1px line. */
+
+/* the shortcut chip on a view tab — smaller and quieter than a real kbd */
+.mode-key {
+  font-family: var(--mono);
+  font-size: 9px;
+  font-weight: 500;
+  padding: 2px 4px;
+  border: 0;
+  border-radius: 5px;
+  background: color-mix(in srgb, var(--chrome-text) 11%, transparent);
+  color: var(--chrome-muted);
+  line-height: 1;
+}
+.mode.active .mode-key { color: var(--chrome-text); }
+
+/* Icons that are geometry rather than a font character. A glyph is only an
+   icon where some installed font carries it, and on a box with a minimal font
+   set U+25D0 rendered as a tofu box — next to the bell, which made the bell
+   look broken too even though it has always been drawn. */
+.icon-theme { width: 15px; height: 15px; display: block; }
+.icon-home { width: 15px; height: 15px; display: block; }
+
+/* The home link is an anchor rather than a button, so it does not inherit the
+   centring a button gives its content for free. */
+a.icon-btn { display: inline-flex; align-items: center; justify-content: center; }
+.icon-arrow {
+  width: 9px; height: 9px; display: block;
+  fill: none; stroke: currentColor;
+  stroke-width: 1.3; stroke-linecap: round; stroke-linejoin: round;
+}
+kbd:has(.icon-arrow) { display: inline-flex; align-items: center; padding: 4px 5px; }
+
+/* the sort arrow: a border triangle, which needs no font at all */
+.rt-arrow {
+  display: inline-block;
+  width: 0; height: 0;
+  margin-left: 5px;
+  border-left: 3.5px solid transparent;
+  border-right: 3.5px solid transparent;
+}
+.rt-arrow.down { border-top: 4.5px solid currentColor; }
+.rt-arrow.up { border-bottom: 4.5px solid currentColor; }
+
+/* ── arriving from the door ─────────────────────────────────────────
+ *
+ * Set on <html> in the head, before the first paint, and cleared once the last
+ * piece has landed so nothing here is live during use. See noloader.py.
+ *
+ * The order is the argument: the graph is what the reader was already looking
+ * at, so it is the thing that must not appear to have been re-fetched. The
+ * chrome is the room it turns out to be in.
+ */
+
+/* No curtain. Not hidden — never rendered: the markup is inline in the body and
+   a frame of loading screen is exactly the thing this is removing. */
+html[data-entry] .atlas-loader { display: none !important; }
+
+/* What fills the screen instead: the field, across the whole viewport.
+ *
+ * And the same painting inside `#main`, not a second one. `.galaxy-field` draws
+ * this gradient in the view, which sits between the two rails and below the top
+ * bar; two radial gradients with different origins do not agree where they
+ * overlap, and the edge of `#main` came out as a box drawn on the screen.
+ *
+ * `.galaxy-field` is `background-attachment: fixed`, so it resolves against the
+ * viewport too and the two are one painting from one origin — see field.py.
+ * That works only because the entry fades `#main` rather than scaling it: a
+ * transform would make it the containing block for its own fixed background
+ * and put the box straight back.
+ *
+ * Spelled out rather than shared with layers.css: that rule is keyed to a class
+ * this element does not have, and a flash of the wrong colour is not something
+ * to make conditional on a stylesheet load order. */
+/* Both cuts. Written out rather than reaching for --field because that token is
+   night-only by design, and a flash of the wrong theme is not worth making
+   conditional on which stylesheet resolved first.
+
+   The day ramp is the viewer's own canvas, not the door's teal. The door is a
+   separate document, so the "continuation" is a thing the reader reads and not
+   a surface that survives the navigation — whereas this gradient is still on
+   screen once the flight has finished, sitting directly against the chrome and
+   the galaxy field. Matching where it lands beats matching where it left. */
+html[data-entry],
+html[data-entry] body {
+  background: radial-gradient(120% 92% at 50% 46%,
+    #FCFCFC 0%, #F5F5F5 38%, #EFEFEF 72%, #E6E6E6 100%) fixed;
+}
+html[data-theme="dark"][data-entry],
+html[data-theme="dark"][data-entry] body {
+  background: radial-gradient(120% 92% at 50% 46%,
+    #16262C 0%, #111A1F 38%, #0D1113 72%, #0A0C0E 100%) fixed;
+}
+
+html[data-entry] #main {
+  animation: entry-view 820ms cubic-bezier(.16,.84,.44,1) both;
+  /* Nothing of its own behind the view: the page is already painting exactly
+     what belongs there, and anything here would be the second gradient again. */
+  background: transparent;
+}
+html[data-entry] .chrome {
+  animation: entry-down 520ms cubic-bezier(.16,.84,.44,1) 300ms both;
+}
+html[data-entry] .sidebar-left {
+  animation: entry-left 560ms cubic-bezier(.16,.84,.44,1) 420ms both;
+}
+html[data-entry] .sidebar-right {
+  animation: entry-right 560ms cubic-bezier(.16,.84,.44,1) 500ms both;
+}
+/* The toolbar and the key belong to the view, so they come in over it rather
+   than with it — otherwise the first thing that resolves out of the flight is
+   a row of buttons. */
+html[data-entry] .graph-toolbar,
+html[data-entry] .graph-legend {
+  animation: entry-up 420ms cubic-bezier(.16,.84,.44,1) 660ms both;
+}
+
+/* A fade, and no zoom. The zoom was saying "you are arriving somewhere", which
+   the camera in the scene underneath already says better — and a rectangle that
+   is growing has a moving edge, which is the one thing an eye cannot help
+   following. */
+@keyframes entry-view {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+@keyframes entry-down {
+  from { opacity: 0; transform: translateY(-100%); }
+  to   { opacity: 1; transform: none; }
+}
+@keyframes entry-left {
+  from { opacity: 0; transform: translateX(-24px); }
+  to   { opacity: 1; transform: none; }
+}
+@keyframes entry-right {
+  from { opacity: 0; transform: translateX(24px); }
+  to   { opacity: 1; transform: none; }
+}
+@keyframes entry-up {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: none; }
+}
+
+/* Somebody who has asked for no motion has asked for no entrance. The curtain
+   stays suppressed and the field stays: those are not motion. */
+@media (prefers-reduced-motion: reduce) {
+  html[data-entry] #main,
+  html[data-entry] .chrome,
+  html[data-entry] .sidebar-left,
+  html[data-entry] .sidebar-right,
+  html[data-entry] .graph-toolbar,
+  html[data-entry] .graph-legend { animation: none; }
+}
+
+
+/* ── services: what ships together ──────────────────────────────────
+ *
+ * A tier is a seriousness ranking as much as a position, so the five borrow the
+ * status hues the rest of the viewer already reads that way rather than
+ * introducing a sixth palette nobody has learnt.
+ */
+
+.service-field { position: relative; margin: 14px 0 4px; }
+
+/* Behind the cards, and deaf to the mouse: a curve passing under a card must
+   never take the click that was meant for it. */
+.service-arrows {
+  position: absolute; inset: 0;
+  pointer-events: none;
+  overflow: visible;
+  z-index: 0;
+}
+.service-arrow {
+  fill: none;
+  stroke: var(--muted);
+  stroke-width: 1.3;
+  opacity: .5;
+  transition: opacity .18s ease, stroke .18s ease;
+}
+.service-arrow.strong { stroke: var(--error); stroke-width: 2; opacity: .8; }
+
+
+/* Hovering a service, or its row in the list below, dims every boundary that is
+   not its own. Sixteen boxes and thirty-four arrows cannot answer "whose"
+   without it.
+   
+   Which arrows count is decided in script, not here: CSS can test an attribute
+   against a constant but not against another attribute on an ancestor, so the
+   hover marks its own arrows `.lit` and this only says what lit and unlit look
+   like. */
+.service-field[data-lit] .service-arrow { opacity: .06; }
+.service-field[data-lit] .service-arrow.lit {
+  opacity: .95;
+  stroke: var(--accent);
+  stroke-width: 2;
+}
+.service-field[data-lit] .service-card { opacity: .5; transition: opacity .18s ease; }
+.service-field[data-lit] .service-card.lit { opacity: 1; }
+
+.service-band { position: relative; z-index: 1; margin-bottom: 18px; }
+.service-band-head {
+  display: flex; align-items: center; gap: 7px;
+  font-size: 11px; text-transform: uppercase; letter-spacing: .07em;
+  color: var(--label);
+  margin-bottom: 3px;
+}
+.service-band-name { font-weight: 650; }
+.service-band-meaning {
+  font-size: 12px; color: var(--text-dim);
+  max-width: 780px; margin-bottom: 8px; line-height: 1.5;
+}
+
+.service-row { display: flex; flex-wrap: wrap; gap: 8px; }
+.service-row.tight { gap: 6px; margin: 4px 0 6px; }
+
+.service-card {
+  position: relative;
+  flex: 1 1 176px;
+  max-width: 260px;
+  text-align: left;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--tier, var(--muted));
+  border-radius: 8px;
+  background: var(--bg-panel);
+  color: inherit;
+  cursor: pointer;
+  transition: border-color .15s ease, background .15s ease, transform .15s ease;
+}
+.service-card:hover {
+  background: var(--bg-raised);
+  border-color: color-mix(in srgb, var(--tier) 55%, var(--border));
+  transform: translateY(-1px);
+}
+.service-card-name { font-size: 13px; font-weight: 650; margin-bottom: 6px; }
+.service-card-scale {
+  font-size: 11px; color: var(--text-dim); margin-top: 6px; line-height: 1.45;
+}
+
+.service-figures { display: flex; flex-wrap: wrap; gap: 12px; }
+.service-figure { display: flex; align-items: baseline; gap: 4px; }
+.service-figure b { font-size: 14px; font-weight: 650; font-variant-numeric: tabular-nums; }
+.service-figure span { font-size: 10px; color: var(--label); text-transform: uppercase; letter-spacing: .06em; }
+
+.service-pill {
+  padding: 3px 10px;
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  background: var(--bg-raised);
+  color: var(--text-dim);
+  font-size: 11px;
+  cursor: pointer;
+}
+.service-pill:hover { color: var(--text); border-color: var(--tier, var(--border)); }
+/* A service that may be down while a sale goes through — the only distinction
+   the deploy order actually acts on. */
+.service-pill.survivable { border-style: dashed; opacity: .78; }
+
+.service-edges { display: flex; flex-direction: column; gap: 6px; margin: 6px 0 14px; }
+.service-edge {
+  display: grid;
+  grid-template-columns: minmax(180px, 260px) auto 1fr;
+  align-items: center;
+  gap: 10px;
+  padding: 7px 10px;
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  background: var(--bg-panel);
+}
+.service-edge.strong { border-color: color-mix(in srgb, var(--error) 45%, var(--border)); }
+.service-edge.unlisted { border-style: dashed; }
+.service-edge-pair { display: flex; align-items: center; gap: 6px; }
+.service-edge-name {
+  padding: 0; border: 0; background: none;
+  color: var(--text); font-size: 12px; font-weight: 600;
+  cursor: pointer;
+}
+.service-edge-name:hover { color: var(--accent); text-decoration: underline; }
+.service-edge-arrow { color: var(--label); }
+.service-edge-counts { display: flex; align-items: baseline; gap: 4px; }
+.service-edge-counts b { font-size: 12px; font-variant-numeric: tabular-nums; }
+.service-edge-counts span {
+  font-size: 10px; color: var(--label);
+  text-transform: uppercase; letter-spacing: .06em;
+  margin-right: 6px;
+}
+.service-edge-why { font-size: 11px; color: var(--text-dim); line-height: 1.45; }
+
+.service-prose { font-size: 12px; color: var(--text-dim); line-height: 1.55; max-width: 820px; }
+.service-prose strong, .service-card-scale strong, .service-band-meaning strong {
+  color: var(--text); font-weight: 600;
+}
+.service-prose code {
+  font-family: var(--mono, ui-monospace, monospace);
+  font-size: 11px;
+  padding: 1px 4px;
+  border-radius: 4px;
+  background: var(--bg-raised);
+}
+
+.service-facts {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 12px;
+  margin: 14px 0;
+}
+.service-fact {
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg-panel);
+}
+.service-fact-label {
+  font-size: 10px; text-transform: uppercase; letter-spacing: .07em;
+  color: var(--label); margin-bottom: 5px;
+}
+
+.service-schemas { display: flex; flex-direction: column; gap: 8px; margin: 6px 0 14px; }
+.service-schema {
+  padding: 8px 11px;
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  background: var(--bg-panel);
+}
+.service-schema-head { display: flex; align-items: baseline; gap: 8px; }
+.service-schema-name {
+  padding: 0; border: 0; background: none;
+  color: var(--text); font-size: 12px; font-weight: 650;
+  cursor: pointer;
+}
+.service-schema-name:hover { color: var(--accent); text-decoration: underline; }
+.service-schema-count { font-size: 10px; color: var(--label); }
+
+/* Tables, screens and flows are all "a lot of names you might want one of", so
+   they get one shape rather than three that differ by a pixel. */
+.service-tables { display: flex; flex-wrap: wrap; gap: 5px; margin: 6px 0 14px; }
+.service-table {
+  padding: 3px 9px;
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  background: var(--bg-raised);
+  color: var(--text-dim);
+  font-family: var(--mono, ui-monospace, monospace);
+  font-size: 11px;
+  cursor: pointer;
+}
+.service-table:hover { color: var(--text); border-color: var(--accent); }
+
+.service-ops { display: flex; flex-wrap: wrap; gap: 5px; margin: 6px 0 14px; }
+.service-op {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 3px 9px;
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  background: var(--bg-raised);
+  cursor: pointer;
+}
+.service-op:hover { border-color: var(--accent); }
+.service-op-name { font-size: 11px; color: var(--text-dim); }
+.service-op:hover .service-op-name { color: var(--text); }
+
+.deploy-steps { display: flex; flex-direction: column; gap: 10px; margin: 12px 0 18px; }
+.deploy-step {
+  display: grid;
+  grid-template-columns: 34px 1fr;
+  gap: 12px;
+  align-items: start;
+  padding: 11px 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg-panel);
+}
+.deploy-order {
+  width: 28px; height: 28px;
+  display: grid; place-items: center;
+  border-radius: 50%;
+  color: var(--ink-on-fill);
+  font-size: 13px; font-weight: 700;
+}
+.deploy-tier {
+  font-size: 11px; text-transform: uppercase; letter-spacing: .07em;
+  color: var(--label); font-weight: 650;
+  margin-bottom: 2px;
+}
+
+/* What the thing on this page is called, above what it is called here. Small
+   and quiet: it is a label for the reader who came looking for the word, not a
+   heading competing with the title under it. */
+.artefact-kind {
+  font-size: 10px; text-transform: uppercase; letter-spacing: .09em;
+  color: var(--label);
+  margin-bottom: 3px;
+}
+.artefact-generator { color: var(--text-faint); }
+
+.hld-tier {
+  padding: 11px 13px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg-panel);
+}
+.hld-tier-head {
+  display: flex; align-items: center; gap: 7px;
+  font-size: 11px; text-transform: uppercase; letter-spacing: .07em;
+  color: var(--label);
+  margin-bottom: 5px;
+}
+
+/* Context: for a coding session rather than a reader. */
+.context-actions { display: flex; flex-wrap: wrap; gap: 8px; margin: 14px 0 4px; }
+.context-copy {
+  padding: 6px 13px;
+  border: 1px solid var(--accent);
+  border-radius: 6px;
+  background: color-mix(in srgb, var(--accent) 12%, transparent);
+  color: var(--text);
+  font: inherit; font-size: 12px;
+  cursor: pointer;
+}
+.context-copy:hover { background: color-mix(in srgb, var(--accent) 22%, transparent); }
+
+.context-files { display: flex; flex-direction: column; gap: 4px; margin: 6px 0 16px; }
+.context-file {
+  display: grid;
+  grid-template-columns: minmax(240px, 400px) 1fr;
+  gap: 14px;
+  align-items: baseline;
+  padding: 6px 10px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--bg-panel);
+}
+.context-path {
+  padding: 0; border: 0; background: none;
+  font-family: var(--mono, ui-monospace, monospace);
+  font-size: 11.5px;
+  color: var(--text);
+  text-align: left;
+  cursor: pointer;
+  overflow-wrap: anywhere;
+}
+.context-path:hover { color: var(--accent); text-decoration: underline; }
+.context-why { font-size: 11.5px; color: var(--text-dim); }
+
+/* ── the drawn designs ──────────────────────────────────────────────
+ *
+ * One set of rules for the HLD and the LLD: they are the same drawing at two
+ * altitudes, and a box that changed meaning between them would be a box nobody
+ * trusts. Everything is a token, because a diagram that reads in one theme and
+ * not the other is half a diagram.
+ */
+
+.dia-frame {
+  margin: 14px 0 6px;
+  padding: 8px 4px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--bg-panel);
+  overflow-x: auto;
+}
+.dia { display: block; min-width: 720px; }
+
+.dia-band { fill: var(--bg-raised); stroke: var(--border); stroke-width: 1; }
+.dia-band-label {
+  fill: var(--label);
+  letter-spacing: .09em;
+  font-weight: 650;
+}
+/* The noun under a column header. Quieter than the header, because the header
+   is the question and this is only what the boxes happen to be called. */
+.dia-band-kind {
+  fill: var(--text-faint);
+  letter-spacing: .04em;
+  font-variant-numeric: tabular-nums;
+}
+
+.dia-box { cursor: pointer; }
+.dia-box-bg {
+  fill: var(--bg-panel);
+  stroke: var(--border);
+  stroke-width: 1;
+  transition: stroke .15s ease, fill .15s ease;
+}
+.dia-box:hover .dia-box-bg,
+.dia-box:focus-visible .dia-box-bg {
+  fill: var(--bg-hover);
+  stroke: var(--tier, var(--accent));
+}
+.dia-box:focus { outline: none; }
+.dia-box-name { fill: var(--text); font-weight: 650; }
+.dia-box-counts { fill: var(--text-dim); font-variant-numeric: tabular-nums; }
+
+.dia-arrow {
+  fill: none;
+  stroke: var(--muted);
+  stroke-width: 1.2;
+  opacity: .55;
+  transition: opacity .18s ease, stroke .18s ease, stroke-width .18s ease;
+}
+.dia-arrow.strong { stroke: var(--error); stroke-width: 1.9; opacity: .85; }
+.dia-arrow-head { fill: var(--muted); }
+.dia-arrow-head.strong { fill: var(--error); }
+.dia-lane-label { fill: var(--text-faint); font-variant-numeric: tabular-nums; }
+
+/* Hovering one service dims every boundary that is not its own. Which arrows
+   those are is decided in script — CSS can test an attribute against a constant
+   but not against another element's — so this only says what lit and unlit look
+   like. */
+.dia.lit .dia-arrow { opacity: .07; }
+.dia.lit .dia-arrow.lit { opacity: .95; stroke: var(--accent); stroke-width: 2; }
+
+/* A lit arrow flows the way it runs.
+ *
+ * Which boundaries are this one's is answered by the isolate. Which *way* they
+ * run is carried by a seven-pixel head, and with thirteen lit at once — half of
+ * them curving back — the heads are the last thing the eye finds. A travelling
+ * dash says it before anything is read, and separates what reaches this box
+ * from what it reaches.
+ *
+ * The dashes move along the path in the direction it was drawn, and every path
+ * in these diagrams is built `M from … to`. No new data; the drawing order
+ * already meant something.
+ *
+ * The offset is two full dash periods, so the loop has no seam. Only
+ * `stroke-dashoffset` animates, which composites without touching layout.
+ */
+@keyframes dia-flow {
+  from { stroke-dashoffset: 0; }
+  to   { stroke-dashoffset: -24; }
+}
+/* A box under the pointer, and the boundaries that are its own run — in the
+ * accent the isolate has always drawn them in. Nothing else moves.
+ *
+ * The trigger is the box rather than the frame or the arrow. The frame meant
+ * everything ran whenever the pointer was anywhere near, which says nothing;
+ * the arrow meant aiming at a 1.2-pixel target to be told what you were already
+ * pointing at. A box is the thing a reader is asking about.
+ *
+ * `.lit` rather than `:hover`, because a box can be lit by keyboard focus with
+ * no pointer in the frame at all. */
+.dia.lit .dia-arrow.lit {
+  stroke-dasharray: 7 5;
+  animation: dia-flow 820ms linear infinite;
+}
+/* Strong couplings keep their own weight and run a little slower, so that two
+   arrows out of the same box do not read as one moving thing. */
+.dia.lit .dia-arrow.strong.lit { animation-duration: 1180ms; }
+.dia.lit .dia-box { opacity: .38; transition: opacity .18s ease; }
+.dia.lit .dia-box.lit { opacity: 1; }
+
+.dia-note {
+  padding: 6px 12px 2px;
+  font-size: 11px;
+  color: var(--text-faint);
+}
+
+
+/* A stacked block of prose with a heading on it — the levels of the hierarchy
+   and the rules under them. Not `.service-card`: that one is a flex tile with a
+   pointer cursor and a hover lift, which is right for a row of things you click
+   and wrong for a paragraph you read. */
+.detail-stack { display: flex; flex-direction: column; gap: 8px; margin: 6px 0 16px; }
+.detail-card {
+  padding: 10px 13px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg-panel);
+  max-width: 860px;
+}
+.detail-card-name {
+  font-size: 12.5px;
+  font-weight: 650;
+  color: var(--text);
+  margin-bottom: 5px;
+}
+
+/* The paragraph on the page that somebody would be glad to skip — the cloud
+   provider nobody has chosen, and "build is 0%". It should not read like the
+   paragraph above it. */
+.service-prose.warn {
+  border-left: 3px solid var(--warning, var(--accent));
+  padding-left: 11px;
+  color: var(--text);
+}
+
+/* A surface calls nine services and there are fifteen surfaces. At rest that is
+   a wash; these lift only when their own box is hovered. */
+.dia .dia-arrow.soft { opacity: 0.13; }
+.dia.lit .dia-arrow.soft { opacity: 0.05; }
+.dia .dia-arrow.soft.lit { opacity: 0.9; }
+
+
+/* Something that opens something else has to look like it does. A control that
+   is only discoverable by clicking everything is not a control. */
+.detail-card.linked { cursor: pointer; transition: border-color .15s ease, background .15s ease; }
+.detail-card.linked:hover,
+.detail-card.linked:focus-visible {
+  border-color: var(--accent);
+  background: var(--bg-raised);
+}
+.detail-card.linked:focus-visible { outline: none; }
+
+.journey-section-label.linked { cursor: pointer; }
+.journey-section-label.linked:hover { color: var(--accent); text-decoration: underline; }
+
+.dia .dia-band-label.linked { cursor: pointer; }
+.dia .dia-band-label.linked:hover { fill: var(--accent); text-decoration: underline; }
+.dia .dia-band-label.linked:focus-visible { outline: none; fill: var(--accent); }
+
+
+/* A group head that opens something. Marked the same way a selected row is,
+   because it is the same claim — this is the thing you are looking at. */
+.tree-group-head.linked { cursor: pointer; border-radius: 5px; }
+.tree-group-head.linked:hover { background: var(--bg-hover); }
+.tree-group-head.linked:focus-visible { outline: none; background: var(--bg-hover); }
+.tree-group-head.linked.selected {
+  background: color-mix(in srgb, var(--accent) 16%, transparent);
+  color: var(--text);
+}
+
+
+/* Asked for stillness, given stillness. The arrowheads still say which way —
+   less immediately, which is the trade. */
+@media (prefers-reduced-motion: reduce) {
+  .dia .dia-arrow,
+  .dia.lit .dia-arrow.lit,
+  .dia.lit .dia-arrow.strong.lit {
+    animation: none;
+    stroke-dasharray: none;
+  }
+  .journey-col:hover + .journey-arrow { animation: none; }
+}
+
+
+/* An anchor standing in a row of buttons. Everything a chip is, minus the two
+   things an anchor brings with it. */
+.chip-link {
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+}

@@ -1,0 +1,48 @@
+id: LLD-Content block
+title: Content block — 7 transitions
+generatedBy: tools/derive-diagrams.py
+index: diagrams/hld/04-lifecycles.yaml
+source: states/content-block.yaml
+entity: Content block
+contract: white-label
+enum: ContentBlock.status
+enumKind: inline
+enumSchema: ContentBlock
+enumProperty: status
+owner: white-label
+initial:
+- draft
+terminal:
+- archived
+transitions:
+- from: draft
+  to: scheduled
+  trigger: operation
+  guard: '**A date rather than a person with an alarm.** The same fix as `Product.onSaleFrom`'
+- from: scheduled
+  to: published
+  trigger: timer
+  guard: '`publishAt` reached'
+- from: draft
+  to: published
+  trigger: operation
+  guard: Published immediately
+- from: published
+  to: expired
+  trigger: timer
+  guard: '`expireAt` reached. **Content goes, the block stays** — a seasonal banner returns next year'
+- from: expired
+  to: scheduled
+  trigger: operation
+  guard: Rescheduled for the next season
+  isReversal: true
+- from: published
+  to: archived
+  trigger: operation
+  guard: Retired
+- from: expired
+  to: archived
+  trigger: operation
+  guard: Retired
+notes: '**`expired` is not `archived`.** A seasonal block expires every year and is rescheduled; archiving
+  it would mean re-authoring it every spring.'

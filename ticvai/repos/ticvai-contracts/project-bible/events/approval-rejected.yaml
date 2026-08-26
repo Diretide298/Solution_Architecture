@@ -1,0 +1,44 @@
+# approval.rejected v1 — published by approvals
+# Checked by tools/check-states.py.
+
+name: approval.rejected
+version: 1
+publisher: approvals
+description: An approval request was refused.
+aggregate: approvalRequest
+emittedWhen: ApprovalStatus pending or escalated to rejected
+payload:
+- field: requestId
+  type: string
+- field: kind
+  type: string
+- field: subjectContract
+  type: string
+- field: subjectId
+  type: string
+- field: reason
+  type: string
+  notes: '**Required.** The only signal to the requester and to the analytics'
+- field: rejectedByPrincipalId
+  type: uuid
+- field: rejectedAt
+  type: timestamp
+consumers:
+- context: orders
+  purpose: Void the held action and tell the requester
+  idempotencyKey: requestId
+  onFailure: retryThenDeadLetter
+  isCritical: true
+- context: marketing
+  purpose: Notify the requester (11.1.19)
+  idempotencyKey: requestId
+  onFailure: retry
+  isCritical: false
+- context: reporting
+  purpose: Rejection analytics
+  idempotencyKey: requestId
+  onFailure: retry
+  isCritical: false
+retention: Retained with the request. This is an audit record, not an operational message
+notes: Critical on the owning contract because **a rejected refund left in `pendingApproval` is a refund
+  that neither happens nor fails**, and the guest is told nothing.

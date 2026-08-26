@@ -1,0 +1,2267 @@
+# P01 — Guest Web Storefront (B2C)
+#
+# WEB-001 to WEB-013 are the purchase path and are fully specified.
+# The remainder carry structure and open questions; layout is still to be drawn.
+#
+# Validated against _schema.yaml; component kinds from _components.yaml.
+
+platform:
+  code: P01
+  audience: guest
+  formFactor: web
+  shortName: Guest Web
+  name: Guest Web — Storefront
+  surface: guestFacing
+  runtime: reactWeb
+  offlineCapable: false
+  themes:
+  - light
+  directions:
+  - ltr
+  - rtl
+  screenCount: 35
+  app: guest-web
+  appStatus: scaffolded
+  packages:
+  - design-tokens
+  - ui
+  - api-client
+  deployment:
+    target: browser
+    distribution: CDN + edge
+    bundleUpdate: immediate on deploy
+    hosting: static build served from the cell region
+    storeReview: false
+    deviceOwnership: guest device
+    networkAssumption: public internet, unmanaged
+    releaseCadence: continuous
+  designReferences:
+  - path: sources/designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
+    note: White Label Builder boards 1 and 2 — brand, app structure, homepage, content and publishing.
+  operator: guest
+  wireframeBoard: wireframes/P01 Guest Web.dc.html
+  wireframeBoardNote: '**The generated board for the whole platform.** Individual screens keep the client-pack
+    anchor where one exists — a screen the client drew should open the client''s frame — and this renders
+    every screen on the platform including the ones no pack covers.
+
+
+    **Declared 24 August.** The file was written from the first generation and nothing pointed at it:
+    `check-wireframes` has no unmatched-board concept, so the Python suite passed while the viewer flagged
+    an orphan. **A board nobody references is a board nobody reviews.**'
+screens:
+- id: WEB-001
+  name: Home / Landing
+  module: Discovery & Browse
+  purpose: Show a guest what is on and give them one obvious way to start booking.
+  wave: 1
+  layout:
+    template: dashboard
+    regions:
+    - name: header
+      ref: appHeader
+      components:
+      - kind: iconButton
+        label: Search
+      - kind: secondaryButton
+        label: Sign in
+        notes: Becomes an account menu once authenticated
+    - name: contentBody
+      components:
+      - kind: banner
+        bindsTo: TenantAppStatus.maintenanceMessage
+        notes: Only when isInMaintenance. Tenant-branded, never a generic error page
+      - kind: cardList
+        bindsTo: HomepageLayout.sections
+        notes: Section order comes from tenant configuration (WLB-011), not from code. A section referencing
+          a disabled module must not render at all
+  states:
+    loading: Section skeletons in configured order. Header renders immediately from cache.
+    emptyFirstRun: No sections configured. Shows the tenant contact block rather than a blank page —
+      a storefront with nothing on it should still tell a guest how to reach the venue.
+    emptyNoResults: TODO — the filter matched nothing. The action widens or clears, never creates.
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
+    error: Config fetch failed. Falls back to the last cached configuration with a dismissible warning.
+      A storefront that will not load because branding is unavailable is worse than an unbranded one.
+  wireframe:
+    status: generated
+    board: wireframes/P01 Guest Web.dc.html#web-001
+  capability: C79
+  apis:
+  - operationId: getTenantAppStatus
+    purpose: Maintenance check before rendering anything
+    trigger: onLoad
+    contract: white-label
+  - operationId: getTenantConfig
+    contract: white-label
+    purpose: Full working configuration
+    trigger: onLoad
+  - operationId: listProducts
+    contract: catalogue
+    purpose: List products
+    trigger: onLoad
+  navigation:
+    isEntryPoint: true
+    exitTo:
+    - WEB-002
+    - WEB-003
+    - WEB-004
+    - WEB-016
+  accessibility:
+    focusOrder: Skip link, then first section heading. Not the carousel.
+  implementation:
+    app: guest-web
+    route: /discovery-and-browse/home-landing
+    component: apps/guest-web/src/routes/discovery-and-browse/HomeLandingDashboard.tsx
+    status: notStarted
+  density: compact
+  requiresModule: ticketing
+- id: WEB-002
+  name: Event & Attraction Listing
+  module: Discovery & Browse
+  purpose: Browse and filter everything bookable.
+  wave: 1
+  layout:
+    template: list
+    regions:
+    - name: contentBody
+      components:
+      - kind: searchField
+        label: Search events and attractions
+      - kind: multiSelect
+        label: Category
+      - kind: datePicker
+        label: Date
+        notes: Format from region settings, not a locale guess
+      - kind: cardList
+        bindsTo: Product[]
+        notes: Cursor pagination. Infinite scroll with an explicit load-more fallback
+  states:
+    loading: Card skeletons at the current page size.
+    emptyFirstRun: No products match. Names the most restrictive filter and offers to clear it — an
+      empty state with no action is a dead end.
+    emptyNoResults: TODO — the filter matched nothing. The action widens or clears, never creates.
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
+    error: Retry with filters preserved. Filters are never silently reset.
+  wireframe:
+    status: generated
+    board: wireframes/P01 Guest Web.dc.html#web-002
+  capability: C79
+  navigation:
+    entryFrom:
+    - WEB-001
+    - WEB-003
+    exitTo:
+    - WEB-001
+    - WEB-003
+    - WEB-004
+  implementation:
+    app: guest-web
+    route: /discovery-and-browse/event-and-attraction-listing
+    component: apps/guest-web/src/routes/discovery-and-browse/EventAndAttractionListingList.tsx
+    status: notStarted
+  apis:
+  - operationId: listProducts
+    contract: catalogue
+    purpose: List products
+    trigger: onLoad
+  - operationId: listPerformances
+    contract: catalogue
+    purpose: List performances of an event
+    trigger: onLoad
+  - operationId: searchCatalogue
+    contract: catalogue
+    purpose: Find something by name
+    trigger: onLoad
+  density: compact
+  entryState:
+    params:
+    - name: eventId
+      from: deepLink
+    coldEntry: TODO — what this screen shows when somebody arrives with no upstream screen.
+  requiresModule: ticketing
+- id: WEB-003
+  name: Search Results
+  module: Discovery & Browse
+  purpose: Find something when the guest does not know what it is called.
+  wave: 1
+  layout:
+    template: list
+    regions:
+    - name: contentBody
+      components:
+      - kind: searchField
+      - kind: dataTable
+  states:
+    loading: Results stream in; facets render first
+    emptyFirstRun: '**No results is a real answer.** Offers what is on rather than an empty page, because
+      a guest who searched for a closed attraction still came to buy something'
+    emptyNoResults: TODO — the filter matched nothing. The action widens or clears, never creates.
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
+    error: Search unavailable. Falls back to browsing the catalogue
+  wireframe:
+    status: generated
+    board: wireframes/P01 Guest Web.dc.html#web-003
+  capability: C79
+  implementation:
+    app: guest-web
+    route: /discovery-and-browse/search-results
+    component: apps/guest-web/src/routes/discovery-and-browse/SearchResultsList.tsx
+    status: notStarted
+  navigation:
+    entryFrom:
+    - WEB-001
+    exitTo:
+    - WEB-001
+    - WEB-002
+    - WEB-004
+    inferred: true
+  notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
+  apis:
+  - operationId: searchCatalogue
+    contract: catalogue
+    purpose: Find something by name
+    trigger: onLoad
+  - operationId: listProducts
+    contract: catalogue
+    purpose: List products
+    trigger: onLoad
+  density: compact
+  requiresModule: ticketing
+- id: WEB-004
+  name: Event / Attraction Detail
+  module: Discovery & Browse
+  purpose: Decide whether to book this.
+  wave: 1
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+        bindsTo: Product
+      - kind: banner
+        bindsTo: Product.lifecycleState
+        notes: Shown only when withdrawn — reachable via a stale link but no longer sellable. A silent
+          404 on a shared link is a bad guest experience
+    - name: actionBar
+      components:
+      - kind: primaryButton
+        label: Select tickets
+        notes: Disabled with a stated reason when not sellable
+  states:
+    loading: Detail skeleton with the image slot reserved to avoid layout shift.
+    emptyFirstRun: Not applicable — a product either exists or the screen is notFound.
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
+    error: Product unavailable, with a route back to the listing.
+  wireframe:
+    status: generated
+    board: wireframes/P01 Guest Web.dc.html#web-004
+  capability: C79
+  navigation:
+    entryFrom:
+    - WEB-001
+    - WEB-002
+    - WEB-003
+    exitTo:
+    - WEB-001
+    - WEB-002
+    - WEB-003
+    - WEB-005
+  implementation:
+    app: guest-web
+    route: /discovery-and-browse/event-attraction-detail
+    component: apps/guest-web/src/routes/discovery-and-browse/EventAttractionDetail.tsx
+    status: notStarted
+  apis:
+  - operationId: getProduct
+    contract: catalogue
+    purpose: Read a product
+    trigger: onLoad
+  - operationId: listPerformances
+    contract: catalogue
+    purpose: List performances of an event
+    trigger: onLoad
+  density: compact
+  entryState:
+    params:
+    - name: eventId
+      from: WEB-002
+    - name: productId
+      from: WEB-001
+    coldEntry: Resolves from the session; a cold arrival is the ordinary case.
+  requiresModule: ticketing
+- id: WEB-005
+  name: Ticket Type Selection
+  module: Booking & Selection
+  purpose: Choose which ticket and how many.
+  wave: 1
+  layout:
+    template: form
+    regions:
+    - name: contentBody
+      components:
+      - kind: cardList
+        bindsTo: ProductVariant[]
+        notes: Each row is a variant with a stepper. Price updates live
+      - kind: banner
+        bindsTo: PromotionEvaluation.rejected
+        notes: Shows near-miss offers — "add one more for the family rate". Uses the rejected list,
+          which exists precisely so this can be said
+    - name: actionBar
+      components:
+      - kind: primaryButton
+        label: Continue
+  states:
+    loading: Variant rows skeleton.
+    emptyFirstRun: No ticket types on sale, with the next on-sale date if known.
+    emptyNoResults: TODO — the filter matched nothing. The action widens or clears, never creates.
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
+    error: Pricing unavailable. Continue is blocked rather than showing a stale price.
+  wireframe:
+    status: generated
+    board: wireframes/P01 Guest Web.dc.html#web-005
+  capability: C80
+  navigation:
+    entryFrom:
+    - WEB-004
+    exitTo:
+    - WEB-001
+    - WEB-006
+    - WEB-007
+    - WEB-008
+    - WEB-010
+  implementation:
+    app: guest-web
+    route: /booking-and-selection/ticket-type-selection
+    component: apps/guest-web/src/routes/booking-and-selection/TicketTypeSelectionForm.tsx
+    status: notStarted
+  apis:
+  - operationId: evaluatePromotions
+    contract: promotions
+    purpose: Evaluate promotions against a cart
+    trigger: onAction
+  - operationId: listProductVariants
+    contract: catalogue
+    purpose: List generated variants
+    trigger: onLoad
+  density: compact
+  entryState:
+    params:
+    - name: productId
+      from: WEB-004
+    coldEntry: Resolves from the session; a cold arrival is the ordinary case.
+  requiresModule: ticketing
+- id: WEB-006
+  name: Date & Session Selection
+  module: Booking & Selection
+  purpose: Pick a date and time that has capacity.
+  wave: 1
+  layout:
+    template: form
+    regions:
+    - name: contentBody
+      components:
+      - kind: datePicker
+        notes: Sold-out dates disabled with a reason on hover, not hidden
+      - kind: cardList
+        bindsTo: Availability.performances
+        notes: Session times with remaining counts. Availability is per channel — a session showing
+          sold out here may still have counter allocation, which is correct behaviour and not a defect
+    - name: actionBar
+      components:
+      - kind: primaryButton
+        label: Continue
+  states:
+    loading: Calendar skeleton with the current month reserved.
+    emptyFirstRun: No sessions in range, with the next available date offered.
+    emptyNoResults: TODO — the filter matched nothing. The action widens or clears, never creates.
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
+    error: Availability unavailable. Selection blocked — overselling is worse than waiting.
+  wireframe:
+    status: generated
+    board: wireframes/P01 Guest Web.dc.html#web-006
+  capability: C81
+  navigation:
+    entryFrom:
+    - WEB-005
+    exitTo:
+    - WEB-001
+    - WEB-005
+    - WEB-007
+    - WEB-008
+    - WEB-010
+  notes: 'Availability is read live and never cached beyond a few seconds. A guest selecting a session
+    that filled while they were reading is a worse outcome than a slightly slower screen. **Wired 24
+    August from review**: acquireLease. **The operations existed and this screen could not call them**
+    — reviewers reported them as missing APIs, which is what an unreachable operation looks like from
+    a wireframe.'
+  implementation:
+    app: guest-web
+    route: /booking-and-selection/date-and-session-selection
+    component: apps/guest-web/src/routes/booking-and-selection/DateAndSessionSelectionForm.tsx
+    status: notStarted
+  apis:
+  - operationId: getAvailability
+    contract: catalogue
+    purpose: Live remaining capacity
+    trigger: onLoad
+  - operationId: acquireLease
+    contract: catalogue
+    purpose: Acquire an inventory lease
+    trigger: onAction
+  density: compact
+  requiresModule: ticketing
+- id: WEB-007
+  name: Seat Map Selection
+  module: Booking & Selection
+  purpose: Choose specific seats.
+  wave: 2
+  layout:
+    template: canvas
+    regions:
+    - name: contentBody
+      components:
+      - kind: seatMap
+        bindsTo: SeatAvailability
+      - kind: banner
+        notes: Hold countdown, always visible. A selection that expires silently while a guest enters
+          card details is the worst outcome in this flow
+    - name: contextPanel
+      components:
+      - kind: cartPanel
+        bindsTo: SeatHold
+    - name: actionBar
+      components:
+      - kind: primaryButton
+        label: Continue to checkout
+  states:
+    loading: Map skeleton at the venue's aspect ratio.
+    emptyFirstRun: No seats available in the selected category.
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
+    error: Map unavailable, with the option to continue on best-available instead.
+  wireframe:
+    status: generated
+    board: wireframes/P01 Guest Web.dc.html#web-007
+  capability: C51
+  navigation:
+    entryFrom:
+    - WEB-006
+    exitTo:
+    - WEB-001
+    - WEB-005
+    - WEB-006
+    - WEB-008
+    - WEB-010
+  notes: 'A map with no geometry falls back to category and best-available selection. Availability returns
+    renderMode: list, and the screen renders groups rather than a plan. Never refuses the seated flow.'
+  implementation:
+    app: guest-web
+    route: /booking-and-selection/seat-map-selection
+    component: apps/guest-web/src/routes/booking-and-selection/SeatMapSelectionCanvas.tsx
+    status: notStarted
+  apis:
+  - operationId: createSeatHold
+    contract: seating
+    purpose: Hold specific seats
+    trigger: onAction
+  - operationId: getSeatAvailability
+    contract: seating
+    purpose: Seat status for a performance
+    trigger: onLoad
+  density: compact
+  entryState:
+    params:
+    - name: performanceId
+      from: deepLink
+    coldEntry: '**A link to a performance that has happened.** Offers the next performance of the same
+      event.'
+  requiresModule: seating
+- id: WEB-008
+  name: Add-ons & Upsell
+  module: Booking & Selection
+  purpose: See add-ons & upsell for this venue.
+  wave: 2
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+  states:
+    loading: Upsells resolve after the cart is priced
+    emptyFirstRun: No add-ons for this product — the step is skipped entirely rather than shown empty
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
+    error: Upsells unavailable. **The purchase continues** — a failed upsell must never block a sale
+  wireframe:
+    status: generated
+    board: wireframes/P01 Guest Web.dc.html#web-008
+  capability: C86
+  implementation:
+    app: guest-web
+    route: /booking-and-selection/add-ons-and-upsell
+    component: apps/guest-web/src/routes/booking-and-selection/AddOnsAndUpsellDetail.tsx
+    status: notStarted
+  navigation:
+    entryFrom:
+    - WEB-001
+    inferred: true
+    exitTo:
+    - WEB-001
+    - WEB-005
+    - WEB-006
+    - WEB-007
+  notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
+    Add-ons. **`listCatalogueBundles` removed** — Sanket noted the screen shows individual add-ons rather
+    than bundles, and it does. **Rewired on the 20 August review.**
+  apis:
+  - operationId: addCartLine
+    contract: orders
+    purpose: Add something
+    trigger: onAction
+  - operationId: getUpsellSuggestions
+    contract: promotions
+    purpose: Suggestions for a cart
+    trigger: onAction
+  density: compact
+  entryState:
+    params:
+    - name: cartId
+      from: session
+    coldEntry: Resolves from the session; a cold arrival is the ordinary case.
+  requiresModule: ticketing
+- id: WEB-009
+  name: Wishlist
+  module: Booking & Selection
+  purpose: Find the right one quickly, and act on it without opening it.
+  wave: 3
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+  states:
+    loading: Saved items load
+    emptyFirstRun: Nothing saved — explains what the list is for
+    error: Could not load
+  wireframe:
+    status: generated
+    board: wireframes/P01 Guest Web.dc.html#web-009
+  capability: C79
+  apis:
+  - operationId: getWishlist
+    contract: marketing-crm
+    purpose: Read a guest's saved items
+    trigger: onLoad
+  - operationId: addToWishlist
+    contract: marketing-crm
+    purpose: Save an item
+    trigger: onAction
+  - operationId: removeFromWishlist
+    contract: marketing-crm
+    purpose: Remove a saved item
+    trigger: onAction
+  notes: Withdrawn products stay in the list marked unavailable. A guest who saved something and finds
+    it silently gone assumes the feature is broken. Purpose derived from the screen name and its operations
+    on 17 August, not from a requirement. Wishlist. **Device operations removed** — Sanket flagged that
+    no device management appears on this screen, and he was right. **Rewired on the 20 August review.**
+  implementation:
+    app: guest-web
+    route: /booking-and-selection/wishlist
+    component: apps/guest-web/src/routes/booking-and-selection/WishlistDetail.tsx
+    status: notStarted
+  navigation:
+    entryFrom:
+    - WEB-001
+    inferred: true
+    exitTo:
+    - WEB-001
+    - WEB-005
+    - WEB-006
+    - WEB-007
+  density: compact
+  entryState:
+    params:
+    - name: itemId
+      from: deepLink
+    - name: subjectId
+      from: session
+    coldEntry: TODO — what this screen shows when somebody arrives with no upstream screen.
+  requiresModule: marketing
+- id: WEB-010
+  name: Shopping Cart
+  module: Cart & Checkout
+  purpose: Review and confirm what is being bought.
+  wave: 1
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: cartPanel
+        bindsTo: PromotionEvaluation
+      - kind: textField
+        label: Promo code
+      - kind: banner
+        bindsTo: PromotionEvaluation.rejected
+        notes: When a code does not apply, say which condition failed. "Expired" and "already used"
+          are very different conversations
+    - name: actionBar
+      components:
+      - kind: primaryButton
+        label: Checkout
+  states:
+    loading: Totals skeleton. Line items render immediately from local state.
+    emptyFirstRun: Empty cart with a route back to browsing.
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
+    error: Pricing failed. Checkout blocked rather than proceeding on a stale total.
+  wireframe:
+    status: generated
+    board: wireframes/P01 Guest Web.dc.html#web-010
+  capability: C02
+  apis:
+  - operationId: getCart
+    contract: orders
+    purpose: The cart, priced and checked, right now
+    trigger: onLoad
+  - operationId: addCartLine
+    contract: orders
+    purpose: Add something
+    trigger: onAction
+  - operationId: updateCartLine
+    contract: orders
+    purpose: Change a quantity
+    trigger: onAction
+  - operationId: removeCartLine
+    contract: orders
+    purpose: Take something out
+    trigger: onAction
+  - operationId: extendCart
+    contract: orders
+    purpose: Give the guest more time
+    trigger: onAction
+  - operationId: checkoutCart
+    contract: orders
+    purpose: Turn the cart into an order
+    trigger: onAction
+  - operationId: abandonCart
+    contract: orders
+    purpose: Empty it deliberately
+    trigger: onAction
+  - operationId: evaluatePromotions
+    contract: promotions
+    purpose: Evaluate promotions against a cart
+    trigger: onAction
+  - operationId: getCouponCode
+    contract: promotions
+    purpose: Look up a code
+    trigger: onLoad
+  navigation:
+    entryFrom:
+    - WEB-005
+    - WEB-006
+    - WEB-007
+    - WEB-008
+    exitTo:
+    - WEB-001
+    - WEB-011
+    - WEB-012
+    - WEB-013
+  implementation:
+    app: guest-web
+    route: /cart-and-checkout/shopping-cart
+    component: apps/guest-web/src/routes/cart-and-checkout/ShoppingCartDetail.tsx
+    status: notStarted
+  density: compact
+  entryState:
+    params:
+    - name: cartId
+      from: WEB-008
+    - name: code
+      from: deepLink
+    - name: lineId
+      from: deepLink
+    coldEntry: TODO — what this screen shows when somebody arrives with no upstream screen.
+  requiresModule: ticketing
+- id: WEB-011
+  name: Guest Details & Attendee Forms
+  module: Cart & Checkout
+  purpose: Collect who is coming and how to reach them.
+  wave: 1
+  layout:
+    template: form
+    regions:
+    - name: contentBody
+      components:
+      - kind: textField
+        label: Full name
+      - kind: textField
+        label: Email
+      - kind: textField
+        label: Mobile
+      - kind: detailPanel
+        bindsTo: EntitlementTemplate.isNameBound
+        notes: Per-attendee fields appear only where the entitlement is name-bound. Most are not — identity
+          and entitlement are separate concerns
+      - kind: consentBlock
+        bindsTo: ConsentPurposeConfig[]
+        notes: Marketing consent is opt-in and unticked. Transactional is required for service and is
+          presented differently, not as a choice dressed as one
+    - name: actionBar
+      components:
+      - kind: primaryButton
+        label: Continue to payment
+  states:
+    loading: Form renders immediately; prefill populates when it arrives.
+    emptyFirstRun: Not applicable.
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
+    error: Prefill failed. The form still works, entered manually.
+  wireframe:
+    status: generated
+    board: wireframes/P01 Guest Web.dc.html#web-011
+  capability: C03
+  apis:
+  - operationId: addToWishlist
+    contract: marketing-crm
+    purpose: Save an item
+    trigger: onAction
+  - operationId: getWishlist
+    contract: marketing-crm
+    purpose: Read a guest's saved items
+    trigger: onLoad
+  - operationId: listGuestDevices
+    contract: marketing-crm
+    purpose: A guest's registered devices
+    trigger: onLoad
+  - operationId: recordConsent
+    contract: marketing-crm
+    purpose: Record a consent decision
+    trigger: onAction
+  - operationId: registerGuestDevice
+    contract: marketing-crm
+    purpose: Register a device for push
+    trigger: onAction
+  - operationId: removeFromWishlist
+    contract: marketing-crm
+    purpose: Remove a saved item
+    trigger: onAction
+  - operationId: revokeGuestDevice
+    contract: marketing-crm
+    purpose: Revoke a device registration
+    trigger: onAction
+  - operationId: getGuestProfile
+    contract: marketing-crm
+    purpose: Read a guest profile
+    trigger: onLoad
+  - operationId: listConsentPurposes
+    contract: marketing-crm
+    purpose: Configured consent purposes
+    trigger: onLoad
+  - operationId: updateMyProfile
+    contract: marketing-crm
+    purpose: A guest correcting their own details
+    trigger: onAction
+  navigation:
+    entryFrom:
+    - WEB-010
+    exitTo:
+    - WEB-001
+    - WEB-010
+    - WEB-012
+    - WEB-013
+  accessibility:
+    focusOrder: First empty field, not the top of the form.
+    announcements: Validation errors announced on blur, not on every keystroke.
+  implementation:
+    app: guest-web
+    route: /cart-and-checkout/guest-details-and-attendee-forms
+    component: apps/guest-web/src/routes/cart-and-checkout/GuestDetailsAndAttendeeFormsForm.tsx
+    status: notStarted
+  density: compact
+  entryState:
+    params:
+    - name: deviceId
+      from: deepLink
+    - name: itemId
+      from: deepLink
+    - name: subjectId
+      from: session
+    coldEntry: TODO — what this screen shows when somebody arrives with no upstream screen.
+  requiresModule: marketing
+  notes: '**Wired 24 August from review**: updateMyProfile. **The operations existed and this screen
+    could not call them** — reviewers reported them as missing APIs, which is what an unreachable operation
+    looks like from a wireframe.'
+- id: WEB-012
+  name: Checkout — Payment
+  module: Cart & Checkout
+  purpose: Take payment and create the order.
+  wave: 1
+  layout:
+    template: form
+    regions:
+    - name: contentBody
+      components:
+      - kind: paymentTerminal
+        bindsTo: Payment
+      - kind: cartPanel
+        notes: Order summary stays visible throughout. Never collapsed behind a link
+    - name: actionBar
+      components:
+      - kind: primaryButton
+        label: Pay now
+  states:
+    loading: Button enters loading and is disabled. Double submission is impossible.
+    emptyFirstRun: Not applicable.
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
+    error: Declined, with the reason where it is safe to show, and a retry that reuses the same idempotency
+      key.
+  wireframe:
+    status: generated
+    board: wireframes/P01 Guest Web.dc.html#web-012
+  capability: C04
+  apis:
+  - operationId: transferOrderTickets
+    contract: orders
+    purpose: Transfer tickets to another guest
+    trigger: onAction
+  - operationId: createOrder
+    contract: orders
+    purpose: Create an order
+    trigger: onAction
+  - operationId: createPayment
+    contract: orders
+    purpose: Take a payment against an order
+    trigger: onAction
+  - operationId: getOrder
+    contract: orders
+    purpose: Read an order
+    trigger: onLoad
+  navigation:
+    entryFrom:
+    - WEB-011
+    exitTo:
+    - WEB-001
+    - WEB-010
+    - WEB-011
+    - WEB-013
+  notes: 'The unknown outcome is the one to build for. A payment taken but never confirmed must offer
+    inquiry, not a retry — a retry double-charges and the guest finds out. **Card only, so tender currency
+    equals base currency.** A guest paying with a foreign card is converted by their own issuer at their
+    own rate — that is not our conversion and is not recorded as one. The displayed comparison price
+    (`WEB-035`) and the charged amount are different numbers and the screen says so before the guest
+    commits. **Wired 24 August from review**: getOrder. **The operations existed and this screen could
+    not call them** — reviewers reported them as missing APIs, which is what an unreachable operation
+    looks like from a wireframe.'
+  openQuestions:
+  - Sandbox credentials for Stripe and Network International are outstanding. The recovery paths cannot
+    be tested without them.
+  implementation:
+    app: guest-web
+    route: /cart-and-checkout/checkout-payment
+    component: apps/guest-web/src/routes/cart-and-checkout/CheckoutPaymentForm.tsx
+    status: notStarted
+  density: compact
+  entryState:
+    params:
+    - name: orderId
+      from: deepLink
+    coldEntry: '**A guest opening an order link weeks later.** Shows the order if it still resolves;
+      if it was refunded or the performance passed, says which and offers the order list rather than
+      an error.'
+  requiresModule: ticketing
+- id: WEB-013
+  name: Order Confirmation
+  module: Cart & Checkout
+  purpose: Confirm the purchase and deliver the tickets.
+  wave: 1
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: banner
+        notes: Confirmation with the order number prominent
+      - kind: detailPanel
+        bindsTo: Order
+      - kind: secondaryButton
+        label: Add to wallet
+      - kind: secondaryButton
+        label: Resend confirmation
+  states:
+    loading: Skeleton. Order number shows immediately from the create response.
+    emptyFirstRun: Not applicable.
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
+    error: Payment succeeded but confirmation did not load. Shows the order number and a support route
+      — never implies the purchase failed.
+  wireframe:
+    status: generated
+    board: wireframes/P01 Guest Web.dc.html#web-013
+  capability: C03
+  apis:
+  - operationId: transferOrderTickets
+    contract: orders
+    purpose: Transfer tickets to another guest
+    trigger: onAction
+  - operationId: getOrder
+    contract: orders
+    purpose: Read an order
+    trigger: onLoad
+  - operationId: reprintOrder
+    contract: orders
+    purpose: Reprint or resend tickets
+    trigger: onAction
+  navigation:
+    entryFrom:
+    - WEB-012
+    exitTo:
+    - WEB-001
+    - WEB-010
+    - WEB-011
+    - WEB-012
+    - WEB-018
+  implementation:
+    app: guest-web
+    route: /cart-and-checkout/order-confirmation
+    component: apps/guest-web/src/routes/cart-and-checkout/OrderConfirmationDetail.tsx
+    status: notStarted
+  density: compact
+  entryState:
+    params:
+    - name: orderId
+      from: WEB-012
+    coldEntry: Resolves from the session; a cold arrival is the ordinary case.
+  requiresModule: ticketing
+- id: WEB-014
+  name: Pay for a Booking
+  module: Cart & Checkout
+  purpose: Pay for a booking somebody else took, without an account.
+  wave: 1
+  layout:
+    template: form
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+        bindsTo: PaymentLink
+        notes: Venue, lines, total. **What they are paying for, before how to pay** — a guest who booked
+          by phone may not recognise a reference number.
+      - kind: banner
+        notes: The deadline, counted in time remaining rather than as a timestamp. **Expires in 46 minutes**
+          is actionable; **expires at 14:32** needs arithmetic.
+      - kind: textField
+        label: Email for your tickets (optional)
+        notes: '**Optional, and only to send the ticket.** Requiring an account before taking money
+          is how a paid booking becomes an abandoned one.'
+      - kind: primaryButton
+        label: Pay now
+  states:
+    loading: The lines and the total, with the deadline counting down.
+    emptyFirstRun: '**Not reachable empty** — a link always names an order. An empty state here means
+      the token did not resolve, which is the error state.'
+    emptyNoAccess: '**The token is the credential, so there is no permission case** — either it resolves
+      or it has gone.'
+    error: Could not load the booking. **The hold is unaffected** — a failed page load must not release
+      inventory.
+    expired: '**The hold was released and the booking is gone.** Says so plainly, with what was held
+      and a link to book it again. The commonest non-happy path on this screen by a wide margin.'
+    alreadyPaid: '**Paid, with the order number and the tickets.** A guest clicking twice is normal
+      — the second click should show their tickets, not a payment form.'
+    superseded: '**A newer link was sent.** Names the channel it went to, because *this link no longer
+      works* with no explanation sends them to the phone.'
+  wireframe:
+    status: generated
+    board: wireframes/P01 Guest Web.dc.html#web-014
+  capability: C04
+  apis:
+  - operationId: getPaymentLink
+    contract: orders
+    purpose: What is owed and until when
+    trigger: onLoad
+  - operationId: payByLink
+    contract: orders
+    purpose: Take the money and convert the reservation
+    trigger: onAction
+  implementation:
+    app: guest-web
+    route: /pay/:token
+    component: apps/guest-web/src/routes/cart-and-checkout/PayByLinkForm.tsx
+    status: notStarted
+  navigation:
+    exitTo:
+    - WEB-013
+  notes: BL-072, rebuilt 20 August. **Declared `getCart` and `checkoutCart` until then, and `createPaymentLink`
+    takes an `orderId`** — the screen was looking for a cart that was never created, and its entryState
+    said `cartId` came from the session when **a guest arriving from an email has no session.** Wired
+    by name-matching rather than by following the journey.
+  density: compact
+  entryState:
+    params:
+    - name: token
+      from: deepLink
+    coldEntry: '**Cold is the only way in.** The guest arrives from an email, an SMS or a WhatsApp message
+      with no session and quite possibly no account. **A link opened three days late is the ordinary
+      case, not an edge** — the screen says the hold was released and offers to book again. Expired,
+      already paid and superseded are three different messages, and **404 is never one of them**: telling
+      somebody their booking does not exist when it expired is how a support call starts.'
+  requiresModule: ticketing
+- id: WEB-015
+  name: Virtual Waiting Room
+  module: High-Demand Access
+  purpose: Virtual Waiting Room — the screen a person opens when they need to deal with virtual waiting
+    room.
+  wave: 2
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+  states:
+    loading: Position in the queue, updating
+    emptyFirstRun: —
+    error: '**Lost the queue position.** The worst failure on this screen: it re-queues rather than
+      silently admitting, and says so, because a guest who thinks they lost their place will open a
+      second tab and make it worse'
+  wireframe:
+    status: generated
+    board: wireframes/P01 Guest Web.dc.html#web-015
+  openQuestions:
+  - CF-48 — Q2 Virtual Waiting Room. Edge infrastructure, not the Q1 queue contract. Build-or-buy decision
+    outstanding with Dinesh and Qossai.
+  implementation:
+    app: guest-web
+    route: /high-demand-access/virtual-waiting-room
+    component: apps/guest-web/src/routes/high-demand-access/VirtualWaitingRoomDetail.tsx
+    status: notStarted
+  navigation:
+    entryFrom:
+    - WEB-001
+    inferred: true
+    exitTo:
+    - WEB-001
+  notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
+  apis:
+  - operationId: joinQueue
+    contract: queue
+    purpose: Join a virtual queue
+    trigger: onAction
+  - operationId: getQueueEntry
+    contract: queue
+    purpose: Read a queue entry
+    trigger: onLoad
+  - operationId: getWaitTimes
+    contract: queue
+    purpose: Wait times across a venue
+    trigger: onLoad
+  density: compact
+  entryState:
+    params:
+    - name: entryId
+      from: deepLink
+    coldEntry: TODO — what this screen shows when somebody arrives with no upstream screen.
+  requiresModule: queue
+- id: WEB-016
+  name: Login / Register
+  module: Account & Self-Service
+  purpose: Get a guest into the app, fast, on a device that may be shared.
+  wave: 1
+  layout:
+    template: list
+    regions:
+    - name: contentBody
+      components:
+      - kind: searchField
+      - kind: dataTable
+  states:
+    loading: Checking the session
+    emptyFirstRun: —
+    emptyNoResults: TODO — the filter matched nothing. The action widens or clears, never creates.
+    error: Sign-in failed. Wrong password reads differently from an unavailable identity provider
+  wireframe:
+    status: generated
+    board: wireframes/P01 Guest Web.dc.html#web-016
+  capability: C36
+  apis:
+  - operationId: registerGuest
+    contract: identity
+    purpose: from page inventory
+    trigger: onLoad
+  - operationId: completeSsoAuthorization
+    contract: identity
+    purpose: Exchange an SSO code for a session
+    trigger: onAction
+  - operationId: enrolMfaMethod
+    contract: identity
+    purpose: Enrol an MFA method
+    trigger: onAction
+  - operationId: getCurrentSession
+    contract: identity
+    purpose: Current session and effective permissions
+    trigger: onLoad
+  - operationId: getGuestSession
+    contract: identity
+    purpose: Read the current guest session
+    trigger: onLoad
+  - operationId: guestLogout
+    contract: identity
+    purpose: End a guest session
+    trigger: onAction
+  - operationId: guestSocialLogin
+    contract: identity
+    purpose: Sign in with Apple or Google
+    trigger: onAction
+  - operationId: guestUaePassLogin
+    contract: identity
+    purpose: Sign in with a national identity provider
+    trigger: onAction
+  - operationId: linkGuestCheckout
+    contract: identity
+    purpose: Attach a guest checkout to an account
+    trigger: onAction
+  - operationId: listMfaMethods
+    contract: identity
+    purpose: Enrolled MFA methods
+    trigger: onLoad
+  - operationId: listSsoProviders
+    contract: identity
+    purpose: Identity providers configured for this tenant
+    trigger: onLoad
+  - operationId: login
+    contract: identity
+    purpose: Authenticate and open a session
+    trigger: onAction
+  - operationId: logout
+    contract: identity
+    purpose: Close the current session
+    trigger: onAction
+  - operationId: refreshToken
+    contract: identity
+    purpose: Rotate the access token
+    trigger: onAction
+  - operationId: removeMfaMethod
+    contract: identity
+    purpose: Remove an MFA method
+    trigger: onAction
+  - operationId: requestGuestOtp
+    contract: identity
+    purpose: Request a one-time code
+    trigger: onAction
+  - operationId: selectRole
+    contract: identity
+    purpose: Choose a role for a multi-role session
+    trigger: onAction
+  - operationId: startSsoAuthorization
+    contract: identity
+    purpose: Begin an SSO flow
+    trigger: onLoad
+  - operationId: verifyGuestOtp
+    contract: identity
+    purpose: Verify a one-time code and issue a session
+    trigger: onAction
+  - operationId: verifyMfaChallenge
+    contract: identity
+    purpose: Complete a step-up challenge
+    trigger: onAction
+  - operationId: verifyMfaEnrolment
+    contract: identity
+    purpose: Complete enrolment
+    trigger: onAction
+  - operationId: claimCart
+    contract: orders
+    purpose: Attach an anonymous cart to a guest
+    trigger: onAction
+  implementation:
+    app: guest-web
+    route: /account-and-self-service/login-register
+    component: apps/guest-web/src/routes/account-and-self-service/LoginRegisterList.tsx
+    status: notStarted
+  navigation:
+    entryFrom:
+    - WEB-001
+    inferred: true
+    exitTo:
+    - WEB-001
+    - WEB-017
+    - WEB-018
+    - WEB-019
+  notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
+  density: compact
+  entryState:
+    params:
+    - name: cartId
+      from: session
+    - name: challengeId
+      from: deepLink
+    - name: methodId
+      from: deepLink
+    - name: providerId
+      from: deepLink
+    coldEntry: TODO — what this screen shows when somebody arrives with no upstream screen.
+  requiresModule: ticketing
+- id: WEB-017
+  name: My Account Dashboard
+  module: Account & Self-Service
+  purpose: The screen this app sits on. Everything else is entered from here and returns to it.
+  wave: 1
+  layout:
+    template: dashboard
+    regions:
+    - name: contentBody
+      components:
+      - kind: metricTile
+      - kind: chart
+  states:
+    loading: Tiles skeleton
+    emptyFirstRun: A new account with no orders — offers what to do next
+    error: Partial. Each tile fails independently
+  wireframe:
+    status: generated
+    board: wireframes/P01 Guest Web.dc.html#web-017
+  capability: C36
+  apis:
+  - operationId: addToWishlist
+    contract: marketing-crm
+    purpose: Save an item
+    trigger: onAction
+  - operationId: getWishlist
+    contract: marketing-crm
+    purpose: Read a guest's saved items
+    trigger: onLoad
+  - operationId: listGuestDevices
+    contract: marketing-crm
+    purpose: A guest's registered devices
+    trigger: onLoad
+  - operationId: recordConsent
+    contract: marketing-crm
+    purpose: Record a consent decision
+    trigger: onAction
+  - operationId: registerGuestDevice
+    contract: marketing-crm
+    purpose: Register a device for push
+    trigger: onAction
+  - operationId: removeFromWishlist
+    contract: marketing-crm
+    purpose: Remove a saved item
+    trigger: onAction
+  - operationId: revokeGuestDevice
+    contract: marketing-crm
+    purpose: Revoke a device registration
+    trigger: onAction
+  implementation:
+    app: guest-web
+    route: /account-and-self-service/my-account-dashboard
+    component: apps/guest-web/src/routes/account-and-self-service/MyAccountDashboard.tsx
+    status: notStarted
+  navigation:
+    entryFrom:
+    - WEB-001
+    inferred: true
+    exitTo:
+    - WEB-001
+    - WEB-016
+    - WEB-018
+    - WEB-019
+  notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
+  density: compact
+  entryState:
+    params:
+    - name: deviceId
+      from: deepLink
+    - name: itemId
+      from: deepLink
+    - name: subjectId
+      from: session
+    coldEntry: TODO — what this screen shows when somebody arrives with no upstream screen.
+  requiresModule: marketing
+- id: WEB-018
+  name: My Tickets
+  module: Account & Self-Service
+  purpose: Find my tickets for this venue.
+  wave: 1
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+  states:
+    loading: Tickets load
+    emptyFirstRun: No tickets — distinguishes never bought from all past
+    error: Could not load
+  wireframe:
+    status: generated
+    board: wireframes/P01 Guest Web.dc.html#web-018
+  capability: C09
+  notes: Dynamic QR with a visible countdown. Anti-screenshot, per the guest boards. Purpose derived
+    from the screen name and its operations on 17 August, not from a requirement. The read surface Deep
+    asked for. **All four were missing and the table itself did not exist until 18 August.** **Rewired
+    on the 20 August review.** **`listEntitlements` wired 24 August, raised in review.** The staff-scoped
+    list was on this guest screen — **a guest-facing list must be scoped to the caller, not filtered
+    by a subject parameter**, or a guest is one parameter away from somebody else’s.
+  apis:
+  - operationId: listMyEntitlements
+    contract: access
+    purpose: Every ticket, pass and membership this guest holds
+    trigger: onLoad
+  - operationId: getEntitlement
+    contract: access
+    purpose: One entitlement, with what remains on it
+    trigger: onLoad
+  - operationId: getEntitlementCredential
+    contract: access
+    purpose: The thing that gets scanned
+    trigger: onLoad
+  - operationId: getEntitlementHistory
+    contract: access
+    purpose: Every scan, freeze, share and reissue against it
+    trigger: onLoad
+  - operationId: listEntitlements
+    contract: access
+    purpose: Every entitlement this guest holds, including expired
+    trigger: onLoad
+  implementation:
+    app: guest-web
+    route: /account-and-self-service/my-tickets
+    component: apps/guest-web/src/routes/account-and-self-service/MyTicketsDetail.tsx
+    status: notStarted
+  navigation:
+    entryFrom:
+    - WEB-001
+    inferred: true
+    exitTo:
+    - WEB-001
+    - WEB-016
+    - WEB-017
+    - WEB-019
+  density: compact
+  entryState:
+    params:
+    - name: entitlementId
+      from: deepLink
+    coldEntry: '**A ticket link opened after the event.** Shows the entitlement with its status — expired,
+      used, transferred — because *not found* to somebody holding a ticket is the wrong answer.'
+  requiresModule: access
+- id: WEB-019
+  name: Order History
+  module: Account & Self-Service
+  purpose: Find order history for this venue.
+  wave: 1
+  layout:
+    template: list
+    regions:
+    - name: contentBody
+      components:
+      - kind: searchField
+      - kind: dataTable
+  states:
+    loading: Orders, newest first
+    emptyFirstRun: No orders yet
+    emptyNoResults: TODO — the filter matched nothing. The action widens or clears, never creates.
+    error: Could not load
+  wireframe:
+    status: generated
+    board: wireframes/P01 Guest Web.dc.html#web-019
+  capability: C34
+  apis:
+  - operationId: transferOrderTickets
+    contract: orders
+    purpose: Transfer tickets to another guest
+    trigger: onAction
+  - operationId: listMyOrders
+    contract: orders
+    purpose: The orders this guest placed
+    trigger: onLoad
+  implementation:
+    app: guest-web
+    route: /account-and-self-service/order-history
+    component: apps/guest-web/src/routes/account-and-self-service/OrderHistoryList.tsx
+    status: notStarted
+  navigation:
+    entryFrom:
+    - WEB-001
+    inferred: true
+    exitTo:
+    - WEB-001
+    - WEB-016
+    - WEB-017
+    - WEB-018
+  notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
+    **`listMyOrders` wired 24 August, raised in review.** The staff-scoped list was on this guest screen
+    — **a guest-facing list must be scoped to the caller, not filtered by a subject parameter**, or
+    a guest is one parameter away from somebody else’s.
+  density: compact
+  entryState:
+    params:
+    - name: orderId
+      from: deepLink
+    coldEntry: '**A guest opening an order link weeks later.** Shows the order if it still resolves;
+      if it was refunded or the performance passed, says which and offers the order list rather than
+      an error.'
+  requiresModule: ticketing
+- id: WEB-020
+  name: Profile & Preferences
+  module: Account & Self-Service
+  purpose: Change how profile behaves here, and see which level the current value came from.
+  wave: 1
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+  states:
+    loading: Profile and consents
+    emptyFirstRun: —
+    error: '**Save failed and the form keeps what was typed.** A consent change that silently did not
+      save is a compliance failure, so the screen states it rather than showing success'
+  wireframe:
+    status: generated
+    board: wireframes/P01 Guest Web.dc.html#web-020
+  capability: C36
+  notes: Consent withdrawal must be as easy as granting it. Same screen, same number of clicks. Purpose
+    derived from the screen name and its operations on 17 August, not from a requirement. Profile and
+    Preferences. **Wishlist and device operations removed; profile, consent and email verification added.**
+    Deep listed exactly these. **Rewired on the 20 August review.**
+  apis:
+  - operationId: getGuestProfile
+    contract: marketing-crm
+    purpose: Read a guest profile
+    trigger: onLoad
+  - operationId: updateMyProfile
+    contract: marketing-crm
+    purpose: A guest correcting their own details
+    trigger: onAction
+  - operationId: recordConsent
+    contract: marketing-crm
+    purpose: Record a consent decision
+    trigger: onAction
+  - operationId: listConsentPurposes
+    contract: marketing-crm
+    purpose: Configured consent purposes
+    trigger: onLoad
+  - operationId: verifyGuestEmail
+    contract: identity
+    purpose: Send a verification link, or consume one
+    trigger: onAction
+  implementation:
+    app: guest-web
+    route: /account-and-self-service/profile-and-preferences
+    component: apps/guest-web/src/routes/account-and-self-service/ProfileAndPreferencesDetail.tsx
+    status: notStarted
+  navigation:
+    entryFrom:
+    - WEB-001
+    inferred: true
+    exitTo:
+    - WEB-001
+    - WEB-016
+    - WEB-017
+    - WEB-018
+  density: compact
+  entryState:
+    params:
+    - name: subjectId
+      from: session
+    coldEntry: Resolves from the session; a cold arrival is the ordinary case.
+  requiresModule: marketing
+- id: WEB-021
+  name: Wallet & Gift Cards
+  module: Membership, Loyalty & Value
+  purpose: See wallet & gift cards for this venue.
+  wave: 2
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+  states:
+    loading: Balance and gift cards
+    emptyFirstRun: No wallet — offers to top up
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
+    error: Balance unavailable. **Spending is blocked** rather than attempted against an unknown balance
+  wireframe:
+    status: generated
+    board: wireframes/P01 Guest Web.dc.html#web-021
+  capability: C21
+  implementation:
+    app: guest-web
+    route: /membership-loyalty-and-value/wallet-and-gift-cards
+    component: apps/guest-web/src/routes/membership-loyalty-and-value/WalletAndGiftCardsDetail.tsx
+    status: notStarted
+  navigation:
+    entryFrom:
+    - WEB-001
+    exitTo:
+    - WEB-001
+    - WEB-022
+    - WEB-023
+    - WEB-024
+    inferred: true
+  notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
+  apis:
+  - operationId: getWallet
+    contract: retail
+    purpose: Read a guest wallet
+    trigger: onLoad
+  - operationId: listWalletTransactions
+    contract: retail
+    purpose: Wallet transaction history
+    trigger: onLoad
+  - operationId: getGiftCard
+    contract: retail
+    purpose: Check a gift card balance
+    trigger: onLoad
+  density: compact
+  entryState:
+    params:
+    - name: cardCode
+      from: deepLink
+    - name: subjectId
+      from: session
+    coldEntry: TODO — what this screen shows when somebody arrives with no upstream screen.
+  requiresModule: retail
+- id: WEB-022
+  name: Membership Plans
+  module: Membership, Loyalty & Value
+  purpose: Membership Plans — the screen a person opens when they need to deal with membership plans.
+  wave: 2
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+  states:
+    loading: Plans load
+    emptyFirstRun: No memberships on sale at this venue
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
+    error: Could not load
+  wireframe:
+    status: generated
+    board: wireframes/P01 Guest Web.dc.html#web-022
+  capability: C31
+  implementation:
+    app: guest-web
+    route: /membership-loyalty-and-value/membership-plans
+    component: apps/guest-web/src/routes/membership-loyalty-and-value/MembershipPlansDetail.tsx
+    status: notStarted
+  navigation:
+    entryFrom:
+    - WEB-001
+    exitTo:
+    - WEB-001
+    - WEB-021
+    - WEB-023
+    - WEB-024
+    inferred: true
+  notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
+  apis:
+  - operationId: listProducts
+    contract: catalogue
+    purpose: List products
+    trigger: onLoad
+  - operationId: getProduct
+    contract: catalogue
+    purpose: Read a product
+    trigger: onLoad
+  density: compact
+  entryState:
+    params:
+    - name: productId
+      from: WEB-001
+    coldEntry: Resolves from the session; a cold arrival is the ordinary case.
+  requiresModule: ticketing
+- id: WEB-023
+  name: Membership Management
+  module: Membership, Loyalty & Value
+  purpose: Work with membership management for this venue.
+  wave: 2
+  layout:
+    template: form
+    regions:
+    - name: contentBody
+      components:
+      - kind: textField
+      - kind: primaryButton
+  states:
+    loading: Membership and its benefits
+    emptyFirstRun: —
+    error: Could not load. Cancellation and renewal are both blocked
+  wireframe:
+    status: generated
+    board: wireframes/P01 Guest Web.dc.html#web-023
+  capability: C31
+  apis:
+  - operationId: transferOrderTickets
+    contract: orders
+    purpose: Transfer tickets to another guest
+    trigger: onAction
+  implementation:
+    app: guest-web
+    route: /membership-loyalty-and-value/membership-management
+    component: apps/guest-web/src/routes/membership-loyalty-and-value/MembershipManagementForm.tsx
+    status: notStarted
+  navigation:
+    entryFrom:
+    - WEB-001
+    inferred: true
+    exitTo:
+    - WEB-001
+    - WEB-021
+    - WEB-022
+    - WEB-024
+  notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
+  density: compact
+  entryState:
+    params:
+    - name: orderId
+      from: deepLink
+    coldEntry: '**A guest opening an order link weeks later.** Shows the order if it still resolves;
+      if it was refunded or the performance passed, says which and offers the order list rather than
+      an error.'
+  requiresModule: ticketing
+- id: WEB-024
+  name: Loyalty & Rewards
+  module: Membership, Loyalty & Value
+  purpose: See loyalty & rewards for this venue.
+  wave: 3
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+  states:
+    loading: Points and rewards
+    emptyFirstRun: No points yet — explains how they accrue
+    error: Could not load
+  wireframe:
+    status: generated
+    board: wireframes/P01 Guest Web.dc.html#web-024
+  capability: C93
+  apis:
+  - operationId: addToWishlist
+    contract: marketing-crm
+    purpose: Save an item
+    trigger: onAction
+  - operationId: getWishlist
+    contract: marketing-crm
+    purpose: Read a guest's saved items
+    trigger: onLoad
+  - operationId: listGuestDevices
+    contract: marketing-crm
+    purpose: A guest's registered devices
+    trigger: onLoad
+  - operationId: recordConsent
+    contract: marketing-crm
+    purpose: Record a consent decision
+    trigger: onAction
+  - operationId: registerGuestDevice
+    contract: marketing-crm
+    purpose: Register a device for push
+    trigger: onAction
+  - operationId: removeFromWishlist
+    contract: marketing-crm
+    purpose: Remove a saved item
+    trigger: onAction
+  - operationId: revokeGuestDevice
+    contract: marketing-crm
+    purpose: Revoke a device registration
+    trigger: onAction
+  implementation:
+    app: guest-web
+    route: /membership-loyalty-and-value/loyalty-and-rewards
+    component: apps/guest-web/src/routes/membership-loyalty-and-value/LoyaltyAndRewardsDetail.tsx
+    status: notStarted
+  navigation:
+    entryFrom:
+    - WEB-001
+    exitTo:
+    - WEB-001
+    - WEB-021
+    - WEB-022
+    - WEB-023
+    inferred: true
+  notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
+  density: compact
+  entryState:
+    params:
+    - name: deviceId
+      from: deepLink
+    - name: itemId
+      from: deepLink
+    - name: subjectId
+      from: session
+    coldEntry: TODO — what this screen shows when somebody arrives with no upstream screen.
+  requiresModule: marketing
+- id: WEB-025
+  name: Help Centre / FAQ
+  module: Engagement & Support
+  purpose: Answer a question without needing a person.
+  wave: 1
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+  states:
+    loading: Articles load
+    emptyFirstRun: No articles — offers contact instead of an empty help centre
+    error: Could not load
+  wireframe:
+    status: generated
+    board: wireframes/P01 Guest Web.dc.html#web-025
+  capability: C105
+  notes: Same content the AI concierge grounds on. One source, two surfaces. Purpose derived from the
+    screen name and its operations on 17 August, not from a requirement.
+  apis:
+  - operationId: getTenantAppStatus
+    contract: white-label
+    purpose: App status and recent changes
+    trigger: onLoad
+  implementation:
+    app: guest-web
+    route: /engagement-and-support/help-centre-faq
+    component: apps/guest-web/src/routes/engagement-and-support/HelpCentreFaqDetail.tsx
+    status: notStarted
+  navigation:
+    entryFrom:
+    - WEB-001
+    exitTo:
+    - WEB-001
+    - WEB-026
+    - WEB-027
+    - WEB-028
+    inferred: true
+  density: compact
+  requiresModule: core
+- id: WEB-026
+  name: Survey & Feedback
+  module: Engagement & Support
+  purpose: Work with survey & feedback for this venue.
+  wave: 3
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+  states:
+    loading: Survey loads
+    emptyFirstRun: —
+    error: Could not submit. **The answers are kept** and retried
+  wireframe:
+    status: generated
+    board: wireframes/P01 Guest Web.dc.html#web-026
+  capability: C33
+  apis:
+  - operationId: submitReview
+    contract: marketing-crm
+    purpose: from page inventory
+    trigger: onLoad
+  implementation:
+    app: guest-web
+    route: /engagement-and-support/survey-and-feedback
+    component: apps/guest-web/src/routes/engagement-and-support/SurveyAndFeedbackDetail.tsx
+    status: notStarted
+  navigation:
+    entryFrom:
+    - WEB-001
+    exitTo:
+    - WEB-001
+    - WEB-025
+    - WEB-027
+    - WEB-028
+    inferred: true
+  notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
+  density: compact
+  requiresModule: marketing
+- id: WEB-027
+  name: Newsletter Subscription
+  module: Engagement & Support
+  purpose: Record newsletter subscription for this venue.
+  wave: 2
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+  states:
+    loading: —
+    emptyFirstRun: —
+    error: Could not subscribe. **Consent is not recorded on a failed request**, because a subscription
+      the guest believes happened and did not is worse than a visible failure
+  wireframe:
+    status: generated
+    board: wireframes/P01 Guest Web.dc.html#web-027
+  capability: C59
+  apis:
+  - operationId: recordConsent
+    contract: marketing-crm
+    purpose: from page inventory
+    trigger: onLoad
+  - operationId: addToWishlist
+    contract: marketing-crm
+    purpose: Save an item
+    trigger: onAction
+  - operationId: getWishlist
+    contract: marketing-crm
+    purpose: Read a guest's saved items
+    trigger: onLoad
+  - operationId: listGuestDevices
+    contract: marketing-crm
+    purpose: A guest's registered devices
+    trigger: onLoad
+  - operationId: registerGuestDevice
+    contract: marketing-crm
+    purpose: Register a device for push
+    trigger: onAction
+  - operationId: removeFromWishlist
+    contract: marketing-crm
+    purpose: Remove a saved item
+    trigger: onAction
+  - operationId: revokeGuestDevice
+    contract: marketing-crm
+    purpose: Revoke a device registration
+    trigger: onAction
+  implementation:
+    app: guest-web
+    route: /engagement-and-support/newsletter-subscription
+    component: apps/guest-web/src/routes/engagement-and-support/NewsletterSubscriptionDetail.tsx
+    status: notStarted
+  navigation:
+    entryFrom:
+    - WEB-001
+    exitTo:
+    - WEB-001
+    - WEB-025
+    - WEB-026
+    - WEB-028
+    inferred: true
+  notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
+  density: compact
+  entryState:
+    params:
+    - name: deviceId
+      from: deepLink
+    - name: itemId
+      from: deepLink
+    - name: subjectId
+      from: session
+    coldEntry: TODO — what this screen shows when somebody arrives with no upstream screen.
+  requiresModule: marketing
+- id: WEB-028
+  name: Contact & Venue Information
+  module: Engagement & Support
+  purpose: Find contact & venue information for this venue.
+  wave: 1
+  layout:
+    template: form
+    regions:
+    - name: contentBody
+      components:
+      - kind: textField
+      - kind: primaryButton
+  states:
+    loading: Venue details
+    emptyFirstRun: —
+    error: Could not load. Falls back to the tenant contact details from the cached config
+  wireframe:
+    status: generated
+    board: wireframes/P01 Guest Web.dc.html#web-028
+  capability: C105
+  apis:
+  - operationId: getTenantAppStatus
+    contract: white-label
+    purpose: App status and recent changes
+    trigger: onLoad
+  implementation:
+    app: guest-web
+    route: /engagement-and-support/contact-and-venue-information
+    component: apps/guest-web/src/routes/engagement-and-support/ContactAndVenueInformationForm.tsx
+    status: notStarted
+  navigation:
+    entryFrom:
+    - WEB-001
+    inferred: true
+    exitTo:
+    - WEB-001
+    - WEB-025
+    - WEB-026
+    - WEB-027
+  notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
+  density: compact
+  requiresModule: core
+- id: WEB-029
+  name: Error / Sold Out / Maintenance
+  module: System States
+  purpose: Say what is wrong in a way that tells the person whether to wait or leave.
+  wave: 1
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+  states:
+    loading: —
+    emptyFirstRun: —
+    error: '**This screen is the error state.** It distinguishes sold out, closed, and platform unavailable
+      — three different things a guest must not confuse, because only one means come back later'
+  wireframe:
+    status: generated
+    board: wireframes/P01 Guest Web.dc.html#web-029
+  capability: C57
+  notes: Tenant-branded. An unbranded error page inside a tenant's storefront reads as the tenant's
+    failure, not ours. Purpose derived from the screen name and its operations on 17 August, not from
+    a requirement.
+  apis:
+  - operationId: getTenantAppStatus
+    contract: white-label
+    purpose: from page inventory
+    trigger: onLoad
+  implementation:
+    app: guest-web
+    route: /system-states/error-sold-out-maintenance
+    component: apps/guest-web/src/routes/system-states/ErrorSoldOutMaintenanceDetail.tsx
+    status: notStarted
+  navigation:
+    entryFrom:
+    - WEB-001
+    inferred: true
+    exitTo:
+    - WEB-001
+  density: compact
+  requiresModule: core
+- id: WEB-030
+  name: Ticket Transfer
+  module: Ticketing
+  purpose: Send a ticket to someone else, and see what you have sent.
+  capability: C00
+  wave: 1
+  layout:
+    template: list
+    regions:
+    - name: contentBody
+      components:
+      - kind: dataTable
+  apis:
+  - operationId: transferOrderTickets
+    contract: orders
+    purpose: Transfer tickets to another guest
+    trigger: onAction
+  - operationId: claimTicketTransfer
+    contract: orders
+    purpose: Claim transferred tickets
+    trigger: onAction
+  - operationId: listOrders
+    contract: orders
+    purpose: List orders
+    trigger: onLoad
+  states:
+    loading: Your transferable tickets
+    emptyFirstRun: Nothing transferable — already used, or not transferable by product rule
+    emptyNoResults: TODO — the filter matched nothing. The action widens or clears, never creates.
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
+    error: Could not load. **Transferring is blocked** — sending a ticket you could not read is sending
+      the wrong one
+  navigation:
+    exitTo:
+    - WEB-001
+    - WEB-031
+    - WEB-035
+    inferred: true
+  implementation:
+    app: guest-web
+    route: /ticket-transfer
+    component: apps/guest-web/src/routes/TicketTransfer.tsx
+    status: notStarted
+  wireframe:
+    status: generated
+    board: wireframes/P01 Guest Web.dc.html#web-030
+  notes: Added 17 August for parity with GST-014. **Not on the wireframe board** — needs drawing. CF-93.
+  density: compact
+  entryState:
+    params:
+    - name: orderId
+      from: deepLink
+    - name: transferId
+      from: deepLink
+    coldEntry: '**A guest opening an order link weeks later.** Shows the order if it still resolves;
+      if it was refunded or the performance passed, says which and offers the order list rather than
+      an error.'
+  requiresModule: ticketing
+- id: WEB-031
+  name: My Reservations
+  module: Ticketing
+  purpose: What you have booked and not yet paid for.
+  capability: C00
+  wave: 2
+  layout:
+    template: list
+    regions:
+    - name: contentBody
+      components:
+      - kind: dataTable
+  apis:
+  - operationId: listReservations
+    contract: orders
+    purpose: List reservations
+    trigger: onLoad
+  - operationId: getReservation
+    contract: orders
+    purpose: Read a reservation
+    trigger: onLoad
+  - operationId: cancelReservation
+    contract: orders
+    purpose: Cancel a reservation
+    trigger: onAction
+  states:
+    loading: Reservations, soonest first
+    emptyFirstRun: Nothing reserved
+    emptyNoResults: TODO — the filter matched nothing. The action widens or clears, never creates.
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
+    error: Could not load. Cancelling is blocked
+  navigation:
+    exitTo:
+    - WEB-001
+    - WEB-030
+    - WEB-035
+    inferred: true
+  implementation:
+    app: guest-web
+    route: /my-reservations
+    component: apps/guest-web/src/routes/MyReservations.tsx
+    status: notStarted
+  wireframe:
+    status: generated
+    board: wireframes/P01 Guest Web.dc.html#web-031
+  notes: Added 17 August for parity with GST-016. **Not on the wireframe board** — needs drawing. CF-93.
+  density: compact
+  entryState:
+    params:
+    - name: reservationId
+      from: deepLink
+    coldEntry: TODO — what this screen shows when somebody arrives with no upstream screen.
+  requiresModule: ticketing
+- id: WEB-032
+  name: Offers & Promotions
+  module: Promotions
+  purpose: What is on, and what applies to you.
+  capability: C00
+  wave: 2
+  layout:
+    template: list
+    regions:
+    - name: contentBody
+      components:
+      - kind: dataTable
+  apis:
+  - operationId: listPromotions
+    contract: promotions
+    purpose: List promotions
+    trigger: onLoad
+  - operationId: getPromotion
+    contract: promotions
+    purpose: Read a promotion
+    trigger: onLoad
+  - operationId: evaluatePromotions
+    contract: promotions
+    purpose: Evaluate promotions against a cart
+    trigger: onAction
+  states:
+    loading: Offers load
+    emptyFirstRun: Nothing running — said plainly rather than shown as an empty page
+    emptyNoResults: TODO — the filter matched nothing. The action widens or clears, never creates.
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
+    error: Could not load
+  navigation:
+    exitTo:
+    - WEB-001
+    inferred: true
+  implementation:
+    app: guest-web
+    route: /offers-promotions
+    component: apps/guest-web/src/routes/OffersPromotions.tsx
+    status: notStarted
+  wireframe:
+    status: generated
+    board: wireframes/P01 Guest Web.dc.html#web-032
+  notes: Added 17 August for parity with GST-037. **Not on the wireframe board** — needs drawing. CF-93.
+  density: compact
+  entryState:
+    params:
+    - name: promotionId
+      from: deepLink
+    coldEntry: TODO — what this screen shows when somebody arrives with no upstream screen.
+  requiresModule: ticketing
+- id: WEB-033
+  name: Shop
+  module: Retail
+  purpose: Merchandise, browsable before you arrive.
+  capability: C00
+  wave: 2
+  layout:
+    template: list
+    regions:
+    - name: contentBody
+      components:
+      - kind: dataTable
+  apis:
+  - operationId: listMerchandise
+    contract: retail
+    purpose: List merchandise
+    trigger: onLoad
+  - operationId: lookupMerchandise
+    contract: retail
+    purpose: Price and stock check by barcode
+    trigger: onLoad
+  - operationId: reserveMerchandise
+    contract: retail
+    purpose: Reserve an item for collection
+    trigger: onAction
+  - operationId: addCartLine
+    contract: orders
+    purpose: Add something
+    trigger: onAction
+  states:
+    loading: Products load
+    emptyFirstRun: Nothing available online at this venue
+    emptyNoResults: TODO — the filter matched nothing. The action widens or clears, never creates.
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
+    error: Could not load. **Reserving is blocked** — a reservation against unknown stock is a promise
+      we cannot keep
+  navigation:
+    exitTo:
+    - WEB-001
+    inferred: true
+  implementation:
+    app: guest-web
+    route: /shop
+    component: apps/guest-web/src/routes/Shop.tsx
+    status: notStarted
+  wireframe:
+    status: generated
+    board: wireframes/P01 Guest Web.dc.html#web-033
+  notes: Added 17 August for parity with GST-026. **Not on the wireframe board** — needs drawing. CF-93.
+  density: compact
+  entryState:
+    params:
+    - name: cartId
+      from: session
+    - name: outletId
+      from: deepLink
+    coldEntry: TODO — what this screen shows when somebody arrives with no upstream screen.
+  requiresModule: retail
+- id: WEB-034
+  name: Lost & Found
+  module: Support
+  purpose: Report something you left behind.
+  capability: C00
+  wave: 3
+  layout:
+    template: list
+    regions:
+    - name: contentBody
+      components:
+      - kind: dataTable
+  apis:
+  - operationId: listMyCases
+    contract: marketing-crm
+    purpose: The cases this guest raised
+    trigger: onLoad
+  - operationId: raiseMyCase
+    contract: marketing-crm
+    purpose: Report something — lost property, a complaint, a question
+    trigger: onAction
+  - operationId: replyToMyCase
+    contract: marketing-crm
+    purpose: Reply on a case the guest raised
+    trigger: onAction
+  states:
+    loading: Your reports
+    emptyFirstRun: Nothing reported
+    emptyNoResults: TODO — the filter matched nothing. The action widens or clears, never creates.
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
+    error: Could not submit. **The report is kept** and retried
+  navigation:
+    exitTo:
+    - WEB-001
+    inferred: true
+  implementation:
+    app: guest-web
+    route: /lost-found
+    component: apps/guest-web/src/routes/LostFound.tsx
+    status: notStarted
+  wireframe:
+    status: generated
+    board: wireframes/P01 Guest Web.dc.html#web-034
+  notes: Added 17 August for parity with GST-034. **Not on the wireframe board** — needs drawing. CF-93.
+    **Guest case operations wired 24 August.** **No case operation was guest-callable** — a guest could
+    raise nothing and read nothing, and `check-screens` refused the staff-permissioned ones on a guest
+    surface. `listMyCases`, `raiseMyCase` and `replyToMyCase` are scoped to the caller rather than filtered
+    by a subject parameter.
+  density: compact
+  requiresModule: marketing
+  entryState:
+    params:
+    - name: caseId
+      from: deepLink
+      optional: true
+    coldEntry: A case opened from a notification or the list. **Optional** — the ordinary way in is
+      to raise a new one, not to open an old one.
+- id: WEB-035
+  name: Multi-Currency & Pricing
+  module: Ticketing
+  purpose: Compare prices in your own currency before you travel.
+  capability: C00
+  wave: 1
+  layout:
+    template: list
+    regions:
+    - name: contentBody
+      components:
+      - kind: dataTable
+  apis:
+  - operationId: listFxRates
+    contract: finance
+    purpose: The rates in force
+    trigger: onLoad
+  - operationId: listProducts
+    contract: catalogue
+    purpose: List products
+    trigger: onLoad
+  states:
+    loading: Rates and prices, with the base currency shown first
+    emptyFirstRun: One currency configured at this venue — the selector is hidden rather than shown
+      with a single option
+    emptyNoResults: TODO — the filter matched nothing. The action widens or clears, never creates.
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
+    error: Rates unavailable. **Prices show in base currency rather than a stale conversion** — a wrong
+      rate is worse than no rate, because a guest who budgets against it arrives short
+  navigation:
+    exitTo:
+    - WEB-001
+    - WEB-030
+    - WEB-031
+    inferred: true
+  implementation:
+    app: guest-web
+    route: /multi-currency-pricing
+    component: apps/guest-web/src/routes/MulticurrencyPricing.tsx
+    status: notStarted
+  wireframe:
+    status: generated
+    board: wireframes/P01 Guest Web.dc.html#web-035
+  notes: 'Added 17 August. **The surface the matrix names** — 2.6.33 *"website should be able to display
+    multi currency"* and 2.9.1 *"in the B2C portal for guests comparison"*. Wave 1 against the app''s
+    Wave 2, because **the website is where an overseas guest compares before booking** and the app is
+    where they check after. **Display only — the sale settles in base currency** (CF-37). Not on the
+    wireframe board; needs drawing. **`getRegionSettings` deliberately not called** — a guest does not
+    need the venue''s scope configuration to pick a currency. `listFxRates` is the currency list: a
+    rate exists only for a currency the venue enabled, so the two questions have one answer.'
+  density: compact
+  requiresModule: ticketing

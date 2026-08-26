@@ -1,0 +1,64 @@
+$schema: ./_schema.yaml
+id: F89
+name: Offline policy is set, cached, monitored and reconciled
+actor: technician
+capability: Offline policy is set, cached, monitored and reconciled
+wave: 2
+frequency: As the venue needs it.
+criticality: financial
+primaryContract: tenancy
+contracts:
+- tenancy
+- orders
+- catalogue
+platforms:
+- P08
+trigger:
+  description: A venue decides how much trading it will tolerate with no network.
+offlineBehaviour: Configuration is online. What it configures is entirely offline.
+steps:
+- step: 1
+  screen: BO-037
+  action: Offline Package Status.
+  operations:
+  - setOfflinePolicy
+  outcome: '**Drawn by the client as POS-5A.** 1 operations on this step.'
+- step: 2
+  screen: BO-128
+  action: Live Workstation Health Monitor.
+  operations:
+  - setOfflinePolicy
+  outcome: '**Drawn by the client as POS-5B.** 1 operations on this step.'
+  crossesDevice: true
+- step: 3
+  screen: BO-129
+  action: Software, Configuration & Version Management.
+  operations:
+  - setConfigurationProfile
+  - setConnectivityThresholds
+  outcome: '**Drawn by the client as POS-5C.** 2 operations on this step.'
+  crossesDevice: true
+- step: 4
+  screen: BO-130
+  action: Offline Policy & Rules Configuration.
+  operations:
+  - setOfflinePolicy
+  outcome: '**Drawn by the client as POS-5D.** 1 operations on this step.'
+  crossesDevice: true
+branches:
+- at: 1
+  condition: A step in the chain is not licensed for this tenant.
+  behaviour: '**The chain stops at the module boundary.** `requiresModule` on each screen decides —
+    a tenant without the retail licence does not see the retail half, and the journey is shorter rather
+    than broken.'
+  severity: medium
+  resolvedBy: getModuleEnablement
+exitStates:
+- state: completed
+  description: The chain ran as the client drew it.
+- state: stoppedAtModule
+  description: '**A licence boundary, not a failure.**'
+notes: '**POS board 5.** F33 walks a till going offline; this walks the venue deciding the rules it
+  obeys. **Derived from the client''s own `GOES TO` edges**, not from an inferred path — a pair of frames
+  the client linked is evidence; a chain assembled from unrelated pairs is a guess.'
+openQuestions: null

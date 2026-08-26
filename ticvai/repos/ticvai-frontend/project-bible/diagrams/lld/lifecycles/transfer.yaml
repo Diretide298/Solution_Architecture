@@ -1,0 +1,52 @@
+id: LLD-Stock transfer
+title: Stock transfer — 6 transitions
+generatedBy: tools/derive-diagrams.py
+index: diagrams/hld/04-lifecycles.yaml
+source: states/transfer.yaml
+entity: Stock transfer
+contract: inventory
+enum: TransferStatus
+enumKind: named
+enumSchema: TransferStatus
+owner: inventory
+initial:
+- dispatched
+terminal:
+- received
+- cancelled
+transitions:
+- from: dispatched
+  to: inTransit
+  operation: createStockTransfer
+  trigger: operation
+  guard: Left the source location. **Stock is deducted here, not on receipt** — otherwise it exists
+    in two places
+- from: inTransit
+  to: received
+  operation: receiveStockTransfer
+  trigger: operation
+  guard: Full quantity arrived
+- from: inTransit
+  to: partiallyReceived
+  operation: receiveStockTransfer
+  trigger: operation
+  guard: Short. The difference is a discrepancy to investigate, not a silent adjustment
+- from: partiallyReceived
+  to: received
+  operation: receiveStockTransfer
+  trigger: operation
+  guard: Balance arrived
+- from: partiallyReceived
+  to: cancelled
+  operation: closeTransferShort
+  trigger: operation
+  guard: Balance written off
+  requiresApproval: true
+- from: dispatched
+  to: cancelled
+  operation: createStockTransfer
+  trigger: operation
+  guard: Recalled before leaving
+notes: Inter-venue transfer is the operational answer to an outlet with no stock (14 August). It is
+  deliberately not automatic — a system that moves stock between venues without a person deciding produces
+  a lorry nobody booked.

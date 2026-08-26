@@ -1,0 +1,727 @@
+id: LLD-finance
+title: finance — 54 operations
+generatedBy: tools/derive-diagrams.py
+index: diagrams/hld/03-contracts.yaml
+tier: spine
+service: LedgerService
+operations:
+- operation: abandonPeriodClose
+  verb: POST
+  path: /fiscal-periods/{periodId}/abandon-close
+  scope: region
+  permission: LEDGER_APPROVE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - ledger.fiscal_period
+  writes:
+  - cache:idempotency
+  - ledger.fiscal_period
+- operation: approveJournalEntry
+  verb: POST
+  path: /journal-entries/{entryId}/approve
+  scope: region
+  permission: LEDGER_APPROVE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - ledger.journal_entry
+  writes:
+  - cache:idempotency
+  - ledger.journal_entry
+- operation: beginPeriodClose
+  verb: POST
+  path: /fiscal-periods/{periodId}/begin-close
+  scope: region
+  permission: LEDGER_APPROVE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - ledger.fiscal_period
+  writes:
+  - cache:idempotency
+  - ledger.fiscal_period
+- operation: calculateTax
+  verb: POST
+  path: /tax/calculate
+  scope: venue
+  permission: LEDGER_VIEW
+  audience:
+  - staff
+  offline: true
+  reads:
+  - cache:idempotency
+  - ledger.tax_code
+  - platform.region_settings
+  writes:
+  - cache:idempotency
+- operation: closeFiscalPeriod
+  verb: POST
+  path: /fiscal-periods/{periodId}/close
+  scope: region
+  permission: LEDGER_APPROVE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - ledger.fiscal_period
+  writes:
+  - cache:idempotency
+  - ledger.fiscal_period
+- operation: createAccount
+  verb: POST
+  path: /accounts
+  scope: region
+  permission: ACCOUNT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - ledger.account
+  writes:
+  - cache:idempotency
+  - ledger.account
+- operation: createCostCenter
+  verb: POST
+  path: /cost-centers
+  scope: region
+  permission: ACCOUNT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - ledger.cost_center
+  writes:
+  - cache:idempotency
+  - ledger.cost_center
+- operation: createJournalEntry
+  verb: POST
+  path: /journal-entries
+  scope: region
+  permission: LEDGER_POST
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - ledger.journal_entry
+  writes:
+  - cache:idempotency
+  - ledger.journal_entry
+- operation: createLegalEntity
+  verb: POST
+  path: /legal-entities
+  scope: tenant
+  permission: ACCOUNT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - ledger.legal_entity
+  writes:
+  - cache:idempotency
+  - ledger.legal_entity
+- operation: createRecognitionSchedule
+  verb: POST
+  path: /recognition-schedules
+  scope: region
+  permission: ACCOUNT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - ledger.recognition_schedule
+  writes:
+  - cache:idempotency
+  - ledger.recognition_schedule
+- operation: createTaxCode
+  verb: POST
+  path: /tax-codes
+  scope: region
+  permission: TAX_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - ledger.tax_code
+  writes:
+  - cache:idempotency
+  - ledger.tax_code
+- operation: createTaxExemption
+  verb: POST
+  path: /tax-exemptions
+  scope: region
+  permission: TAX_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - ledger.tax_exemption
+  writes:
+  - cache:idempotency
+  - ledger.tax_exemption
+- operation: disputeObligation
+  verb: POST
+  path: /inter-entity-obligations/{obligationId}/dispute
+  scope: tenant
+  permission: LEDGER_POST
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - ledger.inter_entity_obligation
+  writes:
+  - cache:idempotency
+  - ledger.inter_entity_obligation
+- operation: getAccount
+  verb: GET
+  path: /accounts/{accountId}
+  scope: region
+  permission: LEDGER_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - ledger.account
+  writes: []
+- operation: getDeferredRevenue
+  verb: GET
+  path: /deferred-revenue
+  scope: venue
+  permission: LEDGER_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - ledger.account
+  - ledger.entry
+  - orders.sales_order
+  writes: []
+- operation: getFinancialReport
+  verb: GET
+  path: /reports/financial
+  scope: venue
+  permission: REPORT_VIEW_VENUE
+  audience:
+  - staff
+  - partner
+  offline: false
+  reads:
+  - ledger.account
+  - ledger.entry
+  - ledger.event_budget
+  - ledger.fiscal_period
+  writes: []
+- operation: getForeignTenderReport
+  verb: GET
+  path: /fx/foreign-tender
+  scope: venue
+  permission: LEDGER_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - ledger.fx_rate
+  - orders.payment
+  - orders.shift
+  writes: []
+- operation: getJournalEntry
+  verb: GET
+  path: /journal-entries/{entryId}
+  scope: region
+  permission: LEDGER_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - ledger.journal_entry
+  writes: []
+- operation: getSettlement
+  verb: GET
+  path: /settlements/{settlementId}
+  scope: region
+  permission: SETTLEMENT_VIEW
+  audience:
+  - staff
+  - partner
+  offline: false
+  reads:
+  - ledger.settlement
+  writes: []
+- operation: getTrialBalance
+  verb: GET
+  path: /ledger/trial-balance
+  scope: region
+  permission: LEDGER_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - ledger.account
+  - ledger.entry
+  - ledger.event_budget
+  - ledger.fiscal_period
+  writes: []
+- operation: getUnifiedReconciliation
+  verb: GET
+  path: /reconciliation/unified
+  scope: venue
+  permission: LEDGER_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - ledger.entry
+  - ledger.settlement
+  - orders.payment
+  - retail.wallet_transaction
+  writes: []
+- operation: ingestSettlementFile
+  verb: POST
+  path: /settlements
+  scope: region
+  permission: SETTLEMENT_RECONCILE
+  audience:
+  - staff
+  - partner
+  offline: false
+  reads:
+  - cache:idempotency
+  - ledger.settlement
+  writes:
+  - cache:idempotency
+  - ledger.settlement
+- operation: listAccountMappings
+  verb: GET
+  path: /account-mappings
+  scope: region
+  permission: LEDGER_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - ledger.account_mapping
+  writes: []
+- operation: listAccounts
+  verb: GET
+  path: /accounts
+  scope: region
+  permission: LEDGER_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - ledger.account
+  writes: []
+- operation: listCostCenters
+  verb: GET
+  path: /cost-centers
+  scope: region
+  permission: LEDGER_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - ledger.cost_center
+  writes: []
+- operation: listFiscalPeriods
+  verb: GET
+  path: /fiscal-periods
+  scope: region
+  permission: LEDGER_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - ledger.fiscal_period
+  writes: []
+- operation: listFxRates
+  verb: GET
+  path: /fx-rates
+  scope: region
+  permission: LEDGER_VIEW
+  audience:
+  - staff
+  - guest
+  offline: true
+  reads:
+  - ledger.fx_rate
+  writes: []
+- operation: listInterEntityObligations
+  verb: GET
+  path: /fx/inter-entity
+  scope: tenant
+  permission: LEDGER_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - ledger.inter_entity_obligation
+  writes: []
+- operation: listJournalEntries
+  verb: GET
+  path: /journal-entries
+  scope: region
+  permission: LEDGER_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - ledger.journal_entry
+  writes: []
+- operation: listLedgerEntries
+  verb: GET
+  path: /ledger/entries
+  scope: venue
+  permission: LEDGER_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - ledger.entry
+  writes: []
+- operation: listLegalEntities
+  verb: GET
+  path: /legal-entities
+  scope: tenant
+  permission: LEDGER_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - ledger.legal_entity
+  writes: []
+- operation: listPriceVariances
+  verb: GET
+  path: /price-variances
+  scope: venue
+  permission: LEDGER_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - ledger.price_variance
+  writes: []
+- operation: listRecognitionSchedules
+  verb: GET
+  path: /recognition-schedules
+  scope: region
+  permission: LEDGER_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - ledger.recognition_schedule
+  writes: []
+- operation: listSettlementExceptions
+  verb: GET
+  path: /settlements/{settlementId}/exceptions
+  scope: region
+  permission: SETTLEMENT_VIEW
+  audience:
+  - staff
+  - partner
+  offline: false
+  reads:
+  - ledger.settlement_exception
+  writes: []
+- operation: listSettlements
+  verb: GET
+  path: /settlements
+  scope: region
+  permission: SETTLEMENT_VIEW
+  audience:
+  - staff
+  - partner
+  offline: false
+  reads:
+  - ledger.settlement
+  writes: []
+- operation: listTaxCodes
+  verb: GET
+  path: /tax-codes
+  scope: region
+  permission: LEDGER_VIEW
+  audience:
+  - staff
+  offline: true
+  reads:
+  - ledger.tax_code
+  writes: []
+- operation: listTaxExemptions
+  verb: GET
+  path: /tax-exemptions
+  scope: region
+  permission: LEDGER_VIEW
+  audience:
+  - staff
+  offline: true
+  reads:
+  - ledger.tax_exemption
+  writes: []
+- operation: recordDeposit
+  verb: POST
+  path: /deposits
+  scope: venue
+  permission: LEDGER_POST
+  audience:
+  - staff
+  - service
+  offline: false
+  reads:
+  - cache:idempotency
+  - ledger.account
+  - orders.sales_order
+  writes:
+  - cache:idempotency
+  - ledger.deposit
+  - ledger.entry
+- operation: recordSettlement
+  verb: POST
+  path: /inter-entity-obligations/{obligationId}/settle
+  scope: tenant
+  permission: LEDGER_POST
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - ledger.fx_rate
+  - ledger.inter_entity_obligation
+  writes:
+  - cache:idempotency
+  - ledger.entry
+  - ledger.inter_entity_obligation
+- operation: recordWriteOff
+  verb: POST
+  path: /write-offs
+  scope: tenant
+  permission: LEDGER_POST
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - control.partner_agreement
+  - ledger.account
+  writes:
+  - cache:idempotency
+  - ledger.entry
+- operation: rejectJournal
+  verb: POST
+  path: /journal-entries/{entryId}/reject
+  scope: region
+  permission: LEDGER_APPROVE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - ledger.journal_entry
+  writes:
+  - cache:idempotency
+  - ledger.journal_entry
+- operation: reopenPeriod
+  verb: POST
+  path: /fiscal-periods/{periodId}/reopen
+  scope: region
+  permission: LEDGER_APPROVE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - ledger.fiscal_period
+  writes:
+  - cache:idempotency
+  - ledger.fiscal_period
+- operation: resolveObligationDispute
+  verb: POST
+  path: /inter-entity-obligations/{obligationId}/resolve
+  scope: tenant
+  permission: LEDGER_POST
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - ledger.inter_entity_obligation
+  writes:
+  - cache:idempotency
+  - ledger.inter_entity_obligation
+- operation: resolveSettlementException
+  verb: POST
+  path: /settlements/{settlementId}/exceptions
+  scope: region
+  permission: SETTLEMENT_RECONCILE
+  audience:
+  - staff
+  - partner
+  offline: false
+  reads:
+  - cache:idempotency
+  - ledger.settlement_exception
+  writes:
+  - cache:idempotency
+  - ledger.settlement_exception
+- operation: reverseJournalEntry
+  verb: POST
+  path: /journal-entries/{entryId}/reverse
+  scope: region
+  permission: LEDGER_APPROVE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - ledger.journal_entry
+  writes:
+  - cache:idempotency
+  - ledger.journal_entry
+- operation: reviewPriceVariance
+  verb: POST
+  path: /price-variances/{varianceId}/review
+  scope: venue
+  permission: LEDGER_APPROVE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - ledger.price_variance
+  writes:
+  - cache:idempotency
+  - ledger.price_variance
+- operation: runFxRevaluation
+  verb: POST
+  path: /fx/revaluation
+  scope: region
+  permission: LEDGER_APPROVE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - ledger.fiscal_period
+  - ledger.fx_rate
+  - ledger.inter_entity_obligation
+  writes:
+  - cache:idempotency
+  - ledger.entry
+  - ledger.journal_entry
+- operation: runRecognition
+  verb: POST
+  path: /recognition/run
+  scope: region
+  permission: LEDGER_POST
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - ledger.account
+  - ledger.fiscal_period
+  - orders.sales_order
+  writes:
+  - cache:idempotency
+  - ledger.entry
+  - ledger.journal_entry
+- operation: setAccountMappings
+  verb: PUT
+  path: /account-mappings
+  scope: region
+  permission: ACCOUNT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - ledger.account_mapping
+  writes:
+  - cache:idempotency
+  - ledger.account_mapping
+- operation: setFxRate
+  verb: PUT
+  path: /fx-rates
+  scope: region
+  permission: LEDGER_APPROVE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - ledger.fx_rate
+  writes:
+  - cache:idempotency
+  - ledger.fx_rate
+- operation: settleDeposit
+  verb: POST
+  path: /deposits/{depositId}/settle
+  scope: venue
+  permission: LEDGER_POST
+  audience:
+  - staff
+  - service
+  offline: false
+  reads:
+  - cache:idempotency
+  - ledger.account
+  - ledger.deposit
+  writes:
+  - cache:idempotency
+  - ledger.deposit
+  - ledger.entry
+- operation: updateAccount
+  verb: PATCH
+  path: /accounts/{accountId}
+  scope: region
+  permission: ACCOUNT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - ledger.account
+  writes:
+  - cache:idempotency
+  - ledger.account
+- operation: updateTaxCode
+  verb: PATCH
+  path: /tax-codes/{taxCodeId}
+  scope: region
+  permission: TAX_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - ledger.tax_code
+  writes:
+  - cache:idempotency
+  - ledger.tax_code
+- operation: validateRecognitionSchedules
+  verb: POST
+  path: /recognition-schedules/validate
+  scope: tenant
+  permission: LEDGER_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - catalogue.product
+  - ledger.recognition_schedule
+  writes: []

@@ -1,0 +1,57 @@
+id: LLD-Tenant migration
+title: Tenant migration — 8 transitions
+generatedBy: tools/derive-diagrams.py
+index: diagrams/hld/04-lifecycles.yaml
+source: states/tenant-migration.yaml
+entity: Tenant migration
+contract: subscription
+enum: TenantMigrationStatus
+enumKind: named
+enumSchema: TenantMigrationStatus
+owner: control
+initial:
+- planned
+terminal:
+- complete
+- failed
+- rolledBack
+transitions:
+- from: planned
+  to: copying
+  operation: executeTenantMigration
+  trigger: operation
+  guard: Plan still valid and the tenant has no open shifts. **A cutover during a shift loses the drawer**
+  requiresApproval: true
+- from: copying
+  to: verifying
+  trigger: job
+  guard: Copy finished. Row counts and checksums next
+- from: verifying
+  to: awaitingCutover
+  trigger: job
+  guard: Verified. Waiting for the stated window
+- from: verifying
+  to: failed
+  trigger: job
+  guard: Verification failed. Nothing has cut over, so nothing is lost
+- from: awaitingCutover
+  to: cuttingOver
+  trigger: timer
+  guard: Window reached
+- from: cuttingOver
+  to: complete
+  trigger: job
+  guard: Traffic on the target. **The source is retained, not dropped**
+- from: cuttingOver
+  to: rolledBack
+  operation: rollbackTenantMigration
+  trigger: operation
+  guard: Cutover failed. The retained source is why this is possible
+  isReversal: true
+  requiresApproval: true
+- from: copying
+  to: failed
+  trigger: job
+  guard: Copy failed
+notes: 'The upgrade path a tenant buys — shared to dedicated (ADR-0017). Region cannot change: moving
+  across a residency boundary is an export, not a migration.'

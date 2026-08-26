@@ -1,0 +1,47 @@
+id: LLD-Lost item
+title: Lost item — 6 transitions
+generatedBy: tools/derive-diagrams.py
+index: diagrams/hld/04-lifecycles.yaml
+source: states/lost-item.yaml
+entity: Lost item
+contract: marketing-crm
+enum: LostItem.status
+enumKind: inline
+enumSchema: LostItem
+enumProperty: status
+owner: marketing-crm
+initial:
+- open
+terminal:
+- claimed
+- disposed
+- returned
+transitions:
+- from: open
+  to: matched
+  trigger: operation
+  guard: A candidate found. **Scored, never auto-claimed** — returning the wrong phone to the wrong
+    person is worse than returning none
+- from: matched
+  to: open
+  trigger: operation
+  guard: The match was wrong
+  isReversal: true
+- from: matched
+  to: claimed
+  trigger: operation
+  guard: Collected by the owner, identity checked
+- from: open
+  to: returned
+  trigger: operation
+  guard: Handed back directly without a formal match
+- from: open
+  to: disposed
+  trigger: timer
+  guard: '**Past `disposeAfter`.** A storeroom with no disposal date is a storeroom that fills'
+- from: matched
+  to: disposed
+  trigger: timer
+  guard: Matched and never collected
+notes: '**`matched` is a proposal, not a resolution.** The last step is a human looking at the item
+  and the person, and the model refuses to skip it.'

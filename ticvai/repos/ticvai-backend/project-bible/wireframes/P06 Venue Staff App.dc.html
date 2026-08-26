@@ -1,0 +1,1136 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>P06 Venue Staff App — wireframe board</title>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#0B1324;--mut:#6B7280;--dim:#8494A8;--line:#DCE3ED;--soft:#E5E7EB;
+--brand:#0D6EFD;--brand2:#00B8FF;--navy:#0C2340;--paper:#FFF;--wash:#F6F8FB}
+*{box-sizing:border-box}
+body{margin:0;background:var(--wash);color:var(--ink);
+font-family:Manrope,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:13px;line-height:1.5}
+a{color:inherit}
+.wrap{max-width:1680px;margin:0 auto;padding:22px 34px 90px}
+.home{font-size:11.5px;color:var(--mut);text-decoration:none;letter-spacing:.02em}
+.head{display:flex;align-items:baseline;justify-content:space-between;gap:20px;
+margin:14px 0 6px;padding-bottom:16px;border-bottom:2px solid var(--ink)}
+.mark{font-size:13px;font-weight:800;letter-spacing:.16em;
+background:linear-gradient(90deg,var(--brand),var(--brand2));-webkit-background-clip:text;
+background-clip:text;color:transparent}
+h1{font-size:19px;font-weight:800;letter-spacing:-.015em;margin:0}
+.meta{font-size:11px;color:var(--mut);font-family:'IBM Plex Mono',ui-monospace,monospace}
+.lede{font-size:12px;color:var(--mut);max-width:74ch;margin:14px 0 0}
+.grp{font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:11px;font-weight:600;
+letter-spacing:.14em;color:var(--dim);text-transform:uppercase;margin:48px 0 16px;
+padding-bottom:9px;border-bottom:1px solid var(--line)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(342px,1fr));gap:30px}
+.scr{display:flex;flex-direction:column;gap:11px;scroll-margin-top:24px}
+.ttl{font-size:15.5px;font-weight:800;letter-spacing:-.01em}
+.pur{font-size:11.5px;color:var(--mut);margin-top:2px}
+.frame{background:var(--paper);border:1px solid var(--soft);border-radius:14px;overflow:hidden;
+height:440px;display:flex;flex-direction:column;box-shadow:0 10px 26px rgba(12,35,64,.07)}
+.frame.dark{background:var(--navy);border-color:#1E3A5F}
+.bar{flex:none;height:30px;display:flex;align-items:center;gap:8px;padding:0 12px;
+border-bottom:1px solid var(--soft);font-size:10.5px;color:var(--mut)}
+.dark .bar{border-color:#1E3A5F;color:#7FA3C9}
+.strip{flex:none;height:20px;display:flex;align-items:center;padding:0 12px;font-size:9.5px;
+letter-spacing:.08em;text-transform:uppercase;background:#FFF7E6;color:#8A6D00;
+border-bottom:1px solid #F0E0B8}
+.body{flex:1;display:flex;min-height:0}
+.rail{flex:none;width:74px;background:var(--navy);display:flex;flex-direction:column;gap:6px;padding:10px 8px}
+.rail i{display:block;height:9px;border-radius:3px;background:#1E3A5F}
+.rail i.on{background:linear-gradient(90deg,var(--brand),var(--brand2))}
+.main{flex:1;padding:12px;display:flex;flex-direction:column;gap:9px;overflow:hidden}
+.side{flex:none;width:96px;border-left:1px solid var(--soft);padding:12px 10px;
+display:flex;flex-direction:column;gap:8px}
+.dark .side{border-color:#1E3A5F}
+.act{flex:none;height:38px;border-top:1px solid var(--soft);display:flex;align-items:center;
+gap:8px;padding:0 12px}
+.dark .act{border-color:#1E3A5F}
+.cmp{border:1px dashed #C7D0DC;border-radius:7px;padding:7px 9px;font-size:10px;color:var(--mut);background:#FAFBFD}
+.dark .cmp{border-color:#264a75;background:#0E2A4C;color:#9FC0E0}
+.cmp b{display:block;font-size:9.5px;letter-spacing:.09em;text-transform:uppercase;
+color:#94A3B4;font-weight:700;margin-bottom:3px}
+.cmp .why{margin-top:5px;font-size:9.5px;color:#7C8899;font-style:italic;line-height:1.45}
+.btn{height:22px;border-radius:6px;padding:0 12px;display:inline-flex;align-items:center;
+font-size:10px;font-weight:700;background:linear-gradient(90deg,var(--brand),var(--brand2));color:#FFF}
+.btn.sec{background:none;border:1px solid var(--soft);color:var(--mut);font-weight:600}
+.foot{font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:9.5px;line-height:1.75;color:#7C8899}
+.foot b{color:#4A5566;font-weight:600}
+.foot .off{color:#8A6D00}
+.tag{display:inline-block;font-size:9px;letter-spacing:.06em;text-transform:uppercase;
+padding:1px 6px;border-radius:4px;background:#EEF2F7;color:#64748B;margin-left:6px}
+.tag.named{background:#FFF1E6;color:#9A5B00}
+.bottom{margin-top:64px;padding-top:16px;border-top:1px solid var(--line);
+display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
+</style></head><body>
+<div class="wrap">
+  <a class="home" href="TICVAI%20Wireframe%20Boards.dc.html">&larr; All boards</a>
+  <div class="head">
+    <div><span class="mark">TICVAI</span>
+      <h1>P06 · Venue Staff App — Operations <span style="font-weight:600;color:#6B7280">(66 screens)</span></h1></div>
+    <div class="meta">staff · mobileApp · venue-staff-app</div>
+  </div>
+  <p class="lede"> <strong>10 of these are named in a client board and not written up in it</strong> — the operations are real, the layout is not.</p>
+  <div class="grp">01 — Operations · 46 screens</div><div class="grid">
+      <div id="emp-001" class="scr">
+        <div><div class="ttl">EMP-001 · Sign in</div>
+        <div class="pur">Get an employee onto a shared device fast.</div></div>
+        <div class="frame dark">
+          <div class="bar">Operations · wave 1 · comfortable</div>
+          <div class="strip">status · offline capable</div>
+          <div class="body"><div class="main"><div class="cmp"><b>detailPanel</b>detailPanel<span class="why">Structure from the wireframe board. Components not yet enumerated.</span></div></div></div>
+          
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> · login · forceLogout · getCurrentSession · getGuestSession +4</div>
+          <div><b>STATES</b> · <span class="off">loading · emptyFirstRun · emptyNoAccess · error · offline</span></div>
+          <div><b>ARRIVES WITH</b> · sessionId←session</div>
+          <div><b>GOES TO</b> · entry point · EMP-002 · EMP-003 · EMP-048</div>
+        </div>
+      </div>
+      <div id="emp-002" class="scr">
+        <div><div class="ttl">EMP-002 · Select venue &amp; role</div>
+        <div class="pur">Confirm which hat this person is wearing today.</div></div>
+        <div class="frame dark">
+          <div class="bar">Operations · wave 1 · comfortable</div>
+          <div class="strip">status · offline capable</div>
+          <div class="body"><div class="main"><div class="cmp"><b>detailPanel</b>detailPanel<span class="why">Structure from the wireframe board. Components not yet enumerated.</span></div></div></div>
+          
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> · listRoles · selectRole · createRole · forceLogout +6</div>
+          <div><b>STATES</b> · <span class="off">loading · emptyFirstRun · emptyNoAccess · error · offline</span></div>
+          <div><b>ARRIVES WITH</b> · sessionId←session</div>
+          <div><b>GOES TO</b> · EMP-001 · EMP-003 · EMP-048</div>
+        </div>
+      </div>
+      <div id="emp-003" class="scr">
+        <div><div class="ttl">EMP-003 · Home — on duty</div>
+        <div class="pur">The screen the device sits on between tasks.</div></div>
+        <div class="frame dark">
+          <div class="bar">Operations · wave 1 · comfortable</div>
+          <div class="strip">status · offline capable</div>
+          <div class="body"><div class="main"><div class="cmp"><b>detailPanel</b>detailPanel<span class="why">Structure from the wireframe board. Components not yet enumerated.</span></div></div></div>
+          
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> · getCurrentShift · listIncidents · acceptShiftVariance · approveShiftOpen +13</div>
+          <div><b>STATES</b> · <span class="off">loading · emptyFirstRun · emptyNoAccess · error · offline</span></div>
+          <div><b>ARRIVES WITH</b> · incidentId←deepLink, shiftId←session</div>
+          <div><b>GOES TO</b> · EMP-001 · EMP-002 · EMP-004 · EMP-048</div>
+        </div>
+      </div>
+      <div id="emp-048" class="scr">
+        <div><div class="ttl">EMP-048 · Opening checklist</div>
+        <div class="pur">Confirm a gate is fit to open before the first guest reaches it.</div></div>
+        <div class="frame dark">
+          <div class="bar">Operations · wave 1 · comfortable</div>
+          <div class="strip">status · offline capable</div>
+          <div class="body"><div class="main"><div class="cmp"><b>detailPanel</b>detailPanel<span class="why">Structure from the wireframe board. Components not yet enumerated.</span></div></div></div>
+          
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> · listInspectionTemplates · submitInspection · createInspectionTemplate · listInspections</div>
+          <div><b>STATES</b> · <span class="off">loading · emptyFirstRun · emptyNoAccess · error · offline</span></div>
+          
+          <div><b>GOES TO</b> · EMP-001 · EMP-002 · EMP-003</div>
+        </div>
+      </div>
+      <div id="emp-009" class="scr">
+        <div><div class="ttl">EMP-009 · End shift</div>
+        <div class="pur">Close out cleanly, including anything unsynced.</div></div>
+        <div class="frame dark">
+          <div class="bar">Operations · wave 1 · comfortable</div>
+          <div class="strip">status · offline capable</div>
+          <div class="body"><div class="main"><div class="cmp"><b>detailPanel</b>detailPanel<span class="why">Structure from the wireframe board. Components not yet enumerated.</span></div></div></div>
+          
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> · closeShift · acceptShiftVariance · approveShiftOpen · createCashMovement +9</div>
+          <div><b>STATES</b> · <span class="off">loading · emptyFirstRun · emptyNoAccess · error · offline</span></div>
+          <div><b>ARRIVES WITH</b> · shiftId←session</div>
+          <div><b>GOES TO</b> · EMP-001 · EMP-002 · EMP-003</div>
+        </div>
+      </div>
+      <div id="emp-010" class="scr">
+        <div><div class="ttl">EMP-010 · Scan — ready</div>
+        <div class="pur">The raised centre action, and the thing this app is for.</div></div>
+        <div class="frame dark">
+          <div class="bar">Operations · wave 1 · comfortable</div>
+          <div class="strip">status · offline capable</div>
+          <div class="body"><div class="main"><div class="cmp"><b>detailPanel</b>detailPanel<span class="why">Structure from the wireframe board. Components not yet enumerated.</span></div></div></div>
+          
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> · listScans · syncScans · getOfflinePackage · lookupTicket +3</div>
+          <div><b>STATES</b> · <span class="off">loading · emptyFirstRun · emptyNoAccess · error · offline · outcomeAdmitted</span></div>
+          
+          <div><b>GOES TO</b> · EMP-001 · EMP-002 · EMP-003</div>
+        </div>
+      </div>
+      <div id="emp-014" class="scr">
+        <div><div class="ttl">EMP-014 · Ticket lookup</div>
+        <div class="pur">Answer a question without admitting anybody.</div></div>
+        <div class="frame dark">
+          <div class="bar">Operations · wave 1 · comfortable</div>
+          <div class="strip">status · offline capable</div>
+          <div class="body"><div class="main"><div class="cmp"><b>detailPanel</b>detailPanel<span class="why">Structure from the wireframe board. Components not yet enumerated.</span></div></div></div>
+          
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> · listOrders · getOrder · createOrder · applyManualDiscount +10</div>
+          <div><b>STATES</b> · <span class="off">loading · emptyFirstRun · emptyNoAccess · error · offline</span></div>
+          <div><b>ARRIVES WITH</b> · orderId←deepLink</div>
+          <div><b>GOES TO</b> · EMP-001 · EMP-002 · EMP-003</div>
+        </div>
+      </div>
+      <div id="emp-015" class="scr">
+        <div><div class="ttl">EMP-015 · Group scan</div>
+        <div class="pur">Admit a party on one credential.</div></div>
+        <div class="frame dark">
+          <div class="bar">Operations · wave 2 · comfortable</div>
+          <div class="strip">status · offline capable</div>
+          <div class="body"><div class="main"><div class="cmp"><b>detailPanel</b>detailPanel<span class="why">Structure from the wireframe board. Components not yet enumerated.</span></div></div></div>
+          
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> · listScans · syncScans · getOfflinePackage · lookupTicket +3</div>
+          <div><b>STATES</b> · <span class="off">loading · emptyFirstRun · emptyNoAccess · error · offline</span></div>
+          
+          <div><b>GOES TO</b> · EMP-001 · EMP-002 · EMP-003</div>
+        </div>
+      </div>
+      <div id="emp-017" class="scr">
+        <div><div class="ttl">EMP-017 · Sync &amp; reconciliation</div>
+        <div class="pur">Learn that the server disagreed with you.</div></div>
+        <div class="frame dark">
+          <div class="bar">Operations · wave 1 · comfortable</div>
+          <div class="strip">status · offline capable</div>
+          <div class="body"><div class="main"><div class="cmp"><b>detailPanel</b>detailPanel<span class="why">Structure from the wireframe board. Components not yet enumerated.</span></div></div></div>
+          
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> · syncScans · listSyncRejections · getOfflinePackage · listScans +5</div>
+          <div><b>STATES</b> · <span class="off">loading · emptyFirstRun · emptyNoAccess · error · offline</span></div>
+          
+          <div><b>GOES TO</b> · EMP-001 · EMP-002 · EMP-003</div>
+        </div>
+      </div>
+      <div id="emp-018" class="scr">
+        <div><div class="ttl">EMP-018 · Offline package</div>
+        <div class="pur">Know which rules this device is enforcing.</div></div>
+        <div class="frame dark">
+          <div class="bar">Operations · wave 1 · comfortable</div>
+          <div class="strip">status · offline capable</div>
+          <div class="body"><div class="main"><div class="cmp"><b>detailPanel</b>detailPanel<span class="why">Structure from the wireframe board. Components not yet enumerated.</span></div></div></div>
+          
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> · listCatalogueBundles · getLatestBundle · publishBundle · reportBundleApplied</div>
+          <div><b>STATES</b> · <span class="off">loading · emptyFirstRun · emptyNoAccess · error · offline</span></div>
+          <div><b>ARRIVES WITH</b> · version←deepLink</div>
+          <div><b>GOES TO</b> · EMP-001 · EMP-002 · EMP-003</div>
+        </div>
+      </div>
+      <div id="emp-004" class="scr">
+        <div><div class="ttl">EMP-004 · Task list</div>
+        <div class="pur">See what is assigned, and what is overdue.</div></div>
+        <div class="frame dark">
+          <div class="bar">Operations · wave 1 · comfortable</div>
+          <div class="strip">status · offline capable</div>
+          <div class="body"><div class="main"><div class="cmp"><b>detailPanel</b>detailPanel<span class="why">Structure from the wireframe board. Components not yet enumerated.</span></div></div></div>
+          
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> · listWorkOrders · acceptWorkOrder · rejectWorkOrder · attachWorkOrderEvidence +12</div>
+          <div><b>STATES</b> · <span class="off">loading · emptyFirstRun · emptyNoAccess · error · offline</span></div>
+          <div><b>ARRIVES WITH</b> · workOrderId←deepLink</div>
+          <div><b>GOES TO</b> · EMP-001 · EMP-002 · EMP-003 · EMP-005</div>
+        </div>
+      </div>
+      <div id="emp-005" class="scr">
+        <div><div class="ttl">EMP-005 · Task detail</div>
+        <div class="pur">Do the task and record that it was done.</div></div>
+        <div class="frame dark">
+          <div class="bar">Operations · wave 1 · comfortable</div>
+          <div class="strip">status · offline capable</div>
+          <div class="body"><div class="main"><div class="cmp"><b>detailPanel</b>detailPanel<span class="why">Structure from the wireframe board. Components not yet enumerated.</span></div></div></div>
+          
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> · getWorkOrder · startWorkOrder · pauseWorkOrder · completeWorkOrder +12</div>
+          <div><b>STATES</b> · <span class="off">loading · emptyFirstRun · emptyNoAccess · error · offline</span></div>
+          <div><b>ARRIVES WITH</b> · workOrderId←deepLink</div>
+          <div><b>GOES TO</b> · BO-030 · BO-078 · EMP-001 · EMP-002</div>
+        </div>
+      </div>
+      <div id="emp-006" class="scr">
+        <div><div class="ttl">EMP-006 · Raise a task</div>
+        <div class="pur">Report something without finding a manager.</div></div>
+        <div class="frame dark">
+          <div class="bar">Operations · wave 1 · comfortable</div>
+          <div class="strip">status · offline capable</div>
+          <div class="body"><div class="main"><div class="cmp"><b>detailPanel</b>detailPanel<span class="why">Structure from the wireframe board. Components not yet enumerated.</span></div></div></div>
+          
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> · createWorkOrder · acceptWorkOrder · attachWorkOrderEvidence · cancelWorkOrder +12</div>
+          <div><b>STATES</b> · <span class="off">loading · emptyFirstRun · emptyNoAccess · error · offline</span></div>
+          <div><b>ARRIVES WITH</b> · workOrderId←deepLink</div>
+          <div><b>GOES TO</b> · EMP-001 · EMP-002 · EMP-003</div>
+        </div>
+      </div>
+      <div id="emp-007" class="scr">
+        <div><div class="ttl">EMP-007 · Handover notes</div>
+        <div class="pur">Tell the next shift what they are walking into.</div></div>
+        <div class="frame dark">
+          <div class="bar">Operations · wave 2 · comfortable</div>
+          <div class="strip">status · offline capable</div>
+          <div class="body"><div class="main"><div class="cmp"><b>detailPanel</b>detailPanel<span class="why">Structure from the wireframe board. Components not yet enumerated.</span></div></div></div>
+          
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> · listAnnouncements · publishAnnouncement · acknowledgeAnnouncement · getAnnouncementReach</div>
+          <div><b>STATES</b> · <span class="off">loading · emptyFirstRun · emptyNoAccess · error · offline</span></div>
+          <div><b>ARRIVES WITH</b> · announcementId←deepLink</div>
+          <div><b>GOES TO</b> · EMP-001 · EMP-002 · EMP-003 · EMP-009</div>
+        </div>
+      </div>
+      <div id="emp-008" class="scr">
+        <div><div class="ttl">EMP-008 · Shift summary</div>
+        <div class="pur">See what this person actually did today.</div></div>
+        <div class="frame dark">
+          <div class="bar">Operations · wave 2 · comfortable</div>
+          <div class="strip">status · offline capable</div>
+          <div class="body"><div class="main"><div class="cmp"><b>detailPanel</b>detailPanel<span class="why">Structure from the wireframe board. Components not yet enumerated.</span></div></div></div>
+          
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> · listShifts · getCurrentShift · openShift · acceptShiftVariance +9</div>
+          <div><b>STATES</b> · <span class="off">loading · emptyFirstRun · emptyNoAccess · error · offline</span></div>
+          <div><b>ARRIVES WITH</b> · shiftId←session</div>
+          <div><b>GOES TO</b> · EMP-001 · EMP-002 · EMP-003</div>
+        </div>
+      </div>
+      <div id="emp-019" class="scr">
+        <div><div class="ttl">EMP-019 · AI assistant — home</div>
+        <div class="pur">The tab that is already in the shell.</div></div>
+        <div class="frame dark">
+          <div class="bar">Operations · wave 1 · comfortable</div>
+          <div class="strip">status · offline capable</div>
+          <div class="body"><div class="main"><div class="cmp"><b>detailPanel</b>detailPanel<span class="why">Structure from the wireframe board. Components not yet enumerated.</span></div></div></div>
+          
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> · listAiConversations · createAiConversation · sendAiMessage</div>
+          <div><b>STATES</b> · <span class="off">loading · emptyFirstRun · emptyNoAccess · error · offline</span></div>
+          <div><b>ARRIVES WITH</b> · conversationId←deepLink</div>
+          <div><b>GOES TO</b> · EMP-001 · EMP-002 · EMP-003</div>
+        </div>
+      </div>
+      <div id="emp-020" class="scr">
+        <div><div class="ttl">EMP-020 · AI assistant — answer</div>
+        <div class="pur">Answer with the operation behind it visible.</div></div>
+        <div class="frame dark">
+          <div class="bar">Operations · wave 1 · comfortable</div>
+          <div class="strip">status · offline capable</div>
+          <div class="body"><div class="main"><div class="cmp"><b>detailPanel</b>detailPanel<span class="why">Structure from the wireframe board. Components not yet enumerated.</span></div></div></div>
+          
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> · sendAiMessage · createAiConversation · listAiConversations</div>
+          <div><b>STATES</b> · <span class="off">loading · emptyFirstRun · emptyNoAccess · error · offline</span></div>
+          <div><b>ARRIVES WITH</b> · conversationId←deepLink</div>
+          <div><b>GOES TO</b> · BO-058 · EMP-001 · EMP-002 · EMP-003</div>
+        </div>
+      </div>
+      <div id="emp-031" class="scr">
+        <div><div class="ttl">EMP-031 · Queue monitor</div>
+        <div class="pur">See the queue from the floor.</div></div>
+        <div class="frame dark">
+          <div class="bar">Operations · wave 2 · comfortable</div>
+          <div class="strip">status · offline capable</div>
+          <div class="body"><div class="main"><div class="cmp"><b>detailPanel</b>detailPanel<span class="why">Structure from the wireframe board. Components not yet enumerated.</span></div></div></div>
+          
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> · listQueues · getQueue · createQueue · callNextParties +5</div>
+          <div><b>STATES</b> · <span class="off">loading · emptyFirstRun · emptyNoAccess · error · offline</span></div>
+          <div><b>ARRIVES WITH</b> · queueId←deepLink</div>
+          <div><b>GOES TO</b> · EMP-001 · EMP-002 · EMP-003</div>
+        </div>
+      </div>
+      <div id="emp-032" class="scr">
+        <div><div class="ttl">EMP-032 · Manual wait entry</div>
+        <div class="pur">Take over when the wait feed dies.</div></div>
+        <div class="frame dark">
+          <div class="bar">Operations · wave 2 · comfortable</div>
+          <div class="strip">status · offline capable</div>
+          <div class="body"><div class="main"><div class="cmp"><b>detailPanel</b>detailPanel<span class="why">Structure from the wireframe board. Components not yet enumerated.</span></div></div></div>
+          
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> · setWaitTime · getWaitTimes · callNextParties · createQueue +5</div>
+          <div><b>STATES</b> · <span class="off">loading · emptyFirstRun · emptyNoAccess · error · offline</span></div>
+          <div><b>ARRIVES WITH</b> · queueId←deepLink</div>
+          <div><b>GOES TO</b> · BO-005 · EMP-001 · EMP-002 · EMP-003</div>
+        </div>
+      </div>
+      <div id="emp-033" class="scr">
+        <div><div class="ttl">EMP-033 · Capacity view</div>
+        <div class="pur">Know whether the next session can take a walk-up.</div></div>
+        <div class="frame dark">
+          <div class="bar">Operations · wave 2 · comfortable</div>
+          <div class="strip">status · offline capable</div>
+          <div class="body"><div class="main"><div class="cmp"><b>detailPanel</b>detailPanel<span class="why">Structure from the wireframe board. Components not yet enumerated.</span></div></div></div>
+          
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> · listEnvelopes · getChannelAllocations · createEnvelope · releaseChannelAllocation +2</div>
+          <div><b>STATES</b> · <span class="off">loading · emptyFirstRun · emptyNoAccess · error · offline</span></div>
+          <div><b>ARRIVES WITH</b> · envelopeId←deepLink</div>
+          <div><b>GOES TO</b> · EMP-001 · EMP-002 · EMP-003</div>
+        </div>
+      </div>
+      <div id="emp-034" class="scr">
+        <div><div class="ttl">EMP-034 · Walk-up sale</div>
+        <div class="pur">Sell at the gate without a till.</div></div>
+        <div class="frame dark">
+          <div class="bar">Operations · wave 2 · comfortable</div>
+          <div class="strip">status · offline capable</div>
+          <div class="body"><div class="main"><div class="cmp"><b>detailPanel</b>detailPanel<span class="why">Structure from the wireframe board. Components not yet enumerated.</span></div></div></div>
+          
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> · createOrder · listProducts · applyManualDiscount · createProduct +20</div>
+          <div><b>STATES</b> · <span class="off">loading · emptyFirstRun · emptyNoAccess · error · offline</span></div>
+          <div><b>ARRIVES WITH</b> · orderId←deepLink, productId←deepLink</div>
+          <div><b>GOES TO</b> · EMP-001 · EMP-002 · EMP-003</div>
+        </div>
+      </div>
+      <div id="emp-035" class="scr">
+        <div><div class="ttl">EMP-035 · Payment on device</div>
+        <div class="pur">Take a card payment on the handheld.</div></div>
+        <div class="frame dark">
+          <div class="bar">Operations · wave 2 · comfortable</div>
+          <div class="strip">status · offline capable</div>
+          <div class="body"><div class="main"><div class="cmp"><b>detailPanel</b>detailPanel<span class="why">Structure from the wireframe board. Components not yet enumerated.</span></div></div></div>
+          
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> · createPayment · inquirePaymentStatus · addTip · capturePayment</div>
+          <div><b>STATES</b> · <span class="off">loading · emptyFirstRun · emptyNoAccess · error · offline</span></div>
+          <div><b>ARRIVES WITH</b> · paymentId←deepLink</div>
+          <div><b>GOES TO</b> · EMP-001 · EMP-002 · EMP-003</div>
+        </div>
+      </div>
+      <div id="emp-036" class="scr">
+        <div><div class="ttl">EMP-036 · Issue media</div>
+        <div class="pur">Give the guest something the gate can read.</div></div>
+        <div class="frame dark">
+          <div class="bar">Operations · wave 2 · comfortable</div>
+          <div class="strip">status · offline capable</div>
+          <div class="body"><div class="main"><div class="cmp"><b>detailPanel</b>detailPanel<span class="why">Structure from the wireframe board. Components not yet enumerated.</span></div></div></div>
+          
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> · getMediaEntitlements · appendEntitlementToMedia · getMediaAsset</div>
+          <div><b>STATES</b> · <span class="off">loading · emptyFirstRun · emptyNoAccess · error · offline</span></div>
+          <div><b>ARRIVES WITH</b> · mediaCode←deepLink, mediaId←deepLink</div>
+          <div><b>GOES TO</b> · EMP-001 · EMP-002 · EMP-003</div>
+        </div>
+      </div>
+      <div id="emp-037" class="scr">
+        <div><div class="ttl">EMP-037 · Notifications</div>
+        <div class="pur">Tell the right person the right thing.</div></div>
+        <div class="frame dark">
+          <div class="bar">Operations · wave 1 · comfortable</div>
+          <div class="strip">status · offline capable</div>
+          <div class="body"><div class="main"><div class="cmp"><b>detailPanel</b>detailPanel<span class="why">Structure from the wireframe board. Components not yet enumerated.</span></div></div></div>
+          
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> · listAnnouncements · acknowledgeAnnouncement · getAnnouncementReach · publishAnnouncement</div>
+          <div><b>STATES</b> · <span class="off">loading · emptyFirstRun · emptyNoAccess · error · offline</span></div>
+          <div><b>ARRIVES WITH</b> · announcementId←deepLink</div>
+          <div><b>GOES TO</b> · EMP-001 · EMP-002 · EMP-003</div>
+        </div>
+      </div>
+      <div id="emp-039" class="scr">
+        <div><div class="ttl">EMP-039 · Announcements</div>
+        <div class="pur">Read what the venue told everybody.</div></div>
+        <div class="frame dark">
+          <div class="bar">Operations · wave 2 · comfortable</div>
+          <div class="strip">status · offline capable</div>
+          <div class="body"><div class="main"><div class="cmp"><b>detailPanel</b>detailPanel<span class="why">Structure from the wireframe board. Components not yet enumerated.</span></div></div></div>
+          
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> · listAnnouncements · acknowledgeAnnouncement · getAnnouncementReach · publishAnnouncement</div>
+          <div><b>STATES</b> · <span class="off">loading · emptyFirstRun · emptyNoAccess · error · offline</span></div>
+          <div><b>ARRIVES WITH</b> · announcementId←deepLink</div>
+          <div><b>GOES TO</b> · EMP-001 · EMP-002 · EMP-003</div>
+        </div>
+      </div>
+      <div id="emp-047" class="scr">
+        <div><div class="ttl">EMP-047 · Emergency mode</div>
+        <div class="pur">Evacuate, and stop pretending to be a ticketing app.</div></div>
+        <div class="frame dark">
+          <div class="bar">Operations · wave 1 · comfortable</div>
+          <div class="strip">status · offline capable</div>
+          <div class="body"><div class="main"><div class="cmp"><b>detailPanel</b>detailPanel<span class="why">Structure from the wireframe board. Components not yet enumerated.</span></div></div></div>
+          
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> · listAnnouncements · acknowledgeAnnouncement · getAnnouncementReach · publishAnnouncement</div>
+          <div><b>STATES</b> · <span class="off">loading · emptyFirstRun · emptyNoAccess · error · offline</span></div>
+          <div><b>ARRIVES WITH</b> · announcementId←deepLink</div>
+          <div><b>GOES TO</b> · EMP-001 · EMP-002 · EMP-003</div>
+        </div>
+      </div>
+      <div id="emp-050" class="scr">
+        <div><div class="ttl">EMP-050 · Post-incident restore</div>
+        <div class="pur">Put the venue back to how it was.</div></div>
+        <div class="frame dark">
+          <div class="bar">Operations · wave 2 · comfortable</div>
+          <div class="strip">status · offline capable</div>
+          <div class="body"><div class="main"><div class="cmp"><b>detailPanel</b>detailPanel<span class="why">Structure from the wireframe board. Components not yet enumerated.</span></div></div></div>
+          
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> · listIncidents · getIncident · reportIncident · recordAuthorityNotification +1</div>
+          <div><b>STATES</b> · <span class="off">loading · emptyFirstRun · emptyNoAccess · error · offline</span></div>
+          <div><b>ARRIVES WITH</b> · incidentId←deepLink</div>
+          <div><b>GOES TO</b> · EMP-001 · EMP-002 · EMP-003</div>
+        </div>
+      </div>
+      <div id="emp-021" class="scr">
+        <div><div class="ttl">EMP-021 · Roster</div>
+        <div class="pur">See who is on, and where.</div></div>
+        <div class="frame dark">
+          <div class="bar">Operations · wave 1 · comfortable</div>
+          <div class="strip">status · offline capable</div>
+          <div class="body"><div class="main"><div class="cmp"><b>detailPanel</b>detailPanel<span class="why">Structure from the wireframe board. Components not yet enumerated.</span></div></div></div>
+          
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> · listRotaAssignments · createRotaAssignment · requestShiftSwap · updateRotaAssignment</div>
+          <div><b>STATES</b> · <span class="off">loading · emptyFirstRun · emptyNoAccess · error · offline</span></div>
+          <div><b>ARRIVES WITH</b> · assignmentId←deepLink</div>
+          <div><b>GOES TO</b> · EMP-001 · EMP-002 · EMP-003</div>
+        </div>
+      </div>
+      <div id="emp-022" class="scr">
+        <div><div class="ttl">EMP-022 · My rota</div>
+        <div class="pur">Know when to turn up next.</div></div>
+        <div class="frame dark">
+          <div class="bar">Operations · wave 1 · comfortable</div>
+          <div class="strip">status · offline capable</div>
+          <div class="body"><div class="main"><div class="cmp"><b>detailPanel</b>detailPanel<span class="why">Structure from the wireframe board. Components not yet enumerated.</span></div></div></div>
+          
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> · listRotaAssignments · createRotaAssignment · requestShiftSwap · updateRotaAssignment</div>
+          <div><b>STATES</b> · <span class="off">loading · emptyFirstRun · emptyNoAccess · error · offline</span></div>
+          <div><b>ARRIVES WITH</b> · assignmentId←deepLink</div>
+          <div><b>GOES TO</b> · EMP-001 · EMP-002 · EMP-003</div>
+        </div>
+      </div>
+      <div id="emp-023" class="scr">
+        <div><div class="ttl">EMP-023 · Swap request</div>
+        <div class="pur">Ask somebody to take a shift.</div></div>
+        <div class="frame dark">
+          <div class="bar">Operations · wave 2 · comfortable</div>
+          <div class="strip">status · offline capable</div>
+          <div class="body"><div class="main"><div class="cmp"><b>detailPanel</b>detailPanel<span class="why">Structure from the wireframe board. Components not yet enumerated.</span></div></div></div>
+          
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> · requestShiftSwap · createRotaAssignment · listRotaAssignments · updateRotaAssignment</div>
+          <div><b>STATES</b> · <span class="off">loading · emptyFirstRun · emptyNoAccess · error · offline</span></div>
+          <div><b>ARRIVES WITH</b> · assignmentId←deepLink</div>
+          <div><b>GOES TO</b> · EMP-001 · EMP-002 · EMP-003</div>
+        </div>
+      </div>
+      <div id="emp-024" class="scr">
+        <div><div class="ttl">EMP-024 · Clock in / out</div>
+        <div class="pur">Record attendance from the device already in hand.</div></div>
+        <div class="frame dark">
+          <div class="bar">Operations · wave 1 · comfortable</div>
+          <div class="strip">status · offline capable</div>
+          <div class="body"><div class="main"><div class="cmp"><b>detailPanel</b>detailPanel<span class="why">Structure from the wireframe board. Components not yet enumerated.</span></div></div></div>
+          
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> · recordAttendance · listAttendance · amendAttendance</div>
+          <div><b>STATES</b> · <span class="off">loading · emptyFirstRun · emptyNoAccess · error · offline</span></div>
+          <div><b>ARRIVES WITH</b> · recordId←deepLink</div>
+          <div><b>GOES TO</b> · EMP-001 · EMP-002 · EMP-003</div>
+        </div>
+      </div>
+      <div id="emp-025" class="scr">
+        <div><div class="ttl">EMP-025 · Break management</div>
+        <div class="pur">Take a break without leaving a gate unstaffed.</div></div>
+        <div class="frame dark">
+          <div class="bar">Operations · wave 2 · comfortable</div>
+          <div class="strip">status · offline capable</div>
+          <div class="body"><div class="main"><div class="cmp"><b>detailPanel</b>detailPanel<span class="why">Structure from the wireframe board. Components not yet enumerated.</span></div></div></div>
+          
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> · recordAttendance · amendAttendance · listAttendance</div>
+          <div><b>STATES</b> · <span class="off">loading · emptyFirstRun · emptyNoAccess · error · offline</span></div>
+          <div><b>ARRIVES WITH</b> · recordId←deepLink</div>
+          <div><b>GOES TO</b> · EMP-001 · EMP-002 · EMP-003</div>
+        </div>
+      </div>
+      <div id="emp-026" class="scr">
+        <div><div class="ttl">EMP-026 · Incident report</div>
+        <div class="pur">Record what happened while it is fresh.</div></div>
+        <div class="frame dark">
+          <div class="bar">Operations · wave 1 · comfortable</div>
+          <div class="strip">status · offline capable</div>
+          <div class="body"><div class="main"><div class="cmp"><b>detailPanel</b>detailPanel<span class="why">Structure from the wireframe board. Components not yet enumerated.</span></div></div></div>
+          
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> · reportIncident · getIncident · listIncidents · recordAuthorityNotification +1</div>
+          <div><b>STATES</b> · <span class="off">loading · emptyFirstRun · emptyNoAccess · error · offline</span></div>
+          <div><b>ARRIVES WITH</b> · incidentId←deepLink</div>
+          <div><b>GOES TO</b> · EMP-001 · EMP-002 · EMP-003 · EMP-004</div>
+        </div>
+      </div>
+      <div id="emp-027" class="scr">
+        <div><div class="ttl">EMP-027 · Incident detail</div>
+        <div class="pur">Follow up on something already reported.</div></div>
+        <div class="frame dark">
+          <div class="bar">Operations · wave 2 · comfortable</div>
+          <div class="strip">status · offline capable</div>
+          <div class="body"><div class="main"><div class="cmp"><b>detailPanel</b>detailPanel<span class="why">Structure from the wireframe board. Components not yet enumerated.</span></div></div></div>
+          
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> · getIncident · updateIncident · listIncidents · recordAuthorityNotification +1</div>
+          <div><b>STATES</b> · <span class="off">loading · emptyFirstRun · emptyNoAccess · error · offline</span></div>
+          <div><b>ARRIVES WITH</b> · incidentId←deepLink</div>
+          <div><b>GOES TO</b> · EMP-001 · EMP-002 · EMP-003</div>
+        </div>
+      </div>
+      <div id="emp-028" class="scr">
+        <div><div class="ttl">EMP-028 · Lost &amp; found</div>
+        <div class="pur">Log something handed in.</div></div>
+        <div class="frame dark">
+          <div class="bar">Operations · wave 2 · comfortable</div>
+          <div class="strip">status · offline capable</div>
+          <div class="body"><div class="main"><div class="cmp"><b>detailPanel</b>detailPanel<span class="why">Structure from the wireframe board. Components not yet enumerated.</span></div></div></div>
+          
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> · createCase · addCaseMessage · escalateCase · getCase +3</div>
+          <div><b>STATES</b> · <span class="off">loading · emptyFirstRun · emptyNoAccess · error · offline</span></div>
+          <div><b>ARRIVES WITH</b> · caseId←deepLink</div>
+          <div><b>GOES TO</b> · EMP-001 · EMP-002 · EMP-003</div>
+        </div>
+      </div>
+      <div id="emp-029" class="scr">
+        <div><div class="ttl">EMP-029 · Guest assistance</div>
+        <div class="pur">Help a guest without leaving the floor.</div></div>
+        <div class="frame dark">
+          <div class="bar">Operations · wave 2 · comfortable</div>
+          <div class="strip">status · offline capable</div>
+          <div class="body"><div class="main"><div class="cmp"><b>detailPanel</b>detailPanel<span class="why">Structure from the wireframe board. Components not yet enumerated.</span></div></div></div>
+          
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> · reportIncident · createCase · addCaseMessage · escalateCase +8</div>
+          <div><b>STATES</b> · <span class="off">loading · emptyFirstRun · emptyNoAccess · error · offline</span></div>
+          <div><b>ARRIVES WITH</b> · caseId←deepLink, incidentId←deepLink</div>
+          <div><b>GOES TO</b> · EMP-001 · EMP-002 · EMP-003</div>
+        </div>
+      </div>
+      <div id="emp-030" class="scr">
+        <div><div class="ttl">EMP-030 · Venue map</div>
+        <div class="pur">Find a gate, an exit or a colleague.</div></div>
+        <div class="frame dark">
+          <div class="bar">Operations · wave 2 · comfortable</div>
+          <div class="strip">status · offline capable</div>
+          <div class="body"><div class="main"><div class="cmp"><b>detailPanel</b>detailPanel<span class="why">Structure from the wireframe board. Components not yet enumerated.</span></div></div></div>
+          
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> · getRefundPolicy · listDiningOutlets · setRefundPolicy · listDeliveryLocations +2</div>
+          <div><b>STATES</b> · <span class="off">loading · emptyFirstRun · emptyNoAccess · error · offline</span></div>
+          <div><b>ARRIVES WITH</b> · mapId←deepLink, venueId←session</div>
+          <div><b>GOES TO</b> · EMP-001 · EMP-002 · EMP-003</div>
+        </div>
+      </div>
+      <div id="emp-038" class="scr">
+        <div><div class="ttl">EMP-038 · Broadcast to team</div>
+        <div class="pur">Reach everybody on shift at once.</div></div>
+        <div class="frame dark">
+          <div class="bar">Operations · wave 2 · comfortable</div>
+          <div class="strip">status · offline capable</div>
+          <div class="body"><div class="main"><div class="cmp"><b>detailPanel</b>detailPanel<span class="why">Structure from the wireframe board. Components not yet enumerated.</span></div></div></div>
+          
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> · publishAnnouncement · getAnnouncementReach · acknowledgeAnnouncement · listAnnouncements</div>
+          <div><b>STATES</b> · <span class="off">loading · emptyFirstRun · emptyNoAccess · error · offline</span></div>
+          <div><b>ARRIVES WITH</b> · announcementId←deepLink</div>
+          <div><b>GOES TO</b> · EMP-001 · EMP-002 · EMP-003</div>
+        </div>
+      </div>
+      <div id="emp-040" class="scr">
+        <div><div class="ttl">EMP-040 · Knowledge base</div>
+        <div class="pur">Look up the rule rather than guess it.</div></div>
+        <div class="frame dark">
+          <div class="bar">Operations · wave 2 · comfortable</div>
+          <div class="strip">status · offline capable</div>
+          <div class="body"><div class="main"><div class="cmp"><b>detailPanel</b>detailPanel<span class="why">Structure from the wireframe board. Components not yet enumerated.</span></div></div></div>
+          
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> · semanticSearch</div>
+          <div><b>STATES</b> · <span class="off">loading · emptyFirstRun · emptyNoAccess · error · offline</span></div>
+          
+          <div><b>GOES TO</b> · EMP-001 · EMP-002 · EMP-003</div>
+        </div>
+      </div>
+      <div id="emp-041" class="scr">
+        <div><div class="ttl">EMP-041 · Training</div>
+        <div class="pur">Do the module that unlocks the role.</div></div>
+        <div class="frame dark">
+          <div class="bar">Operations · wave 3 · comfortable</div>
+          <div class="strip">status · offline capable</div>
+          <div class="body"><div class="main"><div class="cmp"><b>detailPanel</b>detailPanel<span class="why">Structure from the wireframe board. Components not yet enumerated.</span></div></div></div>
+          
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> · semanticSearch</div>
+          <div><b>STATES</b> · <span class="off">loading · emptyFirstRun · emptyNoAccess · error · offline</span></div>
+          
+          <div><b>GOES TO</b> · EMP-001 · EMP-002 · EMP-003</div>
+        </div>
+      </div>
+      <div id="emp-042" class="scr">
+        <div><div class="ttl">EMP-042 · Profile</div>
+        <div class="pur">Change what this person controls about themselves.</div></div>
+        <div class="frame dark">
+          <div class="bar">Operations · wave 1 · comfortable</div>
+          <div class="strip">status · offline capable</div>
+          <div class="body"><div class="main"><div class="cmp"><b>detailPanel</b>detailPanel<span class="why">Structure from the wireframe board. Components not yet enumerated.</span></div></div></div>
+          
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> · getCurrentSession · listMfaMethods · forceLogout · getGuestSession +3</div>
+          <div><b>STATES</b> · <span class="off">loading · emptyFirstRun · emptyNoAccess · error · offline</span></div>
+          <div><b>ARRIVES WITH</b> · sessionId←session</div>
+          <div><b>GOES TO</b> · EMP-001 · EMP-002 · EMP-003</div>
+        </div>
+      </div>
+      <div id="emp-043" class="scr">
+        <div><div class="ttl">EMP-043 · Device settings</div>
+        <div class="pur">Set how this handheld behaves.</div></div>
+        <div class="frame dark">
+          <div class="bar">Operations · wave 1 · comfortable</div>
+          <div class="strip">status · offline capable</div>
+          <div class="body"><div class="main"><div class="cmp"><b>detailPanel</b>detailPanel<span class="why">Structure from the wireframe board. Components not yet enumerated.</span></div></div></div>
+          
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> · listDevices · listGuestDevices · registerDevice · adjustLoyaltyPoints +8</div>
+          <div><b>STATES</b> · <span class="off">loading · emptyFirstRun · emptyNoAccess · error · offline</span></div>
+          <div><b>ARRIVES WITH</b> · subjectId←session</div>
+          <div><b>GOES TO</b> · EMP-001 · EMP-002 · EMP-003</div>
+        </div>
+      </div>
+      <div id="emp-044" class="scr">
+        <div><div class="ttl">EMP-044 · Accessibility</div>
+        <div class="pur">Make the app usable in the conditions it is used in.</div></div>
+        <div class="frame dark">
+          <div class="bar">Operations · wave 2 · comfortable</div>
+          <div class="strip">status · offline capable</div>
+          <div class="body"><div class="main"><div class="cmp"><b>detailPanel</b>detailPanel<span class="why">Structure from the wireframe board. Components not yet enumerated.</span></div></div></div>
+          
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> · none declared</div>
+          <div><b>STATES</b> · <span class="off">loading · emptyFirstRun · error · offline</span></div>
+          
+          <div><b>GOES TO</b> · EMP-001 · EMP-002 · EMP-003</div>
+        </div>
+      </div>
+      <div id="emp-045" class="scr">
+        <div><div class="ttl">EMP-045 · Arabic / RTL</div>
+        <div class="pur">Render the staff app right to left.</div></div>
+        <div class="frame dark">
+          <div class="bar">Operations · wave 1 · comfortable</div>
+          <div class="strip">status · offline capable</div>
+          <div class="body"><div class="main"><div class="cmp"><b>detailPanel</b>detailPanel<span class="why">Structure from the wireframe board. Components not yet enumerated.</span></div></div></div>
+          
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> · none declared</div>
+          <div><b>STATES</b> · <span class="off">loading · emptyFirstRun · error · offline</span></div>
+          
+          <div><b>GOES TO</b> · EMP-001 · EMP-002 · EMP-003</div>
+        </div>
+      </div>
+      <div id="emp-046" class="scr">
+        <div><div class="ttl">EMP-046 · Sign out</div>
+        <div class="pur">Leave the shared device safe for the next person.</div></div>
+        <div class="frame dark">
+          <div class="bar">Operations · wave 1 · comfortable</div>
+          <div class="strip">status · offline capable</div>
+          <div class="body"><div class="main"><div class="cmp"><b>detailPanel</b>detailPanel<span class="why">Structure from the wireframe board. Components not yet enumerated.</span></div></div></div>
+          
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> · logout</div>
+          <div><b>STATES</b> · <span class="off">loading · emptyFirstRun · error · offline</span></div>
+          
+          <div><b>GOES TO</b> · EMP-001 · EMP-002 · EMP-003</div>
+        </div>
+      </div>
+      <div id="emp-049" class="scr">
+        <div><div class="ttl">EMP-049 · Hand over the journal</div>
+        <div class="pur">Move an unsynced journal off a device that is going flat.</div></div>
+        <div class="frame dark">
+          <div class="bar">Operations · wave 1 · comfortable</div>
+          <div class="strip">status · offline capable</div>
+          <div class="body"><div class="main"><div class="cmp"><b>detailPanel</b>detailPanel<span class="why">Structure from the wireframe board. Components not yet enumerated.</span></div></div></div>
+          
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> · listScans · syncScans</div>
+          <div><b>STATES</b> · <span class="off">loading · emptyFirstRun · emptyNoAccess · error · offline</span></div>
+          
+          <div><b>GOES TO</b> · EMP-001 · EMP-002 · EMP-003</div>
+        </div>
+      </div></div><div class="grp">02 — Floor Service · 10 screens</div><div class="grid">
+      <div id="emp-051" class="scr">
+        <div><div class="ttl">EMP-051 · Restaurant Service Command Center<span class="tag named">named only</span></div>
+        <div class="pur">Restaurant Service Command Center — from the client design board, 20 August.</div></div>
+        <div class="frame dark">
+          <div class="bar">Floor Service · wave 2 · comfortable</div>
+          <div class="strip">status · offline capable</div>
+          <div class="body"><div class="main"><div class="cmp"><b>searchField</b>Search restaurant service command center</div><div class="cmp"><b>cardList</b>cardList<span class="why">**Cards rather than a table.** One thumb, arm’s length, and a person who is walking.</span></div><div class="cmp"><b>primaryButton</b>Confirm</div></div></div>
+          
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> · getTableMap · listTableReservations · listFnbOrders</div>
+          <div><b>STATES</b> · <span class="off">loading · emptyFirstRun · emptyNoResults · emptyNoAccess · error · offline</span></div>
+          <div><b>ARRIVES WITH</b> · venueId←session, outletId←EMP-003</div>
+          <div><b>GOES TO</b> · nothing declared</div>
+        </div>
+      </div>
+      <div id="emp-052" class="scr">
+        <div><div class="ttl">EMP-052 · Floor Plan &amp; Table Map<span class="tag">board</span></div>
+        <div class="pur">Floor Plan &amp; Table Map — from the client design board, 20 August.</div></div>
+        <div class="frame dark">
+          <div class="bar">Floor Service · wave 2 · comfortable</div>
+          <div class="strip">status · offline capable</div>
+          <div class="body"><div class="main"><div class="cmp"><b>searchField</b>Search floor plan</div><div class="cmp"><b>cardList</b>cardList<span class="why">**Cards rather than a table.** One thumb, arm’s length, and a person who is walking.</span></div><div class="cmp"><b>primaryButton</b>Confirm</div></div></div>
+          
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> · getTableMap · setTableLayout</div>
+          <div><b>STATES</b> · <span class="off">loading · emptyFirstRun · emptyNoResults · emptyNoAccess · error · offline</span></div>
+          <div><b>ARRIVES WITH</b> · venueId←session, outletId←EMP-003</div>
+          <div><b>GOES TO</b> · nothing declared</div>
+        </div>
+      </div>
+      <div id="emp-053" class="scr">
+        <div><div class="ttl">EMP-053 · Table &amp; Seating Configuration<span class="tag named">named only</span></div>
+        <div class="pur">Table &amp; Seating Configuration — from the client design board, 20 August.</div></div>
+        <div class="frame dark">
+          <div class="bar">Floor Service · wave 2 · comfortable</div>
+          <div class="strip">status · offline capable</div>
+          <div class="body"><div class="main"><div class="cmp"><b>searchField</b>Search table</div><div class="cmp"><b>cardList</b>cardList<span class="why">**Cards rather than a table.** One thumb, arm’s length, and a person who is walking.</span></div><div class="cmp"><b>primaryButton</b>Confirm</div></div></div>
+          
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> · setTableLayout</div>
+          <div><b>STATES</b> · <span class="off">loading · emptyFirstRun · emptyNoResults · emptyNoAccess · error · offline</span></div>
+          <div><b>ARRIVES WITH</b> · venueId←session, outletId←EMP-003</div>
+          <div><b>GOES TO</b> · nothing declared</div>
+        </div>
+      </div>
+      <div id="emp-054" class="scr">
+        <div><div class="ttl">EMP-054 · Reservation Calendar &amp; Timeline<span class="tag">board</span></div>
+        <div class="pur">Reservation Calendar &amp; Timeline — from the client design board, 20 August.</div></div>
+        <div class="frame dark">
+          <div class="bar">Floor Service · wave 2 · comfortable</div>
+          <div class="strip">status · offline capable</div>
+          <div class="body"><div class="main"><div class="cmp"><b>searchField</b>Search reservation calendar</div><div class="cmp"><b>cardList</b>cardList<span class="why">**Cards rather than a table.** One thumb, arm’s length, and a person who is walking.</span></div><div class="cmp"><b>primaryButton</b>Confirm</div></div></div>
+          
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> · listTableReservations</div>
+          <div><b>STATES</b> · <span class="off">loading · emptyFirstRun · emptyNoResults · emptyNoAccess · error · offline</span></div>
+          <div><b>ARRIVES WITH</b> · venueId←session</div>
+          <div><b>GOES TO</b> · nothing declared</div>
+        </div>
+      </div>
+      <div id="emp-055" class="scr">
+        <div><div class="ttl">EMP-055 · Create / Edit Reservation<span class="tag named">named only</span></div>
+        <div class="pur">Create / Edit Reservation — from the client design board, 20 August.</div></div>
+        <div class="frame dark">
+          <div class="bar">Floor Service · wave 2 · comfortable</div>
+          <div class="strip">status · offline capable</div>
+          <div class="body"><div class="main"><div class="cmp"><b>searchField</b>Search create / edit reservation</div><div class="cmp"><b>cardList</b>cardList<span class="why">**Cards rather than a table.** One thumb, arm’s length, and a person who is walking.</span></div><div class="cmp"><b>primaryButton</b>Confirm</div></div></div>
+          
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> · createTableReservation</div>
+          <div><b>STATES</b> · <span class="off">loading · emptyFirstRun · emptyNoResults · emptyNoAccess · error · offline</span></div>
+          <div><b>ARRIVES WITH</b> · venueId←session</div>
+          <div><b>GOES TO</b> · nothing declared</div>
+        </div>
+      </div>
+      <div id="emp-056" class="scr">
+        <div><div class="ttl">EMP-056 · Walk-In &amp; Waitlist Management<span class="tag">board</span></div>
+        <div class="pur">Walk-In &amp; Waitlist Management — from the client design board, 20 August.</div></div>
+        <div class="frame dark">
+          <div class="bar">Floor Service · wave 2 · comfortable</div>
+          <div class="strip">status · offline capable</div>
+          <div class="body"><div class="main"><div class="cmp"><b>searchField</b>Search walk-in</div><div class="cmp"><b>cardList</b>cardList<span class="why">**Cards rather than a table.** One thumb, arm’s length, and a person who is walking.</span></div><div class="cmp"><b>primaryButton</b>Confirm</div></div></div>
+          
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> · joinRestaurantWaitlist</div>
+          <div><b>STATES</b> · <span class="off">loading · emptyFirstRun · emptyNoResults · emptyNoAccess · error · offline</span></div>
+          <div><b>ARRIVES WITH</b> · venueId←session</div>
+          <div><b>GOES TO</b> · nothing declared</div>
+        </div>
+      </div>
+      <div id="emp-057" class="scr">
+        <div><div class="ttl">EMP-057 · Guest Profile &amp; Dining History<span class="tag named">named only</span></div>
+        <div class="pur">Guest Profile &amp; Dining History — from the client design board, 20 August.</div></div>
+        <div class="frame dark">
+          <div class="bar">Floor Service · wave 2 · comfortable</div>
+          <div class="strip">status · offline capable</div>
+          <div class="body"><div class="main"><div class="cmp"><b>searchField</b>Search guest profile</div><div class="cmp"><b>cardList</b>cardList<span class="why">**Cards rather than a table.** One thumb, arm’s length, and a person who is walking.</span></div><div class="cmp"><b>primaryButton</b>Confirm</div></div></div>
+          
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> · getGuestProfile · listOrders</div>
+          <div><b>STATES</b> · <span class="off">loading · emptyFirstRun · emptyNoResults · emptyNoAccess · error · offline</span></div>
+          <div><b>ARRIVES WITH</b> · venueId←session, subjectId←EMP-003</div>
+          <div><b>GOES TO</b> · nothing declared</div>
+        </div>
+      </div>
+      <div id="emp-058" class="scr">
+        <div><div class="ttl">EMP-058 · Live Table &amp; Service Management<span class="tag">board</span></div>
+        <div class="pur">Live Table &amp; Service Management — from the client design board, 20 August.</div></div>
+        <div class="frame dark">
+          <div class="bar">Floor Service · wave 2 · comfortable</div>
+          <div class="strip">status · offline capable</div>
+          <div class="body"><div class="main"><div class="cmp"><b>searchField</b>Search live table</div><div class="cmp"><b>cardList</b>cardList<span class="why">**Cards rather than a table.** One thumb, arm’s length, and a person who is walking.</span></div><div class="cmp"><b>primaryButton</b>Confirm</div></div></div>
+          
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> · openTableVisit · updateTableVisit · mergeTableVisits · transferTableVisit</div>
+          <div><b>STATES</b> · <span class="off">loading · emptyFirstRun · emptyNoResults · emptyNoAccess · error · offline</span></div>
+          <div><b>ARRIVES WITH</b> · venueId←session, visitId←EMP-003</div>
+          <div><b>GOES TO</b> · nothing declared</div>
+        </div>
+      </div>
+      <div id="emp-059" class="scr">
+        <div><div class="ttl">EMP-059 · Table Order, Bill &amp; Payment Management<span class="tag named">named only</span></div>
+        <div class="pur">Table Order, Bill &amp; Payment Management — from the client design board, 20 August.</div></div>
+        <div class="frame dark">
+          <div class="bar">Floor Service · wave 2 · comfortable</div>
+          <div class="strip">status · offline capable</div>
+          <div class="body"><div class="main"><div class="cmp"><b>searchField</b>Search table order, bill</div><div class="cmp"><b>cardList</b>cardList<span class="why">**Cards rather than a table.** One thumb, arm’s length, and a person who is walking.</span></div><div class="cmp"><b>primaryButton</b>Confirm</div></div></div>
+          
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> · closeTableVisit · createPayment · createFnbOrder</div>
+          <div><b>STATES</b> · <span class="off">loading · emptyFirstRun · emptyNoResults · emptyNoAccess · error · offline</span></div>
+          <div><b>ARRIVES WITH</b> · venueId←session, visitId←EMP-003</div>
+          <div><b>GOES TO</b> · nothing declared</div>
+        </div>
+      </div>
+      <div id="emp-060" class="scr">
+        <div><div class="ttl">EMP-060 · Reservation &amp; Table Performance<span class="tag named">named only</span></div>
+        <div class="pur">Reservation &amp; Table Performance — from the client design board, 20 August.</div></div>
+        <div class="frame dark">
+          <div class="bar">Floor Service · wave 2 · comfortable</div>
+          <div class="strip">status · offline capable</div>
+          <div class="body"><div class="main"><div class="cmp"><b>searchField</b>Search reservation</div><div class="cmp"><b>cardList</b>cardList<span class="why">**Cards rather than a table.** One thumb, arm’s length, and a person who is walking.</span></div><div class="cmp"><b>primaryButton</b>Confirm</div></div></div>
+          
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> · listTableReservations · getTableMap</div>
+          <div><b>STATES</b> · <span class="off">loading · emptyFirstRun · emptyNoResults · emptyNoAccess · error · offline</span></div>
+          <div><b>ARRIVES WITH</b> · venueId←session, outletId←EMP-003</div>
+          <div><b>GOES TO</b> · nothing declared</div>
+        </div>
+      </div></div><div class="grp">03 — Stock on the Floor · 10 screens</div><div class="grid">
+      <div id="emp-061" class="scr">
+        <div><div class="ttl">EMP-061 · Retail Inventory Command Center<span class="tag named">named only</span></div>
+        <div class="pur">Retail Inventory Command Center — from the client design board, 20 August.</div></div>
+        <div class="frame dark">
+          <div class="bar">Stock on the Floor · wave 2 · comfortable</div>
+          <div class="strip">status · offline capable</div>
+          <div class="body"><div class="main"><div class="cmp"><b>searchField</b>Search retail inventory command center</div><div class="cmp"><b>cardList</b>cardList<span class="why">**Cards rather than a table.** One thumb, arm’s length, and a person who is walking.</span></div><div class="cmp"><b>primaryButton</b>Confirm</div></div></div>
+          
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> · getStockPositions · listStockMovements</div>
+          <div><b>STATES</b> · <span class="off">loading · emptyFirstRun · emptyNoResults · emptyNoAccess · error · offline</span></div>
+          <div><b>ARRIVES WITH</b> · venueId←session</div>
+          <div><b>GOES TO</b> · nothing declared</div>
+        </div>
+      </div>
+      <div id="emp-062" class="scr">
+        <div><div class="ttl">EMP-062 · Store Stock &amp; SKU Availability<span class="tag named">named only</span></div>
+        <div class="pur">Store Stock &amp; SKU Availability — from the client design board, 20 August.</div></div>
+        <div class="frame dark">
+          <div class="bar">Stock on the Floor · wave 2 · comfortable</div>
+          <div class="strip">status · offline capable</div>
+          <div class="body"><div class="main"><div class="cmp"><b>searchField</b>Search store stock</div><div class="cmp"><b>cardList</b>cardList<span class="why">**Cards rather than a table.** One thumb, arm’s length, and a person who is walking.</span></div><div class="cmp"><b>primaryButton</b>Confirm</div></div></div>
+          
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> · getStockPositions · setItemAvailability</div>
+          <div><b>STATES</b> · <span class="off">loading · emptyFirstRun · emptyNoResults · emptyNoAccess · error · offline</span></div>
+          <div><b>ARRIVES WITH</b> · venueId←session, itemId←EMP-003</div>
+          <div><b>GOES TO</b> · nothing declared</div>
+        </div>
+      </div>
+      <div id="emp-063" class="scr">
+        <div><div class="ttl">EMP-063 · Requisition &amp; Smart Store Replenishment<span class="tag">board</span></div>
+        <div class="pur">Requisition &amp; Smart Store Replenishment — from the client design board, 20 August.</div></div>
+        <div class="frame dark">
+          <div class="bar">Stock on the Floor · wave 2 · comfortable</div>
+          <div class="strip">status · offline capable</div>
+          <div class="body"><div class="main"><div class="cmp"><b>searchField</b>Search requisition</div><div class="cmp"><b>cardList</b>cardList<span class="why">**Cards rather than a table.** One thumb, arm’s length, and a person who is walking.</span></div><div class="cmp"><b>primaryButton</b>Confirm</div></div></div>
+          
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> · createRequisition · listRequisitions</div>
+          <div><b>STATES</b> · <span class="off">loading · emptyFirstRun · emptyNoResults · emptyNoAccess · error · offline</span></div>
+          <div><b>ARRIVES WITH</b> · venueId←session</div>
+          <div><b>GOES TO</b> · nothing declared</div>
+        </div>
+      </div>
+      <div id="emp-064" class="scr">
+        <div><div class="ttl">EMP-064 · Store-to-Store &amp; Warehouse Transfers<span class="tag">board</span></div>
+        <div class="pur">Store-to-Store &amp; Warehouse Transfers — from the client design board, 20 August.</div></div>
+        <div class="frame dark">
+          <div class="bar">Stock on the Floor · wave 2 · comfortable</div>
+          <div class="strip">status · offline capable</div>
+          <div class="body"><div class="main"><div class="cmp"><b>searchField</b>Search store-to-store</div><div class="cmp"><b>cardList</b>cardList<span class="why">**Cards rather than a table.** One thumb, arm’s length, and a person who is walking.</span></div><div class="cmp"><b>primaryButton</b>Confirm</div></div></div>
+          
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> · createStockTransfer · listStockLocations</div>
+          <div><b>STATES</b> · <span class="off">loading · emptyFirstRun · emptyNoResults · emptyNoAccess · error · offline</span></div>
+          <div><b>ARRIVES WITH</b> · venueId←session</div>
+          <div><b>GOES TO</b> · nothing declared</div>
+        </div>
+      </div>
+      <div id="emp-065" class="scr">
+        <div><div class="ttl">EMP-065 · Receiving &amp; Store Put-Away<span class="tag">board</span></div>
+        <div class="pur">Receiving &amp; Store Put-Away — from the client design board, 20 August.</div></div>
+        <div class="frame dark">
+          <div class="bar">Stock on the Floor · wave 2 · comfortable</div>
+          <div class="strip">status · offline capable</div>
+          <div class="body"><div class="main"><div class="cmp"><b>searchField</b>Search receiving</div><div class="cmp"><b>cardList</b>cardList<span class="why">**Cards rather than a table.** One thumb, arm’s length, and a person who is walking.</span></div><div class="cmp"><b>primaryButton</b>Confirm</div></div></div>
+          
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> · createGoodsReceipt · rejectReceivedGoods</div>
+          <div><b>STATES</b> · <span class="off">loading · emptyFirstRun · emptyNoResults · emptyNoAccess · error · offline</span></div>
+          <div><b>ARRIVES WITH</b> · venueId←session, receiptId←EMP-003</div>
+          <div><b>GOES TO</b> · nothing declared</div>
+        </div>
+      </div>
+      <div id="emp-066" class="scr">
+        <div><div class="ttl">EMP-066 · Stock Count &amp; Cycle Count Management<span class="tag">board</span></div>
+        <div class="pur">Stock Count &amp; Cycle Count Management — from the client design board, 20 August.</div></div>
+        <div class="frame dark">
+          <div class="bar">Stock on the Floor · wave 2 · comfortable</div>
+          <div class="strip">status · offline capable</div>
+          <div class="body"><div class="main"><div class="cmp"><b>searchField</b>Search stock count</div><div class="cmp"><b>cardList</b>cardList<span class="why">**Cards rather than a table.** One thumb, arm’s length, and a person who is walking.</span></div><div class="cmp"><b>primaryButton</b>Confirm</div></div></div>
+          
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> · startStockCount · postStockCount · getCountVariance</div>
+          <div><b>STATES</b> · <span class="off">loading · emptyFirstRun · emptyNoResults · emptyNoAccess · error · offline</span></div>
+          <div><b>ARRIVES WITH</b> · venueId←session, countId←EMP-003</div>
+          <div><b>GOES TO</b> · nothing declared</div>
+        </div>
+      </div>
+      <div id="emp-067" class="scr">
+        <div><div class="ttl">EMP-067 · Damage, Loss, Shrinkage &amp; Stock Adjustment<span class="tag">board</span></div>
+        <div class="pur">Damage, Loss, Shrinkage &amp; Stock Adjustment — from the client design board, 20 August.</div></div>
+        <div class="frame dark">
+          <div class="bar">Stock on the Floor · wave 2 · comfortable</div>
+          <div class="strip">status · offline capable</div>
+          <div class="body"><div class="main"><div class="cmp"><b>searchField</b>Search damage, loss, shrinkage</div><div class="cmp"><b>cardList</b>cardList<span class="why">**Cards rather than a table.** One thumb, arm’s length, and a person who is walking.</span></div><div class="cmp"><b>primaryButton</b>Confirm</div></div></div>
+          
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> · recordWaste · createStockMovement</div>
+          <div><b>STATES</b> · <span class="off">loading · emptyFirstRun · emptyNoResults · emptyNoAccess · error · offline</span></div>
+          <div><b>ARRIVES WITH</b> · venueId←session, outletId←EMP-003</div>
+          <div><b>GOES TO</b> · nothing declared</div>
+        </div>
+      </div>
+      <div id="emp-068" class="scr">
+        <div><div class="ttl">EMP-068 · Reservation, Allocation &amp; Omnichannel Inventory<span class="tag named">named only</span></div>
+        <div class="pur">Reservation, Allocation &amp; Omnichannel Inventory — from the client design board, 20 August.</div></div>
+        <div class="frame dark">
+          <div class="bar">Stock on the Floor · wave 2 · comfortable</div>
+          <div class="strip">status · offline capable</div>
+          <div class="body"><div class="main"><div class="cmp"><b>searchField</b>Search reservation, allocation</div><div class="cmp"><b>cardList</b>cardList<span class="why">**Cards rather than a table.** One thumb, arm’s length, and a person who is walking.</span></div><div class="cmp"><b>primaryButton</b>Confirm</div></div></div>
+          
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> · getStockPositions · reserveMerchandise</div>
+          <div><b>STATES</b> · <span class="off">loading · emptyFirstRun · emptyNoResults · emptyNoAccess · error · offline</span></div>
+          <div><b>ARRIVES WITH</b> · venueId←session, outletId←EMP-003</div>
+          <div><b>GOES TO</b> · nothing declared</div>
+        </div>
+      </div>
+      <div id="emp-069" class="scr">
+        <div><div class="ttl">EMP-069 · Barcode, RFID, Serialized Stock &amp; Traceability<span class="tag">board</span></div>
+        <div class="pur">Barcode, RFID, Serialized Stock &amp; Traceability — from the client design board, 20 August.</div></div>
+        <div class="frame dark">
+          <div class="bar">Stock on the Floor · wave 2 · comfortable</div>
+          <div class="strip">status · offline capable</div>
+          <div class="body"><div class="main"><div class="cmp"><b>searchField</b>Search barcode, rfid, serialized stock</div><div class="cmp"><b>cardList</b>cardList<span class="why">**Cards rather than a table.** One thumb, arm’s length, and a person who is walking.</span></div><div class="cmp"><b>primaryButton</b>Confirm</div></div></div>
+          
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> · listSerialisedItems · lookupMerchandise</div>
+          <div><b>STATES</b> · <span class="off">loading · emptyFirstRun · emptyNoResults · emptyNoAccess · error · offline</span></div>
+          <div><b>ARRIVES WITH</b> · venueId←session</div>
+          <div><b>GOES TO</b> · nothing declared</div>
+        </div>
+      </div>
+      <div id="emp-070" class="scr">
+        <div><div class="ttl">EMP-070 · Inventory Exceptions, AI Replenishment &amp; Action Center<span class="tag named">named only</span></div>
+        <div class="pur">Inventory Exceptions, AI Replenishment &amp; Action Center — from the client design board, 20 August.</div></div>
+        <div class="frame dark">
+          <div class="bar">Stock on the Floor · wave 2 · comfortable</div>
+          <div class="strip">status · offline capable</div>
+          <div class="body"><div class="main"><div class="cmp"><b>searchField</b>Search inventory exceptions, ai replenishment</div><div class="cmp"><b>cardList</b>cardList<span class="why">**Cards rather than a table.** One thumb, arm’s length, and a person who is walking.</span></div><div class="cmp"><b>primaryButton</b>Confirm</div></div></div>
+          
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> · listAlerts · acknowledgeAlert · createRequisition</div>
+          <div><b>STATES</b> · <span class="off">loading · emptyFirstRun · emptyNoResults · emptyNoAccess · error · offline</span></div>
+          <div><b>ARRIVES WITH</b> · venueId←session, alertId←EMP-003</div>
+          <div><b>GOES TO</b> · nothing declared</div>
+        </div>
+      </div></div>
+  <div class="bottom">
+    <span>Generated by tools/derive-wireframes.py from screens/P06-staff-app.yaml — do not hand-edit</span>
+    <span>P06 · 66 screens · 3 groups</span>
+  </div>
+</div></body></html>

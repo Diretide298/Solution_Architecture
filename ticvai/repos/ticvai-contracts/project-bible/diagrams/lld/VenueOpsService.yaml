@@ -1,0 +1,1190 @@
+id: LLD-VenueOpsService
+title: VenueOpsService — 102 operations, 32 tables
+generatedBy: tools/derive-diagrams.py
+tier: operations
+index: diagrams/hld.yaml
+why: '**Six small domains, 102 operations, one team.** Queue, maintenance, bookable resources, venue
+  mapping, media assets and arcade. None is large enough to deploy alone, all are venue-scoped, none
+  is on the critical sale path, and **all six are licensed as optional modules** — a venue that buys
+  none of them should not be running six idle services.'
+scale: Low and steady. Queue readings are the only frequent write.
+ifDown: Down degrades venue operations. Selling and admitting continue.
+coverage:
+  operations: 102
+  inAFlow: 48
+  percent: 47%
+  note: '**Flow coverage is how much of this service a journey has walked.** A service under 40% is
+    unwalked rather than under-documented.'
+schemas:
+- schema: queue
+  tables: 4
+  storage: ''
+- schema: maintenance
+  tables: 8
+  storage: Photo, video, document, note or signature against a work order. Evidence, not decoration
+    — captured offline and queued
+- schema: resources
+  tables: 4
+  storage: What a person resource is certified to do, and until when (BL-042). **A lapsed lifeguard
+    certificate is a safety failure, not a data-quality one.**
+- schema: venuemap
+  tables: 4
+  storage: The navigation graph (19.2.56). **`isStepFree` is the most important attribute on it** —
+    a wheelchair user routed up a staircase was failed by the map.
+- schema: assets
+  tables: 4
+  storage: ''
+- schema: games
+  tables: 8
+  storage: ''
+operationsByContract:
+- contract: maintenance
+  count: 36
+  operations:
+  - operation: acceptWorkOrder
+    verb: POST
+    path: /work-orders/{workOrderId}/accept
+    scope: venue
+    permission: MAINTENANCE_EXECUTE
+    offline: true
+    reads: 2
+    writes: 2
+  - operation: attachWorkOrderEvidence
+    verb: POST
+    path: /work-orders/{workOrderId}/attachments
+    scope: venue
+    permission: MAINTENANCE_EXECUTE
+    offline: true
+    reads: 3
+    writes: 2
+  - operation: cancelWorkOrder
+    verb: POST
+    path: /work-orders/{workOrderId}/cancel
+    scope: venue
+    permission: WORK_ORDER_MANAGE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: closeWorkOrder
+    verb: POST
+    path: /work-orders/{workOrderId}/close
+    scope: venue
+    permission: MAINTENANCE_APPROVE
+    offline: false
+    reads: 3
+    writes: 2
+  - operation: completeWorkOrder
+    verb: POST
+    path: /work-orders/{workOrderId}/complete
+    scope: venue
+    permission: WORK_ORDER_MANAGE
+    offline: true
+    reads: 2
+    writes: 2
+  - operation: createAsset
+    verb: POST
+    path: /assets
+    scope: venue
+    permission: ASSET_MANAGE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: createInspectionTemplate
+    verb: POST
+    path: /inspection-templates
+    scope: tenant
+    permission: INSPECTION_MANAGE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: createMaintenancePlan
+    verb: POST
+    path: /maintenance-plans
+    scope: venue
+    permission: ASSET_MANAGE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: createWorkOrder
+    verb: POST
+    path: /work-orders
+    scope: venue
+    permission: WORK_ORDER_MANAGE
+    offline: true
+    reads: 2
+    writes: 2
+  - operation: getAsset
+    verb: GET
+    path: /assets/{assetId}
+    scope: venue
+    permission: ASSET_VIEW
+    offline: true
+    reads: 3
+    writes: 0
+  - operation: getAssetHistory
+    verb: GET
+    path: /assets/{assetId}/history
+    scope: venue
+    permission: ASSET_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: getDueMaintenance
+    verb: GET
+    path: /maintenance-plans/due
+    scope: venue
+    permission: ASSET_VIEW
+    offline: false
+    reads: 2
+    writes: 0
+  - operation: getIncident
+    verb: GET
+    path: /incidents/{incidentId}
+    scope: venue
+    permission: INCIDENT_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: getWorkOrder
+    verb: GET
+    path: /work-orders/{workOrderId}
+    scope: venue
+    permission: WORK_ORDER_VIEW
+    offline: true
+    reads: 1
+    writes: 0
+  - operation: listAssets
+    verb: GET
+    path: /assets
+    scope: venue
+    permission: ASSET_VIEW
+    offline: true
+    reads: 1
+    writes: 0
+  - operation: listIncidents
+    verb: GET
+    path: /incidents
+    scope: venue
+    permission: INCIDENT_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listInspectionTemplates
+    verb: GET
+    path: /inspection-templates
+    scope: venue
+    permission: INSPECTION_VIEW
+    offline: true
+    reads: 1
+    writes: 0
+  - operation: listInspections
+    verb: GET
+    path: /inspections
+    scope: venue
+    permission: INSPECTION_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listMaintenancePlans
+    verb: GET
+    path: /maintenance-plans
+    scope: venue
+    permission: ASSET_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listWorkOrders
+    verb: GET
+    path: /work-orders
+    scope: venue
+    permission: WORK_ORDER_VIEW
+    offline: true
+    reads: 1
+    writes: 0
+  - operation: lookupAsset
+    verb: GET
+    path: /assets/lookup
+    scope: venue
+    permission: ASSET_VIEW
+    offline: true
+    reads: 3
+    writes: 0
+  - operation: pauseWorkOrder
+    verb: POST
+    path: /work-orders/{workOrderId}/pause
+    scope: venue
+    permission: MAINTENANCE_EXECUTE
+    offline: true
+    reads: 2
+    writes: 3
+  - operation: recordAuthorityNotification
+    verb: POST
+    path: /incidents/{incidentId}/notify-authority
+    scope: venue
+    permission: INCIDENT_MANAGE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: recordWorkOrderParts
+    verb: POST
+    path: /work-orders/{workOrderId}/parts
+    scope: venue
+    permission: WORK_ORDER_MANAGE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: recordWorkOrderTime
+    verb: POST
+    path: /work-orders/{workOrderId}/time
+    scope: venue
+    permission: WORK_ORDER_MANAGE
+    offline: true
+    reads: 2
+    writes: 2
+  - operation: rejectWorkOrder
+    verb: POST
+    path: /work-orders/{workOrderId}/reject
+    scope: venue
+    permission: MAINTENANCE_EXECUTE
+    offline: true
+    reads: 2
+    writes: 2
+  - operation: reportIncident
+    verb: POST
+    path: /incidents
+    scope: venue
+    permission: INCIDENT_REPORT
+    offline: true
+    reads: 2
+    writes: 2
+  - operation: resumeWorkOrder
+    verb: POST
+    path: /work-orders/{workOrderId}/resume
+    scope: venue
+    permission: MAINTENANCE_EXECUTE
+    offline: true
+    reads: 2
+    writes: 2
+  - operation: setAssetStatus
+    verb: PUT
+    path: /assets/{assetId}/status
+    scope: venue
+    permission: ASSET_MANAGE
+    offline: true
+    reads: 2
+    writes: 2
+  - operation: startWorkOrder
+    verb: POST
+    path: /work-orders/{workOrderId}/start
+    scope: venue
+    permission: MAINTENANCE_EXECUTE
+    offline: true
+    reads: 2
+    writes: 2
+  - operation: submitInspection
+    verb: POST
+    path: /inspections
+    scope: venue
+    permission: INSPECTION_SUBMIT
+    offline: true
+    reads: 2
+    writes: 2
+  - operation: updateAsset
+    verb: PATCH
+    path: /assets/{assetId}
+    scope: venue
+    permission: ASSET_MANAGE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: updateIncident
+    verb: PATCH
+    path: /incidents/{incidentId}
+    scope: venue
+    permission: INCIDENT_MANAGE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: updateMaintenancePlan
+    verb: PATCH
+    path: /maintenance-plans/{planId}
+    scope: venue
+    permission: ASSET_MANAGE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: updateWorkOrder
+    verb: PATCH
+    path: /work-orders/{workOrderId}
+    scope: venue
+    permission: WORK_ORDER_MANAGE
+    offline: true
+    reads: 2
+    writes: 2
+  - operation: verifyWorkOrder
+    verb: POST
+    path: /work-orders/{workOrderId}/verify
+    scope: venue
+    permission: WORK_ORDER_VERIFY
+    offline: false
+    reads: 2
+    writes: 2
+- contract: queue
+  count: 21
+  operations:
+  - operation: callNextParties
+    verb: POST
+    path: /queues/{queueId}/call-next
+    scope: venue
+    permission: QUEUE_MANAGE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: configureQueueFeed
+    verb: PUT
+    path: /queue-feeds
+    scope: venue
+    permission: QUEUE_MANAGE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: createQueue
+    verb: POST
+    path: /queues
+    scope: venue
+    permission: QUEUE_MANAGE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: getQueue
+    verb: GET
+    path: /queues/{queueId}
+    scope: venue
+    permission: QUEUE_VIEW
+    offline: true
+    reads: 1
+    writes: 0
+  - operation: getQueueEntry
+    verb: GET
+    path: /queue-entries/{entryId}
+    scope: venue
+    permission: null
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: getQueueFeedHealth
+    verb: GET
+    path: /queue-feeds/{feedId}/health
+    scope: venue
+    permission: QUEUE_MANAGE
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: getSignageQueueBoard
+    verb: GET
+    path: /signage/queue-board
+    scope: venue
+    permission: null
+    offline: true
+    reads: 2
+    writes: 0
+  - operation: getSignageQueueCalls
+    verb: GET
+    path: /signage/queue-calls
+    scope: venue
+    permission: null
+    offline: true
+    reads: 1
+    writes: 0
+  - operation: getWaitTimes
+    verb: GET
+    path: /queues/wait-times
+    scope: venue
+    permission: null
+    offline: true
+    reads: 3
+    writes: 0
+  - operation: joinQueue
+    verb: POST
+    path: /queue-entries
+    scope: venue
+    permission: null
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: leaveQueue
+    verb: DELETE
+    path: /queue-entries/{entryId}
+    scope: venue
+    permission: null
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: listQueueEntries
+    verb: GET
+    path: /queues/{queueId}/entries
+    scope: venue
+    permission: QUEUE_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listQueueFeeds
+    verb: GET
+    path: /queue-feeds
+    scope: venue
+    permission: QUEUE_MANAGE
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listQueues
+    verb: GET
+    path: /queues
+    scope: venue
+    permission: QUEUE_VIEW
+    offline: true
+    reads: 1
+    writes: 0
+  - operation: overrideQueueEntry
+    verb: POST
+    path: /queue-entries/{entryId}/override
+    scope: venue
+    permission: QUEUE_OVERRIDE
+    offline: true
+    reads: 2
+    writes: 2
+  - operation: redeemQueueEntry
+    verb: POST
+    path: /queue-entries/{entryId}/redeem
+    scope: workstation
+    permission: QUEUE_REDEEM
+    offline: true
+    reads: 2
+    writes: 2
+  - operation: setQueueStatus
+    verb: PUT
+    path: /queues/{queueId}/status
+    scope: venue
+    permission: QUEUE_MANAGE
+    offline: true
+    reads: 2
+    writes: 2
+  - operation: setWaitTime
+    verb: PUT
+    path: /queues/{queueId}/wait-time
+    scope: venue
+    permission: QUEUE_MANAGE
+    offline: true
+    reads: 2
+    writes: 2
+  - operation: submitQueueReading
+    verb: POST
+    path: /queue-feeds/readings
+    scope: venue
+    permission: null
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: testQueueFeed
+    verb: POST
+    path: /queue-feeds/{feedId}/test
+    scope: venue
+    permission: QUEUE_MANAGE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: updateQueue
+    verb: PATCH
+    path: /queues/{queueId}
+    scope: venue
+    permission: QUEUE_MANAGE
+    offline: false
+    reads: 2
+    writes: 2
+- contract: games
+  count: 14
+  operations:
+  - operation: adjustGameCard
+    verb: POST
+    path: /game-cards/{cardCode}/adjust
+    scope: venue
+    permission: LEDGER_POST
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: createGame
+    verb: POST
+    path: /games
+    scope: venue
+    permission: PRODUCT_CONFIGURE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: createPrize
+    verb: POST
+    path: /prizes
+    scope: venue
+    permission: PRODUCT_CONFIGURE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: getGameCard
+    verb: GET
+    path: /game-cards/{cardCode}
+    scope: venue
+    permission: null
+    offline: true
+    reads: 2
+    writes: 0
+  - operation: issueGameCard
+    verb: POST
+    path: /game-cards
+    scope: workstation
+    permission: ORDER_CREATE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: listGames
+    verb: GET
+    path: /games
+    scope: venue
+    permission: PRODUCT_VIEW
+    offline: true
+    reads: 1
+    writes: 0
+  - operation: listPrizes
+    verb: GET
+    path: /prizes
+    scope: venue
+    permission: PRODUCT_VIEW
+    offline: true
+    reads: 1
+    writes: 0
+  - operation: loadGameCredits
+    verb: POST
+    path: /game-cards/{cardCode}/load
+    scope: workstation
+    permission: ORDER_CREATE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: recordGamePlay
+    verb: POST
+    path: /game-plays
+    scope: venue
+    permission: null
+    offline: true
+    reads: 2
+    writes: 2
+  - operation: redeemPrize
+    verb: POST
+    path: /prize-redemptions
+    scope: workstation
+    permission: ORDER_CREATE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: setReaderProfile
+    verb: PUT
+    path: /reader-profiles
+    scope: venue
+    permission: PRODUCT_CONFIGURE
+    offline: false
+    reads: 3
+    writes: 2
+  - operation: syncGamePlays
+    verb: POST
+    path: /game-plays/sync
+    scope: venue
+    permission: null
+    offline: false
+    reads: 2
+    writes: 3
+  - operation: transferGameCard
+    verb: POST
+    path: /game-cards/{cardCode}/transfer
+    scope: venue
+    permission: ORDER_MODIFY
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: updateGame
+    verb: PATCH
+    path: /games/{gameId}
+    scope: venue
+    permission: PRODUCT_CONFIGURE
+    offline: false
+    reads: 2
+    writes: 2
+- contract: venue-map
+  count: 12
+  operations:
+  - operation: acceptVenueLabelProposals
+    verb: POST
+    path: /venue-maps/{mapId}/proposals
+    scope: venue
+    permission: VENUE_MAP_MANAGE
+    offline: false
+    reads: 3
+    writes: 2
+  - operation: acceptWalkwayProposals
+    verb: POST
+    path: /venue-maps/{mapId}/walkway-proposals
+    scope: venue
+    permission: VENUE_MAP_MANAGE
+    offline: false
+    reads: 4
+    writes: 3
+  - operation: createVenueMap
+    verb: POST
+    path: /venue-maps
+    scope: venue
+    permission: VENUE_MAP_MANAGE
+    offline: false
+    reads: 4
+    writes: 2
+  - operation: getVenueMap
+    verb: GET
+    path: /venue-maps/{mapId}
+    scope: venue
+    permission: VENUE_MAP_VIEW
+    offline: true
+    reads: 4
+    writes: 0
+  - operation: getVenueMapGraph
+    verb: GET
+    path: /venue-maps/{mapId}/graph
+    scope: venue
+    permission: VENUE_MAP_VIEW
+    offline: true
+    reads: 4
+    writes: 1
+  - operation: getVenueMapLive
+    verb: GET
+    path: /venue-maps/{mapId}/live
+    scope: venue
+    permission: VENUE_MAP_VIEW
+    offline: false
+    reads: 4
+    writes: 0
+  - operation: importVenueGeometry
+    verb: POST
+    path: /venue-maps/{mapId}/import
+    scope: venue
+    permission: VENUE_MAP_MANAGE
+    offline: false
+    reads: 2
+    writes: 4
+  - operation: listVenueMaps
+    verb: GET
+    path: /venue-maps
+    scope: venue
+    permission: VENUE_MAP_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: publishVenueMap
+    verb: POST
+    path: /venue-maps/{mapId}/publish
+    scope: venue
+    permission: VENUE_MAP_PUBLISH
+    offline: false
+    reads: 6
+    writes: 3
+  - operation: setPathClosure
+    verb: POST
+    path: /venue-maps/{mapId}/paths/{pathId}/closure
+    scope: venue
+    permission: VENUE_MAP_MANAGE
+    offline: false
+    reads: 3
+    writes: 4
+  - operation: setVenuePoint
+    verb: POST
+    path: /venue-maps/{mapId}/points
+    scope: venue
+    permission: VENUE_MAP_MANAGE
+    offline: false
+    reads: 5
+    writes: 2
+  - operation: validateVenueMapGraph
+    verb: POST
+    path: /venue-maps/{mapId}/validate-graph
+    scope: venue
+    permission: VENUE_MAP_MANAGE
+    offline: false
+    reads: 3
+    writes: 0
+- contract: assets
+  count: 10
+  operations:
+  - operation: completeUpload
+    verb: POST
+    path: /media/uploads/{uploadId}/complete
+    scope: venue
+    permission: ASSET_LIBRARY_MANAGE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: createCollection
+    verb: POST
+    path: /media/collections
+    scope: venue
+    permission: ASSET_LIBRARY_MANAGE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: createUpload
+    verb: POST
+    path: /media/uploads
+    scope: venue
+    permission: ASSET_LIBRARY_MANAGE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: deleteMediaAsset
+    verb: DELETE
+    path: /media/{mediaId}
+    scope: venue
+    permission: ASSET_LIBRARY_MANAGE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: getExpiringRights
+    verb: GET
+    path: /media/rights-expiring
+    scope: venue
+    permission: ASSET_LIBRARY_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: getMediaAsset
+    verb: GET
+    path: /media/{mediaId}
+    scope: venue
+    permission: ASSET_LIBRARY_VIEW
+    offline: false
+    reads: 2
+    writes: 0
+  - operation: listCollections
+    verb: GET
+    path: /media/collections
+    scope: venue
+    permission: ASSET_LIBRARY_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: replaceMediaAsset
+    verb: POST
+    path: /media/{mediaId}/replace
+    scope: venue
+    permission: ASSET_LIBRARY_MANAGE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: searchMedia
+    verb: GET
+    path: /media
+    scope: venue
+    permission: ASSET_LIBRARY_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: updateMediaAsset
+    verb: PATCH
+    path: /media/{mediaId}
+    scope: venue
+    permission: ASSET_LIBRARY_MANAGE
+    offline: false
+    reads: 2
+    writes: 2
+- contract: resources
+  count: 9
+  operations:
+  - operation: bookResource
+    verb: POST
+    path: /resource-bookings
+    scope: venue
+    permission: RESOURCE_BOOK
+    offline: false
+    reads: 3
+    writes: 2
+  - operation: checkInResource
+    verb: POST
+    path: /resource-bookings/{bookingId}/check-in
+    scope: venue
+    permission: RESOURCE_BOOK
+    offline: true
+    reads: 3
+    writes: 4
+  - operation: checkOutResource
+    verb: POST
+    path: /resource-bookings/{bookingId}/check-out
+    scope: venue
+    permission: RESOURCE_BOOK
+    offline: true
+    reads: 4
+    writes: 4
+  - operation: createResource
+    verb: POST
+    path: /resources
+    scope: venue
+    permission: RESOURCE_MANAGE
+    offline: false
+    reads: 3
+    writes: 2
+  - operation: getResourceAvailability
+    verb: GET
+    path: /resources/{resourceId}/availability
+    scope: venue
+    permission: RESOURCE_VIEW
+    offline: false
+    reads: 3
+    writes: 0
+  - operation: getSessionManifest
+    verb: GET
+    path: /sessions/{sessionId}/manifest
+    scope: venue
+    permission: RESOURCE_VIEW
+    offline: true
+    reads: 3
+    writes: 0
+  - operation: listResources
+    verb: GET
+    path: /resources
+    scope: venue
+    permission: RESOURCE_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: reorderSessionManifest
+    verb: PUT
+    path: /sessions/{sessionId}/manifest
+    scope: venue
+    permission: RESOURCE_BOOK
+    offline: true
+    reads: 2
+    writes: 2
+  - operation: setResourceQualifications
+    verb: PUT
+    path: /resources/{resourceId}/qualifications
+    scope: venue
+    permission: RESOURCE_MANAGE
+    offline: false
+    reads: 3
+    writes: 2
+tables:
+- table: assets.media_asset
+  columns: 23
+  store: postgres
+  parent: null
+  writtenBy:
+  - assets
+  foreignWriters: null
+- table: assets.media_collection
+  columns: 7
+  store: postgres
+  parent: null
+  writtenBy:
+  - assets
+  foreignWriters: null
+- table: assets.media_upload
+  columns: 7
+  store: postgres
+  parent: null
+  writtenBy:
+  - assets
+  foreignWriters: null
+- table: assets.media_usage
+  columns: 6
+  store: postgres
+  parent: null
+  writtenBy:
+  - assets
+  foreignWriters: null
+- table: games.card
+  columns: 13
+  store: postgres
+  parent: null
+  writtenBy:
+  - games
+  foreignWriters: null
+- table: games.credit_ledger
+  columns: 1
+  store: postgres
+  parent: games.card
+  writtenBy:
+  - games
+  foreignWriters: null
+- table: games.game
+  columns: 15
+  store: postgres
+  parent: null
+  writtenBy:
+  - games
+  foreignWriters: null
+- table: games.play
+  columns: 9
+  store: postgres
+  parent: null
+  writtenBy:
+  - games
+  foreignWriters: null
+- table: games.prize
+  columns: 11
+  store: postgres
+  parent: null
+  writtenBy:
+  - games
+  foreignWriters: null
+- table: games.reader_profile
+  columns: 6
+  store: postgres
+  parent: null
+  writtenBy:
+  - games
+  foreignWriters: null
+- table: games.redemption
+  columns: 9
+  store: postgres
+  parent: null
+  writtenBy:
+  - games
+  foreignWriters: null
+- table: games.redemption_line
+  columns: 5
+  store: postgres
+  parent: games.redemption
+  writtenBy: []
+  foreignWriters: null
+- table: maintenance.asset
+  columns: 24
+  store: postgres
+  parent: null
+  writtenBy:
+  - maintenance
+  foreignWriters: null
+- table: maintenance.incident
+  columns: 18
+  store: postgres
+  parent: null
+  writtenBy:
+  - maintenance
+  foreignWriters: null
+- table: maintenance.inspection
+  columns: 13
+  store: postgres
+  parent: null
+  writtenBy:
+  - maintenance
+  foreignWriters: null
+- table: maintenance.inspection_template
+  columns: 8
+  store: postgres
+  parent: null
+  writtenBy:
+  - maintenance
+  foreignWriters: null
+- table: maintenance.inspection_template_item
+  columns: 10
+  store: postgres
+  parent: maintenance.inspection_template
+  writtenBy: []
+  foreignWriters: null
+- table: maintenance.maintenance_plan
+  columns: 11
+  store: postgres
+  parent: null
+  writtenBy:
+  - maintenance
+  foreignWriters: null
+- table: maintenance.work_order
+  columns: 28
+  store: postgres
+  parent: null
+  writtenBy:
+  - maintenance
+  foreignWriters: null
+- table: maintenance.work_order_attachment
+  columns: 9
+  store: postgres
+  parent: maintenance.work_order
+  writtenBy:
+  - maintenance
+  foreignWriters: null
+- table: queue.entry
+  columns: 18
+  store: postgres
+  parent: null
+  writtenBy:
+  - queue
+  foreignWriters: null
+- table: queue.feed
+  columns: 7
+  store: postgres
+  parent: null
+  writtenBy:
+  - queue
+  foreignWriters: null
+- table: queue.queue
+  columns: 21
+  store: postgres
+  parent: null
+  writtenBy:
+  - queue
+  foreignWriters: null
+- table: queue.reading
+  columns: 6
+  store: postgres
+  parent: null
+  writtenBy:
+  - queue
+  foreignWriters: null
+- table: resources.booking
+  columns: 14
+  store: postgres
+  parent: null
+  writtenBy:
+  - resources
+  foreignWriters: null
+- table: resources.qualification
+  columns: 6
+  store: postgres
+  parent: null
+  writtenBy:
+  - resources
+  foreignWriters: null
+- table: resources.resource
+  columns: 15
+  store: postgres
+  parent: null
+  writtenBy:
+  - resources
+  foreignWriters: null
+- table: resources.session_participant
+  columns: 8
+  store: postgres
+  parent: null
+  writtenBy:
+  - resources
+  foreignWriters: null
+- table: venuemap.import_job
+  columns: 9
+  store: postgres
+  parent: null
+  writtenBy:
+  - venue-map
+  foreignWriters: null
+- table: venuemap.map
+  columns: 14
+  store: postgres
+  parent: null
+  writtenBy:
+  - venue-map
+  foreignWriters: null
+- table: venuemap.path
+  columns: 10
+  store: postgres
+  parent: null
+  writtenBy:
+  - venue-map
+  foreignWriters: null
+- table: venuemap.point
+  columns: 15
+  store: postgres
+  parent: null
+  writtenBy:
+  - venue-map
+  foreignWriters: null
+readsFrom:
+- service: TenancyService
+  operations: 4
+- service: IdentityService
+  operations: 3
+- service: AccessService
+  operations: 2
+- service: CatalogueService
+  operations: 2
+- service: AiService
+  operations: 2
+- service: MarketingService
+  operations: 1
+writesOutside:
+- service: OrderService
+  operations: 2
+  why: '**The owner defines the row; this service may only append to it.**'
+- service: CrossCellService
+  operations: 1
+  why: '**The owner defines the row; this service may only append to it.**'
+- service: InventoryService
+  operations: 1
+  why: '**The owner defines the row; this service may only append to it.**'
+screens:
+- P01:WEB-015 Virtual Waiting Room
+- P02:GST-003 Attractions List
+- P02:GST-004 Attraction Details
+- P02:GST-021 Interactive Map
+- P02:GST-022 Attraction Wait Times
+- P02:GST-023 Virtual Queue / Join Queue
+- P02:GST-026 Retail / Merchandise
+- P02:GST-038 Digital Companion Mode
+- P02:GST-046 Branded Queue / Waiting Room
+- P02:GST-051 Plan Your Adventure – Start
+- P02:GST-053 Build Your Own Itinerary
+- P02:GST-054 AI Optimized Itinerary
+- P02:GST-059 Plan My Day – In Progress
+- P04:POS-002 Sell — Ticket Catalogue
+- P04:POS-010 Add to Existing Ticket
+- P06:EMP-003 Home — on duty
+- P06:EMP-004 Task list
+- P06:EMP-005 Task detail
+- P06:EMP-006 Raise a task
+- P06:EMP-026 Incident report
+- P06:EMP-027 Incident detail
+- P06:EMP-029 Guest assistance
+- P06:EMP-030 Venue map
+- P06:EMP-031 Queue monitor
+- P06:EMP-032 Manual wait entry
+- P06:EMP-036 Issue media
+- P06:EMP-048 Opening checklist
+- P06:EMP-050 Post-incident restore
+- P08:BO-001 Queue Directory
+- P08:BO-002 Queue Configuration
+- P08:BO-003 Queue Integration Setup
+- P08:BO-004 Manual Wait Time Entry
+- P08:BO-005 Queue Monitor
+- P08:BO-027 Reissue & Media Replacement
+- P08:BO-030 Work Order Verification
+- P08:BO-031 Asset Register
+- P08:BO-038 Reconciliation Queue
+- P08:BO-069 Asset Register
+- P08:BO-071 Planned Maintenance
+- P08:BO-072 Incident Log
+- P08:BO-092 Venue Maps
+- P08:BO-093 Map Import & Labelling
+- P08:BO-094 Map Editor & Publish
+- P08:BO-095 Resources
+- P08:BO-096 Resource Calendar
+- P08:BO-097 Check Out & Check In
+- P08:BO-098 Qualifications
+- P08:BO-099 Session Manifest
+- P08:BO-125 Product & Category Button Configuration
+- P11:ACC-006 Reviewer Queue
+- P13:CMS-002 Brand Kit
+- P13:CMS-004 Logo & Assets
+- P13:CMS-010 Media Library
+flows:
+- F08 Steward works a shift on the employee app
+- F12 Asset fails and closes a queue
+- F15 A part is needed and ordered
+- F18 A guest plays an arcade game
+- F21 A ride queue fills and a guest is redirected
+- F22 A tenant rebrands their app
+- F25 A guest rents a cabana
+- F26 A venue maps its site
+- F48 A guest finds it, queues for it, and eats
+- F49 A guest plans a day and follows it
+- F64 A steward signs in and takes a venue and a role
+- F65 A task is raised, worked and handed over
+- F67 A queue is monitored and capacity is held
+- F69 An incident is reported, escalated and closed
+- F70 A guest needs help and something is lost

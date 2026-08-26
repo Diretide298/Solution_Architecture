@@ -1,0 +1,434 @@
+id: HLD
+title: TICVAI — sixteen services in five tiers
+generatedBy: tools/derive-diagrams.py
+about: '**What ships together.** 1,014 operations and 379 tables resolve into sixteen deployable services,
+  and **the data boundary decides where they split** — no service spans a schema it does not own, and
+  no schema is written by two services.
+
+
+  **Arrows are cross-service writes.** The rule is that the owner defines the row and a foreign writer
+  may only append to it: a till closing posts to `ledger.entry` because settling a shift *is* a ledger
+  act.'
+decision: docs/adr/0028-service-decomposition.md
+tiers:
+- tier: foundation
+  meaning: Read by everything, reads nothing above. **Deploys first and alone** — twelve contracts read
+    Identity and 289 tables anchor on `platform.scope_node`.
+  services:
+  - service: TenancyService
+    operations: 52
+    tables: 35
+    schemas:
+    - platform
+    - workforce
+    - approvals
+    contracts:
+    - tenancy
+    - workforce
+    - approvals
+    flowCoverage: 62%
+    scale: Read-heavy and highly cacheable. Config changes are rare.
+    ifDown: Same as identity — nothing runs without a scope.
+    ref: diagrams/lld/TenancyService.yaml
+  - service: IdentityService
+    operations: 44
+    tables: 20
+    schemas:
+    - identity
+    - pii
+    contracts:
+    - identity
+    flowCoverage: 48%
+    scale: Read-heavy, latency-critical, cached hard. Every request resolves a principal.
+    ifDown: '**A restart is an outage everywhere.** Deploys go out first and alone.'
+    ref: diagrams/lld/IdentityService.yaml
+- tier: commerce
+  meaning: The sale path. Highest availability and the highest write rate in the platform.
+  services:
+  - service: CatalogueService
+    operations: 132
+    tables: 40
+    schemas:
+    - catalogue
+    - promotions
+    - seating
+    contracts:
+    - catalogue
+    - promotions
+    - seating
+    flowCoverage: 43%
+    scale: Read-heavy, bundle-published to tills. **The catalogue bundle is this service's output**
+      (ADR-0013).
+    ifDown: A bad publish reaches every workstation. Versioned and rollback-able for that reason.
+    ref: diagrams/lld/CatalogueService.yaml
+  - service: OrderService
+    operations: 96
+    tables: 34
+    schemas:
+    - orders
+    contracts:
+    - orders
+    - shift
+    flowCoverage: 55%
+    scale: Write-heavy, spiky, latency-critical. **The one that autoscales.**
+    ifDown: '**Down means no sales.** Highest availability target in the platform.'
+    ref: diagrams/lld/OrderService.yaml
+  - service: LedgerService
+    operations: 54
+    tables: 18
+    schemas:
+    - ledger
+    contracts:
+    - finance
+    flowCoverage: 61%
+    scale: Write-heavy, batch-tolerant, not latency-critical. Recognition and revaluation are jobs.
+    ifDown: '**Correctness over availability.** A ledger that is briefly unavailable is recoverable;
+      one that is briefly wrong is not.'
+    ref: diagrams/lld/LedgerService.yaml
+  - service: AccessService
+    operations: 30
+    tables: 8
+    schemas:
+    - access
+    contracts:
+    - access
+    flowCoverage: 57%
+    scale: Read-heavy, extreme latency sensitivity, edge-cached. **`frozenDays` is held rather than
+      replayed** precisely because the gate cannot afford the arithmetic.
+    ifDown: Down means the gates stop. Runs at the edge with a local decision cache.
+    ref: diagrams/lld/AccessService.yaml
+- tier: operations
+  meaning: What a venue does with what it sold. **Licensed per module** — a venue that bought none of
+    these runs none of them.
+  services:
+  - service: VenueOpsService
+    operations: 102
+    tables: 32
+    schemas:
+    - queue
+    - maintenance
+    - resources
+    - venuemap
+    - assets
+    - games
+    contracts:
+    - queue
+    - maintenance
+    - resources
+    - venue-map
+    - assets
+    - games
+    flowCoverage: 47%
+    scale: Low and steady. Queue readings are the only frequent write.
+    ifDown: Down degrades venue operations. Selling and admitting continue.
+    ref: diagrams/lld/VenueOpsService.yaml
+  - service: FnbService
+    operations: 96
+    tables: 34
+    schemas:
+    - fnb
+    contracts:
+    - fnb
+    flowCoverage: 73%
+    scale: Write-heavy during service, idle between. **Two peaks a day, sharply.**
+    ifDown: Down means the kitchen falls back to paper. Offline-capable by design.
+    ref: diagrams/lld/FnbService.yaml
+  - service: InventoryService
+    operations: 50
+    tables: 19
+    schemas:
+    - inventory
+    contracts:
+    - inventory
+    flowCoverage: 96%
+    scale: Mixed. Counting is bursty; procurement is not.
+    ifDown: Down blocks receiving and counting; selling continues from the till's cache.
+    ref: diagrams/lld/InventoryService.yaml
+  - service: RetailService
+    operations: 35
+    tables: 14
+    schemas:
+    - retail
+    contracts:
+    - retail
+    flowCoverage: 43%
+    scale: Follows the sale. Nothing unusual.
+    ifDown: Down means the shop stops; the gates and the restaurant do not.
+    ref: diagrams/lld/RetailService.yaml
+- tier: engagement
+  meaning: Guests and intelligence. **Nothing that takes money depends on these**, which is a deliberate
+    property and one that should be tested rather than assumed.
+  services:
+  - service: MarketingService
+    operations: 96
+    tables: 37
+    schemas:
+    - marketing
+    contracts:
+    - marketing-crm
+    flowCoverage: 41%
+    scale: Bursty on send, read-heavy otherwise. **The one to watch for a split.**
+    ifDown: Down stops campaigns and guest lookup. Neither stops trading.
+    ref: diagrams/lld/MarketingService.yaml
+  - service: AiService
+    operations: 30
+    tables: 15
+    schemas:
+    - ai
+    - qdrant
+    contracts:
+    - ai
+    flowCoverage: 57%
+    scale: Latency-tolerant, cost-sensitive, token-metered. Different hardware from everything else.
+    ifDown: Down degrades suggestions and the concierge. **Nothing that takes money depends on it.**
+    ref: diagrams/lld/AiService.yaml
+- tier: platform
+  meaning: Provisioning, publishing, reporting, and the one path that crosses a region.
+  services:
+  - service: ControlService
+    operations: 102
+    tables: 41
+    schemas:
+    - control
+    contracts:
+    - subscription
+    - platform-ops
+    - public-api
+    flowCoverage: 39%
+    scale: Low volume, high consequence. Tenant provisioning and licensing.
+    ifDown: Down blocks provisioning and the developer API. **Trading is unaffected.**
+    ref: diagrams/lld/ControlService.yaml
+  - service: WhiteLabelService
+    operations: 50
+    tables: 13
+    schemas:
+    - whitelabel
+    contracts:
+    - white-label
+    flowCoverage: 44%
+    scale: Read-heavy and heavily cached. Published, not queried.
+    ifDown: Down freezes the current published config. Guests see the last good version.
+    ref: diagrams/lld/WhiteLabelService.yaml
+  - service: ReportingService
+    operations: 29
+    tables: 13
+    schemas:
+    - reporting
+    contracts:
+    - reporting
+    flowCoverage: 62%
+    scale: Analytical. Runs against the replica and the analytical store.
+    ifDown: Down stops dashboards. **Nothing operational depends on it.**
+    ref: diagrams/lld/ReportingService.yaml
+  - service: CrossCellService
+    operations: 16
+    tables: 1
+    schemas:
+    - sync
+    contracts:
+    - cross-cell
+    flowCoverage: 31%
+    scale: Low volume, high scrutiny.
+    ifDown: Down blocks cross-region entitlements. Each region continues alone.
+    ref: diagrams/lld/CrossCellService.yaml
+crossServiceWrites:
+- from: CrossCellService
+  to: TenancyService
+  writes: 11
+  reads: 16
+  kind: strong
+- from: OrderService
+  to: LedgerService
+  writes: 7
+  reads: 5
+  kind: strong
+- from: OrderService
+  to: AccessService
+  writes: 7
+  reads: 12
+  kind: strong
+- from: OrderService
+  to: CatalogueService
+  writes: 5
+  reads: 19
+  kind: strong
+- from: FnbService
+  to: MarketingService
+  writes: 4
+  reads: 0
+  kind: ordinary
+- from: CatalogueService
+  to: AccessService
+  writes: 3
+  reads: 5
+  kind: ordinary
+- from: FnbService
+  to: InventoryService
+  writes: 3
+  reads: 7
+  kind: ordinary
+- from: FnbService
+  to: OrderService
+  writes: 3
+  reads: 4
+  kind: ordinary
+- from: OrderService
+  to: MarketingService
+  writes: 3
+  reads: 1
+  kind: ordinary
+- from: WhiteLabelService
+  to: ControlService
+  writes: 3
+  reads: 3
+  kind: ordinary
+- from: AccessService
+  to: IdentityService
+  writes: 2
+  reads: 8
+  kind: ordinary
+- from: ControlService
+  to: TenancyService
+  writes: 2
+  reads: 4
+  kind: ordinary
+- from: FnbService
+  to: CatalogueService
+  writes: 2
+  reads: 2
+  kind: ordinary
+- from: InventoryService
+  to: CatalogueService
+  writes: 2
+  reads: 2
+  kind: ordinary
+- from: MarketingService
+  to: IdentityService
+  writes: 2
+  reads: 15
+  kind: ordinary
+- from: MarketingService
+  to: ControlService
+  writes: 2
+  reads: 1
+  kind: ordinary
+- from: ReportingService
+  to: AiService
+  writes: 2
+  reads: 4
+  kind: ordinary
+- from: RetailService
+  to: InventoryService
+  writes: 2
+  reads: 0
+  kind: ordinary
+- from: VenueOpsService
+  to: OrderService
+  writes: 2
+  reads: 0
+  kind: ordinary
+- from: AccessService
+  to: CrossCellService
+  writes: 1
+  reads: 0
+  kind: ordinary
+- from: AccessService
+  to: MarketingService
+  writes: 1
+  reads: 1
+  kind: ordinary
+- from: ControlService
+  to: IdentityService
+  writes: 1
+  reads: 3
+  kind: ordinary
+- from: ControlService
+  to: MarketingService
+  writes: 1
+  reads: 0
+  kind: ordinary
+- from: IdentityService
+  to: OrderService
+  writes: 1
+  reads: 2
+  kind: ordinary
+- from: IdentityService
+  to: TenancyService
+  writes: 1
+  reads: 1
+  kind: ordinary
+- from: IdentityService
+  to: MarketingService
+  writes: 1
+  reads: 5
+  kind: ordinary
+- from: InventoryService
+  to: TenancyService
+  writes: 1
+  reads: 0
+  kind: ordinary
+- from: MarketingService
+  to: OrderService
+  writes: 1
+  reads: 2
+  kind: ordinary
+- from: OrderService
+  to: RetailService
+  writes: 1
+  reads: 2
+  kind: ordinary
+- from: OrderService
+  to: IdentityService
+  writes: 1
+  reads: 13
+  kind: ordinary
+- from: TenancyService
+  to: MarketingService
+  writes: 1
+  reads: 1
+  kind: ordinary
+- from: TenancyService
+  to: IdentityService
+  writes: 1
+  reads: 17
+  kind: ordinary
+- from: VenueOpsService
+  to: CrossCellService
+  writes: 1
+  reads: 0
+  kind: ordinary
+- from: VenueOpsService
+  to: InventoryService
+  writes: 1
+  reads: 0
+  kind: ordinary
+deployOrder:
+- order: 1
+  tier: foundation
+  rule: '**First and alone.** A restart of Identity is an outage everywhere.'
+- order: 2
+  tier: commerce
+  rule: '**Catalogue before Order** — a till pulls a bundle before it sells. **Access last of the four**:
+    it runs at the edge with a local cache and can lag the others safely.'
+- order: 3
+  tier: operations
+  rule: '**Module-gated.** `requiresModule` on every screen decides what a tenant sees.'
+- order: 4
+  tier: engagement
+  rule: '**Can ship late and be down.**'
+- order: 5
+  tier: platform
+  rule: Control provisions a tenant rather than serving one. CrossCell only matters once a second region
+    exists.
+canBeDownWithoutStoppingASale:
+- MarketingService
+- AiService
+- ReportingService
+- CrossCellService
+notes: '**`shift` moved from Tenancy to Order on 24 August.** It owns no tables of its own — which is
+  true, and the conclusion drawn from it was wrong. **A service with no data belongs where its data
+  is**, and a shift''s data is entirely in `orders`.
+
+
+  **The coupling made it visible**: all 43 of Tenancy''s cross-service touches into `orders` were the
+  `shift` contract. Moving it took Tenancy''s cross-service writes from 23 to 2.'

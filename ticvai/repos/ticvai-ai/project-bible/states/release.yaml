@@ -1,0 +1,65 @@
+# Release — state model
+# Contract: platform-ops.ReleaseStatus
+# Checked by tools/check-states.py.
+
+entity: Release
+contract: platform-ops
+enum: ReleaseStatus
+enumKind: named
+enumSchema: ReleaseStatus
+owner: control
+initial:
+- draft
+terminal:
+- superseded
+- withdrawn
+transitions:
+- from: draft
+  to: inDev
+  operation: promoteRelease
+  trigger: operation
+  guard: Cut and deployed to development
+- from: inDev
+  to: inStaging
+  operation: promoteRelease
+  trigger: operation
+  guard: Passed development checks
+  requiresApproval: true
+- from: inStaging
+  to: inProduction
+  operation: promoteRelease
+  trigger: operation
+  guard: '**Approved by someone other than the promoter.** Staging promotion is where a bad release
+    is stopped'
+  requiresApproval: true
+- from: inStaging
+  to: inDev
+  operation: rejectRelease
+  trigger: operation
+  guard: Rejected back
+  isReversal: true
+- from: inProduction
+  to: superseded
+  trigger: cascade
+  guard: A later release reached production
+- from: inDev
+  to: withdrawn
+  operation: withdrawRelease
+  trigger: operation
+  guard: Abandoned
+- from: inStaging
+  to: withdrawn
+  operation: withdrawRelease
+  trigger: operation
+  guard: Abandoned in staging
+  requiresApproval: true
+- from: inProduction
+  to: withdrawn
+  operation: withdrawRelease
+  trigger: operation
+  guard: '**Pulled from production.** Distinct from rolled back — the rollout state handles the mechanics;
+    this records the decision'
+  requiresApproval: true
+notes: A release moves forward only. There is no path from production back to staging, because the artefact
+  in production is the one that was tested — re-promoting a modified build under the same version is
+  how a hotfix becomes an incident.

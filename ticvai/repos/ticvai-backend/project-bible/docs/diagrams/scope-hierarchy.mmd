@@ -1,0 +1,33 @@
+flowchart TD
+    T["<b>tenant</b><br/><i>238 operations</i><br/>plans · licences · roles · templates"]
+    B["<b>brand</b><br/><i>2 operations · optional</i><br/>a tenant with one brand skips it"]
+    R["<b>region</b><br/><i>46 operations · 8 configs</i><br/>currency · tax · timezone · fiscal year"]
+    V["<b>venue</b><br/><i>675 operations · 29 configs</i><br/>the platform's default scope"]
+
+    D["<b>department</b><br/>requisitions · rotas · cost centres"]
+    SD["<b>subDepartment</b><br/><i>optional second tier</i>"]
+    W["<b>workstation</b><br/><i>45 operations</i><br/>a till is a scope"]
+
+    O["<b>outlet</b><br/><i>5 configs</i><br/>menu · tables · return policy · hours"]
+
+    T --> B --> R --> V
+    V --> D --> SD --> W
+    V --> O
+    D -.->|"siblings, never parent and child"| O
+
+    subgraph ORG [" ORGANISATIONAL — who works where "]
+        D
+        SD
+        W
+    end
+
+    subgraph COM [" COMMERCIAL — what is sold where "]
+        O
+    end
+
+    classDef spine fill:#0D6EFD,stroke:#0B1324,stroke-width:2px,color:#fff
+    classDef norm fill:#F7F9FC,stroke:#5A6577,stroke-width:1px,color:#0B1324
+    classDef new fill:#FFF7E6,stroke:#8A6D00,stroke-width:2px,color:#0B1324
+    class T,R,V spine
+    class B,D,SD,W norm
+    class O new

@@ -1,0 +1,54 @@
+$schema: ./_schema.yaml
+id: F103
+name: A tenant claims a domain and gets a certificate
+actor: platformAdmin
+capability: A tenant claims a domain and gets a certificate
+wave: 2
+frequency: As needed.
+criticality: operational
+primaryContract: white-label
+contracts:
+- white-label
+- platform-ops
+platforms:
+- P09
+trigger:
+  description: A tenant wants their storefront on their own hostname.
+offlineBehaviour: None of it offline.
+steps:
+- step: 1
+  screen: ADM-017
+  action: Domain & Certificate Management.
+  operations:
+  - claimCustomDomain
+  - listCustomDomains
+  - releaseCustomDomain
+  - verifyCustomDomain
+  outcome: 4 operations, 4 of them previously unwalked.
+- step: 2
+  screen: ADM-016
+  action: White-Label Branding Management.
+  operations:
+  - createPreview
+  - diffConfigVersion
+  - getAppIcons
+  - getBrandIdentity
+  - setAppIcons
+  outcome: 5 operations, 5 of them previously unwalked.
+  crossesDevice: true
+branches:
+- at: 1
+  condition: The acting principal lacks the permission at this scope.
+  behaviour: '**Refused at the first step, not the last.** ADR-0002 makes authorisation user-driven
+    — a person who gets three steps in and then cannot finish has been told the wrong thing.'
+  severity: medium
+  resolvedBy: resolvePermissions
+exitStates:
+- state: completed
+  description: The journey ran end to end.
+- state: refused
+  description: '**Stopped at a permission or a licence boundary**, with the reason named.'
+notes: '**No domain or certificate operation existed anywhere in 1,010 operations**, and `ADM-017 Domain
+  & Certificate Management` declared 41 of them, none about a domain. **A white-label platform whose
+  tenants cannot use their own domain is white-label in name only.** Built 24 August.'
+openQuestions: null

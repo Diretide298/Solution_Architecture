@@ -1,0 +1,46 @@
+id: DIAGRAMS
+title: TICVAI — high level and low level, by layer
+generatedBy: tools/derive-diagrams.py
+about: '**Two levels, five subjects.** The high level is one file per subject and fits on a canvas;
+  the low level is one file per thing and does not.
+
+
+  **Every file is derived and none is authored.** A hand-maintained diagram in a package with nine validators
+  is the one artefact that goes stale silently — nothing fails when it is wrong. `check-package` refuses
+  a diagram older than the decomposition it is drawn from.'
+howToRead: Start at `hld/00-platform.yaml` — actors, surfaces, services, stores, externals, regions.
+  Every node carries a `ref` at the file below it.
+notCovered:
+  db: '**The DB layer already has both and they are computed** — the Galaxy view is the schema overview
+    and the drill-down is the table detail. **A YAML restating a live view is a file that can disagree
+    with it**, which is the failure this folder exists to avoid.'
+  decisions: 29 ADRs and a conflict register. Prose, and it should stay prose.
+hld:
+- file: diagrams/hld/00-platform.yaml
+  id: HLD
+  title: TICVAI — the whole platform
+- file: diagrams/hld/01-hierarchy.yaml
+  id: HIERARCHY
+  title: TICVAI scope hierarchy — eight levels
+- file: diagrams/hld/02-services.yaml
+  id: HLD
+  title: TICVAI — sixteen services in five tiers
+- file: diagrams/hld/03-contracts.yaml
+  id: HLD-CONTRACTS
+  title: 30 contracts — the join between every other layer
+- file: diagrams/hld/04-lifecycles.yaml
+  id: HLD-LIFECYCLES
+  title: 113 state models and 29 events
+lld:
+- set: services
+  files: 16
+  folder: diagrams/lld/services/
+- set: platforms
+  files: 15
+  folder: diagrams/lld/platforms/
+- set: contracts
+  files: 30
+  folder: diagrams/lld/contracts/
+- set: lifecycles
+  files: 113
+  folder: diagrams/lld/lifecycles/

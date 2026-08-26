@@ -1,0 +1,954 @@
+{
+ "note": "Every read panel the client F&B boards name, against the operation that serves it. **A board panel is not an endpoint** \u2014 `getKitchenLoad`, `getKitchenSla` and `listKitchenExceptions` are three panels on one screen and one `listKitchenTickets` answers all three. Building them as written would give the contract an endpoint per panel, and a contract with an endpoint per panel changes every time a panel moves.",
+ "shapes": {
+  "filter": "An existing operation with parameters. Cheapest, and most of these.",
+  "report": "`runReport` or `getDashboard` with a definition. **A report definition is data, not code** \u2014 which is why twenty analytics panels need no operations.",
+  "derive": "Computed at read time from something already stored. **A stored derivation is one that goes stale**, which is the same rule that made `inventory.stock_level` derived.",
+  "suggestion": "`requestSuggestion` with a `kind`. **Seventeen panels, one operation** \u2014 the boards drew each as its own endpoint, and six endpoints is six places to change when a model changes.",
+  "build": "Genuinely new. Four, all in Board 2's three newest frames."
+ },
+ "generated": "24 August 2026",
+ "panels": {
+  "allocateToOutlets": {
+   "shape": "filter",
+   "frames": [
+    "FNB-2N"
+   ],
+   "note": "Allocation is a transfer per outlet. **One mechanism** \u2014 a commissary allocating and a store transferring are the same movement.",
+   "servedBy": "createStockTransfer",
+   "exists": true
+  },
+  "buildProductionPlan": {
+   "shape": "build",
+   "frames": [
+    "FNB-2M"
+   ],
+   "note": "**Genuinely new.** Forecast demand against recipes to produce a prep list. Sits on `requestSuggestion(kind=prepPlan)` for the forecast and needs a plan artefact to hold it."
+  },
+  "classifyMenuItems": {
+   "shape": "suggestion",
+   "frames": [
+    "FNB-2K",
+    "FNB-6D"
+   ],
+   "note": "`kind=menuEngineering`.",
+   "servedBy": "requestSuggestion",
+   "exists": true
+  },
+  "consolidateOutletDemand": {
+   "shape": "derive",
+   "frames": [
+    "FNB-2N"
+   ],
+   "note": "Outlet requisitions summed for the commissary. **The consolidation is the read**, and storing it would fix a number that moves every time an outlet edits a line.",
+   "servedBy": "listRequisitions",
+   "exists": true
+  },
+  "createBatch": {
+   "shape": "filter",
+   "frames": [
+    "FNB-5D"
+   ],
+   "note": "A batch is a planned run.",
+   "servedBy": "planProductionRun",
+   "exists": true
+  },
+  "forecastDemand": {
+   "shape": "suggestion",
+   "frames": [
+    "FNB-5K",
+    "FNB-6H"
+   ],
+   "note": "`kind=demandForecast`.",
+   "servedBy": "requestSuggestion",
+   "exists": true
+  },
+  "forecastKitchenDemand": {
+   "shape": "suggestion",
+   "frames": [
+    "FNB-3K"
+   ],
+   "note": "`kind=demandForecast` scoped to a kitchen. **The scope is a parameter, not an operation.**",
+   "servedBy": "requestSuggestion",
+   "exists": true
+  },
+  "getActualUsage": {
+   "shape": "filter",
+   "frames": [
+    "FNB-5C"
+   ],
+   "note": "`?reason=consumption`.",
+   "servedBy": "listStockMovements",
+   "exists": true
+  },
+  "getAnswerSources": {
+   "shape": "filter",
+   "frames": [
+    "FNB-6K"
+   ],
+   "note": "`AiMessage.sources`. Already returned with every AI answer.",
+   "servedBy": "sendAiMessage",
+   "exists": true
+  },
+  "getBatchYield": {
+   "shape": "derive",
+   "frames": [
+    "FNB-5D"
+   ],
+   "note": "Planned against actual output. **`completeProductionRun` records what was made**; yield is the two compared.",
+   "servedBy": "getProductionRun",
+   "exists": true
+  },
+  "getBatchYieldSummary": {
+   "shape": "report",
+   "frames": [
+    "FNB-6F"
+   ],
+   "note": "Yield across runs, by product and by period.",
+   "servedBy": "runReport",
+   "exists": true
+  },
+  "getCapacityUtilisation": {
+   "shape": "report",
+   "frames": [
+    "FNB-6G"
+   ],
+   "note": "Seats and kitchen capacity against demand.",
+   "servedBy": "runReport",
+   "exists": true
+  },
+  "getCategoryMargin": {
+   "shape": "report",
+   "frames": [
+    "FNB-6D"
+   ],
+   "note": "Margin by category.",
+   "servedBy": "runReport",
+   "exists": true
+  },
+  "getChannelContribution": {
+   "shape": "report",
+   "frames": [
+    "FNB-6B"
+   ],
+   "note": "The same, after channel cost.",
+   "servedBy": "runReport",
+   "exists": true
+  },
+  "getChannelRevenue": {
+   "shape": "report",
+   "frames": [
+    "FNB-6B"
+   ],
+   "note": "Revenue by sales channel.",
+   "servedBy": "runReport",
+   "exists": true
+  },
+  "getComboCost": {
+   "shape": "derive",
+   "frames": [
+    "FNB-2G"
+   ],
+   "note": "Slot options costed through their recipes. **The cheapest and dearest combination both matter** \u2014 a meal deal priced against its cheapest option loses money on every other.",
+   "servedBy": "listRecipes",
+   "exists": true
+  },
+  "getCountHistory": {
+   "shape": "filter",
+   "frames": [
+    "FNB-5H"
+   ],
+   "note": "`?itemId=&includeLines=true`.",
+   "servedBy": "listStockCounts",
+   "exists": true
+  },
+  "getDaypartRevenue": {
+   "shape": "report",
+   "frames": [
+    "FNB-6B"
+   ],
+   "note": "Revenue by daypart.",
+   "servedBy": "runReport",
+   "exists": true
+  },
+  "getExecutiveSummary": {
+   "shape": "report",
+   "frames": [
+    "FNB-6A"
+   ],
+   "note": "The seeded executive dashboard.",
+   "servedBy": "getDashboard",
+   "exists": true
+  },
+  "getFloorPlan": {
+   "shape": "filter",
+   "frames": [
+    "FNB-4B"
+   ],
+   "note": "Same call. The plan is the map with its layout.",
+   "servedBy": "getTableMap",
+   "exists": true
+  },
+  "getFoodCostBridge": {
+   "shape": "report",
+   "frames": [
+    "FNB-6E"
+   ],
+   "note": "The same bridge scoped to food cost.",
+   "servedBy": "runReport",
+   "exists": true
+  },
+  "getForecastAccuracy": {
+   "shape": "report",
+   "frames": [
+    "FNB-6H"
+   ],
+   "note": "Suggested against actual over `ai.suggestion_outcome`. **The table built so this panel could exist** \u2014 and so a model could be trained later.",
+   "servedBy": "runReport",
+   "exists": true
+  },
+  "getForecastDrivers": {
+   "shape": "suggestion",
+   "frames": [
+    "FNB-6H"
+   ],
+   "note": "**`Suggestion.explanation`.** Plain words, always present, whatever the basis.",
+   "servedBy": "requestSuggestion",
+   "exists": true
+  },
+  "getGuest": {
+   "shape": "filter",
+   "frames": [
+    "FNB-4G"
+   ],
+   "note": "Guest-callable and already there.",
+   "servedBy": "getGuestProfile",
+   "exists": true
+  },
+  "getGuestMix": {
+   "shape": "report",
+   "frames": [
+    "FNB-6C"
+   ],
+   "note": "New against returning, by segment.",
+   "servedBy": "runReport",
+   "exists": true
+  },
+  "getIngredientCoverage": {
+   "shape": "derive",
+   "frames": [
+    "FNB-5B"
+   ],
+   "note": "On-hand divided by forecast usage. **Days of cover is arithmetic over two things already held**, and storing it makes it wrong within the hour.",
+   "servedBy": "getStockPositions",
+   "exists": true
+  },
+  "getIngredientInflation": {
+   "shape": "report",
+   "frames": [
+    "FNB-6E"
+   ],
+   "note": "Purchase price movement by ingredient.",
+   "servedBy": "runReport",
+   "exists": true
+  },
+  "getKitchenLoad": {
+   "shape": "filter",
+   "frames": [
+    "FNB-3A",
+    "FNB-3E"
+   ],
+   "note": "Count and age of open tickets by station. **The rail already holds it** \u2014 a load figure is the rail counted, not a second source.",
+   "servedBy": "listKitchenTickets",
+   "exists": true
+  },
+  "getKitchenPerformance": {
+   "shape": "report",
+   "frames": [
+    "FNB-3K",
+    "FNB-6G"
+   ],
+   "note": "As above, rolled to the outlet.",
+   "servedBy": "runReport",
+   "exists": true
+  },
+  "getKitchenSla": {
+   "shape": "filter",
+   "frames": [
+    "FNB-3A",
+    "FNB-3J"
+   ],
+   "note": "The target, not a measurement. Set by `setKitchenSla` and read from venue settings.",
+   "servedBy": "getVenueSettings",
+   "exists": true
+  },
+  "getLostSales": {
+   "shape": "derive",
+   "frames": [
+    "FNB-6F"
+   ],
+   "note": "**`refusedOrderCount` on the 86 event is the figure.** Built 24 August precisely so this panel had a source \u2014 *off for ninety minutes* is a note; *and eleven guests asked* is a purchasing decision.",
+   "servedBy": "list86Events",
+   "exists": true
+  },
+  "getMakeVsBuyCost": {
+   "shape": "derive",
+   "frames": [
+    "FNB-2N"
+   ],
+   "note": "Recipe cost against supplier price for the same item. **The decision a commissary exists to make**, and both sides are already held.",
+   "servedBy": "listRecipes",
+   "exists": true
+  },
+  "getMarginBridge": {
+   "shape": "report",
+   "frames": [
+    "FNB-6A"
+   ],
+   "note": "Margin movement decomposed \u2014 price, mix, cost, waste. **A bridge is a definition, not an endpoint**, and every domain wants one.",
+   "servedBy": "runReport",
+   "exists": true
+  },
+  "getMenuDiff": {
+   "shape": "derive",
+   "frames": [
+    "FNB-2J"
+   ],
+   "note": "Two menu versions compared. **`publishMenu` versions them and `rollbackMenu` depends on it** \u2014 the diff is the two read together.",
+   "servedBy": "getMenu",
+   "exists": true
+  },
+  "getMenuPerformance": {
+   "shape": "report",
+   "frames": [
+    "FNB-2A",
+    "FNB-2K"
+   ],
+   "note": "Units, margin and attach rate by item.",
+   "servedBy": "runReport",
+   "exists": true
+  },
+  "getModifierUplift": {
+   "shape": "report",
+   "frames": [
+    "FNB-6D"
+   ],
+   "note": "Revenue added by modifiers. **The number that justifies maintaining them** \u2014 a venue with forty modifier groups and no uplift figure is maintaining forty groups on faith.",
+   "servedBy": "runReport",
+   "exists": true
+  },
+  "getOnTimeByChannel": {
+   "shape": "report",
+   "frames": [
+    "FNB-6G"
+   ],
+   "note": "Ticket age against SLA, grouped by service mode.",
+   "servedBy": "runReport",
+   "exists": true
+  },
+  "getOrderCourses": {
+   "shape": "filter",
+   "frames": [
+    "FNB-3C"
+   ],
+   "note": "Courses are on the ticket. `KitchenTicket.coursing` plus its lines grouped by course.",
+   "servedBy": "getFnbOrder",
+   "exists": true
+  },
+  "getOutletFoodCost": {
+   "shape": "report",
+   "frames": [
+    "FNB-6E"
+   ],
+   "note": "Food cost percentage by outlet.",
+   "servedBy": "runReport",
+   "exists": true
+  },
+  "getOutletPerformance": {
+   "shape": "report",
+   "frames": [
+    "FNB-6C"
+   ],
+   "note": "The outlet scorecard.",
+   "servedBy": "runReport",
+   "exists": true
+  },
+  "getPaymentMix": {
+   "shape": "report",
+   "frames": [
+    "FNB-6B"
+   ],
+   "note": "Tender split.",
+   "servedBy": "runReport",
+   "exists": true
+  },
+  "getPrepRequirements": {
+   "shape": "filter",
+   "frames": [
+    "FNB-2M"
+   ],
+   "note": "The plan's lines.",
+   "servedBy": "getProductionRun",
+   "exists": true
+  },
+  "getProductAllergens": {
+   "shape": "filter",
+   "frames": [
+    "FNB-2L"
+   ],
+   "note": "Allergens are on the item. `?includeAllergens=true` \u2014 **contains and mayContain are different claims** and both are already modelled.",
+   "servedBy": "getMenu",
+   "exists": true
+  },
+  "getProductPerformance": {
+   "shape": "report",
+   "frames": [
+    "FNB-6D"
+   ],
+   "note": "The cross-domain version, on P16.",
+   "servedBy": "runReport",
+   "exists": true
+  },
+  "getProfitability": {
+   "shape": "report",
+   "frames": [
+    "FNB-6E"
+   ],
+   "note": "Contribution by outlet, by daypart, by channel.",
+   "servedBy": "runReport",
+   "exists": true
+  },
+  "getRecipe": {
+   "shape": "filter",
+   "frames": [
+    "FNB-2F"
+   ],
+   "note": "`?itemId=`. Singular of an existing list.",
+   "servedBy": "listRecipes",
+   "exists": true
+  },
+  "getRecipeCost": {
+   "shape": "derive",
+   "frames": [
+    "FNB-2A",
+    "FNB-2D",
+    "FNB-2F"
+   ],
+   "note": "Recipe joined to current ingredient prices. **Never stored: a stored cost goes stale the moment a supplier changes**, and a stale food cost is worse than none.",
+   "servedBy": "listRecipes",
+   "exists": true
+  },
+  "getReservationMetrics": {
+   "shape": "report",
+   "frames": [
+    "FNB-4K"
+   ],
+   "note": "Booked, seated, no-show, walk-in conversion.",
+   "servedBy": "runReport",
+   "exists": true
+  },
+  "getReservationTimeline": {
+   "shape": "filter",
+   "frames": [
+    "FNB-4D"
+   ],
+   "note": "`?date=&groupBy=slot`. **A timeline is a list with a time axis**, and the conflict view sits on `resolveBookingConflict` beside it.",
+   "servedBy": "listTableReservations",
+   "exists": true
+  },
+  "getRevenueVsBudget": {
+   "shape": "report",
+   "frames": [
+    "FNB-6A"
+   ],
+   "note": "Actual against plan. **Budget is an input the venue supplies.**",
+   "servedBy": "runReport",
+   "exists": true
+  },
+  "getRevpash": {
+   "shape": "report",
+   "frames": [
+    "FNB-4K"
+   ],
+   "note": "Revenue per available seat hour. **A definition over covers, seats and revenue** \u2014 three things already stored, and the metric that tells a restaurant more than any other.",
+   "servedBy": "runReport",
+   "exists": true
+  },
+  "getScenarioAssumptions": {
+   "shape": "suggestion",
+   "frames": [
+    "FNB-6J"
+   ],
+   "note": "**`Suggestion.inputs`.** Recorded so the answer can be reproduced \u2014 which is exactly what an assumptions panel shows.",
+   "servedBy": "requestSuggestion",
+   "exists": true
+  },
+  "getSectionRevenue": {
+   "shape": "report",
+   "frames": [
+    "FNB-2K"
+   ],
+   "note": "Revenue by menu section.",
+   "servedBy": "runReport",
+   "exists": true
+  },
+  "getServiceMetrics": {
+   "shape": "report",
+   "frames": [
+    "FNB-6C"
+   ],
+   "note": "Wait, turn, and time to first course.",
+   "servedBy": "runReport",
+   "exists": true
+  },
+  "getServiceOverview": {
+   "shape": "filter",
+   "frames": [
+    "FNB-4A"
+   ],
+   "note": "Covers, turns and stage counts \u2014 **all derivable from the map plus open visits**, and a separate overview endpoint is a second thing to keep in step.",
+   "servedBy": "getTableMap",
+   "exists": true
+  },
+  "getStationBottlenecks": {
+   "shape": "report",
+   "frames": [
+    "FNB-6G"
+   ],
+   "note": "The same definition ranked by wait rather than by throughput. **A bottleneck is a sort order, not a metric.**",
+   "servedBy": "runReport",
+   "exists": true
+  },
+  "getStationPerformance": {
+   "shape": "report",
+   "frames": [
+    "FNB-3K"
+   ],
+   "note": "Definition over `fnb.kitchen_ticket_line` by station. **Board 6 and Board 3 draw the same numbers at different depths** \u2014 one definition, two dashboards.",
+   "servedBy": "runReport",
+   "exists": true
+  },
+  "getStockOverview": {
+   "shape": "filter",
+   "frames": [
+    "FNB-5A"
+   ],
+   "note": "Positions rolled to the outlet.",
+   "servedBy": "getStockPositions",
+   "exists": true
+  },
+  "getTableCheck": {
+   "shape": "filter",
+   "frames": [
+    "FNB-4J"
+   ],
+   "note": "The bill for the visit on that table.",
+   "servedBy": "getBill",
+   "exists": true
+  },
+  "getTablePerformance": {
+   "shape": "report",
+   "frames": [
+    "FNB-4K"
+   ],
+   "note": "Turn time and covers by table.",
+   "servedBy": "runReport",
+   "exists": true
+  },
+  "getTableTimeline": {
+   "shape": "filter",
+   "frames": [
+    "FNB-4H"
+   ],
+   "note": "`?includeHistory=true`. Seated, ordered, courses fired, paid \u2014 **the stage transitions `setServiceStage` records.**",
+   "servedBy": "getTableVisit",
+   "exists": true
+  },
+  "getTheoreticalUsage": {
+   "shape": "derive",
+   "frames": [
+    "FNB-5C"
+   ],
+   "note": "Recipes multiplied by items sold. **The theoretical side of a variance** \u2014 computed, never stored, because a recipe change would silently rewrite last month.",
+   "servedBy": "listRecipes",
+   "exists": true
+  },
+  "getVarianceReasons": {
+   "shape": "filter",
+   "frames": [
+    "FNB-5C"
+   ],
+   "note": "`?groupBy=reason`.",
+   "servedBy": "getCountVariance",
+   "exists": true
+  },
+  "getVarianceSummary": {
+   "shape": "filter",
+   "frames": [
+    "FNB-5A"
+   ],
+   "note": "Already returns it. Rolled to the count.",
+   "servedBy": "getCountVariance",
+   "exists": true
+  },
+  "getVarianceTrend": {
+   "shape": "report",
+   "frames": [
+    "FNB-6F"
+   ],
+   "note": "Variance across counts over time.",
+   "servedBy": "runReport",
+   "exists": true
+  },
+  "getWastageByReason": {
+   "shape": "report",
+   "frames": [
+    "FNB-5E"
+   ],
+   "note": "The same movements grouped.",
+   "servedBy": "runReport",
+   "exists": true
+  },
+  "getWasteByOrigin": {
+   "shape": "report",
+   "frames": [
+    "FNB-6F"
+   ],
+   "note": "Grouped by station and by stage instead.",
+   "servedBy": "runReport",
+   "exists": true
+  },
+  "listActionQueue": {
+   "shape": "filter",
+   "frames": [
+    "FNB-6K"
+   ],
+   "note": "**Already the AI action queue.** `decideProposedAction` clears it \u2014 one queue, not one per domain.",
+   "servedBy": "listProposedActions",
+   "exists": true
+  },
+  "listActiveOrders": {
+   "shape": "filter",
+   "frames": [
+    "FNB-3D"
+   ],
+   "note": "`?status=accepted,inPreparation`.",
+   "servedBy": "listFnbOrders",
+   "exists": true
+  },
+  "listAvailability": {
+   "shape": "filter",
+   "frames": [
+    "FNB-2H"
+   ],
+   "note": "GET on the same resource. `?outletId=`, with the 86 history beside it.",
+   "servedBy": "setItemAvailability",
+   "exists": true
+  },
+  "listCollectionQueue": {
+   "shape": "filter",
+   "frames": [
+    "FNB-3G"
+   ],
+   "note": "`?status=ready&serviceMode=collection`. Ordered by ready-at, oldest first \u2014 **food under a lamp is a clock nobody is watching.**",
+   "servedBy": "listKitchenTickets",
+   "exists": true
+  },
+  "listCombos": {
+   "shape": "filter",
+   "frames": [
+    "FNB-2G"
+   ],
+   "note": "`?kind=combo`. Combos are products with slots.",
+   "servedBy": "listProducts",
+   "exists": true
+  },
+  "listComplaintThemes": {
+   "shape": "report",
+   "frames": [
+    "FNB-6C"
+   ],
+   "note": "Cases grouped by category, over `marketing.case`.",
+   "servedBy": "runReport",
+   "exists": true
+  },
+  "listCostHistory": {
+   "shape": "report",
+   "frames": [
+    "FNB-2F"
+   ],
+   "note": "Recipe cost over time as prices moved.",
+   "servedBy": "runReport",
+   "exists": true
+  },
+  "listExecutiveInsights": {
+   "shape": "suggestion",
+   "frames": [
+    "FNB-6A"
+   ],
+   "note": "`kind=anomaly` across the venue.",
+   "servedBy": "requestSuggestion",
+   "exists": true
+  },
+  "listExpoOrders": {
+   "shape": "filter",
+   "frames": [
+    "FNB-3F"
+   ],
+   "note": "`?status=readyForAssembly`. **The expeditor sees the same rail filtered**, which is why no expeditor role was modelled.",
+   "servedBy": "listKitchenTickets",
+   "exists": true
+  },
+  "listGuestVisits": {
+   "shape": "filter",
+   "frames": [
+    "FNB-4G"
+   ],
+   "note": "`?subjectId=`. A visit is an order at a venue.",
+   "servedBy": "listOrders",
+   "exists": true
+  },
+  "listKitchenExceptions": {
+   "shape": "filter",
+   "frames": [
+    "FNB-3A",
+    "FNB-3H"
+   ],
+   "note": "Tickets past their SLA. `?breachingSla=true` over the same rail \u2014 **an exception is a ticket, not a different kind of thing.**",
+   "servedBy": "listKitchenTickets",
+   "exists": true
+  },
+  "listKitchenRecommendations": {
+   "shape": "suggestion",
+   "frames": [
+    "FNB-3K"
+   ],
+   "note": "The same, scoped to a kitchen.",
+   "servedBy": "requestSuggestion",
+   "exists": true
+  },
+  "listOrderLog": {
+   "shape": "filter",
+   "frames": [
+    "FNB-3C"
+   ],
+   "note": "`?includeHistory=true` with the audit trail.",
+   "servedBy": "listFnbOrders",
+   "exists": true
+  },
+  "listOutletStock": {
+   "shape": "filter",
+   "frames": [
+    "FNB-5B"
+   ],
+   "note": "`?locationId=`.",
+   "servedBy": "getStockPositions",
+   "exists": true
+  },
+  "listPriceHistory": {
+   "shape": "filter",
+   "frames": [
+    "FNB-2D"
+   ],
+   "note": "`?includeHistory=true`. Price rows are versioned.",
+   "servedBy": "listPrices",
+   "exists": true
+  },
+  "listProductionBatches": {
+   "shape": "filter",
+   "frames": [
+    "FNB-5D"
+   ],
+   "note": "Already exists.",
+   "servedBy": "listProductionRuns",
+   "exists": true
+  },
+  "listRecommendations": {
+   "shape": "suggestion",
+   "frames": [
+    "FNB-6J"
+   ],
+   "note": "Open suggestions for this scope.",
+   "servedBy": "requestSuggestion",
+   "exists": true
+  },
+  "listSeatedTables": {
+   "shape": "filter",
+   "frames": [
+    "FNB-4H"
+   ],
+   "note": "`?state=occupied`.",
+   "servedBy": "getTableMap",
+   "exists": true
+  },
+  "listStockAlerts": {
+   "shape": "filter",
+   "frames": [
+    "FNB-5A",
+    "FNB-5K"
+   ],
+   "note": "`?domain=inventory`. One alert mechanism, filtered.",
+   "servedBy": "listAlerts",
+   "exists": true
+  },
+  "listTableRecommendations": {
+   "shape": "suggestion",
+   "frames": [
+    "FNB-4K"
+   ],
+   "note": "The same, scoped to the floor.",
+   "servedBy": "requestSuggestion",
+   "exists": true
+  },
+  "listTables": {
+   "shape": "filter",
+   "frames": [
+    "FNB-4A",
+    "FNB-4B",
+    "FNB-4C"
+   ],
+   "note": "**The map is the list.** A table map returns every table with its state; a separate list endpoint is the same rows without the geometry.",
+   "servedBy": "getTableMap",
+   "exists": true
+  },
+  "listTransfers": {
+   "shape": "filter",
+   "frames": [
+    "FNB-5G"
+   ],
+   "note": "Already exists.",
+   "servedBy": "listStockTransfers",
+   "exists": true
+  },
+  "listWaitlist": {
+   "shape": "filter",
+   "frames": [
+    "FNB-4A",
+    "FNB-4F"
+   ],
+   "note": "The list is a GET on the same resource. `?status=waiting,notified`.",
+   "servedBy": "joinRestaurantWaitlist",
+   "exists": true
+  },
+  "listWastage": {
+   "shape": "filter",
+   "frames": [
+    "FNB-5A",
+    "FNB-5E"
+   ],
+   "note": "`?reason=waste`. Waste is a movement kind.",
+   "servedBy": "listStockMovements",
+   "exists": true
+  },
+  "printPrepSheets": {
+   "shape": "filter",
+   "frames": [
+    "FNB-2M"
+   ],
+   "note": "A render of the plan. **Not an endpoint** \u2014 the same rule that made `printOrderLabel` the exception, and it is the exception because of allergens.",
+   "servedBy": "getProductionRun",
+   "exists": true
+  },
+  "publishDemandPlan": {
+   "shape": "suggestion",
+   "frames": [
+    "FNB-6H"
+   ],
+   "note": "`kind=demandForecast`, then `recordSuggestionOutcome` when the venue commits to it \u2014 **publishing a plan is accepting a suggestion**, and that is the label a model trains on.",
+   "servedBy": "requestSuggestion",
+   "exists": true
+  },
+  "queueAction": {
+   "shape": "filter",
+   "frames": [
+    "FNB-6K"
+   ],
+   "note": "**A suggestion becomes a proposed action and the queue is already there.** One queue, not one per domain.",
+   "servedBy": "decideProposedAction",
+   "exists": true
+  },
+  "recalculateNutrition": {
+   "shape": "derive",
+   "frames": [
+    "FNB-2L"
+   ],
+   "note": "Nutrition summed from ingredients. **Recomputed on recipe change, not stored** \u2014 a stored figure survives a recipe edit and becomes a false label.",
+   "servedBy": "setRecipe",
+   "exists": true
+  },
+  "releaseProductionPlan": {
+   "shape": "build",
+   "frames": [
+    "FNB-2M"
+   ],
+   "note": "**Genuinely new.** A plan becomes production runs. **Separate from building it because a plan is edited before it is released**, and a plan that creates runs as it is drafted creates runs nobody asked for."
+  },
+  "scheduleCommissaryRun": {
+   "shape": "filter",
+   "frames": [
+    "FNB-2N"
+   ],
+   "note": "A commissary run is a production run at a central kitchen. `?locationKind=commissary`.",
+   "servedBy": "planProductionRun",
+   "exists": true
+  },
+  "setSubstitutionRules": {
+   "shape": "build",
+   "frames": [
+    "FNB-2L"
+   ],
+   "note": "**Genuinely new.** What may replace what, and under what conditions \u2014 and it is the input `verifyAllergens` checks against."
+  },
+  "simulateScenario": {
+   "shape": "suggestion",
+   "frames": [
+    "FNB-6J"
+   ],
+   "note": "`kind=scenario` with the change in `context`.",
+   "servedBy": "requestSuggestion",
+   "exists": true
+  },
+  "simulateSlaPolicy": {
+   "shape": "suggestion",
+   "frames": [
+    "FNB-3J"
+   ],
+   "note": "`kind=slaTarget`.",
+   "servedBy": "requestSuggestion",
+   "exists": true
+  },
+  "suggestPrice": {
+   "shape": "suggestion",
+   "frames": [
+    "FNB-2F"
+   ],
+   "note": "`kind=price`.",
+   "servedBy": "requestSuggestion",
+   "exists": true
+  },
+  "suggestReplenishment": {
+   "shape": "suggestion",
+   "frames": [
+    "FNB-5K"
+   ],
+   "note": "`kind=replenishment`.",
+   "servedBy": "requestSuggestion",
+   "exists": true
+  },
+  "verifyAllergens": {
+   "shape": "build",
+   "frames": [
+    "FNB-2L"
+   ],
+   "note": "**Genuinely new, and the one that matters in this frame.** A substituted ingredient changes the allergen claim, and BL-127 built allergens without linking substitution. **A dish declared nut-free after a substitution nobody checked is the failure this prevents.**"
+  }
+ },
+ "summary": {
+  "filter": 41,
+  "report": 34,
+  "derive": 10,
+  "suggestion": 14,
+  "build": 4,
+  "unmapped": 0
+ }
+}

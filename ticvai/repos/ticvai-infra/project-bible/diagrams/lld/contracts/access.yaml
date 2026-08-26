@@ -1,0 +1,408 @@
+id: LLD-access
+title: access — 31 operations
+generatedBy: tools/derive-diagrams.py
+index: diagrams/hld/03-contracts.yaml
+tier: spine
+service: AccessService
+operations:
+- operation: addBlacklistEntry
+  verb: POST
+  path: /blacklist
+  scope: venue
+  permission: ACCESS_POINT_CONFIGURE
+  audience: null
+  offline: false
+  reads:
+  - access.blacklist
+  - cache:idempotency
+  writes:
+  - access.blacklist
+  - cache:idempotency
+- operation: createAccessPoint
+  verb: POST
+  path: /access-points
+  scope: venue
+  permission: ACCESS_POINT_CONFIGURE
+  audience: null
+  offline: false
+  reads:
+  - access.access_point
+  - cache:idempotency
+  writes:
+  - access.access_point
+  - cache:idempotency
+- operation: createAdmissionProfile
+  verb: POST
+  path: /admission-profiles
+  scope: venue
+  permission: ACCESS_POINT_CONFIGURE
+  audience: null
+  offline: false
+  reads:
+  - access.admission_profile
+  - cache:idempotency
+  writes:
+  - access.admission_profile
+  - cache:idempotency
+- operation: createParkingEntitlement
+  verb: POST
+  path: /parking-entitlements
+  scope: venue
+  permission: null
+  audience: null
+  offline: false
+  reads:
+  - access.parking_facility
+  - cache:idempotency
+  - orders.sales_order
+  writes:
+  - access.parking_entitlement
+  - cache:idempotency
+- operation: enrolFacePass
+  verb: POST
+  path: /face-pass/enrolments
+  scope: venue
+  permission: GUEST_MANAGE
+  audience: null
+  offline: false
+  reads:
+  - cache:idempotency
+  - marketing.consent_record
+  - pii.subject
+  writes:
+  - cache:idempotency
+  - marketing.consent_record
+  - pii.subject_biometric
+- operation: getAccessPoint
+  verb: GET
+  path: /access-points/{accessPointId}
+  scope: venue
+  permission: SCOPE_VIEW
+  audience: null
+  offline: true
+  reads:
+  - access.access_point
+  writes: []
+- operation: getEntitlement
+  verb: GET
+  path: /entitlements/{entitlementId}
+  scope: venue
+  permission: ORDER_VIEW
+  audience:
+  - staff
+  - guest
+  offline: true
+  reads:
+  - access.entitlement
+  - catalogue.entitlement_template
+  - identity.grant
+  writes: []
+- operation: getEntitlementCredential
+  verb: GET
+  path: /entitlements/{entitlementId}/credential
+  scope: venue
+  permission: ORDER_VIEW
+  audience:
+  - staff
+  - guest
+  offline: false
+  reads:
+  - access.entitlement
+  writes:
+  - access.entitlement
+- operation: getEntitlementHistory
+  verb: GET
+  path: /entitlements/{entitlementId}/history
+  scope: venue
+  permission: ORDER_VIEW
+  audience:
+  - staff
+  - guest
+  offline: false
+  reads:
+  - access.entitlement
+  - access.scan_event
+  writes: []
+- operation: getFacePassEnrolment
+  verb: GET
+  path: /face-pass/enrolments/{enrolmentId}
+  scope: venue
+  permission: GUEST_VIEW
+  audience: null
+  offline: false
+  reads:
+  - pii.subject_biometric
+  writes: []
+- operation: getOfflinePackage
+  verb: GET
+  path: /access/offline-package
+  scope: workstation
+  permission: ACCESS_VALIDATE
+  audience: null
+  offline: false
+  reads:
+  - access.access_point
+  - access.admission_profile
+  - access.blacklist
+  - cache:resolution
+  - catalogue.entitlement_template
+  - identity.principal
+  - venuemap.map
+  - venuemap.path
+  - venuemap.point
+  writes:
+  - cache:resolution
+- operation: listAccessPoints
+  verb: GET
+  path: /access-points
+  scope: venue
+  permission: SCOPE_VIEW
+  audience: null
+  offline: true
+  reads:
+  - access.access_point
+  writes: []
+- operation: listAdmissionProfiles
+  verb: GET
+  path: /admission-profiles
+  scope: venue
+  permission: SCOPE_VIEW
+  audience: null
+  offline: true
+  reads:
+  - access.admission_profile
+  writes: []
+- operation: listBlacklist
+  verb: GET
+  path: /blacklist
+  scope: venue
+  permission: SCOPE_VIEW
+  audience: null
+  offline: true
+  reads:
+  - access.blacklist
+  writes: []
+- operation: listEntitlements
+  verb: GET
+  path: /my/entitlements/all
+  scope: tenant
+  permission: null
+  audience:
+  - guest
+  offline: false
+  reads:
+  - access.admission_profile
+  - access.entitlement
+  - catalogue.product
+  writes: []
+- operation: listMyEntitlements
+  verb: GET
+  path: /guests/me/entitlements
+  scope: venue
+  permission: ORDER_VIEW
+  audience:
+  - staff
+  - guest
+  offline: true
+  reads:
+  - access.entitlement
+  - catalogue.entitlement_template
+  - catalogue.product
+  - identity.grant
+  writes: []
+- operation: listParkingFacilities
+  verb: GET
+  path: /parking-facilities
+  scope: venue
+  permission: ACCESS_POINT_CONFIGURE
+  audience: null
+  offline: true
+  reads:
+  - access.parking_facility
+  writes: []
+- operation: listScans
+  verb: GET
+  path: /access/scans
+  scope: venue
+  permission: REPORT_VIEW_VENUE
+  audience: null
+  offline: false
+  reads:
+  - access.scan_event
+  writes: []
+- operation: lookupTicket
+  verb: GET
+  path: /access/lookup
+  scope: venue
+  permission: TICKET_LOOKUP
+  audience: null
+  offline: true
+  reads:
+  - access.scan_event
+  - catalogue.entitlement_template
+  - orders.sales_order
+  - pii.subject
+  writes: []
+- operation: overrideAccess
+  verb: POST
+  path: /access/override
+  scope: venue
+  permission: ACCESS_OVERRIDE
+  audience: null
+  offline: true
+  reads:
+  - access.access_point
+  - access.scan_event
+  - cache:idempotency
+  - identity.principal
+  writes:
+  - access.scan_event
+  - cache:idempotency
+- operation: removeBlacklistEntry
+  verb: DELETE
+  path: /blacklist/{mediaCode}
+  scope: venue
+  permission: ACCESS_POINT_CONFIGURE
+  audience: null
+  offline: false
+  reads:
+  - access.blacklist
+  - cache:idempotency
+  writes:
+  - access.blacklist
+  - cache:idempotency
+- operation: revokeFacePass
+  verb: DELETE
+  path: /face-pass/enrolments/{enrolmentId}
+  scope: venue
+  permission: GUEST_MANAGE
+  audience: null
+  offline: false
+  reads:
+  - cache:idempotency
+  - pii.subject_biometric
+  writes:
+  - cache:idempotency
+  - pii.subject_biometric
+- operation: setAccessPointGeofence
+  verb: PUT
+  path: /access-points/{accessPointId}/geofence
+  scope: venue
+  permission: ACCESS_POINT_CONFIGURE
+  audience: null
+  offline: false
+  reads:
+  - access.access_point
+  - cache:idempotency
+  writes:
+  - access.access_point
+  - cache:idempotency
+- operation: setParkingFacility
+  verb: PUT
+  path: /parking-facilities
+  scope: venue
+  permission: PARKING_CONFIGURE
+  audience: null
+  offline: false
+  reads:
+  - access.parking_facility
+  - cache:idempotency
+  writes:
+  - access.parking_facility
+  - cache:idempotency
+- operation: setTurnstileMode
+  verb: PUT
+  path: /access-points/{accessPointId}/mode
+  scope: venue
+  permission: TURNSTILE_MODE_SET
+  audience: null
+  offline: true
+  reads:
+  - access.access_point
+  - cache:idempotency
+  writes:
+  - access.access_point
+  - cache:idempotency
+- operation: syncScans
+  verb: POST
+  path: /access/scans
+  scope: workstation
+  permission: ACCESS_VALIDATE
+  audience: null
+  offline: false
+  reads:
+  - access.access_point
+  writes:
+  - access.scan_event
+  - sync.rejection
+- operation: updateAccessPoint
+  verb: PATCH
+  path: /access-points/{accessPointId}
+  scope: venue
+  permission: ACCESS_POINT_CONFIGURE
+  audience: null
+  offline: false
+  reads:
+  - access.access_point
+  - cache:idempotency
+  writes:
+  - access.access_point
+  - cache:idempotency
+- operation: updateAdmissionProfile
+  verb: PUT
+  path: /admission-profiles/{profileId}
+  scope: venue
+  permission: ACCESS_POINT_CONFIGURE
+  audience: null
+  offline: false
+  reads:
+  - access.admission_profile
+  - cache:idempotency
+  writes:
+  - access.admission_profile
+  - cache:idempotency
+- operation: updateParkingEntitlement
+  verb: PATCH
+  path: /parking-entitlements/{entitlementId}
+  scope: venue
+  permission: null
+  audience: null
+  offline: false
+  reads:
+  - access.parking_entitlement
+  - cache:idempotency
+  writes:
+  - access.parking_entitlement
+  - cache:idempotency
+- operation: validateAccess
+  verb: POST
+  path: /access/validate
+  scope: workstation
+  permission: ACCESS_VALIDATE
+  audience: null
+  offline: true
+  reads:
+  - access.access_point
+  - access.admission_profile
+  - access.blacklist
+  - access.entitlement
+  - cache:idempotency
+  - catalogue.entitlement_template
+  writes:
+  - access.scan_event
+  - cache:idempotency
+- operation: validateGroupAccess
+  verb: POST
+  path: /access/group-validate
+  scope: workstation
+  permission: ACCESS_VALIDATE
+  audience: null
+  offline: true
+  reads:
+  - access.access_point
+  - access.admission_profile
+  - cache:idempotency
+  - catalogue.entitlement_template
+  writes:
+  - access.scan_event
+  - cache:idempotency

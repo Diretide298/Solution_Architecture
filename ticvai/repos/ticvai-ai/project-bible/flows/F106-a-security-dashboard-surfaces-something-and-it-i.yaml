@@ -1,0 +1,58 @@
+$schema: ./_schema.yaml
+id: F106
+name: A security dashboard surfaces something and it is investigated
+actor: platformAdmin
+capability: A security dashboard surfaces something and it is investigated
+wave: 3
+frequency: As needed.
+criticality: safety
+primaryContract: reporting
+contracts:
+- reporting
+- tenancy
+- identity
+platforms:
+- P08
+- P09
+trigger:
+  description: An anomaly appears — a login pattern, an override rate, a spend spike.
+offlineBehaviour: Analytical. Reads the replica.
+steps:
+- step: 1
+  screen: ADM-031
+  action: Security & Compliance Dashboard.
+  operations:
+  - createDashboard
+  - listDashboards
+  - updateDashboard
+  outcome: 3 operations, 3 of them previously unwalked.
+- step: 2
+  screen: ADM-004
+  action: Platform Audit Log.
+  operations:
+  - listAiInteractions
+  outcome: 1 operations, 1 of them previously unwalked.
+  crossesDevice: true
+- step: 3
+  screen: BO-068
+  action: Audit Log.
+  operations:
+  - listAuditRecords
+  - resolvePermissions
+  outcome: 2 operations, 0 of them previously unwalked.
+  crossesDevice: true
+branches:
+- at: 1
+  condition: The acting principal lacks the permission at this scope.
+  behaviour: '**Refused at the first step, not the last.** ADR-0002 makes authorisation user-driven
+    — a person who gets three steps in and then cannot finish has been told the wrong thing.'
+  severity: medium
+  resolvedBy: resolvePermissions
+exitStates:
+- state: completed
+  description: The journey ran end to end.
+- state: refused
+  description: '**Stopped at a permission or a licence boundary**, with the reason named.'
+notes: '**`listAuditRecords` was built 24 August because nothing read the audit trail.** This is the
+  journey it exists for: a dashboard notices, and somebody reads the record behind it.'
+openQuestions: null

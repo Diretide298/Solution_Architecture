@@ -1,0 +1,56 @@
+id: LLD-Refund
+title: Refund — 5 transitions
+generatedBy: tools/derive-diagrams.py
+index: diagrams/hld/04-lifecycles.yaml
+source: states/refund.yaml
+entity: Refund
+contract: orders
+enum: Refund.status
+enumKind: inline
+enumSchema: Refund
+enumProperty: status
+owner: orders
+initial:
+- pendingApproval
+- pendingGateway
+terminal:
+- completed
+- declined
+- failed
+transitions:
+- from: pendingApproval
+  to: pendingGateway
+  operation: decideApprovalRequest
+  trigger: operation
+  guard: '**Approved.** Routed through `approvals` — refund thresholds were one of four bespoke implementations
+    before CF-59a'
+- from: pendingApproval
+  to: declined
+  operation: decideApprovalRequest
+  trigger: operation
+  guard: Refused, with a reason the guest can be told
+- from: pendingGateway
+  to: completed
+  trigger: job
+  guard: The gateway confirmed. **Only now is the entitlement cancelled** — cancelling on request means
+    a guest whose refund failed has lost their ticket and their money
+  emits:
+  - order.refunded
+- from: pendingGateway
+  to: failed
+  trigger: job
+  guard: '**The gateway refused or timed out. The entitlement is untouched**, and the guest still holds
+    a valid ticket while this is resolved'
+- from: failed
+  to: pendingGateway
+  operation: createRefund
+  trigger: operation
+  guard: Retried. Safe, because nothing was cancelled on the failure
+  isReversal: true
+notes: '**The order of operations is the design.** Approve, then gateway, then cancel the entitlement
+  — never the reverse. A refund that cancels first and fails at the gateway leaves a guest with no ticket
+  and no money, and they will be at a gate rather than on a phone.
+
+
+  `pendingApproval` is skipped where the amount is below the configured threshold, which is why there
+  are two initial states.'

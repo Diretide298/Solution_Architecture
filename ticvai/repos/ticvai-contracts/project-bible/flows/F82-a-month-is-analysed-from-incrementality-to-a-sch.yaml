@@ -1,0 +1,81 @@
+$schema: ./_schema.yaml
+id: F82
+name: A month is analysed from incrementality to a scheduled report
+actor: venueManager
+capability: A month is analysed from incrementality to a scheduled report
+wave: 3
+frequency: As the venue needs it.
+criticality: operational
+primaryContract: reporting
+contracts:
+- reporting
+- ai
+- marketing-crm
+platforms:
+- P08
+- P16
+trigger:
+  description: Somebody has to explain last month.
+offlineBehaviour: Analytical. Reads the replica; nothing operational depends on it.
+steps:
+- step: 1
+  screen: ANL-005
+  action: Cost, Margin & Profitability.
+  operations:
+  - getStockValuation
+  outcome: '**Drawn by the client as RET-6F.** 1 operations on this step.'
+- step: 2
+  screen: ANL-007
+  action: Guest & Conversion Intelligence.
+  operations:
+  - createSegment
+  - listSegments
+  - previewSegment
+  outcome: '**Drawn by the client as RET-6E.** 3 operations on this step.'
+  crossesDevice: true
+- step: 3
+  screen: ANL-004
+  action: Product Performance.
+  operations:
+  - getDashboard
+  - listProducts
+  - runReport
+  outcome: '**Drawn by the client as RET-6C.** 3 operations on this step.'
+  crossesDevice: true
+- step: 4
+  screen: ANL-006
+  action: Inventory & Waste Intelligence.
+  operations:
+  - listExpiringBatches
+  outcome: '**Drawn by the client as RET-6D.** 1 operations on this step.'
+  crossesDevice: true
+- step: 5
+  screen: BO-058
+  action: Reporting Home.
+  operations:
+  - createReportSchedule
+  - deleteReport
+  - getFinancialReport
+  - getReport
+  - listReportExecutions
+  - saveNaturalLanguageQuery
+  outcome: '**Drawn by the client as RET-6H.** 7 operations on this step.'
+  crossesDevice: true
+branches:
+- at: 1
+  condition: A step in the chain is not licensed for this tenant.
+  behaviour: '**The chain stops at the module boundary.** `requiresModule` on each screen decides —
+    a tenant without the retail licence does not see the retail half, and the journey is shorter rather
+    than broken.'
+  severity: medium
+  resolvedBy: getModuleEnablement
+exitStates:
+- state: completed
+  description: The chain ran as the client drew it.
+- state: stoppedAtModule
+  description: '**A licence boundary, not a failure.**'
+notes: '**Retail board 6 as drawn.** ReportingService sat at 14% coverage — the lowest but one — and
+  this is the chain the client themselves laid out. **Derived from the client''s own `GOES TO` edges**,
+  not from an inferred path — a pair of frames the client linked is evidence; a chain assembled from
+  unrelated pairs is a guess.'
+openQuestions: null

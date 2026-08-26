@@ -1,0 +1,61 @@
+$schema: ./_schema.yaml
+id: F100
+name: An AI provider is configured, budgeted and audited
+actor: platformAdmin
+capability: An AI provider is configured, budgeted and audited
+wave: 2
+frequency: As needed.
+criticality: operational
+primaryContract: ai
+contracts:
+- ai
+- subscription
+platforms:
+- P08
+- P09
+trigger:
+  description: A tenant wants the concierge on, and somebody has to decide which model, at what cost,
+    with what retention.
+offlineBehaviour: None of it offline.
+steps:
+- step: 1
+  screen: ADM-037
+  action: AI Provider & Credentials.
+  operations:
+  - listAiProviders
+  - setAiCredential
+  - setAiProvider
+  - testAiProvider
+  outcome: 4 operations, 4 of them previously unwalked.
+- step: 2
+  screen: BO-091
+  action: AI Policy & Spend.
+  operations:
+  - getAiPolicy
+  - getAiUsage
+  - setAiPolicy
+  outcome: 3 operations, 3 of them previously unwalked.
+  crossesDevice: true
+- step: 3
+  screen: ADM-004
+  action: Platform Audit Log.
+  operations:
+  - listAiInteractions
+  outcome: 1 operations, 1 of them previously unwalked.
+  crossesDevice: true
+branches:
+- at: 1
+  condition: The acting principal lacks the permission at this scope.
+  behaviour: '**Refused at the first step, not the last.** ADR-0002 makes authorisation user-driven
+    — a person who gets three steps in and then cannot finish has been told the wrong thing.'
+  severity: medium
+  resolvedBy: resolvePermissions
+exitStates:
+- state: completed
+  description: The journey ran end to end.
+- state: refused
+  description: '**Stopped at a permission or a licence boundary**, with the reason named.'
+notes: '**AiService was the thinnest service in the package at 20%.** ADR-0020 makes it a hard boundary
+  and **that boundary had never been walked from the configuration side** — only from the guest side
+  in F40. **CF-64 retention is still open and lands here.**'
+openQuestions: null

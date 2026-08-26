@@ -1,0 +1,108 @@
+id: LLD-Approval request
+title: Approval request — 13 transitions
+generatedBy: tools/derive-diagrams.py
+index: diagrams/hld/04-lifecycles.yaml
+source: states/approval-request.yaml
+entity: Approval request
+contract: approvals
+enum: ApprovalStatus
+enumKind: named
+enumSchema: ApprovalStatus
+owner: approvals
+initial:
+- draft
+- pending
+terminal:
+- approved
+- rejected
+- withdrawn
+- expired
+- cancelled
+transitions:
+- from: draft
+  to: pending
+  operation: createApprovalRequest
+  trigger: operation
+  guard: Submitted. A draft is for a person gathering detail; a contract raising one submits immediately
+- from: pending
+  to: escalated
+  operation: escalateApprovalRequest
+  trigger: operation
+  guard: Moved up a level. **Adds an approver rather than replacing one** — who was asked and did not
+    answer is the question the escalation report exists for
+- from: pending
+  to: escalated
+  trigger: timer
+  guard: SLA breached and the rule names an escalation target
+- from: escalated
+  to: pending
+  operation: decideApprovalRequest
+  trigger: operation
+  guard: A level approved and the chain continues
+- from: pending
+  to: approved
+  operation: decideApprovalRequest
+  trigger: operation
+  guard: '**Final level granted.** Records an authorisation — the requesting contract executes afterwards
+    under the approver''s own permission'
+  requiresApproval: true
+  emits:
+  - approval.granted
+- from: escalated
+  to: approved
+  operation: decideApprovalRequest
+  trigger: operation
+  guard: Granted after escalation
+  requiresApproval: true
+  emits:
+  - approval.granted
+- from: pending
+  to: rejected
+  operation: decideApprovalRequest
+  trigger: operation
+  guard: Refused, with a reason. **The reason is required** — without it the requester learns nothing
+    and the analytics mean nothing
+  emits:
+  - approval.rejected
+- from: escalated
+  to: rejected
+  operation: decideApprovalRequest
+  trigger: operation
+  guard: Refused after escalation
+  emits:
+  - approval.rejected
+- from: pending
+  to: withdrawn
+  operation: withdrawApprovalRequest
+  trigger: operation
+  guard: The requester took it back. **Not a rejection** — nobody refused it, and it must not count
+    against an approver
+- from: draft
+  to: cancelled
+  operation: withdrawApprovalRequest
+  trigger: operation
+  guard: Abandoned before submission
+- from: pending
+  to: expired
+  trigger: timer
+  guard: '**Nobody answered.** Usually a routing defect rather than a busy approver, which is why expired
+    is counted separately from rejected'
+- from: escalated
+  to: expired
+  trigger: timer
+  guard: Nobody answered after escalation
+- from: rejected
+  to: pending
+  operation: resubmitApprovalRequest
+  trigger: operation
+  guard: '**Creates a new request linked to this one** rather than reopening it. A request refused twice
+    and granted on the third attempt is a pattern worth seeing'
+  isReversal: true
+notes: 'No transition out of `approved` or `rejected`. **A completed approval is evidence** (11.1.56)
+  — amending one is not a correction, it is a different fact, and reopening creates a new decision linked
+  to the old.
+
+
+  `withdrawn` and `expired` are deliberately distinct from `rejected`. One is the requester changing
+  their mind, one is nobody answering, and only the third is an approver saying no. Collapsing them
+  makes the rejection rate meaningless.'

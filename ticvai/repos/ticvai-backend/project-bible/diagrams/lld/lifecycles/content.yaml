@@ -1,0 +1,49 @@
+id: LLD-White-label content
+title: White-label content — 5 transitions
+generatedBy: tools/derive-diagrams.py
+index: diagrams/hld/04-lifecycles.yaml
+source: states/content.yaml
+entity: White-label content
+contract: white-label
+enum: ContentStatus
+enumKind: named
+enumSchema: ContentStatus
+owner: whitelabel
+initial:
+- draft
+terminal:
+- archived
+transitions:
+- from: draft
+  to: published
+  operation: publishTenantConfig
+  trigger: operation
+  guard: Live on the guest surfaces
+  requiresApproval: true
+  emits:
+  - whitelabel.contentPublished
+- from: published
+  to: draft
+  operation: restoreConfigVersion
+  trigger: operation
+  guard: Edited. **The published version stays live until the new one publishes** — editing must not
+    blank a homepage
+- from: published
+  to: archived
+  operation: updateContentPage
+  trigger: operation
+  guard: Withdrawn
+- from: archived
+  to: published
+  operation: publishTenantConfig
+  trigger: operation
+  guard: Restored
+  isReversal: true
+  requiresApproval: true
+- from: draft
+  to: archived
+  operation: updateContentPage
+  trigger: operation
+  guard: Abandoned
+notes: Draft and published coexist. That is the whole point of the builder — a tenant edits a homepage
+  over a week while guests keep seeing the current one.

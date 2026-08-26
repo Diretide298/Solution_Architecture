@@ -1,0 +1,975 @@
+{
+ "code": "P13",
+ "name": "Venue CMS \u2014 White Label",
+ "shortName": "Venue CMS",
+ "app": "venue-management-web",
+ "operator": "venue",
+ "audience": "staff",
+ "formFactor": "web",
+ "offlineCapable": false,
+ "generated": "2026-08-24",
+ "note": "Derived by tools/derive-platform.py. **The gaps section is the point** \u2014 a page listing what exists is a directory; one listing what is missing is a worklist.",
+ "counts": {
+  "screens": 20,
+  "operations": 77,
+  "contracts": 8,
+  "modules": 1,
+  "undrawn": 0,
+  "operationsWithNoScreen": 120
+ },
+ "waves": {
+  "wave2": 20
+ },
+ "modules": [
+  {
+   "module": "White Label",
+   "screens": 20,
+   "waves": [
+    2
+   ]
+  }
+ ],
+ "contracts": [
+  {
+   "contract": "white-label",
+   "operations": 19
+  },
+  {
+   "contract": "subscription",
+   "operations": 19
+  },
+  {
+   "contract": "marketing-crm",
+   "operations": 11
+  },
+  {
+   "contract": "assets",
+   "operations": 10
+  },
+  {
+   "contract": "maintenance",
+   "operations": 7
+  },
+  {
+   "contract": "fnb",
+   "operations": 5
+  },
+  {
+   "contract": "identity",
+   "operations": 4
+  },
+  {
+   "contract": "orders",
+   "operations": 2
+  }
+ ],
+ "screens": [
+  {
+   "id": "CMS-001",
+   "name": "Tenant Workspace",
+   "module": "White Label",
+   "wave": 2,
+   "route": "/white-label/tenant-workspace",
+   "operations": 21,
+   "drawn": true
+  },
+  {
+   "id": "CMS-002",
+   "name": "Brand Kit",
+   "module": "White Label",
+   "wave": 2,
+   "route": "/white-label/brand-kit",
+   "operations": 4,
+   "drawn": true
+  },
+  {
+   "id": "CMS-003",
+   "name": "Typography",
+   "module": "White Label",
+   "wave": 2,
+   "route": "/white-label/typography",
+   "operations": 4,
+   "drawn": true
+  },
+  {
+   "id": "CMS-004",
+   "name": "Logo & Assets",
+   "module": "White Label",
+   "wave": 2,
+   "route": "/white-label/logo-assets",
+   "operations": 7,
+   "drawn": true
+  },
+  {
+   "id": "CMS-005",
+   "name": "Theme Editor",
+   "module": "White Label",
+   "wave": 2,
+   "route": "/white-label/theme-editor",
+   "operations": 2,
+   "drawn": true
+  },
+  {
+   "id": "CMS-006",
+   "name": "Component Preview",
+   "module": "White Label",
+   "wave": 2,
+   "route": "/white-label/component-preview",
+   "operations": 5,
+   "drawn": true
+  },
+  {
+   "id": "CMS-007",
+   "name": "Page Builder",
+   "module": "White Label",
+   "wave": 2,
+   "route": "/white-label/page-builder",
+   "operations": 2,
+   "drawn": true
+  },
+  {
+   "id": "CMS-008",
+   "name": "Content Blocks",
+   "module": "White Label",
+   "wave": 2,
+   "route": "/white-label/content-blocks",
+   "operations": 2,
+   "drawn": true
+  },
+  {
+   "id": "CMS-009",
+   "name": "Navigation & Menus",
+   "module": "White Label",
+   "wave": 2,
+   "route": "/white-label/navigation-menus",
+   "operations": 5,
+   "drawn": true
+  },
+  {
+   "id": "CMS-010",
+   "name": "Media Library",
+   "module": "White Label",
+   "wave": 2,
+   "route": "/white-label/media-library",
+   "operations": 12,
+   "drawn": true
+  },
+  {
+   "id": "CMS-011",
+   "name": "Translations",
+   "module": "White Label",
+   "wave": 2,
+   "route": "/white-label/translations",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "CMS-012",
+   "name": "RTL Preview",
+   "module": "White Label",
+   "wave": 2,
+   "route": "/white-label/rtl-preview",
+   "operations": 2,
+   "drawn": true
+  },
+  {
+   "id": "CMS-013",
+   "name": "SEO & Metadata",
+   "module": "White Label",
+   "wave": 2,
+   "route": "/white-label/seo-metadata",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "CMS-014",
+   "name": "Publishing Workflow",
+   "module": "White Label",
+   "wave": 2,
+   "route": "/white-label/publishing-workflow",
+   "operations": 3,
+   "drawn": true
+  },
+  {
+   "id": "CMS-015",
+   "name": "Version History",
+   "module": "White Label",
+   "wave": 2,
+   "route": "/white-label/version-history",
+   "operations": 3,
+   "drawn": true
+  },
+  {
+   "id": "CMS-016",
+   "name": "Site Settings",
+   "module": "White Label",
+   "wave": 2,
+   "route": "/white-label/site-settings",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "CMS-017",
+   "name": "Domain & Certificate",
+   "module": "White Label",
+   "wave": 2,
+   "route": "/white-label/domain-certificate",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "CMS-018",
+   "name": "Consent & Legal",
+   "module": "White Label",
+   "wave": 2,
+   "route": "/white-label/consent-legal",
+   "operations": 11,
+   "drawn": true
+  },
+  {
+   "id": "CMS-019",
+   "name": "User Access",
+   "module": "White Label",
+   "wave": 2,
+   "route": "/white-label/user-access",
+   "operations": 2,
+   "drawn": true
+  },
+  {
+   "id": "CMS-020",
+   "name": "Change Log",
+   "module": "White Label",
+   "wave": 2,
+   "route": "/white-label/change-log",
+   "operations": 1,
+   "drawn": true
+  }
+ ],
+ "gaps": {
+  "operationsWithNoScreen": [
+   {
+    "operation": "attachModifierGroup",
+    "contract": "fnb",
+    "verb": "PUT",
+    "summary": "Give an item its choices"
+   },
+   {
+    "operation": "clearTable",
+    "contract": "fnb",
+    "verb": "POST",
+    "summary": "Mark a table cleared and free"
+   },
+   {
+    "operation": "createCombo",
+    "contract": "fnb",
+    "verb": "POST",
+    "summary": "A meal deal, priced as one thing"
+   },
+   {
+    "operation": "createModifierGroup",
+    "contract": "fnb",
+    "verb": "POST",
+    "summary": "Create a modifier group"
+   },
+   {
+    "operation": "createTable",
+    "contract": "fnb",
+    "verb": "POST",
+    "summary": "A table as a thing, not an inference"
+   },
+   {
+    "operation": "getTableVisit",
+    "contract": "fnb",
+    "verb": "GET",
+    "summary": "Read a visit with all its orders"
+   },
+   {
+    "operation": "rebalanceStationLoad",
+    "contract": "fnb",
+    "verb": "POST",
+    "summary": "Move work between stations mid-service"
+   },
+   {
+    "operation": "requestBill",
+    "contract": "fnb",
+    "verb": "POST",
+    "summary": "The party asked to pay"
+   },
+   {
+    "operation": "resolveBookingConflict",
+    "contract": "fnb",
+    "verb": "GET",
+    "summary": "Two bookings, one table \u2014 and what to do about it"
+   },
+   {
+    "operation": "sendBookingConfirmation",
+    "contract": "fnb",
+    "verb": "POST",
+    "summary": "Confirm a booking, and ask them to confirm back"
+   },
+   {
+    "operation": "sendOrderNotification",
+    "contract": "fnb",
+    "verb": "POST",
+    "summary": "Tell the guest where their order is"
+   },
+   {
+    "operation": "setComboSlots",
+    "contract": "fnb",
+    "verb": "PUT",
+    "summary": "What the guest chooses, and what it costs extra"
+   },
+   {
+    "operation": "setKitchenSla",
+    "contract": "fnb",
+    "verb": "PUT",
+    "summary": "How long a ticket may sit before it is late"
+   },
+   {
+    "operation": "setSectionLayout",
+    "contract": "fnb",
+    "verb": "PUT",
+    "summary": "Divide the floor into sections and give each a server"
+   },
+   {
+    "operation": "updateTable",
+    "contract": "fnb",
+    "verb": "PUT",
+    "summary": "Change what a table is"
+   },
+   {
+    "operation": "updateTableReservation",
+    "contract": "fnb",
+    "verb": "PATCH",
+    "summary": "Change or cancel a booking"
+   },
+   {
+    "operation": "createMfaChallenge",
+    "contract": "identity",
+    "verb": "POST",
+    "summary": "Step-up authentication for a sensitive action"
+   },
+   {
+    "operation": "deleteGuestAccount",
+    "contract": "identity",
+    "verb": "DELETE",
+    "summary": "Self-service account deletion"
+   },
+   {
+    "operation": "exportSubjectData",
+    "contract": "identity",
+    "verb": "POST",
+    "summary": "Everything the platform holds about one guest"
+   },
+   {
+    "operation": "setPasswordPolicy",
+    "contract": "identity",
+    "verb": "PUT",
+    "summary": "Length, breach check, lockout and step-up"
+   },
+   {
+    "operation": "setSegregationRules",
+    "contract": "identity",
+    "verb": "PUT",
+    "summary": "Which permissions may not be held together"
+   },
+   {
+    "operation": "updateMaintenancePlan",
+    "contract": "maintenance",
+    "verb": "PATCH",
+    "summary": "Amend or suspend a plan"
+   },
+   {
+    "operation": "activateJourney",
+    "contract": "marketing-crm",
+    "verb": "POST",
+    "summary": "Start it, or stop it"
+   },
+   {
+    "operation": "addGuestNote",
+    "contract": "marketing-crm",
+    "verb": "POST",
+    "summary": "What the floor needs to know about this table"
+   },
+   {
+    "operation": "addSuppression",
+    "contract": "marketing-crm",
+    "verb": "POST",
+    "summary": "Suppress an address"
+   },
+   {
+    "operation": "createChallenge",
+    "contract": "marketing-crm",
+    "verb": "POST",
+    "summary": "Define a challenge, mission or streak"
+   },
+   {
+    "operation": "createForm",
+    "contract": "marketing-crm",
+    "verb": "POST",
+    "summary": "Define a waiver, survey or capture form"
+   },
+   {
+    "operation": "createInvitationCampaign",
+    "contract": "marketing-crm",
+    "verb": "POST",
+    "summary": "A quota-bounded, addressed invitation"
+   },
+   {
+    "operation": "createLoyaltyProgramme",
+    "contract": "marketing-crm",
+    "verb": "POST",
+    "summary": "Create a loyalty programme"
+   },
+   {
+    "operation": "createReferral",
+    "contract": "marketing-crm",
+    "verb": "POST",
+    "summary": "Issue a referral code"
+   },
+   {
+    "operation": "createUrlRedirect",
+    "contract": "marketing-crm",
+    "verb": "POST",
+    "summary": "301, 302 and custom redirects"
+   },
+   {
+    "operation": "getJourneyPerformance",
+    "contract": "marketing-crm",
+    "verb": "GET",
+    "summary": "Entrants, completions, goals reached"
+   },
+   {
+    "operation": "getLostItemMatches",
+    "contract": "marketing-crm",
+    "verb": "GET",
+    "summary": "Candidate matches, scored"
+   },
+   {
+    "operation": "getMyChallenges",
+    "contract": "marketing-crm",
+    "verb": "GET",
+    "summary": "Active challenges and how far along I am"
+   },
+   {
+    "operation": "getSuppressionList",
+    "contract": "marketing-crm",
+    "verb": "GET",
+    "summary": "Addresses suppressed from all sending"
+   },
+   {
+    "operation": "getWaiverStatus",
+    "contract": "marketing-crm",
+    "verb": "GET",
+    "summary": "Whether this guest may be issued a ticket that requires a waiver"
+   },
+   {
+    "operation": "listMessageTriggers",
+    "contract": "marketing-crm",
+    "verb": "GET",
+    "summary": "What fires a message, and when"
+   },
+   {
+    "operation": "listReviews",
+    "contract": "marketing-crm",
+    "verb": "GET",
+    "summary": "List guest reviews and ratings"
+   },
+   {
+    "operation": "listSegmentMembers",
+    "contract": "marketing-crm",
+    "verb": "GET",
+    "summary": "List guests currently matching a segment"
+   },
+   {
+    "operation": "matchGuest",
+    "contract": "marketing-crm",
+    "verb": "POST",
+    "summary": "Is this the same person we already have?"
+   },
+   {
+    "operation": "mergeGuests",
+    "contract": "marketing-crm",
+    "verb": "POST",
+    "summary": "Two records, one person"
+   },
+   {
+    "operation": "recordLostItem",
+    "contract": "marketing-crm",
+    "verb": "POST",
+    "summary": "Report something lost, or hand something in"
+   },
+   {
+    "operation": "recordPrivacyIncident",
+    "contract": "marketing-crm",
+    "verb": "POST",
+    "summary": "Log a personal-data breach and start the clock"
+   },
+   {
+    "operation": "respondToReview",
+    "contract": "marketing-crm",
+    "verb": "POST",
+    "summary": "Respond to a review"
+   },
+   {
+    "operation": "retryMessageDispatch",
+    "contract": "marketing-crm",
+    "verb": "POST",
+    "summary": "Send it again, or by another channel"
+   },
+   {
+    "operation": "setCallDisposition",
+    "contract": "marketing-crm",
+    "verb": "POST",
+    "summary": "Why the conversation ended, and any callback"
+   },
+   {
+    "operation": "setConsentPurposes",
+    "contract": "marketing-crm",
+    "verb": "PUT",
+    "summary": "Configure consent purposes"
+   },
+   {
+    "operation": "setMessageTrigger",
+    "contract": "marketing-crm",
+    "verb": "POST",
+    "summary": "Fire a message from a platform event"
+   },
+   {
+    "operation": "setSeoMetadata",
+    "contract": "marketing-crm",
+    "verb": "PUT",
+    "summary": "Titles, descriptions, canonicals and hreflang"
+   },
+   {
+    "operation": "startKioskAssist",
+    "contract": "marketing-crm",
+    "verb": "POST",
+    "summary": "A staff member helps a guest at a kiosk, remotely"
+   },
+   {
+    "operation": "submitForm",
+    "contract": "marketing-crm",
+    "verb": "POST",
+    "summary": "Sign a waiver, answer a survey, capture details"
+   },
+   {
+    "operation": "updateGuestPreferences",
+    "contract": "marketing-crm",
+    "verb": "PUT",
+    "summary": "The things a regular should not have to say twice"
+   },
+   {
+    "operation": "uploadGuestDocument",
+    "contract": "marketing-crm",
+    "verb": "POST",
+    "summary": "Store a guest photo, ID or signed document"
+   },
+   {
+    "operation": "captureStoredValue",
+    "contract": "orders",
+    "verb": "POST",
+    "summary": "Take some or all of a held balance"
+   },
+   {
+    "operation": "convertReservation",
+    "contract": "orders",
+    "verb": "POST",
+    "summary": "Convert a reservation into an order"
+   },
+   {
+    "operation": "convertToTermProduct",
+    "contract": "orders",
+    "verb": "POST",
+    "summary": "Turn a visit into a membership or season pass"
+   },
+   {
+    "operation": "createCart",
+    "contract": "orders",
+    "verb": "POST",
+    "summary": "Start a cart"
+   },
+   {
+    "operation": "createPaymentLink",
+    "contract": "orders",
+    "verb": "POST",
+    "summary": "Send a guest a link to pay later"
+   },
+   {
+    "operation": "createResaleListing",
+    "contract": "orders",
+    "verb": "POST",
+    "summary": "List an entitlement for resale"
+   },
+   {
+    "operation": "createReservation",
+    "contract": "orders",
+    "verb": "POST",
+    "summary": "Hold without payment"
+   },
+   {
+    "operation": "extendReservation",
+    "contract": "orders",
+    "verb": "POST",
+    "summary": "Extend a reservation"
+   },
+   {
+    "operation": "getGroupBooking",
+    "contract": "orders",
+    "verb": "GET",
+    "summary": ""
+   },
+   {
+    "operation": "issueInvitation",
+    "contract": "orders",
+    "verb": "POST",
+    "summary": "Issue a complimentary entitlement, with no payment expected"
+   },
+   {
+    "operation": "listAbandonedCarts",
+    "contract": "orders",
+    "verb": "GET",
+    "summary": "Carts that lapsed without checking out"
+   },
+   {
+    "operation": "listChargebacks",
+    "contract": "orders",
+    "verb": "GET",
+    "summary": "Open disputes, by deadline"
+   },
+   {
+    "operation": "listFraudRules",
+    "contract": "orders",
+    "verb": "GET",
+    "summary": ""
+   },
+   {
+    "operation": "listInvitationAllowances",
+    "contract": "orders",
+    "verb": "GET",
+    "summary": "Who may issue comps, and how many are left"
+   },
+   {
+    "operation": "listPaymentProviders",
+    "contract": "orders",
+    "verb": "GET",
+    "summary": "Gateways configured for this scope"
+   },
+   {
+    "operation": "listPaymentTokens",
+    "contract": "orders",
+    "verb": "GET",
+    "summary": "A guest's saved payment methods"
+   },
+   {
+    "operation": "openGuestCreditAccount",
+    "contract": "orders",
+    "verb": "POST",
+    "summary": "A credit limit for an individual booking ahead"
+   },
+   {
+    "operation": "printTicketProof",
+    "contract": "orders",
+    "verb": "POST",
+    "summary": "Print a sample without selling anything"
+   },
+   {
+    "operation": "pushWalletPassUpdate",
+    "contract": "orders",
+    "verb": "POST",
+    "summary": "Push a change to every device holding it"
+   },
+   {
+    "operation": "quoteUpgrade",
+    "contract": "orders",
+    "verb": "POST",
+    "summary": "What an upgrade costs, pro-rata"
+   },
+   {
+    "operation": "reissueEntitlement",
+    "contract": "orders",
+    "verb": "POST",
+    "summary": "Zero-value reissue of an expired entitlement for a later date"
+   },
+   {
+    "operation": "resendPaymentLink",
+    "contract": "orders",
+    "verb": "POST",
+    "summary": ""
+   },
+   {
+    "operation": "respondToChargeback",
+    "contract": "orders",
+    "verb": "POST",
+    "summary": "Submit evidence, or accept the loss"
+   },
+   {
+    "operation": "setFraudRules",
+    "contract": "orders",
+    "verb": "PUT",
+    "summary": ""
+   },
+   {
+    "operation": "setPaymentProvider",
+    "contract": "orders",
+    "verb": "PUT",
+    "summary": "Configure a gateway and its routing"
+   },
+   {
+    "operation": "shareEntitlement",
+    "contract": "orders",
+    "verb": "POST",
+    "summary": "Let somebody else use this, without giving it away"
+   },
+   {
+    "operation": "splitOrder",
+    "contract": "orders",
+    "verb": "POST",
+    "summary": "Break one order into independent orders"
+   },
+   {
+    "operation": "storePaymentToken",
+    "contract": "orders",
+    "verb": "POST",
+    "summary": "Save a payment method for future use"
+   },
+   {
+    "operation": "voidPayment",
+    "contract": "orders",
+    "verb": "POST",
+    "summary": "Release an authorisation before it is captured"
+   },
+   {
+    "operation": "cancelInvoice",
+    "contract": "subscription",
+    "verb": "POST",
+    "summary": "Cancel or credit an invoice"
+   },
+   {
+    "operation": "cancelSubscription",
+    "contract": "subscription",
+    "verb": "POST",
+    "summary": "Terminate a tenant subscription"
+   },
+   {
+    "operation": "createPartnerUser",
+    "contract": "subscription",
+    "verb": "POST",
+    "summary": "Add a user to a partner branch"
+   },
+   {
+    "operation": "disputeInvoice",
+    "contract": "subscription",
+    "verb": "POST",
+    "summary": "Raise a dispute"
+   },
+   {
+    "operation": "executeTenantMigration",
+    "contract": "subscription",
+    "verb": "POST",
+    "summary": "Move the tenant"
+   },
+   {
+    "operation": "exportPartnerInvoice",
+    "contract": "subscription",
+    "verb": "POST",
+    "summary": "Partner invoice and settlement, in an ERP format"
+   },
+   {
+    "operation": "launchCellCluster",
+    "contract": "subscription",
+    "verb": "POST",
+    "summary": "Launch an identical cluster"
+   },
+   {
+    "operation": "listCellClusters",
+    "contract": "subscription",
+    "verb": "GET",
+    "summary": "Clusters in a region"
+   },
+   {
+    "operation": "listPartnerUsers",
+    "contract": "subscription",
+    "verb": "GET",
+    "summary": "Users beneath a partner, by branch"
+   },
+   {
+    "operation": "listTenantMigrations",
+    "contract": "subscription",
+    "verb": "GET",
+    "summary": "Tenant moves between cells"
+   },
+   {
+    "operation": "listVenueTypeTemplates",
+    "contract": "subscription",
+    "verb": "GET",
+    "summary": "Starting configurations by venue kind"
+   },
+   {
+    "operation": "planTenantMigration",
+    "contract": "subscription",
+    "verb": "POST",
+    "summary": "Plan moving a tenant to another cell"
+   },
+   {
+    "operation": "recordInvoicePayment",
+    "contract": "subscription",
+    "verb": "POST",
+    "summary": "Record payment against an invoice"
+   },
+   {
+    "operation": "recordUsage",
+    "contract": "subscription",
+    "verb": "POST",
+    "summary": "Record metered usage"
+   },
+   {
+    "operation": "registerPartner",
+    "contract": "subscription",
+    "verb": "POST",
+    "summary": "A business applies to become a partner"
+   },
+   {
+    "operation": "resolveInvoiceDispute",
+    "contract": "subscription",
+    "verb": "POST",
+    "summary": "Resolve a dispute"
+   },
+   {
+    "operation": "rollbackTenantMigration",
+    "contract": "subscription",
+    "verb": "POST",
+    "summary": "Roll a cutover back"
+   },
+   {
+    "operation": "settleAiUsage",
+    "contract": "subscription",
+    "verb": "POST",
+    "summary": "Turn metered AI interactions into a billable usage record"
+   },
+   {
+    "operation": "createBanner",
+    "contract": "white-label",
+    "verb": "POST",
+    "summary": "Create a banner"
+   },
+   {
+    "operation": "createContentBlock",
+    "contract": "white-label",
+    "verb": "POST",
+    "summary": "Author a block of content"
+   },
+   {
+    "operation": "createContentPage",
+    "contract": "white-label",
+    "verb": "POST",
+    "summary": "Create a content page"
+   },
+   {
+    "operation": "createPromoBlock",
+    "contract": "white-label",
+    "verb": "POST",
+    "summary": "Create a promotional block"
+   },
+   {
+    "operation": "deleteBanner",
+    "contract": "white-label",
+    "verb": "DELETE",
+    "summary": "Delete a banner"
+   },
+   {
+    "operation": "deleteContentPage",
+    "contract": "white-label",
+    "verb": "DELETE",
+    "summary": "Delete a content page"
+   },
+   {
+    "operation": "deletePromoBlock",
+    "contract": "white-label",
+    "verb": "DELETE",
+    "summary": "Delete a promotional block"
+   },
+   {
+    "operation": "getFeatureToggles",
+    "contract": "white-label",
+    "verb": "GET",
+    "summary": "Read tenant feature toggles"
+   },
+   {
+    "operation": "getModuleEnablement",
+    "contract": "white-label",
+    "verb": "GET",
+    "summary": "Read module enablement"
+   },
+   {
+    "operation": "getNavigation",
+    "contract": "white-label",
+    "verb": "GET",
+    "summary": "Read navigation"
+   },
+   {
+    "operation": "publishContentBlock",
+    "contract": "white-label",
+    "verb": "POST",
+    "summary": "Publish now, or schedule it"
+   },
+   {
+    "operation": "setFeatureToggles",
+    "contract": "white-label",
+    "verb": "PUT",
+    "summary": "Set feature toggles"
+   },
+   {
+    "operation": "setFooter",
+    "contract": "white-label",
+    "verb": "PUT",
+    "summary": "Footer columns, legal links and social"
+   },
+   {
+    "operation": "setHeader",
+    "contract": "white-label",
+    "verb": "PUT",
+    "summary": "Configure the header"
+   },
+   {
+    "operation": "setMaintenanceMode",
+    "contract": "white-label",
+    "verb": "PUT",
+    "summary": "Enable or clear maintenance mode"
+   },
+   {
+    "operation": "setModuleEnablement",
+    "contract": "white-label",
+    "verb": "PUT",
+    "summary": "Enable or disable modules"
+   },
+   {
+    "operation": "setNavigation",
+    "contract": "white-label",
+    "verb": "PUT",
+    "summary": "Set main and overflow navigation"
+   },
+   {
+    "operation": "updateBanner",
+    "contract": "white-label",
+    "verb": "PATCH",
+    "summary": "Amend or activate a banner"
+   },
+   {
+    "operation": "updateContentPage",
+    "contract": "white-label",
+    "verb": "PUT",
+    "summary": "Amend a content page"
+   },
+   {
+    "operation": "updatePromoBlock",
+    "contract": "white-label",
+    "verb": "PATCH",
+    "summary": "Amend a promotional block"
+   }
+  ],
+  "modulesSplitAcrossWaves": [],
+  "screensNotDrawn": [],
+  "flowsNamingAMissingScreen": []
+ }
+}

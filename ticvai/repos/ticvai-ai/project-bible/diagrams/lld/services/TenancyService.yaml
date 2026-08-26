@@ -1,0 +1,827 @@
+id: LLD-TenancyService
+title: TenancyService — 52 operations, 35 tables
+generatedBy: tools/derive-diagrams.py
+tier: foundation
+index: diagrams/hld/02-services.yaml
+why: '**`platform.scope_node` is reached by 304 of 379 tables** — the tenancy spine. Workforce and approvals
+  are folded in because each is small, both read `scope_node` constantly and write it rarely, and splitting
+  them means three services doing the same joins.
+
+
+  **`shift` was folded in here on 24 August and moved to OrderService the same day.** The reasoning
+  was that a shift owns no tables of its own — which is true — and the conclusion was wrong. **A service
+  with no data belongs where its data is**, and a shift''s data is entirely in `orders`: `orders.shift`,
+  `orders.deposit_box`, `orders.cash_movement`, `orders.cash_count_line`.
+
+
+  **The coupling made it visible.** All 43 of Tenancy''s cross-service touches into `orders` were the
+  `shift` contract — 19 writes and 24 reads, the heaviest coupling in the platform, created to solve
+  a cosmetic problem.'
+scale: Read-heavy and highly cacheable. Config changes are rare.
+ifDown: Same as identity — nothing runs without a scope.
+coverage:
+  operations: 52
+  inAFlow: 32
+  percent: 62%
+  note: '**Flow coverage is how much of this service a journey has walked.** A service under 40% is
+    unwalked rather than under-documented.'
+schemas:
+- schema: platform
+  tables: 24
+  stores:
+  - postgres
+  largestTable: platform.workstation
+- schema: workforce
+  tables: 5
+  stores:
+  - postgres
+  largestTable: workforce.rota_assignment
+- schema: approvals
+  tables: 6
+  stores:
+  - postgres
+  largestTable: approvals.request
+operationsByContract:
+- contract: tenancy
+  count: 27
+  operations:
+  - operation: configureWorkstation
+    verb: PUT
+    path: /workstations/{workstationId}
+    scope: venue
+    permission: WORKSTATION_CONFIGURE
+    offline: false
+    reads: 3
+    writes: 3
+  - operation: createOutlet
+    verb: POST
+    path: /outlets
+    scope: venue
+    permission: REGION_CONFIGURE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: createSaleBoard
+    verb: POST
+    path: /sale-boards
+    scope: venue
+    permission: WORKSTATION_CONFIGURE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: createScopeNode
+    verb: POST
+    path: /scope-nodes
+    scope: brand
+    permission: SCOPE_MANAGE
+    offline: false
+    reads: 2
+    writes: 3
+  - operation: deployConfigurationProfile
+    verb: POST
+    path: /configuration-profiles/{profileId}/deploy
+    scope: tenant
+    permission: TENANT_CONFIGURE
+    offline: false
+    reads: 3
+    writes: 3
+  - operation: getRegionSettings
+    verb: GET
+    path: /regions/{regionId}/settings
+    scope: region
+    permission: SCOPE_VIEW
+    offline: true
+    reads: 2
+    writes: 1
+  - operation: getScopeNode
+    verb: GET
+    path: /scope-nodes/{scopeNodeId}
+    scope: venue
+    permission: SCOPE_VIEW
+    offline: false
+    reads: 2
+    writes: 1
+  - operation: getVenueSettings
+    verb: GET
+    path: /venues/{venueId}/settings
+    scope: venue
+    permission: TENANT_VIEW
+    offline: true
+    reads: 2
+    writes: 0
+  - operation: getWorkstation
+    verb: GET
+    path: /workstations/{workstationId}
+    scope: workstation
+    permission: SCOPE_VIEW
+    offline: true
+    reads: 2
+    writes: 0
+  - operation: getWorkstationHealth
+    verb: GET
+    path: /workstations/{workstationId}/health
+    scope: tenant
+    permission: DEVICE_VIEW
+    offline: false
+    reads: 3
+    writes: 0
+  - operation: listAuditRecords
+    verb: GET
+    path: /audit-records
+    scope: venue
+    permission: AI_AUDIT_VIEW
+    offline: false
+    reads: 4
+    writes: 1
+  - operation: listDevices
+    verb: GET
+    path: /devices
+    scope: venue
+    permission: DEVICE_VIEW
+    offline: true
+    reads: 1
+    writes: 0
+  - operation: listOutlets
+    verb: GET
+    path: /outlets
+    scope: venue
+    permission: SCOPE_VIEW
+    offline: true
+    reads: 1
+    writes: 0
+  - operation: listSaleBoards
+    verb: GET
+    path: /sale-boards
+    scope: venue
+    permission: SCOPE_VIEW
+    offline: true
+    reads: 1
+    writes: 0
+  - operation: listScopeNodes
+    verb: GET
+    path: /scope-nodes
+    scope: tenant
+    permission: SCOPE_VIEW
+    offline: false
+    reads: 2
+    writes: 1
+  - operation: listWorkstations
+    verb: GET
+    path: /workstations
+    scope: venue
+    permission: SCOPE_VIEW
+    offline: false
+    reads: 2
+    writes: 0
+  - operation: recordDeviceHeartbeat
+    verb: POST
+    path: /devices/{deviceId}/heartbeat
+    scope: workstation
+    permission: null
+    offline: false
+    reads: 1
+    writes: 1
+  - operation: registerDevice
+    verb: POST
+    path: /devices
+    scope: venue
+    permission: DEVICE_CONFIGURE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: setConfigurationProfile
+    verb: PUT
+    path: /configuration-profiles
+    scope: tenant
+    permission: TENANT_CONFIGURE
+    offline: false
+    reads: 2
+    writes: 3
+  - operation: setConnectivityThresholds
+    verb: PUT
+    path: /connectivity-policy
+    scope: venue
+    permission: TENANT_CONFIGURE
+    offline: false
+    reads: 2
+    writes: 3
+  - operation: setOfflinePolicy
+    verb: PUT
+    path: /offline-policy
+    scope: venue
+    permission: TENANT_CONFIGURE
+    offline: false
+    reads: 2
+    writes: 3
+  - operation: setRolePermissions
+    verb: PUT
+    path: /roles/{roleId}/permissions
+    scope: tenant
+    permission: ROLE_MANAGE
+    offline: false
+    reads: 4
+    writes: 4
+  - operation: setVenueSettings
+    verb: PUT
+    path: /venues/{venueId}/settings
+    scope: venue
+    permission: TENANT_CONFIGURE
+    offline: false
+    reads: 3
+    writes: 3
+  - operation: updateOutlet
+    verb: PATCH
+    path: /outlets/{outletId}
+    scope: venue
+    permission: REGION_CONFIGURE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: updateRegionSettings
+    verb: PUT
+    path: /regions/{regionId}/settings
+    scope: region
+    permission: REGION_CONFIGURE
+    offline: false
+    reads: 2
+    writes: 3
+  - operation: updateSaleBoard
+    verb: PUT
+    path: /sale-boards/{saleBoardId}
+    scope: venue
+    permission: WORKSTATION_CONFIGURE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: updateScopeNode
+    verb: PATCH
+    path: /scope-nodes/{scopeNodeId}
+    scope: brand
+    permission: SCOPE_MANAGE
+    offline: false
+    reads: 2
+    writes: 3
+- contract: approvals
+  count: 13
+  operations:
+  - operation: createApprovalDelegation
+    verb: POST
+    path: /delegations
+    scope: venue
+    permission: APPROVAL_DECIDE
+    offline: false
+    reads: 3
+    writes: 2
+  - operation: createApprovalRequest
+    verb: POST
+    path: /approval-requests
+    scope: venue
+    permission: APPROVAL_REQUEST
+    offline: false
+    reads: 5
+    writes: 2
+  - operation: decideApprovalRequest
+    verb: POST
+    path: /approval-requests/{requestId}/decide
+    scope: venue
+    permission: APPROVAL_DECIDE
+    offline: false
+    reads: 4
+    writes: 3
+  - operation: escalateApprovalRequest
+    verb: POST
+    path: /approval-requests/{requestId}/escalate
+    scope: venue
+    permission: APPROVAL_REQUEST
+    offline: false
+    reads: 3
+    writes: 3
+  - operation: evaluateApprovalRequirement
+    verb: POST
+    path: /approval-requests/evaluate
+    scope: venue
+    permission: APPROVAL_VIEW
+    offline: false
+    reads: 6
+    writes: 1
+  - operation: getApprovalAnalytics
+    verb: GET
+    path: /approval-analytics
+    scope: venue
+    permission: APPROVAL_VIEW
+    offline: false
+    reads: 3
+    writes: 0
+  - operation: listApprovalDelegations
+    verb: GET
+    path: /delegations
+    scope: venue
+    permission: APPROVAL_VIEW
+    offline: false
+    reads: 2
+    writes: 0
+  - operation: listApprovalMatrices
+    verb: GET
+    path: /approval-matrices
+    scope: venue
+    permission: APPROVAL_CONFIGURE
+    offline: false
+    reads: 2
+    writes: 0
+  - operation: listApprovalRequests
+    verb: GET
+    path: /approval-requests
+    scope: venue
+    permission: APPROVAL_VIEW
+    offline: false
+    reads: 2
+    writes: 0
+  - operation: resubmitApprovalRequest
+    verb: POST
+    path: /approval-requests/{requestId}/resubmit
+    scope: venue
+    permission: APPROVAL_REQUEST
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: revokeApprovalDelegation
+    verb: DELETE
+    path: /delegations/{delegationId}
+    scope: venue
+    permission: APPROVAL_DECIDE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: setApprovalMatrix
+    verb: PUT
+    path: /approval-matrices
+    scope: venue
+    permission: APPROVAL_CONFIGURE
+    offline: false
+    reads: 2
+    writes: 3
+  - operation: withdrawApprovalRequest
+    verb: POST
+    path: /approval-requests/{requestId}/withdraw
+    scope: venue
+    permission: APPROVAL_REQUEST
+    offline: false
+    reads: 2
+    writes: 2
+- contract: workforce
+  count: 12
+  operations:
+  - operation: acknowledgeAnnouncement
+    verb: POST
+    path: /announcements/{announcementId}/acknowledge
+    scope: venue
+    permission: WORKFORCE_VIEW
+    offline: true
+    reads: 2
+    writes: 2
+  - operation: amendAttendance
+    verb: POST
+    path: /attendance/{recordId}/amend
+    scope: venue
+    permission: WORKFORCE_MANAGE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: broadcastToGuests
+    verb: POST
+    path: /guest-broadcast
+    scope: venue
+    permission: ANNOUNCEMENT_PUBLISH
+    offline: false
+    reads: 5
+    writes: 3
+  - operation: createRotaAssignment
+    verb: POST
+    path: /rota-assignments
+    scope: venue
+    permission: WORKFORCE_MANAGE
+    offline: false
+    reads: 4
+    writes: 2
+  - operation: getAnnouncementReach
+    verb: GET
+    path: /announcements/{announcementId}/reach
+    scope: venue
+    permission: WORKFORCE_VIEW
+    offline: false
+    reads: 3
+    writes: 0
+  - operation: listAnnouncements
+    verb: GET
+    path: /announcements
+    scope: venue
+    permission: WORKFORCE_VIEW
+    offline: true
+    reads: 2
+    writes: 0
+  - operation: listAttendance
+    verb: GET
+    path: /attendance
+    scope: venue
+    permission: WORKFORCE_VIEW
+    offline: false
+    reads: 2
+    writes: 0
+  - operation: listRotaAssignments
+    verb: GET
+    path: /rota-assignments
+    scope: venue
+    permission: WORKFORCE_VIEW
+    offline: true
+    reads: 2
+    writes: 0
+  - operation: publishAnnouncement
+    verb: POST
+    path: /announcements
+    scope: venue
+    permission: ANNOUNCEMENT_PUBLISH
+    offline: false
+    reads: 3
+    writes: 3
+  - operation: recordAttendance
+    verb: POST
+    path: /attendance/clock
+    scope: venue
+    permission: ATTENDANCE_RECORD
+    offline: true
+    reads: 3
+    writes: 2
+  - operation: requestShiftSwap
+    verb: POST
+    path: /rota-assignments/{assignmentId}/swap
+    scope: venue
+    permission: WORKFORCE_VIEW
+    offline: false
+    reads: 3
+    writes: 3
+  - operation: updateRotaAssignment
+    verb: PATCH
+    path: /rota-assignments/{assignmentId}
+    scope: venue
+    permission: WORKFORCE_MANAGE
+    offline: false
+    reads: 2
+    writes: 2
+tables:
+- table: approvals.decision
+  columns: 13
+  store: postgres
+  parent: null
+  writtenBy:
+  - approvals
+  foreignWriters: null
+- table: approvals.delegation
+  columns: 8
+  store: postgres
+  parent: null
+  writtenBy:
+  - approvals
+  foreignWriters: null
+- table: approvals.escalation
+  columns: 1
+  store: postgres
+  parent: approvals.request
+  writtenBy:
+  - approvals
+  foreignWriters: null
+- table: approvals.matrix
+  columns: 6
+  store: postgres
+  parent: null
+  writtenBy:
+  - approvals
+  foreignWriters: null
+- table: approvals.request
+  columns: 26
+  store: postgres
+  parent: null
+  writtenBy:
+  - approvals
+  - subscription
+  - workforce
+  foreignWriters:
+  - subscription
+- table: approvals.rule
+  columns: 17
+  store: postgres
+  parent: null
+  writtenBy:
+  - approvals
+  foreignWriters: null
+- table: platform.audit_read
+  columns: 2
+  store: postgres
+  parent: identity.principal
+  writtenBy:
+  - tenancy
+  foreignWriters: null
+- table: platform.audit_record
+  columns: 2
+  store: postgres
+  parent: identity.principal
+  writtenBy:
+  - inventory
+  - tenancy
+  foreignWriters:
+  - inventory
+- table: platform.configuration_profile
+  columns: 9
+  store: postgres
+  parent: null
+  writtenBy:
+  - tenancy
+  foreignWriters: null
+- table: platform.connectivity_policy
+  columns: 8
+  store: postgres
+  parent: null
+  writtenBy:
+  - tenancy
+  foreignWriters: null
+- table: platform.denomination
+  columns: 8
+  store: postgres
+  parent: null
+  writtenBy: []
+  foreignWriters: null
+- table: platform.device
+  columns: 17
+  store: postgres
+  parent: null
+  writtenBy:
+  - tenancy
+  foreignWriters: null
+- table: platform.device_heartbeat
+  columns: 1
+  store: postgres
+  parent: platform.device
+  writtenBy: []
+  foreignWriters: null
+- table: platform.dsar_request
+  columns: 7
+  store: postgres
+  parent: null
+  writtenBy:
+  - cross-cell
+  - identity
+  foreignWriters:
+  - cross-cell
+  - identity
+- table: platform.guest_link
+  columns: 5
+  store: postgres
+  parent: null
+  writtenBy:
+  - cross-cell
+  foreignWriters:
+  - cross-cell
+- table: platform.offline_policy
+  columns: 8
+  store: postgres
+  parent: null
+  writtenBy:
+  - tenancy
+  foreignWriters: null
+- table: platform.outbox
+  columns: 0
+  store: postgres
+  parent: null
+  writtenBy: []
+  foreignWriters: null
+- table: platform.outlet
+  columns: 9
+  store: postgres
+  parent: null
+  writtenBy:
+  - tenancy
+  foreignWriters: null
+- table: platform.profile_deployment
+  columns: 12
+  store: postgres
+  parent: null
+  writtenBy:
+  - tenancy
+  foreignWriters: null
+- table: platform.redemption_right
+  columns: 16
+  store: postgres
+  parent: null
+  writtenBy:
+  - cross-cell
+  foreignWriters:
+  - cross-cell
+- table: platform.region_settings
+  columns: 10
+  store: postgres
+  parent: null
+  writtenBy:
+  - tenancy
+  foreignWriters: null
+- table: platform.sale_board
+  columns: 6
+  store: postgres
+  parent: null
+  writtenBy:
+  - tenancy
+  foreignWriters: null
+- table: platform.sale_board_page
+  columns: 3
+  store: postgres
+  parent: platform.sale_board
+  writtenBy: []
+  foreignWriters: null
+- table: platform.sale_board_tile
+  columns: 1
+  store: postgres
+  parent: null
+  writtenBy: []
+  foreignWriters: null
+- table: platform.schema_version
+  columns: 0
+  store: postgres
+  parent: null
+  writtenBy: []
+  foreignWriters: null
+- table: platform.scope_node
+  columns: 8
+  store: postgres
+  parent: null
+  writtenBy:
+  - tenancy
+  foreignWriters: null
+- table: platform.tenant
+  columns: 1
+  store: postgres
+  parent: null
+  writtenBy: []
+  foreignWriters: null
+- table: platform.venue_settings
+  columns: 7
+  store: postgres
+  parent: null
+  writtenBy:
+  - tenancy
+  foreignWriters: null
+- table: platform.wallet_authorisation
+  columns: 16
+  store: postgres
+  parent: null
+  writtenBy:
+  - cross-cell
+  foreignWriters:
+  - cross-cell
+- table: platform.workstation
+  columns: 18
+  store: postgres
+  parent: null
+  writtenBy:
+  - tenancy
+  foreignWriters: null
+- table: workforce.announcement
+  columns: 13
+  store: postgres
+  parent: null
+  writtenBy:
+  - workforce
+  foreignWriters: null
+- table: workforce.announcement_receipt
+  columns: 2
+  store: postgres
+  parent: workforce.announcement
+  writtenBy:
+  - workforce
+  foreignWriters: null
+- table: workforce.attendance
+  columns: 15
+  store: postgres
+  parent: null
+  writtenBy:
+  - workforce
+  foreignWriters: null
+- table: workforce.rota_assignment
+  columns: 17
+  store: postgres
+  parent: null
+  writtenBy:
+  - workforce
+  foreignWriters: null
+- table: workforce.shift_swap
+  columns: 8
+  store: postgres
+  parent: null
+  writtenBy:
+  - workforce
+  foreignWriters: null
+readsFrom:
+- service: IdentityService
+  operations: 17
+- service: AccessService
+  operations: 3
+- service: MarketingService
+  operations: 1
+- service: VenueOpsService
+  operations: 1
+writesOutside:
+- service: MarketingService
+  operations: 1
+  why: '**The owner defines the row; this service may only append to it.**'
+- service: IdentityService
+  operations: 1
+  why: '**The owner defines the row; this service may only append to it.**'
+screens:
+- P04:POS-001 Begin Shift
+- P04:POS-002 Sell — Ticket Catalogue
+- P04:POS-004 Sell — Seat Map
+- P04:POS-009 Staff Roster
+- P04:POS-011 Returns, Refunds & Exchanges
+- P04:POS-016 Till Configuration
+- P04:POS-018 Safe Drop & Cash Transfer Management
+- P04:POS-019 Shift Templates & Policies
+- P04:POS-020 Shift Exceptions & Alerts
+- P04:POS-024 Outlet Setup
+- P06:EMP-007 Handover notes
+- P06:EMP-021 Roster
+- P06:EMP-022 My rota
+- P06:EMP-023 Swap request
+- P06:EMP-024 Clock in / out
+- P06:EMP-025 Break management
+- P06:EMP-037 Notifications
+- P06:EMP-038 Broadcast to team
+- P06:EMP-039 Announcements
+- P06:EMP-043 Device settings
+- P06:EMP-047 Emergency mode
+- P08:BO-035 Override Audit
+- P08:BO-036 Device Registry
+- P08:BO-037 Offline Package Status
+- P08:BO-044 F&B Outlets
+- P08:BO-055 Rota & Scheduling
+- P08:BO-056 Time & Attendance
+- P08:BO-063 Opening Hours & Calendar
+- P08:BO-064 Zones & Areas
+- P08:BO-066 Notification Settings
+- P08:BO-068 Audit Log
+- P08:BO-071 Planned Maintenance
+- P08:BO-084 Approval Inbox
+- P08:BO-085 Approval Request
+- P08:BO-086 Approval Matrix
+- P08:BO-087 Approval Delegations
+- P08:BO-088 Approval Analytics
+- P08:BO-100 Venue Home
+- P08:BO-101 Orders & Money
+- P08:BO-102 Sell
+- P08:BO-103 Access & Venue
+- P08:BO-104 Food & Beverage
+- P08:BO-105 Stock & Supply
+- P08:BO-106 People & Access Rights
+- P08:BO-107 Guests & Marketing
+- P08:BO-108 Venue Operations
+- P08:BO-109 Menu Builder & POS Layout Designer
+- P08:BO-115 Category, Brand & Merchandise Hierarchy
+- P08:BO-116 Merchandising & Product Presentation
+- P08:BO-117 Product Import, Governance & AI Configuration Assistant
+- P08:BO-118 Campaign & Audience Management
+- P08:BO-122 POS Experience Dashboard
+- P08:BO-123 POS Profile Management
+- P08:BO-124 Layout & Journey Builder
+- P08:BO-125 Product & Category Button Configuration
+- P08:BO-126 Deployment, Preview & Audit
+- P08:BO-127 Hardware & Peripherals Management
+- P08:BO-128 Live Workstation Health Monitor
+- P08:BO-129 Software, Configuration & Version Management
+- P08:BO-130 Offline Policy & Rules Configuration
+- P08:BO-131 Connectivity & Auto-Switch Settings
+- P08:BO-133 Offline Alerts, Limits & Audit
+- P08:BO-135 Order Routing & KDS/Printer Rules
+- P08:BO-136 F&B Global Settings & Controls
+- P08:BO-142 Store Rules, Controls & Permissions
+- P08:BO-143 Retail Global Settings & Controls
+- P09:ADM-006 Tenant Hierarchy Explorer
+- P11:ACC-002 Registration Form
+- P11:ACC-005 Accreditation Badge
+- P11:ACC-007 Reviewer Application Detail
+- P15:KIT-009 SLA, Priority & Service Rules
+- P16:ANL-003 Operational Performance
+flows:
+- F08 Steward works a shift on the employee app
+- F106 A security dashboard surfaces something and it is investigated
+- F14 A discount needs a manager
+- F15 A part is needed and ordered
+- F16 A venue opens for the first time
+- F23 A contractor gets a badge and uses it
+- F32 A till opens, trades and settles
+- F34 A retail sale, from scan to return
+- F58 A ticket is sold at a till, added to, and refunded
+- F68 A rota is published, worked and swapped
+- F69 An incident is reported, escalated and closed
+- F71 A device is prepared, used and handed over
+- F73 A till is configured and its cash rules set
+- F74 A shift closes and the day is reported
+- F79 A workstation is registered, configured and rolled out
+- F86 A POS layout is designed, previewed and deployed
+- F89 Offline policy is set, cached, monitored and reconciled
+- F95 A fleet is watched, a fault is found, and a station is fixed

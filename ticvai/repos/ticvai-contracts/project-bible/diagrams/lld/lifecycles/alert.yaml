@@ -1,0 +1,47 @@
+id: LLD-Operational alert
+title: Operational alert — 5 transitions
+generatedBy: tools/derive-diagrams.py
+index: diagrams/hld/04-lifecycles.yaml
+source: states/alert.yaml
+entity: Operational alert
+contract: reporting
+enum: Alert.status
+enumKind: inline
+enumSchema: Alert
+enumProperty: status
+owner: reporting
+initial:
+- raised
+terminal:
+- resolved
+- expired
+transitions:
+- from: raised
+  to: acknowledged
+  trigger: operation
+  guard: '**Somebody has seen it.** CF-134: on-platform, marked as read — an alert nobody acknowledged
+    is an alert nobody saw'
+- from: acknowledged
+  to: resolved
+  trigger: operation
+  guard: The condition cleared or was fixed
+- from: raised
+  to: resolved
+  trigger: operation
+  guard: Fixed without acknowledgement — **counted separately, because it means the panel was bypassed**
+- from: raised
+  to: expired
+  trigger: timer
+  guard: '**The condition cleared on its own.** A threshold that breached and recovered with nobody
+    acting is a threshold set wrong'
+- from: acknowledged
+  to: expired
+  trigger: timer
+  guard: Seen, and it cleared before anybody acted
+notes: '**`expired` and `resolved` are separated deliberately.** One means somebody fixed it and the
+  other means it fixed itself — and a run of `expired` alerts is the signal to change the threshold
+  rather than to staff the panel harder.
+
+
+  **Escalation is `escalateAfterMinutes` on `VenueSettings.alerting`, not a state.** An unacknowledged
+  alert is still `raised`; escalation changes who is told, not what it is.'

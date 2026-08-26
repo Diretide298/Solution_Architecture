@@ -1,0 +1,262 @@
+**Minutes of Meeting**
+
+*TICVAI Kick-off Meeting — POS Session **&** Role Management, Guest App Publishing, Finance **&** Ledger Deep-Dive*
+
+| **Date** | 12 August 2026 | **Project** | TICVAI |
+| --- | --- | --- | --- |
+| **Meeting Type** | Kick-off Meeting — POS Session Management, Guest App Publishing & Finance/Ledger Deep-Dive | **Prepared by** | Chitrangi Mestry |
+
+# **Primary Objective**
+
+To clarify POS session, break, and role-permission handling across workstations and roaming ("flying pause") terminals; align on a publishing approach for client-branded guest applications; and walk through the finance and ledger architecture — the dual-ledger data model, VAT/tax logic, revenue recognition, refund processing, settlement/reconciliation, and financial reporting — as a functional and technical reference for TICVAI's platform, alongside planning next steps for infrastructure compliance review and the following UI/UX-focused workshops.
+
+# **Participants**
+
+- TICVAI Team 
+
+- Softlabs Team 
+
+# **Agenda**
+
+- POS session management and break handling
+
+- Flying pause setup and permission configuration
+
+- Role-based access and workstation-linked front-end
+
+- Multiple roles per user and role switching
+
+- Guest application publishing and white-labeling approach
+
+- Finance & ledger architecture overview
+
+- VAT / tax calculation logic
+
+- Deferred revenue and ledger flow
+
+- Refund ledger sequencing and refund policy
+
+- Customer support / chat integration approach
+
+- Settlement and reconciliation process
+
+- Billing, fees, reporting and ERP integration roadmap
+
+- Chart of accounts and account mapping
+
+- Finance module walkthrough (dashboards, transactions ledger, revenue recognition, payments, refunds, shift/till management, financial reporting)
+
+- AI financial assistant and vector database compliance
+
+- Infrastructure components for compliance review
+
+- POS hardware specification requirements
+
+- Progress update on workflows and schemas
+
+- Next steps and meeting planning
+
+# **Discussion Summary**
+
+### **1. POS Session Management and Break Handling**
+
+Chinmay opened by referencing the requirement matrix's "one user per session" rule for the POS and asked how breaks — where a live cashier needs to step away — should be handled. Allam confirmed the model: the logged-in user must either log out or suspend their shift before a second user can log into the same workstation; the workstation and user session are tied together, so no second user can log in over an active session. Qossai confirmed this matches the intended meaning of "one user, one session" — a user can take a break and a different user can log in afterward, but never concurrently on the same workstation.
+
+### **2. Flying ****POS**** Setup and Permission Configuration**
+
+Chinmay asked for clarity on how the "flying pause" (a mobile/roaming POS instance not tied to a fixed terminal) is set up and permissioned, referencing the earlier point-of-sale/FP module split (e.g., a park entrance terminal configured only for ticketing vs. a theatre terminal configured for both ticketing and FP).  Allam explained that every device running the application is assigned a unique workstation ID, which determines what modules and permissions are available at login, based on the roles and permissions configured for that user. Qossai added that ultimately the device itself is secondary to the user's configured role: whatever role a user is logged in under determines what they see, regardless of which physical workstation, tablet, or laptop they log in from — illustrated with a cashier who sees the full park ticket range at a main-gate POS but only the food & beverage menu when logged in from a restaurant POS, because access is scoped to their assigned role, not the device.
+
+### **3. Role-Based Access and Workstation-Linked Front-End**
+
+Allam added that, in addition to role-based access, each workstation can be linked to a specific front-end "sales board" — for example, of ten workstations, five could be assigned to ticketing, three to food & beverage, and two to retail — so that when a cashier logs in on a given workstation, the system automatically opens the matching front end (ticketing, F&B, or retail) for that workstation. Qossai reiterated that a finance user logging in from any workstation, laptop, or from home would only see finance reports and related information, since access is entirely role-driven.
+
+### **4. Multiple Roles per User and Role Switching**
+
+Chinmay confirmed that, like the pause application, the web/admin version would also be configured to load a user's access automatically at login rather than requiring self-configuration. Allam noted a further capability typically reserved for admin/IT staff: a single user can be assigned multiple roles (e.g., admin, cashier, supervisor, manager simultaneously) and choose or swap between them at login to see the corresponding privileges. Chinmay proposed the resulting rule: if a user has only one assigned role they log in directly into it; if they have more than one, they are prompted to select which role/account to use.  Allam confirmed this was correct, noting that in the standard case a user is assigned only a single role.
+
+### **5. Guest Application Publishing and White-Labe****l****ling**
+
+Chinmay raised the question of how client-branded guest applications (e.g., for a venue such as Ferrari World) should be published, once the client has re-themed or configured the interface to their own branding. He outlined two options: the client publishes their own independently listed app on the App/Play Store, or all venues are accessed through a single universal TICVAI app where the user selects their venue. Qossai's view was that regardless of the branding approach, the TICVAI name must always remain visible to the end user in some form (e.g., a "Made by TICVAI" credit in the app listing) and cannot be removed by the client. Chinmay asked whether there should be a dedicated client-facing module with customization screens and a publish action tied to CI/CD, versus simply providing the client a canvas to export and publish the build themselves. Qossai and  Allam asked Softlabs to prepare and present both options with their pros and cons so the two teams can jointly decide the best approach; Chinmay agreed to bring this analysis to a future session rather than over email, given the volume of related design questions still emerging.
+
+### **6. Finance ****&**** Ledger Architecture Overview**
+
+Moving into the finance-specific portion of the session, Chinmay presented the backend data model for the platform's ledger system. The platform will maintain full account-level records — not just process payments — with transactions classified down to the individual user and tenant level. Two ledgers underpin the model: a primary ledger tracking transaction-level entries (used for reconciliation) and a second ledger recording journal entries reflecting each financial event, enabling trial balance, P&L, and balance sheet generation at any point in time without additional transformation. The database is planned to scale horizontally to absorb peak-season load (e.g., during high-volume ticketing periods); the specific approach for redeploying multiple database instances/clusters is still being worked out. The stack will be built on .NET and PostgreSQL for strong typing and ACID guarantees, structured as an append-only ledger — transactions are never deleted; refunds and corrections are appended as new entries — enabling automatic reconciliation to produce the balance sheet. An AI-assisted reporting layer for accountants/finance managers is planned but parked for phase two; the underlying data model is being kept "AI-ready" so it can be integrated later without rework. Example financial events include online ticket sales, gateway sales, and gift card purchases, with debits covering receivables/bank statements and credits covering ticket revenue across venues.
+
+### **7. VAT / Tax Calculation Logic**
+
+VAT will be calculated per line item rather than on the overall basket total, since different items (e.g., tickets vs. bottled water) can carry different VAT rates — each line will carry its own VAT calculation to ensure accuracy for taxation purposes. Qossai reminded the group of a prior requirement to support tax-on-tax (VAT charged on VAT), which has come from multiple existing clients.  Allam emphasized that the tax component must be configurable to support multiple countries' tax structures — not only the UAE's relatively simple flat 5% rate but more complex structures such as Egypt's — including whether discounts are applied inclusive or exclusive of tax. Chinmay confirmed a dedicated, isolated taxation model is planned to support this configurability, including country-specific additions, and that this will be explored in more detail in a dedicated tax workshop.
+
+### **8. Deferred Revenue and Ledger Flow**
+
+Chinmay walked through the deferred revenue and ledger posting flow: placing an order has no ledger impact; capturing payment triggers VAT calculation and receivables recognition, with the liability carried in the second ledger and reported by visit date. Ticket revenue is only recognized (moved into the primary ledger) once the visit/redemption occurs — refunds are deliberately excluded from the primary ledger until fully resolved, since including them earlier would complicate later corrections; revenue is instead held in a separate ledger until the visit date to allow refunds or transfers to be cleanly managed. Allam noted the revenue recognition rules should follow the document Qossai had previously shared and should all be configurable. Chinmay confirmed the current design is based purely on the requirement matrix's recognition points — e.g., immediate recognition for POS sales, recognition on redemption for gift cards, straight-line or per-visit recognition for annual passes, and breakage revenue recognized on expiry for unused tickets.  Allam asked Chinmay to also cross-check the ticketing system's user manual, which contains additional recognition rules beyond the requirement matrix; Chinmay confirmed he is working through the (lengthy, legacy-format) manuals already.
+
+### **9. Refund Ledger Sequencing and Refund Policy**
+
+Chinmay outlined a six-step refund flow: a refund initiated from the POS/ticketing software calls the refund service, which connects to the ledger; since committed funds are held in the ledger before being moved to the second ledger at the event, refunds can be initiated directly from the ledger without routing through the second ledger, calling an external worker which connects to the payment gateway to initiate the refund. The refund engine must support time-banded rules (refunds disallowed after a cut-off), chargeback handling, and full audit trail entries (credit memos, adjustments to an issued invoice without moving cash).  Allam added further refund requirements: configurable refund percentage by time band (e.g., full refund a set number of days before the event, reduced percentage closer to or after that threshold); support for both online and on-site refund initiation (a POS-initiated refund routed for approval before hitting the bank, and a customer-initiated refund request raised directly from their account/profile, triggering a notification to operations for approval, rejection, or a request for more information); and support for partial refunds. Chinmay confirmed this maps to a preset, time-gated refund percentage structure with the ability for an authorized approver (e.g., venue or finance manager) to apply a custom override percentage, and asked at what organizational layer this approval authority should sit.  Allam confirmed access should be fully role-driven and configurable — no role or permission is predefined; any privilege (including refund approval) can be assigned to any custom-built role.
+
+### **10. Customer Support / Chat Integration Approach**
+
+Chinmay asked whether the platform needs to account for client-side chat/call support — since TICVAI will not maintain client support staff directly — via integration adapters into each client's own support systems.  Allam clarified this would typically mean the client's own contact center accessing the platform to look up reservation/ticket issues. Qossai and Reshma discussed two approaches: connecting external client chat systems via an adapter, versus keeping all support interactions within the TICVAI platform (with client staff logging in to view and respond to their own tickets/chats). Reshma favored keeping everything within TICVAI's own application to retain a full audit trail and avoid inconsistent inputs across different client systems, particularly since TICVAI is responsible for its own reconciliation and settlement. Qossai agreed this suits larger clients but suggested smaller clients without their own support infrastructure could use a native, white-labelled TICVAI chat feature offered as a subscription add-on, with a built-in AI chat assistant as the first line of response before escalation to a human/CR representative role within the platform. The group agreed on this phased approach: build native chat/AI-assisted support into the platform first (creating a dedicated CR-representative role for incoming chats), while keeping the door open to build client-specific integration adapters in phase two for larger clients who need a peer-to-peer connection to their own support systems.
+
+### **11. Settlement and Reconciliation Process**
+
+Chinmay described the planned settlement/reconciliation flow, run at the end of each week or month, in five steps: ingest data, parse, match, classify, and auto-resolve. The goal is to automate what is traditionally a manual reconciliation process performed by an accountant, so that only genuinely mismatched amounts are escalated for human review — reducing manual effort and improving speed, accuracy, and auditability compared to reviewing thousands of entries by hand.
+
+### **12. Billing, Fees, Reporting and ERP Integration Roadmap**
+
+Chinmay outlined the broader billing/fees/reporting/ERP scope: subscription and membership billing, fee management, financial reporting, payment gateway management, payment device management, and ERP integration (the latter planned for phase two, consistent with the currently limited/agreed integration scope). The taxation model discussed in item 7 will also sit within this area and will be covered in a separate, dedicated workshop.  Allam added that payment gateway integrations (Stripe, Network International) must be full end-to-end integrations that consume all relevant APIs — not just the "happy path." He gave two examples: (a) a payment inquiry API to check whether a payment actually succeeded when the success response failed to reach TICVAI's system (so the order can still be closed and tickets issued), and (b) recovering from a customer completing an OTP/payment step but closing the browser before the session finalizes — in both cases a backend service should periodically check incomplete sessions against the gateway's payment-status API and complete the order if payment succeeded. Chinmay related a personal example of this exact failure mode with an unrelated ticketing app and confirmed his understanding of the required flow;  Allam confirmed on-site payment failures (e.g., a card machine charging the customer but the confirmation message not reaching the POS due to a network/communication gap) require the same kind of reconciling background service.
+
+### **13. Chart of Accounts and Account Mapping**
+
+Chinmay asked for clarity on how chart-of-accounts data would be structured, expecting the platform to ingest CSV files from clients into the ledger, and requested more detail on the resulting account table structure.  Allam confirmed the platform should support both scenarios: creating a chart of accounts natively on the TICVAI platform, and mapping to an externally maintained chart of accounts where a client already has one. Chinmay acknowledged some due diligence remains on his side for this item and will follow up with any questions in a future workshop.
+
+### **14. Finance Module Walkthrough — Dashboards, Chart of Accounts ****&**** Entities**
+
+ Allam then walked through a set of reference finance-module screens built from the shared finance requirement/metric sheet, explicitly framed as a base for TICVAI's own UI/UX design rather than a template to copy exactly. The first screen set covered: a finance dashboard showing gross revenue, net revenue, recognized revenue, deferred revenue, and refunds (with graphical charts, selectable by period); a legal entities view listing all tenant sites with country, currency, and active/inactive status for multi-tenant setups; the chart of accounts (with external-system codes for ERP/third-party mapping, and classification into assets, liability, income, or expense); a chart-of-accounts hierarchy and edit view showing parent-account relationships and financial dimensions (e.g., profit-center classification, cost centers); transaction-to-account and payment/offset account mapping; financial year/period setup (which varies by country, e.g., UAE's January–December year vs. India's April–March) with the ability to close a period to lock further postings; and an ERP integration center for external system connections. Qossai confirmed with Chinmay that sharing this reference material (including sub-page detail beyond the summary shown) would help the front-end and API design process, given the scale of the requirement matrix; Chinmay agreed this visual/backend reference materially helps translate the written requirement matrix into a concrete system design.
+
+### **15. Financial Transactions Ledger and Journal Entries**
+
+The second screen set covered the financial transactions ledger: a list of all system transactions with daily counts and totals, a pending/failed sync status for transactions awaiting an external system integration, and a transaction detail view showing chart-of-account mapping, payment method, product-level detail, and whether a given line sits in sale, deferred, or redemption status. A journal entry list showed all posted debit/credit entries, alongside a manual journal entry capability (for cases such as manually booking revenue) and an approval workflow — a finance user posts a voucher, a finance manager/director reviews and approves it, and only then does it hit the ledger.
+
+### **16. Revenue Recognition Rules and Allocation Splits**
+
+The revenue allocation screen showed recognized vs. unrecognized (wallet) revenue graphically, alongside the revenue recognition rule configuration itself — for example, F&B revenue is recognized immediately on sale, while annual memberships use monthly straight-line allocation (e.g., a 1,500 AED annual membership recognizing 150 AED per month over its term, with the balance recognized at membership expiry). A "revenue allocation split builder" allows a combo/package ticket's price to be split across products (e.g., a portion to tickets, a portion to F&B) or across legal entities (e.g., a two-day pass covering two venues, split by fixed amount or percentage per venue) — Chinmay confirmed the typical model is a percentage-of-total-price split, and  Allam confirmed both fixed-amount and percentage-based splits are supported.
+
+### **17. Payments Reconciliation**
+
+The payments screen consolidates all payments collected across gateways (Stripe, NI) and on-site methods (cash, card), with an automated reconciliation and matching capability comparing platform-recorded payments against the payment gateway's records (e.g., flagging a variance between 10,000 AED shown by the gateway vs. 9,500 AED recorded internally).  Allam suggested this depends on available payment-gateway reconciliation APIs and should be investigated further. Chinmay sought clarification on the intended mechanism — a periodic reconciliation file from the bank/payment partner compared in bulk, rather than a per-transaction API call (which he flagged as impractical at scale) — and  Allam confirmed the intended approach is a monthly file-based reconciliation against which discrepancies/variances are flagged for review, rather than a per-transaction check.
+
+### **18. Bulk Refund Processing and Refund Requests**
+
+ Allam flagged an additional refund requirement raised for the first time in this session: bulk refund processing — for example, refunding roughly 5,000 transactions in one action if an entire event is cancelled, rather than requiring transactions to be refunded one at a time. This should support bulk selection/refund at the event or date level (for both online and on-site bookings), subject to an approval step before all selected refunds are processed together. A related refund-requests screen shows customer-initiated online refund requests awaiting a decision from finance/operations (accept, request more information, or auto-deny).
+
+### **19. Cash/Shift and Till Management**
+
+ Allam then walked through cash/shift ("till") management: a shift/session view showing open and closed sessions per workstation, expected cash and card totals, and a "blind" cash-out process where a cashier does not see their expected total when closing out (only their float plus sales should reconcile against what they physically deposit) — with the system flagging any shortage or overage for supervisor review, and optionally blocking shift closure entirely until the discrepancy is resolved or explained. Shift closure requires supervisor authorization, generates a denomination-itemized closing receipt, and triggers automatic email of the closing report to finance/leadership. A live till monitor dashboard shows real-time cash status per workstation and open/close codes; a configurable cash-drawer limit allows a cashier to "unload" excess cash mid-shift on a busy day, with the system tracking the unloaded amount separately so it reconciles correctly at final shift close. Chinmay confirmed the need for a mid-shift "partial hold" state that preserves the removed cash for end-of-shift reconciliation.
+
+### **20. End-of-Day Reports and Overage/Shortage Handling**
+
+A defined set of end-of-day reports was reviewed, including a cashier shift report, till report, sales-by-location report, payment type summary, cash management report, variance report, refund report, and end-of-day consolidated report — illustrated with an example showing an expected cash total of 8,480 AED against an actual deposit of 8,460 AED, a 20 AED variance/shortage. Any such variance posts automatically to a dedicated overage/shortage ledger account, visible at month-end for review.
+
+### **21. Financial Reporting (P****&****L, Balance Sheet, Trial Balance)**
+
+The financial reporting module automatically generates a profit & loss statement (revenue realized per category, cost of sales — e.g., F&B ingredient procurement costs offset against F&B revenue to derive profit), a balance sheet (assets and liabilities), a trial balance and ledger view, revenue and deferred-revenue analytics, and site-wise revenue performance. A financial approval center/financial controls screen surfaces transactions with exceptions or variances requiring review. A set of automatable daily, weekly, and monthly finance summary reports rounds out the reporting suite;  Allam summarized the core reporting pillars as profit & loss, balance sheet, cash flow, trial balance, and operational/review-related reports.
+
+### **22. AI Financial Assistant and Vector Database Compliance**
+
+Chinmay raised the AI financial-assistant component and the plan to use a vector database, expressing concern that Postgres's native vector capability may not be sufficient at the expected data volume, and proposing Qdrant as an alternative — subject to confirming it satisfies UAE compliance requirements, to avoid discovering a limitation only after reaching production.  Allam confirmed this was timely, as he has a meeting scheduled with the Dubai Compliance Authority on Friday and needs a list of the specific components/services planned for the AWS/Azure infrastructure (e.g., PostgreSQL as the database) in order to raise and validate them with the authority.
+
+### **23. Infrastructure Components for Compliance Review**
+
+ Allam asked Chinmay to provide a list of the planned infrastructure components (database, database structure, and other AWS/Azure services in scope) by end of day, so he can review internally before Friday's Compliance Authority meeting and report back afterward on any concerns raised (e.g., prior findings around certain database services' compliance status). Chinmay agreed to send this by end of day. Given the Friday call's compressed schedule, Qossai proposed starting the joint Friday session 15 minutes earlier (10:45 AM Chinmay's time) to cover the infrastructure/compliance discussion first, before the main workshop continues at 11:00 AM;  Allam requested that TICVAI's infrastructure team (Dinesh Jadhav and Siddhesh) join this portion so they have full context and can respond to any recommendations directly. Reshma confirmed Dinesh and Siddhesh would be looped in, and  Allam agreed to forward the calendar invite, covering both AWS and Azure infrastructure options.
+
+### **24. POS Hardware Specification Requirements**
+
+Chinmay noted that for the pause/terminal hardware specifications, TICVAI can independently source publicly available documentation or manuals as references, but needs at minimum a list of the exact hardware models and reference numbers currently in use, to inform device/driver configuration. Qossai confirmed he and  Allam would compile this list next week.
+
+### **25. Progress Update on Workflows and Schemas**
+
+Chinmay gave a status update on TICVAI's internal workstream: workflow and schema design is underway but currently covers only around 20% of the full scope, following a deliberately process-centric (rather than user-centric) approach, informed in part by discussion points raised in this and prior sessions. Front-end page isolation is proceeding in parallel, to be followed by full API definition once complete — consistent with the API-first approach discussed previously, intended to accelerate downstream development. Once further along, Chinmay expects to be able to share both low-level and high-level design diagrams.
+
+### **26. Next Steps and Meeting Planning**
+
+Qossai proposed sharing the full design set (screens) with explanations for each page so TICVAI's team can review and raise queries — noting the shared material would represent a summary level (main pages), with sub-pages to follow. Qossai will forward his existing page-level explanations (in PDF) to  Allam, who will compile everything into a single Word document for TICVAI. The team agreed the next joint workshop — tentatively Friday, following the shorter infrastructure/compliance discussion — will cover food & beverage, retail, the licensing module, and shift management, with both sides presenting their respective materials. Reshma reiterated the standing request for TICVAI's team to receive the full set of screens with explanations to review and raise any queries.
+
+# **Decisions Made**
+
+### **POS Sessions, Roles ****&**** Access**
+
+- One user per session is confirmed at the workstation level: a user must log out or suspend their shift before another user can log into the same workstation; access and front-end module selection are entirely role-driven and tied to the individual, not the physical device.
+
+- Each workstation can be pre-linked to a specific front-end (ticketing, F&B, retail) via a "sales board" configuration, auto-loading the correct interface based on which workstation the cashier logs into.
+
+- A single user can be assigned multiple roles and select/switch between them at login; a user with only one assigned role logs in directly, while a user with multiple roles is prompted to choose.
+
+### **Guest Application**
+
+- The TICVAI name/branding must remain visible to end users in any client-branded (white-labeled) guest application, regardless of publishing method.
+
+- Softlabs will prepare and present both guest-app publishing options (client-branded independent App Store listing vs. a single universal TICVAI app) with pros and cons before a final decision is made.
+
+### **Finance ****&**** Ledger Architecture**
+
+- The platform will use a dual-ledger, append-only data model (no deletions; refunds/corrections are appended) built on .NET and PostgreSQL, designed to scale horizontally for peak-season load.
+
+- VAT will be calculated per line item (not on the total basket), with configurable support for tax-on-tax (compound tax) and multi-country tax structures, inclusive or exclusive of discounts.
+
+- Revenue is only recognized into the primary ledger at the point defined by the requirement matrix (e.g., on redemption, per-visit, or on expiry for breakage); refunds are deliberately excluded from the primary ledger until fully resolved.
+
+- An AI-assisted financial reporting layer is confirmed for phase two; the underlying data model will be kept "AI-ready" now to avoid future rework.
+
+- The chart of accounts must support both a natively created TICVAI chart of accounts and mapping to an externally maintained (client/ERP) chart of accounts.
+
+### **Refunds ****&**** Reconciliation**
+
+- Refunds will follow a six-step ledger-to-gateway sequencing flow, with configurable time-banded refund percentages, an authorized-approver override capability, partial refunds, and support for both operations-initiated and customer-initiated (self-service) refund requests.
+
+- Bulk refund processing (e.g., refunding all transactions for a cancelled event in one approved action) is confirmed as a required capability, in addition to single-transaction refunds.
+
+- Settlement/reconciliation will follow a five-step automated flow (ingest, parse, match, classify, auto-resolve), escalating only genuinely mismatched amounts for human review.
+
+- Payment gateway reconciliation will use a periodic (monthly) file-based comparison against internal records rather than a per-transaction API call.
+
+### **Support, Payments ****&**** Reporting**
+
+- Customer support/chat will be built natively into the TICVAI platform first (with a built-in AI assistant and a dedicated CR-representative role), while keeping client-specific integration adapters as a phase-two option for larger clients.
+
+- Full end-to-end payment gateway integration is required (not just the happy path), including payment-status inquiry APIs to recover incomplete or unconfirmed transactions, for both online and on-site payments.
+
+- Cash/shift (till) management will use a blind cash-out reconciliation model with supervisor authorization for shift closure, a configurable cash-drawer limit with mid-shift cash unloading, and automatic overage/shortage posting to a dedicated ledger account.
+
+- Core financial reporting will include P&L, balance sheet, trial balance, cash flow, deferred revenue/site-wise analytics, and an exception-based financial approval/controls view.
+
+### **AI ****&**** Infrastructure**
+
+- Qdrant is proposed as the vector database for the AI financial assistant (in place of native Postgres vector support), pending confirmation of UAE compliance requirements.
+
+- TICVAI will provide a list of planned AWS/Azure infrastructure components to support Softlabs' discussion with the Dubai Compliance Authority on Friday.
+
+### **Process**
+
+- Friday's session will begin 15 minutes early (10:45 AM) for a short infrastructure/compliance discussion, joined by TICVAI's infrastructure team (Dinesh Jadhav and Siddhesh), before the main workshop resumes at 11:00 AM covering F&B, retail, the licensing module, and shift management.
+
+- Softlabs will compile the page-by-page design set with explanations into a single Word document for TICVAI's review.
+
+# **Action Items**
+
+| **Action Item** | **Owner** | **Status** |
+| --- | --- | --- |
+| Share list of infrastructure components (AWS/Azure services, database, structure) to support Softlabs' Dubai Compliance Authority discussion | Chinmay Parab | **Pending** |
+| Review the shared infrastructure component list internally ahead of the Compliance Authority meeting | Allam | **Pending** |
+| Discuss infrastructure components with the Dubai Compliance Authority and confirm feasibility (incl. vector database / Qdrant compliance) | Allam | **Pending** |
+| Have Dinesh Jadhav and Siddhesh join Friday's short infrastructure discussion with the Compliance Authority context | Chinmay Parab | **Pending** |
+| Send calendar invite for Friday's session (infra discussion + workshop), covering both AWS and Azure | Allam | **Pending** |
+| Provide two guest-application publishing options (client-branded App Store listing vs. universal TICVAI app) with pros and cons | Chinmay Parab | **Pending** |
+| Compile the page-by-page UI/UX design set with explanations into a single Word document and share with TICVAI | Allam | **Pending** |
+| Share page-by-page design explanations (currently in PDF) with Softlabs for consolidation into the shared document | Qossai | **Pending** |
+| Compile a reference list of POS hardware/device specifications (exact models, reference numbers) | Qossai / Allam | **Pending — next week** |
+| Continue reviewing the ticketing system's user manuals to capture additional revenue recognition rules beyond the requirement matrix | Chinmay Parab | **Ongoing** |
+| Complete due diligence on chart-of-accounts structure and external system mapping, and follow up in the next finance workshop | Chinmay Parab | **Pending** |
+| Review payment gateway reconciliation file/API documentation (Stripe, Network International) to confirm the file-based reconciliation approach | Allam | **Pending** |
+
+# **Next Meeting**
+
+**Date: **Friday (date to be confirmed)
+
+**Time: **10:45 AM (infrastructure/compliance discussion) followed by 11:00 AM (main workshop)
+
+Planned Topics**Planned**** Topics**
+
+- Infrastructure component review ahead of the Dubai Compliance Authority meeting
+
+- Food & beverage module
+
+- Retail module
+
+- Licensing module
+
+- Shift management
+
+# **Closing Remarks**
+
+This session covered a broad mix of operational and financial ground: POS session/role handling and the roaming "flying pause" model, the guest application's white-labeling and publishing approach, and an in-depth walkthrough of the finance and ledger architecture — including the dual-ledger data model, per-line VAT and tax-on-tax handling, revenue recognition, a six-step refund flow (extended to include bulk refunds), settlement/reconciliation, and end-to-end financial reporting.  Allam's reference walkthrough of finance-module screens (dashboards, chart of accounts, transactions ledger, revenue recognition rules, payments reconciliation, shift/till management, and reporting) gave the TICVAI team a concrete backend reference to inform their own schema and UI/UX design. The session closed with the AI financial assistant's vector database compliance requirements flagged as time-sensitive ahead of Friday's Dubai Compliance Authority meeting, along with confirmation of Friday's combined infrastructure discussion and workshop covering food & beverage, retail, licensing, and shift management.

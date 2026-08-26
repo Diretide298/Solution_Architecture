@@ -1,0 +1,1159 @@
+id: LLD-P09
+title: P09 TICVAI Web — Platform Console — 37 screens
+generatedBy: tools/derive-diagrams.py
+index: diagrams/hld/00-platform.yaml
+audience: platformAdmin
+operator: ticvai
+app: ticvai-web
+formFactor: web
+runtime: reactWeb
+offlineCapable: false
+deployment:
+  target: browser, desktop
+  distribution: served from the Control Plane
+  bundleUpdate: immediate on deploy
+  hosting: Control Plane, outside every cell
+  storeReview: false
+  deviceOwnership: platform staff device
+  networkAssumption: corporate network, IP-restricted
+  releaseCadence: weekly
+why: null
+modulesUsed:
+- module: membership
+  screens: 19
+- module: core
+  screens: 15
+- module: ai
+  screens: 2
+- module: analytics
+  screens: 1
+servicesCalled:
+- service: ControlService
+  operationCalls: 186
+- service: IdentityService
+  operationCalls: 25
+- service: WhiteLabelService
+  operationCalls: 20
+- service: AiService
+  operationCalls: 5
+- service: ReportingService
+  operationCalls: 4
+- service: CrossCellService
+  operationCalls: 3
+- service: TenancyService
+  operationCalls: 2
+coverage:
+  screens: 37
+  inAFlow: 21
+  drawn: 37
+  note: '**A screen in no flow has been specified and never walked.** Every flow written in this package
+    has found a defect.'
+screens:
+- screen: ADM-001
+  name: Platform Login / MFA
+  module: TODO
+  requiresModule: core
+  wave: 1
+  density: compact
+  operations:
+  - forceLogout
+  - getCurrentSession
+  - getGuestSession
+  - listActiveSessions
+  - listMfaMethods
+  - listSsoProviders
+  - login
+  - revokeAllSessions
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - sessionId<-session
+  goesTo:
+  - ADM-002
+  - ADM-003
+  - ADM-004
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-001
+  inFlows:
+  - F104 A platform operator signs in under MFA
+- screen: ADM-002
+  name: Platform Dashboard
+  module: TODO
+  requiresModule: membership
+  wave: 1
+  density: compact
+  operations:
+  - getEntitlementUsage
+  - getSsoConfig
+  - getTenant
+  - getTenantLicences
+  - listTenantCells
+  - listTenants
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - tenantId<-session
+  goesTo:
+  - ADM-001
+  - ADM-003
+  - ADM-004
+  - ADM-005
+  - ADM-006
+  - ADM-007
+  - ADM-008
+  - ADM-012
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-002
+  inFlows: null
+- screen: ADM-003
+  name: Cross-Tenant Health Dashboard
+  module: TODO
+  requiresModule: membership
+  wave: 2
+  density: compact
+  operations:
+  - cancelDecommission
+  - decommissionCell
+  - getCell
+  - getCellCapacity
+  - getCellHealth
+  - getRedemptionRight
+  - listCellJobs
+  - propagateRedemptionRight
+  - reconcileRedemptions
+  - updateCellTier
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - cellId<-deepLink
+  - rightId<-deepLink
+  goesTo:
+  - ADM-001
+  - ADM-002
+  - ADM-004
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-003
+  inFlows:
+  - F19 A membership works in another country
+- screen: ADM-004
+  name: Platform Audit Log
+  module: TODO
+  requiresModule: ai
+  wave: 2
+  density: compact
+  operations:
+  - listAiInteractions
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-001
+  - ADM-002
+  - ADM-003
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-004
+  inFlows:
+  - F100 An AI provider is configured, budgeted and audited
+  - F106 A security dashboard surfaces something and it is investigated
+- screen: ADM-005
+  name: Tenant Directory
+  module: TODO
+  requiresModule: membership
+  wave: 1
+  density: compact
+  operations:
+  - addLicenceAddOn
+  - createTenant
+  - getEntitlementUsage
+  - getSsoConfig
+  - getTenant
+  - getTenantLicences
+  - listTenantCells
+  - listTenants
+  - provisionCell
+  - reactivateTenant
+  - removeLicenceAddOn
+  - setSsoConfig
+  - suspendTenant
+  - terminateTenant
+  - updateTenant
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - tenantId<-ADM-002
+  goesTo:
+  - ADM-001
+  - ADM-002
+  - ADM-003
+  - ADM-012
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-005
+  inFlows:
+  - F16 A venue opens for the first time
+  - F96 A tenant is provisioned, licensed and its modules enabled
+- screen: ADM-006
+  name: Tenant Hierarchy Explorer
+  module: TODO
+  requiresModule: membership
+  wave: 1
+  density: compact
+  operations:
+  - createScopeNode
+  - getEntitlementUsage
+  - getSsoConfig
+  - getTenant
+  - getTenantLicences
+  - listScopeNodes
+  - listTenantCells
+  - listTenants
+  - updateTenant
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - tenantId<-ADM-002
+  goesTo:
+  - ADM-001
+  - ADM-002
+  - ADM-003
+  - ADM-007
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-006
+  inFlows:
+  - F16 A venue opens for the first time
+- screen: ADM-007
+  name: Module & Feature Entitlement
+  module: TODO
+  requiresModule: membership
+  wave: 1
+  density: compact
+  operations:
+  - addLicenceAddOn
+  - getEntitlementUsage
+  - getSsoConfig
+  - getSubscription
+  - getTenant
+  - getTenantLicences
+  - listTenantCells
+  - listTenants
+  - removeLicenceAddOn
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - tenantId<-ADM-002
+  goesTo:
+  - ADM-001
+  - ADM-002
+  - ADM-003
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-007
+  inFlows:
+  - F16 A venue opens for the first time
+  - F96 A tenant is provisioned, licensed and its modules enabled
+- screen: ADM-008
+  name: Subscription & Plan Management
+  module: TODO
+  requiresModule: membership
+  wave: 1
+  density: compact
+  operations:
+  - createPartnerAgreement
+  - createPlan
+  - createPlanVersion
+  - generateInvoice
+  - getEntitlementUsage
+  - getPlan
+  - getSsoConfig
+  - getSubscription
+  - getTenant
+  - getTenantLicences
+  - getUsageMetering
+  - listPartnerAgreements
+  - listPlans
+  - listSubscriptionInvoices
+  - listTenantCells
+  - listTenants
+  - previewSubscriptionChange
+  - setSubscription
+  - updatePartnerAgreement
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - agreementId<-deepLink
+  - planId<-deepLink
+  - tenantId<-ADM-002
+  goesTo:
+  - ADM-001
+  - ADM-002
+  - ADM-003
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-008
+  inFlows:
+  - F96 A tenant is provisioned, licensed and its modules enabled
+- screen: ADM-009
+  name: Tenant Billing & Invoicing
+  module: TODO
+  requiresModule: membership
+  wave: 2
+  density: compact
+  operations:
+  - generateInvoice
+  - getEntitlementUsage
+  - getSsoConfig
+  - getSubscription
+  - getTenant
+  - getTenantLicences
+  - listSubscriptionInvoices
+  - listTenantCells
+  - listTenants
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - tenantId<-ADM-002
+  goesTo:
+  - ADM-001
+  - ADM-002
+  - ADM-003
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-009
+  inFlows: null
+- screen: ADM-010
+  name: Usage Metering
+  module: TODO
+  requiresModule: membership
+  wave: 2
+  density: compact
+  operations:
+  - getEntitlementUsage
+  - getSsoConfig
+  - getTenant
+  - getTenantLicences
+  - getUsageMetering
+  - listTenantCells
+  - listTenants
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - tenantId<-ADM-002
+  goesTo:
+  - ADM-001
+  - ADM-002
+  - ADM-003
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-010
+  inFlows: null
+- screen: ADM-011
+  name: Licence & Seat Management
+  module: TODO
+  requiresModule: membership
+  wave: 2
+  density: compact
+  operations:
+  - addLicenceAddOn
+  - getEntitlementUsage
+  - getSsoConfig
+  - getSubscription
+  - getTenant
+  - getTenantLicences
+  - listTenantCells
+  - listTenants
+  - previewSubscriptionChange
+  - removeLicenceAddOn
+  - setSubscription
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - tenantId<-ADM-002
+  goesTo:
+  - ADM-001
+  - ADM-002
+  - ADM-003
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-011
+  inFlows:
+  - F105 A rate limit is set and a developer hits it
+  - F96 A tenant is provisioned, licensed and its modules enabled
+- screen: ADM-012
+  name: Tenant Isolation & Resource Pool
+  module: TODO
+  requiresModule: membership
+  wave: 1
+  density: compact
+  operations:
+  - getCellCapacity
+  - getEntitlementUsage
+  - getSsoConfig
+  - getTenant
+  - getTenantLicences
+  - listTenantCells
+  - listTenants
+  - provisionCell
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - cellId<-deepLink
+  - tenantId<-ADM-002
+  goesTo:
+  - ADM-001
+  - ADM-002
+  - ADM-003
+  - ADM-006
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-012
+  inFlows:
+  - F16 A venue opens for the first time
+  - F96 A tenant is provisioned, licensed and its modules enabled
+  - F97 A cell is capacity-checked and a tenant is placed on it
+- screen: ADM-013
+  name: Tenant Performance Monitor
+  module: TODO
+  requiresModule: membership
+  wave: 2
+  density: compact
+  operations:
+  - cancelDecommission
+  - decommissionCell
+  - getCell
+  - getCellCapacity
+  - getCellHealth
+  - listCellJobs
+  - updateCellTier
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - cellId<-deepLink
+  goesTo:
+  - ADM-001
+  - ADM-002
+  - ADM-003
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-013
+  inFlows:
+  - F97 A cell is capacity-checked and a tenant is placed on it
+- screen: ADM-014
+  name: Auto-Scaling Configuration
+  module: TODO
+  requiresModule: membership
+  wave: 3
+  density: compact
+  operations:
+  - cancelDecommission
+  - decommissionCell
+  - getCell
+  - getCellCapacity
+  - getCellHealth
+  - listCellJobs
+  - updateCellTier
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - cellId<-deepLink
+  goesTo:
+  - ADM-001
+  - ADM-002
+  - ADM-003
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-014
+  inFlows:
+  - F97 A cell is capacity-checked and a tenant is placed on it
+- screen: ADM-015
+  name: API Rate Limit & Quota Management
+  module: TODO
+  requiresModule: membership
+  wave: 3
+  density: compact
+  operations:
+  - getApiUsage
+  - getEntitlementUsage
+  - getSsoConfig
+  - getTenant
+  - getTenantLicences
+  - listApiClients
+  - listTenantCells
+  - listTenants
+  - setApiQuota
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - tenantId<-ADM-002
+  goesTo:
+  - ADM-001
+  - ADM-002
+  - ADM-003
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-015
+  inFlows:
+  - F105 A rate limit is set and a developer hits it
+- screen: ADM-016
+  name: White-Label Branding Management
+  module: TODO
+  requiresModule: core
+  wave: 2
+  density: compact
+  operations:
+  - createPreview
+  - diffConfigVersion
+  - getAppIcons
+  - getBrandIdentity
+  - getTheme
+  - listConfigVersions
+  - publishTenantConfig
+  - restoreConfigVersion
+  - setAppIcons
+  - setBrandIdentity
+  - setTheme
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - bannerId<-deepLink
+  - pageId<-deepLink
+  - policyKind<-deepLink
+  - version<-deepLink
+  goesTo:
+  - ADM-001
+  - ADM-002
+  - ADM-003
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-016
+  inFlows:
+  - F102 A brand is set, previewed, published and rolled back
+  - F103 A tenant claims a domain and gets a certificate
+- screen: ADM-017
+  name: Domain & Certificate Management
+  module: TODO
+  requiresModule: core
+  wave: 2
+  density: compact
+  operations:
+  - claimCustomDomain
+  - listCustomDomains
+  - releaseCustomDomain
+  - verifyCustomDomain
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - bannerId<-deepLink
+  - pageId<-deepLink
+  - policyKind<-deepLink
+  - version<-deepLink
+  - domainId<-deepLink
+  goesTo:
+  - ADM-001
+  - ADM-002
+  - ADM-003
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-017
+  inFlows:
+  - F103 A tenant claims a domain and gets a certificate
+- screen: ADM-018
+  name: Localisation & Language Pack
+  module: TODO
+  requiresModule: core
+  wave: 2
+  density: compact
+  operations:
+  - listFaqs
+  - listPolicies
+  - setFaqs
+  - setLanguages
+  - setPolicy
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - bannerId<-deepLink
+  - pageId<-deepLink
+  - policyKind<-deepLink
+  - version<-deepLink
+  goesTo:
+  - ADM-001
+  - ADM-002
+  - ADM-003
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-018
+  inFlows: null
+- screen: ADM-019
+  name: Global Configuration & Defaults
+  module: TODO
+  requiresModule: membership
+  wave: 2
+  density: compact
+  operations:
+  - createPlan
+  - createPlanVersion
+  - getPlan
+  - listPlans
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - planId<-deepLink
+  goesTo:
+  - ADM-001
+  - ADM-002
+  - ADM-003
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-019
+  inFlows: null
+- screen: ADM-020
+  name: Platform User Directory
+  module: TODO
+  requiresModule: core
+  wave: 1
+  density: compact
+  operations:
+  - createPrincipal
+  - getPrincipal
+  - listPrincipals
+  - updatePrincipal
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - principalId<-session
+  goesTo:
+  - ADM-001
+  - ADM-002
+  - ADM-003
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-020
+  inFlows:
+  - F16 A venue opens for the first time
+- screen: ADM-021
+  name: Platform Role Management
+  module: TODO
+  requiresModule: core
+  wave: 1
+  density: compact
+  operations:
+  - createRole
+  - listRoles
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-001
+  - ADM-002
+  - ADM-003
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-021
+  inFlows: null
+- screen: ADM-022
+  name: Release & Version Management
+  module: TODO
+  requiresModule: core
+  wave: 2
+  density: compact
+  operations:
+  - createRelease
+  - getRelease
+  - getReleaseReadiness
+  - listReleases
+  - promoteRelease
+  - rejectRelease
+  - withdrawRelease
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - releaseId<-deepLink
+  goesTo:
+  - ADM-001
+  - ADM-002
+  - ADM-003
+  - ADM-027
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-022
+  inFlows:
+  - F04 Platform admin ships a release
+- screen: ADM-023
+  name: Staging Promotion & Approval
+  module: TODO
+  requiresModule: core
+  wave: 2
+  density: compact
+  operations:
+  - createRelease
+  - getRelease
+  - getReleaseReadiness
+  - listReleases
+  - promoteRelease
+  - rejectRelease
+  - withdrawRelease
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - releaseId<-deepLink
+  goesTo:
+  - ADM-001
+  - ADM-002
+  - ADM-003
+  - ADM-029
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-023
+  inFlows:
+  - F04 Platform admin ships a release
+- screen: ADM-024
+  name: Release Notification Composer
+  module: TODO
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations:
+  - listSupportNotices
+  - publishSupportNotice
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-001
+  - ADM-002
+  - ADM-003
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-024
+  inFlows: null
+- screen: ADM-025
+  name: Tenant Upgrade Scheduler
+  module: TODO
+  requiresModule: core
+  wave: 2
+  density: compact
+  operations:
+  - listUpgradeSchedules
+  - scheduleTenantUpgrade
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-001
+  - ADM-002
+  - ADM-003
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-025
+  inFlows: null
+- screen: ADM-026
+  name: End-of-Support Notice Management
+  module: TODO
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations:
+  - listSupportNotices
+  - publishSupportNotice
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-001
+  - ADM-002
+  - ADM-003
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-026
+  inFlows: null
+- screen: ADM-027
+  name: Database Migration Console
+  module: TODO
+  requiresModule: core
+  wave: 1
+  density: compact
+  operations:
+  - applyMigration
+  - getMigrationRun
+  - getVersionSkew
+  - listMigrations
+  - planMigration
+  - rollbackMigrationRun
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - runId<-deepLink
+  goesTo:
+  - ADM-001
+  - ADM-002
+  - ADM-003
+  - ADM-023
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-027
+  inFlows:
+  - F04 Platform admin ships a release
+- screen: ADM-028
+  name: Environment Registry
+  module: TODO
+  requiresModule: core
+  wave: 2
+  density: compact
+  operations:
+  - listEnvironments
+  - registerEnvironment
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-001
+  - ADM-002
+  - ADM-003
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-028
+  inFlows: null
+- screen: ADM-029
+  name: Deployment Monitor
+  module: TODO
+  requiresModule: membership
+  wave: 2
+  density: compact
+  operations:
+  - cancelDecommission
+  - decommissionCell
+  - getCell
+  - getCellCapacity
+  - getCellHealth
+  - getRollout
+  - listCellJobs
+  - listRollouts
+  - pauseRollout
+  - rollbackRollout
+  - startRollout
+  - updateCellTier
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - cellId<-deepLink
+  - rolloutId<-deepLink
+  goesTo:
+  - ADM-001
+  - ADM-002
+  - ADM-003
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-029
+  inFlows:
+  - F04 Platform admin ships a release
+- screen: ADM-030
+  name: Infrastructure Sizing & Scaling Policy
+  module: TODO
+  requiresModule: membership
+  wave: 3
+  density: compact
+  operations:
+  - cancelDecommission
+  - decommissionCell
+  - getCell
+  - getCellCapacity
+  - getCellHealth
+  - listCellJobs
+  - updateCellTier
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - cellId<-deepLink
+  goesTo:
+  - ADM-001
+  - ADM-002
+  - ADM-003
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-030
+  inFlows: null
+- screen: ADM-031
+  name: Security & Compliance Dashboard
+  module: TODO
+  requiresModule: analytics
+  wave: 3
+  density: compact
+  operations:
+  - createDashboard
+  - getDashboard
+  - listDashboards
+  - updateDashboard
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - dashboardId<-deepLink
+  goesTo:
+  - ADM-001
+  - ADM-002
+  - ADM-003
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-031
+  inFlows:
+  - F106 A security dashboard surfaces something and it is investigated
+- screen: ADM-032
+  name: WAF & Security Policy View
+  module: TODO
+  requiresModule: membership
+  wave: 3
+  density: compact
+  operations:
+  - cancelDecommission
+  - decommissionCell
+  - getCell
+  - getCellCapacity
+  - getCellHealth
+  - listCellJobs
+  - updateCellTier
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - cellId<-deepLink
+  goesTo:
+  - ADM-001
+  - ADM-002
+  - ADM-003
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-032
+  inFlows: null
+- screen: ADM-033
+  name: Backup & DR Status
+  module: TODO
+  requiresModule: membership
+  wave: 2
+  density: compact
+  operations:
+  - cancelDecommission
+  - decommissionCell
+  - getCell
+  - getCellCapacity
+  - getCellHealth
+  - listCellJobs
+  - updateCellTier
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - cellId<-deepLink
+  goesTo:
+  - ADM-001
+  - ADM-002
+  - ADM-003
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-033
+  inFlows: null
+- screen: ADM-034
+  name: Archival Job Monitor
+  module: TODO
+  requiresModule: membership
+  wave: 3
+  density: compact
+  operations:
+  - cancelDecommission
+  - decommissionCell
+  - getCell
+  - getCellCapacity
+  - getCellHealth
+  - listCellJobs
+  - updateCellTier
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - cellId<-deepLink
+  goesTo:
+  - ADM-001
+  - ADM-002
+  - ADM-003
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-034
+  inFlows: null
+- screen: ADM-035
+  name: Support & Escalation Console
+  module: TODO
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations:
+  - listSupportNotices
+  - publishSupportNotice
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-001
+  - ADM-002
+  - ADM-003
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-035
+  inFlows: null
+- screen: ADM-036
+  name: Platform Notification Broadcast
+  module: TODO
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations:
+  - listSupportNotices
+  - publishSupportNotice
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-001
+  - ADM-002
+  - ADM-003
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-036
+  inFlows: null
+- screen: ADM-037
+  name: AI Provider & Credentials
+  module: AI
+  requiresModule: ai
+  wave: 1
+  density: compact
+  operations:
+  - listAiProviders
+  - setAiCredential
+  - setAiProvider
+  - testAiProvider
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - providerId<-deepLink
+  goesTo:
+  - ADM-001
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-037
+  inFlows:
+  - F100 An AI provider is configured, budgeted and audited

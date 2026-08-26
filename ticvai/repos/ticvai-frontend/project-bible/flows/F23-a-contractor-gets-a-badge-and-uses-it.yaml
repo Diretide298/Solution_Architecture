@@ -1,0 +1,114 @@
+# F23 — A contractor gets a badge and uses it
+#
+# P11 had no flow and Accreditation is workshop-blocked — so this is written as a
+# proposal to take into the workshop rather than a specification. It assumes an
+# accreditation is an entitlement, which is the position worth testing.
+#
+# Validated by tools/check-flows.py.
+#
+# Moved to Wave 3 (CF-101). **Accreditation is workshop-blocked and entirely Wave 3** (CF-21). This flow was written as a proposal to take into that workshop, which is a Wave 3 activity.
+
+id: F23
+name: A contractor gets a badge and uses it
+actor: contractor
+wave: 3
+frequency: weekly
+criticality: safety
+platforms:
+- P11 Accreditation Web
+- P07 Venue Scanner
+- P08 Venue Management
+offlineBehaviour: '**The gate half is offline like every other scan.** An accreditation is validated
+  from the bundle, which is what makes it work at a service entrance with no signal.'
+trigger:
+  description: A contractor needs access to a plant room for a week, and a steward at a service gate
+    must be able to check it.
+  entryScreen: ACC-002
+  entryPoints:
+  - Contractor applies
+  - A sponsor applies on their behalf
+  - Bulk upload for an event
+steps:
+- step: 1
+  screen: ACC-002
+  action: Applies with documents and a photo
+  operations:
+  - listApprovalRequests
+  outcome: Identity, company, what access is needed
+- step: 2
+  screen: ACC-007
+  action: A reviewer checks and approves
+  operations:
+  - listApprovalRequests
+  - decideApprovalRequest
+  outcome: '**Through `approvals`** — one mechanism, not a fifth'
+- step: 3
+  screen: ACC-005
+  action: The badge is issued
+  operations:
+  - listApprovalRequests
+  outcome: QR, NFC or printed — `MediaKind` already covers all four
+- step: 4
+  screen: SCN-003
+  action: A steward scans it at a service gate
+  operations:
+  - validateAccess
+  outcome: Against an admission profile with zones and hours
+- step: 5
+  screen: SCN-003
+  action: Revoked immediately when the contract ends
+  operations:
+  - listBlacklist
+  outcome: '**The blacklist is in the bundle**, so revocation works offline'
+branches:
+- at: 2
+  condition: Background check required and not complete
+  behaviour: Blocks issue. **12.1.x implies verification and names no provider** — CF-21, and the workshop
+    question.
+  severity: requiresStaff
+  resolvedBy: Reviewer
+- at: 4
+  condition: The contractor arrives outside their hours
+  behaviour: Denied with the reason, which is the hours. **A steward needs to say when they may come
+    back**, not just no.
+  severity: recoverable
+  resolvedBy: Steward
+- at: 4
+  condition: They try a zone the badge does not cover
+  behaviour: Denied. **Zone-based access is what an admission profile already does** — an accreditation
+    is an entitlement with a different issuance path.
+  severity: recoverable
+  resolvedBy: Steward
+- at: 5
+  condition: The contract ends early
+  behaviour: Revoked, and the blacklist reaches the gate on the next bundle. **Until then the badge
+    works** — which is the argument for short bundle intervals at service gates.
+  severity: requiresStaff
+  resolvedBy: Venue manager
+- at: 1
+  condition: The sponsor company is not registered
+  behaviour: Blocks. A contractor with no sponsor is a person with no accountable employer, and that
+    is the point of accreditation.
+  severity: requiresStaff
+  resolvedBy: Reviewer
+- at: 3
+  condition: The badge is lost
+  behaviour: Reissued, and the old one blacklisted. **Both must happen** — reissuing without revoking
+    leaves two valid badges.
+  severity: requiresStaff
+  resolvedBy: Reviewer
+exitStates:
+- state: completed
+  description: Badge issued, used and expired cleanly
+- state: deferred
+  description: Awaiting a background check
+- state: escalated
+  description: Revoked early
+openQuestions:
+- Who runs a background check, and against what. 12.1.x implies verification and names no provider (CF-21).
+- Whether an accreditation grants zones directly or names an admission profile that does. Decides whether
+  this is 25 operations or 40.
+primaryContract: approvals
+contracts:
+- approvals
+- access

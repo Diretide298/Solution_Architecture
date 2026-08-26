@@ -1,0 +1,144 @@
+# assets — derived from the API contracts, not hand-written
+# Migration: V0019
+#
+# Columns come from schema properties. Types are inferred: format uuid to uuid,
+# date-time to timestamptz, ULID patterns to char(26), Money to numeric(18,4).
+# What is NOT here: partitioning, RLS policies, indexes, the PII split. That is
+# storage design and lives in the migration scripts.
+
+module: assets
+migration: V0019
+tableCount: 4
+columnCount: 38
+tables:
+  assets.asset:
+    derivedFrom: Asset
+    columns:
+    - name: id
+      type: uuid
+      required: true
+    - name: kind
+      type: jsonb
+      required: true
+    - name: status
+      type: jsonb
+      required: true
+    - name: filename
+      type: text
+      required: true
+    - name: content_type
+      type: text
+      required: true
+    - name: size_bytes
+      type: integer
+      required: true
+    - name: title
+      type: jsonb
+      required: false
+    - name: alt_text
+      type: jsonb
+      required: false
+      description: Required before use in a guest-facing surface. WCAG 2.2 AA.
+    - name: width
+      type: integer
+      required: false
+    - name: height
+      type: integer
+      required: false
+    - name: duration_seconds
+      type: numeric
+      required: false
+    - name: tags
+      type: jsonb
+      required: false
+    - name: venue_id
+      type: uuid
+      required: false
+    - name: url
+      type: text
+      required: false
+      description: Signed and expiring for private assets; stable CDN URL for public ones.
+    - name: thumbnail_url
+      type: text
+      required: false
+    - name: reference_count
+      type: integer
+      required: true
+      description: How many surfaces reference this asset. Non-zero refuses deletion.
+    - name: rights
+      type: jsonb
+      required: false
+    - name: is_rights_expired
+      type: boolean
+      required: false
+    - name: version
+      type: integer
+      required: false
+    - name: uploaded_by_principal_id
+      type: uuid
+      required: false
+    - name: created_at
+      type: timestamptz
+      required: true
+  assets.asset_usage:
+    derivedFrom: AssetUsage
+    columns:
+    - name: surface
+      type: text
+      required: true
+    - name: reference_id
+      type: text
+      required: true
+    - name: label
+      type: text
+      required: false
+    - name: is_live
+      type: boolean
+      required: false
+      description: True where the referencing surface is published to guests.
+  assets.collection:
+    derivedFrom: Collection
+    columns:
+    - name: id
+      type: uuid
+      required: true
+    - name: name
+      type: text
+      required: true
+    - name: description
+      type: text
+      required: false
+    - name: venue_id
+      type: uuid
+      required: false
+    - name: parent_collection_id
+      type: uuid
+      required: false
+    - name: asset_count
+      type: integer
+      required: true
+    - name: cover_asset_id
+      type: uuid
+      required: false
+  assets.upload:
+    derivedFrom: UploadTicket
+    columns:
+    - name: upload_id
+      type: uuid
+      required: true
+    - name: upload_url
+      type: text
+      required: true
+      description: Signed. PUT the file here, then confirm with `/complete`.
+    - name: method
+      type: text
+      required: true
+    - name: headers
+      type: jsonb
+      required: false
+    - name: max_size_bytes
+      type: integer
+      required: false
+    - name: expires_at
+      type: timestamptz
+      required: true

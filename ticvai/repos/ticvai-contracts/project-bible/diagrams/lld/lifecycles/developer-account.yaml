@@ -1,0 +1,45 @@
+id: LLD-Developer account
+title: Developer account — 6 transitions
+generatedBy: tools/derive-diagrams.py
+index: diagrams/hld/04-lifecycles.yaml
+source: states/developer-account.yaml
+entity: Developer account
+contract: public-api
+enum: DeveloperAccount.status
+enumKind: inline
+enumSchema: DeveloperAccount
+enumProperty: status
+owner: public-api
+initial:
+- pending
+terminal:
+- closed
+transitions:
+- from: pending
+  to: verified
+  trigger: operation
+  guard: '**Checks passed. Nothing was provisioned before this** — an unverified account with live credentials
+    is an open door'
+- from: pending
+  to: closed
+  trigger: timer
+  guard: Never completed verification
+- from: verified
+  to: suspended
+  trigger: operation
+  guard: Abuse, non-payment, or a security finding. **Clients suspend with it**
+- from: suspended
+  to: verified
+  trigger: operation
+  guard: Resolved
+  isReversal: true
+- from: verified
+  to: closed
+  trigger: operation
+  guard: Left. **Clients revoke and listings delist**
+- from: suspended
+  to: closed
+  trigger: operation
+  guard: Never resolved
+notes: '**Suspension cascades to clients and closure cascades to listings.** An account suspended while
+  its API keys keep working is a suspension in name only.'

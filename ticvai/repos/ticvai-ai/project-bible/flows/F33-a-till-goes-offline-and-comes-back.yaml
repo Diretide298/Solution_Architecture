@@ -1,0 +1,209 @@
+$schema: ./_schema.yaml
+id: F33
+name: A till goes offline and comes back
+actor: cashier
+capability: Offline trading and sync recovery
+wave: 1
+frequency: 'Weekly in a venue with good wifi; several times a service in one without. **The frequency
+  is the point** — this is not a disaster path, it is Tuesday.
+
+  '
+criticality: financial
+primaryContract: tenancy
+contracts:
+- tenancy
+- orders
+- catalogue
+- shift
+platforms:
+- P04
+- P08
+trigger:
+  description: 'The network drops. **Nobody decides this and nobody is told** — the workstation notices,
+    and what it does next is `ConnectivityPolicy`.
+
+    '
+  operations:
+  - setConnectivityThresholds
+offlineBehaviour: '**The whole flow is the offline behaviour.** ADR-0013 makes the POS local-first:
+  the catalogue is already on the device, sales journal locally, and the till keeps trading.
+
+  **What it may not do is the interesting part.** A refund offline is refused because the original sale
+  cannot be verified; a stored-value redemption is refused because the balance cannot be checked. `setOfflinePolicy`
+  says which.
+
+  '
+steps:
+- step: 1
+  screen: POS-002
+  action: Three requests fail in a row. The workstation goes offline.
+  operations: []
+  outcome: '**Consecutive, not cumulative.** One dropped request on a busy till is normal; three in
+    a row is a network — and the threshold is a venue setting because a marquee and a shopping centre
+    are different problems.
+
+    '
+  note: '**The workstation obeys `ConnectivityPolicy`; it does not call it.** `check-flows` refused
+    this step for naming a configuration operation as though a till invoked it, and the refusal was
+    right — **a policy the device reads and a policy the device sets are different things**, and a flow
+    that conflates them describes a till that can rewrite its own limits.'
+- step: 2
+  screen: POS-002
+  action: The till keeps selling from its local catalogue.
+  operations:
+  - getLatestBundle
+  - createOrder
+  - createPayment
+  outcome: '**Trading continues and the guest never knows.** The bundle it holds is the one it last
+    pulled — which is why a menu published while a till is offline reaches it late, and why `catalogueStale`
+    is a state on this screen.
+
+    '
+- step: 3
+  screen: POS-002
+  action: A guest asks for a refund. The till refuses.
+  operations: []
+  outcome: '**Refused because the original sale cannot be verified.** `allowedOffline` lists what may
+    happen with no network, and a refund is not on it — **an offline refund against a sale that never
+    synced is money given away against nothing.**
+
+    '
+  note: '**The till enforces `OfflinePolicy` locally.** The refusal happens on the device against a
+    policy it already holds — there is no call, which is the entire point of local-first.'
+- step: 4
+  screen: BO-133
+  action: The venue's offline exposure crosses a ceiling.
+  operations:
+  - listAlerts
+  - listSyncRejections
+  outcome: '**A ceiling on count as well as value.** Nine hundred small sales and one large one are
+    different risks, and a value ceiling alone catches only the second.
+
+    '
+  crossesDevice: true
+  note: '**A handover, not a navigation.** The till is in the venue and the back office is at a desk
+    — **nobody taps from one to the other.** An alert arrives; a supervisor opens the console.'
+- step: 5
+  screen: POS-002
+  action: The connection returns. The till waits before trusting it.
+  operations: []
+  outcome: '**`minimumStableSeconds` is what stops the flapping.** Coming back needs a higher bar than
+    going offline — a workstation that returns and immediately fails has resynced for nothing, and each
+    flap is a sync.
+
+    '
+  note: 'Same: the thresholds are held locally and evaluated locally. **A handover, not a navigation.**
+    The till is in the venue and the back office is at a desk — **nobody taps from one to the other.**
+    An alert arrives; a supervisor opens the console.'
+  crossesDevice: true
+- step: 6
+  screen: POS-002
+  action: The journal syncs.
+  operations:
+  - syncOrders
+  outcome: 'Orders posted in the sequence they were taken. **Sequence matters more than timestamp**
+    — two tills with clocks a minute apart produce a ledger nobody can order, and the local sequence
+    is authoritative within a workstation.
+
+    '
+  note: '`syncOrders` is a real call and the till makes it.'
+- step: 7
+  screen: BO-130
+  action: Four transactions are rejected — a product retired while the till was offline.
+  operations:
+  - listSyncRejections
+  outcome: '**Rejected, not discarded.** A sale that happened is a sale, and the guest has the goods
+    — the rejection is a reconciliation task, not a reversal.
+
+    '
+  crossesDevice: true
+  note: '**A handover, not a navigation.** The till is in the venue and the back office is at a desk
+    — **nobody taps from one to the other.** An alert arrives; a supervisor opens the console.'
+- step: 8
+  screen: BO-130
+  action: The supervisor resolves each one.
+  operations:
+  - listSyncRejections
+  - createOrder
+  outcome: 'Posted against the retired product at the price the guest paid. **The catalogue moved and
+    the transaction did not** — repricing it now would change what was charged.
+
+    '
+  note: '**Resolved remotely.** `listSyncRejections` is venue-scoped and this is a web screen — the
+    supervisor need not be on site, which is what makes an unstaffed kiosk workable.'
+branches:
+- at: 2
+  condition: The offline window passes `maxOfflineHours`.
+  behaviour: '**The till refuses new sales rather than keep journalling.** A till three days offline
+    holding 900 unsynced sales is a reconciliation nobody can do and a fraud nobody can detect — `onCeilingBreach`
+    decides whether it warns, blocks new sales, or blocks everything.
+
+    '
+  severity: high
+  resolvedBy: setOfflinePolicy
+- at: 5
+  condition: The connection is marginal — up, down, up.
+  behaviour: '**The workstation stays offline until it holds for `minimumStableSeconds`.** This is the
+    field a venue with poor wifi will actually tune, and the one that stops a sync storm.
+
+    '
+  severity: medium
+  resolvedBy: setConnectivityThresholds
+- at: 6
+  condition: The shift closed while transactions were still unsynced.
+  behaviour: '**Settlement waits.** F32 exits at `openWithUnsynced` for exactly this — a shift settled
+    against a journal that has not posted is a variance that is not a variance.
+
+    '
+  severity: high
+  resolvedBy: closeShift
+- at: 8
+  condition: A rejected transaction sold stock the venue no longer had.
+  behaviour: '**The oversell stands and the stock goes negative.** A movement is written either way,
+    because **a stock level that refuses to go negative is a stock level that hides what happened**
+    — and the count is where it gets found.
+
+    '
+  severity: medium
+  resolvedBy: createStockMovement
+exitStates:
+- state: syncedClean
+  description: Everything posted, nothing rejected. **The ordinary recovery.**
+- state: syncedWithRejections
+  description: 'Some transactions needed a decision. **A separate exit because somebody had to think**
+    — and the count of these over a month is the real measure of a venue''s connectivity.
+
+    '
+- state: blockedAtCeiling
+  description: 'The till stopped selling before the network returned. **Rare and correct** — the alternative
+    is an unbounded journal.
+
+    '
+- state: stillOffline
+  description: 'The service ended offline. Settlement deferred, exposure visible, and the journal intact.
+
+    '
+notes: "**Written 24 August from the client's POS board 5.** `setOfflinePolicy` and `setConnectivityThresholds`\
+  \ were built on 20 August from an audit of the same pack — **the two things in 36 board screens the\
+  \ package genuinely could not do** — and this is the first flow to walk what they configure.\n**Step\
+  \ 3 is the one worth defending to a client.** A venue will ask why a refund cannot be given offline,\
+  \ and the answer is not a technical limitation: **an offline refund against a sale that never synced\
+  \ is money given away against nothing**, and no amount of local storage changes that.\n\n  **Three\
+  \ steps name no operation, deliberately.** A till obeys `OfflinePolicy` and `ConnectivityPolicy`;\
+  \ it does not call them. `check-flows` refused the first draft for listing them as though the device\
+  \ invoked configuration — **a policy the device reads and a policy the device sets are different things**,\
+  \ and conflating them describes a till that can rewrite its own limits.\n\n  **Resolved 24 August:\
+  \ two failures were hiding under one word.**\n\n  **A device that will not sync is a technician's\
+  \ job.** Bad wifi, a failed edge node, a workstation that has lost its credential — `technician` is\
+  \ already an actor, `getWorkstationHealth` and `runDiagnostics` are already theirs, and F12 already\
+  \ walks a technician closing a work order. **Nothing new is needed for that half.**\n\n  **A transaction\
+  \ the platform refused is a commercial decision and it is not.** Post it at the price the guest paid,\
+  \ void it, or refund — **an IT technician has the access and not the authority**, and a venue that\
+  \ routes those to whoever can reach the device will find someone deciding a hundred-dirham question\
+  \ because they were holding a laptop.\n\n  **The back office is not a place.** `listSyncRejections`\
+  \ is venue-scoped and P08 is a web app — **a supervisor at the main venue resolves a mall kiosk's\
+  \ rejections without going there**, which is the answer the original question assumed away by picturing\
+  \ a desk.\n\n  **What is left is a venue with no supervisor at all** — an unstaffed satellite outlet\
+  \ on a Sunday. That is a staffing decision rather than a design one, and the platform's part is that\
+  \ the rejections stay visible and bounded until somebody with the authority looks."
+openQuestions: null

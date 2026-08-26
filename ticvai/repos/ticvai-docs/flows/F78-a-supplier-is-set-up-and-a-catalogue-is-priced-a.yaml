@@ -1,0 +1,78 @@
+$schema: ./_schema.yaml
+id: F78
+name: A supplier is set up and a catalogue is priced and published
+actor: venueManager
+capability: A supplier is set up and a catalogue is priced and published
+wave: 2
+frequency: As the venue needs it.
+criticality: revenue
+primaryContract: catalogue
+contracts:
+- catalogue
+- inventory
+- promotions
+platforms:
+- P08
+trigger:
+  description: A new range arrives and has to become sellable.
+offlineBehaviour: None of it offline. Publishing changes what every till charges.
+steps:
+- step: 1
+  screen: BO-083
+  action: Suppliers.
+  operations:
+  - createSupplier
+  - getSupplierPerformance
+  - listSuppliers
+  - recordQuotation
+  - updateSupplier
+  outcome: '**Drawn by the client as RET-2G.** 5 operations on this step.'
+- step: 2
+  screen: BO-007
+  action: Product Directory.
+  operations:
+  - bulkUpdateProducts
+  - createMerchandise
+  - createProduct
+  - listAlternativeCodes
+  - listMenus
+  - resolveProductByCode
+  outcome: '**Drawn by the client as RET-2B.** 10 operations on this step.'
+  crossesDevice: true
+- step: 3
+  screen: BO-112
+  action: Production Planning & Production Sheets.
+  operations:
+  - planProductionRun
+  outcome: '**Drawn by the client as RET-2A.** 1 operations on this step.'
+  crossesDevice: true
+- step: 4
+  screen: BO-009
+  action: Pricing Rules.
+  operations:
+  - copyPriceList
+  - createPriceList
+  - getPriceList
+  - listPriceLists
+  - listPrices
+  - setPrices
+  outcome: '**Drawn by the client as RET-2E.** 7 operations on this step.'
+  crossesDevice: true
+branches:
+- at: 1
+  condition: A step in the chain is not licensed for this tenant.
+  behaviour: '**The chain stops at the module boundary.** `requiresModule` on each screen decides —
+    a tenant without the retail licence does not see the retail half, and the journey is shorter rather
+    than broken.'
+  severity: medium
+  resolvedBy: getModuleEnablement
+exitStates:
+- state: completed
+  description: The chain ran as the client drew it.
+- state: stoppedAtModule
+  description: '**A licence boundary, not a failure.**'
+notes: '**Supplier to shelf, as the client drew it.** `updateSupplier` and `getStockTransfer` were both
+  built on 24 August because this board named them and nothing answered. **Derived from the client''s
+  own `GOES TO` edges**, not from an inferred path — a pair of frames the client linked is evidence;
+  a chain assembled from unrelated pairs is a guess.'
+openQuestions: null

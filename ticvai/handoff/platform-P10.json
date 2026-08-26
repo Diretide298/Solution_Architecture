@@ -1,0 +1,296 @@
+{
+ "code": "P10",
+ "name": "Partner Web \u2014 Reseller Portal",
+ "shortName": "Partner Web",
+ "app": "partner-web",
+ "operator": "partner",
+ "audience": "partner",
+ "formFactor": "web",
+ "offlineCapable": false,
+ "generated": "2026-08-26",
+ "note": "Derived by tools/derive-platform.py. **The gaps section is the point** \u2014 a page listing what exists is a directory; one listing what is missing is a worklist.",
+ "counts": {
+  "screens": 21,
+  "operations": 105,
+  "contracts": 9,
+  "modules": 1,
+  "undrawn": 0,
+  "operationsWithNoScreen": 3
+ },
+ "waves": {
+  "wave2": 11,
+  "wave3": 10
+ },
+ "modules": [
+  {
+   "module": "TODO",
+   "screens": 21,
+   "waves": [
+    2,
+    3
+   ]
+  }
+ ],
+ "contracts": [
+  {
+   "contract": "orders",
+   "operations": 26
+  },
+  {
+   "contract": "catalogue",
+   "operations": 24
+  },
+  {
+   "contract": "identity",
+   "operations": 15
+  },
+  {
+   "contract": "promotions",
+   "operations": 11
+  },
+  {
+   "contract": "marketing-crm",
+   "operations": 9
+  },
+  {
+   "contract": "reporting",
+   "operations": 8
+  },
+  {
+   "contract": "finance",
+   "operations": 6
+  },
+  {
+   "contract": "seating",
+   "operations": 4
+  },
+  {
+   "contract": "subscription",
+   "operations": 2
+  }
+ ],
+ "screens": [
+  {
+   "id": "PTR-001",
+   "name": "Partner Login / MFA",
+   "module": "TODO",
+   "wave": 2,
+   "route": "/general/partner-login-mfa",
+   "operations": 12,
+   "drawn": true
+  },
+  {
+   "id": "PTR-002",
+   "name": "Partner Dashboard",
+   "module": "TODO",
+   "wave": 2,
+   "route": "/general/partner-dashboard",
+   "operations": 16,
+   "drawn": true
+  },
+  {
+   "id": "PTR-003",
+   "name": "Profile & Company Details",
+   "module": "TODO",
+   "wave": 2,
+   "route": "/general/profile-and-company-details",
+   "operations": 4,
+   "drawn": true
+  },
+  {
+   "id": "PTR-004",
+   "name": "Notifications",
+   "module": "TODO",
+   "wave": 3,
+   "route": "/general/notifications",
+   "operations": 2,
+   "drawn": true
+  },
+  {
+   "id": "PTR-005",
+   "name": "Inventory & Allocation View",
+   "module": "TODO",
+   "wave": 2,
+   "route": "/general/inventory-and-allocation-view",
+   "operations": 19,
+   "drawn": true
+  },
+  {
+   "id": "PTR-006",
+   "name": "Product Catalog (B2B Pricing)",
+   "module": "TODO",
+   "wave": 2,
+   "route": "/general/product-catalog-b2b-pricing",
+   "operations": 17,
+   "drawn": true
+  },
+  {
+   "id": "PTR-007",
+   "name": "Availability Search",
+   "module": "TODO",
+   "wave": 2,
+   "route": "/general/availability-search",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "PTR-008",
+   "name": "Booking Creation",
+   "module": "TODO",
+   "wave": 2,
+   "route": "/general/booking-creation",
+   "operations": 14,
+   "drawn": true
+  },
+  {
+   "id": "PTR-009",
+   "name": "Group / Bulk Booking",
+   "module": "TODO",
+   "wave": 3,
+   "route": "/general/group-bulk-booking",
+   "operations": 4,
+   "drawn": true
+  },
+  {
+   "id": "PTR-010",
+   "name": "Cart & Quote",
+   "module": "TODO",
+   "wave": 3,
+   "route": "/general/cart-and-quote",
+   "operations": 16,
+   "drawn": true
+  },
+  {
+   "id": "PTR-011",
+   "name": "Quote Management",
+   "module": "TODO",
+   "wave": 3,
+   "route": "/general/quote-management",
+   "operations": 2,
+   "drawn": true
+  },
+  {
+   "id": "PTR-012",
+   "name": "Checkout / Credit Purchase",
+   "module": "TODO",
+   "wave": 2,
+   "route": "/general/checkout-credit-purchase",
+   "operations": 4,
+   "drawn": true
+  },
+  {
+   "id": "PTR-013",
+   "name": "Credit Limit & Balance",
+   "module": "TODO",
+   "wave": 2,
+   "route": "/general/credit-limit-and-balance",
+   "operations": 3,
+   "drawn": true
+  },
+  {
+   "id": "PTR-014",
+   "name": "Settlement & Payment History",
+   "module": "TODO",
+   "wave": 3,
+   "route": "/general/settlement-and-payment-history",
+   "operations": 5,
+   "drawn": true
+  },
+  {
+   "id": "PTR-015",
+   "name": "Order History",
+   "module": "TODO",
+   "wave": 2,
+   "route": "/general/order-history",
+   "operations": 14,
+   "drawn": true
+  },
+  {
+   "id": "PTR-016",
+   "name": "Voucher / Ticket Download",
+   "module": "TODO",
+   "wave": 2,
+   "route": "/general/voucher-ticket-download",
+   "operations": 13,
+   "drawn": true
+  },
+  {
+   "id": "PTR-017",
+   "name": "Commission Statement",
+   "module": "TODO",
+   "wave": 3,
+   "route": "/general/commission-statement",
+   "operations": 2,
+   "drawn": true
+  },
+  {
+   "id": "PTR-018",
+   "name": "Reports & Sales Performance",
+   "module": "TODO",
+   "wave": 3,
+   "route": "/general/reports-and-sales-performance",
+   "operations": 9,
+   "drawn": true
+  },
+  {
+   "id": "PTR-019",
+   "name": "API Credentials & Integration",
+   "module": "TODO",
+   "wave": 3,
+   "route": "/general/api-credentials-and-integration",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "PTR-020",
+   "name": "Sub-Agent Management",
+   "module": "TODO",
+   "wave": 3,
+   "route": "/general/sub-agent-management",
+   "operations": 3,
+   "drawn": true
+  },
+  {
+   "id": "PTR-021",
+   "name": "Support & Contact",
+   "module": "TODO",
+   "wave": 3,
+   "route": "/general/support-and-contact",
+   "operations": 7,
+   "drawn": true
+  }
+ ],
+ "gaps": {
+  "operationsWithNoScreen": [
+   {
+    "operation": "createMfaChallenge",
+    "contract": "identity",
+    "verb": "POST",
+    "summary": "Step-up authentication for a sensitive action"
+   },
+   {
+    "operation": "createPartnerUser",
+    "contract": "subscription",
+    "verb": "POST",
+    "summary": "Add a user to a partner branch"
+   },
+   {
+    "operation": "listPartnerUsers",
+    "contract": "subscription",
+    "verb": "GET",
+    "summary": "Users beneath a partner, by branch"
+   }
+  ],
+  "modulesSplitAcrossWaves": [
+   {
+    "module": "TODO",
+    "waves": [
+     2,
+     3
+    ]
+   }
+  ],
+  "screensNotDrawn": [],
+  "flowsNamingAMissingScreen": []
+ }
+}

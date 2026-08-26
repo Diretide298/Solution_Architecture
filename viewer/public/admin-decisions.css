@@ -1,0 +1,95 @@
+/* The "close items from a spreadsheet" panel on the admin page.
+ *
+ * Its own file for the same reason admin-export.css is: layers.css is loaded by
+ * every page in the viewer and none of the others has this panel. Everything
+ * here that already has a look — the panel, the note, the chip, the error and
+ * the ok box — keeps it; what is said below is only the two things a plan
+ * nobody has agreed to yet needs, which are a file field and a list of rows
+ * grouped by what is about to happen to them.
+ */
+
+/* A file input is the one control in this page that cannot be restyled into the
+ * house shape — the button inside it belongs to the browser. Left alone rather
+ * than half-styled, and only given the room and the border the fields beside it
+ * have, so it sits on the row instead of floating in it. */
+.decide-row .decide-file {
+  flex: 1 1 22rem;
+  min-width: 0;
+  padding: 7px 10px;
+  font-size: 12.5px;
+}
+
+/* The second press. Held apart from the first by more than a gap: they are not
+ * two options, they are two steps, and the one that writes is the one that
+ * should not be reachable by aiming at the other. */
+.decide-apply {
+  margin-top: 12px;
+  border-color: color-mix(in srgb, var(--accent) 45%, transparent);
+  color: var(--accent);
+}
+
+.decide-plan { margin-top: 14px; }
+.decide-summary { margin-bottom: 10px; }
+
+/* One group per thing that is about to happen, and the colour is the whole
+ * point of grouping them: "would be closed" and "closed, but differently" are a
+ * long way apart in consequence and read identically as plain text. The stripe
+ * is on the left edge because these are lists, and a list reads down its
+ * left-hand side. */
+.decide-group {
+  margin-top: 12px;
+  padding: 9px 0 9px 12px;
+  border-left: 3px solid var(--border);
+}
+.decide-group.good { border-left-color: var(--ok); }
+.decide-group.warn { border-left-color: var(--accent); }
+.decide-group.bad  { border-left-color: var(--error); }
+.decide-group.quiet { border-left-color: var(--border); opacity: .75; }
+
+.decide-group-title {
+  margin: 0 0 4px;
+  font-size: 12px; font-weight: 600; color: var(--text);
+}
+.decide-why { margin-bottom: 8px; }
+
+/* Scrolls rather than growing without limit. A month of a review is a few
+ * hundred rows, and a panel that pushes the rest of the page off the bottom is
+ * a panel nobody scrolls back up through to find the button. */
+.decide-list {
+  max-height: 17rem;
+  overflow-y: auto;
+}
+
+/* Row number, id, artefact, then the sentence. Fixed columns for the first
+   three so the eye can run down them; the last takes what is left and wraps,
+   because it is prose and truncating it would hide the disagreement this panel
+   exists to show. */
+.decide-line {
+  display: grid;
+  grid-template-columns: 4.6rem 3.6rem minmax(0, 1fr) minmax(0, 1.3fr);
+  gap: 8px;
+  align-items: baseline;
+  padding: 4px 0;
+  font-size: 12px;
+  border-bottom: 1px solid var(--border);
+}
+.decide-line:last-child { border-bottom: 0; }
+.decide-row { color: var(--text-faint); font-size: 11px; }
+.decide-id {
+  color: var(--text-faint); font-size: 11px;
+  font-family: ui-monospace, Menlo, monospace;
+}
+.decide-what { color: var(--text-dim); overflow-wrap: anywhere; }
+.decide-tail { color: var(--text); overflow-wrap: anywhere; }
+
+/* A problem has no id and no artefact — that is usually why it is a problem —
+   so its one cell takes the whole row rather than sitting in the fourth column
+   with three empty ones in front of it. */
+.decide-group.bad .decide-line { grid-template-columns: 1fr; }
+
+/* Narrow enough that four columns are three too many. Stacked, with the row
+   number and id on their own line above the sentence. */
+@media (max-width: 640px) {
+  .decide-line { grid-template-columns: auto auto; }
+  .decide-what, .decide-tail { grid-column: 1 / -1; }
+}

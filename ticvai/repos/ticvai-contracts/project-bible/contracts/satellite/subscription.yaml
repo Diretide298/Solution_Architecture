@@ -1,0 +1,3372 @@
+openapi: 3.1.0
+info:
+  title: TICVAI Subscription & Licensing
+  version: 0.1.0
+  x-ticvai-screen-count: 36
+  x-ticvai-tier: satellite
+  x-ticvai-module: "20 — Subscription & Licensing Management"
+  x-ticvai-requirements: 59
+  x-ticvai-capabilities: [C74, C75, C95, C96]
+  x-ticvai-platforms:
+    - "P09 TICVAI Web"
+  description: >
+    ## What this contract covers
+
+    **Control Plane. Runs outside any cell, because it provisions cells.**
+
+    | | |
+    |---|---|
+    | **Tier** | satellite |
+    | **Matrix domain** | 20 — Subscription & Licensing Management |
+    | **Requirements** | ~59 |
+    | **Capabilities** | C74, C75, C95, C96 |
+    | **Consumed by** | P09 TICVAI Web |
+
+    ## How to read this file
+
+    **This file is a contract.** It is hand-authored and it is the source of truth for one
+    bounded context: server code, client code and mock servers are generated from it, never
+    the other way round. If a field is not here, it does not exist.
+
+    **Contracts are split into two tiers.**
+
+    - **Spine** — the eight contexts everything else depends on: tenancy, identity,
+      catalogue, orders, shift, access, finance, cross-cell. Frozen first. A change here
+      requires a formal change request, because every satellite has pinned against it.
+    - **Satellite** — a domain that builds on the spine and can move independently.
+      Cheaper to change.
+
+    **`paths` are operations.** Each one declares four TICVAI extensions, and Redocly
+    rejects any that does not:
+
+    | Extension | Answers |
+    |---|---|
+    | `x-ticvai-permission` | Which permission the caller needs. From one enum in `shared/permissions.yaml` — never hand-typed |
+    | `x-ticvai-scope-level` | Where in the seven-level hierarchy that permission must be held |
+    | `x-ticvai-offline-capable` | Whether a disconnected terminal may queue this |
+    | `x-ticvai-conflict-policy` | How a replayed operation resolves — `append`, `serverWins`, `manual` |
+
+    Where `x-ticvai-permission` is null, one of these says why: `x-ticvai-auth: service`
+    (cell-to-cell), `x-ticvai-self-scoped` (acts only on the caller's own resources), or
+    `security: []` (genuinely public).
+
+    **`components.schemas` are API schemas — the shape of data on the wire.** They are not
+    database tables. One API schema may become three columns (`Money`) or five tables
+    (`Order`); some have no table at all (`ValidationResult`, `TrialBalance`). Roughly 70%
+    of the DDL derives from these, and the rest — partitioning, RLS, the PII split — is
+    storage design that lives in the migration scripts.
+
+    **`security` arrays hold OAuth scopes.** Empty means "this scheme, no scopes" — for
+    bearer tokens there is nothing to list. Empty is not the same as absent: absent means
+    unauthenticated.
+
+
+    ## This context
+
+    Tenant lifecycle, subscription plans, module licensing, cell provisioning, usage metering
+    and billing. Domain 18 — 59 requirements. Capabilities C74, C75, C95, C96.
+
+    **This is a Control Plane contract.** It runs outside any tenant cell, because a service
+    that provisions cells cannot live inside one.
+
+    Positions this encodes:
+
+    - **Licensing is the source of module enablement.** The White Label Builder reads it and
+      cannot enable what a tenant has not licensed. Two places deciding what a tenant may use
+      is one place too many.
+    - **A subscription grants; it never enables.** Licensing says *may*; the tenant's own
+      configuration says *does*. Downgrading a plan does not silently switch off a module
+      a venue is trading on — it flags the conflict and waits.
+    - **Cell placement is per region** (ADR-0014), and every region in a different country
+      must be placed in its own jurisdiction. Provisioning enforces that rather than trusting
+      the operator.
+    - **Metering is separate from billing.** Usage is recorded continuously and priced
+      periodically. Conflating them means a pricing change rewrites history.
+    - Suspension is graceful and reversible; termination is neither, and is deliberately
+      harder to reach.
+
+servers:
+  - url: https://{controlPlaneHost}/api/v1
+    variables:
+      controlPlaneHost:
+        default: control.ticvai.local
+
+security:
+  - bearerAuth: []
+
+tags:
+  - name: tenant
+  - name: plan
+  - name: subscription
+  - name: licensing
+  - name: cell
+  - name: metering
+  - name: billing
+
+paths:
+  # ---------------------------------------------------------------- tenants
+  /onboarding-applications:
+    post:
+      operationId: submitOnboardingApplication
+      summary: A prospect signs themselves up
+      description: >
+        BL-165. **The operator-led path assumes somebody at Softlabs decided this tenant exists.**
+        This is the other one.
+
+        **Nothing is provisioned until verification passes** — an unverified application that
+        provisions a cell is a cell somebody has to clean up, and cells are not cheap to clean up.
+
+        **Trial is a state on the application, not a separate plan.** A prospect trials the plan
+        they will pay for, so conversion is a date change rather than a migration — and conversion
+        is the moment least worth adding risk to.
+      tags: [subscription]
+      x-ticvai-permission: TENANT_CONFIGURE
+      x-ticvai-audience: [public]
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/OnboardingApplication' }
+      responses:
+        '201':
+          description: Submitted, pending verification
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/OnboardingApplication' }
+
+  /venue-type-templates:
+    get:
+      operationId: listVenueTypeTemplates
+      summary: Starting configurations by venue kind
+      description: >
+        **A water park and a theatre need different defaults**, and asking a prospect to configure
+        300 settings from empty is asking them to leave.
+
+        **A template is a starting point and not a constraint** — everything it creates is editable
+        the moment it lands.
+      tags: [subscription]
+      x-ticvai-permission: TENANT_CONFIGURE
+      x-ticvai-audience: [staff, public]
+      x-ticvai-scope-level: tenant
+      x-ticvai-read-routing: replica
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '200':
+          description: Templates
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/VenueTypeTemplate' }
+
+  /partners/{partnerId}/users:
+    parameters:
+      - name: partnerId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    get:
+      operationId: listPartnerUsers
+      summary: Users beneath a partner, by branch
+      tags: [subscription]
+      x-ticvai-permission: PARTNER_VIEW
+      x-ticvai-audience: [staff, partner]
+      x-ticvai-scope-level: tenant
+      x-ticvai-read-routing: replica
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '200':
+          description: Users
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/PartnerUser' }
+    post:
+      operationId: createPartnerUser
+      summary: Add a user to a partner branch
+      description: >
+        2.7.51. **Quota and credit resolve nearest-ancestor-wins**, like configuration — a branch
+        with no limit inherits the agency's.
+
+        **A partner with `canManageUsers` does this themselves**, because a venue administering
+        every travel agent's staff list is a venue doing the agency's HR.
+      tags: [subscription]
+      x-ticvai-permission: PARTNER_MANAGE
+      x-ticvai-audience: [staff, partner]
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/PartnerUser' }
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/PartnerUser' }
+
+  /channel-listings:
+    get:
+      operationId: listChannelListings
+      x-ticvai-consumed-by:
+        - "P08 BO-013 Channel & Distribution"
+      summary: What is listed on which OTA
+      tags: [subscription]
+      x-ticvai-permission: PARTNER_VIEW
+      x-ticvai-audience: [staff]
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '200':
+          description: Listings
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/ChannelListing' }
+    put:
+      operationId: setChannelListing
+      x-ticvai-consumed-by:
+        - "P08 BO-013 Channel & Distribution"
+      summary: List a product on a channel, with its own allocation
+      description: >
+        BL-076. **An OTA pulls a feed, caches it and sells against the cache**, so the gap between
+        pushes is the oversell window and the allocation is the bound on it.
+
+        **Publishing the full envelope to an OTA means the OTA will sell it**, and the venue
+        discovers at the gate.
+      tags: [subscription]
+      x-ticvai-permission: PARTNER_MANAGE
+      x-ticvai-audience: [staff]
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/ChannelListing' }
+      responses:
+        '200':
+          description: Listed
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ChannelListing' }
+
+  /partners/{partnerId}/invoice-export:
+    parameters:
+      - name: partnerId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    post:
+      operationId: exportPartnerInvoice
+      summary: Partner invoice and settlement, in an ERP format
+      description: >
+        2.7.41 and 5.12.7, BL-077. **`subscription.generateInvoice` bills a tenant for the platform
+        — a different ledger from invoicing a partner for tickets sold.**
+
+        SAP is named twice in the matrix. **The export is a format, not an integration**: `finance`
+        already has the ledger, the legal entities and the tax codes, and what was missing was a way
+        to get a partner's month out of it in a shape SAP will read.
+
+        **Idempotent on the period.** A month exported twice must produce one invoice, because the
+        second import is what creates a duplicate liability in somebody else's system.
+      tags: [subscription]
+      x-ticvai-permission: LEDGER_VIEW
+      x-ticvai-audience: [staff]
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [periodFrom, periodTo, format]
+              properties:
+                periodFrom: { type: string, format: date }
+                periodTo: { type: string, format: date }
+                format: { type: string, enum: [sapIdoc, csv, json, ubl] }
+      responses:
+        '200':
+          description: Export
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+
+  /ai-usage/settle:
+    post:
+      operationId: settleAiUsage
+      x-ticvai-audience: [staff]
+      summary: Turn metered AI interactions into a billable usage record
+      description: >
+        **The link between the meter and the invoice, and it did not exist.** It lives in
+        `subscription` rather than `ai` because **AI meters and subscription bills** — an AI
+        operation writing a billing record would break the read-only rule in ADR-0020, which is
+        how this landed in the wrong contract on 17 August. `ai.interaction`
+        recorded tokens and cost per call; `recordUsage` wrote a billing line; nothing joined them.
+
+        Runs per tenant per period, aggregating from the interaction log and writing one
+        `control.usage_record` per audience — **staff and guest billed as separate lines**, because
+        they behave differently and a venue needs to see which one moved.
+
+        **Reads the primary, not the analytical replica.** `ai.interaction` sits on the analytical
+        store (ADR-0020) and replica lag at period close would invoice a number that changes after
+        it is sent.
+      tags: [subscription]
+      x-ticvai-permission: PLATFORM_BILLING_MANAGE
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-read-routing: primary
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [tenantId, periodStart, periodEnd]
+              properties:
+                tenantId: { type: string, format: uuid }
+                periodStart: { type: string, format: date }
+                periodEnd: { type: string, format: date }
+      responses:
+        '200':
+          description: Settled
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  tenantId: { type: string, format: uuid }
+                  periodStart: { type: string, format: date }
+                  periodEnd: { type: string, format: date }
+                  lines:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        audience: { type: string, enum: [staff, guest] }
+                        interactions: { type: integer }
+                        promptTokens: { type: integer }
+                        completionTokens: { type: integer }
+                        providerCost:
+                          allOf:
+                            - $ref: '../shared/common.yaml#/components/schemas/Money'
+                          description: What the provider charged us.
+                        billedAmount:
+                          allOf:
+                            - $ref: '../shared/common.yaml#/components/schemas/Money'
+                          description: >
+                            What the tenant is charged. **Separate from cost**, so a margin, a
+                            floor or a cap can be applied without losing what it actually cost.
+                  capApplied:
+                    type: boolean
+                    description: >
+                      **Whether a cap or fair-use limit bit in this period.** A tenant cannot stop
+                      guests asking questions, so an uncapped per-token charge is a bill they
+                      cannot control — see CF-14.
+        '409':
+          description: >
+            Already settled for this period. **Settling twice would invoice twice**, and the
+            idempotency key alone does not protect a re-run with a different key.
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /subscriptions/{subscriptionId}/cancel:
+    parameters:
+      - name: subscriptionId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    post:
+      operationId: cancelSubscription
+      x-ticvai-audience: [staff]
+      summary: Terminate a tenant subscription
+      description: >
+        **Always a decision, never a timer.** A `pastDue` subscription continues to serve
+        indefinitely (CF-61: degrade, never stop) and only a person ends it.
+
+        The effective date matters: terminating at period end is ordinary, terminating
+        immediately closes a venue that may have guests inside it.
+      tags: [subscription]
+      x-ticvai-permission: PLATFORM_BILLING_MANAGE
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [reason, effective]
+              properties:
+                reason: { type: string, enum: [tenantRequested, nonPayment, breachOfTerms, migrated, other] }
+                effective: { type: string, enum: [immediately, atPeriodEnd, onDate] }
+                effectiveDate: { type: string, format: date }
+                dataRetentionDays:
+                  type: integer
+                  description: >
+                    How long the cell is kept before decommissioning. **A tenant who returns
+                    within the window keeps their data**; beyond it they do not.
+                note: { type: string, maxLength: 500 }
+      responses:
+        '200':
+          description: Cancelled
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Subscription' }
+
+  /partner-agreements:
+    get:
+      operationId: listPartnerAgreements
+      x-ticvai-consumed-by:
+        - "P09 ADM-008 Subscription & Plan Management"
+        - "P10 PTR-001 Partner Login / MFA"
+        - "P10 PTR-011 Quote Management"
+        - "P10 PTR-017 Commission Statement"
+      x-ticvai-audience: [staff, partner]
+      summary: Commercial agreements with B2B partners
+      description: >
+        2.7.32. **The object every other partner operation assumes and none of them had.** Credit
+        limits, channel allocations and settlement all existed; the agreement that says what a
+        partner is entitled to did not.
+      tags: [subscription]
+      x-ticvai-permission: PARTNER_MANAGE
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-read-routing: replica
+      parameters:
+        - name: expiringWithinDays
+          in: query
+          description: >
+            2.7.37. **An agreement that lapses silently keeps selling at rates nobody agreed
+            to**, which is discovered at settlement rather than at sale.
+          schema: { type: integer }
+        - name: status
+          in: query
+          schema: { $ref: '#/components/schemas/PartnerAgreementStatus' }
+      responses:
+        '200':
+          description: Agreements
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/PartnerAgreement' }
+
+    post:
+      operationId: createPartnerAgreement
+      x-ticvai-consumed-by:
+        - "P09 ADM-008 Subscription & Plan Management"
+      x-ticvai-audience: [staff]
+      summary: Agree commercial terms with a partner
+      description: >
+        2.7.31, 2.7.32, 2.7.36. Net rates or commission, credit terms, which products, which
+        channels, and when it expires.
+
+        **Rate and commission are alternatives, not both.** A partner buys at a net rate and
+        keeps the margin, or sells at face value and is paid commission — and a partner on both
+        is being paid twice for the same sale.
+      tags: [subscription]
+      x-ticvai-permission: PARTNER_MANAGE
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/PartnerAgreement' }
+      responses:
+        '201':
+          description: Created, pending approval
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/PartnerAgreement' }
+
+  /partner-agreements/{agreementId}:
+    parameters:
+      - name: agreementId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    patch:
+      operationId: updatePartnerAgreement
+      x-ticvai-consumed-by:
+        - "P09 ADM-008 Subscription & Plan Management"
+      x-ticvai-audience: [staff]
+      summary: Amend, suspend or terminate
+      description: >
+        **Amending creates a version; it does not overwrite.** An order placed last week was
+        placed under last week's rate, and settlement must be able to say which.
+      tags: [subscription]
+      x-ticvai-permission: PARTNER_MANAGE
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/PartnerAgreement' }
+      responses:
+        '200':
+          description: Amended as a new version
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/PartnerAgreement' }
+
+  /partner-registrations:
+    post:
+      operationId: registerPartner
+      x-ticvai-audience: [anonymous]
+      summary: A business applies to become a partner
+      description: >
+        2.7.33. **Self-registration with approval**, not an account somebody creates by hand.
+        Routes through `approvals`, because whether to trade with a company is a commercial
+        decision with a threshold and an approver.
+      tags: [subscription]
+      x-ticvai-permission: null   # a prospective partner, before any account exists
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [companyName, contactEmail, country]
+              properties:
+                companyName: { type: string }
+                tradingName: { type: string }
+                contactName: { type: string }
+                contactEmail: { type: string }
+                country: { type: string }
+                taxRegistrationNumber: { type: string }
+                expectedVolume: { type: string }
+      responses:
+        '202':
+          description: Submitted for approval
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/PartnerAgreement' }
+
+  /partner-agreements/{agreementId}/commission-statement:
+    parameters:
+      - name: agreementId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    get:
+      operationId: getCommissionStatement
+      x-ticvai-consumed-by:
+        - "P10 PTR-011 Quote Management"
+        - "P10 PTR-017 Commission Statement"
+      x-ticvai-audience: [staff, partner]
+      summary: What the partner earned and what is owed
+      description: >
+        2.7.13, 2.7.40. **Per period, and reconcilable to the orders behind it** — a statement a
+        partner cannot check line by line is a statement they will dispute.
+
+        Uses the agreement version in force **at the time of each sale**, not the current one,
+        which is why amendment creates a version.
+      tags: [subscription]
+      x-ticvai-permission: PARTNER_VIEW
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-read-routing: analytical
+      parameters:
+        - name: from
+          in: query
+          schema: { type: string, format: date }
+        - name: to
+          in: query
+          schema: { type: string, format: date }
+      responses:
+        '200':
+          description: Statement
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/CommissionStatement' }
+
+  /tenants:
+    get:
+      operationId: listTenants
+      x-ticvai-consumed-by:
+        - "P09 ADM-002 Platform Dashboard"
+        - "P09 ADM-005 Tenant Directory"
+        - "P09 ADM-006 Tenant Hierarchy Explorer"
+        - "P09 ADM-007 Module & Feature Entitlement"
+        - "P09 ADM-008 Subscription & Plan Management"
+        - "P09 ADM-009 Tenant Billing & Invoicing"
+        - "P09 ADM-010 Usage Metering"
+        - "P09 ADM-011 Licence & Seat Management"
+        - "P09 ADM-012 Tenant Isolation & Resource Pool"
+        - "P09 ADM-015 API Rate Limit & Quota Management"
+        - "P13 CMS-001 Tenant Workspace"
+      x-ticvai-audience: [staff]
+      x-ticvai-read-routing: replica
+      summary: List tenants
+      tags: [tenant]
+      x-ticvai-permission: PLATFORM_TENANT_VIEW
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - name: status
+          in: query
+          schema: { $ref: '#/components/schemas/TenantStatus' }
+        - name: planId
+          in: query
+          schema: { type: string, format: uuid }
+        - $ref: '../shared/common.yaml#/components/parameters/PageSize'
+        - $ref: '../shared/common.yaml#/components/parameters/PageCursor'
+      responses:
+        '200':
+          description: Tenants
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '../shared/common.yaml#/components/schemas/Page'
+                  - type: object
+                    properties:
+                      items:
+                        type: array
+                        items: { $ref: '#/components/schemas/Tenant' }
+        '403': { $ref: '../shared/common.yaml#/components/responses/Forbidden' }
+
+    post:
+      operationId: createTenant
+      x-ticvai-consumed-by:
+        - "P09 ADM-005 Tenant Directory"
+        - "P13 CMS-001 Tenant Workspace"
+      x-ticvai-audience: [staff]
+      summary: Create a tenant
+      description: >
+        Creates the record only. **No cell exists until a region is provisioned** — a tenant
+        with no regions has nowhere to run, which is the correct intermediate state during
+        onboarding.
+      tags: [tenant]
+      x-ticvai-permission: PLATFORM_TENANT_MANAGE
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/CreateTenantRequest' }
+      responses:
+        '201':
+          description: Created. Provision a region next
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Tenant' }
+        '409':
+          description: Code already in use
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /tenants/{tenantId}:
+    parameters:
+      - name: tenantId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    get:
+      operationId: getTenant
+      x-ticvai-consumed-by:
+        - "P09 ADM-002 Platform Dashboard"
+        - "P09 ADM-005 Tenant Directory"
+        - "P09 ADM-006 Tenant Hierarchy Explorer"
+        - "P09 ADM-007 Module & Feature Entitlement"
+        - "P09 ADM-008 Subscription & Plan Management"
+        - "P09 ADM-009 Tenant Billing & Invoicing"
+        - "P09 ADM-010 Usage Metering"
+        - "P09 ADM-011 Licence & Seat Management"
+        - "P09 ADM-012 Tenant Isolation & Resource Pool"
+        - "P09 ADM-015 API Rate Limit & Quota Management"
+        - "P13 CMS-001 Tenant Workspace"
+      x-ticvai-audience: [staff]
+      x-ticvai-read-routing: replica
+      summary: Read a tenant with cells and subscription
+      tags: [tenant]
+      x-ticvai-permission: PLATFORM_TENANT_VIEW
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '200':
+          description: Tenant
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/TenantDetail' }
+        '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
+
+    patch:
+      operationId: updateTenant
+      x-ticvai-consumed-by:
+        - "P09 ADM-005 Tenant Directory"
+        - "P09 ADM-006 Tenant Hierarchy Explorer"
+        - "P13 CMS-001 Tenant Workspace"
+      x-ticvai-audience: [staff]
+      summary: Amend tenant details
+      tags: [tenant]
+      x-ticvai-permission: PLATFORM_TENANT_MANAGE
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              minProperties: 1
+              properties:
+                name: { type: string, maxLength: 200 }
+                billingEmail: { type: string }
+                billingAddress: { type: string, maxLength: 500 }
+                accountManagerPrincipalId: { type: string, format: uuid }
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Tenant' }
+
+  /tenants/{tenantId}/suspend:
+    parameters:
+      - name: tenantId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    post:
+      operationId: suspendTenant
+      x-ticvai-consumed-by:
+        - "P09 ADM-005 Tenant Directory"
+        - "P13 CMS-001 Tenant Workspace"
+      x-ticvai-audience: [staff]
+      summary: Suspend a tenant
+      description: >
+        Graceful and reversible. Data is retained, cells stay provisioned, and the behaviour
+        is configurable: read-only, no new sales, or full lockout.
+
+        **Access validation continues under every suspension mode.** A commercial dispute
+        must not strand guests at a gate holding valid tickets.
+      tags: [tenant]
+      x-ticvai-permission: PLATFORM_TENANT_MANAGE
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [mode, reason]
+              properties:
+                mode: { $ref: '#/components/schemas/SuspensionMode' }
+                reason: { type: string, minLength: 3, maxLength: 500 }
+                effectiveAt: { type: string, format: date-time }
+                noticeMessage:
+                  $ref: '#/components/schemas/LocalisedText'
+      responses:
+        '200':
+          description: Suspended
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Tenant' }
+
+  /tenants/{tenantId}/reactivate:
+    parameters:
+      - name: tenantId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    post:
+      operationId: reactivateTenant
+      x-ticvai-consumed-by:
+        - "P09 ADM-005 Tenant Directory"
+        - "P13 CMS-001 Tenant Workspace"
+      x-ticvai-audience: [staff]
+      summary: Lift a suspension
+      tags: [tenant]
+      x-ticvai-permission: PLATFORM_TENANT_MANAGE
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      responses:
+        '200':
+          description: Reactivated
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Tenant' }
+        '409':
+          description: Tenant is terminated, not suspended. Termination is not reversible here
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /tenants/{tenantId}/terminate:
+    parameters:
+      - name: tenantId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    post:
+      operationId: terminateTenant
+      x-ticvai-consumed-by:
+        - "P09 ADM-005 Tenant Directory"
+        - "P13 CMS-001 Tenant Workspace"
+      x-ticvai-audience: [staff]
+      summary: Begin termination
+      description: >
+        Deliberately harder to reach than suspension. Starts a retention window during which
+        data is exportable and the decision remains reversible by a platform administrator.
+        Cells are destroyed only when the window closes.
+
+        A tenant with unsettled ledger balances cannot be terminated — the money has to be
+        resolved first.
+      tags: [tenant]
+      x-ticvai-permission: PLATFORM_TENANT_TERMINATE
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [reason, retentionDays, confirmTenantCode]
+              properties:
+                reason: { type: string, minLength: 3, maxLength: 1000 }
+                retentionDays: { type: integer, minimum: 30, maximum: 2555 }
+                confirmTenantCode:
+                  type: string
+                  description: Must match the tenant's code. Guards against the wrong tenant.
+      responses:
+        '202':
+          description: Termination scheduled
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/TerminationSchedule' }
+        '400':
+          description: Confirmation code does not match
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+        '409':
+          description: Unsettled ledger balances exist
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  # ---------------------------------------------------------------- plans
+  /plans:
+    get:
+      operationId: listPlans
+      x-ticvai-consumed-by:
+        - "P09 ADM-008 Subscription & Plan Management"
+        - "P09 ADM-019 Global Configuration & Defaults"
+      x-ticvai-audience: [staff]
+      x-ticvai-read-routing: replica
+      summary: List subscription plans
+      tags: [plan]
+      x-ticvai-permission: PLATFORM_TENANT_VIEW
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '200':
+          description: Plans
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/Plan' }
+
+    post:
+      operationId: createPlan
+      x-ticvai-consumed-by:
+        - "P09 ADM-008 Subscription & Plan Management"
+        - "P09 ADM-019 Global Configuration & Defaults"
+      x-ticvai-audience: [staff]
+      summary: Create a subscription plan
+      description: >
+        A plan bundles licensed modules, entitlement limits and a cell tier. Plans are
+        versioned: existing subscriptions stay on the version they were sold, so a price
+        change never applies retroactively.
+      tags: [plan]
+      x-ticvai-permission: PLATFORM_PLAN_MANAGE
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/CreatePlanRequest' }
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Plan' }
+
+  /plans/{planId}:
+    parameters:
+      - name: planId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    get:
+      operationId: getPlan
+      x-ticvai-consumed-by:
+        - "P09 ADM-008 Subscription & Plan Management"
+        - "P09 ADM-019 Global Configuration & Defaults"
+      x-ticvai-audience: [staff]
+      x-ticvai-read-routing: replica
+      summary: Read a plan
+      tags: [plan]
+      x-ticvai-permission: PLATFORM_TENANT_VIEW
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '200':
+          description: Plan
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Plan' }
+        '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
+
+    post:
+      operationId: createPlanVersion
+      x-ticvai-consumed-by:
+        - "P09 ADM-008 Subscription & Plan Management"
+        - "P09 ADM-019 Global Configuration & Defaults"
+      x-ticvai-audience: [staff]
+      summary: Publish a new version of a plan
+      description: >
+        Existing subscribers remain on their version until migrated deliberately. A pricing
+        or entitlement change that silently applied to live tenants would be a contractual
+        problem, not a feature.
+      tags: [plan]
+      x-ticvai-permission: PLATFORM_PLAN_MANAGE
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/CreatePlanRequest' }
+      responses:
+        '201':
+          description: New version published
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Plan' }
+
+  # ---------------------------------------------------------------- subscriptions
+  /tenants/{tenantId}/subscription:
+    parameters:
+      - name: tenantId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    get:
+      operationId: getSubscription
+      x-ticvai-consumed-by:
+        - "P09 ADM-007 Module & Feature Entitlement"
+        - "P09 ADM-008 Subscription & Plan Management"
+        - "P09 ADM-009 Tenant Billing & Invoicing"
+        - "P09 ADM-011 Licence & Seat Management"
+        - "P13 CMS-001 Tenant Workspace"
+      x-ticvai-audience: [staff]
+      x-ticvai-read-routing: replica
+      summary: Read the current subscription
+      tags: [subscription]
+      x-ticvai-permission: PLATFORM_TENANT_VIEW
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '200':
+          description: Subscription
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Subscription' }
+        '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
+
+    put:
+      operationId: setSubscription
+      x-ticvai-consumed-by:
+        - "P09 ADM-008 Subscription & Plan Management"
+        - "P09 ADM-011 Licence & Seat Management"
+        - "P13 CMS-001 Tenant Workspace"
+      x-ticvai-audience: [staff]
+      summary: Assign or change a subscription
+      description: >
+        Upgrades take effect immediately. **Downgrades are checked first**: if the target
+        plan licenses fewer modules than the tenant currently has enabled, or lower limits
+        than they are currently using, the change is refused and the conflicts are named.
+
+        Silently switching off a module a venue is trading on is not an acceptable
+        consequence of a billing change.
+      tags: [subscription]
+      x-ticvai-permission: PLATFORM_TENANT_MANAGE
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/SetSubscriptionRequest' }
+      responses:
+        '200':
+          description: Applied
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Subscription' }
+        '409':
+          description: >
+            Downgrade conflicts with current usage. The response names every module and limit
+            that would be violated.
+          content:
+            application/problem+json:
+              schema: { $ref: '#/components/schemas/DowngradeConflictProblem' }
+
+  /tenants/{tenantId}/subscription/preview:
+    parameters:
+      - name: tenantId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    post:
+      operationId: previewSubscriptionChange
+      x-ticvai-consumed-by:
+        - "P09 ADM-008 Subscription & Plan Management"
+        - "P09 ADM-011 Licence & Seat Management"
+        - "P13 CMS-001 Tenant Workspace"
+      x-ticvai-audience: [staff]
+      summary: Preview the effect of a plan change
+      description: >
+        What would change, what would break, and the prorated amount. Run before committing —
+        an account manager should never discover a conflict by causing it.
+      tags: [subscription]
+      x-ticvai-permission: PLATFORM_TENANT_VIEW
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/SetSubscriptionRequest' }
+      responses:
+        '200':
+          description: Preview
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/SubscriptionPreview' }
+
+  # ---------------------------------------------------------------- licensing
+  /tenants/{tenantId}/licences:
+    parameters:
+      - name: tenantId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    get:
+      operationId: getTenantLicences
+      x-ticvai-consumed-by:
+        - "P09 ADM-002 Platform Dashboard"
+        - "P09 ADM-005 Tenant Directory"
+        - "P09 ADM-006 Tenant Hierarchy Explorer"
+        - "P09 ADM-007 Module & Feature Entitlement"
+        - "P09 ADM-008 Subscription & Plan Management"
+        - "P09 ADM-009 Tenant Billing & Invoicing"
+        - "P09 ADM-010 Usage Metering"
+        - "P09 ADM-011 Licence & Seat Management"
+        - "P09 ADM-012 Tenant Isolation & Resource Pool"
+        - "P09 ADM-015 API Rate Limit & Quota Management"
+        - "P13 CMS-001 Tenant Workspace"
+      x-ticvai-audience: [staff]
+      x-ticvai-read-routing: primary   # gates module enablement. Stale grants access to an unlicensed module
+      summary: What a tenant is licensed to use
+      description: >
+        **The authoritative source for module enablement.** The White Label Builder reads
+        this and cannot enable what is not licensed here. Two places deciding what a tenant
+        may use is one place too many.
+      tags: [licensing]
+      x-ticvai-permission: PLATFORM_TENANT_VIEW
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: true
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '200':
+          description: Licence position
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/LicencePosition' }
+        '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
+
+  /tenants/{tenantId}/licences/add-ons:
+    parameters:
+      - name: tenantId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    post:
+      operationId: addLicenceAddOn
+      x-ticvai-consumed-by:
+        - "P09 ADM-005 Tenant Directory"
+        - "P09 ADM-007 Module & Feature Entitlement"
+        - "P09 ADM-011 Licence & Seat Management"
+        - "P13 CMS-001 Tenant Workspace"
+      x-ticvai-audience: [staff]
+      summary: License a module outside the plan
+      description: >
+        A module or limit increase sold separately. Add-ons survive a plan change unless
+        explicitly removed — a tenant who paid for something extra keeps it.
+      tags: [licensing]
+      x-ticvai-permission: PLATFORM_TENANT_MANAGE
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/LicenceAddOn' }
+      responses:
+        '201':
+          description: Added
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/LicencePosition' }
+
+    delete:
+      operationId: removeLicenceAddOn
+      x-ticvai-consumed-by:
+        - "P09 ADM-005 Tenant Directory"
+        - "P09 ADM-007 Module & Feature Entitlement"
+        - "P09 ADM-011 Licence & Seat Management"
+        - "P13 CMS-001 Tenant Workspace"
+      x-ticvai-audience: [staff]
+      summary: Remove an add-on
+      tags: [licensing]
+      x-ticvai-permission: PLATFORM_TENANT_MANAGE
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [moduleKey, reason]
+              properties:
+                moduleKey: { type: string }
+                reason: { type: string, minLength: 3, maxLength: 500 }
+      responses:
+        '200':
+          description: Removed
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/LicencePosition' }
+        '409':
+          description: Module is currently enabled by the tenant. Disable it there first
+          content:
+            application/problem+json:
+              schema: { $ref: '#/components/schemas/DowngradeConflictProblem' }
+
+  /tenants/{tenantId}/entitlement-usage:
+    parameters:
+      - name: tenantId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    get:
+      operationId: getEntitlementUsage
+      x-ticvai-consumed-by:
+        - "P09 ADM-002 Platform Dashboard"
+        - "P09 ADM-005 Tenant Directory"
+        - "P09 ADM-006 Tenant Hierarchy Explorer"
+        - "P09 ADM-007 Module & Feature Entitlement"
+        - "P09 ADM-008 Subscription & Plan Management"
+        - "P09 ADM-009 Tenant Billing & Invoicing"
+        - "P09 ADM-010 Usage Metering"
+        - "P09 ADM-011 Licence & Seat Management"
+        - "P09 ADM-012 Tenant Isolation & Resource Pool"
+        - "P09 ADM-015 API Rate Limit & Quota Management"
+        - "P13 CMS-001 Tenant Workspace"
+      x-ticvai-audience: [staff]
+      x-ticvai-read-routing: analytical
+      summary: Usage against licensed limits
+      description: >
+        Venues, workstations, users, devices, branded apps, AI tokens. Approaching a limit is
+        an account conversation; hitting one silently at a gate is an incident.
+      tags: [licensing]
+      x-ticvai-permission: PLATFORM_TENANT_VIEW
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '200':
+          description: Usage
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/EntitlementUsage' }
+
+  # ---------------------------------------------------------------- cells
+  /tenants/{tenantId}/cells:
+    parameters:
+      - name: tenantId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    get:
+      operationId: listTenantCells
+      x-ticvai-consumed-by:
+        - "P09 ADM-002 Platform Dashboard"
+        - "P09 ADM-005 Tenant Directory"
+        - "P09 ADM-006 Tenant Hierarchy Explorer"
+        - "P09 ADM-007 Module & Feature Entitlement"
+        - "P09 ADM-008 Subscription & Plan Management"
+        - "P09 ADM-009 Tenant Billing & Invoicing"
+        - "P09 ADM-010 Usage Metering"
+        - "P09 ADM-011 Licence & Seat Management"
+        - "P09 ADM-012 Tenant Isolation & Resource Pool"
+        - "P09 ADM-015 API Rate Limit & Quota Management"
+        - "P13 CMS-001 Tenant Workspace"
+      x-ticvai-audience: [staff]
+      x-ticvai-read-routing: replica
+      summary: List a tenant's cells
+      description: One per region (ADR-0014), with placement, tier and health.
+      tags: [cell]
+      x-ticvai-permission: PLATFORM_CELL_VIEW
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '200':
+          description: Cells
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/Cell' }
+
+    post:
+      operationId: provisionCell
+      x-ticvai-consumed-by:
+        - "P09 ADM-005 Tenant Directory"
+        - "P09 ADM-012 Tenant Isolation & Resource Pool"
+        - "P13 CMS-001 Tenant Workspace"
+      x-ticvai-audience: [staff]
+      summary: Provision a cell for a region
+      description: >
+        Every region is its own cell. **Jurisdiction is enforced here, not trusted**: a region
+        in a different country must be placed in that country, and a placement that would put
+        it elsewhere is refused.
+
+        Where no in-region cloud exists, `clientHosted` is the mechanism rather than a
+        workaround.
+      tags: [cell]
+      x-ticvai-permission: PLATFORM_CELL_MANAGE
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/ProvisionCellRequest' }
+      responses:
+        '202':
+          description: Provisioning started
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Cell' }
+        '400':
+          description: >
+            Placement is outside the region's jurisdiction, or the target cloud has no region
+            in that country.
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+        '409':
+          description: A cell already exists for this region
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /cells/{cellId}:
+    parameters:
+      - name: cellId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    get:
+      operationId: getCell
+      x-ticvai-consumed-by:
+        - "P09 ADM-003 Cross-Tenant Health Dashboard"
+        - "P09 ADM-013 Tenant Performance Monitor"
+        - "P09 ADM-014 Auto-Scaling Configuration"
+        - "P09 ADM-029 Deployment Monitor"
+        - "P09 ADM-030 Infrastructure Sizing & Scaling Policy"
+        - "P09 ADM-032 WAF & Security Policy View"
+        - "P09 ADM-033 Backup & DR Status"
+        - "P09 ADM-034 Archival Job Monitor"
+      x-ticvai-audience: [staff]
+      x-ticvai-read-routing: replica
+      summary: Read a cell
+      tags: [cell]
+      x-ticvai-permission: PLATFORM_CELL_VIEW
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '200':
+          description: Cell
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/CellDetail' }
+        '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
+
+    patch:
+      operationId: updateCellTier
+      x-ticvai-consumed-by:
+        - "P09 ADM-003 Cross-Tenant Health Dashboard"
+        - "P09 ADM-013 Tenant Performance Monitor"
+        - "P09 ADM-014 Auto-Scaling Configuration"
+        - "P09 ADM-029 Deployment Monitor"
+        - "P09 ADM-030 Infrastructure Sizing & Scaling Policy"
+        - "P09 ADM-032 WAF & Security Policy View"
+        - "P09 ADM-033 Backup & DR Status"
+        - "P09 ADM-034 Archival Job Monitor"
+      x-ticvai-audience: [staff]
+      summary: Change a cell's tier
+      description: >
+        Promotion from shared to dedicated is a migration, not a setting. Returns a job to
+        track; the cell keeps trading throughout and cuts over at the end.
+      tags: [cell]
+      x-ticvai-permission: PLATFORM_CELL_MANAGE
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [tier]
+              properties:
+                tier: { $ref: '#/components/schemas/CellTier' }
+                scheduledFor: { type: string, format: date-time }
+      responses:
+        '202':
+          description: Migration scheduled
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/CellJob' }
+        '400':
+          description: Target tier is unavailable in this jurisdiction
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /cells/{cellId}/decommission:
+    parameters:
+      - name: cellId
+        in: path
+        required: true
+        schema: { type: string }
+    post:
+      operationId: decommissionCell
+      x-ticvai-consumed-by:
+        - "P09 ADM-003 Cross-Tenant Health Dashboard"
+        - "P09 ADM-013 Tenant Performance Monitor"
+        - "P09 ADM-014 Auto-Scaling Configuration"
+        - "P09 ADM-029 Deployment Monitor"
+        - "P09 ADM-030 Infrastructure Sizing & Scaling Policy"
+        - "P09 ADM-032 WAF & Security Policy View"
+        - "P09 ADM-033 Backup & DR Status"
+        - "P09 ADM-034 Archival Job Monitor"
+      x-ticvai-audience: [staff]
+      summary: Begin decommissioning a cell
+      description: >
+        **Refused while any tenant remains on it.** Migrate them first — `planTenantMigration` exists for exactly this.
+      tags: [cell]
+      x-ticvai-permission: PLATFORM_CELL_MANAGE
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [reason]
+              properties:
+                reason: { type: string }
+      responses:
+        '200':
+          description: Done
+        '409':
+          description: Not in a state that permits this
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /cells/{cellId}/cancel-decommission:
+    parameters:
+      - name: cellId
+        in: path
+        required: true
+        schema: { type: string }
+    post:
+      operationId: cancelDecommission
+      x-ticvai-consumed-by:
+        - "P09 ADM-003 Cross-Tenant Health Dashboard"
+        - "P09 ADM-013 Tenant Performance Monitor"
+        - "P09 ADM-014 Auto-Scaling Configuration"
+        - "P09 ADM-029 Deployment Monitor"
+        - "P09 ADM-030 Infrastructure Sizing & Scaling Policy"
+        - "P09 ADM-032 WAF & Security Policy View"
+        - "P09 ADM-033 Backup & DR Status"
+        - "P09 ADM-034 Archival Job Monitor"
+      x-ticvai-audience: [staff]
+      summary: Halt a decommission
+      description: >
+        Returns the cell to active.
+      tags: [cell]
+      x-ticvai-permission: PLATFORM_CELL_MANAGE
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [reason]
+              properties:
+                reason: { type: string }
+      responses:
+        '200':
+          description: Done
+        '409':
+          description: Not in a state that permits this
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /cells/{cellId}/capacity:
+    parameters:
+      - name: cellId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    get:
+      operationId: getCellCapacity
+      x-ticvai-consumed-by:
+        - "P09 ADM-003 Cross-Tenant Health Dashboard"
+        - "P09 ADM-012 Tenant Isolation & Resource Pool"
+        - "P09 ADM-013 Tenant Performance Monitor"
+        - "P09 ADM-014 Auto-Scaling Configuration"
+        - "P09 ADM-029 Deployment Monitor"
+        - "P09 ADM-030 Infrastructure Sizing & Scaling Policy"
+        - "P09 ADM-032 WAF & Security Policy View"
+        - "P09 ADM-033 Backup & DR Status"
+        - "P09 ADM-034 Archival Job Monitor"
+      x-ticvai-audience: [staff]
+      summary: Load against headroom
+      description: >
+        **Capacity is driven by traffic and concurrent users, not by tenant count.** A shared
+        cell holding forty small tenants may be quieter than one holding three, and a two-week
+        event with 30,000 attendees a day is a small tenant commercially and a large one here.
+
+        Reported per dimension so the constrained one is visible. A cell short of connections
+        and long on storage needs a different response from one short of both.
+      tags: [cell]
+      x-ticvai-permission: PLATFORM_CELL_VIEW
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-read-routing: replica
+      parameters:
+        - name: window
+          in: query
+          schema: { type: string, enum: [hour, day, week, month], default: day }
+      responses:
+        '200':
+          description: Capacity
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/CellCapacity' }
+        '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
+
+  /cell-clusters:
+    get:
+      operationId: listCellClusters
+      x-ticvai-audience: [staff]
+      summary: Clusters in a region
+      description: >
+        A cluster is one or more identical cells serving a region. Scaling out is **launching
+        another identical cluster and placing tenants on it** — not growing one indefinitely,
+        because a single primary has a ceiling that arrives during an event rather than at a
+        planning meeting.
+      tags: [cell]
+      x-ticvai-permission: PLATFORM_CELL_VIEW
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-read-routing: replica
+      parameters:
+        - name: regionId
+          in: query
+          schema: { type: string, format: uuid }
+        - name: kind
+          in: query
+          schema: { $ref: '#/components/schemas/CellKind' }
+      responses:
+        '200':
+          description: Clusters
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/CellCluster' }
+
+    post:
+      operationId: launchCellCluster
+      x-ticvai-audience: [staff]
+      summary: Launch an identical cluster
+      description: >
+        Provisions a cell identical in shape, region and schema version to an existing one, so
+        tenants can be placed on it or moved to it.
+
+        **Identical matters.** A cluster running a different schema version is not additional
+        capacity — it is a second thing to maintain, and a tenant moved onto it lands on a
+        version the platform did not intend.
+      tags: [cell]
+      x-ticvai-permission: PLATFORM_CELL_MANAGE
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [regionId, kind, modelledOnCellId]
+              properties:
+                regionId: { type: string, format: uuid }
+                kind: { $ref: '#/components/schemas/CellKind' }
+                modelledOnCellId:
+                  type: string
+                  format: uuid
+                  description: >
+                    The cell to replicate — shape, tier and **schema version**. Copied rather
+                    than specified, so the two cannot diverge at birth.
+                name: { type: string }
+      responses:
+        '202':
+          description: Launching
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/CellCluster' }
+        '409':
+          description: >
+            The model cell is mid-migration. Replicating a cell whose schema is moving
+            produces a cluster at neither version.
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /tenant-migrations/{migrationId}/rollback:
+    parameters:
+      - name: migrationId
+        in: path
+        required: true
+        schema: { type: string }
+    post:
+      operationId: rollbackTenantMigration
+      x-ticvai-audience: [staff]
+      summary: Roll a cutover back
+      description: >
+        Possible only because the source is retained rather than dropped. Returns traffic to the original cell.
+      tags: [cell]
+      x-ticvai-permission: PLATFORM_CELL_MANAGE
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [reason]
+              properties:
+                reason: { type: string }
+      responses:
+        '200':
+          description: Done
+        '409':
+          description: Not in a state that permits this
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /tenant-migrations:
+    get:
+      operationId: listTenantMigrations
+      x-ticvai-audience: [staff]
+      summary: Tenant moves between cells
+      tags: [cell]
+      x-ticvai-permission: PLATFORM_CELL_VIEW
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-read-routing: replica
+      parameters:
+        - name: tenantId
+          in: query
+          schema: { type: string, format: uuid }
+        - name: status
+          in: query
+          schema: { $ref: '#/components/schemas/TenantMigrationStatus' }
+      responses:
+        '200':
+          description: Migrations
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/TenantMigration' }
+
+    post:
+      operationId: planTenantMigration
+      x-ticvai-audience: [staff]
+      summary: Plan moving a tenant to another cell
+      description: >
+        **The upgrade path a tenant buys.** A client on shared infrastructure who later wants
+        isolation is migrated to their own cell — the shared start is not a decision they are
+        stuck with, and saying so is what makes the cheaper package sellable.
+
+        Also used to rebalance: a shared cell running hot moves a tenant to a newly launched
+        cluster.
+
+        Plans only. Reports what moves, how long the cutover window is, and what cannot move —
+        an entitlement redeemable in another region has a cross-cell link that must be
+        re-pointed rather than copied.
+
+        **Region cannot change.** Moving a tenant across a residency boundary is not a
+        migration, it is an export, and it is refused here.
+      tags: [cell]
+      x-ticvai-permission: PLATFORM_CELL_VIEW
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [tenantId, fromCellId, toCellId]
+              properties:
+                tenantId: { type: string, format: uuid }
+                fromCellId: { type: string, format: uuid }
+                toCellId: { type: string, format: uuid }
+                reason:
+                  type: string
+                  enum: [purchasedIsolation, rebalanceLoad, decommissionCell, complianceRequirement]
+      responses:
+        '200':
+          description: Plan
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/TenantMigrationPlan' }
+        '409':
+          description: >
+            Region mismatch, schema versions differ, or the tenant has open shifts. A tenant
+            mid-trade cannot be moved — a cutover during a shift loses the drawer.
+          content:
+            application/problem+json:
+              schema: { $ref: '#/components/schemas/MigrationBlockedProblem' }
+
+  /tenant-migrations/{migrationId}/execute:
+    parameters:
+      - name: migrationId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    post:
+      operationId: executeTenantMigration
+      x-ticvai-audience: [staff]
+      summary: Move the tenant
+      description: >
+        Copies the tenant's data to the target, verifies row counts and checksums, re-points
+        cross-cell links, then cuts over and marks the source rows for retention rather than
+        deleting them.
+
+        **The source is retained, not dropped.** A cutover that goes wrong needs somewhere to
+        go back to, and a tenant's entire history is not something to delete on the same day it
+        moved.
+
+        Requires step-up and a stated cutover window.
+      tags: [cell]
+      x-ticvai-permission: PLATFORM_CELL_MANAGE
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [cutoverWindowStart, cutoverWindowEnd, stepUpToken]
+              properties:
+                cutoverWindowStart: { type: string, format: date-time }
+                cutoverWindowEnd: { type: string, format: date-time }
+                stepUpToken: { type: string }
+                retainSourceDays: { type: integer, default: 30 }
+      responses:
+        '202':
+          description: Migration started
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/TenantMigration' }
+        '409':
+          description: Plan stale, or the tenant has traded since it was computed
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /cells/{cellId}/health:
+    parameters:
+      - name: cellId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    get:
+      operationId: getCellHealth
+      x-ticvai-consumed-by:
+        - "P09 ADM-003 Cross-Tenant Health Dashboard"
+        - "P09 ADM-013 Tenant Performance Monitor"
+        - "P09 ADM-014 Auto-Scaling Configuration"
+        - "P09 ADM-029 Deployment Monitor"
+        - "P09 ADM-030 Infrastructure Sizing & Scaling Policy"
+        - "P09 ADM-032 WAF & Security Policy View"
+        - "P09 ADM-033 Backup & DR Status"
+        - "P09 ADM-034 Archival Job Monitor"
+      x-ticvai-audience: [staff]
+      x-ticvai-read-routing: replica
+      summary: Cell health and schema version
+      description: >
+        Includes the schema version register, so version skew across a tenant's cells is
+        visible. Skew is expected; unexplained skew is a defect.
+      tags: [cell]
+      x-ticvai-permission: PLATFORM_CELL_VIEW
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '200':
+          description: Health
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/CellHealth' }
+
+  /cells/{cellId}/jobs:
+    parameters:
+      - name: cellId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    get:
+      operationId: listCellJobs
+      x-ticvai-consumed-by:
+        - "P09 ADM-003 Cross-Tenant Health Dashboard"
+        - "P09 ADM-013 Tenant Performance Monitor"
+        - "P09 ADM-014 Auto-Scaling Configuration"
+        - "P09 ADM-029 Deployment Monitor"
+        - "P09 ADM-030 Infrastructure Sizing & Scaling Policy"
+        - "P09 ADM-032 WAF & Security Policy View"
+        - "P09 ADM-033 Backup & DR Status"
+        - "P09 ADM-034 Archival Job Monitor"
+      x-ticvai-audience: [staff]
+      x-ticvai-read-routing: replica
+      summary: Provisioning, migration and maintenance jobs
+      tags: [cell]
+      x-ticvai-permission: PLATFORM_CELL_VIEW
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/PageSize'
+        - $ref: '../shared/common.yaml#/components/parameters/PageCursor'
+      responses:
+        '200':
+          description: Jobs
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '../shared/common.yaml#/components/schemas/Page'
+                  - type: object
+                    properties:
+                      items:
+                        type: array
+                        items: { $ref: '#/components/schemas/CellJob' }
+
+  # ---------------------------------------------------------------- metering
+  /tenants/{tenantId}/usage:
+    parameters:
+      - name: tenantId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    get:
+      operationId: getUsageMetering
+      x-ticvai-consumed-by:
+        - "P09 ADM-008 Subscription & Plan Management"
+        - "P09 ADM-010 Usage Metering"
+        - "P13 CMS-001 Tenant Workspace"
+      x-ticvai-audience: [staff]
+      x-ticvai-read-routing: analytical
+      summary: Metered usage for a period
+      description: >
+        Recorded continuously, priced periodically. Keeping the two apart means a pricing
+        change never rewrites history.
+
+        AI tokens are metered here and feed the token billing model (CF-14), which is still
+        open with the client.
+      tags: [metering]
+      x-ticvai-permission: PLATFORM_TENANT_VIEW
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - name: periodStart
+          in: query
+          required: true
+          schema: { type: string, format: date }
+        - name: periodEnd
+          in: query
+          required: true
+          schema: { type: string, format: date }
+        - name: metric
+          in: query
+          schema: { $ref: '#/components/schemas/UsageMetric' }
+      responses:
+        '200':
+          description: Usage
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/UsageReport' }
+
+  /usage-records:
+    post:
+      operationId: recordUsage
+      x-ticvai-audience: [service]
+      security:
+        - serviceAuth: []
+      summary: Record metered usage
+      description: >
+        Called by cells. Idempotent on the record ID, and batched — a cell reporting every
+        AI call individually would generate more traffic than the calls themselves.
+      tags: [metering]
+      x-ticvai-permission: null
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: append
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [cellId, records]
+              properties:
+                cellId: { type: string, format: uuid }
+                records:
+                  type: array
+                  minItems: 1
+                  maxItems: 1000
+                  items: { $ref: '#/components/schemas/UsageRecord' }
+      responses:
+        '202':
+          description: Accepted
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  accepted: { type: integer }
+                  duplicates: { type: integer }
+
+  # ---------------------------------------------------------------- billing
+  /invoices/{invoiceId}/payment:
+    parameters:
+      - name: invoiceId
+        in: path
+        required: true
+        schema: { type: string }
+    post:
+      operationId: recordInvoicePayment
+      x-ticvai-audience: [staff]
+      summary: Record payment against an invoice
+      description: >
+        Settles it. Late settlement clears `overdue` — the state was a flag, not a penalty.
+      tags: [billing]
+      x-ticvai-permission: PLATFORM_BILLING_MANAGE
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [amount]
+              properties:
+                amount: { type: string }
+                paidAt: { type: string }
+      responses:
+        '200':
+          description: Done
+        '409':
+          description: Not in a state that permits this
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /invoices/{invoiceId}/dispute:
+    parameters:
+      - name: invoiceId
+        in: path
+        required: true
+        schema: { type: string }
+    post:
+      operationId: disputeInvoice
+      x-ticvai-audience: [staff]
+      summary: Raise a dispute
+      description: >
+        **The clock stops.** A tenant querying an invoice should not accrue overdue status while somebody looks into it.
+      tags: [billing]
+      x-ticvai-permission: PLATFORM_BILLING_MANAGE
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [reason]
+              properties:
+                reason: { type: string }
+      responses:
+        '200':
+          description: Done
+        '409':
+          description: Not in a state that permits this
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /invoices/{invoiceId}/resolve-dispute:
+    parameters:
+      - name: invoiceId
+        in: path
+        required: true
+        schema: { type: string }
+    post:
+      operationId: resolveInvoiceDispute
+      x-ticvai-audience: [staff]
+      summary: Resolve a dispute
+      description: >
+        Returns the invoice to issued, with the terms clock resuming from the resolution rather than the original date.
+      tags: [billing]
+      x-ticvai-permission: PLATFORM_BILLING_MANAGE
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [outcome]
+              properties:
+                outcome: { type: string }
+      responses:
+        '200':
+          description: Done
+        '409':
+          description: Not in a state that permits this
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /invoices/{invoiceId}/cancel:
+    parameters:
+      - name: invoiceId
+        in: path
+        required: true
+        schema: { type: string }
+    post:
+      operationId: cancelInvoice
+      x-ticvai-audience: [staff]
+      summary: Cancel or credit an invoice
+      description: >
+        **Credited, never deleted.** An invoice a tenant has seen and queried must remain visible with its outcome, or the next conversation starts from nothing.
+      tags: [billing]
+      x-ticvai-permission: PLATFORM_BILLING_MANAGE
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [reason]
+              properties:
+                reason: { type: string }
+      responses:
+        '200':
+          description: Done
+        '409':
+          description: Not in a state that permits this
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /tenants/{tenantId}/invoices:
+    parameters:
+      - name: tenantId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    get:
+      operationId: listSubscriptionInvoices
+      x-ticvai-consumed-by:
+        - "P09 ADM-008 Subscription & Plan Management"
+        - "P09 ADM-009 Tenant Billing & Invoicing"
+        - "P13 CMS-001 Tenant Workspace"
+      x-ticvai-audience: [staff]
+      x-ticvai-read-routing: replica
+      summary: List subscription invoices
+      description: >
+        Platform billing to the tenant. Distinct from the tenant's own ledger, which records
+        their sales to guests.
+      tags: [billing]
+      x-ticvai-permission: PLATFORM_BILLING_VIEW
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - name: status
+          in: query
+          schema: { $ref: '#/components/schemas/InvoiceStatus' }
+        - $ref: '../shared/common.yaml#/components/parameters/PageSize'
+        - $ref: '../shared/common.yaml#/components/parameters/PageCursor'
+      responses:
+        '200':
+          description: Invoices
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '../shared/common.yaml#/components/schemas/Page'
+                  - type: object
+                    properties:
+                      items:
+                        type: array
+                        items: { $ref: '#/components/schemas/SubscriptionInvoice' }
+
+    post:
+      operationId: generateInvoice
+      x-ticvai-consumed-by:
+        - "P09 ADM-008 Subscription & Plan Management"
+        - "P09 ADM-009 Tenant Billing & Invoicing"
+        - "P13 CMS-001 Tenant Workspace"
+      x-ticvai-audience: [staff]
+      summary: Generate an invoice for a period
+      description: >
+        Prices the metered usage against the subscription's plan version. Idempotent per
+        tenant and period — running twice does not double-bill, which matters because it will
+        be scheduled.
+      tags: [billing]
+      x-ticvai-permission: PLATFORM_BILLING_MANAGE
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [periodStart, periodEnd]
+              properties:
+                periodStart: { type: string, format: date }
+                periodEnd: { type: string, format: date }
+                dryRun: { type: boolean, default: false }
+      responses:
+        '201':
+          description: Generated
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/SubscriptionInvoice' }
+        '409':
+          description: An invoice already exists for this period
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+components:
+  schemas:
+    LocalisedText:
+      type: object
+      additionalProperties: { type: string }
+
+    ModuleKey:
+      type: string
+      description: >
+        What a tenant buys, and what a screen belongs to. **One vocabulary for both sides of the
+        join**, because two lists that must agree are one list somebody forgets to update.
+
+        **Grain chosen to match how a venue buys, not how the package is built.** `fnb` is one
+        module even though it spans four contracts; `ticketing` and `access` are separate because a
+        venue can run a museum with no gates and a stadium with no shop.
+      enum:
+        - core              # tenancy, identity, venues, staff — never optional
+        - ticketing         # catalogue, orders, entitlements
+        - access            # gates, scanning, admission profiles
+        - fnb               # outlets, menus, kitchen, tables
+        - retail            # merchandise, stock, retail POS
+        - inventory         # procurement, suppliers, counting
+        - seating           # reserved seating, venue maps
+        - membership        # subscriptions, loyalty, wallets
+        - marketing         # campaigns, segments, CRM
+        - resources         # cabanas, equipment, bookable things
+        - queue             # virtual queue and wait times
+        - games             # arcade, redemption, credit
+        - maintenance       # assets, work orders, inspections
+        - accreditation     # passes, vetting, zones
+        - partner           # resellers, channels, agreements
+        - developerApi      # public API and sandbox
+        - analytics         # cross-domain reporting
+        - ai                # concierge, assistants, suggestions
+      x-ticvai-note: >
+        **`core` is listed and cannot be unlicensed.** It exists so a screen can say it belongs to
+        no optional module rather than leaving the field empty — **an empty field and *always on*
+        look identical, and only one of them is a decision.**
+
+
+    OnboardingApplication:
+      type: object
+      x-ticvai-persistence: "control.onboarding_application"
+      description: >
+        BL-165. **`subscription` handles the operator-led path well and has no prospect-led one.**
+        `createTenant` and `provisionCell` assume somebody at Softlabs decided this tenant exists.
+
+        A prospect signing themselves up is a different shape: **nothing is provisioned until they
+        are verified**, because an unverified application that provisions a cell is a cell somebody
+        has to clean up.
+      required: [id, companyName, contactEmail, status]
+      properties:
+        id: { type: string, format: uuid }
+        companyName: { type: string }
+        contactEmail: { type: string, format: email }
+        contactPhone: { type: string, nullable: true }
+        countryCode: { type: string }
+        venueTypeTemplateId:
+          type: string
+          format: uuid
+          nullable: true
+          description: >
+            **A water park and a theatre need different defaults**, and asking a prospect to
+            configure 300 settings from empty is asking them to leave.
+        requestedPlanId: { type: string, format: uuid }
+        status: { type: string, enum: [submitted, verifying, approved, provisioning, active, rejected, abandoned] }
+        trialEndsAt:
+          type: string
+          format: date-time
+          nullable: true
+          description: >
+            **Trial is a state, not a plan.** A tenant on trial has the plan they will pay for and a
+            date by which they must — modelling it as a separate plan means migrating them at
+            conversion, which is the moment least worth adding risk to.
+        rejectionReason: { type: string, nullable: true }
+        provisionedTenantId: { type: string, format: uuid, nullable: true }
+
+    VenueTypeTemplate:
+      type: object
+      x-ticvai-persistence: "control.venue_type_template"
+      description: >
+        BL-165. **What a venue of this kind starts with.** Product kinds, price list structure,
+        access profiles, roles, report set.
+
+        **A template is a starting point and not a constraint** — everything it creates is editable
+        the moment it lands, which is the difference between a template and a plan tier.
+      required: [id, name, venueKind]
+      properties:
+        id: { type: string, format: uuid }
+        name: { type: string }
+        venueKind: { type: string, enum: [themePark, waterPark, museum, theatre, stadium, arena, zoo, aquarium, cinema, attraction, mixed] }
+        seedsProductKinds: { type: array, items: { type: string } }
+        seedsRoles: { type: array, items: { type: string } }
+        seedsAdmissionProfiles: { type: array, items: { type: string } }
+        seedsReports: { type: array, items: { type: string } }
+
+
+    PartnerUser:
+      type: object
+      x-ticvai-persistence: "control.partner_user"
+      description: >
+        2.7.51, BL-075. **A partner was a flat account** — `registerPartner` created one and nothing
+        created a user beneath it.
+
+        The requirement asks for Master Agency, Branch, Department and User with permissions, quotas
+        and credit cascading down. **That is a scope tree, and `tenancy` already has one** — so this
+        is a principal on a partner branch rather than a new hierarchy.
+
+        **Quota and credit resolve the way configuration does: nearest ancestor wins.** A branch with
+        no credit limit inherits the agency's, which is the behaviour a partner expects and would
+        otherwise have to be enforced by hand.
+      required: [id, partnerId, principalId, branchScopePath]
+      properties:
+        id: { type: string, format: uuid }
+        partnerId: { type: string, format: uuid }
+        principalId: { type: string, format: uuid }
+        branchScopePath:
+          type: string
+          description: >
+            The branch this user sits on. **An ltree, like every other scope path**, so a report at
+            agency level rolls up its branches without anybody writing a join.
+        allocationQuota:
+          type: integer
+          nullable: true
+          description: >
+            Units this branch may sell. **Null inherits the parent's**, and a quota set at branch
+            level below the agency's is a deliberate restriction rather than an error.
+        creditLimitOverride: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+        canManageUsers:
+          type: boolean
+          default: false
+          description: >
+            **Partner-managed access control** — 2.7.51 asks for it, and a venue administering every
+            travel agent's staff list is a venue doing the agency's HR.
+
+    ChannelListing:
+      type: object
+      x-ticvai-persistence: "control.channel_listing"
+      description: >
+        BL-076. **The integration register marks *Resellers & OTA* as covered, and that is true of
+        the commercial model and not of the integration.** Agreements, allocations and credit exist;
+        the exchange with Viator, Klook, Headout and GetYourGuide does not.
+
+        **An OTA is not a partner portal.** A partner logs in and books; an OTA pulls a feed,
+        caches it, and sells against the cache — **so the failure mode is a sale against stale
+        inventory**, and everything below exists to bound that.
+      required: [id, channelName, productId, status]
+      properties:
+        id: { type: string, format: uuid }
+        channelName: { type: string, enum: [viator, klook, headout, getYourGuide, tiqets, expedia, other] }
+        productId: { type: string, format: uuid }
+        externalProductRef: { type: string, nullable: true }
+        status: { type: string, enum: [draft, live, paused, delisted] }
+        allocationUnits:
+          type: integer
+          nullable: true
+          description: >
+            **Inventory published to this channel, not the venue's whole capacity.** An OTA given the
+            full envelope will sell it, and the venue discovers at the gate.
+        priceListId: { type: string, format: uuid }
+        adapter:
+          type: string
+          nullable: true
+          enum: [viatorApi, klookApi, headoutApi, getYourGuideApi, tiqetsApi, octoStandard, generic]
+          description: >
+            BL-067. **The commercial model was complete and the wire was not** — `PartnerAgreement`
+            carries rates, commission, credit and channels, and `alternative-codes` maps a partner
+            SKU so an inbound order matches. What was missing is which protocol speaks to whom.
+
+            **`octoStandard` is the one that matters.** OCTo is the open connectivity standard the
+            OTAs converged on, and a venue that implements it once reaches several channels —
+            **a per-OTA adapter is a per-OTA maintenance commitment**, and naming the standard
+            first is what keeps that list from growing.
+        adapterCredentialRef:
+          type: string
+          nullable: true
+          description: A vault reference. **Never the credential**, following the rule ADR-0020 set for AI providers.
+        pushIntervalMinutes:
+          type: integer
+          default: 15
+          description: >
+            How often availability is pushed. **The gap between pushes is the oversell window**, and
+            a channel selling a high-demand slot needs a shorter one than a channel selling a museum
+            on a Tuesday.
+        guestDataScope:
+          type: string
+          enum: [none, nameOnly, nameAndContact, full]
+          default: nameOnly
+          description: >
+            **What the OTA passes through, and it is usually less than the venue wants.** A ticket
+            arriving with no contact detail cannot be reissued or notified of a cancellation, and the
+            venue should know that at listing time rather than at the gate.
+        lastPushedAt: { type: string, format: date-time, nullable: true }
+
+
+    PartnerAgreementStatus:
+      type: string
+      enum: [pendingApproval, active, expiringSoon, expired, suspended, terminated]
+
+    PartnerRateMode:
+      type: string
+      description: >
+        **Alternatives, not both.** A partner buys at a net rate and keeps the margin, or sells
+        at face value and is paid commission. Both is being paid twice for the same sale.
+      enum: [netRate, commission]
+
+    PartnerAgreement:
+      type: object
+      x-ticvai-persistence: "control.partner_agreement"
+      required: [partnerId, rateMode, validFrom]
+      properties:
+        id: { type: string, format: uuid, readOnly: true }
+        partnerId: { type: string, format: uuid }
+        partnerName: { type: string, readOnly: true }
+        version:
+          type: integer
+          readOnly: true
+          description: >
+            **Amending creates a version.** An order placed last week was placed under last
+            week's rate, and settlement must be able to say which.
+        status: { $ref: '#/components/schemas/PartnerAgreementStatus' }
+        rateMode: { $ref: '#/components/schemas/PartnerRateMode' }
+        commissionPercent: { type: number, nullable: true }
+        volumeTiers:
+          type: array
+          description: >
+            2.7.57. **A tier that changes at a threshold needs the sale to look back at cumulative
+            volume, and nothing did.** Flat net rates and per-channel price lists cover the simple
+            case and stop there.
+
+            **The window is the argument, not the tier.** A partner who sells 400 in January and 400
+            in February is either a 400-tier partner twice or an 800-tier partner once, and the two
+            are different money. `volumeWindow` says which.
+          items:
+            type: object
+            required: [fromUnits, commissionPercent]
+            properties:
+              fromUnits: { type: integer }
+              commissionPercent: { type: number }
+              appliesRetrospectively:
+                type: boolean
+                default: false
+                description: >
+                  **Whether crossing a tier reprices what came before it.** Retrospective is what a
+                  partner assumes and prospective is what a venue budgets for — it has to be stated.
+        volumeWindow:
+          type: string
+          nullable: true
+          enum: [calendarMonth, calendarQuarter, calendarYear, agreementYear, rolling12Months]
+        seasonalRates:
+          type: array
+          description: >
+            Rates that change by date range. **Separate from the volume tier because they compound**
+            — a peak-season rate at a high volume tier is both, and a single rate table cannot say so.
+          items:
+            type: object
+            properties:
+              from: { type: string, format: date }
+              to: { type: string, format: date }
+              commissionPercent: { type: number }
+        segmentTier: { type: string, nullable: true }
+        brandingAssetId:
+          type: string
+          format: uuid
+          nullable: true
+          description: >
+            2.7.x, BL-078. **A reseller selling a venue's tickets under their own brand is a second
+            scope level white-label does not have** — `BrandIdentity` and `setTheme` are tenant-scoped
+            throughout.
+
+            **Co-branding rather than replacement.** The venue's identity stays on the ticket because
+            the ticket admits to the venue; the partner's sits beside it.
+        storefrontSubdomain: { type: string, nullable: true }
+        sponsorship:
+          type: object
+          nullable: true
+          description: >
+            BL-050. **Sponsorship inventory is sellable capacity of a different kind** — logo
+            placements, hospitality allocations, naming rights. It is closer to a partner agreement
+            than to a product: **a sponsor buys a relationship for a season, not a ticket for a
+            date.**
+
+            Modelled here rather than as a `ProductKind` because the commercial terms — the term,
+            the exclusivity, the settlement — are the agreement's, and duplicating them onto a
+            product would mean two places to disagree.
+          properties:
+            placements:
+              type: array
+              items:
+                type: object
+                properties:
+                  surface: { type: string, enum: [signage, ticketFace, appBanner, emailFooter, venueNaming, zoneNaming, uniform, printedMap] }
+                  quantity: { type: integer }
+                  exclusive:
+                    type: boolean
+                    default: false
+                    description: >
+                      **Exclusivity is the expensive word.** A sponsor paying for category
+                      exclusivity has bought the absence of a competitor, and a second agreement
+                      breaching it is a legal problem rather than a scheduling one.
+            hospitalityAllocation:
+              type: integer
+              nullable: true
+              description: Tickets or cabanas included. **Issued as invitations, not sales** — no revenue attaches.
+            categoryExclusivity: { type: string, nullable: true }
+        netRates:
+          type: array
+          description: Per product or category. Absent means the commission applies across the catalogue.
+          items:
+            type: object
+            properties:
+              productId: { type: string, format: uuid, nullable: true }
+              categoryId: { type: string, format: uuid, nullable: true }
+              netPrice: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+              maxDiscountPercent:
+                type: number
+                nullable: true
+                description: >
+                  1.6.10. **What the partner may not undercut.** A reseller selling below the
+                  venue's own price damages the direct channel, and the venue usually cares
+                  more about that than the margin.
+        creditTermDays:
+          type: integer
+          description: 2.7.36. Net 30, net 60. Drives when an invoice becomes overdue.
+        acceptedByPrincipalId:
+          type: string
+          format: uuid
+          nullable: true
+          description: >
+            BL-079. **Electronic acceptance against a version**, following the `signatureRef`
+            precedent. An agreement accepted with no version recorded is an agreement nobody can
+            produce in a dispute.
+        acceptedVersion:
+          type: integer
+          nullable: true
+        acceptedAt:
+          type: string
+          format: date-time
+          nullable: true
+        signatureRef:
+          type: string
+          nullable: true
+        corporateAllocations:
+          type: array
+          description: >
+            BL-035. **`PartnerAgreement` covered commercial terms and not allocations.** A corporate
+            account with fifty places for its staff is the same structure as a reseller with fifty
+            to sell, and **the difference is that a corporate member does not pay.**
+          items:
+            type: object
+            properties:
+              productId: { type: string, format: uuid }
+              quantity: { type: integer }
+              usedQuantity: { type: integer, readOnly: true }
+              perMemberLimit: { type: integer, nullable: true }
+              validTo: { type: string, format: date, nullable: true }
+        settlementCurrency:
+          type: string
+          pattern: '^[A-Z]{3}$'
+          description: >
+            **The currency this partner is billed and settles in**, which is often not the venue's.
+            A UK tour operator selling a Dubai attraction is invoiced in GBP against sales booked in
+            AED, and the difference is somebody's exposure.
+
+            **`creditLimit` and `netRates` are expressed in this currency**, not the venue's — a limit
+            in the wrong currency is a limit that moves with the exchange rate.
+        fxPolicy:
+          type: string
+          enum: [rateAtSale, rateAtInvoice, fixedRate]
+          default: rateAtSale
+          description: >
+            **Which rate converts a sale into the settlement currency, and it is a commercial term.**
+            `rateAtSale` puts the movement on the partner; `rateAtInvoice` puts it on the venue;
+            `fixedRate` puts it on whoever guessed wrong when the agreement was signed.
+
+            **Not a default to leave alone** — on a monthly statement across a moving rate the three
+            produce materially different numbers, and the partner will have assumed one of them.
+        fixedRate:
+          type: number
+          nullable: true
+          description: Where `fxPolicy` is `fixedRate`. **An amendment creates a version** so an old statement stays readable.
+        creditLimit: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+        allowedChannels:
+          type: array
+          items: { $ref: '../shared/common.yaml#/components/schemas/SalesChannel' }
+        allowedVenueIds:
+          type: array
+          items: { type: string, format: uuid }
+        requiresApprovalAboveValue:
+          allOf:
+            - $ref: '../shared/common.yaml#/components/schemas/Money'
+          nullable: true
+          description: 2.7.39. Routes through `approvals` rather than a second mechanism here.
+        validFrom: { type: string, format: date }
+        validTo:
+          type: string
+          format: date
+          nullable: true
+          description: >
+            2.7.37. **An agreement that lapses silently keeps selling at rates nobody agreed
+            to**, discovered at settlement rather than at sale. Null means open-ended, which
+            should be rare and deliberate.
+        expiryAlertDays: { type: integer, default: 30 }
+        approvalRequestId: { type: string, nullable: true, readOnly: true }
+        notes: { type: string }
+
+    CommissionStatement:
+      type: object
+      x-ticvai-persistence: "none — aggregated from orders and control.partner_agreement"
+      properties:
+        agreementId: { type: string, format: uuid }
+        partnerName: { type: string }
+        from: { type: string, format: date }
+        to: { type: string, format: date }
+        currency: { type: string }
+        grossSales: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+        refunds: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+        netSales: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+        commissionEarned: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+        amountDue: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+        lines:
+          type: array
+          description: >
+            **Reconcilable order by order.** A statement a partner cannot check line by line is
+            a statement they will dispute, and the dispute costs more than the detail.
+          items:
+            type: object
+            properties:
+              orderId: { type: string, format: uuid }
+              orderNumber: { type: string }
+              soldAt: { type: string, format: date-time }
+              agreementVersion:
+                type: integer
+                description: The version in force at the time of that sale, not the current one.
+              gross: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+              commission: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+              isRefunded: { type: boolean }
+
+    TenantStatus:
+      type: string
+      enum: [onboarding, active, suspended, terminating, terminated]
+
+    SuspensionMode:
+      type: string
+      description: >
+        Access validation continues under every mode. A commercial dispute must not strand
+        guests at a gate holding valid tickets.
+      enum: [readOnly, noNewSales, fullLockout]
+
+    CellTier:
+      type: string
+      enum: [shared, dedicated, isolated, clientHosted]
+
+    CellStatus:
+      type: string
+      enum: [provisioning, active, migrating, suspended, decommissioning, failed]
+
+    CreateTenantRequest:
+      x-ticvai-persistence: "none — request only"
+      type: object
+      required: [code, name, billingEmail]
+      properties:
+        code: { type: string, maxLength: 64, pattern: '^[a-z0-9-]+$' }
+        name: { type: string, maxLength: 200 }
+        billingEmail: { type: string }
+        billingAddress: { type: string, maxLength: 500 }
+        accountManagerPrincipalId: { type: string, format: uuid }
+        planId: { type: string, format: uuid }
+
+    Tenant:
+      x-ticvai-persistence: "control.tenant"
+      type: object
+      required: [id, code, name, status, createdAt]
+      properties:
+        id: { type: string, format: uuid }
+        code: { type: string }
+        name: { type: string }
+        status: { $ref: '#/components/schemas/TenantStatus' }
+        suspensionMode: { $ref: '#/components/schemas/SuspensionMode' }
+        suspensionReason: { type: string, nullable: true }
+        planId: { type: string, format: uuid, nullable: true }
+        planName: { type: string, nullable: true }
+        cellCount: { type: integer }
+        venueCount: { type: integer }
+        billingEmail: { type: string }
+        accountManagerPrincipalId: { type: string, format: uuid, nullable: true }
+        createdAt: { type: string, format: date-time }
+        activatedAt: { type: string, format: date-time, nullable: true }
+
+    TenantDetail:
+      x-ticvai-persistence: "control.tenant"
+      allOf:
+        - $ref: '#/components/schemas/Tenant'
+        - type: object
+          properties:
+            subscription: { $ref: '#/components/schemas/Subscription' }
+            cells:
+              type: array
+              items: { $ref: '#/components/schemas/Cell' }
+            licences: { $ref: '#/components/schemas/LicencePosition' }
+
+    TerminationSchedule:
+      x-ticvai-persistence: "none — computed"
+      type: object
+      required: [tenantId, scheduledAt, retentionUntil, isReversible]
+      properties:
+        tenantId: { type: string, format: uuid }
+        scheduledAt: { type: string, format: date-time }
+        retentionUntil:
+          type: string
+          format: date-time
+          description: Cells are destroyed after this. Until then the decision is reversible.
+        isReversible: { type: boolean }
+        dataExportUrl: { type: string, nullable: true }
+        requestedByPrincipalId: { type: string, format: uuid }
+
+    EntitlementLimit:
+      type: object
+      required: [metric, limit]
+      properties:
+        metric: { $ref: '#/components/schemas/UsageMetric' }
+        limit:
+          type: integer
+          nullable: true
+          description: Null means unlimited.
+        overageAllowed: { type: boolean, default: false }
+        overageUnitPrice: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+
+    CreatePlanRequest:
+      x-ticvai-persistence: "none — request only"
+      type: object
+      required: [code, name, cellTier, licensedModules, limits, basePrice]
+      properties:
+        code: { type: string, maxLength: 64 }
+        name: { type: string, maxLength: 200 }
+        description: { type: string, maxLength: 1000 }
+        cellTier: { $ref: '#/components/schemas/CellTier' }
+        licensedModules:
+          type: array
+          minItems: 1
+          description: >
+            **A closed set as of 24 August.** `moduleKey` was a free string, so nothing could join a
+            licence to a screen — **a tenant without an F&B licence was still served every F&B
+            screen**, because no screen said which module it belonged to in a form the licence could
+            match.
+
+            **The key is the join.** `screen.requiresModule` names one of these, and navigation is
+            built from the intersection of what a tenant licensed and what their role permits.
+          items: { $ref: '#/components/schemas/ModuleKey' }
+        limits:
+          type: array
+          items: { $ref: '#/components/schemas/EntitlementLimit' }
+        basePrice: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+        billingPeriod:
+          type: string
+          enum: [monthly, quarterly, annual]
+        includesBrandedApp:
+          type: boolean
+          description: >
+            Branded native publishing carries per-tenant operational cost and is priced, not
+            absorbed.
+        includedAiTokens: { type: integer, nullable: true }
+
+    Plan:
+      x-ticvai-persistence: "control.plan"
+      allOf:
+        - $ref: '#/components/schemas/CreatePlanRequest'
+        - type: object
+          required: [id, version, isActive, subscriberCount]
+          properties:
+            id: { type: string, format: uuid }
+            version:
+              type: string
+              description: >
+                Existing subscribers stay on the version they were sold. A price change never
+                applies retroactively.
+            isActive: { type: boolean }
+            subscriberCount: { type: integer }
+            publishedAt: { type: string, format: date-time }
+
+    SetSubscriptionRequest:
+      x-ticvai-persistence: "none — request only"
+      type: object
+      required: [planId]
+      properties:
+        planId: { type: string, format: uuid }
+        planVersion:
+          type: string
+          description: Defaults to the current version.
+        effectiveFrom: { type: string, format: date }
+        prorate: { type: boolean, default: true }
+        note: { type: string, maxLength: 500 }
+
+    Subscription:
+      x-ticvai-persistence: "control.subscription"
+      type: object
+      required: [tenantId, planId, planVersion, status, startsAt]
+      properties:
+        tenantId: { type: string, format: uuid }
+        planId: { type: string, format: uuid }
+        planName: { type: string }
+        planVersion: { type: string }
+        status:
+          type: string
+          enum: [trial, active, pastDue, cancelled, expired]
+        startsAt: { type: string, format: date }
+        renewsAt: { type: string, format: date, nullable: true }
+        cancelledAt: { type: string, format: date, nullable: true }
+        currentPrice: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+        billingPeriod: { type: string }
+
+    DowngradeConflictProblem:
+      x-ticvai-persistence: "none — error shape"
+      allOf:
+        - $ref: '../shared/common.yaml#/components/schemas/Problem'
+        - type: object
+          properties:
+            modulesInUse:
+              type: array
+              description: Enabled by the tenant but not licensed by the target plan.
+              items:
+                type: object
+                properties:
+                  moduleKey: { type: string }
+                  displayName: { type: string }
+                  isEnabled: { type: boolean }
+            limitsExceeded:
+              type: array
+              items:
+                type: object
+                properties:
+                  metric: { $ref: '#/components/schemas/UsageMetric' }
+                  currentUsage: { type: integer }
+                  targetLimit: { type: integer }
+
+    SubscriptionPreview:
+      x-ticvai-persistence: "none — computed"
+      type: object
+      required: [canApply, priceChange]
+      properties:
+        canApply: { type: boolean }
+        priceChange: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+        proratedAmount: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+        modulesGained:
+          type: array
+          items: { type: string }
+        modulesLost:
+          type: array
+          items: { type: string }
+        conflicts: { $ref: '#/components/schemas/DowngradeConflictProblem' }
+        cellTierChange:
+          type: object
+          nullable: true
+          properties:
+            from: { $ref: '#/components/schemas/CellTier' }
+            to: { $ref: '#/components/schemas/CellTier' }
+            requiresMigration: { type: boolean }
+
+    LicenceAddOn:
+      x-ticvai-persistence: "control.licence_add_on"
+      type: object
+      required: [moduleKey]
+      properties:
+        moduleKey: { type: string }
+        limitOverrides:
+          type: array
+          items: { $ref: '#/components/schemas/EntitlementLimit' }
+        price: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+        validFrom: { type: string, format: date }
+        validTo: { type: string, format: date, nullable: true }
+        note: { type: string, maxLength: 500 }
+
+    LicencePosition:
+      x-ticvai-persistence: "none — union of plan and add-ons"
+      type: object
+      required: [tenantId, licensedModules, limits]
+      properties:
+        tenantId: { type: string, format: uuid }
+        planId: { type: string, format: uuid, nullable: true }
+        licensedModules:
+          type: array
+          description: >
+            Union of plan modules and add-ons. The White Label Builder reads this and cannot
+            enable anything absent from it.
+          items:
+            type: object
+            required: [moduleKey, source]
+            properties:
+              moduleKey: { type: string }
+              displayName: { type: string }
+              source:
+                type: string
+                enum: [plan, addOn]
+              validTo: { type: string, format: date, nullable: true }
+        limits:
+          type: array
+          items: { $ref: '#/components/schemas/EntitlementLimit' }
+
+    UsageMetric:
+      type: string
+      enum:
+        - venues
+        - workstations
+        - activeUsers
+        - devices
+        - brandedApps
+        - aiTokens
+        - apiCalls
+        - storageGb
+        - transactions
+        - guestProfiles
+
+    EntitlementUsage:
+      x-ticvai-persistence: "none — aggregated from usage_record"
+      type: object
+      required: [tenantId, metrics]
+      properties:
+        tenantId: { type: string, format: uuid }
+        metrics:
+          type: array
+          items:
+            type: object
+            required: [metric, current, isNearLimit]
+            properties:
+              metric: { $ref: '#/components/schemas/UsageMetric' }
+              current: { type: integer }
+              limit: { type: integer, nullable: true }
+              percentUsed: { type: number, nullable: true }
+              isNearLimit:
+                type: boolean
+                description: >
+                  Approaching a limit is an account conversation. Hitting one silently at a
+                  gate is an incident.
+              isExceeded: { type: boolean }
+        asAt: { type: string, format: date-time }
+
+    ProvisionCellRequest:
+      x-ticvai-persistence: "none — request only"
+      type: object
+      required: [regionId, countryCode, tier]
+      properties:
+        regionId: { type: string, format: uuid }
+        countryCode:
+          type: string
+          pattern: '^[A-Z]{2}$'
+          description: >
+            Determines the jurisdiction. Placement must be within it — this is enforced, not
+            trusted.
+        tier: { $ref: '#/components/schemas/CellTier' }
+        cloudProvider: { type: string }
+        cloudRegion: { type: string }
+        clientHostedEndpoint:
+          type: string
+          nullable: true
+          description: Required for `clientHosted`, where no in-region cloud exists.
+
+    Cell:
+      x-ticvai-persistence: "control.cell"
+      type: object
+      required: [id, name, tenantId, regionId, countryCode, tier, status]
+      properties:
+        id: { type: string, format: uuid }
+        name: { type: string }
+        tenantId:
+          type: string
+          format: uuid
+          nullable: true
+          description: >
+            Null on a shared cell, which holds many. Nullable since the ADR-0014 amendment of
+            14 August — it was required when a cell meant one tenant.
+        kind: { $ref: '#/components/schemas/CellKind' }
+        clusterId: { type: string, format: uuid, nullable: true }
+        isReachable:
+          type: boolean
+          default: true
+          description: >
+            False for `onPremise`. The Control Plane holds the record for licensing and support
+            and **cannot reach the installation** — it may sit behind a firewall with no inbound
+            route. Every operation assuming reachability must handle absence rather than timing
+            out, and a cell that has not called home for a month is not necessarily broken.
+        lastContactAt:
+          type: string
+          format: date-time
+          nullable: true
+          description: >
+            When the site last called out. The only liveness signal for an unreachable cell,
+            and the number a support engineer asks for first.
+        licenceExpiresAt:
+          type: string
+          format: date-time
+          nullable: true
+          description: >
+            On-premise only. Licensing cannot be enforced by a Control Plane the site cannot
+            reach, so a signed licence file is verified locally. **An expired licence degrades
+            rather than stops** — a venue whose gates refuse entry because a licence lapsed
+            over a weekend is worse than one running unlicensed until Monday.
+        participatesInCrossCell:
+          type: boolean
+          default: true
+          description: >
+            False by default for `onPremise`. Redeeming a pass issued elsewhere requires
+            reaching the issuing cell at that moment, and an on-premise site may not be able
+            to. Exclusion is the honest default; local-then-reconcile carries a
+            double-redemption risk that needs a decision rather than an assumption.
+        regionId: { type: string, format: uuid }
+        regionName: { type: string }
+        countryCode: { type: string }
+        tier: { $ref: '#/components/schemas/CellTier' }
+        status: { $ref: '#/components/schemas/CellStatus' }
+        cloudProvider: { type: string, nullable: true }
+        cloudRegion: { type: string, nullable: true }
+        apiEndpoint: { type: string, nullable: true }
+        venueCount: { type: integer }
+        provisionedAt: { type: string, format: date-time, nullable: true }
+
+    CellDetail:
+      x-ticvai-persistence: "control.cell"
+      allOf:
+        - $ref: '#/components/schemas/Cell'
+        - type: object
+          properties:
+            health: { $ref: '#/components/schemas/CellHealth' }
+            activeJobs:
+              type: array
+              items: { $ref: '#/components/schemas/CellJob' }
+
+    CellKind:
+      type: string
+      description: >
+        Four deployment models (ADR-0017). `shared` is the default; the others exist because a
+        client asked or a law requires it.
+      enum:
+        - shared       # TICVAI infrastructure, UAE. Many tenants, isolated by RLS. The default
+        - dedicated    # TICVAI infrastructure, own database and cluster. What the extra cost buys
+        - onPremise    # the venue's own hardware. Nothing leaves the site, and TICVAI cannot reach it
+        - controlPlane
+
+    CellCapacity:
+      type: object
+      x-ticvai-persistence: "none — measured, not stored"
+      required: [cellId, isConstrained, dimensions, measuredAt]
+      properties:
+        cellId: { type: string, format: uuid }
+        kind: { $ref: '#/components/schemas/CellKind' }
+        tenantCount:
+          type: integer
+          description: >
+            Reported, and **deliberately not the sizing signal.** Forty quiet tenants may load
+            a cell less than three busy ones.
+        isConstrained: { type: boolean }
+        constrainedDimension: { type: string, nullable: true }
+        dimensions:
+          type: array
+          description: >
+            Per dimension, because the response differs. Short of connections and long on
+            storage is a different problem from short of both.
+          items:
+            type: object
+            required: [dimension, used, headroom]
+            properties:
+              dimension:
+                type: string
+                enum:
+                  - concurrentUsers
+                  - transactionsPerSecond
+                  - scansPerSecond
+                  - databaseConnections
+                  - storageGb
+                  - replicationLag
+                  - cpu
+              used: { type: number }
+              limit: { type: number }
+              headroom:
+                type: number
+                description: Fraction remaining. Negative means already over.
+              peakAt: { type: string, format: date-time, nullable: true }
+        forecastBreachAt:
+          type: string
+          format: date-time
+          nullable: true
+          description: >
+            When the constrained dimension is projected to run out at the current trend. Null
+            where there is no trend to project — an honest null beats an invented date.
+        measuredAt: { type: string, format: date-time }
+
+    CellCluster:
+      type: object
+      x-ticvai-persistence: "control.cell_cluster"
+      required: [id, regionId, kind, cellIds, status]
+      properties:
+        id: { type: string, format: uuid }
+        name: { type: string }
+        regionId: { type: string, format: uuid }
+        kind: { $ref: '#/components/schemas/CellKind' }
+        cellIds:
+          type: array
+          items: { type: string, format: uuid }
+        schemaVersion:
+          type: string
+          description: >
+            Every cell in a cluster runs the same version. A cluster at mixed versions is not
+            capacity, it is two things to maintain.
+        modelledOnCellId: { type: string, format: uuid, nullable: true }
+        status:
+          type: string
+          enum: [provisioning, active, draining, retired]
+        acceptingNewTenants:
+          type: boolean
+          description: >
+            False on a cluster being drained, or one held back as headroom for a known event.
+        tenantCount: { type: integer }
+        provisionedAt: { type: string, format: date-time }
+
+    TenantMigrationStatus:
+      type: string
+      enum: [planned, copying, verifying, awaitingCutover, cuttingOver, complete, failed, rolledBack]
+
+    TenantMigrationPlan:
+      type: object
+      x-ticvai-persistence: "control.tenant_migration_plan"
+      required: [id, tenantId, fromCellId, toCellId, canProceed, computedAt]
+      properties:
+        id: { type: string, format: uuid }
+        tenantId: { type: string, format: uuid }
+        fromCellId: { type: string, format: uuid }
+        toCellId: { type: string, format: uuid }
+        fromKind: { $ref: '#/components/schemas/CellKind' }
+        toKind: { $ref: '#/components/schemas/CellKind' }
+        canProceed: { type: boolean }
+        blockers:
+          type: array
+          items:
+            type: object
+            properties:
+              blocker:
+                type: string
+                enum:
+                  - regionMismatch
+                  - schemaVersionMismatch
+                  - openShifts
+                  - migrationInFlight
+                  - targetNotAcceptingTenants
+                  - crossCellLinksUnresolvable
+              detail: { type: string }
+        rowCounts:
+          type: object
+          additionalProperties: { type: integer }
+        estimatedCopyMinutes: { type: integer }
+        estimatedCutoverSeconds:
+          type: integer
+          description: >
+            How long the tenant is unavailable. The number the client asks about, and the only
+            one they will remember.
+        crossCellLinksToRepoint:
+          type: integer
+          description: >
+            Entitlements redeemable in another region hold a link that must be re-pointed
+            rather than copied. Copying leaves two cells claiming the same guest.
+        computedAt: { type: string, format: date-time }
+        expiresAt: { type: string, format: date-time }
+
+    TenantMigration:
+      type: object
+      x-ticvai-persistence: "control.tenant_migration"
+      required: [id, planId, tenantId, status, startedAt]
+      properties:
+        id: { type: string, format: uuid }
+        planId: { type: string, format: uuid }
+        tenantId: { type: string, format: uuid }
+        fromCellId: { type: string, format: uuid }
+        toCellId: { type: string, format: uuid }
+        reason: { type: string }
+        status: { $ref: '#/components/schemas/TenantMigrationStatus' }
+        rowsCopied: { type: integer }
+        rowsExpected: { type: integer }
+        verificationPassed: { type: boolean, nullable: true }
+        cutoverAt: { type: string, format: date-time, nullable: true }
+        sourceRetainedUntil:
+          type: string
+          format: date-time
+          nullable: true
+          description: >
+            The source is retained, not dropped. A cutover that goes wrong needs somewhere to
+            return to, and a tenant's whole history is not something to delete on the day it
+            moved.
+        startedAt: { type: string, format: date-time }
+        completedAt: { type: string, format: date-time, nullable: true }
+        error: { type: string, nullable: true }
+
+    MigrationBlockedProblem:
+      allOf:
+        - $ref: '../shared/common.yaml#/components/schemas/Problem'
+        - type: object
+          x-ticvai-persistence: "none — error shape"
+          properties:
+            blockers:
+              type: array
+              items:
+                type: object
+                properties:
+                  blocker: { type: string }
+                  detail: { type: string }
+
+    CellHealth:
+      x-ticvai-persistence: "none — polled, not stored"
+      type: object
+      required: [cellId, isHealthy, schemaVersion, checkedAt]
+      properties:
+        cellId: { type: string, format: uuid }
+        isHealthy: { type: boolean }
+        schemaVersion:
+          type: string
+          description: >
+            From the cell's version register. Skew across a tenant's cells is expected during
+            rollout; unexplained skew is a defect.
+        isSchemaBehind: { type: boolean }
+        databaseStatus: { type: string }
+        replicationLagSeconds: { type: number, nullable: true }
+        lastBackupAt: { type: string, format: date-time, nullable: true }
+        lastRestoreDrillAt: { type: string, format: date-time, nullable: true }
+        checkedAt: { type: string, format: date-time }
+
+    CellJob:
+      x-ticvai-persistence: "control.cell_job"
+      type: object
+      required: [id, cellId, kind, status, createdAt]
+      properties:
+        id: { type: string, format: uuid }
+        cellId: { type: string, format: uuid }
+        kind:
+          type: string
+          enum: [provision, tierMigration, schemaMigration, backup, restore, decommission]
+        status:
+          type: string
+          enum: [queued, running, completed, failed, rolledBack]
+        progressPercent: { type: integer, minimum: 0, maximum: 100 }
+        message: { type: string, nullable: true }
+        error: { type: string, nullable: true }
+        scheduledFor: { type: string, format: date-time, nullable: true }
+        createdAt: { type: string, format: date-time }
+        completedAt: { type: string, format: date-time, nullable: true }
+
+    UsageRecord:
+      x-ticvai-persistence: "control.usage_record"
+      type: object
+      required: [id, metric, quantity, recordedAt]
+      properties:
+        id: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+        metric: { $ref: '#/components/schemas/UsageMetric' }
+        quantity: { type: number, minimum: 0 }
+        venueId: { type: string, format: uuid, nullable: true }
+        capability:
+          type: string
+          nullable: true
+          description: For AI token usage — which capability consumed them.
+        recordedAt: { type: string, format: date-time }
+
+    UsageReport:
+      x-ticvai-persistence: "none — aggregated"
+      type: object
+      required: [tenantId, periodStart, periodEnd, metrics]
+      properties:
+        tenantId: { type: string, format: uuid }
+        periodStart: { type: string, format: date }
+        periodEnd: { type: string, format: date }
+        metrics:
+          type: array
+          items:
+            type: object
+            properties:
+              metric: { $ref: '#/components/schemas/UsageMetric' }
+              total: { type: number }
+              included: { type: number, nullable: true }
+              overage: { type: number }
+              byVenue:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    venueId: { type: string, format: uuid }
+                    quantity: { type: number }
+              byCapability:
+                type: array
+                description: AI tokens only.
+                items:
+                  type: object
+                  properties:
+                    capability: { type: string }
+                    quantity: { type: number }
+
+    InvoiceStatus:
+      type: string
+      enum: [draft, issued, paid, overdue, disputed, cancelled]
+
+    SubscriptionInvoice:
+      x-ticvai-persistence: "control.invoice + control.invoice_line"
+      type: object
+      required: [id, invoiceNumber, tenantId, periodStart, periodEnd, status, total]
+      properties:
+        id: { type: string, format: uuid }
+        invoiceNumber: { type: string }
+        tenantId: { type: string, format: uuid }
+        periodStart: { type: string, format: date }
+        periodEnd: { type: string, format: date }
+        status: { $ref: '#/components/schemas/InvoiceStatus' }
+        lines:
+          type: array
+          items:
+            type: object
+            properties:
+              description: { type: string }
+              kind:
+                type: string
+                enum: [basePlan, addOn, overage, oneOff, credit]
+              metric: { $ref: '#/components/schemas/UsageMetric' }
+              quantity: { type: number }
+              unitPrice: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+              amount: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+        subtotal: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+        taxAmount: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+        total: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+        planVersionUsed:
+          type: string
+          description: Priced against the version the tenant is subscribed to, not the latest.
+        issuedAt: { type: string, format: date-time, nullable: true }
+        dueAt: { type: string, format: date, nullable: true }
+        paidAt: { type: string, format: date-time, nullable: true }
+
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

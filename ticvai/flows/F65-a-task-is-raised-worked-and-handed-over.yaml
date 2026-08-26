@@ -1,0 +1,82 @@
+$schema: ./_schema.yaml
+id: F65
+name: A task is raised, worked and handed over
+actor: supervisor
+capability: Venue task management
+wave: 2
+frequency: Routine.
+criticality: operational
+primaryContract: maintenance
+contracts:
+- maintenance
+- workforce
+- assets
+platforms:
+- P06
+trigger:
+  description: Somebody notices something — a spill, a broken reader, a queue building. **The person
+    who notices is rarely the person who fixes it.**
+offlineBehaviour: '**Raising works offline; accepting does not.** A task raised on a device with no
+  signal is still a task; a task accepted offline is two people walking to the same spill.'
+steps:
+- step: 1
+  screen: EMP-006
+  action: A steward raises a task.
+  operations:
+  - createWorkOrder
+  outcome: '**Raised in seconds, from where the problem is.** A form that takes a minute is a spill
+    somebody steps around instead.'
+- step: 2
+  screen: EMP-004
+  action: It appears on the list for whoever is free.
+  operations:
+  - listWorkOrders
+  outcome: '**Ordered by urgency and proximity**, not by arrival — a spill on the concourse outranks
+    a bulb in a store room raised an hour earlier.'
+  crossesDevice: true
+- step: 3
+  screen: EMP-005
+  action: Someone accepts it and works it.
+  operations:
+  - acceptWorkOrder
+  - getWorkOrder
+  - attachWorkOrderEvidence
+  outcome: '**Accepting is the lock.** Two stewards walking to the same task is the failure the list
+    exists to prevent.'
+- step: 4
+  screen: EMP-005
+  action: It is completed with evidence.
+  operations:
+  - completeWorkOrder
+  - attachWorkOrderEvidence
+  outcome: '**A photograph closes a spill; a signature closes an inspection.** The evidence kind is
+    the task kind.'
+- step: 5
+  screen: EMP-007
+  action: Unfinished work is written into the handover.
+  operations: []
+  outcome: '**The handover is generated from open tasks, not typed.** A note somebody writes at the
+    end of a tiring shift is a note that omits things.'
+branches:
+- at: 3
+  condition: The task needs a skill this steward does not have.
+  behaviour: Released back to the list with a reason. **A task returned is better than a task done badly**,
+    and the reason is what fixes the routing.
+  severity: medium
+  resolvedBy: pauseWorkOrder
+- at: 4
+  condition: It cannot be completed this shift.
+  behaviour: Paused, not cancelled. **A paused task carries into the handover; a cancelled one disappears.**
+  severity: medium
+  resolvedBy: pauseWorkOrder
+exitStates:
+- state: completed
+  description: Done, with evidence.
+- state: handedOver
+  description: '**Open at shift end and visible to the next shift.**'
+- state: cancelled
+  description: No longer needed, with a reason.
+notes: '**Written 24 August.** `EMP-004`, `EMP-005` and `EMP-006` declared identical nine-operation
+  sets — **a list screen that could complete a task and a detail screen that could create one.** `createWorkOrder`
+  now sits only on the raise screen.'
+openQuestions: null

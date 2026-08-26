@@ -1,0 +1,197 @@
+id: LLD-games
+title: games — 14 operations
+generatedBy: tools/derive-diagrams.py
+index: diagrams/hld/03-contracts.yaml
+tier: satellite
+service: VenueOpsService
+operations:
+- operation: adjustGameCard
+  verb: POST
+  path: /game-cards/{cardCode}/adjust
+  scope: venue
+  permission: LEDGER_POST
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - games.card
+  writes:
+  - cache:idempotency
+  - games.card
+- operation: createGame
+  verb: POST
+  path: /games
+  scope: venue
+  permission: PRODUCT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - games.game
+  writes:
+  - cache:idempotency
+  - games.game
+- operation: createPrize
+  verb: POST
+  path: /prizes
+  scope: venue
+  permission: PRODUCT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - games.prize
+  writes:
+  - cache:idempotency
+  - games.prize
+- operation: getGameCard
+  verb: GET
+  path: /game-cards/{cardCode}
+  scope: venue
+  permission: null
+  audience:
+  - guest
+  offline: true
+  reads:
+  - games.card
+  - games.credit_ledger
+  writes: []
+- operation: issueGameCard
+  verb: POST
+  path: /game-cards
+  scope: workstation
+  permission: ORDER_CREATE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - games.card
+  writes:
+  - cache:idempotency
+  - games.card
+- operation: listGames
+  verb: GET
+  path: /games
+  scope: venue
+  permission: PRODUCT_VIEW
+  audience:
+  - staff
+  offline: true
+  reads:
+  - games.game
+  writes: []
+- operation: listPrizes
+  verb: GET
+  path: /prizes
+  scope: venue
+  permission: PRODUCT_VIEW
+  audience:
+  - staff
+  offline: true
+  reads:
+  - games.prize
+  writes: []
+- operation: loadGameCredits
+  verb: POST
+  path: /game-cards/{cardCode}/load
+  scope: workstation
+  permission: ORDER_CREATE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - games.card
+  writes:
+  - cache:idempotency
+  - games.card
+- operation: recordGamePlay
+  verb: POST
+  path: /game-plays
+  scope: venue
+  permission: null
+  audience:
+  - guest
+  offline: true
+  reads:
+  - cache:idempotency
+  - games.play
+  writes:
+  - cache:idempotency
+  - games.play
+- operation: redeemPrize
+  verb: POST
+  path: /prize-redemptions
+  scope: workstation
+  permission: ORDER_CREATE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - games.redemption
+  writes:
+  - cache:idempotency
+  - games.redemption
+- operation: setReaderProfile
+  verb: PUT
+  path: /reader-profiles
+  scope: venue
+  permission: PRODUCT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - catalogue.product
+  - games.reader_profile
+  writes:
+  - cache:idempotency
+  - games.reader_profile
+- operation: syncGamePlays
+  verb: POST
+  path: /game-plays/sync
+  scope: venue
+  permission: null
+  audience:
+  - device
+  offline: false
+  reads:
+  - games.card
+  - games.game
+  writes:
+  - games.credit_ledger
+  - games.play
+  - sync.rejection
+- operation: transferGameCard
+  verb: POST
+  path: /game-cards/{cardCode}/transfer
+  scope: venue
+  permission: ORDER_MODIFY
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - games.card
+  writes:
+  - cache:idempotency
+  - games.card
+- operation: updateGame
+  verb: PATCH
+  path: /games/{gameId}
+  scope: venue
+  permission: PRODUCT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - games.game
+  writes:
+  - cache:idempotency
+  - games.game

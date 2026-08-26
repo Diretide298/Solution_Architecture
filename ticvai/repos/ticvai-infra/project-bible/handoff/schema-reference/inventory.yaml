@@ -1,0 +1,473 @@
+# inventory — derived from the API contracts, not hand-written
+# Migration: V0012
+#
+# Columns come from schema properties. Types are inferred: format uuid to uuid,
+# date-time to timestamptz, ULID patterns to char(26), Money to numeric(18,4).
+# What is NOT here: partitioning, RLS policies, indexes, the PII split. That is
+# storage design and lives in the migration scripts.
+
+module: inventory
+migration: V0012
+tableCount: 10
+columnCount: 140
+tables:
+  inventory.count:
+    derivedFrom: StockCount
+    columns:
+    - name: id
+      type: text
+      required: true
+    - name: location_id
+      type: uuid
+      required: true
+    - name: location_name
+      type: text
+      required: false
+    - name: kind
+      type: text
+      required: true
+    - name: status
+      type: jsonb
+      required: true
+    - name: is_blind
+      type: boolean
+      required: true
+    - name: line_count
+      type: integer
+      required: true
+    - name: counted_count
+      type: integer
+      required: true
+    - name: variance_line_count
+      type: integer
+      required: false
+    - name: variance_value
+      type: numeric(18,4)
+      required: false
+    - name: started_by_principal_id
+      type: uuid
+      required: false
+    - name: posted_by_principal_id
+      type: uuid
+      required: false
+    - name: journal_entry_id
+      type: text
+      required: false
+    - name: started_at
+      type: timestamptz
+      required: true
+    - name: closed_at
+      type: timestamptz
+      required: false
+    - name: posted_at
+      type: timestamptz
+      required: false
+  inventory.goods_receipt:
+    derivedFrom: GoodsReceipt
+    columns:
+    - name: id
+      type: text
+      required: true
+    - name: receipt_number
+      type: text
+      required: true
+    - name: purchase_order_id
+      type: text
+      required: true
+    - name: location_id
+      type: uuid
+      required: true
+    - name: delivery_note_reference
+      type: text
+      required: false
+    - name: lines
+      type: jsonb
+      required: true
+    - name: total_value
+      type: numeric(18,4)
+      required: false
+    - name: received_by_principal_id
+      type: uuid
+      required: true
+    - name: journal_entry_id
+      type: text
+      required: false
+      description: The accrual the supplier invoice will later match against.
+    - name: created_at
+      type: timestamptz
+      required: true
+    - name: recorded_at
+      type: timestamptz
+      required: false
+    - name: synced_at
+      type: timestamptz
+      required: false
+  inventory.item:
+    derivedFrom: InventoryItem
+    columns:
+    - name: sku
+      type: varchar(64)
+      required: true
+    - name: barcode
+      type: varchar(128)
+      required: false
+    - name: name
+      type: varchar(200)
+      required: true
+    - name: venue_id
+      type: uuid
+      required: true
+    - name: category_id
+      type: uuid
+      required: false
+    - name: base_unit
+      type: text
+      required: true
+      description: The unit stock is held in. Immutable once movements exist.
+    - name: purchase_unit
+      type: text
+      required: false
+      description: How the supplier sells it — a case of 24 against a base unit of one.
+    - name: purchase_unit_factor
+      type: numeric
+      required: false
+    - name: costing_method
+      type: jsonb
+      required: true
+    - name: reorder_point
+      type: numeric
+      required: false
+    - name: reorder_quantity
+      type: numeric
+      required: false
+    - name: par_level
+      type: numeric
+      required: false
+    - name: preferred_supplier_id
+      type: uuid
+      required: false
+    - name: allow_negative_stock
+      type: boolean
+      required: false
+      description: True permits issue beyond on-hand. Occasionally needed at a bar mid-service; dangerous
+        everywhere else.
+    - name: is_perishable
+      type: boolean
+      required: false
+    - name: shelf_life_days
+      type: integer
+      required: false
+    - name: id
+      type: uuid
+      required: true
+    - name: on_hand
+      type: numeric
+      required: true
+      description: Derived from movements. Not directly editable.
+    - name: on_order
+      type: numeric
+      required: false
+    - name: in_transit
+      type: numeric
+      required: false
+    - name: available
+      type: numeric
+      required: false
+    - name: average_cost
+      type: numeric(18,4)
+      required: false
+    - name: last_purchase_price
+      type: numeric(18,4)
+      required: false
+    - name: is_below_reorder_point
+      type: boolean
+      required: false
+    - name: has_movements
+      type: boolean
+      required: false
+      description: True locks costing method and base unit.
+    - name: is_active
+      type: boolean
+      required: true
+  inventory.location:
+    derivedFrom: StockLocation
+    columns:
+    - name: id
+      type: uuid
+      required: true
+    - name: code
+      type: text
+      required: true
+    - name: name
+      type: text
+      required: true
+    - name: venue_id
+      type: uuid
+      required: true
+    - name: kind
+      type: jsonb
+      required: true
+    - name: parent_location_id
+      type: uuid
+      required: false
+    - name: is_active
+      type: boolean
+      required: false
+  inventory.movement:
+    derivedFrom: StockMovement
+    columns:
+    - name: id
+      type: char(26)
+      required: true
+    - name: item_id
+      type: uuid
+      required: true
+    - name: location_id
+      type: uuid
+      required: true
+    - name: kind
+      type: jsonb
+      required: true
+    - name: quantity
+      type: numeric
+      required: true
+      description: Positive increases stock, negative decreases it.
+    - name: unit
+      type: text
+      required: false
+    - name: reason
+      type: varchar(500)
+      required: false
+      description: Required for adjustments, which are reported separately.
+    - name: cost_center_id
+      type: uuid
+      required: false
+    - name: recorded_at
+      type: timestamptz
+      required: true
+    - name: balance_after
+      type: numeric
+      required: true
+    - name: unit_cost
+      type: numeric(18,4)
+      required: false
+    - name: total_cost
+      type: numeric(18,4)
+      required: false
+    - name: principal_id
+      type: uuid
+      required: true
+    - name: source_type
+      type: text
+      required: false
+      description: What generated it — an order, a count, a transfer.
+    - name: source_id
+      type: text
+      required: false
+    - name: journal_entry_id
+      type: text
+      required: false
+    - name: created_at
+      type: timestamptz
+      required: true
+  inventory.purchase_order:
+    derivedFrom: PurchaseOrder
+    columns:
+    - name: id
+      type: text
+      required: true
+    - name: purchase_order_number
+      type: text
+      required: true
+    - name: requisition_id
+      type: text
+      required: false
+    - name: supplier_id
+      type: uuid
+      required: true
+    - name: supplier_name
+      type: text
+      required: false
+    - name: status
+      type: jsonb
+      required: true
+    - name: deliver_to_location_id
+      type: uuid
+      required: false
+    - name: lines
+      type: jsonb
+      required: true
+    - name: subtotal
+      type: numeric(18,4)
+      required: false
+    - name: tax_amount
+      type: numeric(18,4)
+      required: false
+    - name: total
+      type: numeric(18,4)
+      required: true
+    - name: expected_delivery
+      type: date
+      required: false
+    - name: raised_by_principal_id
+      type: uuid
+      required: false
+    - name: created_at
+      type: timestamptz
+      required: true
+    - name: closed_at
+      type: timestamptz
+      required: false
+  inventory.quotation:
+    derivedFrom: Quotation
+    columns:
+    - name: requisition_id
+      type: text
+      required: true
+    - name: reference
+      type: varchar(128)
+      required: false
+    - name: lines
+      type: jsonb
+      required: true
+    - name: lead_time_days
+      type: integer
+      required: false
+    - name: valid_until
+      type: date
+      required: true
+    - name: note
+      type: varchar(1000)
+      required: false
+    - name: id
+      type: uuid
+      required: true
+    - name: supplier_id
+      type: uuid
+      required: true
+    - name: supplier_name
+      type: text
+      required: false
+    - name: total
+      type: numeric(18,4)
+      required: true
+    - name: is_selected
+      type: boolean
+      required: false
+    - name: received_at
+      type: timestamptz
+      required: true
+  inventory.requisition:
+    derivedFrom: Requisition
+    columns:
+    - name: id
+      type: text
+      required: true
+    - name: requisition_number
+      type: text
+      required: true
+    - name: venue_id
+      type: uuid
+      required: true
+    - name: department_id
+      type: uuid
+      required: false
+    - name: status
+      type: jsonb
+      required: true
+    - name: lines
+      type: jsonb
+      required: true
+    - name: estimated_total
+      type: numeric(18,4)
+      required: false
+    - name: raised_by_principal_id
+      type: uuid
+      required: true
+    - name: approved_by_principal_id
+      type: uuid
+      required: false
+    - name: approval_note
+      type: text
+      required: false
+    - name: required_by
+      type: date
+      required: false
+    - name: created_at
+      type: timestamptz
+      required: true
+    - name: approved_at
+      type: timestamptz
+      required: false
+  inventory.supplier:
+    derivedFrom: Supplier
+    columns:
+    - name: id
+      type: uuid
+      required: true
+    - name: code
+      type: varchar(64)
+      required: true
+    - name: name
+      type: varchar(200)
+      required: true
+    - name: contact_name
+      type: text
+      required: false
+    - name: contact_email
+      type: text
+      required: false
+    - name: contact_phone
+      type: text
+      required: false
+    - name: tax_registration_number
+      type: text
+      required: false
+    - name: payment_terms_days
+      type: integer
+      required: false
+    - name: lead_time_days
+      type: integer
+      required: false
+    - name: currency
+      type: char(3)
+      required: false
+    - name: account_id
+      type: uuid
+      required: false
+    - name: is_active
+      type: boolean
+      required: false
+  inventory.transfer:
+    derivedFrom: StockTransfer
+    columns:
+    - name: id
+      type: text
+      required: true
+    - name: transfer_number
+      type: text
+      required: false
+    - name: from_location_id
+      type: uuid
+      required: true
+    - name: to_location_id
+      type: uuid
+      required: true
+    - name: status
+      type: jsonb
+      required: true
+    - name: lines
+      type: jsonb
+      required: true
+    - name: dispatched_by_principal_id
+      type: uuid
+      required: false
+    - name: received_by_principal_id
+      type: uuid
+      required: false
+    - name: dispatched_at
+      type: timestamptz
+      required: true
+    - name: received_at
+      type: timestamptz
+      required: false

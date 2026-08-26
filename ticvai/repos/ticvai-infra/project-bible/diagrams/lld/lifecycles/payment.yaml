@@ -1,0 +1,84 @@
+id: LLD-Payment
+title: Payment — 9 transitions
+generatedBy: tools/derive-diagrams.py
+index: diagrams/hld/04-lifecycles.yaml
+source: states/payment.yaml
+entity: Payment
+contract: orders
+enum: Payment.status
+enumKind: inline
+enumSchema: Payment
+enumProperty: status
+owner: orders
+initial:
+- authorised
+- pendingConfirmation
+terminal:
+- captured
+- declined
+- failed
+- voided
+- refunded
+transitions:
+- from: authorised
+  to: captured
+  operation: capturePayment
+  trigger: operation
+  guard: Funds taken. **Authorise and capture are separate because a hold is not a payment** — a guest
+    whose card is authorised has not yet paid
+  emits:
+  - order.paid
+- from: authorised
+  to: voided
+  operation: voidPayment
+  trigger: operation
+  guard: Released before capture. **Cheaper and cleaner than a refund**, and the guest never sees a
+    charge
+- from: authorised
+  to: pendingConfirmation
+  trigger: timer
+  guard: The gateway stopped answering after the authorisation
+- from: pendingConfirmation
+  to: captured
+  operation: inquirePaymentStatus
+  trigger: operation
+  guard: '**The inquiry found it succeeded.** This is the state CF-63 exists for — the terminal was
+    charged and the response never arrived'
+  emits:
+  - order.paid
+- from: pendingConfirmation
+  to: declined
+  operation: inquirePaymentStatus
+  trigger: operation
+  guard: The inquiry found it failed. Safe to retry
+- from: pendingConfirmation
+  to: failed
+  operation: inquirePaymentStatus
+  trigger: operation
+  guard: '**The inquiry itself could not resolve it.** Escalates to a human with the gateway reference
+    — not retried, because retrying an unknown charge is how a guest is charged twice'
+- from: authorised
+  to: declined
+  trigger: job
+  guard: Capture refused by the issuer
+- from: captured
+  to: refunded
+  operation: createRefund
+  trigger: operation
+  guard: Money returned. **The payment record is not reversed** — a refund is its own record pointing
+    at this one
+- from: authorised
+  to: failed
+  trigger: job
+  guard: The gateway rejected it outright
+notes: '**`pendingConfirmation` is the whole reason this model matters.** Every other state is ordinary;
+  this one is a card that may or may not have been charged, and the only safe action is to ask the gateway
+  rather than to guess.
+
+
+  **Never retried automatically.** A retry against an unknown authorisation is the mechanism by which
+  a guest is charged twice, and the second charge is discovered by the guest rather than by us.
+
+
+  A payment is never deleted or reversed in place. `refunded` points forward to a refund record, because
+  the audit needs both halves.'

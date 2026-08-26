@@ -1,0 +1,67 @@
+$schema: ./_schema.yaml
+id: F99
+name: A chargeback arrives and is defended
+actor: financeController
+capability: A chargeback arrives and is defended
+wave: 3
+frequency: As needed.
+criticality: financial
+primaryContract: finance
+contracts:
+- finance
+- orders
+platforms:
+- P08
+- P10
+trigger:
+  description: A bank reverses a payment and the venue has days to answer.
+offlineBehaviour: None of it offline.
+steps:
+- step: 1
+  screen: BO-025
+  action: Chargebacks & Disputes.
+  operations:
+  - getSettlement
+  - ingestSettlementFile
+  - listSettlementExceptions
+  - listSettlements
+  - resolveSettlementException
+  outcome: 5 operations, 5 of them previously unwalked.
+- step: 2
+  screen: BO-024
+  action: Payment Exceptions.
+  operations:
+  - addTip
+  - capturePayment
+  - closeDepositBoxes
+  - createPayment
+  - inquirePaymentStatus
+  - settleDeposit
+  outcome: 6 operations, 0 of them previously unwalked.
+  crossesDevice: true
+- step: 3
+  screen: PTR-014
+  action: Settlement & Payment History.
+  operations:
+  - getSettlement
+  - ingestSettlementFile
+  - listSettlementExceptions
+  - listSettlements
+  - resolveSettlementException
+  outcome: 5 operations, 5 of them previously unwalked.
+  crossesDevice: true
+branches:
+- at: 1
+  condition: The acting principal lacks the permission at this scope.
+  behaviour: '**Refused at the first step, not the last.** ADR-0002 makes authorisation user-driven
+    — a person who gets three steps in and then cannot finish has been told the wrong thing.'
+  severity: medium
+  resolvedBy: resolvePermissions
+exitStates:
+- state: completed
+  description: The journey ran end to end.
+- state: refused
+  description: '**Stopped at a permission or a licence boundary**, with the reason named.'
+notes: '**A chargeback crosses Order, Ledger and the partner portal** — three services, and the evidence
+  has to be assembled from all three before a deadline nobody controls.'
+openQuestions: null

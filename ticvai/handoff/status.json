@@ -1,0 +1,337 @@
+{
+ "scope": "platform",
+ "generated": "2026-08-26",
+ "note": "Derived on every run by tools/build-status.py. A hand-maintained status page is worse than none, because somebody plans against it.",
+ "counts": {
+  "operations": 1023,
+  "contracts": 28,
+  "tables": 379,
+  "relationships": 914,
+  "states": 113,
+  "events": 29,
+  "flows": 94,
+  "adrs": 30,
+  "screens": 492,
+  "platforms": 15,
+  "apps": 12
+ },
+ "metrics": {
+  "design": [
+   {
+    "name": "API data lineage resolved",
+    "done": 1023,
+    "total": 1023,
+    "percent": 100,
+    "note": "Every operation maps to the tables it reads and writes."
+   },
+   {
+    "name": "Operations declaring an auth model",
+    "done": 1023,
+    "total": 1023,
+    "percent": 100,
+    "note": "A permission, an auth mode, or a declared audience. None may be silent."
+   },
+   {
+    "name": "Screens defined, specified and given a purpose",
+    "done": 492,
+    "total": 492,
+    "percent": 100,
+    "note": "Loading, empty and error states written for each."
+   },
+   {
+    "name": "Configuration levels decided",
+    "done": 321,
+    "total": 321,
+    "percent": 100,
+    "note": "Every configurable value has a scope level. Venue is the floor (ADR-0018)."
+   },
+   {
+    "name": "Platforms with a unique name",
+    "done": 15,
+    "total": 15,
+    "percent": 100,
+    "note": "No two platforms share a name in any document."
+   },
+   {
+    "name": "Contracts touched by a flow",
+    "done": 28,
+    "total": 28,
+    "percent": 100,
+    "note": "Every contract appears in at least one journey."
+   },
+   {
+    "name": "State models",
+    "done": 113,
+    "total": 122,
+    "percent": 93,
+    "note": "The denominator is status enums in contracts. Some models describe behaviour with no enum, so this can exceed 100%."
+   },
+   {
+    "name": "Tables with a relationship",
+    "done": 356,
+    "total": 379,
+    "percent": 94,
+    "note": "The remainder are partitions, platform-written tables and caches, each stating why."
+   },
+   {
+    "name": "Screens with operations",
+    "done": 478,
+    "total": 492,
+    "percent": 97,
+    "note": "The remainder are static, workshop-blocked, or navigation shells."
+   },
+   {
+    "name": "Requirements contracted",
+    "done": 2647,
+    "total": 2788,
+    "percent": 95,
+    "note": "Read row by row from traceability.json. Excludes deliberately parked requirements."
+   },
+   {
+    "name": "Requirements with an artefact",
+    "done": 1848,
+    "total": 2072,
+    "percent": 89,
+    "note": "An artefact class covering the requirement, not just a contract."
+   },
+   {
+    "name": "Operations reaching a screen",
+    "done": 758,
+    "total": 1023,
+    "percent": 74,
+    "note": "Not a defect on its own \u2014 sync, webhook and job operations have no screen."
+   },
+   {
+    "name": "Artefact classes",
+    "done": 12,
+    "total": 15,
+    "percent": 80,
+    "note": "Three remain: device and hardware, retention (CF-64), performance targets."
+   },
+   {
+    "name": "Flows",
+    "done": 94,
+    "total": 120,
+    "percent": 78,
+    "note": "**Raised from 60 to 120 on 24 August**, after the journey pass took the count past the old estimate and the invariant fired. The estimate was set when flows were being written one domain at a time; **walking the guest and staff platforms screen by screen showed the real surface is roughly twice that.** 120 is an estimate and not a commitment. Every flow written has found a defect \u2014 a till that could author the catalogue, a scanner that could create gates, a shift summary that could sign off its own review."
+   }
+  ],
+  "build": [
+   {
+    "name": "Tables written",
+    "done": 0,
+    "total": 379,
+    "percent": 0,
+    "note": "DDL is generated when the design stops moving (ADR-0024)."
+   },
+   {
+    "name": "Sprint 0",
+    "done": 0,
+    "total": 11,
+    "percent": 0,
+    "note": "Repository, CI, migrations, seed data."
+   },
+   {
+    "name": "Code built",
+    "done": 0,
+    "total": 1,
+    "percent": 0,
+    "note": "Nothing has executed since 30 July."
+   }
+  ]
+ },
+ "metricDefinitions": {
+  "Operations reaching a screen": {
+   "population": "distinct operationIds across all contracts",
+   "counted": "an operation appears in the apis[] of at least one screen, on any platform",
+   "notCounted": [
+    "screen-operation pairs \u2014 one operation on six screens is one, not six",
+    "per-platform tallies summed \u2014 that counts an operation once per platform",
+    "flow steps \u2014 an operation named only by a flow does not reach a screen"
+   ],
+   "invariant": "done <= total, and total equals the operation count"
+  },
+  "Requirements contracted": {
+   "population": "traceability rows that are not PARKED",
+   "counted": "verdict CONTRACTED",
+   "notCounted": [
+    "CONTRACTED_PARTIAL",
+    "rows a contract claims by domain rather than by row"
+   ]
+  },
+  "Tables with a relationship": {
+   "population": "tables in the schema reference, excluding cache: and vault: pseudo-tables",
+   "counted": "the table is either end of an edge in relationship-graph.json"
+  }
+ },
+ "headline": {
+  "design": 93,
+  "build": 0
+ },
+ "waves": {
+  "wave1": 169,
+  "wave2": 253,
+  "wave3": 70
+ },
+ "platformBreakdown": [
+  {
+   "code": "P01",
+   "name": "Guest Web",
+   "app": "guest-web",
+   "operator": "guest",
+   "screens": 46
+  },
+  {
+   "code": "P02",
+   "name": "Guest App",
+   "app": "guest-app",
+   "operator": "guest",
+   "screens": 63
+  },
+  {
+   "code": "P04",
+   "name": "Venue POS",
+   "app": "venue-pos",
+   "operator": "venue",
+   "screens": 24
+  },
+  {
+   "code": "P05",
+   "name": "Guest Kiosk",
+   "app": "guest-app",
+   "operator": "guest",
+   "screens": 17
+  },
+  {
+   "code": "P06",
+   "name": "Venue Staff App",
+   "app": "venue-staff-app",
+   "operator": "venue",
+   "screens": 66
+  },
+  {
+   "code": "P07",
+   "name": "Venue Scanner",
+   "app": "venue-scanner",
+   "operator": "venue",
+   "screens": 11
+  },
+  {
+   "code": "P08",
+   "name": "Venue Management",
+   "app": "venue-management-web",
+   "operator": "venue",
+   "screens": 143
+  },
+  {
+   "code": "P09",
+   "name": "TICVAI Web",
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "screens": 37
+  },
+  {
+   "code": "P10",
+   "name": "Partner Web",
+   "app": "partner-web",
+   "operator": "partner",
+   "screens": 21
+  },
+  {
+   "code": "P11",
+   "name": "Accreditation Web",
+   "app": "accreditation-web",
+   "operator": "public",
+   "screens": 8
+  },
+  {
+   "code": "P12",
+   "name": "Venue Support",
+   "app": "venue-support-web",
+   "operator": "venue",
+   "screens": 8
+  },
+  {
+   "code": "P13",
+   "name": "Venue CMS",
+   "app": "venue-management-web",
+   "operator": "venue",
+   "screens": 20
+  },
+  {
+   "code": "P14",
+   "name": "Developer",
+   "app": "developer-portal-web",
+   "operator": "partner",
+   "screens": 8
+  },
+  {
+   "code": "P15",
+   "name": "Kitchen Display",
+   "app": "kitchen-display",
+   "operator": "venue",
+   "screens": 10
+  },
+  {
+   "code": "P16",
+   "name": "Venue Analytics",
+   "app": "venue-management-web",
+   "operator": "venue",
+   "screens": 10
+  }
+ ],
+ "conflicts": {
+  "open": 12,
+  "closed": 148,
+  "withdrawn": 6,
+  "blocking": 0,
+  "byOwner": {
+   "Dinesh + Chinmay": 1,
+   "Dinesh": 1,
+   "Chinmay": 1,
+   "Chinmay + Allam": 1,
+   "Allam": 1,
+   "Dinesh + Qossai": 1,
+   "Chinmay + Qossai": 1,
+   "Qossai + finance": 1,
+   "Qossai": 1,
+   "Allam + counsel": 1,
+   "Chinmay \u2014 schedule": 1
+  },
+  "openIds": [
+   "CF-21",
+   "CF-35",
+   "CF-64",
+   "CF-127",
+   "CF-133",
+   "CF-140",
+   "CF-161",
+   "CF-162",
+   "CF-163",
+   "CF-164",
+   "CF-165",
+   "CF-166"
+  ]
+ },
+ "stores": [
+  "derived",
+  "postgres",
+  "postgres-analytical",
+  "qdrant",
+  "redis"
+ ],
+ "openQuestions": [
+  {
+   "id": "CF-64",
+   "what": "Retention. Determines the database topology and is the most expensive open item to answer late."
+  },
+  {
+   "id": "CF-100",
+   "what": "Agent hours for the conversation queue. Blocks go-live, not build."
+  },
+  {
+   "id": "ADR-0021",
+   "what": "The embedding model, gated on a benchmark. The architecture holds whichever wins."
+  }
+ ]
+}

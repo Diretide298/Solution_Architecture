@@ -1,0 +1,81 @@
+$schema: ./_schema.yaml
+id: F85
+name: Production is planned, costed and released
+actor: supervisor
+capability: Production is planned, costed and released
+wave: 2
+frequency: As the venue needs it.
+criticality: operational
+primaryContract: fnb
+contracts:
+- fnb
+- inventory
+- ai
+platforms:
+- P08
+trigger:
+  description: A central kitchen decides what to make tomorrow.
+offlineBehaviour: Planning needs the network. A forecast is not a local computation.
+steps:
+- step: 1
+  screen: BO-136
+  action: F&B Global Settings & Controls.
+  operations:
+  - buildProductionPlan
+  - listProductionRuns
+  - releaseProductionPlan
+  outcome: '**Drawn by the client as FNB-2M.** 3 operations on this step.'
+- step: 2
+  screen: BO-137
+  action: Recipe Consumption & Theoretical Inventory.
+  operations:
+  - getProductionRun
+  - listProductionRuns
+  outcome: '**Drawn by the client as FNB-2F.** 2 operations on this step.'
+  crossesDevice: true
+- step: 3
+  screen: BO-008
+  action: Product Detail & Variants.
+  operations:
+  - getProduct
+  - listProductVariants
+  - setProductAttributes
+  - updateProduct
+  outcome: '**Drawn by the client as FNB-2D.** 4 operations on this step.'
+  crossesDevice: true
+- step: 4
+  screen: BO-007
+  action: Product Directory.
+  operations:
+  - bulkUpdateProducts
+  - createMerchandise
+  - createProduct
+  - getProduct
+  outcome: '**Drawn by the client as FNB-2C.** 4 operations on this step.'
+- step: 5
+  screen: BO-045
+  action: Menu Management.
+  operations:
+  - createMenu
+  - setMenuSections
+  - verifyAllergens
+  outcome: '**Drawn by the client as FNB-2B.** 3 operations on this step.'
+  crossesDevice: true
+branches:
+- at: 1
+  condition: A step in the chain is not licensed for this tenant.
+  behaviour: '**The chain stops at the module boundary.** `requiresModule` on each screen decides —
+    a tenant without the retail licence does not see the retail half, and the journey is shorter rather
+    than broken.'
+  severity: medium
+  resolvedBy: getModuleEnablement
+exitStates:
+- state: completed
+  description: The chain ran as the client drew it.
+- state: stoppedAtModule
+  description: '**A licence boundary, not a failure.**'
+notes: '**F&B board 2, the three newest frames.** `buildProductionPlan` and `releaseProductionPlan`
+  were built 24 August and this is their first walk. **Derived from the client''s own `GOES TO` edges**,
+  not from an inferred path — a pair of frames the client linked is evidence; a chain assembled from
+  unrelated pairs is a guess.'
+openQuestions: null

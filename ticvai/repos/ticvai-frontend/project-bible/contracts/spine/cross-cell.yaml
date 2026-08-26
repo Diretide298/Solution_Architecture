@@ -1,0 +1,938 @@
+openapi: 3.1.0
+info:
+  title: TICVAI Cross-Cell
+  version: 0.1.0
+  x-ticvai-screen-count: 5
+  x-ticvai-tier: spine
+  x-ticvai-module: "Cross-cutting — multi-region"
+  x-ticvai-capabilities: [C56, C37]
+  x-ticvai-platforms:
+    - "Control Plane"
+    - "cell-to-cell"
+  description: >
+    ## What this contract covers
+
+    **Makes a multi-region tenant behave as one platform without moving personal data.**
+
+    | | |
+    |---|---|
+    | **Tier** | spine |
+    | **Matrix domain** | Cross-cutting — multi-region |
+    | **Capabilities** | C56, C37 |
+    | **Consumed by** | Control Plane · cell-to-cell |
+
+    ## How to read this file
+
+    **This file is a contract.** It is hand-authored and it is the source of truth for one
+    bounded context: server code, client code and mock servers are generated from it, never
+    the other way round. If a field is not here, it does not exist.
+
+    **Contracts are split into two tiers.**
+
+    - **Spine** — the eight contexts everything else depends on: tenancy, identity,
+      catalogue, orders, shift, access, finance, cross-cell. Frozen first. A change here
+      requires a formal change request, because every satellite has pinned against it.
+    - **Satellite** — a domain that builds on the spine and can move independently.
+      Cheaper to change.
+
+    **`paths` are operations.** Each one declares four TICVAI extensions, and Redocly
+    rejects any that does not:
+
+    | Extension | Answers |
+    |---|---|
+    | `x-ticvai-permission` | Which permission the caller needs. From one enum in `shared/permissions.yaml` — never hand-typed |
+    | `x-ticvai-scope-level` | Where in the seven-level hierarchy that permission must be held |
+    | `x-ticvai-offline-capable` | Whether a disconnected terminal may queue this |
+    | `x-ticvai-conflict-policy` | How a replayed operation resolves — `append`, `serverWins`, `manual` |
+
+    Where `x-ticvai-permission` is null, one of these says why: `x-ticvai-auth: service`
+    (cell-to-cell), `x-ticvai-self-scoped` (acts only on the caller's own resources), or
+    `security: []` (genuinely public).
+
+    **`components.schemas` are API schemas — the shape of data on the wire.** They are not
+    database tables. One API schema may become three columns (`Money`) or five tables
+    (`Order`); some have no table at all (`ValidationResult`, `TrialBalance`). Roughly 70%
+    of the DDL derives from these, and the rest — partitioning, RLS, the PII split — is
+    storage design that lives in the migration scripts.
+
+    **Where a schema maps to storage, `x-ticvai-persistence` says so.** The value is a table
+    name, a list of tables, or `none` with a reason. It is documentation of the mapping, not
+    a generator input — the DDL lives in versioned SQL migrations, because partitioning, RLS
+    policies, `ltree` indexes and partial indexes have no expression in OpenAPI.
+
+    **`security` arrays hold OAuth scopes.** Empty means "this scheme, no scopes" — for
+    bearer tokens there is nothing to list. Empty is not the same as absent: absent means
+    unauthenticated.
+
+
+    ## This context
+
+    Entitlements, wallets, memberships and guest identity span cells (ADR-0010). Under
+    cell-per-region (ADR-0014) this is the normal path for any multi-region tenant, not an
+    exception — which is why it is Wave 1.
+
+    Three mechanisms, and one rule that governs all of them.
+
+    **The rule: only a pseudonymous `guestLinkId` crosses a cell boundary.** No name, email,
+    phone, document number, date of birth or biometric template. Each cell holds its own
+    Subject record with its own personal data, referenced locally. Linking is an explicit
+    consented guest action, and that consent record is the transfer basis.
+
+    **Guest Link Registry** — Control Plane. Maps a pseudonymous link to the cells holding a
+    local record.
+
+    **Redemption delegation** — the selling cell owns the order and the entitlement.
+    Consuming cells receive a narrow redemption right carrying only what a gate needs.
+    Redemption is authoritative in the consuming cell and reconciled back, exactly as an
+    offline scan is authoritative on the device. The gate must work when the inter-cell link
+    is down.
+
+    **Wallet authorisation** — a single authoritative balance in the home cell. Split
+    balances double-spend. Cross-cell spend is a synchronous hold-and-capture, with a
+    bounded pre-authorised allocation as the link-down fallback.
+
+    Orders never span cells. What propagates is the right, not the order.
+
+servers:
+  - url: https://{controlPlaneHost}/api/v1
+    description: Guest Link Registry and DSAR orchestration
+    variables:
+      controlPlaneHost:
+        default: control.ticvai.local
+  - url: https://{cellHost}/api/v1
+    description: Redemption and wallet operations, cell-scoped
+    variables:
+      cellHost:
+        default: cell.ticvai.local
+
+security:
+  - bearerAuth: []
+
+# Cell-to-cell operations use serviceAuth and are marked per operation. There is no user
+# in those calls, so the permission model does not apply — mTLS plus a cell-identity token
+# does. See common.yaml securitySchemes.
+
+tags:
+  - name: guestLink
+  - name: redemption
+  - name: wallet
+  - name: dsar
+
+paths:
+  # ------------------------------------------------------------ guest links
+  /guest-links:
+    post:
+      operationId: createGuestLink
+      x-ticvai-audience: [service]
+      security:
+        - serviceAuth: []
+      summary: Link a guest's records across cells
+      description: >
+        Requires explicit recorded consent. The consent version is retained as the transfer
+        basis and is surfaced to the guest before the link is created.
+
+        Creating a link never transfers personal data. It records that two cells each hold a
+        record for the same person, and nothing more.
+
+        A guest who never transacts across regions never acquires a link.
+      tags: [guestLink]
+      x-ticvai-permission: null   # service-to-service. See x-ticvai-auth
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/CreateGuestLinkRequest' }
+      responses:
+        '201':
+          description: Linked
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/GuestLink' }
+        '400': { $ref: '../shared/common.yaml#/components/responses/BadRequest' }
+        '403':
+          description: Consent absent or expired
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+        '409':
+          description: The subject in the target cell is already linked to a different guest
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /guest-links/{guestLinkId}:
+    parameters:
+      - name: guestLinkId
+        in: path
+        required: true
+        schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+    get:
+      operationId: getGuestLink
+      x-ticvai-consumed-by:
+        - "P02 GST-015 Memberships"
+      x-ticvai-audience: [service]
+      x-ticvai-read-routing: replica
+      security:
+        - serviceAuth: []
+      summary: Read a guest link
+      description: >
+        Returns which cells hold a record and the home cell. **Never returns personal data**
+        — that is what makes this safe to serve from the Control Plane.
+      tags: [guestLink]
+      x-ticvai-permission: null   # service-to-service. See x-ticvai-auth
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '200':
+          description: Link
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/GuestLink' }
+        '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
+
+    delete:
+      operationId: revokeGuestLink
+      x-ticvai-audience: [service]
+      security:
+        - serviceAuth: []
+      summary: Sever a link on consent withdrawal
+      description: >
+        Entitlements already redeemed are unaffected — they happened. Un-redeemed delegated
+        rights are revoked in every consuming cell and refunded per policy.
+      tags: [guestLink]
+      x-ticvai-permission: null   # service-to-service. See x-ticvai-auth
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [reason]
+              properties:
+                reason:
+                  type: string
+                  enum: [consentWithdrawn, guestRequest, erasure, administrative]
+      responses:
+        '200':
+          description: Severed. Reports rights revoked per cell.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [revokedRights]
+                properties:
+                  revokedRights:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        cellName: { type: string }
+                        count: { type: integer }
+        '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
+
+  /guest-links/resolve:
+    get:
+      operationId: resolveGuestLink
+      x-ticvai-audience: [service]
+      x-ticvai-read-routing: replica
+      security:
+        - serviceAuth: []
+      summary: Find the link for a local subject
+      description: >
+        Called by a cell holding a local subject that needs to know whether the guest exists
+        elsewhere — for example before offering a cross-region product.
+      tags: [guestLink]
+      x-ticvai-permission: null   # service-to-service. See x-ticvai-auth
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - name: cellName
+          in: query
+          required: true
+          schema: { type: string }
+        - name: localSubjectId
+          in: query
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        '200':
+          description: Link, or empty when unlinked
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  link: { $ref: '#/components/schemas/GuestLink' }
+        '404':
+          description: No link exists for this subject
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  # ------------------------------------------------------------ redemption
+  /redemption-rights:
+    post:
+      operationId: propagateRedemptionRight
+      x-ticvai-consumed-by:
+        - "P09 ADM-003 Cross-Tenant Health Dashboard"
+      x-ticvai-audience: [service]
+      security:
+        - serviceAuth: []
+      summary: Propagate a right from the issuing cell to a consuming cell
+      description: >
+        Cell-to-cell. Called by the issuing cell after an order completes for a product
+        valid in another region.
+
+        The projection is deliberately narrow — validity window, admission profile,
+        entitlement counters, and the pseudonymous link. Enough for a gate, nothing more.
+      tags: [redemption]
+      x-ticvai-permission: null   # service-to-service. See x-ticvai-auth
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: append
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/PropagateRightRequest' }
+      responses:
+        '201':
+          description: Right accepted
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/RedemptionRight' }
+        '400': { $ref: '../shared/common.yaml#/components/responses/BadRequest' }
+        '409':
+          description: Right already propagated. Idempotent — returns the existing right.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/RedemptionRight' }
+
+  /redemption-rights/{rightId}:
+    parameters:
+      - name: rightId
+        in: path
+        required: true
+        schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+    get:
+      operationId: getRedemptionRight
+      x-ticvai-consumed-by:
+        - "P07 SCN-011 Delegated right"
+        - "P09 ADM-003 Cross-Tenant Health Dashboard"
+      x-ticvai-audience: [staff]
+      x-ticvai-read-routing: replica
+      summary: Read a redemption right
+      tags: [redemption]
+      x-ticvai-permission: TICKET_LOOKUP
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: true
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '200':
+          description: Right
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/RedemptionRight' }
+        '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
+
+    delete:
+      operationId: revokeRedemptionRight
+      x-ticvai-audience: [service]
+      security:
+        - serviceAuth: []
+      summary: Revoke a right
+      description: Called by the issuing cell on refund, cancellation or link severance.
+      tags: [redemption]
+      x-ticvai-permission: null   # service-to-service. See x-ticvai-auth
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      responses:
+        '204': { description: Revoked }
+        '409':
+          description: >
+            Already fully consumed. Revocation cannot undo a redemption that has happened —
+            the guest was admitted.
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /redemption-rights/{rightId}/consume:
+    parameters:
+      - name: rightId
+        in: path
+        required: true
+        schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+    post:
+      operationId: consumeRedemptionRight
+      x-ticvai-consumed-by:
+        - "P07 SCN-003 Ready to scan"
+        - "P07 SCN-011 Delegated right"
+      x-ticvai-audience: [staff]
+      summary: Consume entries against a right, locally authoritative
+      description: >
+        Called by the consuming cell when a gate admits. **Authoritative locally** — it does
+        not call the issuing cell first, because the gate must work when the inter-cell link
+        is down.
+
+        Consumption is reported back through the reconciliation endpoint. If the issuing cell
+        later reports a conflicting count, the divergence is surfaced rather than silently
+        resolved: the guest was already admitted, and the ledger records what happened.
+      tags: [redemption]
+      x-ticvai-permission: ACCESS_VALIDATE
+      x-ticvai-scope-level: workstation
+      x-ticvai-offline-capable: true
+      x-ticvai-conflict-policy: append
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [id, entries, scanId, recordedAt]
+              properties:
+                id: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+                entries: { type: integer, minimum: 1 }
+                scanId: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+                recordedAt: { type: string, format: date-time }
+      responses:
+        '200':
+          description: Consumed
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/RedemptionRight' }
+        '409':
+          description: Entries exhausted, or the right is revoked or outside its window
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /redemption-rights/reconcile:
+    post:
+      operationId: reconcileRedemptions
+      x-ticvai-consumed-by:
+        - "P09 ADM-003 Cross-Tenant Health Dashboard"
+      x-ticvai-audience: [service]
+      security:
+        - serviceAuth: []
+      summary: Report consumption back to the issuing cell
+      description: >
+        Batched, ordered, idempotent. Runs continuously while the link is up and catches up
+        after an outage.
+
+        Divergences are returned, not resolved. A right consumed in two cells during a
+        partition is a real event that needs a human decision, not a silent winner.
+      tags: [redemption]
+      x-ticvai-permission: null   # service-to-service. See x-ticvai-auth
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: append
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [consumingCellName, consumptions]
+              properties:
+                consumingCellName: { type: string }
+                consumptions:
+                  type: array
+                  maxItems: 500
+                  items:
+                    type: object
+                    required: [rightId, totalConsumed, lastConsumedAt]
+                    properties:
+                      rightId: { type: string }
+                      totalConsumed: { type: integer }
+                      lastConsumedAt: { type: string, format: date-time }
+      responses:
+        '200':
+          description: Reconciled
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [accepted, divergences]
+                properties:
+                  accepted: { type: integer }
+                  divergences:
+                    type: array
+                    description: >
+                      Rights where the issuing cell's count and the consuming cell's count
+                      disagree. Surfaced for review, never auto-resolved.
+                    items:
+                      type: object
+                      properties:
+                        rightId: { type: string }
+                        issuerCount: { type: integer }
+                        consumerCount: { type: integer }
+                        detail: { type: string }
+
+  # ------------------------------------------------------------ wallet
+  /wallet-authorisations:
+    post:
+      operationId: authoriseWalletSpend
+      x-ticvai-audience: [staff]
+      summary: Hold funds against the guest's home-cell balance
+      description: >
+        The card-authorisation pattern. Called by a consuming cell before accepting wallet
+        tender for a guest whose home cell is elsewhere.
+
+        The balance is single and authoritative in the home cell. **Split balances
+        double-spend**, which is why this is a synchronous hold rather than a replicated
+        figure.
+
+        When the inter-cell link is down, the consuming cell draws against its bounded
+        allocation instead — see `/wallet-allocations`.
+      tags: [wallet]
+      x-ticvai-permission: ORDER_CREATE
+      x-ticvai-scope-level: workstation
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/AuthoriseWalletRequest' }
+      responses:
+        '201':
+          description: Held
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/WalletAuthorisation' }
+        '402':
+          description: Insufficient balance
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+        '409':
+          description: Guest link severed, or the wallet is suspended
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+        '503':
+          description: >
+            Home cell unreachable. The caller falls back to its allocation if one is
+            configured, or declines wallet tender.
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /wallet-authorisations/{authorisationId}/capture:
+    parameters:
+      - name: authorisationId
+        in: path
+        required: true
+        schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+    post:
+      operationId: captureWalletAuthorisation
+      x-ticvai-audience: [staff]
+      summary: Capture a held amount
+      description: >
+        Capture may be less than the hold — a partial capture releases the remainder.
+      tags: [wallet]
+      x-ticvai-permission: ORDER_CREATE
+      x-ticvai-scope-level: workstation
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [amount, orderId]
+              properties:
+                amount: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+                orderId: { type: string }
+      responses:
+        '200':
+          description: Captured
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/WalletAuthorisation' }
+        '409':
+          description: Hold expired, already captured, or capture exceeds the hold
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /wallet-authorisations/{authorisationId}/release:
+    parameters:
+      - name: authorisationId
+        in: path
+        required: true
+        schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+    post:
+      operationId: releaseWalletAuthorisation
+      x-ticvai-audience: [staff]
+      summary: Release a hold without capturing
+      tags: [wallet]
+      x-ticvai-permission: ORDER_CREATE
+      x-ticvai-scope-level: workstation
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      responses:
+        '200':
+          description: Released
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/WalletAuthorisation' }
+
+  /wallet-allocations:
+    get:
+      operationId: getWalletAllocation
+      x-ticvai-audience: [staff]
+      x-ticvai-read-routing: primary   # cross-cell wallet authorisation. Stale means double-spend across cells
+      summary: The consuming cell's bounded offline allocation
+      description: >
+        A pre-authorised amount the consuming cell may draw against when the home cell is
+        unreachable. Bounded, so exposure is capped.
+
+        Set to zero, wallet spend simply fails during a link outage — which some tenants
+        will prefer to any exposure at all.
+      tags: [wallet]
+      x-ticvai-permission: ORDER_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: true
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - name: guestLinkId
+          in: query
+          required: true
+          schema: { type: string }
+      responses:
+        '200':
+          description: Allocation
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/WalletAllocation' }
+
+    put:
+      operationId: setWalletAllocationPolicy
+      x-ticvai-audience: [staff]
+      x-ticvai-config-scope: region
+      summary: Set the allocation cap policy
+      tags: [wallet]
+      x-ticvai-permission: REGION_CONFIGURE
+      x-ticvai-scope-level: region
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [mode]
+              properties:
+                mode:
+                  type: string
+                  enum: [none, fixed, percentageOfBalance]
+                  description: >
+                    `none` declines wallet tender when the link is down. Safest, and the
+                    right default until a tenant asks otherwise.
+                fixedAmount: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+                percentage: { type: number, minimum: 0, maximum: 100 }
+      responses:
+        '200':
+          description: Policy set
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/WalletAllocation' }
+
+  # ------------------------------------------------------------ dsar
+  /dsar/requests:
+    post:
+      operationId: createDsarRequest
+      x-ticvai-audience: [service]
+      security:
+        - serviceAuth: []
+      summary: Raise a data subject request across every linked cell
+      description: >
+        Orchestrated from the Control Plane by `guestLinkId`, fanning out to each linked
+        cell. A guest linked across cells exists in both; a request served from one cell
+        would be incomplete.
+
+        Erasure deletes each cell's personal data record and severs the link. Ledger entries
+        retain their opaque subject reference and stay intact — which is how an append-only
+        ledger and an erasure obligation coexist.
+      tags: [dsar]
+      x-ticvai-permission: null   # service-to-service. See x-ticvai-auth
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [guestLinkId, kind]
+              properties:
+                guestLinkId: { type: string }
+                kind:
+                  type: string
+                  enum: [access, rectification, erasure, portability, restriction]
+                requestedBy: { type: string, maxLength: 200 }
+                note: { type: string, maxLength: 1000 }
+      responses:
+        '202':
+          description: Accepted. Fan-out proceeds asynchronously.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/DsarRequest' }
+
+  /dsar/requests/{requestId}:
+    parameters:
+      - name: requestId
+        in: path
+        required: true
+        schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+    get:
+      operationId: getDsarRequest
+      x-ticvai-audience: [service]
+      x-ticvai-read-routing: replica
+      security:
+        - serviceAuth: []
+      summary: Track fan-out progress per cell
+      tags: [dsar]
+      x-ticvai-permission: null   # service-to-service. See x-ticvai-auth
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '200':
+          description: Status
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/DsarRequest' }
+        '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
+
+components:
+  schemas:
+    GuestLink:
+      x-ticvai-persistence: "platform.guest_link"
+      type: object
+      required: [guestLinkId, homeCellName, linkedCells, consentVersion, linkedAt]
+      properties:
+        guestLinkId:
+          type: string
+          pattern: '^[0-9A-HJKMNP-TV-Z]{26}$'
+          description: >
+            Pseudonymous. Not derived from any personal data. This is the only identifier
+            that crosses a cell boundary.
+        homeCellName:
+          type: string
+          description: >
+            Cell of first registration. Authoritative for the wallet balance.
+        linkedCells:
+          type: array
+          items:
+            type: object
+            required: [cellName, linkedAt]
+            properties:
+              cellName: { type: string }
+              linkedAt: { type: string, format: date-time }
+        consentVersion:
+          type: string
+          description: >
+            Version of the consent notice shown when the link was created. Retained as the
+            transfer basis.
+        linkedAt: { type: string, format: date-time }
+        revokedAt: { type: string, format: date-time, nullable: true }
+
+    CreateGuestLinkRequest:
+      type: object
+      required: [homeCellName, homeSubjectId, targetCellName, targetSubjectId, consentVersion]
+      properties:
+        homeCellName: { type: string }
+        homeSubjectId:
+          type: string
+          format: uuid
+          description: Local subject id in the home cell. Never leaves that cell beyond this call.
+        targetCellName: { type: string }
+        targetSubjectId: { type: string, format: uuid }
+        consentVersion: { type: string }
+        consentedAt: { type: string, format: date-time }
+
+    RedemptionRight:
+      x-ticvai-persistence: "platform.redemption_right"
+      type: object
+      required: [rightId, ticketId, issuingCellName, consumingCellName, validFrom, validTo, entriesAllowed, entriesConsumed, status]
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+          description: >
+            **Added 20 August.** The schema reference derives table columns from API response schemas, and a response is not a table — this one returned everything a caller needs and not the row's own identity, so the table had no key and no row could be addressed, updated or deleted. Found by an audit of all 365 tables, not by a reader.
+        rightId: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+        ticketId: { type: string }
+        guestLinkId: { type: string, nullable: true }
+        issuingCellName: { type: string }
+        consumingCellName: { type: string }
+        mediaCodes:
+          type: array
+          items: { type: string }
+        validFrom: { type: string, format: date-time }
+        validTo: { type: string, format: date-time }
+        admissionProfileId: { type: string, format: uuid }
+        venueId:
+          type: string
+          format: uuid
+          nullable: true
+          description: Null where the right is valid at any venue in the consuming cell.
+        entriesAllowed: { type: integer, nullable: true, description: Null means unlimited. }
+        entriesConsumed: { type: integer }
+        status:
+          type: string
+          enum: [active, exhausted, revoked, expired]
+        lastConsumedAt: { type: string, format: date-time, nullable: true }
+        lastReconciledAt: { type: string, format: date-time, nullable: true }
+
+    PropagateRightRequest:
+      type: object
+      required: [rightId, ticketId, issuingCellName, validFrom, validTo, admissionProfileId, entriesAllowed]
+      properties:
+        rightId: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+        ticketId: { type: string }
+        guestLinkId: { type: string }
+        issuingCellName: { type: string }
+        mediaCodes:
+          type: array
+          items: { type: string }
+        validFrom: { type: string, format: date-time }
+        validTo: { type: string, format: date-time }
+        admissionProfileId: { type: string, format: uuid }
+        venueId: { type: string, format: uuid }
+        entriesAllowed: { type: integer, nullable: true }
+
+    AuthoriseWalletRequest:
+      type: object
+      required: [id, guestLinkId, amount, expiresInSeconds]
+      properties:
+        id: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+        guestLinkId: { type: string }
+        amount: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+        expiresInSeconds:
+          type: integer
+          minimum: 30
+          maximum: 1800
+          description: >
+            A hold that outlives the sale strands the guest's own funds. Keep it short.
+
+    WalletAuthorisation:
+      x-ticvai-persistence: "platform.wallet_authorisation"
+      type: object
+      required: [authorisationId, guestLinkId, amount, status, createdAt, expiresAt]
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+          description: >
+            **Added 20 August.** The schema reference derives table columns from API response schemas, and a response is not a table — this one returned everything a caller needs and not the row's own identity, so the table had no key and no row could be addressed, updated or deleted. Found by an audit of all 365 tables, not by a reader.
+        authorisationId: { type: string }
+        guestLinkId: { type: string }
+        amount: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+        capturedAmount: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+        status:
+          type: string
+          enum: [held, captured, partiallyCaptured, released, expired]
+        homeCellName: { type: string }
+        consumingCellName: { type: string }
+        orderId: { type: string, nullable: true }
+        createdAt: { type: string, format: date-time }
+        expiresAt: { type: string, format: date-time }
+
+    WalletAllocation:
+      x-ticvai-persistence: "platform.wallet_authorisation"
+      type: object
+      required: [guestLinkId, mode, availableAmount]
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+          description: >
+            **Added 20 August.** The schema reference derives table columns from API response schemas, and a response is not a table — this one returned everything a caller needs and not the row's own identity, so the table had no key and no row could be addressed, updated or deleted. Found by an audit of all 365 tables, not by a reader.
+        guestLinkId: { type: string }
+        mode:
+          type: string
+          enum: [none, fixed, percentageOfBalance]
+        allocatedAmount: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+        drawnAmount: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+        availableAmount: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+        lastToppedUpAt: { type: string, format: date-time, nullable: true }
+
+    DsarRequest:
+      x-ticvai-persistence: "platform.dsar_request"
+      type: object
+      required: [requestId, guestLinkId, kind, status, createdAt, cellResults]
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+          description: >
+            **Added 20 August.** The schema reference derives table columns from API response schemas, and a response is not a table — this one returned everything a caller needs and not the row's own identity, so the table had no key and no row could be addressed, updated or deleted. Found by an audit of all 365 tables, not by a reader.
+        requestId: { type: string }
+        guestLinkId: { type: string }
+        kind:
+          type: string
+          enum: [access, rectification, erasure, portability, restriction]
+        status:
+          type: string
+          enum: [pending, inProgress, completed, partiallyFailed]
+        createdAt: { type: string, format: date-time }
+        completedAt: { type: string, format: date-time, nullable: true }
+        cellResults:
+          type: array
+          items:
+            type: object
+            required: [cellName, status]
+            properties:
+              cellName: { type: string }
+              status:
+                type: string
+                enum: [pending, completed, failed]
+              completedAt: { type: string, format: date-time, nullable: true }
+              error: { type: string, nullable: true }
+
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

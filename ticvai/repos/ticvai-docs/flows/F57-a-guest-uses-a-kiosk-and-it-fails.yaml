@@ -1,0 +1,72 @@
+$schema: ./_schema.yaml
+id: F57
+name: A guest uses a kiosk and it fails
+actor: guest
+capability: Kiosk failure recovery
+wave: 2
+frequency: Routine.
+criticality: revenue
+primaryContract: orders
+contracts:
+- orders
+- identity
+platforms:
+- P05
+trigger:
+  description: A guest is mid-purchase at an unattended machine and something breaks. **Nobody is there.**
+offlineBehaviour: '**A kiosk that loses the network mid-sale is the worst case in the platform** — the
+  guest may have paid and the machine cannot tell.'
+steps:
+- step: 1
+  screen: KSK-006
+  action: They review and confirm.
+  operations:
+  - getCart
+  - checkoutCart
+  outcome: The last point a guest can correct anything alone.
+- step: 2
+  screen: KSK-008
+  action: The payment does not resolve.
+  operations:
+  - inquirePaymentStatus
+  outcome: '**Ask, never retry.** An unattended machine that retries charges twice and nobody notices
+    until the statement.'
+  crossesDevice: true
+- step: 3
+  screen: KSK-010
+  action: Or it resolves and the printer fails.
+  operations:
+  - transferOrderTickets
+  outcome: '**The sale stands.** A paid guest with no ticket must never be told to pay again — the media
+    goes to their phone.'
+  crossesDevice: true
+- step: 4
+  screen: KSK-013
+  action: They call for help.
+  operations:
+  - endKioskAssist
+  outcome: '**One button, always visible.** A guest stuck with no way to summon anybody is a guest who
+    leaves and disputes the charge.'
+branches:
+- at: 2
+  condition: The status cannot be determined at all.
+  behaviour: '**Held as unresolved and a person is called.** The one case where the machine must not
+    decide — F75 branch, and the reason `KSK-008` is its own screen.'
+  severity: high
+  resolvedBy: inquirePaymentStatus
+- at: 4
+  condition: Nobody comes.
+  behaviour: '**The kiosk goes out of service rather than serving the next guest.** A machine that failed
+    one guest and cheerfully takes the next one’s money is a machine failing twice.'
+  severity: high
+  resolvedBy: getTenantAppStatus
+exitStates:
+- state: recovered
+  description: Failed and resolved without staff.
+- state: staffResolved
+  description: A person came.
+- state: outOfService
+  description: '**Withdrawn rather than repeating the failure.**'
+notes: '**Written 24 August.** Every branch is a decision a cashier would otherwise make, and **`KSK-008`
+  and `KSK-010` exist as separate screens precisely because the two failures need different answers.**'
+openQuestions: null

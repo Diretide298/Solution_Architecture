@@ -1,0 +1,187 @@
+id: HIERARCHY
+title: TICVAI scope hierarchy — eight levels
+generatedBy: tools/derive-diagrams.py
+about: '**Where configuration lives.** A venue operator does not have one set of settings — a tenant
+  with four brands across two countries and eleven venues has settings belonging at four different heights,
+  and flattening them means either every venue configures everything from scratch or one change at the
+  top breaks a venue that needed to differ.
+
+
+  `platform.scope_node` is the answer. A node has a `level`, a `parent_id` and a materialised `path`;
+  **configuration resolves by walking that path upward until something answers.**'
+decisions:
+- docs/adr/0011-hierarchy-is-binding.md
+- docs/adr/0018-configuration-scope.md
+spine:
+  table: platform.scope_node
+  columns:
+  - id
+  - level
+  - parent_id
+  - path
+  - code
+  - name
+  - is_active
+  - child_count
+  note: '**The tenancy spine.** **304 of 379 tables anchor on it** and 71 reference it directly — the
+    terminal anchor for almost everything in the package, and the reason a scope walk answers nearly
+    every configuration question.'
+branches:
+  organisational: Who works where. Department, sub-department and workstation carry requisitions, rotas
+    and cost centres.
+  commercial: What is sold where. Only `outlet`, and only F&B and retail resolve against it.
+levels:
+- level: tenant
+  branch: root
+  parent: null
+  operations: 245
+  configurations: 26
+  configuredBy:
+  - claimCustomDomain
+  - createDashboard
+  - createInspectionTemplate
+  - createKnowledgeCollection
+  - createLoyaltyProgramme
+  - createMessageTemplate
+  - getAiPolicy
+  - listIndexSources
+  owns:
+  - Plans and licences
+  - Roles and permissions
+  - Message and inspection templates
+  - Loyalty programmes
+  - Dashboards
+  why: '**The commercial entity, and the level things are bought at.** Plans, licences, roles, message
+    templates and loyalty programmes live here because they are bought here — a role defined at venue
+    level would have to be defined eleven times.'
+- level: brand
+  branch: organisational
+  parent: tenant
+  operations: 2
+  configurations: 0
+  configuredBy: null
+  owns:
+  - Brand identity between company and country
+  why: '**Optional, and it costs nothing when unused.** A tenant operating two cinema brands needs a
+    level between the company and the country; a tenant with one brand never creates a node, and the
+    resolver skips a level that is not there.'
+- level: region
+  branch: organisational
+  parent: brand
+  operations: 46
+  configurations: 8
+  configuredBy:
+  - createSeatMapTemplate
+  - createUpsellRule
+  - listAiProviders
+  - setAccountMappings
+  - setAiProvider
+  - setFxRate
+  - setWalletAllocationPolicy
+  - updateRegionSettings
+  owns:
+  - Currency and decimal scale
+  - Tax authority
+  - Timezone
+  - Fiscal year
+  - AI provider and seat-map templates
+  why: '**The level most often got wrong.** Currency, decimal scale, timezone and fiscal year are not
+    venue settings and are **not overridable below** — a platform that lets one venue pick a different
+    decimal scale has produced a ledger that cannot be consolidated (ADR-0018).'
+- level: venue
+  branch: organisational
+  parent: region
+  operations: 675
+  configurations: 29
+  configuredBy:
+  - configureQueueFeed
+  - configureWorkstation
+  - createAdmissionProfile
+  - createDonationCampaign
+  - createEntitlementTemplate
+  - createResource
+  - createSaleBoard
+  - createVenueMap
+  owns:
+  - Almost everything operational
+  - Kitchen SLA and section layout
+  - Venue map
+  - Substitution rules
+  - Message triggers
+  why: '**Two thirds of all operations scope here, and that is the correct shape.** A venue is the unit
+    a guest visits, a shift is worked at and stock is held in. It is the platform''s default, and a
+    reader who assumes venue scope will be right most of the time.'
+- level: department
+  branch: organisational
+  parent: venue
+  operations: 0
+  configurations: 0
+  configuredBy: null
+  owns:
+  - Requisitions
+  - Rotas
+  - Cost centres
+  why: '**The staffing and budget tree** — who works where and whose budget it comes out of.'
+- level: subDepartment
+  branch: organisational
+  parent: department
+  operations: 0
+  configurations: 0
+  configuredBy: null
+  owns:
+  - A second tier of the same
+  why: Optional second tier. A venue that does not need two does not create them.
+- level: workstation
+  branch: organisational
+  parent: subDepartment
+  operations: 45
+  configurations: 0
+  configuredBy: null
+  owns:
+  - Configuration profile
+  - Offline policy
+  - Connectivity thresholds
+  - Deposit box
+  why: '**A till is a scope, not just a device.** ADR-0002 makes authorisation user-driven rather than
+    workstation-driven, but the workstation still holds settings a person does not carry with them.'
+- level: outlet
+  branch: COMMERCIAL
+  parent: venue
+  operations: 0
+  configurations: 5
+  configuredBy:
+  - createMenu
+  - setMenuSections
+  - setReturnPolicy
+  - setTableLayout
+  - updateMenu
+  owns:
+  - Menu and menu sections
+  - Table layout
+  - Return policy
+  - Opening hours
+  why: '**A sibling of department, never a child of it** (CF-138, ADR-0018). A department answers *who
+    works where*; an outlet answers *what is sold where*.
+
+
+    **Modelling a restaurant as a department puts it in the staffing tree** — a venue whose restaurant
+    is run by a concession would be describing staff it does not employ.
+
+
+    **Only F&B and retail resolve here.** Everything else has no outlet on its path and resolves from
+    venue exactly as before, which is what made an eighth level cheap enough to add after the hierarchy
+    was already binding.'
+rules:
+- rule: Region settings are not overridable below
+  why: A venue in Dubai and a venue in Abu Dhabi share a currency, a tax authority and a fiscal calendar.
+    **One venue on a different decimal scale is a ledger that cannot consolidate.**
+- rule: An absent level is skipped, not empty
+  why: A tenant with one brand never creates a brand node and the resolver walks past it. **That is
+    what makes an optional level cost nothing.**
+- rule: Outlet is a sibling of department
+  why: The same physical restaurant can be one department and two outlets — a kitchen and a bar — or
+    two departments and one outlet.
+- rule: Venue scope is a default, not a service boundary
+  why: '675 of 1,014 operations are venue-scoped. **`shift` was folded into Tenancy because it is venue-scoped
+    and moved to Order the same day**: scope answers whose configuration this is, schema answers whose
+    data it is.'

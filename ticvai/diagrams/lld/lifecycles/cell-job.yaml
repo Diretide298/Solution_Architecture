@@ -1,0 +1,43 @@
+id: LLD-Cell job
+title: Cell job — 5 transitions
+generatedBy: tools/derive-diagrams.py
+index: diagrams/hld/04-lifecycles.yaml
+source: states/cell-job.yaml
+entity: Cell job
+contract: subscription
+enum: CellJob.status
+enumKind: inline
+enumSchema: CellJob
+enumProperty: status
+owner: subscription
+initial:
+- queued
+terminal:
+- completed
+- failed
+- rolledBack
+transitions:
+- from: queued
+  to: running
+  trigger: job
+  guard: Picked up
+- from: running
+  to: completed
+  trigger: job
+  guard: Done
+- from: running
+  to: failed
+  trigger: job
+  guard: '**The cell is left in a known state** — a job that fails halfway and reports nothing is worse
+    than one that fails loudly'
+- from: failed
+  to: rolledBack
+  trigger: job
+  guard: Reversed where reversible
+- from: failed
+  to: queued
+  trigger: job
+  guard: Retried
+  isReversal: true
+notes: Provisioning, migration and configuration work against a single cell. **Idempotent by requirement**
+  — a retried job must not double-apply.

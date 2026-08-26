@@ -1,0 +1,79 @@
+$schema: ./_schema.yaml
+id: F70
+name: A guest needs help and something is lost
+actor: supervisor
+capability: Guest assistance
+wave: 2
+frequency: Routine.
+criticality: operational
+primaryContract: marketing-crm
+contracts:
+- marketing-crm
+- venue-map
+- workforce
+platforms:
+- P06
+trigger:
+  description: A guest approaches a member of staff. **They are lost, they lost something, or something
+    went wrong.**
+offlineBehaviour: '**The map works offline; the case does not.** A venue map is cached because a guest
+  asking for directions is the most common question in a building with poor signal.'
+steps:
+- step: 1
+  screen: EMP-029
+  action: The steward opens guest assistance.
+  operations:
+  - listCases
+  - getCase
+  outcome: '**Any existing case first.** A guest asking twice about the same thing should not be asked
+    to explain it twice.'
+- step: 2
+  screen: EMP-030
+  action: They show the guest where to go.
+  operations:
+  - getVenueMap
+  - getVenueMapLive
+  - listDiningOutlets
+  outcome: '**`getVenueMapLive` carries closures and queues.** A map showing an outlet that shut an
+    hour ago sends the guest to a locked door.'
+  crossesDevice: true
+- step: 3
+  screen: EMP-028
+  action: A lost item is logged.
+  operations:
+  - createCase
+  - addCaseMessage
+  outcome: '**Lost and found is a case, not a separate register.** The guest who lost it and the guest
+    who found it are both in a conversation.'
+  crossesDevice: true
+- step: 4
+  screen: EMP-028
+  action: It is matched and returned.
+  operations:
+  - updateCase
+  - addCaseMessage
+  outcome: '**Closed with the guest told**, not closed silently. A case resolved without a message is
+    a guest still waiting.'
+branches:
+- at: 3
+  condition: The item is high value or identity documents.
+  behaviour: Escalated immediately. **A passport in lost property is a different problem from an umbrella**,
+    and the escalation path is the case one.
+  severity: high
+  resolvedBy: escalateCase
+- at: 4
+  condition: The guest has left the venue.
+  behaviour: '**The case stays open and reaches them by the channel they consented to.** A found item
+    and no consent to contact is a real limit, and the case records that rather than hiding it.'
+  severity: medium
+  resolvedBy: addCaseMessage
+exitStates:
+- state: resolved
+  description: Guest helped, case closed with a message.
+- state: escalated
+  description: High-value or sensitive.
+- state: openAfterVisit
+  description: '**The guest left and the case follows them.**'
+notes: '**Written 24 August.** `EMP-030` — the venue map — declared `getRefundPolicy` and `setRefundPolicy`.
+  **A map that could rewrite a refund policy.** Removed.'
+openQuestions: null

@@ -1,0 +1,4498 @@
+id: LLD-P08
+title: P08 Venue Management — Back Office — 143 screens
+generatedBy: tools/derive-diagrams.py
+index: diagrams/hld/00-platform.yaml
+audience: staff
+operator: venue
+app: venue-management-web
+formFactor: web
+runtime: reactWeb
+offlineCapable: false
+deployment:
+  target: browser, desktop
+  distribution: served from the cell
+  bundleUpdate: immediate on deploy
+  hosting: in-cell, in-region
+  storeReview: false
+  deviceOwnership: venue-owned workstation
+  networkAssumption: venue LAN
+  releaseCadence: weekly
+why: null
+modulesUsed:
+- module: core
+  screens: 46
+- module: ticketing
+  screens: 32
+- module: fnb
+  screens: 16
+- module: inventory
+  screens: 10
+- module: marketing
+  screens: 6
+- module: access
+  screens: 6
+- module: analytics
+  screens: 6
+- module: queue
+  screens: 5
+- module: maintenance
+  screens: 5
+- module: resources
+  screens: 5
+- module: seating
+  screens: 3
+- module: retail
+  screens: 2
+- module: ai
+  screens: 1
+servicesCalled:
+- service: OrderService
+  operationCalls: 161
+- service: CatalogueService
+  operationCalls: 151
+- service: VenueOpsService
+  operationCalls: 110
+- service: TenancyService
+  operationCalls: 107
+- service: FnbService
+  operationCalls: 68
+- service: InventoryService
+  operationCalls: 61
+- service: ReportingService
+  operationCalls: 55
+- service: LedgerService
+  operationCalls: 53
+- service: AccessService
+  operationCalls: 38
+- service: MarketingService
+  operationCalls: 29
+- service: RetailService
+  operationCalls: 14
+- service: IdentityService
+  operationCalls: 9
+- service: AiService
+  operationCalls: 8
+- service: ControlService
+  operationCalls: 3
+coverage:
+  screens: 143
+  inAFlow: 66
+  drawn: 143
+  note: '**A screen in no flow has been specified and never walked.** Every flow written in this package
+    has found a defect.'
+screens:
+- screen: BO-001
+  name: Queue Directory
+  module: Access & Venue
+  requiresModule: queue
+  wave: 1
+  density: compact
+  operations:
+  - callNextParties
+  - configureQueueFeed
+  - createEvent
+  - createPerformances
+  - createQueue
+  - getEvent
+  - getQueue
+  - getQueueFeedHealth
+  - getWaitTimes
+  - listEvents
+  - listPerformances
+  - listQueueEntries
+  - listQueueFeeds
+  - listQueues
+  - setQueueStatus
+  - setWaitTime
+  - testQueueFeed
+  - updateEvent
+  - updateQueue
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - eventId<-deepLink
+  - feedId<-deepLink
+  - queueId<-deepLink
+  goesTo:
+  - BO-002
+  - BO-003
+  - BO-004
+  - BO-005
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-001
+  inFlows:
+  - F09 Event is cancelled and refunded
+- screen: BO-002
+  name: Queue Configuration
+  module: Access & Venue
+  requiresModule: queue
+  wave: 1
+  density: compact
+  operations:
+  - callNextParties
+  - cancelPerformance
+  - createQueue
+  - getPerformance
+  - getQueue
+  - getSeatAvailability
+  - getWaitTimes
+  - listQueueEntries
+  - listQueues
+  - recommendSeats
+  - setQueueStatus
+  - setWaitTime
+  - updatePerformance
+  - updateQueue
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - performanceId<-BO-001
+  - queueId<-BO-001
+  goesTo:
+  - BO-001
+  - BO-003
+  - BO-004
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-002
+  inFlows:
+  - F09 Event is cancelled and refunded
+- screen: BO-003
+  name: Queue Integration Setup
+  module: Access & Venue
+  requiresModule: queue
+  wave: 1
+  density: compact
+  operations:
+  - configureQueueFeed
+  - getQueueFeedHealth
+  - listQueueFeeds
+  - testQueueFeed
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - feedId<-BO-001
+  - orderId<-deepLink
+  - venueId<-session
+  goesTo:
+  - BO-001
+  - BO-002
+  - BO-004
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-003
+  inFlows: null
+- screen: BO-004
+  name: Manual Wait Time Entry
+  module: Access & Venue
+  requiresModule: queue
+  wave: 1
+  density: compact
+  operations:
+  - approveRefund
+  - callNextParties
+  - createBulkRefund
+  - createQueue
+  - getQueue
+  - getWaitTimes
+  - listQueueEntries
+  - listQueues
+  - setQueueStatus
+  - setWaitTime
+  - updateQueue
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - queueId<-BO-001
+  - refundId<-deepLink
+  goesTo:
+  - BO-001
+  - BO-002
+  - BO-003
+  - BO-005
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-004
+  inFlows:
+  - F09 Event is cancelled and refunded
+- screen: BO-005
+  name: Queue Monitor
+  module: Access & Venue
+  requiresModule: marketing
+  wave: 1
+  density: compact
+  operations:
+  - callNextParties
+  - createCampaign
+  - createQueue
+  - getCampaign
+  - getCampaignPerformance
+  - getQueue
+  - getWaitTimes
+  - launchCampaign
+  - listCampaigns
+  - listQueueEntries
+  - listQueues
+  - pauseCampaign
+  - setQueueStatus
+  - setWaitTime
+  - stopCampaign
+  - testSendCampaign
+  - unscheduleCampaign
+  - updateCampaign
+  - updateQueue
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - campaignId<-deepLink
+  - queueId<-BO-001
+  goesTo:
+  - BO-001
+  - BO-002
+  - BO-003
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-005
+  inFlows:
+  - F09 Event is cancelled and refunded
+  - F21 A ride queue fills and a guest is redirected
+- screen: BO-006
+  name: Parking Configuration
+  module: Access & Venue
+  requiresModule: access
+  wave: 2
+  density: compact
+  operations:
+  - listAccessPoints
+  - listParkingFacilities
+  - setParkingFacility
+  - updateAccessPoint
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - accessPointId<-deepLink
+  goesTo:
+  - BO-001
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-006
+  inFlows: null
+- screen: BO-007
+  name: Product Directory
+  module: Sell
+  requiresModule: ticketing
+  wave: 1
+  density: compact
+  operations:
+  - bulkUpdateProducts
+  - createMerchandise
+  - createProduct
+  - getProduct
+  - listAlternativeCodes
+  - listMenus
+  - listMerchandise
+  - listProductVariants
+  - listProducts
+  - resolveProductByCode
+  - setAlternativeCodes
+  - setProductAttributes
+  - transitionProductLifecycle
+  - updateProduct
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - productId<-deepLink
+  goesTo:
+  - BO-001
+  - BO-008
+  - BO-009
+  - BO-010
+  boardFrames:
+  - FNB-2C
+  - RET-2A
+  - RET-2B
+  wireframe: wireframes/Retail Board 2.dc.html#ret-2a
+  inFlows:
+  - F78 A supplier is set up and a catalogue is priced and published
+  - F85 Production is planned, costed and released
+  - F93 A recipe changes and its allergen claim is re-verified
+- screen: BO-008
+  name: Product Detail & Variants
+  module: Orders & Money
+  requiresModule: ticketing
+  wave: 1
+  density: compact
+  operations:
+  - getProduct
+  - listProductVariants
+  - setProductAttributes
+  - updateProduct
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - venueId<-session
+  - productId<-deepLink
+  goesTo:
+  - BO-001
+  - BO-007
+  - BO-009
+  - BO-010
+  boardFrames:
+  - FNB-2D
+  - RET-2C
+  wireframe: wireframes/Retail Board 2.dc.html#ret-2c
+  inFlows:
+  - F10 Partner books, uses and settles
+  - F85 Production is planned, costed and released
+  - F93 A recipe changes and its allergen claim is re-verified
+- screen: BO-009
+  name: Pricing Rules
+  module: Sell
+  requiresModule: ticketing
+  wave: 1
+  density: compact
+  operations:
+  - copyPriceList
+  - createPriceList
+  - getPriceList
+  - listPriceLists
+  - listPrices
+  - setPrices
+  - updatePriceList
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - priceListId<-deepLink
+  goesTo:
+  - BO-001
+  - BO-007
+  - BO-008
+  - BO-010
+  boardFrames:
+  - RET-2F
+  wireframe: wireframes/Retail Board 2.dc.html#ret-2f
+  inFlows:
+  - F78 A supplier is set up and a catalogue is priced and published
+- screen: BO-010
+  name: Promotions & Coupons
+  module: Sell
+  requiresModule: ticketing
+  wave: 2
+  density: compact
+  operations:
+  - analysePromotionConflicts
+  - createCouponCampaign
+  - createPromotion
+  - endPromotion
+  - evaluatePromotions
+  - generateCouponCodes
+  - getDashboard
+  - getPromotion
+  - getPromotionUsage
+  - listCouponCampaigns
+  - listCouponCodes
+  - listPromotions
+  - pausePromotion
+  - publishPromotion
+  - runReport
+  - simulatePromotion
+  - unschedulePromotion
+  - updatePromotion
+  - voidCouponCode
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - venueId<-session
+  - campaignId<-deepLink
+  - dashboardId<-deepLink
+  - promotionId<-deepLink
+  - reportId<-deepLink
+  - code<-deepLink
+  goesTo:
+  - BO-001
+  - BO-007
+  - BO-008
+  - BO-009
+  boardFrames:
+  - POS-4E
+  - RET-5A
+  - RET-5B
+  - RET-5C
+  - RET-5E
+  wireframe: wireframes/POS Board 4.dc.html#pos-4e
+  inFlows:
+  - F77 A promotion is built, bundled, published and measured
+  - F90 An audience is built, offered to, and the result is judged
+- screen: BO-011
+  name: Packages & Bundles
+  module: Sell
+  requiresModule: ticketing
+  wave: 2
+  density: compact
+  operations:
+  - createBundle
+  - getLatestBundle
+  - listCatalogueBundles
+  - publishBundle
+  - reportBundleApplied
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - version<-deepLink
+  goesTo:
+  - BO-001
+  - BO-007
+  - BO-008
+  - BO-009
+  boardFrames:
+  - FNB-2G
+  - RET-5H
+  wireframe: wireframes/Retail Board 5.dc.html#ret-5h
+  inFlows:
+  - F77 A promotion is built, bundled, published and measured
+- screen: BO-012
+  name: Membership Products
+  module: Sell
+  requiresModule: ticketing
+  wave: 2
+  density: compact
+  operations:
+  - createEntitlementTemplate
+  - createProduct
+  - getProduct
+  - listAlternativeCodes
+  - listEntitlementTemplates
+  - listProductVariants
+  - listProducts
+  - resolveProductByCode
+  - setAlternativeCodes
+  - setProductAttributes
+  - transitionProductLifecycle
+  - updateProduct
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - productId<-deepLink
+  goesTo:
+  - BO-001
+  - BO-007
+  - BO-008
+  - BO-009
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-012
+  inFlows: null
+- screen: BO-013
+  name: Channel & Distribution
+  module: Sell
+  requiresModule: ticketing
+  wave: 2
+  density: compact
+  operations:
+  - createEnvelope
+  - getChannelAllocations
+  - listChannelListings
+  - listEnvelopes
+  - listProducts
+  - publishBundle
+  - releaseChannelAllocation
+  - setChannelAllocations
+  - setChannelListing
+  - updateEnvelope
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - envelopeId<-deepLink
+  goesTo:
+  - BO-001
+  - BO-007
+  - BO-008
+  - BO-009
+  boardFrames:
+  - RET-5G
+  wireframe: wireframes/Retail Board 5.dc.html#ret-5g
+  inFlows:
+  - F77 A promotion is built, bundled, published and measured
+- screen: BO-014
+  name: Catalogue Publishing
+  module: Sell
+  requiresModule: ticketing
+  wave: 1
+  density: compact
+  operations:
+  - createProduct
+  - getProduct
+  - listAlternativeCodes
+  - listPrices
+  - listProductVariants
+  - listProducts
+  - publishBundle
+  - resolveProductByCode
+  - setAlternativeCodes
+  - setItemAvailability
+  - setProductAttributes
+  - transitionProductLifecycle
+  - updateProduct
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - venueId<-session
+  - itemId<-deepLink
+  - priceListId<-deepLink
+  - productId<-deepLink
+  goesTo:
+  - BO-001
+  - BO-007
+  - BO-008
+  - BO-009
+  boardFrames:
+  - FNB-2H
+  - RET-2H
+  wireframe: wireframes/Retail Board 2.dc.html#ret-2h
+  inFlows: null
+- screen: BO-015
+  name: Session Calendar
+  module: Sell
+  requiresModule: ticketing
+  wave: 1
+  density: compact
+  operations:
+  - cancelPerformance
+  - createEvent
+  - createPerformances
+  - getEvent
+  - getPerformance
+  - getSeatAvailability
+  - listEvents
+  - listPerformances
+  - recommendSeats
+  - updateEvent
+  - updatePerformance
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - eventId<-deepLink
+  - performanceId<-deepLink
+  goesTo:
+  - BO-001
+  - BO-007
+  - BO-008
+  - BO-009
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-015
+  inFlows: null
+- screen: BO-016
+  name: Session Template
+  module: Sell
+  requiresModule: ticketing
+  wave: 1
+  density: compact
+  operations:
+  - cancelPerformance
+  - createEvent
+  - createPerformances
+  - getEvent
+  - getPerformance
+  - getSeatAvailability
+  - listEvents
+  - listPerformances
+  - recommendSeats
+  - updateEvent
+  - updatePerformance
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - eventId<-deepLink
+  - performanceId<-deepLink
+  goesTo:
+  - BO-001
+  - BO-007
+  - BO-008
+  - BO-009
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-016
+  inFlows: null
+- screen: BO-017
+  name: Capacity Management
+  module: Sell
+  requiresModule: ticketing
+  wave: 1
+  density: compact
+  operations:
+  - createEnvelope
+  - getChannelAllocations
+  - listEnvelopes
+  - releaseChannelAllocation
+  - setChannelAllocations
+  - updateEnvelope
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - envelopeId<-deepLink
+  goesTo:
+  - BO-001
+  - BO-007
+  - BO-008
+  - BO-009
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-017
+  inFlows: null
+- screen: BO-018
+  name: Allocation & Holds
+  module: Sell
+  requiresModule: ticketing
+  wave: 2
+  density: compact
+  operations:
+  - acquireLease
+  - forceReleaseLease
+  - listLeases
+  - releaseLease
+  - renewLease
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - leaseId<-deepLink
+  goesTo:
+  - BO-001
+  - BO-007
+  - BO-008
+  - BO-009
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-018
+  inFlows: null
+- screen: BO-019
+  name: Closures & Blackouts
+  module: Sell
+  requiresModule: ticketing
+  wave: 2
+  density: compact
+  operations:
+  - cancelPerformance
+  - createEvent
+  - createPerformances
+  - getEvent
+  - getPerformance
+  - getSeatAvailability
+  - listEvents
+  - listPerformances
+  - recommendSeats
+  - updateEvent
+  - updatePerformance
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - eventId<-deepLink
+  - performanceId<-deepLink
+  goesTo:
+  - BO-001
+  - BO-007
+  - BO-008
+  - BO-009
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-019
+  inFlows: null
+- screen: BO-020
+  name: F&B Order Management
+  module: Food & Beverage
+  requiresModule: fnb
+  wave: 1
+  density: compact
+  operations:
+  - acceptFnbOrder
+  - amendFnbOrder
+  - cancelFnbOrder
+  - createFnbOrder
+  - getFnbOrder
+  - listFnbOrders
+  - listKitchenStations
+  - listKitchenTickets
+  - prioritiseKitchenTicket
+  - setKitchenStations
+  - setKitchenTicketStatus
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - venueId<-session
+  - orderId<-deepLink
+  - ticketId<-deepLink
+  goesTo: []
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-020
+  inFlows:
+  - F11 Guest orders food to a lounger
+- screen: BO-021
+  name: Order Search
+  module: Food & Beverage
+  requiresModule: fnb
+  wave: 1
+  density: compact
+  operations:
+  - getGuestOrderStatus
+  - recordOrderHandover
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - venueId<-session
+  - orderId<-deepLink
+  goesTo: []
+  boardFrames:
+  - RET-3A
+  wireframe: wireframes/Retail Board 3.dc.html#ret-3a
+  inFlows:
+  - F11 Guest orders food to a lounger
+  - F81 A retail sale runs from overview to tender
+- screen: BO-022
+  name: Order Detail
+  module: Orders & Money
+  requiresModule: ticketing
+  wave: 1
+  density: compact
+  operations:
+  - applyManualDiscount
+  - createOrder
+  - createRefund
+  - exchangeOrderLines
+  - getOrder
+  - getOrderStatement
+  - holdOrder
+  - listOrderRefunds
+  - listOrders
+  - modifyOrder
+  - reprintOrder
+  - rescheduleOrder
+  - resumeOrder
+  - voidOrder
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - orderId<-deepLink
+  goesTo:
+  - BO-001
+  - BO-007
+  - BO-008
+  - BO-009
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-022
+  inFlows: null
+- screen: BO-023
+  name: Refunds & Exchanges
+  module: Orders & Money
+  requiresModule: ticketing
+  wave: 1
+  density: compact
+  operations:
+  - applyManualDiscount
+  - createOrder
+  - createRefund
+  - exchangeOrderLines
+  - getOrder
+  - getOrderStatement
+  - getRefundPolicy
+  - holdOrder
+  - listOrderRefunds
+  - listOrders
+  - modifyOrder
+  - reprintOrder
+  - rescheduleOrder
+  - resumeOrder
+  - voidOrder
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - orderId<-deepLink
+  - venueId<-session
+  goesTo:
+  - BO-001
+  - BO-007
+  - BO-008
+  - BO-009
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-023
+  inFlows:
+  - F09 Event is cancelled and refunded
+- screen: BO-024
+  name: Payment Exceptions
+  module: Orders & Money
+  requiresModule: ticketing
+  wave: 1
+  density: compact
+  operations:
+  - addTip
+  - capturePayment
+  - closeDepositBoxes
+  - createPayment
+  - inquirePaymentStatus
+  - settleDeposit
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - paymentId<-deepLink
+  - depositId<-deepLink
+  goesTo:
+  - BO-001
+  - BO-007
+  - BO-008
+  - BO-009
+  boardFrames:
+  - RET-3K
+  wireframe: wireframes/Retail Board 3.dc.html#ret-3k
+  inFlows:
+  - F32 A till opens, trades and settles
+  - F99 A chargeback arrives and is defended
+- screen: BO-025
+  name: Chargebacks & Disputes
+  module: Orders & Money
+  requiresModule: core
+  wave: 2
+  density: compact
+  operations:
+  - getSettlement
+  - ingestSettlementFile
+  - listSettlementExceptions
+  - listSettlements
+  - resolveSettlementException
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - settlementId<-deepLink
+  goesTo:
+  - BO-001
+  - BO-007
+  - BO-008
+  - BO-009
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-025
+  inFlows:
+  - F99 A chargeback arrives and is defended
+- screen: BO-026
+  name: Group Bookings
+  module: Orders & Money
+  requiresModule: ticketing
+  wave: 2
+  density: compact
+  operations:
+  - applyManualDiscount
+  - createOrder
+  - createRefund
+  - exchangeOrderLines
+  - getOrder
+  - getOrderStatement
+  - holdOrder
+  - listOrderRefunds
+  - listOrders
+  - modifyOrder
+  - reprintOrder
+  - rescheduleOrder
+  - resumeOrder
+  - voidOrder
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - orderId<-deepLink
+  goesTo:
+  - BO-001
+  - BO-007
+  - BO-008
+  - BO-009
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-026
+  inFlows: null
+- screen: BO-027
+  name: Reissue & Media Replacement
+  module: Orders & Money
+  requiresModule: ticketing
+  wave: 2
+  density: compact
+  operations:
+  - appendEntitlementToMedia
+  - getMediaAsset
+  - getMediaEntitlements
+  - replaceMediaAsset
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - mediaCode<-deepLink
+  - mediaId<-deepLink
+  goesTo:
+  - BO-001
+  - BO-007
+  - BO-008
+  - BO-009
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-027
+  inFlows: null
+- screen: BO-028
+  name: Refund Approval Queue
+  module: Orders & Money
+  requiresModule: ticketing
+  wave: 1
+  density: compact
+  operations:
+  - createRefundRequest
+  states:
+  - emptyFirstRun
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-001
+  - BO-007
+  - BO-008
+  - BO-009
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-028
+  inFlows: null
+- screen: BO-029
+  name: Report Builder
+  module: Orders & Money
+  requiresModule: analytics
+  wave: 2
+  density: compact
+  operations:
+  - askReportingQuestion
+  - createReport
+  - deleteReport
+  - getFinancialReport
+  - getReport
+  - listReports
+  - runReport
+  - saveNaturalLanguageQuery
+  - updateReport
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - conversationId<-deepLink
+  - reportId<-deepLink
+  goesTo:
+  - BO-001
+  - BO-007
+  - BO-008
+  - BO-009
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-029
+  inFlows: null
+- screen: BO-030
+  name: Work Order Verification
+  module: Access & Venue
+  requiresModule: maintenance
+  wave: 1
+  density: compact
+  operations:
+  - acceptWorkOrder
+  - attachWorkOrderEvidence
+  - cancelWorkOrder
+  - closeWorkOrder
+  - completeWorkOrder
+  - createWorkOrder
+  - getWorkOrder
+  - listWorkOrders
+  - verifyWorkOrder
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - venueId<-session
+  - workOrderId<-deepLink
+  goesTo:
+  - BO-001
+  - BO-007
+  - BO-008
+  - BO-009
+  - BO-031
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-030
+  inFlows:
+  - F12 Asset fails and closes a queue
+- screen: BO-031
+  name: Asset Register
+  module: Access & Venue
+  requiresModule: maintenance
+  wave: 1
+  density: compact
+  operations:
+  - createAsset
+  - getAsset
+  - getAssetHistory
+  - listAssets
+  - lookupAsset
+  - setAssetStatus
+  - updateAsset
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - venueId<-session
+  - assetId<-deepLink
+  goesTo:
+  - BO-001
+  - BO-007
+  - BO-008
+  - BO-009
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-031
+  inFlows:
+  - F12 Asset fails and closes a queue
+- screen: BO-032
+  name: Admission Profiles
+  module: Access & Venue
+  requiresModule: access
+  wave: 1
+  density: compact
+  operations:
+  - createAdmissionProfile
+  - listAdmissionProfiles
+  - updateAdmissionProfile
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - profileId<-deepLink
+  goesTo:
+  - BO-001
+  - BO-007
+  - BO-008
+  - BO-009
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-032
+  inFlows: null
+- screen: BO-033
+  name: Blacklist Management
+  module: Access & Venue
+  requiresModule: access
+  wave: 1
+  density: compact
+  operations:
+  - addBlacklistEntry
+  - listBlacklist
+  - removeBlacklistEntry
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - mediaCode<-deepLink
+  goesTo:
+  - BO-001
+  - BO-007
+  - BO-008
+  - BO-009
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-033
+  inFlows: null
+- screen: BO-034
+  name: Scan Activity
+  module: Access & Venue
+  requiresModule: access
+  wave: 1
+  density: compact
+  operations:
+  - getOfflinePackage
+  - listScans
+  - lookupTicket
+  - overrideAccess
+  - syncScans
+  - validateAccess
+  - validateGroupAccess
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-001
+  - BO-007
+  - BO-008
+  - BO-009
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-034
+  inFlows: null
+- screen: BO-035
+  name: Override Audit
+  module: Access & Venue
+  requiresModule: access
+  wave: 1
+  density: compact
+  operations:
+  - getOfflinePackage
+  - listAuditRecords
+  - listScans
+  - lookupTicket
+  - overrideAccess
+  - syncScans
+  - validateAccess
+  - validateGroupAccess
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-001
+  - BO-007
+  - BO-008
+  - BO-009
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-035
+  inFlows: null
+- screen: BO-036
+  name: Device Registry
+  module: Venue Operations
+  requiresModule: marketing
+  wave: 2
+  density: compact
+  operations:
+  - adjustLoyaltyPoints
+  - configureWorkstation
+  - deployConfigurationProfile
+  - getConsentHistory
+  - getGuestConsents
+  - getGuestLoyalty
+  - getGuestProfile
+  - getWishlist
+  - getWorkstation
+  - getWorkstationHealth
+  - listAlerts
+  - listAuditRecords
+  - listDevices
+  - listGuestDevices
+  - listWorkstations
+  - mergeGuestProfiles
+  - recordDeviceHeartbeat
+  - registerDevice
+  - searchGuests
+  - updateGuestProfile
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - venueId<-session
+  - subjectId<-deepLink
+  - workstationId<-deepLink
+  - deviceId<-deepLink
+  - profileId<-deepLink
+  goesTo:
+  - BO-001
+  - BO-007
+  - BO-008
+  - BO-009
+  boardFrames:
+  - POS-1A
+  - POS-1B
+  - POS-1C
+  wireframe: wireframes/POS Board 1.dc.html#pos-1a
+  inFlows:
+  - F79 A workstation is registered, configured and rolled out
+  - F95 A fleet is watched, a fault is found, and a station is fixed
+- screen: BO-037
+  name: Offline Package Status
+  module: Sell
+  requiresModule: ticketing
+  wave: 1
+  density: compact
+  operations:
+  - getLatestBundle
+  - getOfflinePackage
+  - listCatalogueBundles
+  - listSyncRejections
+  - listWorkstations
+  - publishBundle
+  - reportBundleApplied
+  - setOfflinePolicy
+  - syncOrders
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - version<-deepLink
+  goesTo:
+  - BO-001
+  - BO-007
+  - BO-008
+  - BO-009
+  boardFrames:
+  - POS-5A
+  - POS-5C
+  - RET-3J
+  wireframe: wireframes/POS Board 5.dc.html#pos-5a
+  inFlows:
+  - F89 Offline policy is set, cached, monitored and reconciled
+- screen: BO-038
+  name: Reconciliation Queue
+  module: Access & Venue
+  requiresModule: queue
+  wave: 1
+  density: compact
+  operations:
+  - callNextParties
+  - createQueue
+  - getQueue
+  - getWaitTimes
+  - listQueueEntries
+  - listQueues
+  - setQueueStatus
+  - setWaitTime
+  - updateQueue
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - queueId<-deepLink
+  goesTo:
+  - BO-001
+  - BO-007
+  - BO-008
+  - BO-009
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-038
+  inFlows: null
+- screen: BO-039
+  name: Shift Directory
+  module: Orders & Money
+  requiresModule: core
+  wave: 1
+  density: compact
+  operations:
+  - acceptShiftVariance
+  - approveShiftOpen
+  - closeShift
+  - createCashMovement
+  - getCurrentShift
+  - getShift
+  - listCashMovements
+  - listShifts
+  - openShift
+  - recordNoSale
+  - reopenShift
+  - resumeShift
+  - suspendShift
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - shiftId<-session
+  goesTo:
+  - BO-001
+  - BO-007
+  - BO-008
+  - BO-009
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-039
+  inFlows: null
+- screen: BO-040
+  name: Variance Approval
+  module: Orders & Money
+  requiresModule: core
+  wave: 1
+  density: compact
+  operations:
+  - acceptShiftVariance
+  - approveShiftOpen
+  - closeShift
+  - createCashMovement
+  - getCurrentShift
+  - getShift
+  - listCashMovements
+  - listShifts
+  - openShift
+  - recordNoSale
+  - reopenShift
+  - resumeShift
+  - suspendShift
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - shiftId<-session
+  goesTo:
+  - BO-001
+  - BO-007
+  - BO-008
+  - BO-009
+  - BO-089
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-040
+  inFlows:
+  - F13 Month end closes
+- screen: BO-041
+  name: Cash Movements
+  module: Orders & Money
+  requiresModule: core
+  wave: 2
+  density: compact
+  operations:
+  - acceptShiftVariance
+  - approveShiftOpen
+  - closeShift
+  - createCashMovement
+  - getCurrentShift
+  - getShift
+  - listCashMovements
+  - listShifts
+  - openShift
+  - recordNoSale
+  - reopenShift
+  - resumeShift
+  - suspendShift
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - shiftId<-session
+  goesTo:
+  - BO-001
+  - BO-007
+  - BO-008
+  - BO-009
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-041
+  inFlows: null
+- screen: BO-042
+  name: Banking & Safe
+  module: Orders & Money
+  requiresModule: core
+  wave: 2
+  density: compact
+  operations:
+  - acceptShiftVariance
+  - approveShiftOpen
+  - closeShift
+  - createCashMovement
+  - getCurrentShift
+  - getShift
+  - listCashMovements
+  - listShifts
+  - openShift
+  - recordNoSale
+  - reopenShift
+  - resumeShift
+  - suspendShift
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - shiftId<-session
+  goesTo:
+  - BO-001
+  - BO-007
+  - BO-008
+  - BO-009
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-042
+  inFlows: null
+- screen: BO-043
+  name: Daily Reconciliation
+  module: Orders & Money
+  requiresModule: core
+  wave: 1
+  density: compact
+  operations:
+  - getSettlement
+  - getTrialBalance
+  - ingestSettlementFile
+  - listLedgerEntries
+  - listSettlementExceptions
+  - listSettlements
+  - resolveSettlementException
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - settlementId<-deepLink
+  goesTo:
+  - BO-001
+  - BO-007
+  - BO-008
+  - BO-009
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-043
+  inFlows:
+  - F98 A day is reconciled from takings to the ledger
+- screen: BO-044
+  name: F&B Outlets
+  module: Venue Operations
+  requiresModule: fnb
+  wave: 2
+  density: compact
+  operations:
+  - createOutlet
+  - getGuestMenu
+  - getHaccpStatus
+  - getOutletStock
+  - getReturnPolicy
+  - getTableMap
+  - listFnbOrders
+  - listMerchandise
+  - listOutlets
+  - recordWaste
+  - reserveMerchandise
+  - setReturnPolicy
+  - setTableLayout
+  - signCorrectiveAction
+  - updateOutlet
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - outletId<-deepLink
+  - actionId<-deepLink
+  goesTo:
+  - BO-001
+  - BO-007
+  - BO-008
+  - BO-009
+  boardFrames:
+  - FNB-1B
+  - FNB-1C
+  - FNB-1D
+  - FNB-1E
+  - FNB-1F
+  - FNB-1G
+  - FNB-1H
+  - FNB-1J
+  - FNB-1K
+  - RET-1B
+  - RET-1C
+  - RET-1D
+  - RET-1E
+  - RET-1F
+  - RET-1G
+  - RET-1H
+  - RET-1J
+  - RET-1K
+  wireframe: wireframes/Retail Board 1.dc.html#ret-1b
+  inFlows:
+  - F28 A temperature excursion is caught and signed off
+- screen: BO-045
+  name: Menu Management
+  module: Food & Beverage
+  requiresModule: fnb
+  wave: 1
+  density: compact
+  operations:
+  - applyMenuActions
+  - createMenu
+  - getMenu
+  - listMenus
+  - publishMenu
+  - rollbackMenu
+  - scheduleMenuPublish
+  - setMenuSections
+  - updateMenu
+  - verifyAllergens
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - venueId<-session
+  - menuId<-deepLink
+  - menuItemId<-deepLink
+  goesTo: []
+  boardFrames:
+  - FNB-2A
+  - FNB-2B
+  - FNB-2E
+  - FNB-2J
+  - FNB-2K
+  wireframe: wireframes/FnB Board 2.dc.html#fnb-2a
+  inFlows:
+  - F31 A menu is drafted, scheduled and rolled back
+  - F85 Production is planned, costed and released
+  - F93 A recipe changes and its allergen claim is re-verified
+- screen: BO-046
+  name: Kitchen Display
+  module: Food & Beverage
+  requiresModule: fnb
+  wave: 1
+  density: compact
+  operations:
+  - listKitchenStations
+  - listKitchenTickets
+  - prioritiseKitchenTicket
+  - setKitchenStations
+  - setKitchenTicketStatus
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - venueId<-session
+  - ticketId<-deepLink
+  goesTo: []
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-046
+  inFlows: null
+- screen: BO-047
+  name: F&B Order Management
+  module: Orders & Money
+  requiresModule: ticketing
+  wave: 2
+  density: compact
+  operations:
+  - applyManualDiscount
+  - createOrder
+  - createRefund
+  - exchangeOrderLines
+  - getOrder
+  - getOrderStatement
+  - holdOrder
+  - listOrderRefunds
+  - listOrders
+  - modifyOrder
+  - reprintOrder
+  - rescheduleOrder
+  - resumeOrder
+  - voidOrder
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - orderId<-deepLink
+  goesTo:
+  - BO-001
+  - BO-007
+  - BO-008
+  - BO-009
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-047
+  inFlows: null
+- screen: BO-048
+  name: Retail Products
+  module: Orders & Money
+  requiresModule: retail
+  wave: 2
+  density: compact
+  operations:
+  - createMerchandise
+  - listMerchandise
+  - lookupMerchandise
+  - updateMerchandise
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - merchandiseId<-deepLink
+  goesTo:
+  - BO-001
+  - BO-007
+  - BO-008
+  - BO-009
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-048
+  inFlows:
+  - F17 A guest buys merchandise and collects later
+- screen: BO-049
+  name: Stock Levels
+  module: Stock & Supply
+  requiresModule: inventory
+  wave: 2
+  density: compact
+  operations:
+  - createStockMovement
+  - createStockTransfer
+  - getStockPositions
+  - getStockValuation
+  - listStockLocations
+  - setItemAvailability
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - venueId<-session
+  - itemId<-deepLink
+  goesTo:
+  - BO-001
+  - BO-007
+  - BO-008
+  - BO-009
+  - BO-079
+  - BO-080
+  - BO-082
+  boardFrames:
+  - FNB-5A
+  - FNB-5B
+  - RET-4A
+  - RET-4H
+  wireframe: wireframes/Retail Board 4.dc.html#ret-4a
+  inFlows:
+  - F35 Stock arrives short and an oversell is resolved
+  - F92 Store stock is watched, replenished and reconciled
+- screen: BO-050
+  name: Stock Position & Valuation
+  module: Stock & Supply
+  requiresModule: inventory
+  wave: 2
+  density: compact
+  operations:
+  - getStockPositions
+  - getStockValuation
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-001
+  - BO-007
+  - BO-008
+  - BO-009
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-050
+  inFlows: null
+- screen: BO-051
+  name: Purchase Orders
+  module: Orders & Money
+  requiresModule: ticketing
+  wave: 2
+  density: compact
+  operations:
+  - applyManualDiscount
+  - createOrder
+  - exchangeOrderLines
+  - getOrder
+  - getOrderStatement
+  - holdOrder
+  - listOrderRefunds
+  - listOrders
+  - modifyOrder
+  - reprintOrder
+  - rescheduleOrder
+  - resumeOrder
+  - voidOrder
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - orderId<-deepLink
+  goesTo:
+  - BO-001
+  - BO-007
+  - BO-008
+  - BO-009
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-051
+  inFlows: null
+- screen: BO-052
+  name: Goods Receipt
+  module: Stock & Supply
+  requiresModule: inventory
+  wave: 2
+  density: compact
+  operations:
+  - acknowledgePurchaseOrder
+  - cancelPurchaseOrder
+  - closePurchaseOrderShort
+  - closeTransferShort
+  - createGoodsReceipt
+  - createPurchaseOrder
+  - getPurchaseOrder
+  - getStockTransfer
+  - listGoodsReceipts
+  - listPurchaseOrders
+  - rejectReceivedGoods
+  - sendPurchaseOrder
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - purchaseOrderId<-deepLink
+  - receiptId<-deepLink
+  - transferId<-deepLink
+  goesTo:
+  - BO-001
+  - BO-007
+  - BO-008
+  - BO-009
+  - BO-049
+  boardFrames:
+  - RET-4E
+  wireframe: wireframes/Retail Board 4.dc.html#ret-4e
+  inFlows:
+  - F15 A part is needed and ordered
+  - F35 Stock arrives short and an oversell is resolved
+  - F76 Stock is counted, requested, transferred and received
+  - F92 Store stock is watched, replenished and reconciled
+- screen: BO-053
+  name: Staff Directory
+  module: People & Access Rights
+  requiresModule: core
+  wave: 1
+  density: compact
+  operations:
+  - createPrincipal
+  - getPrincipal
+  - listPrincipals
+  - updatePrincipal
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - principalId<-session
+  goesTo:
+  - BO-001
+  - BO-007
+  - BO-008
+  - BO-009
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-053
+  inFlows: null
+- screen: BO-054
+  name: Role Assignment
+  module: People & Access Rights
+  requiresModule: core
+  wave: 1
+  density: compact
+  operations:
+  - createRole
+  - listRoles
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-001
+  - BO-007
+  - BO-008
+  - BO-009
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-054
+  inFlows: null
+- screen: BO-055
+  name: Rota & Scheduling
+  module: People & Access Rights
+  requiresModule: core
+  wave: 2
+  density: compact
+  operations:
+  - createRotaAssignment
+  - listRotaAssignments
+  - requestShiftSwap
+  - updateRotaAssignment
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - assignmentId<-deepLink
+  goesTo:
+  - BO-001
+  - BO-007
+  - BO-008
+  - BO-009
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-055
+  inFlows: null
+- screen: BO-056
+  name: Time & Attendance
+  module: People & Access Rights
+  requiresModule: core
+  wave: 2
+  density: compact
+  operations:
+  - amendAttendance
+  - listAttendance
+  - recordAttendance
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - recordId<-deepLink
+  goesTo:
+  - BO-001
+  - BO-007
+  - BO-008
+  - BO-009
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-056
+  inFlows: null
+- screen: BO-057
+  name: Training & Certification
+  module: People & Access Rights
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations:
+  - listPrincipals
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-001
+  - BO-007
+  - BO-008
+  - BO-009
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-057
+  inFlows: null
+- screen: BO-058
+  name: Reporting Home
+  module: Venue Operations
+  requiresModule: analytics
+  wave: 1
+  density: compact
+  operations:
+  - askReportingQuestion
+  - createReport
+  - createReportSchedule
+  - deleteReport
+  - getFinancialReport
+  - getReport
+  - listReportExecutions
+  - listReports
+  - runReport
+  - saveNaturalLanguageQuery
+  - updateReport
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - conversationId<-deepLink
+  - reportId<-deepLink
+  goesTo:
+  - BO-001
+  - BO-007
+  - BO-008
+  - BO-009
+  boardFrames:
+  - RET-6H
+  wireframe: wireframes/Retail Board 6.dc.html#ret-6h
+  inFlows:
+  - F107 A report is defined, scheduled and delivered
+  - F20 A manager asks a question and gets an answer
+  - F82 A month is analysed from incrementality to a scheduled report
+- screen: BO-059
+  name: Sales Reports
+  module: Orders & Money
+  requiresModule: analytics
+  wave: 1
+  density: compact
+  operations:
+  - askReportingQuestion
+  - createReport
+  - deleteReport
+  - getFinancialReport
+  - getReport
+  - listReports
+  - runReport
+  - saveNaturalLanguageQuery
+  - updateReport
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - conversationId<-deepLink
+  - reportId<-deepLink
+  goesTo:
+  - BO-001
+  - BO-007
+  - BO-008
+  - BO-009
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-059
+  inFlows: null
+- screen: BO-060
+  name: Attendance & Footfall
+  module: Venue Operations
+  requiresModule: analytics
+  wave: 2
+  density: compact
+  operations:
+  - askReportingQuestion
+  - createReport
+  - deleteReport
+  - getFinancialReport
+  - getOfflinePackage
+  - getReport
+  - listReports
+  - listScans
+  - lookupTicket
+  - overrideAccess
+  - runReport
+  - saveNaturalLanguageQuery
+  - syncScans
+  - updateReport
+  - validateAccess
+  - validateGroupAccess
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - conversationId<-deepLink
+  - reportId<-deepLink
+  goesTo:
+  - BO-001
+  - BO-007
+  - BO-008
+  - BO-009
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-060
+  inFlows:
+  - F107 A report is defined, scheduled and delivered
+- screen: BO-061
+  name: Scheduled Reports
+  module: Orders & Money
+  requiresModule: analytics
+  wave: 3
+  density: compact
+  operations:
+  - askReportingQuestion
+  - createReport
+  - deleteReport
+  - getFinancialReport
+  - getReport
+  - listReports
+  - runReport
+  - saveNaturalLanguageQuery
+  - updateReport
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - conversationId<-deepLink
+  - reportId<-deepLink
+  goesTo:
+  - BO-001
+  - BO-007
+  - BO-008
+  - BO-009
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-061
+  inFlows:
+  - F107 A report is defined, scheduled and delivered
+- screen: BO-062
+  name: Venue Profile
+  module: Orders & Money
+  requiresModule: ticketing
+  wave: 1
+  density: compact
+  operations:
+  - getRefundPolicy
+  - listDeliveryLocations
+  - listDiningOutlets
+  - setRefundPolicy
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - venueId<-session
+  goesTo:
+  - BO-001
+  - BO-007
+  - BO-008
+  - BO-009
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-062
+  inFlows: null
+- screen: BO-063
+  name: Opening Hours & Calendar
+  module: Sell
+  requiresModule: ticketing
+  wave: 1
+  density: compact
+  operations:
+  - cancelPerformance
+  - createEvent
+  - createPerformances
+  - getEvent
+  - getPerformance
+  - getSeatAvailability
+  - getVenueSettings
+  - listEvents
+  - listPerformances
+  - recommendSeats
+  - updateEvent
+  - updateOutlet
+  - updatePerformance
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - venueId<-session
+  - eventId<-deepLink
+  - outletId<-deepLink
+  - performanceId<-deepLink
+  goesTo:
+  - BO-001
+  - BO-007
+  - BO-008
+  - BO-009
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-063
+  inFlows: null
+- screen: BO-064
+  name: Zones & Areas
+  module: Venue Operations
+  requiresModule: access
+  wave: 1
+  density: compact
+  operations:
+  - createAccessPoint
+  - createScopeNode
+  - getAccessPoint
+  - getScopeNode
+  - listAccessPoints
+  - listScopeNodes
+  - setAccessPointGeofence
+  - setTurnstileMode
+  - updateAccessPoint
+  - updateScopeNode
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - accessPointId<-deepLink
+  - scopeNodeId<-deepLink
+  goesTo:
+  - BO-001
+  - BO-007
+  - BO-008
+  - BO-009
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-064
+  inFlows: null
+- screen: BO-065
+  name: Venue Configuration
+  module: Orders & Money
+  requiresModule: ticketing
+  wave: 1
+  density: compact
+  operations:
+  - getRefundPolicy
+  - listDeliveryLocations
+  - listDiningOutlets
+  - setRefundPolicy
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - venueId<-session
+  goesTo:
+  - BO-001
+  - BO-007
+  - BO-008
+  - BO-009
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-065
+  inFlows: null
+- screen: BO-066
+  name: Notification Settings
+  module: People & Access Rights
+  requiresModule: core
+  wave: 2
+  density: compact
+  operations:
+  - acknowledgeAnnouncement
+  - getAnnouncementReach
+  - listAnnouncements
+  - publishAnnouncement
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - announcementId<-deepLink
+  goesTo:
+  - BO-001
+  - BO-007
+  - BO-008
+  - BO-009
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-066
+  inFlows: null
+- screen: BO-067
+  name: Integrations
+  module: Venue Operations
+  requiresModule: core
+  wave: 2
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-001
+  - BO-007
+  - BO-008
+  - BO-009
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-067
+  inFlows: null
+- screen: BO-068
+  name: Audit Log
+  module: Guests & Marketing
+  requiresModule: core
+  wave: 2
+  density: compact
+  operations:
+  - listAuditRecords
+  - resolvePermissions
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-001
+  - BO-007
+  - BO-008
+  - BO-009
+  boardFrames:
+  - RET-6J
+  wireframe: wireframes/Retail Board 6.dc.html#ret-6j
+  inFlows:
+  - F106 A security dashboard surfaces something and it is investigated
+- screen: BO-069
+  name: Asset Register
+  module: Access & Venue
+  requiresModule: maintenance
+  wave: 2
+  density: compact
+  operations:
+  - createAsset
+  - getAsset
+  - getAssetHistory
+  - listAssets
+  - listGames
+  - lookupAsset
+  - recordGamePlay
+  - setAssetStatus
+  - syncGamePlays
+  - updateAsset
+  - updateGame
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - assetId<-deepLink
+  - gameId<-deepLink
+  goesTo:
+  - BO-001
+  - BO-007
+  - BO-008
+  - BO-009
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-069
+  inFlows:
+  - F18 A guest plays an arcade game
+- screen: BO-070
+  name: Work Orders
+  module: Orders & Money
+  requiresModule: ticketing
+  wave: 2
+  density: compact
+  operations:
+  - applyManualDiscount
+  - createOrder
+  - exchangeOrderLines
+  - getOrder
+  - getOrderStatement
+  - holdOrder
+  - listOrderRefunds
+  - listOrders
+  - modifyOrder
+  - reprintOrder
+  - rescheduleOrder
+  - resumeOrder
+  - voidOrder
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - orderId<-deepLink
+  goesTo:
+  - BO-001
+  - BO-007
+  - BO-008
+  - BO-009
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-070
+  inFlows: null
+- screen: BO-071
+  name: Planned Maintenance
+  module: Access & Venue
+  requiresModule: maintenance
+  wave: 3
+  density: compact
+  operations:
+  - createMaintenancePlan
+  - getDueMaintenance
+  - listMaintenancePlans
+  - setRolePermissions
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - roleId<-deepLink
+  goesTo:
+  - BO-001
+  - BO-007
+  - BO-008
+  - BO-009
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-071
+  inFlows: null
+- screen: BO-072
+  name: Incident Log
+  module: Access & Venue
+  requiresModule: maintenance
+  wave: 2
+  density: compact
+  operations:
+  - getIncident
+  - listIncidents
+  - recordAuthorityNotification
+  - reportIncident
+  - updateIncident
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - incidentId<-deepLink
+  goesTo:
+  - BO-001
+  - BO-007
+  - BO-008
+  - BO-009
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-072
+  inFlows: null
+- screen: BO-073
+  name: Lost & Found Register
+  module: Guests & Marketing
+  requiresModule: marketing
+  wave: 2
+  density: compact
+  operations:
+  - listLostItems
+  - matchLostItem
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - venueId<-session
+  - itemId<-deepLink
+  goesTo:
+  - BO-001
+  - BO-007
+  - BO-008
+  - BO-009
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-073
+  inFlows: null
+- screen: BO-074
+  name: Chart of Accounts
+  module: Orders & Money
+  requiresModule: core
+  wave: 1
+  density: compact
+  operations:
+  - createAccount
+  - createCostCenter
+  - createLegalEntity
+  - getAccount
+  - listAccounts
+  - listCostCenters
+  - listLegalEntities
+  - updateAccount
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - accountId<-deepLink
+  goesTo:
+  - BO-001
+  - BO-075
+  - BO-076
+  - BO-077
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-074
+  inFlows:
+  - F16 A venue opens for the first time
+  - F98 A day is reconciled from takings to the ledger
+- screen: BO-075
+  name: Account Mapping
+  module: Orders & Money
+  requiresModule: core
+  wave: 1
+  density: compact
+  operations:
+  - createTaxCode
+  - createTaxExemption
+  - listAccountMappings
+  - listTaxCodes
+  - listTaxExemptions
+  - setAccountMappings
+  - updateTaxCode
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - taxCodeId<-deepLink
+  goesTo:
+  - BO-001
+  - BO-074
+  - BO-076
+  - BO-077
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-075
+  inFlows:
+  - F16 A venue opens for the first time
+  - F98 A day is reconciled from takings to the ledger
+- screen: BO-076
+  name: Revenue Recognition
+  module: Orders & Money
+  requiresModule: core
+  wave: 2
+  density: compact
+  operations:
+  - createRecognitionSchedule
+  - getDeferredRevenue
+  - listRecognitionSchedules
+  - runRecognition
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-001
+  - BO-074
+  - BO-075
+  - BO-077
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-076
+  inFlows:
+  - F98 A day is reconciled from takings to the ledger
+- screen: BO-077
+  name: FX Rates & Variances
+  module: Orders & Money
+  requiresModule: core
+  wave: 2
+  density: compact
+  operations:
+  - listFxRates
+  - listPriceVariances
+  - reviewPriceVariance
+  - setFxRate
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - varianceId<-deepLink
+  goesTo:
+  - BO-001
+  - BO-074
+  - BO-075
+  - BO-076
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-077
+  inFlows: null
+- screen: BO-078
+  name: Requisitions
+  module: Stock & Supply
+  requiresModule: inventory
+  wave: 1
+  density: compact
+  operations:
+  - approveRequisition
+  - cancelRequisition
+  - compareQuotations
+  - createRequisition
+  - getSuggestedRequisitions
+  - listRequisitions
+  - listStockLocations
+  - rejectRequisition
+  - returnRequisition
+  - updateRequisitionLines
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - requisitionId<-deepLink
+  goesTo:
+  - BO-001
+  - BO-079
+  - BO-080
+  - BO-081
+  - BO-084
+  boardFrames:
+  - FNB-5F
+  - RET-4C
+  - RET-4K
+  wireframe: wireframes/Retail Board 4.dc.html#ret-4c
+  inFlows:
+  - F15 A part is needed and ordered
+  - F76 Stock is counted, requested, transferred and received
+  - F92 Store stock is watched, replenished and reconciled
+- screen: BO-079
+  name: Stock Count
+  module: Stock & Supply
+  requiresModule: inventory
+  wave: 1
+  density: compact
+  operations:
+  - cancelStockCount
+  - enterCountLine
+  - getCountVariance
+  - listStockCounts
+  - postStockCount
+  - recountStockCount
+  - requestRecount
+  - startStockCount
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - countId<-deepLink
+  goesTo:
+  - BO-001
+  - BO-049
+  - BO-078
+  - BO-080
+  - BO-081
+  boardFrames:
+  - FNB-5H
+  - RET-4F
+  wireframe: wireframes/Retail Board 4.dc.html#ret-4f
+  inFlows:
+  - F30 A count is entered, varied and posted
+  - F35 Stock arrives short and an oversell is resolved
+  - F76 Stock is counted, requested, transferred and received
+- screen: BO-080
+  name: Stock Transfers
+  module: Stock & Supply
+  requiresModule: inventory
+  wave: 2
+  density: compact
+  operations:
+  - closeTransferShort
+  - createGoodsReceipt
+  - createStockTransfer
+  - getStockTransfer
+  - listStockTransfers
+  - receiveStockTransfer
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - transferId<-deepLink
+  goesTo:
+  - BO-001
+  - BO-078
+  - BO-079
+  - BO-081
+  boardFrames:
+  - RET-4D
+  wireframe: wireframes/Retail Board 4.dc.html#ret-4d
+  inFlows:
+  - F76 Stock is counted, requested, transferred and received
+  - F92 Store stock is watched, replenished and reconciled
+- screen: BO-081
+  name: Inventory Items
+  module: Stock & Supply
+  requiresModule: inventory
+  wave: 2
+  density: compact
+  operations:
+  - createInventoryItem
+  - createStockLocation
+  - getInventoryItem
+  - listInventoryItems
+  - listStockLocations
+  - lookupInventoryItem
+  - updateInventoryItem
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - itemId<-deepLink
+  goesTo:
+  - BO-001
+  - BO-078
+  - BO-079
+  - BO-080
+  boardFrames:
+  - RET-4B
+  wireframe: wireframes/Retail Board 4.dc.html#ret-4b
+  inFlows:
+  - F76 Stock is counted, requested, transferred and received
+  - F92 Store stock is watched, replenished and reconciled
+- screen: BO-082
+  name: Stock Movements
+  module: Stock & Supply
+  requiresModule: inventory
+  wave: 1
+  density: compact
+  operations:
+  - createStockMovement
+  - createStockTransfer
+  - listOrders
+  - listStockMovements
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-001
+  - BO-078
+  - BO-079
+  - BO-080
+  boardFrames:
+  - RET-4G
+  wireframe: wireframes/Retail Board 4.dc.html#ret-4g
+  inFlows:
+  - F34 A retail sale, from scan to return
+  - F35 Stock arrives short and an oversell is resolved
+- screen: BO-083
+  name: Suppliers
+  module: Stock & Supply
+  requiresModule: inventory
+  wave: 2
+  density: compact
+  operations:
+  - createSupplier
+  - getSupplierPerformance
+  - listSuppliers
+  - recordQuotation
+  - updateSupplier
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - supplierId<-deepLink
+  goesTo:
+  - BO-001
+  - BO-078
+  - BO-079
+  - BO-080
+  boardFrames:
+  - RET-2G
+  wireframe: wireframes/Retail Board 2.dc.html#ret-2g
+  inFlows:
+  - F78 A supplier is set up and a catalogue is priced and published
+- screen: BO-084
+  name: Approval Inbox
+  module: People & Access Rights
+  requiresModule: core
+  wave: 1
+  density: compact
+  operations:
+  - decideApprovalRequest
+  - escalateApprovalRequest
+  - listApprovalRequests
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - requestId<-deepLink
+  goesTo:
+  - BO-001
+  - BO-052
+  - BO-085
+  - BO-086
+  - BO-087
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-084
+  inFlows:
+  - F14 A discount needs a manager
+  - F15 A part is needed and ordered
+- screen: BO-085
+  name: Approval Request
+  module: People & Access Rights
+  requiresModule: core
+  wave: 1
+  density: compact
+  operations:
+  - decideApprovalRequest
+  - evaluateApprovalRequirement
+  - listApprovalRequests
+  - resubmitApprovalRequest
+  - withdrawApprovalRequest
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - requestId<-deepLink
+  goesTo:
+  - BO-001
+  - BO-084
+  - BO-086
+  - BO-087
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-085
+  inFlows:
+  - F14 A discount needs a manager
+- screen: BO-086
+  name: Approval Matrix
+  module: People & Access Rights
+  requiresModule: core
+  wave: 2
+  density: compact
+  operations:
+  - listApprovalMatrices
+  - setApprovalMatrix
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-001
+  - BO-084
+  - BO-085
+  - BO-087
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-086
+  inFlows: null
+- screen: BO-087
+  name: Approval Delegations
+  module: People & Access Rights
+  requiresModule: core
+  wave: 2
+  density: compact
+  operations:
+  - createApprovalDelegation
+  - listApprovalDelegations
+  - revokeApprovalDelegation
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - delegationId<-deepLink
+  goesTo:
+  - BO-001
+  - BO-084
+  - BO-085
+  - BO-086
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-087
+  inFlows: null
+- screen: BO-088
+  name: Approval Analytics
+  module: People & Access Rights
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations:
+  - getApprovalAnalytics
+  - listIndexJobs
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-001
+  - BO-084
+  - BO-085
+  - BO-086
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-088
+  inFlows: null
+- screen: BO-089
+  name: Journal Entries
+  module: Orders & Money
+  requiresModule: core
+  wave: 1
+  density: compact
+  operations:
+  - approveJournalEntry
+  - createJournalEntry
+  - getJournalEntry
+  - listJournalEntries
+  - rejectJournal
+  - reverseJournalEntry
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - entryId<-deepLink
+  goesTo:
+  - BO-001
+  - BO-074
+  - BO-075
+  - BO-076
+  - BO-090
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-089
+  inFlows:
+  - F13 Month end closes
+- screen: BO-090
+  name: Period Close
+  module: Orders & Money
+  requiresModule: core
+  wave: 1
+  density: compact
+  operations:
+  - abandonPeriodClose
+  - beginPeriodClose
+  - closeFiscalPeriod
+  - getTrialBalance
+  - listFiscalPeriods
+  - reopenPeriod
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - periodId<-deepLink
+  goesTo:
+  - BO-001
+  - BO-040
+  - BO-074
+  - BO-075
+  - BO-076
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-090
+  inFlows:
+  - F13 Month end closes
+- screen: BO-091
+  name: AI Policy & Spend
+  module: Guests & Marketing
+  requiresModule: ai
+  wave: 1
+  density: compact
+  operations:
+  - getAiPolicy
+  - getAiUsage
+  - setAiPolicy
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-001
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-091
+  inFlows:
+  - F100 An AI provider is configured, budgeted and audited
+- screen: BO-092
+  name: Venue Maps
+  module: Access & Venue
+  requiresModule: seating
+  wave: 2
+  density: compact
+  operations:
+  - createVenueMap
+  - listVenueMaps
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-093
+  - BO-094
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-092
+  inFlows:
+  - F26 A venue maps its site
+- screen: BO-093
+  name: Map Import & Labelling
+  module: Access & Venue
+  requiresModule: seating
+  wave: 2
+  density: compact
+  operations:
+  - acceptVenueLabelProposals
+  - importVenueGeometry
+  - proposeVenueLabels
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - mapId<-deepLink
+  goesTo:
+  - BO-092
+  - BO-094
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-093
+  inFlows:
+  - F26 A venue maps its site
+- screen: BO-094
+  name: Map Editor & Publish
+  module: Access & Venue
+  requiresModule: seating
+  wave: 2
+  density: compact
+  operations:
+  - getVenueMap
+  - getVenueMapGraph
+  - publishVenueMap
+  - setPathClosure
+  - setVenuePoint
+  - validateVenueMapGraph
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - mapId<-deepLink
+  - pathId<-deepLink
+  goesTo:
+  - BO-092
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-094
+  inFlows:
+  - F26 A venue maps its site
+- screen: BO-095
+  name: Resources
+  module: Access & Venue
+  requiresModule: resources
+  wave: 2
+  density: compact
+  operations:
+  - createResource
+  - listResources
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-096
+  - BO-097
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-095
+  inFlows: null
+- screen: BO-096
+  name: Resource Calendar
+  module: Access & Venue
+  requiresModule: resources
+  wave: 2
+  density: compact
+  operations:
+  - bookResource
+  - getResourceAvailability
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - resourceId<-BO-095
+  goesTo:
+  - BO-097
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-096
+  inFlows:
+  - F25 A guest rents a cabana
+- screen: BO-097
+  name: Check Out & Check In
+  module: Access & Venue
+  requiresModule: resources
+  wave: 2
+  density: compact
+  operations:
+  - authoriseStoredValue
+  - checkInResource
+  - checkOutResource
+  - releaseStoredValue
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams:
+  - authorisationId<-deepLink
+  - bookingId<-deepLink
+  goesTo: []
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-097
+  inFlows:
+  - F25 A guest rents a cabana
+- screen: BO-098
+  name: Qualifications
+  module: Access & Venue
+  requiresModule: resources
+  wave: 2
+  density: compact
+  operations:
+  - setResourceQualifications
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - resourceId<-BO-095
+  goesTo: []
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-098
+  inFlows: null
+- screen: BO-099
+  name: Session Manifest
+  module: Access & Venue
+  requiresModule: resources
+  wave: 2
+  density: compact
+  operations:
+  - getSessionManifest
+  - reorderSessionManifest
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams:
+  - sessionId<-session
+  goesTo: []
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-099
+  inFlows: null
+- screen: BO-100
+  name: Venue Home
+  module: Venue Operations
+  requiresModule: core
+  wave: 1
+  density: compact
+  operations:
+  - getVenueSettings
+  - listShifts
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  - partial
+  offlineState: false
+  entryParams:
+  - venueId<-session
+  goesTo:
+  - BO-101
+  - BO-102
+  - BO-103
+  - BO-104
+  - BO-105
+  - BO-106
+  - BO-107
+  - BO-108
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-100
+  inFlows: null
+- screen: BO-101
+  name: Orders & Money
+  module: Orders & Money
+  requiresModule: core
+  wave: 1
+  density: compact
+  operations:
+  - getVenueSettings
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - venueId<-session
+  goesTo:
+  - BO-008
+  - BO-022
+  - BO-023
+  - BO-024
+  - BO-025
+  - BO-026
+  - BO-027
+  - BO-028
+  - BO-029
+  - BO-039
+  - BO-040
+  - BO-041
+  - BO-042
+  - BO-043
+  - BO-047
+  - BO-048
+  - BO-051
+  - BO-059
+  - BO-061
+  - BO-062
+  - BO-065
+  - BO-070
+  - BO-074
+  - BO-075
+  - BO-076
+  - BO-077
+  - BO-089
+  - BO-090
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-101
+  inFlows: null
+- screen: BO-102
+  name: Sell
+  module: Sell
+  requiresModule: core
+  wave: 1
+  density: compact
+  operations:
+  - getVenueSettings
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - venueId<-session
+  goesTo:
+  - BO-007
+  - BO-009
+  - BO-010
+  - BO-011
+  - BO-012
+  - BO-013
+  - BO-014
+  - BO-015
+  - BO-016
+  - BO-017
+  - BO-018
+  - BO-019
+  - BO-037
+  - BO-063
+  - BO-109
+  - BO-110
+  - BO-111
+  - BO-112
+  - BO-113
+  - BO-114
+  - BO-115
+  - BO-116
+  - BO-117
+  - BO-118
+  - BO-119
+  - BO-120
+  - BO-121
+  - BO-122
+  - BO-123
+  - BO-124
+  - BO-125
+  - BO-126
+  - BO-142
+  - BO-143
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-102
+  inFlows: null
+- screen: BO-103
+  name: Access & Venue
+  module: Access & Venue
+  requiresModule: core
+  wave: 1
+  density: compact
+  operations:
+  - getVenueSettings
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - venueId<-session
+  goesTo:
+  - BO-001
+  - BO-002
+  - BO-003
+  - BO-004
+  - BO-005
+  - BO-006
+  - BO-030
+  - BO-031
+  - BO-032
+  - BO-033
+  - BO-034
+  - BO-035
+  - BO-038
+  - BO-069
+  - BO-071
+  - BO-072
+  - BO-092
+  - BO-093
+  - BO-094
+  - BO-095
+  - BO-096
+  - BO-097
+  - BO-098
+  - BO-099
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-103
+  inFlows: null
+- screen: BO-104
+  name: Food & Beverage
+  module: Food & Beverage
+  requiresModule: core
+  wave: 1
+  density: compact
+  operations:
+  - getVenueSettings
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - venueId<-session
+  goesTo:
+  - BO-020
+  - BO-021
+  - BO-045
+  - BO-046
+  - BO-134
+  - BO-135
+  - BO-136
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-104
+  inFlows: null
+- screen: BO-105
+  name: Stock & Supply
+  module: Stock & Supply
+  requiresModule: core
+  wave: 1
+  density: compact
+  operations:
+  - getVenueSettings
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - venueId<-session
+  goesTo:
+  - BO-049
+  - BO-050
+  - BO-052
+  - BO-078
+  - BO-079
+  - BO-080
+  - BO-081
+  - BO-082
+  - BO-083
+  - BO-137
+  - BO-138
+  - BO-139
+  - BO-140
+  - BO-141
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-105
+  inFlows: null
+- screen: BO-106
+  name: People & Access Rights
+  module: People & Access Rights
+  requiresModule: core
+  wave: 1
+  density: compact
+  operations:
+  - getVenueSettings
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - venueId<-session
+  goesTo:
+  - BO-053
+  - BO-054
+  - BO-055
+  - BO-056
+  - BO-057
+  - BO-066
+  - BO-084
+  - BO-085
+  - BO-086
+  - BO-087
+  - BO-088
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-106
+  inFlows: null
+- screen: BO-107
+  name: Guests & Marketing
+  module: Guests & Marketing
+  requiresModule: core
+  wave: 1
+  density: compact
+  operations:
+  - getVenueSettings
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - venueId<-session
+  goesTo:
+  - BO-068
+  - BO-073
+  - BO-091
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-107
+  inFlows: null
+- screen: BO-108
+  name: Venue Operations
+  module: Venue Operations
+  requiresModule: core
+  wave: 1
+  density: compact
+  operations:
+  - getVenueSettings
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - venueId<-session
+  goesTo:
+  - BO-036
+  - BO-044
+  - BO-058
+  - BO-060
+  - BO-064
+  - BO-067
+  - BO-100
+  - BO-127
+  - BO-128
+  - BO-129
+  - BO-130
+  - BO-131
+  - BO-132
+  - BO-133
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-108
+  inFlows: null
+- screen: BO-109
+  name: Menu Builder & POS Layout Designer
+  module: Sell
+  requiresModule: fnb
+  wave: 2
+  density: compact
+  operations:
+  - listMenus
+  - setMenuSections
+  - updateSaleBoard
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - venueId<-session
+  - menuId<-deepLink
+  - saleBoardId<-deepLink
+  goesTo: []
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-109
+  inFlows: null
+- screen: BO-110
+  name: Recipe & BOM Management
+  module: Sell
+  requiresModule: fnb
+  wave: 2
+  density: compact
+  operations:
+  - listRecipes
+  - setRecipe
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - venueId<-session
+  goesTo: []
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-110
+  inFlows: null
+- screen: BO-111
+  name: Ingredient Substitution, Allergen & Nutrition
+  module: Sell
+  requiresModule: fnb
+  wave: 2
+  density: compact
+  operations:
+  - setRecipe
+  - setSubstitutionRules
+  - updateMenu
+  - verifyAllergens
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - venueId<-session
+  - menuId<-deepLink
+  - menuItemId<-deepLink
+  goesTo: []
+  boardFrames:
+  - FNB-2L
+  wireframe: wireframes/FnB Board 2.dc.html#fnb-2l
+  inFlows:
+  - F31 A menu is drafted, scheduled and rolled back
+  - F93 A recipe changes and its allergen claim is re-verified
+- screen: BO-112
+  name: Production Planning & Production Sheets
+  module: Sell
+  requiresModule: fnb
+  wave: 2
+  density: compact
+  operations:
+  - planProductionRun
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - venueId<-session
+  goesTo: []
+  boardFrames:
+  - RET-2E
+  wireframe: wireframes/Retail Board 2.dc.html#ret-2e
+  inFlows:
+  - F78 A supplier is set up and a catalogue is priced and published
+- screen: BO-113
+  name: Central Kitchen & Commissary Management
+  module: Sell
+  requiresModule: fnb
+  wave: 2
+  density: compact
+  operations:
+  - completeProductionRun
+  - planProductionRun
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - venueId<-session
+  - runId<-deepLink
+  goesTo: []
+  boardFrames:
+  - RET-2D
+  wireframe: wireframes/Retail Board 2.dc.html#ret-2d
+  inFlows: null
+- screen: BO-114
+  name: Variants, Attributes, Barcode & RFID Management
+  module: Sell
+  requiresModule: inventory
+  wave: 2
+  density: compact
+  operations:
+  - listSerialisedItems
+  - lookupMerchandise
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - venueId<-session
+  goesTo: []
+  boardFrames:
+  - RET-4J
+  wireframe: wireframes/Retail Board 4.dc.html#ret-4j
+  inFlows: null
+- screen: BO-115
+  name: Category, Brand & Merchandise Hierarchy
+  module: Sell
+  requiresModule: ticketing
+  wave: 2
+  density: compact
+  operations:
+  - listProductCategories
+  - listSaleBoards
+  - requestSuggestion
+  - runReport
+  - setProductCategories
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - venueId<-session
+  - reportId<-deepLink
+  goesTo: []
+  boardFrames:
+  - POS-4A
+  wireframe: wireframes/POS Board 4.dc.html#pos-4a
+  inFlows:
+  - F86 A POS layout is designed, previewed and deployed
+- screen: BO-116
+  name: Merchandising & Product Presentation
+  module: Sell
+  requiresModule: retail
+  wave: 2
+  density: compact
+  operations:
+  - listMerchandise
+  - listSaleBoards
+  - listWorkstations
+  - setRolePermissions
+  - setVenueSettings
+  - updateMerchandise
+  - updateSaleBoard
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - venueId<-session
+  - merchandiseId<-deepLink
+  - roleId<-deepLink
+  - saleBoardId<-deepLink
+  goesTo: []
+  boardFrames:
+  - POS-4B
+  wireframe: wireframes/POS Board 4.dc.html#pos-4b
+  inFlows:
+  - F86 A POS layout is designed, previewed and deployed
+- screen: BO-117
+  name: Product Import, Governance & AI Configuration Assistant
+  module: Sell
+  requiresModule: ticketing
+  wave: 2
+  density: compact
+  operations:
+  - generateConfiguration
+  - importProductCatalogue
+  - listSaleBoards
+  - requestSuggestion
+  - updateSaleBoard
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - venueId<-session
+  - saleBoardId<-deepLink
+  goesTo: []
+  boardFrames:
+  - POS-4C
+  wireframe: wireframes/POS Board 4.dc.html#pos-4c
+  inFlows:
+  - F86 A POS layout is designed, previewed and deployed
+- screen: BO-118
+  name: Campaign & Audience Management
+  module: Sell
+  requiresModule: marketing
+  wave: 2
+  density: compact
+  operations:
+  - createCampaign
+  - listCampaigns
+  - listSaleBoards
+  - listSegments
+  - runReport
+  - updateSaleBoard
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - venueId<-session
+  - reportId<-deepLink
+  - saleBoardId<-deepLink
+  goesTo: []
+  boardFrames:
+  - POS-4D
+  wireframe: wireframes/POS Board 4.dc.html#pos-4d
+  inFlows:
+  - F86 A POS layout is designed, previewed and deployed
+- screen: BO-119
+  name: Cross-Sell, Upsell & Recommendation Rules
+  module: Sell
+  requiresModule: ticketing
+  wave: 2
+  density: compact
+  operations:
+  - getRecommendations
+  - getUpsellSuggestions
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - venueId<-session
+  goesTo: []
+  boardFrames:
+  - RET-5D
+  wireframe: wireframes/Retail Board 5.dc.html#ret-5d
+  inFlows:
+  - F90 An audience is built, offered to, and the result is judged
+- screen: BO-120
+  name: Omnichannel Commerce & Journey Configuration
+  module: Sell
+  requiresModule: marketing
+  wave: 2
+  density: compact
+  operations:
+  - createJourney
+  - listJourneys
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - venueId<-session
+  goesTo: []
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-120
+  inFlows: null
+- screen: BO-121
+  name: Personalized Offers & Guest Engagement
+  module: Sell
+  requiresModule: marketing
+  wave: 2
+  density: compact
+  operations:
+  - createCampaign
+  - listSegments
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - venueId<-session
+  goesTo: []
+  boardFrames:
+  - RET-5F
+  wireframe: wireframes/Retail Board 5.dc.html#ret-5f
+  inFlows: null
+- screen: BO-122
+  name: POS Experience Dashboard
+  module: Sell
+  requiresModule: core
+  wave: 2
+  density: compact
+  operations:
+  - listSaleBoards
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - venueId<-session
+  goesTo: []
+  boardFrames:
+  - RET-5J
+  wireframe: wireframes/Retail Board 5.dc.html#ret-5j
+  inFlows: null
+- screen: BO-123
+  name: POS Profile Management
+  module: Sell
+  requiresModule: core
+  wave: 2
+  density: compact
+  operations:
+  - listSaleBoards
+  - setConfigurationProfile
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - venueId<-session
+  goesTo: []
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-123
+  inFlows: null
+- screen: BO-124
+  name: Layout & Journey Builder
+  module: Sell
+  requiresModule: core
+  wave: 2
+  density: compact
+  operations:
+  - createSaleBoard
+  - deployConfigurationProfile
+  - listAuditRecords
+  - listDevices
+  - recordDeviceHeartbeat
+  - updateSaleBoard
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - venueId<-session
+  - saleBoardId<-deepLink
+  - deviceId<-deepLink
+  - profileId<-deepLink
+  goesTo: []
+  boardFrames:
+  - POS-1D
+  wireframe: wireframes/POS Board 1.dc.html#pos-1d
+  inFlows:
+  - F79 A workstation is registered, configured and rolled out
+  - F95 A fleet is watched, a fault is found, and a station is fixed
+- screen: BO-125
+  name: Product & Category Button Configuration
+  module: Sell
+  requiresModule: ticketing
+  wave: 2
+  density: compact
+  operations:
+  - getWorkstationHealth
+  - listAlerts
+  - listProducts
+  - recordDeviceHeartbeat
+  - reportIncident
+  - updateSaleBoard
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - venueId<-session
+  - saleBoardId<-deepLink
+  - deviceId<-deepLink
+  - workstationId<-deepLink
+  goesTo: []
+  boardFrames:
+  - POS-1E
+  wireframe: wireframes/POS Board 1.dc.html#pos-1e
+  inFlows:
+  - F95 A fleet is watched, a fault is found, and a station is fixed
+- screen: BO-126
+  name: Deployment, Preview & Audit
+  module: Sell
+  requiresModule: core
+  wave: 2
+  density: compact
+  operations:
+  - deployConfigurationProfile
+  - listAuditRecords
+  - listSaleBoards
+  - listWorkstations
+  - runReport
+  - startRollout
+  - updateSaleBoard
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - venueId<-session
+  - profileId<-deepLink
+  - saleBoardId<-deepLink
+  - reportId<-deepLink
+  - rolloutId<-deepLink
+  goesTo: []
+  boardFrames:
+  - POS-1F
+  - POS-4F
+  wireframe: wireframes/POS Board 1.dc.html#pos-1f
+  inFlows:
+  - F79 A workstation is registered, configured and rolled out
+  - F86 A POS layout is designed, previewed and deployed
+- screen: BO-127
+  name: Hardware & Peripherals Management
+  module: Venue Operations
+  requiresModule: core
+  wave: 2
+  density: compact
+  operations:
+  - listDevices
+  - recordDeviceHeartbeat
+  - registerDevice
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - venueId<-session
+  - deviceId<-deepLink
+  goesTo: []
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-127
+  inFlows: null
+- screen: BO-128
+  name: Live Workstation Health Monitor
+  module: Venue Operations
+  requiresModule: core
+  wave: 2
+  density: compact
+  operations:
+  - getWorkstationHealth
+  - listWorkstations
+  - setOfflinePolicy
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - venueId<-session
+  - workstationId<-deepLink
+  goesTo: []
+  boardFrames:
+  - POS-5B
+  wireframe: wireframes/POS Board 5.dc.html#pos-5b
+  inFlows:
+  - F89 Offline policy is set, cached, monitored and reconciled
+- screen: BO-129
+  name: Software, Configuration & Version Management
+  module: Venue Operations
+  requiresModule: core
+  wave: 2
+  density: compact
+  operations:
+  - configureWorkstation
+  - deployConfigurationProfile
+  - getWorkstationHealth
+  - listWorkstations
+  - setConfigurationProfile
+  - setConnectivityThresholds
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - venueId<-session
+  - profileId<-deepLink
+  - workstationId<-deepLink
+  goesTo: []
+  boardFrames:
+  - POS-5D
+  wireframe: wireframes/POS Board 5.dc.html#pos-5d
+  inFlows:
+  - F89 Offline policy is set, cached, monitored and reconciled
+- screen: BO-130
+  name: Offline Policy & Rules Configuration
+  module: Venue Operations
+  requiresModule: core
+  wave: 1
+  density: compact
+  operations:
+  - createOrder
+  - listSyncRejections
+  - setOfflinePolicy
+  - syncOrders
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - venueId<-session
+  goesTo: []
+  boardFrames:
+  - POS-5E
+  wireframe: wireframes/POS Board 5.dc.html#pos-5e
+  inFlows:
+  - F33 A till goes offline and comes back
+  - F89 Offline policy is set, cached, monitored and reconciled
+- screen: BO-131
+  name: Connectivity & Auto-Switch Settings
+  module: Venue Operations
+  requiresModule: core
+  wave: 2
+  density: compact
+  operations:
+  - setConnectivityThresholds
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - venueId<-session
+  goesTo: []
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-131
+  inFlows: null
+- screen: BO-132
+  name: Offline Transaction Monitor & Sync Queue
+  module: Venue Operations
+  requiresModule: ticketing
+  wave: 2
+  density: compact
+  operations:
+  - listSyncRejections
+  - syncOrders
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - venueId<-session
+  goesTo: []
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-132
+  inFlows: null
+- screen: BO-133
+  name: Offline Alerts, Limits & Audit
+  module: Venue Operations
+  requiresModule: ticketing
+  wave: 1
+  density: compact
+  operations:
+  - decideApprovalRequest
+  - listAlerts
+  - listAuditRecords
+  - listSyncRejections
+  - runReport
+  - setAlertRule
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - venueId<-session
+  - reportId<-deepLink
+  - requestId<-deepLink
+  goesTo: []
+  boardFrames:
+  - POS-5F
+  wireframe: wireframes/POS Board 5.dc.html#pos-5f
+  inFlows:
+  - F33 A till goes offline and comes back
+- screen: BO-134
+  name: Kitchen & Preparation Stations
+  module: Food & Beverage
+  requiresModule: fnb
+  wave: 2
+  density: compact
+  operations:
+  - listKitchenStations
+  - setKitchenStations
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - venueId<-session
+  goesTo: []
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-134
+  inFlows: null
+- screen: BO-135
+  name: Order Routing & KDS/Printer Rules
+  module: Food & Beverage
+  requiresModule: fnb
+  wave: 2
+  density: compact
+  operations:
+  - listWorkstations
+  - setKitchenStations
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - venueId<-session
+  goesTo: []
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-135
+  inFlows: null
+- screen: BO-136
+  name: F&B Global Settings & Controls
+  module: Food & Beverage
+  requiresModule: core
+  wave: 2
+  density: compact
+  operations:
+  - buildProductionPlan
+  - getVenueSettings
+  - listProductionRuns
+  - releaseProductionPlan
+  - setVenueSettings
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - venueId<-session
+  - planId<-deepLink
+  goesTo: []
+  boardFrames:
+  - FNB-2M
+  - FNB-2N
+  - FNB-5D
+  wireframe: wireframes/FnB Board 2.dc.html#fnb-2m
+  inFlows:
+  - F85 Production is planned, costed and released
+- screen: BO-137
+  name: Recipe Consumption & Theoretical Inventory
+  module: Stock & Supply
+  requiresModule: fnb
+  wave: 2
+  density: compact
+  operations:
+  - getCountVariance
+  - getProductionRun
+  - listProductionRuns
+  - listRecipes
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - venueId<-session
+  - countId<-deepLink
+  - runId<-deepLink
+  goesTo: []
+  boardFrames:
+  - FNB-2F
+  - FNB-5C
+  wireframe: wireframes/FnB Board 2.dc.html#fnb-2f
+  inFlows:
+  - F30 A count is entered, varied and posted
+  - F85 Production is planned, costed and released
+- screen: BO-138
+  name: Production Execution & Batch Management
+  module: Stock & Supply
+  requiresModule: fnb
+  wave: 2
+  density: compact
+  operations:
+  - completeProductionRun
+  - listExpiringBatches
+  - planProductionRun
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - venueId<-session
+  - runId<-deepLink
+  goesTo: []
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-138
+  inFlows: null
+- screen: BO-139
+  name: Wastage, Spoilage, Returns & Write-Off
+  module: Stock & Supply
+  requiresModule: fnb
+  wave: 2
+  density: compact
+  operations:
+  - recordWaste
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - venueId<-session
+  - outletId<-deepLink
+  goesTo: []
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-139
+  inFlows: null
+- screen: BO-140
+  name: Product Availability, 86 & Operational Food Safety
+  module: Stock & Supply
+  requiresModule: fnb
+  wave: 2
+  density: compact
+  operations:
+  - listExpiringBatches
+  - setItemAvailability
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - venueId<-session
+  - itemId<-deepLink
+  goesTo: []
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-140
+  inFlows: null
+- screen: BO-141
+  name: Operational Alerts, AI Replenishment & Action Center
+  module: Stock & Supply
+  requiresModule: analytics
+  wave: 2
+  density: compact
+  operations:
+  - acknowledgeAlert
+  - createRequisition
+  - listAlerts
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - venueId<-session
+  - alertId<-deepLink
+  goesTo: []
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-141
+  inFlows: null
+- screen: BO-142
+  name: Store Rules, Controls & Permissions
+  module: Sell
+  requiresModule: core
+  wave: 2
+  density: compact
+  operations:
+  - getVenueSettings
+  - listRoles
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - venueId<-session
+  goesTo: []
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-142
+  inFlows: null
+- screen: BO-143
+  name: Retail Global Settings & Controls
+  module: Sell
+  requiresModule: core
+  wave: 2
+  density: compact
+  operations:
+  - getVenueSettings
+  - setVenueSettings
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - venueId<-session
+  goesTo: []
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-143
+  inFlows: null

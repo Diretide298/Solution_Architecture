@@ -1,0 +1,78 @@
+$schema: ./_schema.yaml
+id: F86
+name: A POS layout is designed, previewed and deployed
+actor: venueManager
+capability: A POS layout is designed, previewed and deployed
+wave: 2
+frequency: As the venue needs it.
+criticality: operational
+primaryContract: tenancy
+contracts:
+- tenancy
+- catalogue
+- promotions
+platforms:
+- P08
+trigger:
+  description: A venue wants its tills to look different — new buttons, a new tender, a new discount
+    rule.
+offlineBehaviour: None of it offline. A layout deployed to some tills and not others is worse than none.
+steps:
+- step: 1
+  screen: BO-115
+  action: Category, Brand & Merchandise Hierarchy.
+  operations:
+  - listProductCategories
+  - setProductCategories
+  outcome: '**Drawn by the client as POS-4A.** 2 operations on this step.'
+- step: 2
+  screen: BO-116
+  action: Merchandising & Product Presentation.
+  operations:
+  - setRolePermissions
+  - updateMerchandise
+  outcome: '**Drawn by the client as POS-4B.** 2 operations on this step.'
+  crossesDevice: true
+- step: 3
+  screen: BO-117
+  action: Product Import, Governance & AI Configuration Assistant.
+  operations:
+  - generateConfiguration
+  - importProductCatalogue
+  outcome: '**Drawn by the client as POS-4C.** 2 operations on this step.'
+  crossesDevice: true
+- step: 4
+  screen: BO-118
+  action: Campaign & Audience Management.
+  operations:
+  - createCampaign
+  outcome: '**Drawn by the client as POS-4D.** 1 operations on this step.'
+  crossesDevice: true
+- step: 5
+  screen: BO-126
+  action: Deployment, Preview & Audit.
+  operations:
+  - deployConfigurationProfile
+  - listAuditRecords
+  - listSaleBoards
+  - listWorkstations
+  outcome: '**Drawn by the client as POS-4F.** 4 operations on this step.'
+  crossesDevice: true
+branches:
+- at: 1
+  condition: A step in the chain is not licensed for this tenant.
+  behaviour: '**The chain stops at the module boundary.** `requiresModule` on each screen decides —
+    a tenant without the retail licence does not see the retail half, and the journey is shorter rather
+    than broken.'
+  severity: medium
+  resolvedBy: getModuleEnablement
+exitStates:
+- state: completed
+  description: The chain ran as the client drew it.
+- state: stoppedAtModule
+  description: '**A licence boundary, not a failure.**'
+notes: '**POS board 4.** Sale boards existed and **nothing walked designing one** — a till layout is
+  the most-seen screen in the venue. **Derived from the client''s own `GOES TO` edges**, not from an
+  inferred path — a pair of frames the client linked is evidence; a chain assembled from unrelated pairs
+  is a guess.'
+openQuestions: null

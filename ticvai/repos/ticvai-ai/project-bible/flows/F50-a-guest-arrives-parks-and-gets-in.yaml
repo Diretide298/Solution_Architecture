@@ -1,0 +1,84 @@
+$schema: ./_schema.yaml
+id: F50
+name: A guest arrives, parks, and gets in
+actor: guest
+capability: Arrival
+wave: 3
+frequency: Routine.
+criticality: revenue
+primaryContract: access
+contracts:
+- access
+- orders
+platforms:
+- P02
+trigger:
+  description: A guest is driving to the venue with a ticket on their phone. **Every guest makes this
+    journey and none of it was walked.**
+offlineBehaviour: '**The ticket must work offline.** A car park with no signal is the ordinary case,
+  and a QR that needs a network is a barrier that does not lift.'
+steps:
+- step: 1
+  screen: GST-027
+  action: They reserve parking on the way.
+  operations:
+  - createParkingEntitlement
+  outcome: '**Parking is an entitlement, not a booking.** It goes on the same media as the ticket, which
+    is why a barrier and a gate read the same thing.'
+- step: 2
+  screen: GST-028
+  action: It is confirmed with a facility and a bay type.
+  operations:
+  - listParkingFacilities
+  - createParkingEntitlement
+  outcome: '**Facility, not space.** Reserving a numbered bay is a promise a venue cannot keep on a
+    busy Saturday.'
+  crossesDevice: true
+- step: 3
+  screen: GST-012
+  action: They open their tickets.
+  operations:
+  - listMyEntitlements
+  - getEntitlement
+  outcome: Everything they hold, for today and later.
+  crossesDevice: true
+- step: 4
+  screen: GST-013
+  action: They open the one for now.
+  operations:
+  - getEntitlementCredential
+  - getEntitlementHistory
+  outcome: '**The credential, not the ticket.** What a gate reads is a rotating credential — and the
+    history is what answers *has this been used*.'
+  crossesDevice: true
+- step: 5
+  screen: GST-055
+  action: The QR rotates as they walk to the gate.
+  operations:
+  - transferOrderTickets
+  outcome: '**Dynamic because a screenshot is a ticket somebody can send.** A static code sold on twice
+    is the fraud this prevents.'
+  crossesDevice: true
+exitStates:
+- state: admitted
+  description: Parked and inside.
+- state: parkedOffsite
+  description: Facility full, alternative taken.
+- state: refusedAtGate
+  description: '**Rare, and it needs a reason the guest can act on.**'
+branches:
+- at: 1
+  condition: The car park is full.
+  behaviour: Told before they drive, not at the barrier. **A guest turned away at a full car park has
+    already spent forty minutes.**
+  severity: high
+  resolvedBy: listParkingFacilities
+- at: 5
+  condition: The phone has no signal at the gate.
+  behaviour: '**The credential is already on the device and rotates locally.** This is the case it was
+    designed for.'
+  severity: high
+  resolvedBy: getEntitlementCredential
+notes: '**Written 24 August.** The arrival journey — and `GST-055` dynamic QR had never appeared in
+  a flow despite being the anti-fraud mechanism the whole ticketing model rests on.'
+openQuestions: null

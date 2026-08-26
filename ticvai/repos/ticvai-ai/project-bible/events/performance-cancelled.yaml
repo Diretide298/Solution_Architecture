@@ -1,0 +1,62 @@
+# performance.cancelled v1 — published by catalogue
+# Checked by tools/check-states.py.
+
+name: performance.cancelled
+version: 1
+publisher: catalogue
+description: A performance was cancelled and everyone holding a ticket must be made whole.
+aggregate: performance
+emittedWhen: Performance.status onSale or suspended or scheduled to cancelled
+payload:
+- field: performanceId
+  type: uuid
+- field: productId
+  type: uuid
+- field: venueId
+  type: uuid
+- field: startsAt
+  type: timestamp
+- field: reason
+  type: string
+  notes: '**Told to the guest.** "Cancelled" with no reason produces a support call per ticket'
+- field: entitlementCount
+  type: integer
+  notes: How many people this reaches — sizes the refund run before it starts
+- field: cancelledAt
+  type: timestamp
+consumers:
+- context: orders
+  purpose: Refund every holder (F09). **The critical consumer** — a cancellation that does not refund
+    is worse than no cancellation
+  idempotencyKey: performanceId
+  onFailure: retryThenDeadLetter
+  isCritical: true
+- context: access
+  purpose: Void the entitlements so a gate refuses them
+  idempotencyKey: performanceId
+  onFailure: retryThenDeadLetter
+  isCritical: true
+- context: catalogue
+  purpose: Release held capacity and close the waitlist
+  idempotencyKey: performanceId
+  onFailure: retry
+  isCritical: false
+- context: marketing
+  purpose: Tell the guests, once, in their own language
+  idempotencyKey: performanceId
+  onFailure: retry
+  isCritical: false
+- context: reporting
+  purpose: Cancelled revenue, separated from refunded revenue
+  idempotencyKey: performanceId
+  onFailure: retry
+  isCritical: false
+retention: Permanent. A cancellation is referenced by every refund it caused
+notes: '**Two consumers are critical and they must not race.** Voiding the entitlement before the refund
+  completes leaves a guest with no ticket and no money; refunding without voiding leaves a valid ticket
+  for a performance that will not happen. The refund state model settles the order: refund first, void
+  on confirmation.
+
+
+  The notification consumer is not critical, which is deliberate — a guest who is refunded and not told
+  is annoyed, and a guest who is told and not refunded is a complaint.'

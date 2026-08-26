@@ -1,0 +1,310 @@
+**Minutes of Meeting**
+
+*TICVAI Reference System Deep-Dive — Backend Configuration **&** Ticketing Logic*
+
+| **Date** | 7 August 2026 | **Project** | TICVAI |
+| --- | --- | --- | --- |
+| **Meeting Type** | Reference System Deep-Dive — Backend Configuration & Ticketing Logic | **Prepared by** | Chitrangi Mestry |
+
+## **Primary Objective**
+
+To walk through the backend configuration and functional logic of an existing, mature ticketing platform — covering system/tenant setup, product and pricing configuration, events and time slots, entitlements, promotions, resource management, point-of-sale operation, reporting, and access control — as a functional reference for TICVAI's own platform, and to align on next steps for UI/UX design.
+
+## **Participants**
+
+- TICVAI Team
+
+- Softlabs Team
+
+## **A****genda**
+
+- Session framing and reference system context
+
+- System organization: tenant and site setup
+
+- Operating areas, workstations and permissions hierarchy
+
+- Roles and user management
+
+- Base parameters: devices and payment methods
+
+- Data mask: flexible custom data capture
+
+- Task scheduler: automated system jobs
+
+- Legacy POS layout designer and system logging
+
+- Statistical groups and website content integration
+
+- Tax configuration
+
+- Accounts management (B2B and B2C)
+
+- Products configuration: metric sheets, pricing and components
+
+- Tenant/B2B onboarding and self-registration flow
+
+- Events, integrations and performances (time slots)
+
+- Capacity splitting via envelopes
+
+- Entitlement components: re-entry, expiration and sale restrictions
+
+- Promotions and dynamic offers
+
+- Resource management
+
+- Maintenance tools
+
+- Live point-of-sale transaction walkthrough
+
+- Dashboards and reporting
+
+- Report and document template design
+
+- Tiered ticketing and access control deep dive
+
+- Next workshop planning
+
+# **Discussion Summary**
+
+**1. Session Framing**
+
+Allam shared his screen to demonstrate two types of ticketing configuration, starting with a multi-site system in which multiple venues are configured within a single database. He was explicit that the purpose was to help the team understand how a mature ticketing platform is configured conceptually — not to replicate the exact structure. Chinmay confirmed this framing and followed along with questions throughout.
+
+**2. System Organization: Tenant ****&**** Site Setup**
+
+Allam began with system organization, where the base tenant is configured. Each tenant onboarded to the platform receives a unique system ID and a tenant/system code, which is associated with every transaction. The system-level configuration also defines the operating calendar — either a standard midnight-to-midnight transaction day, or an alternative (e.g., 6am to 6am) — with licensing applied at the system level.
+
+Within a tenant, individual sites (venues) are configured, each with a unique ID — the demo included several example sites (an adventure park, an in-flight experience, a diving operator, and desert/palm-based excursion brands). Within each site, "operating areas" represent departments (e.g., B2B, B2C, OTAs, on-site/point-of-sale, management, finance). Permissions and rights can be configured at multiple levels — site, operating area, workstation, role, or individual user — with settings applied at the site level (e.g., password complexity policy, UI rights, configuration rights) cascading globally to all users and workstations under that site.
+
+**3. Operating Areas, Workstations ****&**** Permissions Hierarchy**
+
+Each operating area belongs to a site and has its own set of point-of-sale workstations (terminals) associated with it; sales reporting can be scoped to a specific operating area, showing all transactions from its associated workstations. Each workstation configuration records its connected devices — receipt printer, barcode scanner, ticket printer — so that a cashier logging into a given workstation automatically has access to the correct hardware. Every workstation also has its own activity log and rights configuration.
+
+**4. Roles ****&**** User Management**
+
+Roles (e.g., cashier, supervisor, manager, administrator) are fully configurable, each with its own set of privileges. A single user can be assigned multiple roles and switch between them at login (e.g., logging in as a cashier vs. a supervisor) to validate what access each role provides. Allam noted one gap in the reference system worth addressing in TICVAI's platform: a "roles comparison" view, letting an admin directly compare two roles side-by-side (e.g., confirming a cashier role excludes refund/void permissions that a supervisor role includes) to make permission management easier and less error-prone.
+
+**5. Base Parameters: Devices ****&**** Payment Methods**
+
+Base parameters cover system-wide configuration, starting with devices — printers, access-control devices, and scanners are each configured with an appropriate driver (e.g., specific printer brands), then assigned to individual workstations.
+
+Payment methods (cash, card, PayPal, bank transfer, etc.) are configured similarly. Card payment methods are associated with a payment driver for the relevant terminal/provider (e.g., a named payment device integration). A "virtual credit card" option also exists for standalone card terminals not directly integrated with the system — in this case, the cashier manually enters the authorization code returned by the physical terminal, preserving reporting accuracy even without a live integration.
+
+Chinmay asked whether the driver-based integration approach would be standard for TICVAI. Allam confirmed that Stripe and Network International integrations had already been agreed as part of the current scope, and that additional payment driver integrations can be added over time as needed — whatever isn't already integrated would need to be built.
+
+**6. Data Mask: Flexible Custom Data Capture**
+
+Allam introduced "data mask" as one of the most important features in the reference system — a flexible mechanism for capturing custom information anywhere in the platform. Data can be captured at the account level (for any customer type — B2B, B2C, etc.), the event level, as extended ticket information, or per product ("metric cell" level, i.e., tied to a specific ticket/product).
+
+Fields can be standard (e.g., first name, email address) or fully custom, with configurable field types (text, dropdown, radio button, true/false), multi-language labels, and validation rules (min/max length, required/optional). Reusable "mask tables" support shared dropdown value sets (e.g., a full country list) that can be linked to any relevant field. Custom fields were shown supporting venue-specific requirements — for example, a checkbox confirming a guest is not pregnant, required before a specific product can be purchased, or a weight-range field for a specific activity.
+
+Chinmay asked whether TICVAI would need to define all data-capture fields themselves, or whether Softlabs would provide standard fields. Allam confirmed standard fields (names, countries, currencies, etc.) would be provided out of the box, while venue- or product-specific custom fields would be configured through this same data-mask mechanism as needed, without requiring new development for each new field.
+
+**7. Task Scheduler: Automated System Jobs**
+
+The task scheduler manages recurring automated jobs, including:
+
+- Purge job: automatically checks reservations left in an incomplete ("reserved but unpaid") state for longer than a configurable threshold (e.g., 20–30 minutes) and releases the held capacity back into inventory
+
+- Release capacity job: similarly releases inventory held in an abandoned cart (added but never checked out) after a period of inactivity, so it becomes available to other customers
+
+- Data export job: exports reports or ERP-format files to a shared location on a schedule
+
+- Revenue recognition job: runs overnight to move ticket revenue from a "deferred" to a "redeemed" status based on which tickets were actually scanned/used
+
+**8. Legacy POS Layout Designer ****&**** System Logging**
+
+Allam briefly showed "sales board management," a drag-and-drop point-of-sale button/layout designer allowing products and system functions (e.g., ticket list, reservation list, transaction list, media lookup) to be placed as buttons with customizable fonts and colors. He was explicit that this specific interface is old and not intended as a design reference — it was shown only to illustrate the underlying functional concept.
+
+History log management captures a full audit trail of system activity — logins, shift start/end times, and every change made (old value vs. new value) across every screen and transaction. Logging can be enabled or disabled, and historical logs can be archived. A related "task status" feature allows internal, in-system task assignment and follow-up between staff (e.g., a cashier flagging something for a supervisor) without relying on email or messaging apps. A built-in help menu provides step-by-step tutorials with screenshots for common tasks (e.g., how to sell a ticket at the POS).
+
+**9. Statistical Groups ****&**** Website Content Integration**
+
+Statistical groups are used to categorize and display products on the tenant-facing website — for example, a diving operator's site groups its offerings into categories such as scuba diving, free diving, and snorkelling, each showing selectable packages. Allam demonstrated live: selecting a package on the tenant website (which is managed by the tenant) leads through to checkout on the TICVAI-managed booking platform. Package details shown on the website — title, description, terms, age limits, and images — are all pulled from data-mask fields configured in the backend and sync automatically to the live site when updated.
+
+**10. Tax Configuration**
+
+Tax packages define one or more applicable taxes per product, which can be marked inclusive or exclusive of the listed price, with configurable rounding rules. Allam flagged an important capability that should be included in TICVAI's platform: the ability to calculate tax on tax (compound tax) — for example, applying a second tax rate on top of a price that already includes a first tax, rather than calculating both taxes independently from the base price.
+
+**11. Accounts Management (B2B and B2C)**
+
+Accounts are organized into categories — broadly B2B (main accounts and agent/child accounts) and B2C (guest checkout and registered checkout). A sample B2B account showed key fields on its financial tab: credit limit, credit days, and a linked, account-specific price list, meaning a given B2B partner can be assigned different pricing than the general public. Accounts can be structured as a main account with one or more linked child accounts, and every account shows its full linked sales/transaction history. A B2C customer profile example similarly showed a purchase and transaction history tied to that individual.
+
+**12. Products Configuration: Metric Sheets, Pricing ****&**** Components**
+
+Product configuration ("stores") is organized per site. Products are defined in a "metric sheet" — the core product/ticket configuration table — categorized both by product type (e.g., scuba diving, free diving) and by sales channel (B2C, point of sale/on-site, OTA, etc.), since the same underlying product may need separate channel-specific setup.
+
+An individual product record includes pricing (fixed price, tax inclusive/exclusive), a linked print template (the PDF ticket layout), a system-generated product/matrix code, a toggle for whether reservation details must be captured at time of sale, and "entitlements" — what the ticket actually grants, including whether it can be upgraded, whether it allows loading value onto a stored-value card, its linked event (if any), re-entry rules, and its linked performance/time-slot structure.
+
+Multiple price lists can be defined per sales channel (e.g., box office/on-site, B2C, OTA) so the same product can carry different prices depending on where it's sold, and pricing can vary seasonally (a winter/summer pricing example was shown). The platform's "components" and "attributes" model is central to flexible product creation: a component (e.g., "ticket type") can have multiple attributes (e.g., adult, youth, senior, infant, child), each priced independently — adding a new attribute automatically generates a new sellable product variant without additional setup. Sales permissions (who is authorized to sell a given product) can be restricted by site, operating area, workstation, or role.
+
+**13. Tenant/B2B Onboarding ****&**** Self-Registration Flow**
+
+At Chinmay's request, Allam demonstrated the tenant/B2B onboarding process. A new B2B partner account can be created directly from the backend, or through a self-registration flow on the tenant's own website: a "become a partner" link leads to a registration form (built via data mask) capturing company type, name, address, Emirates/state, and required documents such as a trade license and VAT/TRN certificate.
+
+Submitting the form creates a pending account record and automatically emails the tenant's operations/business team. The team reviews and validates the submitted documents — for example, rejecting an expired trade license with a message prompting resubmission — and negotiates commercial terms (pricing, commission) before approving the account. Approval automatically generates login credentials (with a temporary password) which are emailed to the registrant; on first login, the user is required to set their own password.
+
+**14. Events, Integrations ****&**** Performances (Time Slots)**
+
+Dinesh Jadhav, joining partway through, raised a clarifying question on event/product relationships: whether every product necessarily needs an associated event. Allam confirmed this is not the case — an event is only needed where date, time, and capacity control are required; a simple open-dated product (e.g., general park admission valid for a set period) does not need one.
+
+Events also carry an "integration type" setting — for example, an event can be linked to a third-party availability/ticketing platform, so that at time of sale the system checks live availability on that external platform and issues the corresponding QR code from it, rather than managing capacity independently.
+
+"Performances" are the system's term for time slots. Creating performances involves selecting a date range (specific weekdays or all days), a fixed start and end time, a slot duration (e.g., 30 or 60 minutes), "minutes on screen" (how long past its start time a slot remains sellable at the POS — e.g., a 10:00am slot sellable until 10:10am), and separate access-control timing ("time opening"/"time limit") governing how early or late a ticket holder may physically enter relative to their booked time (e.g., entry allowed from 9:30am for a 10:00am slot, with a cutoff at 10:20am). An on-sale date range controls when the performance itself becomes purchasable. Performances can be bulk-created across a date range, capacity can be edited individually or via multi-select bulk edit, and individual performances can be suspended, resumed, or cancelled (e.g., suspending due to weather risk, later resuming once resolved).
+
+**15. Capacity Splitting via Envelopes**
+
+"Envelopes" allow a performance's total capacity to be split across sales channels — for example, of 100 total spaces for a scheduled show, 30 could be reserved for B2C, 40 for B2B, and 30 for on-site sale — so that availability shown to each channel reflects only its allocated share, configured once and applied automatically across all performances it's linked to.
+
+**16. Entitlement Components: Re-entry, Expiration ****&**** Sale Restrictions**
+
+Entitlement components define what a ticket actually grants and how it behaves. "Components" (such as an event or an upgrade) can carry configurable "attributes" — for example, re-entry can be set as not allowed, allowed once per day, or unlimited. Expiration rules offer many configurable options (end of week, end of month, end of year, a variable expiration date, based on first use, or based on the specific performance date/time). Sale restrictions allow minimum/maximum sellable quantity rules per customer (e.g., a promotional bundle requiring a minimum purchase of two), and group-ticket handling can be configured by fixed price or fixed quantity. A single ticket can also be linked to multiple events/entitlements simultaneously (e.g., one ticket granting access to several different experiences).
+
+**17. Promotions ****&**** Dynamic Offers**
+
+Coupons can be generated either as a single, shared promo code (e.g., for social media distribution) or as a batch of unique, single-use alphanumeric codes distributed individually to customers, with configurable reuse rules.
+
+"Dynamic offers" apply automatic, rule-based discounts without requiring a code — for example, a "bring your guest" buy-2-get-1-free structure, buy-3-get-2-at-50%-off, or a fixed-amount discount for a minimum quantity. Multiple rules can be layered onto a single offer, each scoped to specific products via the metric sheet, and the discounted item is automatically added to the cart with its price adjusted (e.g., to zero) once the qualifying condition is met.
+
+**18. Resource Management**
+
+Resource management is an optional module for tracking bookable resources tied to a product or package — for example, a desert excursion package that requires both a vehicle and a driver. A resource "template" defines the required resource types for a given product; individual resources (specific vehicles, named drivers) are listed and can be scheduled with an availability calendar/roster (marking specific dates as unavailable). Once resources are linked to an event, the system checks both resource availability and remaining capacity at the time of sale — whether sold via POS or online — before allowing the booking to proceed.
+
+**19. Maintenance Tools**
+
+Maintenance tools include account activation/deactivation, and a duplicate-detection and profile-merge feature — flagged as heavily used in this region, since common name spelling variations (e.g., different transliterations of the same name) frequently create multiple profiles for the same customer. The merge tool consolidates two profiles into one, carrying over the combined transaction history. A user-log deletion tool is also available for clearing historical logs.
+
+**20. Live Point-of-Sale Transaction Walkthrough**
+
+Allam performed a full, live ticket sale to illustrate the end-to-end POS flow: selecting a performance/time slot (showing real-time remaining capacity), adding a product, and being prompted to attach a reservation account — either searching for an existing customer or creating a new one, with mandatory vs. optional fields driven entirely by the data-mask configuration (e.g., a required weight range, date of birth). He added an add-on product, proceeded to checkout, and — because the configuration required per-ticket detail capture — entered individual "ticket owner" information for each ticket (distinct from the overall "reservation owner"/buyer), noting this can enforce rules such as a minimum age per ticket holder. Payment was completed in cash, generating a printed ticket and a booking reference/reservation code.
+
+Looking up the resulting reservation showed full transaction detail — items purchased, customer information, payment method, applicable taxes, and an optional post-purchase survey — along with the ability to reprint the receipt or regenerate the ticket PDF. The sample PDF ticket included a live QR code, a unique ticket number/barcode ("media identifier"), customizable branding/layout, terms and conditions, and the associated guest name. Allam clarified the distinction between a "ticket ID" (unique to each individual ticket) and a "media code" (which can be shared across multiple tickets scanned together as a single group under one QR code).
+
+**21. Dashboards ****&**** Reporting**
+
+Built-in dashboards include a Sales Summary (scoped to the logged-in cashier, showing transactions, payment totals, any voids/refunds, and a time-based chart of activity) and an Admission Summary (an access-control view showing real-time headcount of guests who have entered a venue based on ticket scans).
+
+The platform includes an extensive report library, filterable by site, operating area, sales channel, workstation, or user. Example reports demonstrated included a Sales Report (payment-method breakdown, totals, voids, deposits, and itemized ticket sales) and a Payment Summary report (per-cashier payment breakdown, e.g. credit card totals).
+
+**22. Report ****&**** Document Template Design**
+
+Report templates can be custom-built by advanced users with SQL/scripting knowledge, and exported in PDF or Excel format. Ticket and receipt document layouts are designed via a drag-and-drop template builder, placing dynamic variables (e.g., guest name, ticket number, QR code) onto a background image/layout — demonstrated using an existing venue's ticket template.
+
+**23. Reference System Access ****&**** Documentation**
+
+Chinmay asked whether Softlabs' backend team could get direct hands-on access to the reference system themselves, noting that even as an older system, an understanding of its backend schema and database structure could meaningfully reduce TICVAI's own schema design effort (estimating perhaps 60% of it could be informed this way). Allam confirmed direct system access would not be possible. Qossai offered an alternative: sharing the full system manual/documentation, which covers backend configuration in detail and should serve a similar purpose — to be shared via WhatsApp or a shared folder, expected later that day or the next, once Qossai was back at his home setup.
+
+Allam reiterated his overall framing: functionally, the reference system is extremely rich — almost anything needed for ticketing already exists in some form — but its technology and UI/UX are dated, which is the core gap TICVAI's platform is meant to address.
+
+**24. Tiered Ticketing ****&**** Access Control Deep Dive**
+
+To illustrate the access-control/entitlement model in a concrete example, Allam walked through a second reference site (a safari/tour-style venue) offering tiered Bronze, Silver, and Gold packages, each priced by adult/child/infant:
+
+- Bronze: a single-entry admission event (no re-entry at the main gate) plus unlimited re-entry to certain included attractions during the visit (e.g., an aviary, a themed area, and a show)
+
+- Silver: includes everything in Bronze, plus access to additional areas (e.g., a dedicated "silver terminal" and a guided safari/truck tour)
+
+- Gold: full access to all areas via a dedicated gold entrance and gold terminal
+
+Each tier's allowed access points are defined by the client filling in a matrix template indicating exactly which gates/attractions that ticket tier may scan into. In the system, this is configured as a chain: Locations (the venue) contain Admission Profiles (e.g., "Bronze," mapped to the specific gates it may use, such as main entrance and exit/retail shop); each Gate has associated Access Points (handheld scanners); and explicit deny rules can be configured to actively block a ticket type at a gate it isn't entitled to use — for example, a Gold ticket is explicitly denied at the Silver/Bronze entrance, ensuring strict tier separation is enforced by the system even if physically attempted.
+
+**25. Next Workshop Planning**
+
+Chinmay proposed returning to UI/UX topics for the next workshop, tentatively Monday, covering the client-facing mobile app and staff/employee mobile app together, alongside the tenant website and TICVAI's own website. Qossai asked for clarification on direction — whether Softlabs should present concepts, or TICVAI would present their vision as before. Chinmay confirmed the same format as the previous UI/UX session: Softlabs should bring whatever application or site examples they have prepared for review. He noted the tenant-facing application is expected to require comparatively little UI/UX discussion, while the client-facing mobile app and staff/employee mobile app will need more design input. Qossai confirmed his understanding of the scope: the client mobile application and the employee/venue mobile application.
+
+**26. Q****&****A: Performance Suspend/Resume**
+
+Tanmay Dukhande asked whether a suspended performance can be resumed. Allam confirmed yes — suspension is a status/state change, not a deletion, so a performance can be resumed at any time before its original start time (for example, suspending due to anticipated bad weather and later resuming once the risk has passed). Chinmay noted this confirms the platform should manage performance availability via a disable-able state rather than deleting and recreating records.
+
+# **Decisions Made**
+
+**Reference ****&**** Approach**
+
+- The demonstrated system is treated as a functional reference only — rich in ticketing functionality, but its UI/UX will not be replicated; TICVAI's platform will modernize the experience while covering equivalent functional depth
+
+- Direct hands-on access to the reference system will not be provided; the full system manual will be shared instead to support backend schema and design work
+
+**Core Platform Structure**
+
+- Multi-tenant, multi-site structure with system/tenant IDs, configurable operating calendar, and a permissions/rights hierarchy spanning site, operating area, workstation, role, and user levels is confirmed as the model to build toward
+
+- A flexible "data mask"-style custom field system (supporting text, dropdown, radio, boolean fields, multi-language labels, and reusable value lists) is required, with standard fields provided out of the box and custom fields configurable per venue/product without new development
+
+- A roles-comparison view (to directly compare permissions between two roles) is confirmed as a desirable addition not present in the reference system
+
+**Products, Pricing ****&**** Events**
+
+- Products will use a flexible components/attributes model, allowing new ticket-type variants (e.g., new age categories) to be added via configuration rather than development
+
+- Multiple, channel-specific and seasonal price lists per product are required
+
+- Events are only required for products needing date/time/capacity control; simple open-dated products do not need an associated event
+
+- Performances (time slots) require separate configuration for POS sale-window timing ("minutes on screen") and access-control entry windows ("time opening/limit"), plus bulk creation, capacity editing, and a suspend/resume (not delete) state model
+
+- Capacity must be splitable by sales channel via an envelope-style mechanism
+
+- Tax configuration must support compound tax (tax-on-tax) calculation, in addition to standard inclusive/exclusive handling
+
+**Entitlements, Promotions ****&**** Resources**
+
+- Entitlement rules must support configurable re-entry limits, a wide range of expiration rule types, minimum/maximum sale-quantity restrictions, group-ticket handling, and linking a single ticket to multiple events
+
+- Both single/shared promo codes and bulk-generated unique codes are required, alongside automatic, rule-based dynamic offers (e.g., buy-2-get-1-free) that don't require code entry
+
+- An optional resource-management module (for bookable assets like vehicles and staff, with scheduling/rostering) is confirmed as a desirable capability
+
+**Operations, POS ****&**** Access Control**
+
+- Duplicate-account detection and profile-merge functionality is required, given its high relevance in this region
+
+- The POS flow will follow the demonstrated logical structure (performance/slot selection → customer/reservation lookup or creation → cart → per-ticket detail capture where required → payment → ticket/receipt generation), reimagined with modern UI/UX
+
+- Tickets require a documented distinction between a unique ticket ID and a shareable media/QR code
+
+- Tiered ticket access control (e.g., Bronze/Silver/Gold) will be modelled via location → admission profile → gate → access point, with explicit deny rules to enforce tier separation
+
+- Built-in dashboards (cashier-level sales summary, venue-level admission summary) and a filterable report library (with custom report/document template design) are confirmed as required capabilities
+
+**Process**
+
+- The next workshop will return to UI/UX, covering the client-facing mobile app and staff/employee mobile app, alongside a lighter-touch look at the tenant and TICVAI websites
+
+- Softlabs will bring prepared application/site concepts to that session, following the same format as the previous UI/UX workshop
+
+# **Action Items**
+
+| **Action Item** | **Owner** | **Status** |
+| --- | --- | --- |
+| Share the full reference system manual/documentation (backend configuration guide) via WhatsApp or shared folder | Qossai | **Pending** |
+| Share the open-items task/tracker sheet along with today's MoM | Chinmay Parab | **Pending** |
+| Use the reference manual and today's walkthrough to inform backend schema and database design | Softlabs Backend Team | **Pending** |
+| Prepare mobile application concepts (client-facing and staff/employee apps) for Monday's UI/UX session | Softlabs Design Team | **Pending** |
+| Prepare tenant website / TICVAI website material for Monday's UI/UX session (expected to be light-touch) | Softlabs Design Team | **Pending** |
+| Confirm scope and agenda for Monday's UI/UX workshop | Chinmay Parab | **Pending** |
+| Offer further deep-dive demos on specific reference-system areas on request in future sessions | Qossai | **Ongoing** |
+| Incorporate compound/tax-on-tax calculation capability into tax engine requirements | Softlabs Backend Team | **Pending** |
+| Incorporate profile duplicate-detection and merge functionality into requirements (high regional relevance) | Softlabs Backend Team | **Pending** |
+
+# **Next Meeting**
+
+**Date:  **Monday (date to be confirmed)
+
+**Time:  **To be confirmed
+
+**Planned Topics**
+
+- Client-facing mobile application UI/UX
+
+- Staff/employee mobile application UI/UX
+
+- Tenant website and TICVAI website (lighter-touch discussion)
+
+# **Closing Remarks**
+
+This was an unusually deep, functionality-focused session: Allam walked the team through nearly every major configuration area of a mature, 20+ year old ticketing platform — tenant/site setup, permissions, custom data capture, products and pricing, events and time slots, entitlements, promotions, resource management, a live point-of-sale transaction, reporting, and a detailed access-control example. Both teams were aligned throughout that this system serves as a functional reference to learn from, not a design to copy — TICVAI's own platform will aim to deliver equivalent depth with a modern, AI-friendly, and easy-to-configure experience. Chinmay found the walkthrough especially valuable for understanding entitlement structures and product customization ahead of the team's own schema design work. The session closed with agreement to return to UI/UX topics next, focused on the client and staff mobile applications.
+
+|  |  |  |
+| --- | --- | --- |

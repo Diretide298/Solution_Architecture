@@ -1,0 +1,80 @@
+id: LLD-Performance
+title: Performance — 10 transitions
+generatedBy: tools/derive-diagrams.py
+index: diagrams/hld/04-lifecycles.yaml
+source: states/performance.yaml
+entity: Performance
+contract: catalogue
+enum: Performance.status
+enumKind: inline
+enumSchema: Performance
+enumProperty: status
+owner: catalogue
+initial:
+- scheduled
+terminal:
+- completed
+- cancelled
+transitions:
+- from: scheduled
+  to: onSale
+  operation: updatePerformance
+  trigger: operation
+  guard: '**Sale opens.** Distinct from existing — a performance can be scheduled and published for
+    months before tickets go on sale'
+- from: onSale
+  to: soldOut
+  trigger: cascade
+  guard: Capacity exhausted. **Computed, not set** — an operator cannot forget, and it flips back automatically
+    when a cart expires or an order is refunded
+- from: soldOut
+  to: onSale
+  trigger: cascade
+  guard: Capacity returned. **This is what makes a waitlist offer possible**
+  isReversal: true
+- from: onSale
+  to: suspended
+  operation: updatePerformance
+  trigger: operation
+  guard: Sale halted without cancelling. Weather, an incident, a pricing error caught late
+- from: suspended
+  to: onSale
+  operation: updatePerformance
+  trigger: operation
+  guard: Resumed
+  isReversal: true
+- from: scheduled
+  to: cancelled
+  operation: cancelPerformance
+  trigger: operation
+  guard: '**Cancelled before selling** — nobody to refund, and the simple case'
+- from: onSale
+  to: cancelled
+  operation: cancelPerformance
+  trigger: operation
+  guard: '**Cancelled with tickets sold.** Triggers F09: every holder refunded, every entitlement void,
+    and the guests told'
+  emits:
+  - performance.cancelled
+- from: suspended
+  to: cancelled
+  operation: cancelPerformance
+  trigger: operation
+  guard: Suspended and then abandoned
+  emits:
+  - performance.cancelled
+- from: onSale
+  to: completed
+  trigger: timer
+  guard: It happened. Unredeemed entitlements expire with it
+- from: soldOut
+  to: completed
+  trigger: timer
+  guard: It happened, having sold out
+notes: '`soldOut` is computed rather than set, and it flips both ways. **An operator who has to mark
+  a performance sold out will forget, and one who has to mark it available again will forget harder**
+  — which is a session that stays closed with capacity nobody can buy.
+
+
+  `suspended` exists so a pricing error can be stopped in seconds without cancelling anything. Cancelling
+  is loud and refunds people; suspending is quiet and reversible.'

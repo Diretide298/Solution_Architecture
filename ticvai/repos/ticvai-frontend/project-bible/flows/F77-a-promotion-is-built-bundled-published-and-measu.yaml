@@ -1,0 +1,81 @@
+$schema: ./_schema.yaml
+id: F77
+name: A promotion is built, bundled, published and measured
+actor: marketer
+capability: A promotion is built, bundled, published and measured
+wave: 3
+frequency: As the venue needs it.
+criticality: revenue
+primaryContract: promotions
+contracts:
+- promotions
+- catalogue
+- marketing-crm
+- ai
+platforms:
+- P08
+- P16
+trigger:
+  description: A venue wants to shift stock or fill a quiet Tuesday.
+offlineBehaviour: '**None of it offline.** A promotion is evaluated on the hot path of every sale, and
+  a promotion published from a device that could not see the others is a promotion that stacks wrongly.'
+steps:
+- step: 1
+  screen: BO-013
+  action: Channel & Distribution.
+  operations:
+  - createEnvelope
+  - listChannelListings
+  - publishBundle
+  - releaseChannelAllocation
+  - setChannelListing
+  - updateEnvelope
+  outcome: '**Drawn by the client as RET-5G.** 6 operations on this step.'
+- step: 2
+  screen: BO-011
+  action: Packages & Bundles.
+  operations:
+  - createBundle
+  - publishBundle
+  outcome: '**Drawn by the client as RET-5H.** 2 operations on this step.'
+  crossesDevice: true
+- step: 3
+  screen: ANL-009
+  action: AI Assistant & Action Center.
+  operations:
+  - acknowledgeAlert
+  - askReportingQuestion
+  - decideProposedAction
+  - listProposedActions
+  - setAlertRule
+  outcome: '**Drawn by the client as RET-5K.** 5 operations on this step.'
+  crossesDevice: true
+- step: 4
+  screen: BO-010
+  action: Promotions & Coupons.
+  operations:
+  - createCouponCampaign
+  - createPromotion
+  - endPromotion
+  - generateCouponCodes
+  - getDashboard
+  - getPromotion
+  outcome: '**Drawn by the client as RET-5A.** 15 operations on this step.'
+  crossesDevice: true
+branches:
+- at: 1
+  condition: A step in the chain is not licensed for this tenant.
+  behaviour: '**The chain stops at the module boundary.** `requiresModule` on each screen decides —
+    a tenant without the retail licence does not see the retail half, and the journey is shorter rather
+    than broken.'
+  severity: medium
+  resolvedBy: getModuleEnablement
+exitStates:
+- state: completed
+  description: The chain ran as the client drew it.
+- state: stoppedAtModule
+  description: '**A licence boundary, not a failure.**'
+notes: '**Board 5 of the client retail pack, followed as drawn.** Channel, bundle, action centre, overview
+  — the commercial loop. **Derived from the client''s own `GOES TO` edges**, not from an inferred path
+  — a pair of frames the client linked is evidence; a chain assembled from unrelated pairs is a guess.'
+openQuestions: null

@@ -1,0 +1,115 @@
+# F15 — A part is needed and ordered
+#
+# Crosses maintenance, approvals, inventory and queue in five steps. Written to test
+# whether the pause-reason distinction from CF-71 actually holds end to end.
+#
+# Validated by tools/check-flows.py.
+
+id: F15
+name: A part is needed and ordered
+actor: technician
+wave: 2
+frequency: weekly
+criticality: operational
+platforms:
+- P06 Venue Staff App
+- P08 Venue Management
+offlineBehaviour: The technician half works offline; procurement does not. A requisition raised in a
+  plant room queues and submits on reconnect.
+trigger:
+  description: A technician opens a machine, finds the fault, and the part is not on the shelf.
+  entryScreen: EMP-005
+  entryPoints:
+  - Work order in progress
+  - Stock count found a shortfall
+  - Planned maintenance
+steps:
+- step: 1
+  screen: EMP-005
+  action: 'Pauses the work order, reason: awaiting parts'
+  operations:
+  - pauseWorkOrder
+  outcome: '**The reason decides the state.** awaitingParts is chased by ordering; paused is chased
+    by asking someone'
+- step: 2
+  screen: BO-078
+  action: Raises a requisition against the work order
+  operations:
+  - createRequisition
+  outcome: Linked, so the job and the purchase find each other
+- step: 3
+  screen: BO-084
+  action: A manager approves it
+  operations:
+  - listApprovalRequests
+  - decideApprovalRequest
+  outcome: Value-based routing — a bearing and a compressor are not the same decision
+- step: 4
+  screen: BO-052
+  action: The goods arrive and are received
+  operations:
+  - createGoodsReceipt
+  - listPurchaseOrders
+  outcome: Stock rises at the venue
+- step: 5
+  screen: EMP-005
+  action: The technician resumes
+  operations:
+  - resumeWorkOrder
+  - completeWorkOrder
+  outcome: The part is consumed and the movement posts
+branches:
+- at: 1
+  condition: The part is in stock at another venue
+  behaviour: '**Inter-venue transfer rather than a purchase** (14 August). Faster and cheaper, and the
+    destination venue’s system-recorded stock gates whether it can be promised.'
+  severity: recoverable
+  resolvedBy: Storekeeper
+- at: 2
+  condition: No supplier is set up for the part
+  behaviour: Blocks. `BO-083` — a requisition naming a supplier nobody has onboarded cannot become a
+    purchase order.
+  severity: requiresStaff
+  resolvedBy: Storekeeper
+- at: 3
+  condition: The requisition is returned for more information
+  behaviour: '**Not a rejection.** The technician amends and resubmits without starting again, which
+    is the whole reason `returnRequisition` exists.'
+  severity: recoverable
+  resolvedBy: Technician
+- at: 4
+  condition: The delivery is short
+  behaviour: '`closeTransferShort` or a partial receipt. **The difference is a discrepancy to investigate,
+    not a silent adjustment.**'
+  severity: requiresStaff
+  resolvedBy: Storekeeper
+- at: 4
+  condition: The wrong part arrived
+  behaviour: Received and rejected as a separate movement. The work order stays blocked and the requisition
+    is raised again.
+  severity: requiresStaff
+  resolvedBy: Storekeeper
+- at: 5
+  condition: The asset was replaced while waiting
+  behaviour: '`closeWorkOrder` with outcome supersededByReplacement. **A work order that can only end
+    by being completed stays open forever when the answer is "never mind".**'
+  severity: recoverable
+  resolvedBy: Supervisor
+- at: 1
+  condition: The asset is safety-critical and out of service
+  behaviour: The queue stays closed and the guest app stops offering it, for however long the part takes.
+    **This is the cascade working**, and it is why the pause reason matters.
+  severity: requiresStaff
+  resolvedBy: Duty manager
+exitStates:
+- state: completed
+  description: Part fitted, asset verified, queue reopened
+- state: deferred
+  description: Awaiting delivery, asset out of service
+- state: escalated
+  description: Superseded by replacement
+primaryContract: maintenance
+contracts:
+- maintenance
+- inventory
+- approvals

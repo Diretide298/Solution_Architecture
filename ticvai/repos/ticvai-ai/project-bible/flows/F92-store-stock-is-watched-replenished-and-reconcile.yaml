@@ -1,0 +1,73 @@
+$schema: ./_schema.yaml
+id: F92
+name: Store stock is watched, replenished and reconciled
+actor: storekeeper
+capability: Store stock is watched, replenished and reconciled
+wave: 2
+frequency: As the venue needs it.
+criticality: operational
+primaryContract: inventory
+contracts:
+- inventory
+- retail
+platforms:
+- P08
+trigger:
+  description: A store manager checks what is low and does something about it.
+offlineBehaviour: '**Watching and counting work offline; requesting does not.**'
+steps:
+- step: 1
+  screen: BO-049
+  action: Stock Levels.
+  operations:
+  - createStockMovement
+  - createStockTransfer
+  - getStockPositions
+  - getStockValuation
+  outcome: '**Drawn by the client as RET-4A.**'
+- step: 2
+  screen: BO-081
+  action: Inventory Items.
+  operations:
+  - updateInventoryItem
+  outcome: '**Drawn by the client as RET-4B.**'
+  crossesDevice: true
+- step: 3
+  screen: BO-078
+  action: Requisitions.
+  operations:
+  - rejectRequisition
+  - returnRequisition
+  - updateRequisitionLines
+  outcome: '**Drawn by the client as RET-4C.**'
+- step: 4
+  screen: BO-080
+  action: Stock Transfers.
+  operations:
+  - closeTransferShort
+  - createGoodsReceipt
+  - createStockTransfer
+  - getStockTransfer
+  outcome: '**Drawn by the client as RET-4D.**'
+- step: 5
+  screen: BO-052
+  action: Goods Receipt.
+  operations:
+  - sendPurchaseOrder
+  outcome: '**Drawn by the client as RET-4E.**'
+  crossesDevice: true
+branches:
+- at: 1
+  condition: A step is not licensed for this tenant.
+  behaviour: '**The chain stops at the module boundary.** `requiresModule` decides — the journey is
+    shorter, not broken.'
+  severity: medium
+  resolvedBy: getModuleEnablement
+exitStates:
+- state: completed
+  description: The chain ran as the client drew it.
+- state: stoppedAtModule
+  description: '**A licence boundary, not a failure.**'
+notes: '**Retail board 4 from the overview inward.** F76 walks count-to-receive; this walks the manager
+  noticing. **Derived from the client''s declared `GOES TO` edges.**'
+openQuestions: null

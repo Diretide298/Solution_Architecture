@@ -1,0 +1,333 @@
+# retail — derived from the API contracts, not hand-written
+# Migration: V0013
+#
+# Columns come from schema properties. Types are inferred: format uuid to uuid,
+# date-time to timestamptz, ULID patterns to char(26), Money to numeric(18,4).
+# What is NOT here: partitioning, RLS policies, indexes, the PII split. That is
+# storage design and lives in the migration scripts.
+
+module: retail
+migration: V0013
+tableCount: 9
+columnCount: 94
+tables:
+  retail.exchange:
+    derivedFrom: RetailExchange
+    columns:
+    - name: id
+      type: text
+      required: true
+    - name: sale_id
+      type: text
+      required: true
+    - name: return_id
+      type: text
+      required: true
+    - name: new_sale_id
+      type: text
+      required: true
+    - name: returned_value
+      type: numeric(18,4)
+      required: false
+    - name: replacement_value
+      type: numeric(18,4)
+      required: false
+    - name: difference
+      type: numeric(18,4)
+      required: true
+      description: Positive means the guest pays; negative means a refund is due. Only the difference
+        settles.
+    - name: created_at
+      type: timestamptz
+      required: false
+  retail.gift_card:
+    derivedFrom: GiftCard
+    columns:
+    - name: card_code
+      type: text
+      required: true
+    - name: kind
+      type: text
+      required: false
+    - name: face_value
+      type: numeric(18,4)
+      required: true
+    - name: balance
+      type: numeric(18,4)
+      required: true
+    - name: status
+      type: text
+      required: true
+    - name: blocked_reason
+      type: text
+      required: false
+    - name: issued_at
+      type: timestamptz
+      required: true
+    - name: activated_at
+      type: timestamptz
+      required: false
+    - name: expires_at
+      type: timestamptz
+      required: false
+  retail.merchandise:
+    derivedFrom: MerchandiseItem
+    columns:
+    - name: id
+      type: uuid
+      required: true
+    - name: sku
+      type: text
+      required: true
+    - name: barcode
+      type: text
+      required: false
+    - name: name
+      type: text
+      required: true
+    - name: outlet_id
+      type: uuid
+      required: true
+    - name: category_id
+      type: uuid
+      required: false
+    - name: variant_id
+      type: uuid
+      required: true
+      description: The catalogue variant sold. Price and tax come from there.
+    - name: inventory_item_id
+      type: uuid
+      required: false
+      description: The stock item depleted on sale. Null means the item sells but never runs out, which
+        is almost always a configuration error.
+    - name: price
+      type: numeric(18,4)
+      required: true
+    - name: on_hand
+      type: numeric
+      required: true
+    - name: is_returnable
+      type: boolean
+      required: false
+    - name: return_window_days
+      type: integer
+      required: false
+    - name: requires_serial_number
+      type: boolean
+      required: false
+    - name: image_asset_ref
+      type: text
+      required: false
+    - name: is_active
+      type: boolean
+      required: true
+  retail.reservation:
+    derivedFrom: MerchandiseReservation
+    columns:
+    - name: id
+      type: text
+      required: true
+    - name: reservation_number
+      type: text
+      required: false
+    - name: outlet_id
+      type: uuid
+      required: true
+    - name: subject_id
+      type: uuid
+      required: false
+    - name: lines
+      type: jsonb
+      required: true
+    - name: status
+      type: text
+      required: true
+    - name: collection_note
+      type: text
+      required: false
+    - name: expires_at
+      type: timestamptz
+      required: true
+    - name: collected_at
+      type: timestamptz
+      required: false
+  retail.return:
+    derivedFrom: RetailReturn
+    columns:
+    - name: id
+      type: text
+      required: true
+    - name: return_number
+      type: text
+      required: false
+    - name: sale_id
+      type: text
+      required: true
+    - name: refund_id
+      type: text
+      required: false
+      description: The refund raised in the Order & Payment context.
+    - name: lines
+      type: jsonb
+      required: true
+    - name: reason
+      type: jsonb
+      required: false
+    - name: refund_amount
+      type: numeric(18,4)
+      required: true
+    - name: refund_tender
+      type: text
+      required: false
+    - name: restocked_quantity
+      type: integer
+      required: true
+    - name: written_off_quantity
+      type: integer
+      required: true
+    - name: accepted_by_principal_id
+      type: uuid
+      required: false
+    - name: secondary_principal_id
+      type: uuid
+      required: false
+    - name: created_at
+      type: timestamptz
+      required: true
+  retail.return_policy:
+    derivedFrom: ReturnPolicy
+    columns:
+    - name: outlet_id
+      type: uuid
+      required: true
+    - name: default_window_days
+      type: integer
+      required: true
+    - name: requires_receipt
+      type: boolean
+      required: true
+    - name: allow_cash_refund_on_card_sale
+      type: boolean
+      required: false
+    - name: self_authorise_limit
+      type: numeric(18,4)
+      required: false
+      description: Up to this, one cashier may accept a return alone.
+    - name: requires_second_user_above
+      type: numeric(18,4)
+      required: false
+    - name: requires_approval_above
+      type: numeric(18,4)
+      required: false
+    - name: restockable_conditions
+      type: jsonb
+      required: false
+      description: Conditions that return stock to sale. Everything else is written off.
+    - name: non_returnable_category_ids
+      type: jsonb
+      required: false
+  retail.sale:
+    derivedFrom: RetailSale
+    columns:
+    - name: id
+      type: text
+      required: true
+    - name: receipt_number
+      type: text
+      required: true
+    - name: order_id
+      type: text
+      required: true
+      description: The order in the Order & Payment context. Retail does not keep its own ledger.
+    - name: outlet_id
+      type: uuid
+      required: true
+    - name: shift_id
+      type: text
+      required: false
+    - name: subject_id
+      type: uuid
+      required: false
+    - name: lines
+      type: jsonb
+      required: true
+    - name: subtotal
+      type: numeric(18,4)
+      required: false
+    - name: discount_amount
+      type: numeric(18,4)
+      required: false
+    - name: tax_amount
+      type: numeric(18,4)
+      required: false
+    - name: gross_amount
+      type: numeric(18,4)
+      required: true
+    - name: reprint_count
+      type: integer
+      required: false
+    - name: created_at
+      type: timestamptz
+      required: true
+    - name: recorded_at
+      type: timestamptz
+      required: false
+  retail.wallet:
+    derivedFrom: Wallet
+    columns:
+    - name: subject_id
+      type: uuid
+      required: true
+    - name: balance
+      type: numeric(18,4)
+      required: true
+    - name: bonus_balance
+      type: numeric(18,4)
+      required: false
+      description: Promotional value. Typically non-refundable and spent first.
+    - name: currency
+      type: char(3)
+      required: true
+    - name: status
+      type: text
+      required: true
+    - name: home_cell_name
+      type: text
+      required: false
+      description: Where the authoritative balance lives. Present when the guest is linked across cells.
+    - name: expires_at
+      type: timestamptz
+      required: false
+    - name: last_activity_at
+      type: timestamptz
+      required: false
+  retail.wallet_transaction:
+    derivedFrom: WalletTransaction
+    columns:
+    - name: id
+      type: text
+      required: true
+    - name: kind
+      type: jsonb
+      required: true
+    - name: amount
+      type: numeric(18,4)
+      required: true
+    - name: balance_after
+      type: numeric(18,4)
+      required: true
+    - name: order_id
+      type: text
+      required: false
+    - name: venue_id
+      type: uuid
+      required: false
+    - name: reason
+      type: text
+      required: false
+    - name: principal_id
+      type: uuid
+      required: false
+    - name: recorded_at
+      type: timestamptz
+      required: true

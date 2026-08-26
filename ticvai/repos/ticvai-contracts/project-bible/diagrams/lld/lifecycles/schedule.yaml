@@ -1,0 +1,44 @@
+id: LLD-Content schedule
+title: Content schedule — 5 transitions
+generatedBy: tools/derive-diagrams.py
+index: diagrams/hld/04-lifecycles.yaml
+source: states/schedule.yaml
+entity: Content schedule
+contract: white-label
+enum: ScheduleState
+enumKind: named
+enumSchema: ScheduleState
+owner: whitelabel
+initial:
+- draft
+terminal:
+- expired
+transitions:
+- from: draft
+  to: scheduled
+  operation: updateBanner
+  trigger: operation
+  guard: Given a start and end
+- from: scheduled
+  to: draft
+  operation: updateBanner
+  trigger: operation
+  guard: Unscheduled before starting
+- from: scheduled
+  to: active
+  trigger: timer
+  guard: Start reached. **The clock is the tenant’s timezone, not the server’s** — a Ramadan banner
+    at midnight UTC is not midnight in Dubai
+  emits:
+  - whitelabel.contentPublished
+- from: active
+  to: expired
+  trigger: timer
+  guard: End reached
+- from: active
+  to: draft
+  operation: updateBanner
+  trigger: operation
+  guard: Pulled early
+  isReversal: true
+notes: Timezone is a region setting. Every scheduling bug in a platform like this is the same bug.

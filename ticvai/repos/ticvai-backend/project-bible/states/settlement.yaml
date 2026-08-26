@@ -1,0 +1,48 @@
+# Settlement — state model
+# Contract: finance.SettlementStatus
+# Checked by tools/check-states.py.
+
+entity: Settlement
+contract: finance
+enum: SettlementStatus
+enumKind: named
+enumSchema: SettlementStatus
+owner: ledger
+initial:
+- ingesting
+terminal:
+- resolved
+- failed
+transitions:
+- from: ingesting
+  to: parsing
+  trigger: job
+  guard: File received
+- from: parsing
+  to: matching
+  trigger: job
+  guard: Parsed into transactions
+- from: parsing
+  to: failed
+  trigger: job
+  guard: Unparseable — format changed without notice, which is how acquirers usually announce it
+- from: matching
+  to: matched
+  trigger: job
+  guard: Every line matched a payment
+- from: matching
+  to: hasExceptions
+  trigger: job
+  guard: Unmatched lines remain
+- from: hasExceptions
+  to: resolved
+  operation: resolveSettlementException
+  trigger: operation
+  guard: Every exception explained or written off
+  requiresApproval: true
+- from: matched
+  to: resolved
+  trigger: job
+  guard: Nothing to resolve
+notes: '`matched` and `resolved` are separate because a fully matched file still needs someone to say
+  so before it posts.'

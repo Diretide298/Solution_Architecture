@@ -1,0 +1,101 @@
+$schema: ./_schema.yaml
+id: F48
+name: A guest finds it, queues for it, and eats
+actor: guest
+capability: In-venue guest journey
+wave: 3
+frequency: Routine.
+criticality: revenue
+primaryContract: queue
+contracts:
+- queue
+- seating
+- fnb
+- venue-map
+- marketing
+platforms:
+- P02
+trigger:
+  description: A guest is standing inside the venue with a phone and an afternoon. **This is the journey
+    the app exists for and nothing walked it.**
+offlineBehaviour: '**The map and the menu cache; joining a queue and placing an order do not.** A queue
+  position taken offline is a position nobody else can see, and an order placed offline is food nobody
+  is making.'
+steps:
+- step: 1
+  screen: GST-021
+  action: They open the map to see what is near.
+  operations:
+  - getVenueMap
+  - getVenueMapGraph
+  - getWaitTimes
+  outcome: '**The map carries wait times, not just geometry.** A map that shows where things are and
+    not how long they take sends a guest to the longest queue in the venue.'
+- step: 2
+  screen: GST-022
+  action: They compare waits across attractions.
+  operations:
+  - getWaitTimes
+  outcome: '**Adaptor-first** (ADR-0012) — the figure comes from whatever the venue runs, and a manually-entered
+    wait from F67 appears here indistinguishably to the guest and distinguishably in the record.'
+  crossesDevice: true
+- step: 3
+  screen: GST-023
+  action: They join a virtual queue rather than stand in it.
+  operations:
+  - joinQueue
+  - getQueueEntry
+  outcome: '**The point of the whole feature**: the guest walks away and the place is kept. `redeemQueueEntry`
+    at the attraction closes it.'
+  crossesDevice: true
+- step: 4
+  screen: GST-024
+  action: While waiting, they order food to where they are sitting.
+  operations:
+  - listDiningOutlets
+  - getGuestMenu
+  - claimLocationSession
+  - createGuestFnbOrder
+  outcome: '**`claimLocationSession` is the interesting one** — a table QR or a seat number binds the
+    order to a place, so the food knows where to go without the guest explaining.'
+  crossesDevice: true
+- step: 5
+  screen: GST-025
+  action: They watch the order progress.
+  operations:
+  - getGuestOrderStatus
+  - getGuestBill
+  outcome: '**The kitchen ticket from F29 is what moves this.** A guest watching a status that never
+    changes is a guest walking to the counter.'
+  crossesDevice: true
+- step: 6
+  screen: GST-030
+  action: Their queue place comes up and they are told.
+  operations:
+  - claimLocationSession
+  outcome: '**The notification is the payoff.** A virtual queue that does not tell you is a queue you
+    have to watch, which is the thing it was meant to replace.'
+  crossesDevice: true
+exitStates:
+- state: served
+  description: Queued, fed, admitted.
+- state: queueAbandoned
+  description: '**Left the queue** — the abandonment rate is a wait-accuracy signal.'
+- state: orderCollected
+  description: Collected rather than delivered.
+branches:
+- at: 3
+  condition: The queue is full or paused.
+  behaviour: '**Told why and when it reopens.** *Unavailable* is the answer that sends a guest to a
+    member of staff.'
+  severity: medium
+  resolvedBy: joinQueue
+- at: 4
+  condition: The guest is somewhere with no delivery.
+  behaviour: '`listDeliveryLocations` decides. **A venue that cannot deliver to a spot should not offer
+    to** — the failure belongs before the order, not after the payment.'
+  severity: high
+  resolvedBy: listDeliveryLocations
+notes: '**Written 24 August.** Six screens across queue, seating, F&B, venue-map and marketing — **the
+  widest cross-module journey in the package, and entirely unwalked.**'
+openQuestions: null

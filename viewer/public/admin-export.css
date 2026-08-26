@@ -1,0 +1,46 @@
+/* The date-range export panel on the admin page.
+ *
+ * A separate file rather than more rules in layers.css, because that
+ * stylesheet is shared by every page in the viewer and this is four selectors
+ * that mean nothing anywhere else. Everything the panel uses that already has a
+ * look — the panel, the note, the select, the chip — keeps it; only the three
+ * things a horizontal date range needs are said here.
+ */
+
+/* `.invite-row` is the flex row this borrows, and its rule stretches every
+   .auth-input inside it to `flex: 1 1 200px`. That is right for an address
+   field, which should take whatever room is going; it is wrong for a date,
+   which is a fixed and rather short thing and looks broken half a panel wide.
+   Both dates are pinned to the same width so the pair reads as one control. */
+.export-row .export-date {
+  flex: 0 0 auto;
+  width: 9.5rem;
+  min-width: 0;
+}
+
+/* .auth-label is a block with 12px above it, which is what stacks a form
+   vertically. Inside this row it is an inline word sitting against the field it
+   names, so the display and the margins both have to go — otherwise each label
+   takes a line of its own and the row becomes a column. */
+.export-row .export-label {
+  display: inline;
+  margin: 0 0 0 4px;
+  align-self: center;
+}
+
+/* The select decides what the two dates are a range *of*, so it comes first and
+   is the widest thing in the row — its options are sentences, and a select that
+   truncates them turns three distinct choices into three that begin the same
+   way. It is allowed to take a line to itself when the row wraps. */
+.export-row .export-what {
+  flex: 1 1 15rem;
+  max-width: 100%;
+}
+
+/* Narrow enough that the row has wrapped anyway. Letting the dates go full
+   width there is better than two half-width fields with a ragged gap, and the
+   labels above them read as a stacked form, which at that size is what it is. */
+@media (max-width: 560px) {
+  .export-row .export-date { flex: 1 1 100%; width: auto; }
+  .export-row .export-label { display: block; margin: 6px 0 0; }
+}

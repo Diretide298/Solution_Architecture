@@ -1,0 +1,60 @@
+id: LLD-Invitation
+title: Invitation — 8 transitions
+generatedBy: tools/derive-diagrams.py
+index: diagrams/hld/04-lifecycles.yaml
+source: states/invitation.yaml
+entity: Invitation
+contract: marketing-crm
+enum: Invitation.status
+enumKind: inline
+enumSchema: Invitation
+enumProperty: status
+owner: marketing-crm
+initial:
+- issued
+terminal:
+- accepted
+- declined
+- expired
+- revoked
+transitions:
+- from: issued
+  to: viewed
+  trigger: operation
+  guard: Opened. **Worth its own state** — an invitation nobody opened and one declined are different
+    failures, and only one is about the invitation
+- from: viewed
+  to: accepted
+  trigger: operation
+  guard: '**The entitlement is issued here, not at send.** An invitation nobody accepts should not consume
+    capacity'
+- from: issued
+  to: accepted
+  trigger: operation
+  guard: Accepted without the view being recorded
+- from: viewed
+  to: declined
+  trigger: operation
+  guard: Declined, and the allocation returns to the pool
+- from: issued
+  to: expired
+  trigger: timer
+  guard: '**No response. The allocation returns** — a held place nobody claimed is a place nobody sold'
+- from: viewed
+  to: expired
+  trigger: timer
+  guard: Opened and never answered
+- from: issued
+  to: revoked
+  trigger: operation
+  guard: Withdrawn by the venue
+- from: viewed
+  to: revoked
+  trigger: operation
+  guard: Withdrawn after it was seen
+notes: '**Capacity is held at `issued` and consumed at `accepted`.** Holding nothing oversells the event;
+  consuming at send means a hundred unanswered invitations lock a hundred seats.
+
+
+  **`viewed` earns its place**: an invitation nobody opened is a delivery problem, and one opened and
+  ignored is a proposition problem.'

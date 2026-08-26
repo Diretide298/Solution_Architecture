@@ -1,0 +1,867 @@
+openapi: 3.1.0
+info:
+  title: TICVAI Games & Redemption
+  version: 0.1.0
+  x-ticvai-screen-count: 7
+  x-ticvai-tier: satellite
+  x-ticvai-module: "10 — Games & F&B Integration"
+  x-ticvai-requirements: 25
+  x-ticvai-capabilities: [C07, C28]
+  x-ticvai-platforms:
+    - "P04 POS"
+    - "P06 Venue Staff App"
+    - "P08 Venue Management"
+    - "P02 Guest App"
+    - "Game readers"
+    - "Ticket-eater machines"
+  description: >
+    ## What this contract covers
+
+    **Arcade play, game credits and prize redemption.**
+
+    | | |
+    |---|---|
+    | **Tier** | satellite |
+    | **Matrix domain** | 10 — Games & F&B Integration |
+    | **Requirements** | ~25 |
+    | **Capabilities** | C07, C28 |
+    | **Consumed by** | P04 POS · P06 Venue Staff App · P08 Venue Management · P02 Guest App · Game readers · Ticket-eater machines |
+
+    ## How to read this file
+
+    **This file is a contract.** It is hand-authored and it is the source of truth for one
+    bounded context: server code, client code and mock servers are generated from it, never
+    the other way round. If a field is not here, it does not exist.
+
+    **Contracts are split into two tiers.**
+
+    - **Spine** — the eight contexts everything else depends on: tenancy, identity,
+      catalogue, orders, shift, access, finance, cross-cell. Frozen first. A change here
+      requires a formal change request, because every satellite has pinned against it.
+    - **Satellite** — a domain that builds on the spine and can move independently.
+      Cheaper to change.
+
+    **`paths` are operations.** Each one declares four TICVAI extensions, and Redocly
+    rejects any that does not: `x-ticvai-permission`, `x-ticvai-scope-level`,
+    `x-ticvai-offline-capable`, `x-ticvai-conflict-policy`.
+
+    **`components.schemas` are API schemas — the shape of data on the wire.** They are not
+    database tables. Roughly 70% of the DDL derives from these; the rest — partitioning,
+    RLS, the PII split — is storage design that lives in the migration scripts.
+
+    ## This context
+
+    Positions this encodes:
+
+    - **Credits and prize points are two different balances on one card.** Credits buy plays
+      and are bought with money; points are won by playing and buy prizes. Conflating them
+      turns a guest who wins into a guest who can play more, which is not the same deal.
+    - **Both balances are stored value and post to the ledger on load, not on spend.** The
+      liability exists the moment a guest pays.
+    - **Game readers are a driver, not a build.** Card readers on machines report plays
+      through an inbound API, and a named vendor adaptor is bespoke work — the same pattern
+      as queue sensors (ADR-0012).
+    - **Prize redemption depletes retail stock** through the inventory movement ledger. A
+      prize wall running out is a stock problem, and it should look like one in reporting.
+    - Play recording is offline-capable; prize redemption is not, because stock depletes in
+      real time.
+
+servers:
+  - url: https://{cellHost}/api/v1
+    variables:
+      cellHost:
+        default: cell.ticvai.local
+
+security:
+  - bearerAuth: []
+
+tags:
+  - name: card
+  - name: game
+  - name: play
+  - name: prize
+
+paths:
+  /game-cards:
+    post:
+      operationId: issueGameCard
+      x-ticvai-consumed-by:
+        - "P04 POS-002 Sell — Ticket Catalogue"
+      x-ticvai-audience: [staff]
+      summary: Issue or activate a game card
+      description: >
+        Physical cards are pre-printed and activated at sale; digital cards live in the guest
+        app. Either way the card carries two balances, and they are not interchangeable.
+      tags: [card]
+      x-ticvai-permission: ORDER_CREATE
+      x-ticvai-scope-level: workstation
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/IssueGameCardRequest' }
+      responses:
+        '201':
+          description: Issued
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/GameCard' }
+        '409':
+          description: Card already active, or the code is unknown
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /reader-profiles:
+    put:
+      operationId: setReaderProfile
+      summary: How a reader behaves and what it shows
+      description: >
+        BL-153. **A guest at an arcade machine cannot read a message, they can only see a light.**
+
+        Display behaviour per outcome, retry pricing, and a re-tap window — **a second tap because
+        nothing appeared to happen is the same play, not a new one.**
+      tags: [games]
+      x-ticvai-permission: PRODUCT_CONFIGURE
+      x-ticvai-audience: [staff]
+      x-ticvai-scope-level: venue
+      x-ticvai-config-scope: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/ReaderProfile' }
+      responses:
+        '200':
+          description: Set
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ReaderProfile' }
+
+  /game-cards/{cardCode}:
+    parameters:
+      - name: cardCode
+        in: path
+        required: true
+        schema: { type: string }
+    get:
+      operationId: getGameCard
+      x-ticvai-consumed-by:
+        - "P02 GST-026 Retail / Merchandise"
+      x-ticvai-audience: [guest]
+      x-ticvai-read-routing: primary
+      summary: Read a card's balances
+      description: >
+        The reader path. Offline-capable so a machine can validate a card during a network
+        blip — the balance may be stale, which is why spend is reconciled on sync.
+      tags: [card]
+      x-ticvai-permission: null   # a guest session. Reads and writes the guest’s own data only
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: true
+      x-ticvai-conflict-policy: serverWins
+      security:
+        - apiKeyAuth: []
+        - bearerAuth: []
+        - guestAuth: []
+      responses:
+        '200':
+          description: Card
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/GameCard' }
+        '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
+
+  /game-cards/{cardCode}/load:
+    parameters:
+      - name: cardCode
+        in: path
+        required: true
+        schema: { type: string }
+    post:
+      operationId: loadGameCredits
+      x-ticvai-consumed-by:
+        - "P04 POS-002 Sell — Ticket Catalogue"
+      x-ticvai-audience: [staff]
+      summary: Load credits onto a card
+      description: >
+        Creates a liability, not revenue. Recognition happens as credits are played, or as
+        breakage when the card expires.
+
+        Bonus credits from a promotion are tracked separately because they are typically
+        non-refundable and are spent first.
+      tags: [card]
+      x-ticvai-permission: ORDER_CREATE
+      x-ticvai-scope-level: workstation
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [id, credits, recordedAt]
+              properties:
+                id: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+                credits: { type: integer, minimum: 1 }
+                bonusCredits: { type: integer, minimum: 0, default: 0 }
+                amountPaid: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+                orderId: { type: string }
+                recordedAt: { type: string, format: date-time }
+      responses:
+        '200':
+          description: Loaded
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/GameCard' }
+
+  /game-cards/{cardCode}/transfer:
+    parameters:
+      - name: cardCode
+        in: path
+        required: true
+        schema: { type: string }
+    post:
+      operationId: transferGameCard
+      x-ticvai-audience: [staff]
+      summary: Move balances to another card
+      description: >
+        A damaged or lost card. The source is blocked and its balances move whole — split
+        transfers are not offered, because a card with a partial balance and a replacement
+        with the rest is a dispute waiting to happen.
+      tags: [card]
+      x-ticvai-permission: ORDER_MODIFY
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [targetCardCode, reason]
+              properties:
+                targetCardCode: { type: string }
+                reason:
+                  type: string
+                  enum: [damaged, lost, faulty, guestRequest, upgrade]
+                note: { type: string, maxLength: 500 }
+      responses:
+        '200':
+          description: Transferred; source blocked
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/GameCard' }
+        '409':
+          description: Target already carries a balance, or either card is blocked
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /games:
+    get:
+      operationId: listGames
+      x-ticvai-consumed-by:
+        - "P08 BO-069 Asset Register"
+      x-ticvai-audience: [staff]
+      x-ticvai-read-routing: replica
+      summary: List games
+      tags: [game]
+      x-ticvai-permission: PRODUCT_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: true
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - name: venueId
+          in: query
+          schema: { type: string, format: uuid }
+        - name: status
+          in: query
+          schema: { $ref: '#/components/schemas/GameStatus' }
+      responses:
+        '200':
+          description: Games
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/Game' }
+
+    post:
+      operationId: createGame
+      x-ticvai-audience: [staff]
+      summary: Register a game
+      description: >
+        Bound to an asset where one exists, so a machine taken out of service by maintenance
+        stops accepting play rather than swallowing credits.
+      tags: [game]
+      x-ticvai-permission: PRODUCT_CONFIGURE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/Game' }
+      responses:
+        '201':
+          description: Registered
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Game' }
+
+  /games/{gameId}:
+    parameters:
+      - name: gameId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    patch:
+      operationId: updateGame
+      x-ticvai-consumed-by:
+        - "P08 BO-069 Asset Register"
+      x-ticvai-audience: [staff]
+      summary: Amend a game
+      description: >
+        Changing credit cost or payout mid-session is refused where plays are in flight — a
+        guest who paid three credits should not be charged four on the same visit.
+      tags: [game]
+      x-ticvai-permission: PRODUCT_CONFIGURE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              minProperties: 1
+              properties:
+                name: { type: string, maxLength: 200 }
+                creditCost: { type: integer, minimum: 1 }
+                minPointsAwarded: { type: integer, minimum: 0 }
+                maxPointsAwarded: { type: integer, minimum: 0 }
+                status: { $ref: '#/components/schemas/GameStatus' }
+                heightRequirementCm: { type: integer, nullable: true }
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Game' }
+
+  /game-plays:
+    post:
+      operationId: recordGamePlay
+      x-ticvai-consumed-by:
+        - "P08 BO-069 Asset Register"
+      x-ticvai-audience: [guest]
+      summary: Record a play
+      description: >
+        Posted by the machine's card reader. Deducts credits and awards points in one
+        operation.
+
+        **Offline-capable.** An arcade floor loses signal, and a machine that stops taking a
+        card because of it is a machine earning nothing. Plays replay on reconnect and are
+        deduplicated on the play ID; a play against an exhausted balance is reported for
+        reconciliation rather than silently accepted.
+      tags: [play]
+      x-ticvai-permission: null   # a guest session. Reads and writes the guest’s own data only
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: true
+      x-ticvai-conflict-policy: append
+      security:
+        - apiKeyAuth: []
+        - serviceAuth: []
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/RecordPlayRequest' }
+      responses:
+        '200':
+          description: Play recorded
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/PlayResult' }
+        '409':
+          description: >
+            Insufficient credits, card blocked, or the game is out of service.
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /game-plays/sync:
+    post:
+      operationId: syncGamePlays
+      x-ticvai-consumed-by:
+        - "P08 BO-069 Asset Register"
+      x-ticvai-audience: [device]
+      summary: Replay plays recorded offline
+      description: >
+        Ordered batch per reader, idempotent on the play ID. Plays that would overdraw a card
+        are reported as divergences rather than rejected outright — the guest already played,
+        and the record should say so.
+      tags: [play]
+      x-ticvai-permission: null   # a registered device, authenticated by its enrolment rather than a person
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: append
+      security:
+        - apiKeyAuth: []
+        - serviceAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [readerId, plays]
+              properties:
+                readerId: { type: string, format: uuid }
+                plays:
+                  type: array
+                  minItems: 1
+                  maxItems: 500
+                  items: { $ref: '#/components/schemas/RecordPlayRequest' }
+      responses:
+        '200':
+          description: Batch processed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  accepted: { type: integer }
+                  duplicates: { type: integer }
+                  divergences:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        playId: { type: string }
+                        cardCode: { type: string }
+                        detail: { type: string }
+
+  /prizes:
+    get:
+      operationId: listPrizes
+      x-ticvai-audience: [staff]
+      x-ticvai-read-routing: replica
+      summary: The prize catalogue
+      description: >
+        Point cost and stock. Out-of-stock prizes stay visible with their availability shown —
+        hiding them means a child asks for the one thing that vanished.
+      tags: [prize]
+      x-ticvai-permission: PRODUCT_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: true
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - name: venueId
+          in: query
+          schema: { type: string, format: uuid }
+        - name: maxPoints
+          in: query
+          description: What a guest can afford right now.
+          schema: { type: integer }
+        - $ref: '../shared/common.yaml#/components/parameters/PageSize'
+        - $ref: '../shared/common.yaml#/components/parameters/PageCursor'
+      responses:
+        '200':
+          description: Prizes
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '../shared/common.yaml#/components/schemas/Page'
+                  - type: object
+                    properties:
+                      items:
+                        type: array
+                        items: { $ref: '#/components/schemas/Prize' }
+
+    post:
+      operationId: createPrize
+      x-ticvai-audience: [staff]
+      summary: Add a prize
+      description: >
+        Links to a merchandise item, so redemption depletes retail stock through the
+        inventory ledger. A prize wall running out is a stock problem and should look like
+        one in reporting.
+      tags: [prize]
+      x-ticvai-permission: PRODUCT_CONFIGURE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/Prize' }
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Prize' }
+
+  /prize-redemptions:
+    post:
+      operationId: redeemPrize
+      x-ticvai-audience: [staff]
+      summary: Redeem points for a prize
+      description: >
+        Deducts points and issues the prize, depleting stock in one transaction.
+
+        **Not offline-capable** — stock depletes in real time, the same reason retail is not.
+        A prize handed over twice because two terminals both thought it was in stock is a
+        problem no reconciliation fixes.
+      tags: [prize]
+      x-ticvai-permission: ORDER_CREATE
+      x-ticvai-scope-level: workstation
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [id, cardCode, lines, recordedAt]
+              properties:
+                id: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+                cardCode: { type: string }
+                lines:
+                  type: array
+                  minItems: 1
+                  items:
+                    type: object
+                    required: [prizeId, quantity]
+                    properties:
+                      prizeId: { type: string, format: uuid }
+                      quantity: { type: integer, minimum: 1 }
+                recordedAt: { type: string, format: date-time }
+      responses:
+        '201':
+          description: Redeemed
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/PrizeRedemption' }
+        '409':
+          description: Insufficient points, or a prize is out of stock
+          content:
+            application/problem+json:
+              schema: { $ref: '#/components/schemas/PrizeConflictProblem' }
+
+  /game-cards/{cardCode}/adjust:
+    parameters:
+      - name: cardCode
+        in: path
+        required: true
+        schema: { type: string }
+    post:
+      operationId: adjustGameCard
+      x-ticvai-audience: [staff]
+      summary: Manually adjust credits or points
+      description: >
+        A machine that swallowed a play, a goodwill gesture, a correction. Requires a reason
+        and is reported separately — manual adjustments to stored value get the same scrutiny
+        here as they do on a wallet.
+      tags: [card]
+      x-ticvai-permission: LEDGER_POST
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [reason]
+              properties:
+                credits: { type: integer }
+                points: { type: integer }
+                reason: { type: string, minLength: 3, maxLength: 500 }
+      responses:
+        '200':
+          description: Adjusted
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/GameCard' }
+
+components:
+  schemas:
+    GameStatus:
+      type: string
+      enum: [inService, outOfService, maintenance, retired]
+
+    ReaderProfile:
+      type: object
+      x-ticvai-persistence: "games.reader_profile"
+      description: >
+        BL-153. **`games` is well built on the money and what is missing sits at the reader.**
+
+        10.2.14 and 10.2.17 want a different colour for a free game and a different one for
+        insufficient credit — **because a guest at an arcade machine cannot read a message, they can
+        only see a light.** The whole interaction is a second long and happens across a noisy room.
+      required: [id, name]
+      properties:
+        id: { type: string, format: uuid }
+        name: { type: string }
+        displayBehaviour:
+          type: object
+          description: >
+            **What the reader shows, per outcome.** Colour and tone, because the guest is looking at
+            a machine rather than a screen.
+          properties:
+            accepted: { type: string }
+            freeGame: { type: string }
+            insufficientCredit: { type: string }
+            cardBlocked: { type: string }
+            readError: { type: string }
+        retryPricing:
+          type: object
+          nullable: true
+          description: >
+            **A retry after a machine fault is not a second play.** Without this a guest whose game
+            crashed pays twice, and the attendant refunds by hand — which is how an arcade loses
+            money and goodwill at once.
+          properties:
+            isFree: { type: boolean, default: true }
+            withinSeconds: { type: integer, default: 60 }
+            maxRetries: { type: integer, default: 1 }
+        rePlayWindowSeconds:
+          type: integer
+          nullable: true
+          description: >
+            **A second tap within this window is the same play, not a new one.** A guest tapping
+            twice because nothing appeared to happen should not be charged twice.
+        entitlementProductIds:
+          type: array
+          description: >
+            **Per-game entitlement.** A pass that includes ten specific rides needs the reader to
+            know which, and a card that works everywhere is a different product.
+          items: { type: string, format: uuid }
+
+
+    IssueGameCardRequest:
+      x-ticvai-persistence: "none — request only"
+      type: object
+      required: [id, kind, venueId]
+      properties:
+        id: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+        kind:
+          type: string
+          enum: [physical, digital]
+        cardCode:
+          type: string
+          description: Required for physical cards, which are pre-printed. Generated for digital.
+        venueId: { type: string, format: uuid }
+        subjectId: { type: string, format: uuid }
+        initialCredits: { type: integer, minimum: 0, default: 0 }
+        validMonths: { type: integer, minimum: 1 }
+
+    GameCard:
+      x-ticvai-persistence: "games.card"
+      type: object
+      required: [cardCode, venueId, credits, bonusCredits, points, status, issuedAt]
+      properties:
+        cardCode: { type: string }
+        kind: { type: string }
+        venueId: { type: string, format: uuid }
+        subjectId: { type: string, format: uuid, nullable: true }
+        credits:
+          type: integer
+          description: Bought with money. Buys plays.
+        bonusCredits:
+          type: integer
+          description: >
+            From a promotion. Typically non-refundable and spent before paid credits.
+        points:
+          type: integer
+          description: >
+            Won by playing. Buys prizes. **Not interchangeable with credits** — a guest who
+            wins should not simply be able to play more.
+        status:
+          type: string
+          enum: [active, blocked, expired, transferred]
+        blockedReason: { type: string, nullable: true }
+        transferredToCardCode: { type: string, nullable: true }
+        lastPlayedAt: { type: string, format: date-time, nullable: true }
+        issuedAt: { type: string, format: date-time }
+        expiresAt: { type: string, format: date-time, nullable: true }
+
+    Game:
+      x-ticvai-persistence: "games.game"
+      type: object
+      required: [id, code, name, venueId, creditCost, status]
+      properties:
+        id: { type: string, format: uuid }
+        code: { type: string, maxLength: 64 }
+        name: { type: string, maxLength: 200 }
+        venueId: { type: string, format: uuid }
+        zone: { type: string, nullable: true }
+        assetId:
+          type: string
+          format: uuid
+          nullable: true
+          description: >
+            The machine. Taken out of service by maintenance, the game stops accepting play
+            rather than swallowing credits.
+        readerId: { type: string, format: uuid, nullable: true }
+        creditCost: { type: integer, minimum: 1 }
+        minPointsAwarded: { type: integer }
+        maxPointsAwarded: { type: integer }
+        heightRequirementCm: { type: integer, nullable: true }
+        status: { $ref: '#/components/schemas/GameStatus' }
+        playsToday: { type: integer }
+        creditsTakenToday: { type: integer }
+        pointsAwardedToday: { type: integer }
+
+    RecordPlayRequest:
+      x-ticvai-persistence: "none — request only"
+      type: object
+      required: [id, cardCode, gameId, recordedAt]
+      properties:
+        id: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+        cardCode: { type: string }
+        gameId: { type: string, format: uuid }
+        creditsUsed: { type: integer, minimum: 1 }
+        pointsAwarded: { type: integer, minimum: 0 }
+        sequence:
+          type: integer
+          description: Monotonic per reader. Preserves order across an offline batch.
+        recordedAt: { type: string, format: date-time }
+
+    PlayResult:
+      x-ticvai-persistence: "games.play"
+      type: object
+      required: [playId, creditsUsed, pointsAwarded, creditsRemaining, pointsBalance]
+      properties:
+        playId: { type: string }
+        cardCode: { type: string }
+        gameId: { type: string, format: uuid }
+        creditsUsed: { type: integer }
+        pointsAwarded: { type: integer }
+        creditsRemaining: { type: integer }
+        pointsBalance: { type: integer }
+        recordedAt: { type: string, format: date-time }
+        syncedAt: { type: string, format: date-time, nullable: true }
+
+    Prize:
+      x-ticvai-persistence: "games.prize"
+      type: object
+      required: [id, name, venueId, pointCost, onHand]
+      properties:
+        id: { type: string, format: uuid }
+        name: { type: string, maxLength: 200 }
+        description: { type: string, nullable: true }
+        venueId: { type: string, format: uuid }
+        merchandiseId:
+          type: string
+          format: uuid
+          nullable: true
+          description: >
+            Links to retail. Redemption depletes stock through the inventory ledger — a prize
+            wall running out is a stock problem and should look like one.
+        pointCost: { type: integer, minimum: 1 }
+        onHand: { type: integer }
+        isAvailable: { type: boolean }
+        tier:
+          type: string
+          nullable: true
+          description: Small, medium, large, jackpot. Drives prize-wall layout.
+        imageAssetRef: { type: string, nullable: true }
+        isActive: { type: boolean }
+
+    PrizeConflictProblem:
+      x-ticvai-persistence: "none — error shape"
+      allOf:
+        - $ref: '../shared/common.yaml#/components/schemas/Problem'
+        - type: object
+          properties:
+            pointsRequired: { type: integer }
+            pointsAvailable: { type: integer }
+            outOfStock:
+              type: array
+              items:
+                type: object
+                properties:
+                  prizeId: { type: string, format: uuid }
+                  name: { type: string }
+                  requested: { type: integer }
+                  onHand: { type: integer }
+
+    PrizeRedemption:
+      x-ticvai-persistence: "games.redemption + games.redemption_line"
+      type: object
+      required: [id, cardCode, lines, pointsUsed, pointsRemaining, recordedAt]
+      properties:
+        id: { type: string }
+        redemptionNumber: { type: string }
+        cardCode: { type: string }
+        venueId: { type: string, format: uuid }
+        lines:
+          type: array
+          items:
+            type: object
+            properties:
+              prizeId: { type: string, format: uuid }
+              name: { type: string }
+              quantity: { type: integer }
+              pointCost: { type: integer }
+        pointsUsed: { type: integer }
+        pointsRemaining: { type: integer }
+        stockMovementIds:
+          type: array
+          description: Movements raised in the inventory ledger.
+          items: { type: string }
+        issuedByPrincipalId: { type: string, format: uuid }
+        recordedAt: { type: string, format: date-time }
+
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+    guestAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+    serviceAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+    apiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-Api-Key

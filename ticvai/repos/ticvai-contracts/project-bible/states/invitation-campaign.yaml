@@ -1,0 +1,36 @@
+# Invitation campaign — state model
+# Contract: marketing-crm.InvitationCampaign.status
+
+entity: Invitation campaign
+contract: marketing-crm
+enum: InvitationCampaign.status
+enumKind: inline
+enumSchema: InvitationCampaign
+enumProperty: status
+owner: marketing-crm
+initial:
+- draft
+terminal:
+- closed
+- cancelled
+transitions:
+- from: draft
+  to: open
+  trigger: operation
+  guard: Invitations may be sent against it
+- from: open
+  to: closed
+  trigger: timer
+  guard: Past the event, or the quota is spent. **Sent invitations stand** — somebody holding an accepted
+    invitation to next week is not affected
+- from: open
+  to: cancelled
+  trigger: operation
+  guard: '**The event itself is off.** Distinct from `closed`, because this one requires telling everybody
+    already invited'
+- from: draft
+  to: cancelled
+  trigger: operation
+  guard: Abandoned before sending
+notes: '**`closed` and `cancelled` differ in what they oblige.** Closing is administrative and sent
+  invitations stand; cancelling means the event is off and every invitee has to be told.'

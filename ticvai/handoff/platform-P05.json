@@ -1,0 +1,361 @@
+{
+ "code": "P05",
+ "name": "Guest Kiosk \u2014 Self-Service",
+ "shortName": "Guest Kiosk",
+ "app": "guest-app",
+ "operator": "guest",
+ "audience": "guest",
+ "formFactor": "kiosk",
+ "offlineCapable": false,
+ "generated": "2026-08-26",
+ "note": "Derived by tools/derive-platform.py. **The gaps section is the point** \u2014 a page listing what exists is a directory; one listing what is missing is a worklist.",
+ "counts": {
+  "screens": 17,
+  "operations": 22,
+  "contracts": 8,
+  "modules": 2,
+  "undrawn": 0,
+  "operationsWithNoScreen": 21
+ },
+ "waves": {
+  "wave2": 17
+ },
+ "modules": [
+  {
+   "module": "Sell",
+   "screens": 16,
+   "waves": [
+    2
+   ]
+  },
+  {
+   "module": "AI",
+   "screens": 1,
+   "waves": [
+    2
+   ]
+  }
+ ],
+ "contracts": [
+  {
+   "contract": "orders",
+   "operations": 7
+  },
+  {
+   "contract": "catalogue",
+   "operations": 4
+  },
+  {
+   "contract": "retail",
+   "operations": 3
+  },
+  {
+   "contract": "white-label",
+   "operations": 2
+  },
+  {
+   "contract": "fnb",
+   "operations": 2
+  },
+  {
+   "contract": "marketing-crm",
+   "operations": 2
+  },
+  {
+   "contract": "promotions",
+   "operations": 1
+  },
+  {
+   "contract": "ai",
+   "operations": 1
+  }
+ ],
+ "screens": [
+  {
+   "id": "KSK-001",
+   "name": "Attract Loop",
+   "module": "Sell",
+   "wave": 2,
+   "route": "/sell/attract-loop",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "KSK-002",
+   "name": "Language Select",
+   "module": "Sell",
+   "wave": 2,
+   "route": "/sell/language-select",
+   "operations": 2,
+   "drawn": true
+  },
+  {
+   "id": "KSK-003",
+   "name": "What are you buying",
+   "module": "Sell",
+   "wave": 2,
+   "route": "/sell/what-are-you-buying",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "KSK-004",
+   "name": "Choose tickets",
+   "module": "Sell",
+   "wave": 2,
+   "route": "/sell/choose-tickets",
+   "operations": 2,
+   "drawn": true
+  },
+  {
+   "id": "KSK-005",
+   "name": "Choose a session",
+   "module": "Sell",
+   "wave": 2,
+   "route": "/sell/choose-a-session",
+   "operations": 2,
+   "drawn": true
+  },
+  {
+   "id": "KSK-006",
+   "name": "Review",
+   "module": "Sell",
+   "wave": 2,
+   "route": "/sell/review",
+   "operations": 4,
+   "drawn": true
+  },
+  {
+   "id": "KSK-007",
+   "name": "Payment",
+   "module": "Sell",
+   "wave": 2,
+   "route": "/sell/payment",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "KSK-008",
+   "name": "Payment unresolved",
+   "module": "Sell",
+   "wave": 2,
+   "route": "/sell/payment-unresolved",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "KSK-009",
+   "name": "Ticket issued",
+   "module": "Sell",
+   "wave": 2,
+   "route": "/sell/ticket-issued",
+   "operations": 2,
+   "drawn": true
+  },
+  {
+   "id": "KSK-010",
+   "name": "Print failure",
+   "module": "Sell",
+   "wave": 2,
+   "route": "/sell/print-failure",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "KSK-011",
+   "name": "Collect a booking",
+   "module": "Sell",
+   "wave": 2,
+   "route": "/sell/collect-a-booking",
+   "operations": 2,
+   "drawn": true
+  },
+  {
+   "id": "KSK-012",
+   "name": "Booking found",
+   "module": "Sell",
+   "wave": 2,
+   "route": "/sell/booking-found",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "KSK-013",
+   "name": "Call staff",
+   "module": "Sell",
+   "wave": 2,
+   "route": "/sell/call-staff",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "KSK-014",
+   "name": "Out of service",
+   "module": "Sell",
+   "wave": 2,
+   "route": "/sell/out-of-service",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "KSK-015",
+   "name": "Assistant",
+   "module": "AI",
+   "wave": 2,
+   "route": "/kiosk/assistant",
+   "operations": 4,
+   "drawn": true
+  },
+  {
+   "id": "KSK-016",
+   "name": "Order Food",
+   "module": "Sell",
+   "wave": 2,
+   "route": "/sell/order-food",
+   "operations": 2,
+   "drawn": true
+  },
+  {
+   "id": "KSK-017",
+   "name": "Shop",
+   "module": "Sell",
+   "wave": 2,
+   "route": "/sell/shop",
+   "operations": 2,
+   "drawn": true
+  }
+ ],
+ "gaps": {
+  "operationsWithNoScreen": [
+   {
+    "operation": "freezeEntitlement",
+    "contract": "catalogue",
+    "verb": "POST",
+    "summary": "Pause a membership at the guest's request"
+   },
+   {
+    "operation": "joinWaitlist",
+    "contract": "catalogue",
+    "verb": "POST",
+    "summary": "Ask to be told if capacity frees up"
+   },
+   {
+    "operation": "leaveWaitlist",
+    "contract": "catalogue",
+    "verb": "DELETE",
+    "summary": "Stop waiting"
+   },
+   {
+    "operation": "updateTableReservation",
+    "contract": "fnb",
+    "verb": "PATCH",
+    "summary": "Change or cancel a booking"
+   },
+   {
+    "operation": "createReferral",
+    "contract": "marketing-crm",
+    "verb": "POST",
+    "summary": "Issue a referral code"
+   },
+   {
+    "operation": "getMyChallenges",
+    "contract": "marketing-crm",
+    "verb": "GET",
+    "summary": "Active challenges and how far along I am"
+   },
+   {
+    "operation": "getWaiverStatus",
+    "contract": "marketing-crm",
+    "verb": "GET",
+    "summary": "Whether this guest may be issued a ticket that requires a waiver"
+   },
+   {
+    "operation": "recordLostItem",
+    "contract": "marketing-crm",
+    "verb": "POST",
+    "summary": "Report something lost, or hand something in"
+   },
+   {
+    "operation": "respondToInvitation",
+    "contract": "marketing-crm",
+    "verb": "POST",
+    "summary": "Accept or decline"
+   },
+   {
+    "operation": "submitForm",
+    "contract": "marketing-crm",
+    "verb": "POST",
+    "summary": "Sign a waiver, answer a survey, capture details"
+   },
+   {
+    "operation": "updateGuestPreferences",
+    "contract": "marketing-crm",
+    "verb": "PUT",
+    "summary": "The things a regular should not have to say twice"
+   },
+   {
+    "operation": "uploadGuestDocument",
+    "contract": "marketing-crm",
+    "verb": "POST",
+    "summary": "Store a guest photo, ID or signed document"
+   },
+   {
+    "operation": "convertToTermProduct",
+    "contract": "orders",
+    "verb": "POST",
+    "summary": "Turn a visit into a membership or season pass"
+   },
+   {
+    "operation": "createCart",
+    "contract": "orders",
+    "verb": "POST",
+    "summary": "Start a cart"
+   },
+   {
+    "operation": "createResaleListing",
+    "contract": "orders",
+    "verb": "POST",
+    "summary": "List an entitlement for resale"
+   },
+   {
+    "operation": "getGroupBooking",
+    "contract": "orders",
+    "verb": "GET",
+    "summary": ""
+   },
+   {
+    "operation": "listPaymentTokens",
+    "contract": "orders",
+    "verb": "GET",
+    "summary": "A guest's saved payment methods"
+   },
+   {
+    "operation": "quoteUpgrade",
+    "contract": "orders",
+    "verb": "POST",
+    "summary": "What an upgrade costs, pro-rata"
+   },
+   {
+    "operation": "shareEntitlement",
+    "contract": "orders",
+    "verb": "POST",
+    "summary": "Let somebody else use this, without giving it away"
+   },
+   {
+    "operation": "storePaymentToken",
+    "contract": "orders",
+    "verb": "POST",
+    "summary": "Save a payment method for future use"
+   },
+   {
+    "operation": "transferWalletBalance",
+    "contract": "retail",
+    "verb": "POST",
+    "summary": "Send balance to another guest"
+   }
+  ],
+  "modulesSplitAcrossWaves": [],
+  "screensNotDrawn": [],
+  "flowsNamingAMissingScreen": []
+ }
+}

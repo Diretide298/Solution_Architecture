@@ -1,0 +1,87 @@
+$schema: ./_schema.yaml
+id: F76
+name: Stock is counted, requested, transferred and received
+actor: storekeeper
+capability: Stock is counted, requested, transferred and received
+wave: 2
+frequency: As the venue needs it.
+criticality: operational
+primaryContract: inventory
+contracts:
+- inventory
+- retail
+- approvals
+platforms:
+- P08
+trigger:
+  description: A store runs low, asks for stock, and it arrives from somewhere else in the venue.
+offlineBehaviour: '**Counting and receiving work offline; requisitioning does not.** A request nobody
+  can see is a request nobody fills.'
+steps:
+- step: 1
+  screen: BO-079
+  action: Stock Count.
+  operations:
+  - cancelStockCount
+  - listStockCounts
+  - recountStockCount
+  outcome: '**Drawn by the client as RET-4F.** 3 operations on this step.'
+- step: 2
+  screen: BO-081
+  action: Inventory Items.
+  operations:
+  - createInventoryItem
+  - createStockLocation
+  - getInventoryItem
+  - listInventoryItems
+  - listStockLocations
+  - lookupInventoryItem
+  outcome: '**Drawn by the client as RET-4B.** 7 operations on this step.'
+- step: 3
+  screen: BO-078
+  action: Requisitions.
+  operations:
+  - approveRequisition
+  - cancelRequisition
+  - compareQuotations
+  - getSuggestedRequisitions
+  - listRequisitions
+  - listStockLocations
+  outcome: '**Drawn by the client as RET-4C.** 9 operations on this step.'
+- step: 4
+  screen: BO-080
+  action: Stock Transfers.
+  operations:
+  - listStockTransfers
+  - receiveStockTransfer
+  outcome: '**Drawn by the client as RET-4D.** 2 operations on this step.'
+- step: 5
+  screen: BO-052
+  action: Goods Receipt.
+  operations:
+  - acknowledgePurchaseOrder
+  - cancelPurchaseOrder
+  - closePurchaseOrderShort
+  - createPurchaseOrder
+  - getPurchaseOrder
+  - listGoodsReceipts
+  outcome: '**Drawn by the client as RET-4E.** 7 operations on this step.'
+  crossesDevice: true
+branches:
+- at: 1
+  condition: A step in the chain is not licensed for this tenant.
+  behaviour: '**The chain stops at the module boundary.** `requiresModule` on each screen decides —
+    a tenant without the retail licence does not see the retail half, and the journey is shorter rather
+    than broken.'
+  severity: medium
+  resolvedBy: getModuleEnablement
+exitStates:
+- state: completed
+  description: The chain ran as the client drew it.
+- state: stoppedAtModule
+  description: '**A licence boundary, not a failure.**'
+notes: '**The client drew this chain and it is the retail stock loop end to end** — count, request,
+  transfer, receive. Four screens the client linked and no flow walked. **Derived from the client''s
+  own `GOES TO` edges**, not from an inferred path — a pair of frames the client linked is evidence;
+  a chain assembled from unrelated pairs is a guess.'
+openQuestions: null

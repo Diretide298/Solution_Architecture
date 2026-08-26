@@ -1,0 +1,250 @@
+{
+ "scope": "ai",
+ "boundaries": [
+  {
+   "name": "The vector store is reached by one contract",
+   "holds": true,
+   "detail": "1 collection, 9 operations, all in `ai`. No screen, service or other contract reaches it directly.",
+   "enforcedBy": "tools/check-package.py \u2014 no non-AI contract writes an AI table"
+  },
+  {
+   "name": "Writes stay inside the domain",
+   "holds": true,
+   "detail": "AI reads the transactional core and writes only its own stores and caches. `generateVenueLayout` wrote into `seating.import_job` on 17 August and now stops at a draft.",
+   "enforcedBy": "tools/check-package.py, with two stated exceptions (ADR-0020)"
+  },
+  {
+   "name": "Conversation logs sit off the transactional primary",
+   "holds": true,
+   "detail": "Prompt and response volume does not compete with a sale. 5 tables on the analytical store.",
+   "enforcedBy": "ADR-0020, checked against the store map"
+  },
+  {
+   "name": "Every model call leaves an audit record",
+   "holds": true,
+   "detail": "10 operations write an `ai.interaction` (8.3.55).",
+   "enforcedBy": "tools/check-package.py \u2014 a model-calling operation with no interaction fails"
+  },
+  {
+   "name": "Only governed operations outside the domain may write to it",
+   "holds": true,
+   "detail": "2 operations in other contracts write an `ai.*` table: ['askReportingQuestion', 'saveNaturalLanguageQuery']. Each is a governance record, not a bypass.",
+   "enforcedBy": "tools/check-package.py allowlist, stated in ADR-0020"
+  }
+ ],
+ "stores": {
+  "postgres": 40,
+  "postgres-analytical": 5,
+  "redis": 4,
+  "qdrant": 1
+ },
+ "generated": "2026-08-26",
+ "note": "Derived by closure from the contract, not listed. See handoff/README.md \u2014 the hand-maintained version of this drifted four times in one day.",
+ "counts": {
+  "operations": 32,
+  "schemas": 22,
+  "states": 11,
+  "events": 11,
+  "tables": 50,
+  "screens": 32,
+  "flows": 11,
+  "documents": 14,
+  "openConflicts": 1
+ },
+ "metrics": {
+  "design": [
+   {
+    "name": "Operations in the contract",
+    "done": 30,
+    "total": 30,
+    "percent": 100,
+    "note": "The seed of the closure."
+   },
+   {
+    "name": "Lifecycles modelled",
+    "done": 4,
+    "total": 4,
+    "percent": 100,
+    "note": "Status enums in the domain contract with a state model."
+   },
+   {
+    "name": "Operations reaching a screen",
+    "done": 19,
+    "total": 30,
+    "percent": 63,
+    "note": "This domain's own operations that a screen calls. Jobs and internal operations legitimately reach none."
+   },
+   {
+    "name": "Events with a critical consumer",
+    "done": 11,
+    "total": 11,
+    "percent": 100,
+    "note": "An event whose loss breaks something must say which consumer."
+   }
+  ],
+  "build": [
+   {
+    "name": "Code built",
+    "done": 0,
+    "total": 1,
+    "percent": 0,
+    "note": "Nothing has executed."
+   }
+  ]
+ },
+ "headline": {
+  "design": 85,
+  "build": 0
+ },
+ "waves": {
+  "wave2": 14,
+  "wave3": 12,
+  "wave1": 6
+ },
+ "reachedOutsideTheContract": [
+  {
+   "file": "approval-request.yaml",
+   "contract": "approvals",
+   "via": [
+    "approval.granted"
+   ]
+  },
+  {
+   "file": "case.yaml",
+   "contract": "marketing-crm",
+   "via": [
+    "marketing.caseClosed"
+   ]
+  },
+  {
+   "file": "content.yaml",
+   "contract": "white-label",
+   "via": [
+    "whitelabel.contentPublished"
+   ]
+  },
+  {
+   "file": "conversation.yaml",
+   "contract": "marketing-crm",
+   "via": [
+    "conversation.handedOver"
+   ]
+  },
+  {
+   "file": "media.yaml",
+   "contract": "assets",
+   "via": [
+    "assets.documentIndexed"
+   ]
+  },
+  {
+   "file": "product.yaml",
+   "contract": "catalogue",
+   "via": [
+    "catalogue.productPublished"
+   ]
+  },
+  {
+   "file": "schedule.yaml",
+   "contract": "white-label",
+   "via": [
+    "whitelabel.contentPublished"
+   ]
+  }
+ ],
+ "governedOperations": {
+  "count": 10,
+  "note": "Operations that call a model and write an ai.interaction (8.3.55)."
+ },
+ "guestCallable": {
+  "count": 0,
+  "operations": []
+ },
+ "storage": {
+  "postgres": 40,
+  "postgres-analytical": 5,
+  "redis": 4,
+  "qdrant": 1
+ },
+ "inboundKeys": [],
+ "conflicts": {
+  "open": 1,
+  "closed": 33,
+  "openIds": [
+   "CF-166"
+  ]
+ },
+ "unmodelledLifecycles": [],
+ "documents": [
+  {
+   "file": "docs/active/ai-scope-for-confirmation.md",
+   "title": "AI scope \u2014 for confirmation",
+   "status": ""
+  },
+  {
+   "file": "docs/active/deep-audit-24-august.md",
+   "title": "Deep audit \u2014 ten invariants, run adversarially",
+   "status": ""
+  },
+  {
+   "file": "docs/active/full-layer-audit-20aug.md",
+   "title": "Full-layer audit \u2014 20 August",
+   "status": ""
+  },
+  {
+   "file": "docs/active/hierarchy-segregation-services.md",
+   "title": "TICVAI \u2014 Hierarchy, Data Segregation and Services",
+   "status": ""
+  },
+  {
+   "file": "docs/active/optimisation-assessment.md",
+   "title": "Optimisation assessment \u2014 RAG, caching, backend, frontend",
+   "status": ""
+  },
+  {
+   "file": "docs/active/optimisation-plan.md",
+   "title": "Optimisation adoption plan",
+   "status": ""
+  },
+  {
+   "file": "docs/active/viewer-update-brief-20aug.md",
+   "title": "Viewer \u2014 what changed in the package on 20 August",
+   "status": ""
+  },
+  {
+   "file": "docs/adr/0007-hybrid-repository-topology.md",
+   "title": "ADR-0007: Hybrid repository topology",
+   "status": "Accepted"
+  },
+  {
+   "file": "docs/adr/0020-ai-isolation-boundary.md",
+   "title": "ADR-0020 \u2014 Where AI runs, and what it is isolated from",
+   "status": "Proposed \u00b7 17 August 2026"
+  },
+  {
+   "file": "docs/adr/0021-qdrant-partitioning.md",
+   "title": "ADR-0021 \u2014 Qdrant: one collection per embedding model, tenant is the shard, scope is the filter",
+   "status": "Proposed \u00b7 17 August 2026"
+  },
+  {
+   "file": "docs/adr/0023-pii-separation.md",
+   "title": "ADR-0023 \u2014 Personal data lives apart from the append-only ledger",
+   "status": "Accepted \u00b7 17 August 2026, recording a decision already impl"
+  },
+  {
+   "file": "docs/adr/0028-service-decomposition.md",
+   "title": "ADR-0028: Sixteen services, and the data boundary decides where they split",
+   "status": "Accepted \u2014 the data topology is reopened (CF-161, 24 August)"
+  },
+  {
+   "file": "docs/architecture/README.md",
+   "title": "Architecture",
+   "status": ""
+  },
+  {
+   "file": "docs/architecture/ai-credentials.md",
+   "title": "AI provider credentials \u2014 where the key lives and who can reach it",
+   "status": ""
+  }
+ ]
+}

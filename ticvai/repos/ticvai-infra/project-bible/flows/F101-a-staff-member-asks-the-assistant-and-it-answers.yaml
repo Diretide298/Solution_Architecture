@@ -1,0 +1,55 @@
+$schema: ./_schema.yaml
+id: F101
+name: A staff member asks the assistant and it answers from the venue
+actor: supervisor
+capability: A staff member asks the assistant and it answers from the venue
+wave: 2
+frequency: As needed.
+criticality: operational
+primaryContract: ai
+contracts:
+- ai
+- reporting
+platforms:
+- P06
+trigger:
+  description: A steward needs an answer during a service and cannot leave the floor to find it.
+offlineBehaviour: '**Needs the network.** A model that answers from a cache answers from yesterday.'
+steps:
+- step: 1
+  screen: EMP-019
+  action: AI assistant — home.
+  operations:
+  - createAiConversation
+  - listAiConversations
+  outcome: 2 operations, 2 of them previously unwalked.
+- step: 2
+  screen: EMP-020
+  action: AI assistant — answer.
+  operations:
+  - createAiConversation
+  - listAiConversations
+  outcome: 2 operations, 2 of them previously unwalked.
+  crossesDevice: true
+- step: 3
+  screen: EMP-040
+  action: Knowledge base.
+  operations:
+  - semanticSearch
+  outcome: 1 operations, 1 of them previously unwalked.
+  crossesDevice: true
+branches:
+- at: 1
+  condition: The acting principal lacks the permission at this scope.
+  behaviour: '**Refused at the first step, not the last.** ADR-0002 makes authorisation user-driven
+    — a person who gets three steps in and then cannot finish has been told the wrong thing.'
+  severity: medium
+  resolvedBy: resolvePermissions
+exitStates:
+- state: completed
+  description: The journey ran end to end.
+- state: refused
+  description: '**Stopped at a permission or a licence boundary**, with the reason named.'
+notes: '**The staff side of the concierge.** `AiMessage.sources` is what makes the answer defensible
+  — an assistant that cannot say where it got something is an assistant nobody should act on.'
+openQuestions: null

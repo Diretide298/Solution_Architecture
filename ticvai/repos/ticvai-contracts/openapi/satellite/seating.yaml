@@ -1,0 +1,1598 @@
+openapi: 3.1.0
+info:
+  title: TICVAI Seating & Venue Mapping
+  version: 0.1.0
+  x-ticvai-screen-count: 5
+  x-ticvai-tier: satellite
+  x-ticvai-module: "19 — Seat Management & Venue Mapping"
+  x-ticvai-requirements: 112
+  x-ticvai-capabilities: [C51, C52, C53, C54, C55, C91]
+  x-ticvai-platforms:
+    - "P08 Venue Back Office"
+    - "P04 POS"
+    - "P01 Guest Web"
+    - "P02 Guest App"
+  description: >
+    ## What this contract covers
+
+    **Seat maps, holds and allocation. Seat categories are entitlement concepts.**
+
+    | | |
+    |---|---|
+    | **Tier** | satellite |
+    | **Matrix domain** | 19 — Seat Management & Venue Mapping |
+    | **Requirements** | ~112 |
+    | **Capabilities** | C51, C52, C53, C54, C55, C91 |
+    | **Consumed by** | P08 Venue Back Office · P04 POS · P01 Guest Web · P02 Guest App |
+
+    ## How to read this file
+
+    **This file is a contract.** It is hand-authored and it is the source of truth for one
+    bounded context: server code, client code and mock servers are generated from it, never
+    the other way round. If a field is not here, it does not exist.
+
+    **Contracts are split into two tiers.**
+
+    - **Spine** — the eight contexts everything else depends on: tenancy, identity,
+      catalogue, orders, shift, access, finance, cross-cell. Frozen first. A change here
+      requires a formal change request, because every satellite has pinned against it.
+    - **Satellite** — a domain that builds on the spine and can move independently.
+      Cheaper to change.
+
+    **`paths` are operations.** Each one declares four TICVAI extensions, and Redocly
+    rejects any that does not:
+
+    | Extension | Answers |
+    |---|---|
+    | `x-ticvai-permission` | Which permission the caller needs. From one enum in `shared/permissions.yaml` — never hand-typed |
+    | `x-ticvai-scope-level` | Where in the seven-level hierarchy that permission must be held |
+    | `x-ticvai-offline-capable` | Whether a disconnected terminal may queue this |
+    | `x-ticvai-conflict-policy` | How a replayed operation resolves — `append`, `serverWins`, `manual` |
+
+    Where `x-ticvai-permission` is null, one of these says why: `x-ticvai-auth: service`
+    (cell-to-cell), `x-ticvai-self-scoped` (acts only on the caller's own resources), or
+    `security: []` (genuinely public).
+
+    **`components.schemas` are API schemas — the shape of data on the wire.** They are not
+    database tables. One API schema may become three columns (`Money`) or five tables
+    (`Order`); some have no table at all (`ValidationResult`, `TrialBalance`). Roughly 70%
+    of the DDL derives from these, and the rest — partitioning, RLS, the PII split — is
+    storage design that lives in the migration scripts.
+
+    **`security` arrays hold OAuth scopes.** Empty means "this scheme, no scopes" — for
+    bearer tokens there is nothing to list. Empty is not the same as absent: absent means
+    unauthenticated.
+
+
+    ## This context
+
+    Seat maps, import, categorisation, holds, blocks, accessibility and recommendations.
+    Domain 19 — 112 requirements.
+
+    Positions this encodes:
+
+    - **Seats have a stable identifier.** Section, row and number are display labels that
+      change when a venue is refitted; the identifier does not. A ticket sold in 2026 must
+      still resolve after a renumbering.
+    - **Seated inventory is blocked offline** and cannot be leased. A seat map is not a
+      count — two terminals holding "10 seats" would sell the same seat.
+    - **Import pairs a manifest with a plan.** The manifest carries logical structure —
+      section, row, seat. The plan carries geometry. Neither alone is sufficient: a manifest
+      cannot be rendered, and a plan cannot be sold from.
+    - **Seat categories and envelopes are entitlement concepts**, not a presentation layer.
+      They constrain Product & Entitlement rather than sitting on top of it.
+    - **A map with no geometry still sells.** A manifest imported without a plan cannot be
+      rendered, but it knows which seats exist and which are free. Selection falls back to
+      category and best-available; it is never refused. Refusing would mean a venue that has
+      not yet supplied a CAD plan cannot sell online at all, which is a far worse outcome
+      than a list instead of a picture.
+    - **Holds are short-lived and explicit.** A selection that expires silently while a guest
+      enters card details is the worst outcome in the flow.
+
+servers:
+  - url: https://{cellHost}/api/v1
+    variables:
+      cellHost:
+        default: cell.ticvai.local
+
+security:
+  - bearerAuth: []
+
+tags:
+  - name: seatMap
+  - name: import
+  - name: category
+  - name: availability
+  - name: hold
+  - name: block
+  - name: rules
+  - name: recommendation
+
+paths:
+  # ---------------------------------------------------------------- seat maps
+  /seat-maps:
+    get:
+      operationId: listSeatMaps
+      x-ticvai-read-routing: replica
+      summary: List seat maps
+      tags: [seatMap]
+      x-ticvai-permission: PRODUCT_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - name: venueId
+          in: query
+          schema: { type: string, format: uuid }
+        - name: status
+          in: query
+          schema: { $ref: '#/components/schemas/SeatMapStatus' }
+        - $ref: '../shared/common.yaml#/components/parameters/PageSize'
+        - $ref: '../shared/common.yaml#/components/parameters/PageCursor'
+      responses:
+        '200':
+          description: Seat maps
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '../shared/common.yaml#/components/schemas/Page'
+                  - type: object
+                    properties:
+                      items:
+                        type: array
+                        items: { $ref: '#/components/schemas/SeatMapSummary' }
+        '403': { $ref: '../shared/common.yaml#/components/responses/Forbidden' }
+
+    post:
+      operationId: createSeatMap
+      summary: Create a seat map
+      description: >
+        Created in `draft`. A draft map cannot be attached to a performance — only a
+        published map can be sold from.
+      tags: [seatMap]
+      x-ticvai-permission: CAPACITY_CONFIGURE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/CreateSeatMapRequest' }
+      responses:
+        '201':
+          description: Created in draft
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/SeatMap' }
+        '400': { $ref: '../shared/common.yaml#/components/responses/BadRequest' }
+
+  /seat-maps/{seatMapId}:
+    parameters:
+      - name: seatMapId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    get:
+      operationId: getSeatMap
+      x-ticvai-consumed-by:
+        - "P02 GST-049 Interactive Seat Selection"
+      x-ticvai-read-routing: replica
+      summary: Read a seat map with its structure
+      description: >
+        Returns sections, rows and seat counts. Individual seats come from
+        `/seat-maps/{id}/seats` — a large venue map is tens of thousands of seats and should
+        not be returned inline.
+      tags: [seatMap]
+      x-ticvai-permission: PRODUCT_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '200':
+          description: Seat map
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/SeatMap' }
+        '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
+
+    patch:
+      operationId: updateSeatMap
+      summary: Rename or amend a seat map
+      description: >
+        Structural changes to a published map are rejected. Clone it, amend the clone, and
+        publish that — a map with tickets sold against it cannot change shape underneath
+        them.
+      tags: [seatMap]
+      x-ticvai-permission: CAPACITY_CONFIGURE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              minProperties: 1
+              properties:
+                name: { type: string, maxLength: 200 }
+                description: { type: string, maxLength: 1000 }
+                isActive: { type: boolean }
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/SeatMap' }
+        '409':
+          description: Structural change attempted on a published map
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /seat-maps/{seatMapId}/publish:
+    parameters:
+      - name: seatMapId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    post:
+      operationId: publishSeatMap
+      summary: Validate and publish a seat map
+      description: >
+        Runs validation first. A map with duplicate seat numbers, missing geometry or
+        accessibility gaps is not published — those defects surface as refused entry at a
+        gate or a guest who cannot find their seat.
+      tags: [seatMap]
+      x-ticvai-permission: CAPACITY_CONFIGURE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      responses:
+        '200':
+          description: Published
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/SeatMap' }
+        '409':
+          description: Validation failed. The response lists every finding
+          content:
+            application/problem+json:
+              schema: { $ref: '#/components/schemas/ValidationProblem' }
+
+  /seat-maps/{seatMapId}/clone:
+    parameters:
+      - name: seatMapId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    post:
+      operationId: cloneSeatMap
+      summary: Clone a map, optionally into another venue
+      description: >
+        The practical route to a refit, and to rolling a proven layout out across venues.
+      tags: [seatMap]
+      x-ticvai-permission: CAPACITY_CONFIGURE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [name]
+              properties:
+                name: { type: string, maxLength: 200 }
+                targetVenueId:
+                  type: string
+                  format: uuid
+                  description: Omit to clone within the same venue.
+                includeCategories: { type: boolean, default: true }
+                includeRules: { type: boolean, default: true }
+      responses:
+        '201':
+          description: Cloned into draft
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/SeatMap' }
+
+  /seat-maps/{seatMapId}/seats:
+    parameters:
+      - name: seatMapId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    get:
+      operationId: listSeats
+      x-ticvai-read-routing: replica
+      summary: List seats in a map
+      tags: [seatMap]
+      x-ticvai-permission: PRODUCT_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - name: sectionCode
+          in: query
+          schema: { type: string }
+        - name: rowLabel
+          in: query
+          schema: { type: string }
+        - name: categoryId
+          in: query
+          schema: { type: string, format: uuid }
+        - name: attribute
+          in: query
+          schema: { $ref: '#/components/schemas/SeatAttribute' }
+        - $ref: '../shared/common.yaml#/components/parameters/PageSize'
+        - $ref: '../shared/common.yaml#/components/parameters/PageCursor'
+      responses:
+        '200':
+          description: Seats
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '../shared/common.yaml#/components/schemas/Page'
+                  - type: object
+                    properties:
+                      items:
+                        type: array
+                        items: { $ref: '#/components/schemas/Seat' }
+
+    patch:
+      operationId: updateSeats
+      summary: Bulk-amend seats
+      description: >
+        Category assignment, attributes and status across a selection. Bulk is the only
+        practical mode — a venue with thirty thousand seats is not edited one at a time.
+      tags: [seatMap]
+      x-ticvai-permission: CAPACITY_CONFIGURE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/BulkUpdateSeatsRequest' }
+      responses:
+        '200':
+          description: Applied
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  updated: { type: integer }
+                  skipped:
+                    type: integer
+                    description: Seats with tickets sold against them, which cannot be recategorised.
+        '409':
+          description: Map is published and the change is structural
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /seat-maps/{seatMapId}/validate:
+    parameters:
+      - name: seatMapId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    post:
+      operationId: validateSeatMap
+      summary: Run validation without publishing
+      description: >
+        Duplicate seat numbers, gaps in a row, rows with no geometry, seats outside their
+        section boundary, accessible seats without a companion seat, and categories with no
+        price.
+      tags: [seatMap]
+      x-ticvai-permission: PRODUCT_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '200':
+          description: Findings
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ValidationReport' }
+
+  # ---------------------------------------------------------------- import
+  /seat-maps/{seatMapId}/import/manifest:
+    parameters:
+      - name: seatMapId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    post:
+      operationId: importSeatManifest
+      summary: Import the logical seat structure
+      description: >
+        A manifest is a flat list — section, row, seat — and is the authoritative source for
+        **which seats exist**. It carries no geometry, so a map with only a manifest can be
+        sold from a list but not rendered.
+
+        `columnMapping` accommodates the reality that every venue's manifest has different
+        column headings.
+      tags: [import]
+      x-ticvai-permission: CAPACITY_CONFIGURE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/ImportManifestRequest' }
+      responses:
+        '202':
+          description: Accepted; parsing proceeds asynchronously
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ImportJob' }
+        '400': { $ref: '../shared/common.yaml#/components/responses/BadRequest' }
+
+  /seat-maps/{seatMapId}/import/geometry:
+    parameters:
+      - name: seatMapId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    post:
+      operationId: importSeatGeometry
+      summary: Import seat geometry from a plan
+      description: >
+        Accepts SVG or a CAD-origin PDF. Where the source carries named layers — a seats
+        layer, an accessible-seating layer, steps, handrails — `layerMapping` extracts each
+        directly. Layer-aware extraction is far more reliable than shape recognition, so it
+        is preferred wherever the source supports it.
+
+        Geometry is joined to the manifest on section and row. A seat present in the plan but
+        absent from the manifest is a finding, not a seat.
+      tags: [import]
+      x-ticvai-permission: CAPACITY_CONFIGURE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/ImportGeometryRequest' }
+      responses:
+        '202':
+          description: Accepted
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ImportJob' }
+
+  /seat-maps/{seatMapId}/import/{jobId}:
+    parameters:
+      - name: seatMapId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+      - name: jobId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    get:
+      operationId: getImportJob
+      x-ticvai-read-routing: replica
+      summary: Import progress and findings
+      tags: [import]
+      x-ticvai-permission: PRODUCT_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '200':
+          description: Job
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ImportJob' }
+        '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
+
+    post:
+      operationId: commitImportJob
+      summary: Apply a parsed import
+      description: >
+        Two-phase by design. Parsing produces a preview with findings; committing applies it.
+        A venue operator should see *"3,142 seats, 4 rows with no geometry, 2 duplicate
+        numbers"* before anything is written.
+      tags: [import]
+      x-ticvai-permission: CAPACITY_CONFIGURE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                ignoreWarnings: { type: boolean, default: false }
+      responses:
+        '200':
+          description: Applied
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ImportJob' }
+        '409':
+          description: Job has errors, or has already been committed
+          content:
+            application/problem+json:
+              schema: { $ref: '#/components/schemas/ValidationProblem' }
+
+  /seat-map-templates:
+    get:
+      operationId: listSeatMapTemplates
+      x-ticvai-read-routing: replica
+      summary: List reusable layout templates
+      tags: [seatMap]
+      x-ticvai-permission: PRODUCT_VIEW
+      x-ticvai-scope-level: region
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '200':
+          description: Templates
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/SeatMapTemplate' }
+    post:
+      operationId: createSeatMapTemplate
+      x-ticvai-config-scope: region
+      summary: Save a map as a reusable template
+      tags: [seatMap]
+      x-ticvai-permission: CAPACITY_CONFIGURE
+      x-ticvai-scope-level: region
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [name, sourceSeatMapId]
+              properties:
+                name: { type: string, maxLength: 200 }
+                sourceSeatMapId: { type: string, format: uuid }
+                description: { type: string, maxLength: 1000 }
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/SeatMapTemplate' }
+
+  # ---------------------------------------------------------------- categories
+  /seat-categories:
+    get:
+      operationId: listSeatCategories
+      x-ticvai-read-routing: replica
+      summary: List seat categories
+      description: >
+        Categories combine with Space Structure and an Envelope to form capacity allocation.
+        They are an entitlement concept, not a colour on a map.
+      tags: [category]
+      x-ticvai-permission: PRODUCT_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: true
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - name: venueId
+          in: query
+          schema: { type: string, format: uuid }
+      responses:
+        '200':
+          description: Categories
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/SeatCategory' }
+
+    post:
+      operationId: createSeatCategory
+      summary: Create a seat category
+      tags: [category]
+      x-ticvai-permission: CAPACITY_CONFIGURE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [code, name, venueId]
+              properties:
+                code: { type: string, maxLength: 64 }
+                name: { type: string, maxLength: 200 }
+                venueId: { type: string, format: uuid }
+                displayColour: { type: string, pattern: '^#[0-9A-Fa-f]{6}$' }
+                rank:
+                  type: integer
+                  description: Ordering for best-seat assignment. Lower is better.
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/SeatCategory' }
+
+  # ---------------------------------------------------------------- availability
+  /performances/{performanceId}/seat-availability:
+    parameters:
+      - name: performanceId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    get:
+      operationId: getSeatAvailability
+      x-ticvai-consumed-by:
+        - "P01 WEB-007 Seat Map Selection"
+        - "P04 POS-004 Sell — Seat Map"
+      x-ticvai-read-routing: primary
+      summary: Seat status for a performance
+      description: >
+        Every seat with its current state — available, held, sold, blocked or buffered.
+
+        **Not offline-capable.** Seated inventory cannot be leased, so a terminal without a
+        connection cannot sell seats.
+      tags: [availability]
+      x-ticvai-permission: PRODUCT_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - name: sectionCode
+          in: query
+          schema: { type: string }
+        - name: categoryId
+          in: query
+          schema: { type: string, format: uuid }
+        - name: availableOnly
+          in: query
+          schema: { type: boolean, default: false }
+        - name: mode
+          in: query
+          description: >
+            `graphical` requires geometry and returns coordinates. `list` returns categories
+            and best-available groups only. `auto` picks by whether the map has geometry, and
+            is what a client should send unless it has a reason not to.
+          schema:
+            type: string
+            enum: [auto, graphical, list]
+            default: auto
+      responses:
+        '200':
+          description: Availability
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/SeatAvailability' }
+        '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
+
+  # ---------------------------------------------------------------- holds
+  /seat-holds:
+    post:
+      operationId: createSeatHold
+      x-ticvai-consumed-by:
+        - "P01 WEB-007 Seat Map Selection"
+        - "P04 POS-004 Sell — Seat Map"
+      summary: Hold specific seats
+      description: >
+        Short-lived and explicit, unlike a lease. Leases cover interchangeable units; a seat
+        hold covers named seats and cannot be sub-allocated.
+
+        The response carries `expiresAt` so the client can show a countdown. A selection
+        that expires silently while a guest enters card details is the worst outcome in this
+        flow.
+
+        Where seating rules apply, holding a seat may implicitly buffer its neighbours —
+        those appear in `bufferedSeatIds`.
+      tags: [hold]
+      x-ticvai-permission: ORDER_CREATE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/CreateSeatHoldRequest' }
+      responses:
+        '201':
+          description: Held
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/SeatHold' }
+        '409':
+          description: >
+            One or more seats are no longer available, or the selection breaks a seating
+            rule. The response names the offending seats.
+          content:
+            application/problem+json:
+              schema: { $ref: '#/components/schemas/SeatConflictProblem' }
+
+  /seat-holds/{holdId}:
+    parameters:
+      - name: holdId
+        in: path
+        required: true
+        schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+    get:
+      operationId: getSeatHold
+      x-ticvai-read-routing: primary
+      summary: Read a hold
+      tags: [hold]
+      x-ticvai-permission: ORDER_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '200':
+          description: Hold
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/SeatHold' }
+        '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
+
+    delete:
+      operationId: releaseSeatHold
+      summary: Release a hold
+      description: Releases buffered neighbours alongside the held seats.
+      tags: [hold]
+      x-ticvai-permission: ORDER_CREATE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '204': { description: Released }
+        '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
+
+  /seat-holds/{holdId}/extend:
+    parameters:
+      - name: holdId
+        in: path
+        required: true
+        schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+    post:
+      operationId: extendSeatHold
+      x-ticvai-consumed-by:
+        - "P01 WEB-007 Seat Map Selection"
+        - "P04 POS-004 Sell — Seat Map"
+      summary: Extend a hold
+      description: >
+        For a guest still completing payment. Bounded by the venue's maximum, so a hold
+        cannot be renewed indefinitely against a busy performance.
+      tags: [hold]
+      x-ticvai-permission: ORDER_CREATE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      responses:
+        '200':
+          description: Extended
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/SeatHold' }
+        '409':
+          description: Already expired, or the extension limit is reached
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  # ---------------------------------------------------------------- blocks
+  /seat-blocks:
+    get:
+      operationId: listSeatBlocks
+      x-ticvai-read-routing: primary   # a released block that still reads as blocked strands sellable seats
+      summary: List seat blocks
+      description: >
+        Seats withheld from sale — production holds, house seats, group allocations,
+        maintenance. Distinct from a hold, which is a guest mid-purchase.
+      tags: [block]
+      x-ticvai-permission: PRODUCT_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - name: performanceId
+          in: query
+          schema: { type: string, format: uuid }
+        - name: reason
+          in: query
+          schema: { $ref: '#/components/schemas/BlockReason' }
+        - $ref: '../shared/common.yaml#/components/parameters/PageSize'
+        - $ref: '../shared/common.yaml#/components/parameters/PageCursor'
+      responses:
+        '200':
+          description: Blocks
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '../shared/common.yaml#/components/schemas/Page'
+                  - type: object
+                    properties:
+                      items:
+                        type: array
+                        items: { $ref: '#/components/schemas/SeatBlock' }
+
+    post:
+      operationId: createSeatBlock
+      summary: Block seats from sale
+      tags: [block]
+      x-ticvai-permission: CAPACITY_CONFIGURE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/CreateSeatBlockRequest' }
+      responses:
+        '201':
+          description: Blocked
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/SeatBlock' }
+        '409':
+          description: One or more seats already sold. Sold seats cannot be blocked
+          content:
+            application/problem+json:
+              schema: { $ref: '#/components/schemas/SeatConflictProblem' }
+
+  /seat-blocks/{blockId}:
+    parameters:
+      - name: blockId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    delete:
+      operationId: releaseSeatBlock
+      summary: Release a block back to sale
+      tags: [block]
+      x-ticvai-permission: CAPACITY_CONFIGURE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [reason]
+              properties:
+                reason: { type: string, minLength: 3, maxLength: 500 }
+      responses:
+        '204': { description: Released }
+        '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
+
+  /seat-blocks/{blockId}/allocate:
+    parameters:
+      - name: blockId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    post:
+      operationId: allocateBlockedSeats
+      x-ticvai-consumed-by:
+        - "P10 PTR-009 Group / Bulk Booking"
+      summary: Issue seats from a block to a group
+      description: >
+        Converts a group allocation into an order without the seats ever returning to public
+        sale.
+      tags: [block]
+      x-ticvai-permission: ORDER_CREATE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [seatIds]
+              properties:
+                seatIds:
+                  type: array
+                  minItems: 1
+                  items: { type: string }
+                subjectId: { type: string, format: uuid }
+                note: { type: string, maxLength: 500 }
+      responses:
+        '200':
+          description: Allocated; returns a hold to convert into an order
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/SeatHold' }
+
+  # ---------------------------------------------------------------- rules
+  /seat-maps/{seatMapId}/rules:
+    parameters:
+      - name: seatMapId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    get:
+      operationId: getSeatingRules
+      x-ticvai-read-routing: replica
+      summary: Read seating rules
+      tags: [rules]
+      x-ticvai-permission: PRODUCT_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: true
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '200':
+          description: Rules
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/SeatingRules' }
+
+    put:
+      operationId: setSeatingRules
+      x-ticvai-config-scope: venue
+      summary: Set seating rules
+      description: >
+        Buffer seats, distancing, orphan-seat prevention and accessibility pairing.
+
+        Orphan prevention is the one operators most often want and least often ask for by
+        name: refusing a selection that would leave a single unsellable seat between two
+        parties.
+      tags: [rules]
+      x-ticvai-permission: CAPACITY_CONFIGURE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/SeatingRules' }
+      responses:
+        '200':
+          description: Set
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/SeatingRules' }
+
+  # ---------------------------------------------------------------- recommendations
+  /performances/{performanceId}/seat-recommendations:
+    parameters:
+      - name: performanceId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    post:
+      operationId: recommendSeats
+      summary: Recommend seats for a party
+      description: >
+        Best available, best value, closest to stage, or accessible with companions.
+
+        Returns contiguous groups where the party requires them — a family of four split
+        across two rows is a complaint, not a booking.
+      tags: [recommendation]
+      x-ticvai-permission: PRODUCT_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/SeatRecommendationRequest' }
+      responses:
+        '200':
+          description: Recommendations, best first
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [options]
+                properties:
+                  options:
+                    type: array
+                    items: { $ref: '#/components/schemas/SeatRecommendation' }
+        '404':
+          description: No selection satisfies the constraints
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+components:
+  schemas:
+    SeatMapStatus:
+      type: string
+      enum: [draft, validated, published, archived]
+
+    SeatAttribute:
+      type: string
+      enum:
+        - standard
+        - accessible          # wheelchair space
+        - companion           # paired with an accessible space
+        - obstructedView
+        - restrictedLegroom
+        - premium
+        - houseSeat
+        - buffer              # kept empty by a seating rule
+
+    SeatStatus:
+      type: string
+      enum: [available, held, sold, blocked, buffered, unavailable]
+
+    Point:
+      type: object
+      required: [x, y]
+      properties:
+        x: { type: number }
+        y: { type: number }
+
+    SeatMapSummary:
+      x-ticvai-persistence: "seating.seat_map"
+      type: object
+      required: [id, name, venueId, status, seatCount]
+      properties:
+        id: { type: string, format: uuid }
+        name: { type: string }
+        venueId: { type: string, format: uuid }
+        status: { $ref: '#/components/schemas/SeatMapStatus' }
+        seatCount: { type: integer }
+        sectionCount: { type: integer }
+        hasGeometry:
+          type: boolean
+          description: >
+            False when only a manifest has been imported. Such a map can be sold from a list
+            but not rendered.
+        publishedAt: { type: string, format: date-time, nullable: true }
+
+    SeatMap:
+      x-ticvai-persistence: "seating.seat_map"
+      allOf:
+        - $ref: '#/components/schemas/SeatMapSummary'
+        - type: object
+          required: [sections]
+          properties:
+            description: { type: string, nullable: true }
+            viewBox:
+              type: object
+              description: Coordinate space for rendering. Absent when there is no geometry.
+              nullable: true
+              properties:
+                width: { type: number }
+                height: { type: number }
+            stagePosition: { $ref: '#/components/schemas/Point' }
+            sections:
+              type: array
+              items: { $ref: '#/components/schemas/Section' }
+            isActive: { type: boolean }
+
+    Section:
+      x-ticvai-persistence: "seating.section"
+      type: object
+      required: [code, name, rowCount, seatCount]
+      properties:
+        code: { type: string }
+        name: { type: string }
+        rowCount: { type: integer }
+        seatCount: { type: integer }
+        boundary:
+          type: array
+          items: { $ref: '#/components/schemas/Point' }
+          description: Polygon for rendering. Absent without geometry.
+        rows:
+          type: array
+          items:
+            type: object
+            required: [label, seatCount]
+            properties:
+              label: { type: string }
+              seatCount: { type: integer }
+              numberingDirection:
+                type: string
+                enum: [leftToRight, rightToLeft]
+                description: >
+                  Which end row numbering starts from. Not recoverable from a manifest and
+                  must be stated — it determines whether a guest finds their seat.
+
+    CreateSeatMapRequest:
+      x-ticvai-persistence: "none — request only"
+      type: object
+      required: [name, venueId]
+      properties:
+        name: { type: string, maxLength: 200 }
+        venueId: { type: string, format: uuid }
+        description: { type: string, maxLength: 1000 }
+        templateId:
+          type: string
+          format: uuid
+          description: Create from a template rather than empty.
+
+    Seat:
+      x-ticvai-persistence: "seating.seat"
+      type: object
+      required: [id, sectionCode, rowLabel, seatNumber, attribute]
+      properties:
+        id:
+          type: string
+          pattern: '^[0-9A-HJKMNP-TV-Z]{26}$'
+          description: >
+            **Stable for the life of the seat.** Section, row and number are display labels
+            that change on a refit; this does not. A ticket sold today must still resolve
+            after a renumbering.
+        sectionCode: { type: string }
+        rowLabel: { type: string }
+        seatNumber: { type: string }
+        displayLabel:
+          type: string
+          description: What the guest sees, e.g. `A2-7-11`.
+        position:
+          allOf:
+            - $ref: '#/components/schemas/Point'
+          nullable: true
+        categoryId: { type: string, format: uuid, nullable: true }
+        attribute: { $ref: '#/components/schemas/SeatAttribute' }
+        companionSeatIds:
+          type: array
+          items: { type: string }
+          description: Present on accessible seats. Sold together, released together.
+        isActive: { type: boolean }
+
+    BulkUpdateSeatsRequest:
+      x-ticvai-persistence: "none — request only"
+      type: object
+      required: [selection]
+      properties:
+        selection:
+          type: object
+          description: Seats to amend. Combine filters; an empty selection is rejected.
+          properties:
+            seatIds:
+              type: array
+              items: { type: string }
+            sectionCodes:
+              type: array
+              items: { type: string }
+            rowLabels:
+              type: array
+              items: { type: string }
+        categoryId: { type: string, format: uuid }
+        attribute: { $ref: '#/components/schemas/SeatAttribute' }
+        isActive: { type: boolean }
+
+    SeatCategory:
+      x-ticvai-persistence: "seating.seat_category"
+      type: object
+      required: [id, code, name, venueId, rank]
+      properties:
+        id: { type: string, format: uuid }
+        code: { type: string }
+        name: { type: string }
+        venueId: { type: string, format: uuid }
+        displayColour: { type: string, nullable: true }
+        rank:
+          type: integer
+          description: Ordering for best-seat assignment. Lower is better.
+        seatCount: { type: integer }
+
+    SeatMapTemplate:
+      x-ticvai-persistence: "seating.seat_map_template"
+      type: object
+      required: [id, name, seatCount, sectionCount]
+      properties:
+        id: { type: string, format: uuid }
+        name: { type: string }
+        description: { type: string, nullable: true }
+        seatCount: { type: integer }
+        sectionCount: { type: integer }
+        hasGeometry: { type: boolean }
+        createdAt: { type: string, format: date-time }
+
+    ImportSourceFormat:
+      type: string
+      enum: [csvManifest, xlsxManifest, svgPlan, pdfPlan]
+
+    ImportManifestRequest:
+      x-ticvai-persistence: "none — request only"
+      type: object
+      required: [fileReference, format, columnMapping]
+      properties:
+        fileReference:
+          type: string
+          description: Object storage reference. The file is not posted through this API.
+        format:
+          type: string
+          enum: [csvManifest, xlsxManifest]
+        sheetName:
+          type: string
+          description: Spreadsheets only. Trailing spaces in sheet names are common — quote exactly.
+        headerRow: { type: integer, default: 1 }
+        columnMapping:
+          type: object
+          description: >
+            Which column holds what. Required because manifests arrive with different
+            headings from every venue.
+          required: [sectionColumn, rowColumn, seatColumn]
+          properties:
+            sectionColumn: { type: string }
+            rowColumn: { type: string }
+            seatColumn: { type: string }
+            categoryColumn: { type: string }
+            attributeColumn: { type: string }
+        replaceExisting:
+          type: boolean
+          default: false
+          description: >
+            False merges. True replaces, and is refused where tickets are sold against the
+            map.
+
+    ImportGeometryRequest:
+      x-ticvai-persistence: "none — request only"
+      type: object
+      required: [fileReference, format]
+      properties:
+        fileReference: { type: string }
+        format:
+          type: string
+          enum: [svgPlan, pdfPlan]
+        layerMapping:
+          type: object
+          description: >
+            Named layers in the source. Layer-aware extraction is far more reliable than
+            shape recognition, so it is preferred wherever the source supports it.
+          properties:
+            seatsLayer: { type: string }
+            accessibleSeatsLayer: { type: string }
+            sectionBoundaryLayer: { type: string }
+            stepsLayer: { type: string }
+            stageLayer: { type: string }
+        joinOn:
+          type: string
+          enum: [sectionAndRow, labelText, ordinal]
+          default: sectionAndRow
+          description: How plan geometry is matched to manifest seats.
+
+    ImportJobStatus:
+      type: string
+      enum: [parsing, previewReady, committing, committed, failed]
+
+    ImportJob:
+      x-ticvai-persistence: "seating.import_job"
+      type: object
+      required: [id, seatMapId, kind, status, createdAt]
+      properties:
+        id: { type: string, format: uuid }
+        seatMapId: { type: string, format: uuid }
+        kind:
+          type: string
+          enum: [manifest, geometry]
+        status: { $ref: '#/components/schemas/ImportJobStatus' }
+        parsedSeatCount: { type: integer }
+        matchedSeatCount:
+          type: integer
+          description: Geometry imports — seats successfully joined to the manifest.
+        unmatchedSeatCount:
+          type: integer
+          description: >
+            Present in one source but not the other. A seat in the plan with no manifest
+            entry is a finding, not a seat.
+        findings:
+          type: array
+          items: { $ref: '#/components/schemas/ValidationFinding' }
+        createdAt: { type: string, format: date-time }
+        completedAt: { type: string, format: date-time, nullable: true }
+
+    ValidationSeverity:
+      type: string
+      enum: [error, warning, info]
+
+    ValidationFindingKind:
+      type: string
+      enum:
+        - duplicateSeatNumber
+        - gapInRow
+        - missingGeometry
+        - seatOutsideSection
+        - accessibleSeatWithoutCompanion
+        - categoryWithoutPrice
+        - unmatchedGeometry
+        - unmatchedManifestSeat
+        - ambiguousNumberingDirection
+        - emptySection
+
+    ValidationFinding:
+      x-ticvai-persistence: "none — computed"
+      type: object
+      required: [kind, severity, message]
+      properties:
+        kind: { $ref: '#/components/schemas/ValidationFindingKind' }
+        severity: { $ref: '#/components/schemas/ValidationSeverity' }
+        message: { type: string }
+        sectionCode: { type: string, nullable: true }
+        rowLabel: { type: string, nullable: true }
+        seatNumbers:
+          type: array
+          items: { type: string }
+        affectedCount: { type: integer }
+
+    ValidationReport:
+      x-ticvai-persistence: "none — computed"
+      type: object
+      required: [seatMapId, passed, errorCount, warningCount, findings]
+      properties:
+        seatMapId: { type: string, format: uuid }
+        passed:
+          type: boolean
+          description: False when any finding has severity `error`.
+        errorCount: { type: integer }
+        warningCount: { type: integer }
+        findings:
+          type: array
+          items: { $ref: '#/components/schemas/ValidationFinding' }
+
+    ValidationProblem:
+      allOf:
+        - $ref: '../shared/common.yaml#/components/schemas/Problem'
+        - type: object
+          properties:
+            findings:
+              type: array
+              items: { $ref: '#/components/schemas/ValidationFinding' }
+
+    SeatConflictProblem:
+      allOf:
+        - $ref: '../shared/common.yaml#/components/schemas/Problem'
+        - type: object
+          properties:
+            conflictingSeats:
+              type: array
+              items:
+                type: object
+                properties:
+                  seatId: { type: string }
+                  displayLabel: { type: string }
+                  status: { $ref: '#/components/schemas/SeatStatus' }
+                  reason: { type: string }
+
+    SeatAvailability:
+      x-ticvai-persistence: "none — computed from seat, hold and block"
+      type: object
+      required: [performanceId, seatMapId, totals, seats]
+      properties:
+        performanceId: { type: string, format: uuid }
+        seatMapId: { type: string, format: uuid }
+        totals:
+          type: object
+          properties:
+            total: { type: integer }
+            available: { type: integer }
+            held: { type: integer }
+            sold: { type: integer }
+            blocked: { type: integer }
+            buffered: { type: integer }
+        byCategory:
+          type: array
+          items:
+            type: object
+            properties:
+              categoryId: { type: string, format: uuid }
+              available: { type: integer }
+              sold: { type: integer }
+              price: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+        seats:
+          type: array
+          items:
+            type: object
+            required: [seatId, status]
+            properties:
+              seatId: { type: string }
+              status: { $ref: '#/components/schemas/SeatStatus' }
+              categoryId: { type: string, format: uuid, nullable: true }
+
+    CreateSeatHoldRequest:
+      x-ticvai-persistence: "none — request only"
+      type: object
+      required: [id, performanceId, seatIds, ttlSeconds]
+      properties:
+        id: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+        performanceId: { type: string, format: uuid }
+        seatIds:
+          type: array
+          minItems: 1
+          maxItems: 50
+          items: { type: string }
+        ttlSeconds:
+          type: integer
+          minimum: 60
+          maximum: 1800
+        subjectId: { type: string, format: uuid }
+
+    SeatHold:
+      x-ticvai-persistence: "seating.seat_hold"
+      type: object
+      required: [id, performanceId, seatIds, status, createdAt, expiresAt]
+      properties:
+        id: { type: string }
+        performanceId: { type: string, format: uuid }
+        seatIds:
+          type: array
+          items: { type: string }
+        bufferedSeatIds:
+          type: array
+          items: { type: string }
+          description: Neighbours implicitly held by a seating rule.
+        status:
+          type: string
+          enum: [held, converted, released, expired]
+        totalPrice: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+        heldByPrincipalId: { type: string, format: uuid, nullable: true }
+        subjectId: { type: string, format: uuid, nullable: true }
+        extensionCount: { type: integer }
+        createdAt: { type: string, format: date-time }
+        expiresAt: { type: string, format: date-time }
+
+    BlockReason:
+      type: string
+      enum: [productionHold, houseSeats, groupAllocation, maintenance, accessibilityReserve, distancing, other]
+
+    CreateSeatBlockRequest:
+      x-ticvai-persistence: "none — request only"
+      type: object
+      required: [performanceId, seatIds, reason, note]
+      properties:
+        performanceId: { type: string, format: uuid }
+        seatIds:
+          type: array
+          minItems: 1
+          items: { type: string }
+        reason: { $ref: '#/components/schemas/BlockReason' }
+        note: { type: string, minLength: 3, maxLength: 500 }
+        releaseAt:
+          type: string
+          format: date-time
+          description: Automatic release, for production holds freed close to performance.
+
+    SeatBlock:
+      x-ticvai-persistence: "seating.seat_block"
+      type: object
+      required: [id, performanceId, seatIds, reason, createdAt]
+      properties:
+        id: { type: string, format: uuid }
+        performanceId: { type: string, format: uuid }
+        seatIds:
+          type: array
+          items: { type: string }
+        reason: { $ref: '#/components/schemas/BlockReason' }
+        note: { type: string }
+        createdByPrincipalId: { type: string, format: uuid }
+        createdAt: { type: string, format: date-time }
+        releaseAt: { type: string, format: date-time, nullable: true }
+        releasedAt: { type: string, format: date-time, nullable: true }
+
+    SeatingRules:
+      x-ticvai-persistence: "seating.seating_rules"
+      type: object
+      required: [seatMapId]
+      properties:
+        seatMapId: { type: string, format: uuid }
+        bufferSeats:
+          type: integer
+          minimum: 0
+          default: 0
+          description: Seats kept empty either side of a sold party.
+        bufferRows:
+          type: integer
+          minimum: 0
+          default: 0
+        preventOrphanSeats:
+          type: boolean
+          default: false
+          description: >
+            Refuse a selection that would leave a single unsellable seat between parties.
+            Operators want this and rarely ask for it by name.
+        maxPartySize: { type: integer, nullable: true }
+        requireContiguous:
+          type: boolean
+          default: false
+          description: A party must sit together or the selection is refused.
+        accessibleCompanionCount:
+          type: integer
+          default: 1
+          description: Companion seats sold alongside each accessible space.
+        allowSplitAcrossRows: { type: boolean, default: true }
+
+    SeatRecommendationStrategy:
+      type: string
+      enum: [bestAvailable, bestValue, closestToStage, accessible, contiguous]
+
+    SeatRecommendationRequest:
+      x-ticvai-persistence: "none — request only"
+      type: object
+      required: [partySize, strategy]
+      properties:
+        partySize: { type: integer, minimum: 1, maximum: 50 }
+        strategy: { $ref: '#/components/schemas/SeatRecommendationStrategy' }
+        categoryIds:
+          type: array
+          items: { type: string, format: uuid }
+        maxPrice: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+        accessibleCount:
+          type: integer
+          default: 0
+          description: Wheelchair spaces in the party. Companions are added automatically.
+        maxOptions: { type: integer, default: 3, maximum: 10 }
+
+    SeatRecommendation:
+      x-ticvai-persistence: "none — computed"
+      type: object
+      required: [seatIds, totalPrice, isContiguous, rank]
+      properties:
+        seatIds:
+          type: array
+          items: { type: string }
+        displayLabels:
+          type: array
+          items: { type: string }
+        totalPrice: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+        categoryId: { type: string, format: uuid }
+        isContiguous: { type: boolean }
+        rank:
+          type: integer
+          description: Best first.
+        rationale:
+          type: string
+          description: >
+            Why this option was chosen — closest to stage, best value in category, only
+            contiguous block remaining. Shown to a call-centre agent, not the guest.
+
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

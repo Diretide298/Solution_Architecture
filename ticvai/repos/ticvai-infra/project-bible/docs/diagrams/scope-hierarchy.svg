@@ -1,0 +1,85 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="620" viewBox="0 0 900 620">
+<style>
+  .bg{fill:#FFFFFF}
+  .box{fill:#F7F9FC;stroke:#5A6577;stroke-width:1.2}
+  .box.spine{fill:#0D6EFD;stroke:#0B1324;stroke-width:2}
+  .box.new{fill:#FFF7E6;stroke:#8A6D00;stroke-width:2;stroke-dasharray:6 3}
+  .lvl{fill:#0B1324;font-family:Arial,Helvetica,sans-serif;font-size:14px;font-weight:700}
+  .lvl.on{fill:#FFFFFF}
+  .cfg{fill:#5A6577;font-family:Arial,Helvetica,sans-serif;font-size:11px}
+  .cfg.on{fill:#DDEBF7}
+  .num{fill:#8494A8;font-family:'Courier New',monospace;font-size:10.5px}
+  .num.on{fill:#BFDBFF}
+  .edge{stroke:#5A6577;stroke-width:1.6;fill:none}
+  .edge.spine{stroke:#0D6EFD;stroke-width:2.4}
+  .hd{fill:#0B1324;font-family:Arial,Helvetica,sans-serif;font-size:17px;font-weight:700}
+  .sub{fill:#5A6577;font-family:Arial,Helvetica,sans-serif;font-size:12px}
+  .grp{fill:#8494A8;font-family:'Courier New',monospace;font-size:10.5px;letter-spacing:1.4px}
+  .warn{fill:#8A6D00;font-family:Arial,Helvetica,sans-serif;font-size:11px;font-weight:700}
+  .band{fill:#F2F5F9;stroke:#E3E8F0;stroke-width:1}
+</style>
+<rect class="bg" x="0" y="0" width="900" height="620"/>
+
+<text class="hd" x="30" y="34">TICVAI scope hierarchy — eight levels</text>
+<text class="sub" x="30" y="56">Seven organisational, one commercial. Every level earns its place by owning configuration nothing above or below can own.</text>
+
+<!-- spine -->
+<line class="edge spine" x1="330" y1="112" x2="330" y2="146"/>
+<line class="edge spine" x1="330" y1="190" x2="330" y2="224"/>
+<line class="edge spine" x1="330" y1="268" x2="330" y2="302"/>
+<path class="edge" d="M330 346 L330 372 L180 372 L180 400"/>
+<path class="edge" d="M330 346 L330 372 L620 372 L620 400"/>
+<line class="edge" x1="180" y1="444" x2="180" y2="474"/>
+<line class="edge" x1="180" y1="518" x2="180" y2="548"/>
+
+<g><rect class="box spine" x="200" y="80" width="260" height="32" rx="6"/>
+<text class="lvl on" x="330" y="101" text-anchor="middle">tenant</text></g>
+<text class="num" x="480" y="94">238 operations</text>
+<text class="cfg" x="480" y="110">plans · licences · roles · message templates</text>
+
+<g><rect class="box" x="200" y="158" width="260" height="32" rx="6"/>
+<text class="lvl" x="330" y="179" text-anchor="middle">brand</text></g>
+<text class="num" x="480" y="172">2 operations · optional</text>
+<text class="cfg" x="480" y="188">a tenant with one brand never creates a node</text>
+
+<g><rect class="box spine" x="200" y="236" width="260" height="32" rx="6"/>
+<text class="lvl on" x="330" y="257" text-anchor="middle">region</text></g>
+<text class="num" x="480" y="250">46 operations · 8 configs</text>
+<text class="cfg" x="480" y="266">currency · tax · timezone · fiscal year — not overridable below</text>
+
+<g><rect class="box spine" x="200" y="314" width="260" height="32" rx="6"/>
+<text class="lvl on" x="330" y="335" text-anchor="middle">venue</text></g>
+<text class="num" x="480" y="328">675 operations · 29 configs</text>
+<text class="cfg" x="480" y="344">the platform's default scope — two thirds of everything</text>
+
+<!-- branches -->
+<rect class="band" x="46" y="386" width="268" height="192" rx="8"/>
+<text class="grp" x="60" y="404">ORGANISATIONAL — WHO WORKS WHERE</text>
+<rect class="band" x="486" y="386" width="368" height="192" rx="8"/>
+<text class="grp" x="500" y="404">COMMERCIAL — WHAT IS SOLD WHERE</text>
+
+<g><rect class="box" x="60" y="412" width="240" height="32" rx="6"/>
+<text class="lvl" x="180" y="433" text-anchor="middle">department</text></g>
+<text class="cfg" x="60" y="462">requisitions · rotas · cost centres</text>
+
+<g><rect class="box" x="60" y="486" width="240" height="32" rx="6"/>
+<text class="lvl" x="180" y="507" text-anchor="middle">subDepartment</text></g>
+<text class="cfg" x="60" y="536">optional second tier</text>
+
+<g><rect class="box" x="60" y="546" width="240" height="26" rx="6"/>
+<text class="lvl" x="180" y="564" text-anchor="middle">workstation</text></g>
+
+<g><rect class="box new" x="500" y="412" width="240" height="32" rx="6"/>
+<text class="lvl" x="620" y="433" text-anchor="middle">outlet</text></g>
+<text class="warn" x="500" y="462">Added 18 August · CF-138 · ADR-0018</text>
+<text class="cfg" x="500" y="482">5 configs: menu, table layout, return policy,</text>
+<text class="cfg" x="500" y="498">opening hours, substitution rules</text>
+<text class="cfg" x="500" y="522">A sibling of department, never a child of it.</text>
+<text class="cfg" x="500" y="538">Only F&amp;B and retail resolve here; everything</text>
+<text class="cfg" x="500" y="554">else has no outlet on its path.</text>
+
+<line class="edge" x1="310" y1="428" x2="494" y2="428" stroke-dasharray="5 4"/>
+<text class="cfg" x="402" y="422" text-anchor="middle">siblings</text>
+
+<text class="sub" x="30" y="600">A restaurant modelled as a department lands in the staffing tree. That is why the two branches cannot be collapsed.</text>
+</svg>

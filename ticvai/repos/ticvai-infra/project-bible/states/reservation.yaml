@@ -1,0 +1,34 @@
+# Reservation — state model
+# Contract: orders.Reservation.status
+# Checked by tools/check-states.py.
+
+entity: Reservation
+contract: orders
+enum: Reservation.status
+enumKind: inline
+enumSchema: Reservation
+enumProperty: status
+owner: orders
+initial:
+- held
+terminal:
+- converted
+- expired
+- cancelled
+transitions:
+- from: held
+  to: converted
+  operation: convertReservation
+  trigger: operation
+  guard: Became an order. **The lease transfers rather than being released and re-acquired**
+- from: held
+  to: expired
+  trigger: timer
+  guard: '**Capacity released.** A reservation nobody converts is capacity nobody can buy'
+- from: held
+  to: cancelled
+  operation: cancelReservation
+  trigger: operation
+  guard: Released deliberately
+notes: 'A hold without payment. **Distinct from a cart**: a reservation is made by staff for a named
+  party, a cart is a guest deciding.'

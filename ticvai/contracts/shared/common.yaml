@@ -1,0 +1,363 @@
+openapi: 3.1.0
+info:
+  title: TICVAI Shared Components
+  version: 1.0.0
+  description: >
+    ## How to read this file
+
+    **Shared types. Every other contract references these rather than redefining them.**
+
+    A type defined once and referenced everywhere is a type that cannot drift. `Money`
+    declared separately in eleven contracts would be eleven chances to forget that some
+    currencies use three decimal places.
+
+    | Defined here | Why it is shared |
+    |---|---|
+    | `Money` | Amount, currency and **scale**. A fixed two-place type truncates 3dp currencies |
+    | `ScopeRef` | A node in the seven-level hierarchy, with its ltree path |
+    | `Problem` | RFC 9457 error shape with an enumerated `type`. Clients switch on it |
+    | `Page` | Cursor pagination. Offset drifts under concurrent writes |
+    | Parameters | `Idempotency-Key`, page size, page cursor |
+    | **Security schemes** | The four authentication models — see below |
+
+    ## Authentication
+
+    | Scheme | Used by |
+    |---|---|
+    | `bearerAuth` | Staff sessions. Carries `sid`, validated against the session registry |
+    | `guestAuth` | Guest sessions. No workstation, no role selection, no single-session rule |
+    | `serviceAuth` | Cell-to-cell and cell-to-Control-Plane. mTLS plus a cell-identity token |
+    | `apiKeyAuth` | Partner and developer. Deferred pending the Developer & API workshop |
+
+    Authorisation is **not** expressed through OAuth scopes. Permissions resolve at login
+    against a seven-level tree with deny-overrides-allow, which scopes cannot express — so
+    they live in `x-ticvai-permission` and `x-ticvai-scope-level` on each operation instead.
+
+    Components referenced by every TICVAI contract. Changes here are breaking
+    changes to every consumer — treat accordingly.
+
+components:
+  parameters:
+    PageSize:
+      name: pageSize
+      in: query
+      schema: { type: integer, minimum: 1, maximum: 200, default: 50 }
+
+    PageCursor:
+      name: cursor
+      in: query
+      description: Opaque cursor from a previous page. Absent on first request.
+      schema: { type: string }
+
+    IdempotencyKey:
+      name: Idempotency-Key
+      in: header
+      required: true
+      description: >
+        Client-generated ULID. Servers deduplicate on this value. Required on every
+        mutating request because offline clients replay their outbox on reconnect.
+      schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+
+    ConsistencyToken:
+      name: X-Consistency-Token
+      in: header
+      required: false
+      description: >
+        WAL LSN returned by a prior write. When present the read is routed to a
+        replica that has caught up past this position, or to the primary. Prevents
+        a ticket sold at the gate being refused by a lagging replica seconds later.
+      schema: { type: string }
+
+  schemas:
+
+    # ---------------------------------------------------------------------------------------
+    # `x-ticvai-audience` says WHO may call an operation. One field, a list, closed set:
+    # staff · guest · partner · public · anonymous · device · service.
+    #
+    # A list because the answer is genuinely plural. `cancelReservation` is called by staff
+    # cancelling anyone's and by a guest cancelling their own — the same operation, two audiences,
+    # and a scalar forces one of them to be a lie.
+    #
+    # **Audience and permission are orthogonal.** Audience says who may call; permission says what
+    # a staff caller must hold. `[staff, guest]` keeps its permission for the staff case and
+    # resolves to the caller's own data for a guest.
+    #
+    # Replaces `x-ticvai-auth` and `x-ticvai-guest-callable`, which answered the same question
+    # differently on 105 operations with only three carrying both (ADR-0025). `public` and
+    # `partner` did not exist in either, which is why an accreditation reviewer holding a real
+    # permission was classified as a guest.
+    # ---------------------------------------------------------------------------------------
+    StoredValueKind:
+      type: string
+      description: >
+        **Six things in this package hold a balance and behave the same way** — a wallet, a gift
+        card, a game card, a voucher, a loyalty position and a prepaid entitlement. They were built
+        separately across three sessions and each grew its own balance, bonus balance, status,
+        blocked reason and expiry (CF-126).
+
+        **The concern is not tidiness. Only one of the six could hold an authorisation.**
+        `authoriseWalletSpend` / `captureWalletAuthorisation` / `releaseWalletAuthorisation` gave
+        two-phase spend to the retail wallet alone, so **a guest with 200 game credits starting a
+        play the machine then failed had no held balance** — the credits were either taken or not,
+        with no third state.
+
+        The entities stay distinct because their lifecycles genuinely differ — a gift card
+        activates at a till, a loyalty position never expires the same way. **What is shared is the
+        spend mechanism**, and this enum is what lets it be shared.
+      enum: [wallet, giftCard, gameCard, voucher, loyalty, prepaidEntitlement]
+
+    StoredValueAuthorisation:
+      type: object
+      x-ticvai-persistence: "orders.stored_value_authorisation"
+      description: >
+        A hold against any stored-value instrument. **Two-phase by necessity, not by preference** —
+        an arcade machine, a kitchen and a gate all take time between committing to a spend and
+        knowing it succeeded, and a balance that cannot be held is a balance that gets
+        double-spent or refunded by hand.
+      required: [id, kind, instrumentId, amount, status]
+      properties:
+        id: { type: string, format: uuid }
+        kind: { $ref: '#/components/schemas/StoredValueKind' }
+        instrumentId:
+          type: string
+          format: uuid
+          description: The wallet, card, voucher or position being held against.
+        amount: { $ref: '#/components/schemas/Money' }
+        status:
+          type: string
+          enum: [held, partiallyCaptured, captured, released, expired]
+          description: >
+            **Mirrors `cross-cell.WalletAuthorisation` exactly**, which is the point — one
+            lifecycle rather than six.
+        capturedAmount: { $ref: '#/components/schemas/Money' }
+        expiresAt:
+          type: string
+          format: date-time
+          description: >
+            **Released automatically.** A hold nobody releases is a guest whose balance is short
+            with no explanation, and the arcade is where that happens most.
+        reference:
+          type: string
+          description: What the hold is for — an order, a play, a table visit.
+
+
+    SalesChannel:
+      type: string
+      description: >
+        **Where a sale came from.** Restored 24 August — this was lost in the `Money` rewrite and
+        nine references across four contracts were pointing at nothing.
+
+        **Not interchangeable with the local `Channel` enums.** `catalogue.Channel` and
+        `orders.Channel` are byte-identical duplicates of each other listing
+        `pos, kiosk, web, mobile, b2b, ota, callCentre`; `orders.OrderChannel` lists
+        `guestApp, guestWeb, partner, api, backOffice` on top. **Pointing the nine at a local enum
+        would silently narrow them** — and the duplication between the two `Channel` enums is the
+        reason a shared one existed in the first place.
+
+        **This is the reporting dimension**: attribution, promotion eligibility and settlement all
+        group by it, which is why it has to mean the same thing in `orders`, `catalogue`,
+        `subscription` and `marketing-crm` rather than four things that nearly line up.
+      enum:
+        - pos
+        - kiosk
+        - guestApp
+        - guestWeb
+        - callCentre
+        - partner
+        - api
+        - backOffice
+        - b2b
+        - ota
+
+    ScopeLevel:
+      type: string
+      description: >
+        **The eight organisational levels, and the shared copy of them.** Restored 24 August.
+
+        `tenancy.yaml` holds the authoritative definition and this mirrors it so a contract can
+        reference a level without depending on the whole tenancy surface. **Seven organisational
+        levels plus `outlet`** — a commercial branch beside the organisational one (CF-138,
+        ADR-0018). **A department has requisitions and rotas; an outlet has a menu and stock**, and
+        modelling a restaurant as a department would put it in the staffing tree.
+      enum: [tenant, brand, region, venue, department, subDepartment, workstation, outlet]
+
+    ScopeRef:
+      type: object
+      description: >
+        **A pointer to a node in the hierarchy, with enough on it to render.** Restored 24 August —
+        `identity.yaml` references this for `effectiveScopes` and it resolved to nothing.
+
+        **The path is materialised**, so a client can test containment with a prefix match rather
+        than walking parents. That is what lets navigation filter locally: a client checks its
+        scopes against a screen's requirement without a round trip, and
+        `platform.scope_node` — reached by 304 of 379 tables — never has to be queried to answer it.
+      required: [id, level, path]
+      properties:
+        id:
+          type: string
+          format: uuid
+        level:
+          $ref: '#/components/schemas/ScopeLevel'
+        path:
+          type: string
+          description: >
+            Materialised ltree path. **Prefix-comparable** — `uae.dubai` contains
+            `uae.dubai.marina`.
+        code:
+          type: string
+          nullable: true
+        name:
+          type: string
+          nullable: true
+
+    Money:
+      type: object
+      x-ticvai-persistence-kind: valueObject
+      x-ticvai-persistence-column: "numeric(18,4)"
+      description: >
+        **On the wire this is three fields; in the database it is one column.**
+
+        24 August. Every column typed `Money` was landing as `jsonb` — 129 of them, including
+        `orders.shift.opening_float`, `inventory.purchase_order.total` and
+        `promotions.voucher.balance`. **`orders.cash_movement.amount` was `numeric(18,4)` because
+        somebody hand-typed that one**, and the inconsistency is what made it visible.
+
+        **A jsonb price cannot be summed in SQL.** Every total, variance and reconciliation moves
+        into application code — and a shift variance computed in .NET against a ledger computed in
+        Postgres is two answers to one question. That is F13 month-end and F98 takings-to-ledger,
+        both walked, both assuming the arithmetic is in the database.
+
+        **`currency` and `scale` are not stored per row.** ADR-0018 makes them region-scoped and
+        not overridable below, so they resolve from the scope walk — storing AED against nine
+        million rows in a UAE region is nine million copies of a fact that cannot differ. A row
+        that needed its own currency would be a row in the wrong region.
+
+        **They stay on the wire** because a client reading a figure should not have to walk a
+        hierarchy to know what it means.
+      required: [amount, currency, scale]
+      properties:
+        amount:
+          type: string
+          description: >
+            Decimal string, never a float. Up to 4 decimal places. **Persisted as
+            `numeric(18,4)`** — the string is a transport choice, so a JavaScript client cannot
+            round a fare in transit.
+          pattern: "^-?\\d+(\\.\\d{1,4})?$"
+        currency:
+          type: string
+          description: >
+            **Resolved from the region, not stored on the row** (ADR-0018). OMR uses 3 decimal
+            places and AED uses 2 — a venue on a different scale from its region is a ledger that
+            cannot consolidate.
+          pattern: "^[A-Z]{3}$"
+        scale:
+          type: integer
+          description: "Resolved from the region alongside `currency`."
+          minimum: 0
+          maximum: 4
+    Problem:
+      type: object
+      description: RFC 9457 problem details. Every error response uses this shape.
+      required: [type, title, status]
+      properties:
+        type: { type: string, format: uri }
+        title: { type: string }
+        status: { type: integer }
+        detail: { type: string }
+        instance: { type: string }
+        traceId: { type: string }
+        errors:
+          type: array
+          items:
+            type: object
+            required: [field, code]
+            properties:
+              field: { type: string }
+              code: { type: string }
+              message: { type: string }
+
+    Page:
+      type: object
+      required: [items, hasMore]
+      properties:
+        items:
+          type: array
+          items: {}
+        nextCursor: { type: string }
+        hasMore: { type: boolean }
+
+  responses:
+    BadRequest:
+      description: Validation failed
+      content:
+        application/problem+json:
+          schema: { $ref: '#/components/schemas/Problem' }
+    Unauthorized:
+      description: Missing, expired or superseded session
+      content:
+        application/problem+json:
+          schema: { $ref: '#/components/schemas/Problem' }
+    Forbidden:
+      description: Authenticated but not permitted at the requested scope
+      content:
+        application/problem+json:
+          schema: { $ref: '#/components/schemas/Problem' }
+    Conflict:
+      description: Idempotency conflict or optimistic concurrency failure
+      content:
+        application/problem+json:
+          schema: { $ref: '#/components/schemas/Problem' }
+    NotFound:
+      description: The resource does not exist, or is outside the caller's scope
+      content:
+        application/problem+json:
+          schema: { $ref: '#/components/schemas/Problem' }
+    TooManyRequests:
+      description: Rate limit exceeded for this tenant, venue or principal
+      content:
+        application/problem+json:
+          schema: { $ref: '#/components/schemas/Problem' }
+
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: >
+        Staff session token. Carries `sid` (validated against the session registry),
+        `tenant`, `cell` and the principal. Permissions are resolved at login and cached;
+        the token itself does not carry them.
+
+    guestAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: >
+        Guest session token. Structurally different from a staff token: no workstation, no
+        role selection, no single-session rule, longer lived, and revoked independently.
+        Scoped to the guest's own resources — a guest token can never widen to another
+        subject.
+
+    serviceAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: >
+        Cell-to-cell and cell-to-Control-Plane authentication. There is no user, so the
+        permission model does not apply.
+
+        The token is issued to a cell identity, carries `aud: cell` or `aud: control-plane`,
+        names the calling cell in `sub`, and is short-lived. Transport is mTLS with per-cell
+        client certificates; the token identifies **which** cell, the certificate proves it.
+
+        A caller presenting a valid token from the wrong certificate is rejected. Neither
+        alone is sufficient.
+
+    apiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-Api-Key
+      description: >
+        Partner and developer authentication. Keys are tenant-scoped, carry their own
+        permission set, and are rate-limited per key. Deferred pending the Developer & API
+        workshop.

@@ -1,0 +1,115 @@
+id: F09
+name: Event is cancelled and refunded
+actor: venueManager
+wave: 1
+frequency: rare
+criticality: revenue
+platforms:
+- P08 Staff Web
+- P01 Guest Web
+offlineBehaviour: Not offline. Cancellation touches the ledger, entitlements and seats in one transaction,
+  and a cell that cannot reach its primary must not begin one.
+trigger:
+  description: A performance is cancelled — weather, a technical failure, an artist. Every ticket sold
+    for it needs handling, and the guests need telling before they travel.
+  entryScreen: BO-001
+  entryPoints:
+  - Duty manager cancels
+  - Automatic on a safety closure
+  - Promoter withdraws
+steps:
+- step: 1
+  screen: BO-001
+  action: Finds the performance
+  operations:
+  - listPerformances
+  outcome: Sees what is sold and what it is worth
+- step: 2
+  screen: BO-002
+  action: Cancels it and states the reason
+  operations:
+  - cancelPerformance
+  outcome: Sales stop immediately. Nothing new can be sold
+- step: 3
+  screen: BO-023
+  action: Reviews the refund exposure
+  operations:
+  - listOrders
+  - getRefundPolicy
+  outcome: How many orders, how much money, how many across other venues
+  note: '**Repointed 24 August.** This step ran through `BO-003 Queue Integration Setup`, which carried
+    17 order operations from the bulk attach and has four queue ones. **A refund is worked on the refunds
+    screen** — `BO-023` — and it needed `getRefundPolicy` wiring, because it had none.'
+- step: 4
+  screen: BO-004
+  action: Authorises the bulk refund
+  operations:
+  - createBulkRefund
+  outcome: Refunds queue against the original payment method
+- step: 5
+  screen: BO-005
+  action: Confirms guests were notified
+  operations:
+  - listCampaigns
+  outcome: Told before they travel, not after
+branches:
+- at: 2
+  condition: Performance is part of a bundle
+  behaviour: The bundle component is cancelled and the rest stands. **A guest who bought ticket plus
+    dinner plus parking loses the ticket, not the evening** — refunding the whole bundle takes money
+    the venue kept the obligation for.
+  severity: requiresStaff
+  resolvedBy: Finance
+- at: 4
+  condition: Original payment method no longer valid
+  behaviour: Refund fails and falls to a manual queue. Card expired, account closed. This is common
+    at scale and needs a person.
+  severity: requiresStaff
+  resolvedBy: Finance
+- at: 4
+  condition: Some tickets already scanned
+  behaviour: Partial performance — a show abandoned at the interval. **Refund policy differs from a
+    full cancellation** and the split is a decision, not a rule.
+  severity: requiresStaff
+  resolvedBy: Venue manager
+- at: 4
+  condition: Seats were sold
+  behaviour: Seats return to available. If the performance is rescheduled rather than cancelled they
+    must be held, and the two paths diverge here.
+  severity: recoverable
+  resolvedBy: Automatic
+- at: 4
+  condition: Entitlement is redeemable at another venue
+  behaviour: Cross-cell. The redemption right must be revoked in the other cell too, and that cell may
+    be unreachable.
+  severity: requiresStaff
+  resolvedBy: Platform admin
+- at: 3
+  condition: Refund exceeds the manager threshold
+  behaviour: Requires a second approver. CF-36 put the threshold at venue level.
+  severity: requiresStaff
+  resolvedBy: Finance controller
+- at: 5
+  condition: Guest has no contact details
+  behaviour: An anonymous counter sale. **Nothing to notify.** They arrive to a closed door, and the
+    only mitigation is signage.
+  severity: abandonsFlow
+  resolvedBy: Venue
+- at: 2
+  condition: Fiscal period has closed over the original sale
+  behaviour: The refund posts to the current period with a reference. It cannot post to a closed one
+    — ADR on append-only.
+  severity: recoverable
+  resolvedBy: Automatic
+exitStates:
+- state: completed
+  description: Cancelled, refunded, guests notified
+- state: deferred
+  description: Refunds queued, some manual
+- state: escalated
+  description: Partial performance referred for a policy decision
+primaryContract: orders
+contracts:
+- orders
+- catalogue
+- marketing-crm

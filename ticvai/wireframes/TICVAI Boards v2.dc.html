@@ -1,0 +1,761 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+html,body{margin:0;padding:0;background:#EEF1F6;-webkit-font-smoothing:antialiased}
+*{box-sizing:border-box}
+a{color:#0D6EFD;text-decoration:none}a:hover{color:#0A55C7}
+</style>
+</helmet>
+
+<div style="font-family:Manrope,system-ui,sans-serif;color:#0B1324;padding:26px 34px 90px;max-width:1420px;margin:0 auto">
+
+  <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:24px;padding-bottom:14px;border-bottom:2px solid #0B1324">
+    <div>
+      <div style="font-size:12px;font-weight:800;letter-spacing:.18em;background:linear-gradient(90deg,#0D6EFD,#00B8FF);-webkit-background-clip:text;background-clip:text;color:transparent">TICVAI</div>
+      <h1 style="font-size:21px;font-weight:800;letter-spacing:-.02em;margin:5px 0 0">Board sampler v2 — high-fidelity <span style="font-weight:600;color:#6B7280">(6 screens)</span></h1>
+    </div>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#6B7280;text-align:right;line-height:1.7">
+      <div>pos-frontline · retail · f&amp;b · inventory</div>
+      <div>drawn at 1:1 · 1280 × 720 · static</div>
+    </div>
+  </div>
+
+  <p style="font-size:12.5px;color:#5A6577;max-width:82ch;margin:16px 0 0;line-height:1.65;text-wrap:pretty">One screen per module board, redrawn against the client dashboard references at full fidelity — real column names, real operations, real states. The annotation block under each frame is unchanged in purpose: what the screen calls, what it can be in, and where it goes.</p>
+
+  <div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;font-weight:600;letter-spacing:.15em;color:#8494A8;text-transform:uppercase;margin:46px 0 18px;padding-bottom:9px;border-bottom:1px solid #DCE3ED">01 — POS &amp; Frontline · cash management &amp; till control</div>
+
+  <div style="display:flex;flex-direction:column;gap:56px">
+
+    <div id="pos-2a" data-screen-label="POS-2A" style="display:flex;flex-direction:column;gap:13px;scroll-margin-top:24px">
+      <div>
+        <div style="display:flex;align-items:baseline;gap:9px">
+          <span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#8494A8">POS-2A</span>
+          <span style="font-size:16.5px;font-weight:800;letter-spacing:-.015em">Cash Operations Dashboard</span>
+          <span style="font-size:9px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:2px 7px;border-radius:5px;background:#EEF2F7;color:#64748B">board 2 · wave 1</span>
+        </div>
+        <div style="font-size:12px;color:#6B7280;margin-top:3px">Cash position across every till in the venue, and the exceptions that need a supervisor today.</div>
+      </div>
+
+      <div style="width:1280px;height:720px;display:flex;background:#F7F9FC;border:1px solid #E3E8F0;border-radius:14px;overflow:hidden;box-shadow:0 16px 38px rgba(12,35,64,.09)">
+        <aside style="flex:none;width:188px;background:#0B1324;display:flex;flex-direction:column;position:relative">
+          <div style="position:absolute;inset:0;background:radial-gradient(300px 200px at 0% 4%,rgba(0,184,255,.20),transparent 70%);pointer-events:none"></div>
+          <div style="position:relative;padding:16px 16px 14px;border-bottom:1px solid rgba(255,255,255,.08)">
+            <img src="assets/ticvai-light-logo.png" alt="TICVAI" style="display:block;height:26px;width:auto">
+            <div style="font-size:9.5px;color:#7FA3C9;letter-spacing:.02em;margin-top:2px">Cash &amp; Till Control</div>
+          </div>
+          <nav style="position:relative;display:flex;flex-direction:column;gap:2px;padding:12px 10px">
+            <div style="display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><rect x="3" y="3" width="7" height="7" rx="2"></rect><rect x="14" y="3" width="7" height="7" rx="2"></rect><rect x="3" y="14" width="7" height="7" rx="2"></rect><rect x="14" y="14" width="7" height="7" rx="2"></rect></svg>Dashboard</div>
+            <div style="display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:9px;background:linear-gradient(90deg,rgba(13,110,253,.30),rgba(0,184,255,.10));color:#fff;font-size:11.5px;font-weight:700;box-shadow:inset 2px 0 0 #00B8FF">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><rect x="2" y="5" width="20" height="14" rx="3"></rect><path d="M2 10h20M6 15h4"></path></svg>Cash Operations</div>
+            <div style="display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><rect x="3" y="5" width="18" height="16" rx="3"></rect><path d="M3 10h18M8 3v4M16 3v4"></path></svg>Opening Float</div>
+            <div style="display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M12 3v18M5 8h9a3 3 0 0 1 0 6H7a3 3 0 0 0 0 6h10"></path></svg>Cash In / Out</div>
+            <div style="display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><rect x="3" y="4" width="18" height="16" rx="3"></rect><circle cx="12" cy="12" r="3"></circle></svg>Safe Drop</div>
+            <div style="display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"></path></svg>Reconciliation</div>
+            <div style="height:1px;background:rgba(255,255,255,.09);margin:9px 8px"></div>
+            <div style="display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><circle cx="9" cy="8" r="3.2"></circle><path d="M3 20a6 6 0 0 1 12 0"></path></svg>Shift / EOD</div>
+            <div style="display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M12 3l9 5v5c0 5-4 8-9 9-5-1-9-4-9-9V8Z"></path></svg>Audit &amp; Reports</div>
+          </nav>
+          <div style="position:relative;margin-top:auto;padding:12px;border-top:1px solid rgba(255,255,255,.08)">
+            <div style="display:flex;align-items:center;gap:9px">
+              <div style="width:28px;height:28px;border-radius:9px;background:linear-gradient(135deg,#0D6EFD,#00B8FF);color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800">SA</div>
+              <div style="line-height:1.25">
+                <div style="font-size:11px;font-weight:700;color:#fff">Sara Ahmed</div>
+                <div style="font-size:9.5px;color:#7FA3C9">Cash Controller</div>
+              </div>
+            </div>
+          </div>
+        </aside>
+
+        <div style="flex:1;display:flex;flex-direction:column;min-width:0">
+          <header style="flex:none;height:54px;display:flex;align-items:center;gap:10px;padding:0 18px;background:#fff;border-bottom:1px solid #E8ECF3">
+            <div style="font-size:13.5px;font-weight:800;letter-spacing:-.01em">Cash Operations</div>
+            <div style="display:flex;gap:6px;margin-left:14px">
+              <div style="display:flex;flex-direction:column;justify-content:center;height:32px;border:1px solid #E3E8F0;border-radius:8px;padding:0 10px;min-width:104px"><span style="font-size:8.5px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:#9AA5B6">Venue</span><span style="font-size:11px;font-weight:700">Dubai Parks</span></div>
+              <div style="display:flex;flex-direction:column;justify-content:center;height:32px;border:1px solid #E3E8F0;border-radius:8px;padding:0 10px;min-width:104px"><span style="font-size:8.5px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:#9AA5B6">Department</span><span style="font-size:11px;font-weight:700">All</span></div>
+              <div style="display:flex;flex-direction:column;justify-content:center;height:32px;border:1px solid #E3E8F0;border-radius:8px;padding:0 10px;min-width:104px"><span style="font-size:8.5px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:#9AA5B6">Business date</span><span style="font-size:11px;font-weight:700">13 May 2026</span></div>
+            </div>
+            <div style="margin-left:auto;display:flex;align-items:center;gap:10px">
+              <span style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#9AA5B6">updated 10:31</span>
+              <div style="height:32px;display:flex;align-items:center;gap:7px;padding:0 13px;border-radius:9px;background:#0D6EFD;color:#fff;font-size:11.5px;font-weight:700">Cash movement</div>
+            </div>
+          </header>
+
+          <div style="flex:1;padding:14px 16px;display:flex;flex-direction:column;gap:12px;min-height:0">
+            <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px">
+              <div style="background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:13px 14px">
+                <div style="font-size:9.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#94A0B4">Total cash (AED)</div>
+                <div style="font-family:'IBM Plex Mono',monospace;font-size:23px;font-weight:600;letter-spacing:-.02em;margin-top:6px">2,345,760</div>
+                <div style="font-size:10.5px;color:#0E9F6E;margin-top:3px">▲ 8.7% <span style="color:#9AA5B6">vs yesterday</span></div>
+              </div>
+              <div style="background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:13px 14px">
+                <div style="font-size:9.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#94A0B4">Cash in (AED)</div>
+                <div style="font-family:'IBM Plex Mono',monospace;font-size:23px;font-weight:600;letter-spacing:-.02em;margin-top:6px">1,086,234</div>
+                <div style="font-size:10.5px;color:#0E9F6E;margin-top:3px">▲ 12.4% <span style="color:#9AA5B6">vs yesterday</span></div>
+              </div>
+              <div style="background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:13px 14px">
+                <div style="font-size:9.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#94A0B4">Cash out (AED)</div>
+                <div style="font-family:'IBM Plex Mono',monospace;font-size:23px;font-weight:600;letter-spacing:-.02em;margin-top:6px">899,672</div>
+                <div style="font-size:10.5px;color:#B4530A;margin-top:3px">▼ 3.2% <span style="color:#9AA5B6">vs yesterday</span></div>
+              </div>
+              <div style="background:#0B1324;border:1px solid #0B1324;border-radius:12px;padding:13px 14px">
+                <div style="font-size:9.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#7FA3C9">Net cash position (AED)</div>
+                <div style="font-family:'IBM Plex Mono',monospace;font-size:23px;font-weight:600;letter-spacing:-.02em;margin-top:6px;color:#fff">2,159,198</div>
+                <div style="font-size:10.5px;color:#5FE0C4;margin-top:3px">▲ 10.2% <span style="color:#7FA3C9">vs yesterday</span></div>
+              </div>
+            </div>
+
+            <div style="display:grid;grid-template-columns:1.35fr 1fr;gap:12px;min-height:0">
+              <div style="background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:13px 14px;display:flex;flex-direction:column;gap:11px">
+                <div style="display:flex;align-items:baseline;justify-content:space-between">
+                  <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Cash by payment type</div>
+                  <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#9AA5B6">AED 2.35M · 4,582 transactions</div>
+                </div>
+                <div style="display:flex;height:9px;border-radius:5px;overflow:hidden">
+                  <div style="width:45.2%;background:#0D6EFD"></div><div style="width:34.6%;background:#00B8FF"></div><div style="width:12.9%;background:#5FE0C4"></div><div style="width:4.8%;background:#C7D3E4"></div><div style="width:2.5%;background:#E4EAF2"></div>
+                </div>
+                <div style="display:flex;flex-direction:column;gap:8px">
+                  <div style="display:flex;align-items:center;gap:9px"><span style="width:8px;height:8px;border-radius:3px;background:#0D6EFD"></span><span style="font-size:11.5px;font-weight:600;flex:1">Cash</span><span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#5A6577">45.2%</span><span style="font-family:'IBM Plex Mono',monospace;font-size:11.5px;font-weight:600;width:90px;text-align:right">1,000,860</span></div>
+                  <div style="display:flex;align-items:center;gap:9px"><span style="width:8px;height:8px;border-radius:3px;background:#00B8FF"></span><span style="font-size:11.5px;font-weight:600;flex:1">Card</span><span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#5A6577">34.6%</span><span style="font-family:'IBM Plex Mono',monospace;font-size:11.5px;font-weight:600;width:90px;text-align:right">812,340</span></div>
+                  <div style="display:flex;align-items:center;gap:9px"><span style="width:8px;height:8px;border-radius:3px;background:#5FE0C4"></span><span style="font-size:11.5px;font-weight:600;flex:1">Digital wallet</span><span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#5A6577">12.9%</span><span style="font-family:'IBM Plex Mono',monospace;font-size:11.5px;font-weight:600;width:90px;text-align:right">300,860</span></div>
+                  <div style="display:flex;align-items:center;gap:9px"><span style="width:8px;height:8px;border-radius:3px;background:#C7D3E4"></span><span style="font-size:11.5px;font-weight:600;flex:1">Voucher</span><span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#5A6577">4.8%</span><span style="font-family:'IBM Plex Mono',monospace;font-size:11.5px;font-weight:600;width:90px;text-align:right">113,020</span></div>
+                  <div style="display:flex;align-items:center;gap:9px"><span style="width:8px;height:8px;border-radius:3px;background:#E4EAF2"></span><span style="font-size:11.5px;font-weight:600;flex:1">Other</span><span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#5A6577">2.5%</span><span style="font-family:'IBM Plex Mono',monospace;font-size:11.5px;font-weight:600;width:90px;text-align:right">57,000</span></div>
+                </div>
+              </div>
+
+              <div style="background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:13px 14px;display:flex;flex-direction:column;gap:10px">
+                <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Till status overview</div>
+                <div style="display:flex;flex-direction:column;gap:7px">
+                  <div style="display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:9px;background:#F7F9FC"><span style="width:7px;height:7px;border-radius:50%;background:#0E9F6E"></span><span style="font-size:11.5px;font-weight:600;flex:1">Open</span><span style="font-family:'IBM Plex Mono',monospace;font-size:14px;font-weight:600">112</span></div>
+                  <div style="display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:9px;background:#F7F9FC"><span style="width:7px;height:7px;border-radius:50%;background:#8494A8"></span><span style="font-size:11.5px;font-weight:600;flex:1">Closed</span><span style="font-family:'IBM Plex Mono',monospace;font-size:14px;font-weight:600">18</span></div>
+                  <div style="display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:9px;background:#FFF8ED"><span style="width:7px;height:7px;border-radius:50%;background:#B4530A"></span><span style="font-size:11.5px;font-weight:600;flex:1;color:#8A4708">Variance</span><span style="font-family:'IBM Plex Mono',monospace;font-size:14px;font-weight:600;color:#8A4708">7</span></div>
+                  <div style="display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:9px;background:#FDF2F2"><span style="width:7px;height:7px;border-radius:50%;background:#DC2626"></span><span style="font-size:11.5px;font-weight:600;flex:1;color:#A81E1E">Offline</span><span style="font-family:'IBM Plex Mono',monospace;font-size:14px;font-weight:600;color:#A81E1E">3</span></div>
+                </div>
+                <div style="margin-top:auto;padding-top:10px;border-top:1px solid #F1F4F9;font-size:10.5px;color:#6B7280;line-height:1.55">Offline tills report a last-known figure. The position is provisional until sync.</div>
+              </div>
+            </div>
+
+            <div style="flex:1;background:#fff;border:1px solid #E8ECF3;border-radius:12px;display:flex;flex-direction:column;min-height:0;overflow:hidden">
+              <div style="flex:none;display:flex;align-items:baseline;justify-content:space-between;padding:12px 14px 10px">
+                <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Cash movements requiring attention</div>
+                <span style="font-size:10.5px;font-weight:700;color:#0D6EFD">View all 21</span>
+              </div>
+              <div style="display:grid;grid-template-columns:76px 1.1fr 1fr .9fr .9fr .8fr .8fr;padding:0 14px 7px;font-size:9px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:#94A0B4;border-bottom:1px solid #EDF1F6">
+                <div>Time</div><div>Till</div><div>Workstation</div><div>Type</div><div style="text-align:right">Amount (AED)</div><div style="text-align:right">Variance</div><div style="text-align:right">Status</div>
+              </div>
+              <div style="display:grid;grid-template-columns:76px 1.1fr 1fr .9fr .9fr .8fr .8fr;align-items:center;padding:9px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA">
+                <div style="font-family:'IBM Plex Mono',monospace;color:#6B7280">10:29</div><div style="font-weight:600">TILL-001 · Ticketing TA 01</div><div style="color:#5A6577">POS-TIC-001</div><div style="color:#5A6577">Safe drop</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">8,152.00</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#6B7280">0.00</div><div style="text-align:right"><span style="font-size:9.5px;font-weight:700;padding:2px 8px;border-radius:999px;background:#E8F6F0;color:#0B7A55">Posted</span></div>
+              </div>
+              <div style="display:grid;grid-template-columns:76px 1.1fr 1fr .9fr .9fr .8fr .8fr;align-items:center;padding:9px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA">
+                <div style="font-family:'IBM Plex Mono',monospace;color:#6B7280">10:18</div><div style="font-weight:600">TILL-004 · Guest Services TA</div><div style="color:#5A6577">POS-GST-001</div><div style="color:#5A6577">Reconciliation</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">15,470.00</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#B4530A">+300.00</div><div style="text-align:right"><span style="font-size:9.5px;font-weight:700;padding:2px 8px;border-radius:999px;background:#FFF3E0;color:#8A4708">Approval</span></div>
+              </div>
+              <div style="display:grid;grid-template-columns:76px 1.1fr 1fr .9fr .9fr .8fr .8fr;align-items:center;padding:9px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA">
+                <div style="font-family:'IBM Plex Mono',monospace;color:#6B7280">09:58</div><div style="font-weight:600">TILL-006 · F&amp;B TA 02</div><div style="color:#5A6577">POS-FNB-004</div><div style="color:#5A6577">Cash out</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">2,400.00</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#6B7280">0.00</div><div style="text-align:right"><span style="font-size:9.5px;font-weight:700;padding:2px 8px;border-radius:999px;background:#E8F6F0;color:#0B7A55">Posted</span></div>
+              </div>
+              <div style="display:grid;grid-template-columns:76px 1.1fr 1fr .9fr .9fr .8fr .8fr;align-items:center;padding:9px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA">
+                <div style="font-family:'IBM Plex Mono',monospace;color:#6B7280">09:41</div><div style="font-weight:600">TILL-007 · Ticketing TA 02</div><div style="color:#5A6577">POS-TIC-002</div><div style="color:#5A6577">Transfer</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">46,200.00</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#6B7280">0.00</div><div style="text-align:right"><span style="font-size:9.5px;font-weight:700;padding:2px 8px;border-radius:999px;background:#EEF2F7;color:#5A6577">In transit</span></div>
+              </div>
+              <div style="display:grid;grid-template-columns:76px 1.1fr 1fr .9fr .9fr .8fr .8fr;align-items:center;padding:9px 14px;font-size:11.5px">
+                <div style="font-family:'IBM Plex Mono',monospace;color:#6B7280">09:12</div><div style="font-weight:600">TILL-008 · Event TA 01</div><div style="color:#5A6577">POS-EVT-001</div><div style="color:#5A6577">Reconciliation</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">24,500.00</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#DC2626">−1,250.00</div><div style="text-align:right"><span style="font-size:9.5px;font-weight:700;padding:2px 8px;border-radius:999px;background:#FDECEC;color:#A81E1E">Escalated</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;line-height:1.85;color:#7C8899">
+        <div><b style="color:#4A5566;font-weight:600">OPERATIONS</b> · listCashMovements · createCashMovement · listDenominations · getCurrentShift</div>
+        <div><b style="color:#4A5566;font-weight:600">STATES</b> · loading · emptyFirstRun · emptyNoAccess · error · <span style="color:#8A6D00">offline</span></div>
+        <div><b style="color:#4A5566;font-weight:600">ARRIVES WITH</b> · venueId←session · businessDate←default · departmentId←filter</div>
+        <div><b style="color:#4A5566;font-weight:600">GOES TO</b> · <a href="#pos-2f">POS-2F</a> · POS-2C · POS-2E · POS-3F</div>
+      </div>
+    </div>
+
+    <div id="pos-2f" data-screen-label="POS-2F" style="display:flex;flex-direction:column;gap:13px;scroll-margin-top:24px">
+      <div>
+        <div style="display:flex;align-items:baseline;gap:9px">
+          <span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#8494A8">POS-2F</span>
+          <span style="font-size:16.5px;font-weight:800;letter-spacing:-.015em">Cash Reconciliation &amp; Variance</span>
+          <span style="font-size:9px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:2px 7px;border-radius:5px;background:#FFF1E6;color:#9A5B00">blind count</span>
+        </div>
+        <div style="font-size:12px;color:#6B7280;margin-top:3px">Count the drawer, then see the expected figure. Above the venue threshold the variance needs an approval before the till closes.</div>
+      </div>
+
+      <div style="width:1280px;height:720px;display:flex;background:#F7F9FC;border:1px solid #E3E8F0;border-radius:14px;overflow:hidden;box-shadow:0 16px 38px rgba(12,35,64,.09)">
+        <aside style="flex:none;width:188px;background:#0B1324;display:flex;flex-direction:column;position:relative">
+          <div style="position:absolute;inset:0;background:radial-gradient(300px 200px at 0% 4%,rgba(0,184,255,.20),transparent 70%);pointer-events:none"></div>
+          <div style="position:relative;padding:16px 16px 14px;border-bottom:1px solid rgba(255,255,255,.08)">
+            <img src="assets/ticvai-light-logo.png" alt="TICVAI" style="display:block;height:26px;width:auto">
+            <div style="font-size:9.5px;color:#7FA3C9;margin-top:2px">Cash &amp; Till Control</div>
+          </div>
+          <nav style="position:relative;display:flex;flex-direction:column;gap:2px;padding:12px 10px">
+            <div style="display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><rect x="3" y="3" width="7" height="7" rx="2"></rect><rect x="14" y="3" width="7" height="7" rx="2"></rect><rect x="3" y="14" width="7" height="7" rx="2"></rect><rect x="14" y="14" width="7" height="7" rx="2"></rect></svg>Dashboard</div>
+            <div style="display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><rect x="2" y="5" width="20" height="14" rx="3"></rect><path d="M2 10h20M6 15h4"></path></svg>Cash Operations</div>
+            <div style="display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><rect x="3" y="5" width="18" height="16" rx="3"></rect><path d="M3 10h18M8 3v4M16 3v4"></path></svg>Opening Float</div>
+            <div style="display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M12 3v18M5 8h9a3 3 0 0 1 0 6H7a3 3 0 0 0 0 6h10"></path></svg>Cash In / Out</div>
+            <div style="display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><rect x="3" y="4" width="18" height="16" rx="3"></rect><circle cx="12" cy="12" r="3"></circle></svg>Safe Drop</div>
+            <div style="display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:9px;background:linear-gradient(90deg,rgba(13,110,253,.30),rgba(0,184,255,.10));color:#fff;font-size:11.5px;font-weight:700;box-shadow:inset 2px 0 0 #00B8FF">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"></path></svg>Reconciliation</div>
+            <div style="height:1px;background:rgba(255,255,255,.09);margin:9px 8px"></div>
+            <div style="display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><circle cx="9" cy="8" r="3.2"></circle><path d="M3 20a6 6 0 0 1 12 0"></path></svg>Shift / EOD</div>
+          </nav>
+          <div style="position:relative;margin-top:auto;padding:12px;border-top:1px solid rgba(255,255,255,.08);font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#7FA3C9;line-height:1.7">TILL-001<br>POS-TIC-001<br>Morning shift</div>
+        </aside>
+
+        <div style="flex:1;display:flex;flex-direction:column;min-width:0">
+          <header style="flex:none;height:54px;display:flex;align-items:center;gap:12px;padding:0 18px;background:#fff;border-bottom:1px solid #E8ECF3">
+            <span style="font-size:11px;font-weight:700;color:#0D6EFD">← Reconciliation</span>
+            <div style="font-size:13.5px;font-weight:800;letter-spacing:-.01em">TILL-001 · Ticketing TA 01</div>
+            <span style="font-size:9.5px;font-weight:700;padding:3px 9px;border-radius:999px;background:#FFF3E0;color:#8A4708">Variance · pending approval</span>
+            <div style="margin-left:auto;display:flex;align-items:center;gap:8px">
+              <div style="height:32px;display:flex;align-items:center;padding:0 13px;border:1px solid #E3E8F0;border-radius:9px;font-size:11.5px;font-weight:700;color:#5A6577">Recount</div>
+              <div style="height:32px;display:flex;align-items:center;padding:0 13px;border-radius:9px;background:#0D6EFD;color:#fff;font-size:11.5px;font-weight:700">Save &amp; approve</div>
+            </div>
+          </header>
+
+          <div style="flex:1;padding:14px 16px;display:grid;grid-template-columns:1.6fr 1fr;gap:12px;min-height:0">
+            <div style="display:flex;flex-direction:column;gap:12px;min-height:0">
+              <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px">
+                <div style="background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:11px 13px"><div style="font-size:9.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#94A0B4">Expected (AED)</div><div style="font-family:'IBM Plex Mono',monospace;font-size:19px;font-weight:600;margin-top:5px">15,170.00</div></div>
+                <div style="background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:11px 13px"><div style="font-size:9.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#94A0B4">Counted (AED)</div><div style="font-family:'IBM Plex Mono',monospace;font-size:19px;font-weight:600;margin-top:5px">15,470.00</div></div>
+                <div style="background:#FFF8ED;border:1px solid #F3DFC0;border-radius:12px;padding:11px 13px"><div style="font-size:9.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#8A4708">Variance (AED)</div><div style="font-family:'IBM Plex Mono',monospace;font-size:19px;font-weight:600;margin-top:5px;color:#8A4708">+300.00</div><div style="font-size:10px;color:#8A4708;margin-top:2px">+1.98% · over threshold 1.00%</div></div>
+              </div>
+
+              <div style="flex:1;background:#fff;border:1px solid #E8ECF3;border-radius:12px;display:flex;flex-direction:column;min-height:0;overflow:hidden">
+                <div style="flex:none;display:flex;align-items:baseline;justify-content:space-between;padding:12px 14px 10px">
+                  <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Denomination count</div>
+                  <span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#9AA5B6">AED · from region settings</span>
+                </div>
+                <div style="display:grid;grid-template-columns:1fr .8fr .8fr 1fr 1fr 1fr;padding:0 14px 7px;font-size:9px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:#94A0B4;border-bottom:1px solid #EDF1F6"><div>Denomination</div><div style="text-align:right">Exp qty</div><div style="text-align:right">Counted</div><div style="text-align:right">Expected</div><div style="text-align:right">Counted</div><div style="text-align:right">Variance</div></div>
+                <div style="display:grid;grid-template-columns:1fr .8fr .8fr 1fr 1fr 1fr;padding:8px 14px;font-size:11.5px;font-family:'IBM Plex Mono',monospace;border-bottom:1px solid #F4F6FA"><div style="font-weight:600">500</div><div style="text-align:right;color:#6B7280">20</div><div style="text-align:right">22</div><div style="text-align:right;color:#6B7280">10,000.00</div><div style="text-align:right">11,000.00</div><div style="text-align:right;color:#B4530A">+1,000.00</div></div>
+                <div style="display:grid;grid-template-columns:1fr .8fr .8fr 1fr 1fr 1fr;padding:8px 14px;font-size:11.5px;font-family:'IBM Plex Mono',monospace;border-bottom:1px solid #F4F6FA"><div style="font-weight:600">200</div><div style="text-align:right;color:#6B7280">15</div><div style="text-align:right">16</div><div style="text-align:right;color:#6B7280">3,000.00</div><div style="text-align:right">3,200.00</div><div style="text-align:right;color:#B4530A">+200.00</div></div>
+                <div style="display:grid;grid-template-columns:1fr .8fr .8fr 1fr 1fr 1fr;padding:8px 14px;font-size:11.5px;font-family:'IBM Plex Mono',monospace;border-bottom:1px solid #F4F6FA"><div style="font-weight:600">100</div><div style="text-align:right;color:#6B7280">20</div><div style="text-align:right">21</div><div style="text-align:right;color:#6B7280">2,000.00</div><div style="text-align:right">2,100.00</div><div style="text-align:right;color:#B4530A">+100.00</div></div>
+                <div style="display:grid;grid-template-columns:1fr .8fr .8fr 1fr 1fr 1fr;padding:8px 14px;font-size:11.5px;font-family:'IBM Plex Mono',monospace;border-bottom:1px solid #F4F6FA"><div style="font-weight:600">50</div><div style="text-align:right;color:#6B7280">10</div><div style="text-align:right">10</div><div style="text-align:right;color:#6B7280">500.00</div><div style="text-align:right">500.00</div><div style="text-align:right;color:#9AA5B6">0.00</div></div>
+                <div style="display:grid;grid-template-columns:1fr .8fr .8fr 1fr 1fr 1fr;padding:8px 14px;font-size:11.5px;font-family:'IBM Plex Mono',monospace;border-bottom:1px solid #F4F6FA"><div style="font-weight:600">20</div><div style="text-align:right;color:#6B7280">10</div><div style="text-align:right">10</div><div style="text-align:right;color:#6B7280">200.00</div><div style="text-align:right">200.00</div><div style="text-align:right;color:#9AA5B6">0.00</div></div>
+                <div style="display:grid;grid-template-columns:1fr .8fr .8fr 1fr 1fr 1fr;padding:8px 14px;font-size:11.5px;font-family:'IBM Plex Mono',monospace;border-bottom:1px solid #F4F6FA"><div style="font-weight:600">10</div><div style="text-align:right;color:#6B7280">10</div><div style="text-align:right">10</div><div style="text-align:right;color:#6B7280">100.00</div><div style="text-align:right">100.00</div><div style="text-align:right;color:#9AA5B6">0.00</div></div>
+                <div style="display:grid;grid-template-columns:1fr .8fr .8fr 1fr 1fr 1fr;padding:8px 14px;font-size:11.5px;font-family:'IBM Plex Mono',monospace;border-bottom:1px solid #F4F6FA"><div style="font-weight:600">5</div><div style="text-align:right;color:#6B7280">20</div><div style="text-align:right">20</div><div style="text-align:right;color:#6B7280">100.00</div><div style="text-align:right">100.00</div><div style="text-align:right;color:#9AA5B6">0.00</div></div>
+                <div style="display:grid;grid-template-columns:1fr .8fr .8fr 1fr 1fr 1fr;padding:8px 14px;font-size:11.5px;font-family:'IBM Plex Mono',monospace;border-bottom:1px solid #F4F6FA"><div style="font-weight:600">1</div><div style="text-align:right;color:#6B7280">50</div><div style="text-align:right">50</div><div style="text-align:right;color:#6B7280">50.00</div><div style="text-align:right">50.00</div><div style="text-align:right;color:#9AA5B6">0.00</div></div>
+                <div style="display:grid;grid-template-columns:1fr .8fr .8fr 1fr 1fr 1fr;padding:8px 14px;font-size:11.5px;font-family:'IBM Plex Mono',monospace;border-bottom:1px solid #F4F6FA"><div style="font-weight:600">0.50</div><div style="text-align:right;color:#6B7280">40</div><div style="text-align:right">40</div><div style="text-align:right;color:#6B7280">20.00</div><div style="text-align:right">20.00</div><div style="text-align:right;color:#9AA5B6">0.00</div></div>
+                <div style="display:grid;grid-template-columns:1fr .8fr .8fr 1fr 1fr 1fr;padding:8px 14px;font-size:11.5px;font-family:'IBM Plex Mono',monospace;border-bottom:1px solid #F4F6FA"><div style="font-weight:600">0.25</div><div style="text-align:right;color:#6B7280">40</div><div style="text-align:right">40</div><div style="text-align:right;color:#6B7280">10.00</div><div style="text-align:right">10.00</div><div style="text-align:right;color:#9AA5B6">0.00</div></div>
+                <div style="display:grid;grid-template-columns:1fr .8fr .8fr 1fr 1fr 1fr;padding:8px 14px;font-size:11.5px;font-family:'IBM Plex Mono',monospace;border-bottom:1px solid #F4F6FA"><div style="font-weight:600">Coins</div><div style="text-align:right;color:#6B7280">—</div><div style="text-align:right">—</div><div style="text-align:right;color:#6B7280">70.00</div><div style="text-align:right">70.00</div><div style="text-align:right;color:#9AA5B6">0.00</div></div>
+                <div style="margin-top:auto;display:grid;grid-template-columns:1fr .8fr .8fr 1fr 1fr 1fr;padding:11px 14px;font-size:12px;font-family:'IBM Plex Mono',monospace;font-weight:600;background:#F7F9FC;border-top:1px solid #E8ECF3"><div>Total</div><div></div><div></div><div style="text-align:right">15,170.00</div><div style="text-align:right">15,470.00</div><div style="text-align:right;color:#B4530A">+300.00</div></div>
+              </div>
+            </div>
+
+            <div style="display:flex;flex-direction:column;gap:12px;min-height:0">
+              <div style="background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:13px 14px;display:flex;flex-direction:column;gap:10px">
+                <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Variance reason</div>
+                <div style="display:flex;flex-direction:column;gap:5px"><span style="font-size:9.5px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:#94A0B4">Reason code</span><div style="height:34px;display:flex;align-items:center;justify-content:space-between;border:1px solid #E3E8F0;border-radius:9px;padding:0 11px;font-size:11.5px;font-weight:600">Cash over<span style="color:#9AA5B6">▾</span></div></div>
+                <div style="display:flex;flex-direction:column;gap:5px"><span style="font-size:9.5px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:#94A0B4">Notes</span><div style="height:58px;border:1px solid #E3E8F0;border-radius:9px;padding:8px 11px;font-size:11.5px;color:#5A6577">Extra cash found during count.</div></div>
+                <div style="display:flex;flex-direction:column;gap:6px"><span style="font-size:9.5px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:#94A0B4">Action</span>
+                  <div style="display:flex;gap:6px">
+                    <div style="flex:1;height:30px;display:flex;align-items:center;justify-content:center;border-radius:8px;background:#EEF5FF;border:1px solid #BBD6FF;color:#0D6EFD;font-size:11px;font-weight:700">Approve</div>
+                    <div style="flex:1;height:30px;display:flex;align-items:center;justify-content:center;border-radius:8px;border:1px solid #E3E8F0;color:#5A6577;font-size:11px;font-weight:700">Adjust</div>
+                    <div style="flex:1;height:30px;display:flex;align-items:center;justify-content:center;border-radius:8px;border:1px solid #E3E8F0;color:#5A6577;font-size:11px;font-weight:700">Escalate</div>
+                  </div>
+                </div>
+              </div>
+
+              <div style="background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:13px 14px;display:flex;flex-direction:column;gap:9px">
+                <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Reconciliation record</div>
+                <div style="display:flex;justify-content:space-between;font-size:11.5px"><span style="color:#6B7280">Reconciled by</span><span style="font-weight:600">Ahmed Khan</span></div>
+                <div style="display:flex;justify-content:space-between;font-size:11.5px"><span style="color:#6B7280">Reconciled at</span><span style="font-family:'IBM Plex Mono',monospace">13 May, 10:45</span></div>
+                <div style="display:flex;justify-content:space-between;font-size:11.5px"><span style="color:#6B7280">Shift</span><span style="font-weight:600">Morning shift</span></div>
+                <div style="display:flex;justify-content:space-between;font-size:11.5px"><span style="color:#6B7280">Workstation</span><span style="font-family:'IBM Plex Mono',monospace">POS-TIC-001</span></div>
+                <div style="display:flex;justify-content:space-between;font-size:11.5px"><span style="color:#6B7280">Sales (AED)</span><span style="font-family:'IBM Plex Mono',monospace">12,450.00</span></div>
+                <div style="display:flex;justify-content:space-between;font-size:11.5px"><span style="color:#6B7280">Cash in / out</span><span style="font-family:'IBM Plex Mono',monospace">3,920.00 / 1,200.00</span></div>
+              </div>
+
+              <div style="margin-top:auto;background:#0B1324;border-radius:12px;padding:13px 14px;color:#C6D2E2">
+                <div style="font-size:9.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#7FD7FF">Blind count</div>
+                <div style="font-size:11px;line-height:1.6;margin-top:6px">The expected column is withheld until submission. A counter who can see the expected total reconciles to it, not to the drawer.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;line-height:1.85;color:#7C8899">
+        <div><b style="color:#4A5566;font-weight:600">OPERATIONS</b> · closeShift · acceptShiftVariance · listDenominations · adjustDepositBoxFloat</div>
+        <div><b style="color:#4A5566;font-weight:600">STATES</b> · loading · countInProgress · awaitingApproval · error · <span style="color:#8A6D00">offline</span></div>
+        <div><b style="color:#4A5566;font-weight:600">ARRIVES WITH</b> · tillId←deepLink · shiftId←session · workstationId←session</div>
+        <div><b style="color:#4A5566;font-weight:600">GOES TO</b> · <a href="#pos-2a">POS-2A</a> · POS-3F · POS-2E</div>
+      </div>
+    </div>
+
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;font-weight:600;letter-spacing:.15em;color:#8494A8;text-transform:uppercase;margin:6px 0 4px;padding-bottom:9px;border-bottom:1px solid #DCE3ED">02 — Retail · store configuration board</div>
+
+    <div id="ret-1a" data-screen-label="RET-1A" style="display:flex;flex-direction:column;gap:13px;scroll-margin-top:24px">
+      <div>
+        <div style="display:flex;align-items:baseline;gap:9px">
+          <span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#8494A8">RET-1A</span>
+          <span style="font-size:16.5px;font-weight:800;letter-spacing:-.015em">Retail Command Center</span>
+          <span style="font-size:9px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:2px 7px;border-radius:5px;background:#EEF2F7;color:#64748B">board 1 · wave 1</span>
+        </div>
+        <div style="font-size:12px;color:#6B7280;margin-top:3px">Trading position across every retail outlet, with the alerts that stop a store selling.</div>
+      </div>
+
+      <div style="width:1280px;height:720px;display:flex;background:#F7F9FC;border:1px solid #E3E8F0;border-radius:14px;overflow:hidden;box-shadow:0 16px 38px rgba(12,35,64,.09)">
+        <aside style="flex:none;width:188px;background:#0B1324;display:flex;flex-direction:column;position:relative">
+          <div style="position:absolute;inset:0;background:radial-gradient(300px 200px at 0% 4%,rgba(0,184,255,.20),transparent 70%);pointer-events:none"></div>
+          <div style="position:relative;padding:16px 16px 14px;border-bottom:1px solid rgba(255,255,255,.08)">
+            <img src="assets/ticvai-light-logo.png" alt="TICVAI" style="display:block;height:26px;width:auto">
+            <div style="font-size:9.5px;color:#7FA3C9;margin-top:2px">Retail Management</div>
+          </div>
+          <nav style="position:relative;display:flex;flex-direction:column;gap:2px;padding:12px 10px">
+            <div style="display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:9px;background:linear-gradient(90deg,rgba(13,110,253,.30),rgba(0,184,255,.10));color:#fff;font-size:11.5px;font-weight:700;box-shadow:inset 2px 0 0 #00B8FF">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><rect x="3" y="3" width="7" height="7" rx="2"></rect><rect x="14" y="3" width="7" height="7" rx="2"></rect><rect x="3" y="14" width="7" height="7" rx="2"></rect><rect x="14" y="14" width="7" height="7" rx="2"></rect></svg>Retail Overview</div>
+            <div style="display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><rect x="3" y="8" width="18" height="12" rx="2"></rect><path d="M3 8l2-4h14l2 4"></path></svg>Store Config</div>
+            <div style="display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><rect x="4" y="4" width="16" height="16" rx="3"></rect><path d="M9 9h6M9 13h6"></path></svg>Products &amp; Pricing</div>
+            <div style="display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><rect x="2" y="5" width="20" height="14" rx="3"></rect><path d="M2 10h20"></path></svg>POS &amp; Sales</div>
+            <div style="display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M4 7l8-4 8 4v10l-8 4-8-4Z"></path></svg>Inventory &amp; Stock</div>
+            <div style="display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"></path></svg>Analytics &amp; AI</div>
+            <div style="height:1px;background:rgba(255,255,255,.09);margin:9px 8px"></div>
+            <div style="display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><circle cx="12" cy="12" r="3"></circle><path d="M12 3v3M12 18v3M3 12h3M18 12h3"></path></svg>System Settings</div>
+          </nav>
+          <div style="position:relative;margin-top:auto;padding:12px;border-top:1px solid rgba(255,255,255,.08)">
+            <div style="display:flex;align-items:center;gap:9px">
+              <div style="width:28px;height:28px;border-radius:9px;background:linear-gradient(135deg,#0D6EFD,#00B8FF);color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800">AM</div>
+              <div style="line-height:1.25"><div style="font-size:11px;font-weight:700;color:#fff">Ahmed Manager</div><div style="font-size:9.5px;color:#7FA3C9">Retail Director</div></div>
+            </div>
+          </div>
+        </aside>
+
+        <div style="flex:1;display:flex;flex-direction:column;min-width:0">
+          <header style="flex:none;height:54px;display:flex;align-items:center;gap:10px;padding:0 18px;background:#fff;border-bottom:1px solid #E8ECF3">
+            <div><div style="font-size:13.5px;font-weight:800;letter-spacing:-.01em">Retail Command Center</div><div style="font-size:10px;color:#9AA5B6">Real-time position across all retail operations</div></div>
+            <div style="margin-left:auto;display:flex;align-items:center;gap:6px">
+              <div style="height:32px;display:flex;align-items:center;gap:7px;padding:0 11px;border:1px solid #E3E8F0;border-radius:8px;font-size:11px;font-weight:700;color:#5A6577">All Parks<span style="color:#9AA5B6">▾</span></div>
+              <div style="height:32px;display:flex;align-items:center;gap:7px;padding:0 11px;border:1px solid #E3E8F0;border-radius:8px;font-size:11px;font-weight:700;color:#5A6577">21 May 2026<span style="color:#9AA5B6">▾</span></div>
+              <div style="height:32px;display:flex;align-items:center;padding:0 12px;border-radius:8px;background:#0B1324;color:#fff;font-size:11px;font-weight:700">AI insights</div>
+            </div>
+          </header>
+
+          <div style="flex:1;padding:14px 16px;display:flex;flex-direction:column;gap:12px;min-height:0">
+            <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:10px">
+              <div style="background:#0B1324;border-radius:12px;padding:11px 13px"><div style="font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#7FA3C9">Retail sales (AED)</div><div style="font-family:'IBM Plex Mono',monospace;font-size:20px;font-weight:600;color:#fff;margin-top:5px">185,720</div><div style="font-size:10px;color:#5FE0C4;margin-top:2px">▲ 12.4%</div></div>
+              <div style="background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:11px 13px"><div style="font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#94A0B4">Transactions</div><div style="font-family:'IBM Plex Mono',monospace;font-size:20px;font-weight:600;margin-top:5px">3,562</div><div style="font-size:10px;color:#0E9F6E;margin-top:2px">▲ 8.7%</div></div>
+              <div style="background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:11px 13px"><div style="font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#94A0B4">ATV (AED)</div><div style="font-family:'IBM Plex Mono',monospace;font-size:20px;font-weight:600;margin-top:5px">52.11</div><div style="font-size:10px;color:#0E9F6E;margin-top:2px">▲ 3.3%</div></div>
+              <div style="background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:11px 13px"><div style="font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#94A0B4">Stores open</div><div style="font-family:'IBM Plex Mono',monospace;font-size:20px;font-weight:600;margin-top:5px">28<span style="font-size:12px;color:#9AA5B6"> / 28</span></div><div style="font-size:10px;color:#9AA5B6;margin-top:2px">96 of 102 POS online</div></div>
+              <div style="background:#fff;border:1px solid #F3DFC0;border-radius:12px;padding:11px 13px"><div style="font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#8A4708">Stock exceptions</div><div style="font-family:'IBM Plex Mono',monospace;font-size:20px;font-weight:600;margin-top:5px;color:#8A4708">80</div><div style="font-size:10px;color:#8A4708;margin-top:2px">17 out · 63 low</div></div>
+            </div>
+
+            <div style="display:grid;grid-template-columns:1.5fr 1fr;gap:12px;flex:1;min-height:0">
+              <div style="background:#fff;border:1px solid #E8ECF3;border-radius:12px;display:flex;flex-direction:column;overflow:hidden">
+                <div style="flex:none;display:flex;align-items:baseline;justify-content:space-between;padding:12px 14px 10px"><div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Store performance</div><span style="font-size:10.5px;font-weight:700;color:#0D6EFD">All 28 stores</span></div>
+                <div style="display:grid;grid-template-columns:1.4fr 1fr .9fr .8fr .8fr .9fr;padding:0 14px 7px;font-size:9px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:#94A0B4;border-bottom:1px solid #EDF1F6"><div>Store</div><div>Type</div><div style="text-align:right">Sales (AED)</div><div style="text-align:right">Txns</div><div style="text-align:right">ATV</div><div style="text-align:right">Stock health</div></div>
+                <div style="display:grid;grid-template-columns:1.4fr 1fr .9fr .8fr .8fr .9fr;align-items:center;padding:9px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA"><div style="font-weight:600">Main Gift Shop</div><div style="color:#5A6577">Gift shop</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">84,320</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">1,240</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">67.97</div><div style="text-align:right"><span style="font-size:9.5px;font-weight:700;padding:2px 8px;border-radius:999px;background:#E8F6F0;color:#0B7A55">Healthy</span></div></div>
+                <div style="display:grid;grid-template-columns:1.4fr 1fr .9fr .8fr .8fr .9fr;align-items:center;padding:9px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA"><div style="font-weight:600">Waterpark Shop</div><div style="color:#5A6577">Merchandise</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">52,410</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">890</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">58.44</div><div style="text-align:right"><span style="font-size:9.5px;font-weight:700;padding:2px 8px;border-radius:999px;background:#FFF3E0;color:#8A4708">Warning</span></div></div>
+                <div style="display:grid;grid-template-columns:1.4fr 1fr .9fr .8fr .8fr .9fr;align-items:center;padding:9px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA"><div style="font-weight:600">Adventure Store</div><div style="color:#5A6577">Souvenir</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">31,780</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">420</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">75.67</div><div style="text-align:right"><span style="font-size:9.5px;font-weight:700;padding:2px 8px;border-radius:999px;background:#E8F6F0;color:#0B7A55">Healthy</span></div></div>
+                <div style="display:grid;grid-template-columns:1.4fr 1fr .9fr .8fr .8fr .9fr;align-items:center;padding:9px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA"><div style="font-weight:600">Exit Kiosk</div><div style="color:#5A6577">Retail kiosk</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">18,220</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">510</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">35.73</div><div style="text-align:right"><span style="font-size:9.5px;font-weight:700;padding:2px 8px;border-radius:999px;background:#FDECEC;color:#A81E1E">Critical</span></div></div>
+                <div style="display:grid;grid-template-columns:1.4fr 1fr .9fr .8fr .8fr .9fr;align-items:center;padding:9px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA"><div style="font-weight:600">Photo Shop</div><div style="color:#5A6577">Photo</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">12,430</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">210</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">59.19</div><div style="text-align:right"><span style="font-size:9.5px;font-weight:700;padding:2px 8px;border-radius:999px;background:#E8F6F0;color:#0B7A55">Healthy</span></div></div>
+                <div style="display:grid;grid-template-columns:1.4fr 1fr .9fr .8fr .8fr .9fr;align-items:center;padding:9px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA"><div style="font-weight:600">Pop-up Store 01</div><div style="color:#5A6577">Pop-up</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">9,640</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">185</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">52.11</div><div style="text-align:right"><span style="font-size:9.5px;font-weight:700;padding:2px 8px;border-radius:999px;background:#E8F6F0;color:#0B7A55">Healthy</span></div></div>
+                <div style="display:grid;grid-template-columns:1.4fr 1fr .9fr .8fr .8fr .9fr;align-items:center;padding:9px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA"><div style="font-weight:600">Event Store Ritz</div><div style="color:#5A6577">Event store</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">8,120</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">142</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">57.18</div><div style="text-align:right"><span style="font-size:9.5px;font-weight:700;padding:2px 8px;border-radius:999px;background:#E8F6F0;color:#0B7A55">Healthy</span></div></div>
+                <div style="display:grid;grid-template-columns:1.4fr 1fr .9fr .8fr .8fr .9fr;align-items:center;padding:9px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA"><div style="font-weight:600">Souvenir Cart 03</div><div style="color:#5A6577">Mobile cart</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">6,480</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">160</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">40.50</div><div style="text-align:right"><span style="font-size:9.5px;font-weight:700;padding:2px 8px;border-radius:999px;background:#FFF3E0;color:#8A4708">Warning</span></div></div>
+                <div style="display:grid;grid-template-columns:1.4fr 1fr .9fr .8fr .8fr .9fr;align-items:center;padding:9px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA"><div style="font-weight:600">Arcade Prize Shop</div><div style="color:#5A6577">Redemption</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">5,220</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">128</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">40.78</div><div style="text-align:right"><span style="font-size:9.5px;font-weight:700;padding:2px 8px;border-radius:999px;background:#E8F6F0;color:#0B7A55">Healthy</span></div></div>
+                <div style="display:grid;grid-template-columns:1.4fr 1fr .9fr .8fr .8fr .9fr;align-items:center;padding:9px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA"><div style="font-weight:600">Waterpark Kiosk 02</div><div style="color:#5A6577">Retail kiosk</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">4,310</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">118</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">36.53</div><div style="text-align:right"><span style="font-size:9.5px;font-weight:700;padding:2px 8px;border-radius:999px;background:#FFF3E0;color:#8A4708">Warning</span></div></div>
+                <div style="display:grid;grid-template-columns:1.4fr 1fr .9fr .8fr .8fr .9fr;align-items:center;padding:9px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA"><div style="font-weight:600">Hotel Lobby Shop</div><div style="color:#5A6577">Gift shop</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">3,980</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">62</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">64.19</div><div style="text-align:right"><span style="font-size:9.5px;font-weight:700;padding:2px 8px;border-radius:999px;background:#E8F6F0;color:#0B7A55">Healthy</span></div></div>
+                <div style="display:grid;grid-template-columns:1.4fr 1fr .9fr .8fr .8fr .9fr;align-items:center;padding:9px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA"><div style="font-weight:600">Global Village Stand</div><div style="color:#5A6577">Pop-up</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">2,410</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">47</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">51.28</div><div style="text-align:right"><span style="font-size:9.5px;font-weight:700;padding:2px 8px;border-radius:999px;background:#FDECEC;color:#A81E1E">Critical</span></div></div>
+                <div style="display:grid;grid-template-columns:1.4fr 1fr .9fr .8fr .8fr .9fr;padding:11px 14px;font-size:11.5px;font-weight:600;background:#F7F9FC;border-top:1px solid #E8ECF3"><div>Total / average</div><div></div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">185,720</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">3,562</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">52.11</div><div></div></div>
+                <div style="flex:none;display:flex;align-items:center;justify-content:space-between;padding:9px 14px;border-top:1px solid #EDF1F6;font-size:10.5px;color:#8494A8"><span style="font-family:'IBM Plex Mono',monospace">Showing 1 to 12 of 28 stores</span><div style="display:flex;gap:4px;align-items:center"><span style="width:20px;height:20px;border-radius:6px;background:#0D6EFD;color:#fff;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700">1</span><span style="width:20px;height:20px;border-radius:6px;border:1px solid #E3E8F0;display:flex;align-items:center;justify-content:center;font-size:10px">2</span><span style="width:20px;height:20px;border-radius:6px;border:1px solid #E3E8F0;display:flex;align-items:center;justify-content:center;font-size:10px">3</span><span style="font-family:'IBM Plex Mono',monospace;margin-left:5px">3 pages</span></div></div>
+              </div>
+
+              <div style="display:flex;flex-direction:column;gap:12px;min-height:0">
+                <div style="background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:12px 14px">
+                  <div style="display:flex;align-items:baseline;justify-content:space-between"><div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Sales trend</div><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#9AA5B6">today vs forecast</span></div>
+                  <svg viewBox="0 0 320 88" width="100%" height="88" style="margin-top:8px;display:block">
+                    <polyline points="4,74 44,66 84,58 124,44 164,48 204,32 244,24 284,16 316,12" fill="none" stroke="#0D6EFD" stroke-width="2" stroke-linejoin="round"></polyline>
+                    <polyline points="4,78 44,70 84,62 124,52 164,44 204,38 244,30 284,24 316,20" fill="none" stroke="#C7D3E4" stroke-width="1.6" stroke-dasharray="4 4"></polyline>
+                    <line x1="0" y1="87" x2="320" y2="87" stroke="#EDF1F6" stroke-width="1"></line>
+                  </svg>
+                  <div style="display:flex;justify-content:space-between;font-family:'IBM Plex Mono',monospace;font-size:9px;color:#9AA5B6;margin-top:4px"><span>12 AM</span><span>8 AM</span><span>4 PM</span><span>12 AM</span></div>
+                </div>
+                <div style="flex:1;background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:8px;min-height:0;overflow:hidden">
+                  <div style="display:flex;align-items:baseline;justify-content:space-between"><div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Operational alerts</div><span style="font-size:10.5px;font-weight:700;color:#0D6EFD">All 12</span></div>
+                  <div style="display:flex;gap:9px;align-items:flex-start"><span style="width:6px;height:6px;border-radius:50%;background:#DC2626;margin-top:5px;flex:none"></span><div style="flex:1"><div style="font-size:11.5px;font-weight:600">POS terminal KIOSK-02 is offline</div><div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#9AA5B6">10:26 · Exit Kiosk</div></div></div>
+                  <div style="display:flex;gap:9px;align-items:flex-start"><span style="width:6px;height:6px;border-radius:50%;background:#B4530A;margin-top:5px;flex:none"></span><div style="flex:1"><div style="font-size:11.5px;font-weight:600">17 products out of stock at Exit Kiosk</div><div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#9AA5B6">10:10 · replenishment due</div></div></div>
+                  <div style="display:flex;gap:9px;align-items:flex-start"><span style="width:6px;height:6px;border-radius:50%;background:#B4530A;margin-top:5px;flex:none"></span><div style="flex:1"><div style="font-size:11.5px;font-weight:600">Transfer TRF-2026-0008 is delayed</div><div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#9AA5B6">09:55 · Central Warehouse</div></div></div>
+                  <div style="display:flex;gap:9px;align-items:flex-start"><span style="width:6px;height:6px;border-radius:50%;background:#0D6EFD;margin-top:5px;flex:none"></span><div style="flex:1"><div style="font-size:11.5px;font-weight:600">Price sync failed for 23 products</div><div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#9AA5B6">09:40 · Photo Shop</div></div></div>
+                  <div style="display:flex;gap:9px;align-items:flex-start"><span style="width:6px;height:6px;border-radius:50%;background:#8494A8;margin-top:5px;flex:none"></span><div style="flex:1"><div style="font-size:11.5px;font-weight:600">Store opening delayed: Pop-up Store 02</div><div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#9AA5B6">09:15 · Global Village</div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;line-height:1.85;color:#7C8899">
+        <div><b style="color:#4A5566;font-weight:600">OPERATIONS</b> · listOutlets · getOutletStock · getStockValuation · listPriceVariances</div>
+        <div><b style="color:#4A5566;font-weight:600">STATES</b> · loading · emptyNoResults · emptyNoAccess · partialSync · error</div>
+        <div><b style="color:#4A5566;font-weight:600">ARRIVES WITH</b> · tenantId←session · parkId←filter · businessDate←default</div>
+        <div><b style="color:#4A5566;font-weight:600">GOES TO</b> · RET-1B · RET-1F · <a href="#inv-6">INV-6</a> · <a href="#pos-2a">POS-2A</a></div>
+      </div>
+    </div>
+
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;font-weight:600;letter-spacing:.15em;color:#8494A8;text-transform:uppercase;margin:6px 0 4px;padding-bottom:9px;border-bottom:1px solid #DCE3ED">03 — F&amp;B · outlet &amp; kitchen board</div>
+
+    <div id="fnb-1a" data-screen-label="FNB-1A" style="display:flex;flex-direction:column;gap:13px;scroll-margin-top:24px">
+      <div>
+        <div style="display:flex;align-items:baseline;gap:9px">
+          <span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#8494A8">FNB-1A</span>
+          <span style="font-size:16.5px;font-weight:800;letter-spacing:-.015em">F&amp;B Command Center</span>
+          <span style="font-size:9px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:2px 7px;border-radius:5px;background:#EEF2F7;color:#64748B">board 1 · wave 1</span>
+        </div>
+        <div style="font-size:12px;color:#6B7280;margin-top:3px">Outlet trading, kitchen load and the items about to run out — the three things a duty manager acts on.</div>
+      </div>
+
+      <div style="width:1280px;height:720px;display:flex;background:#F7F9FC;border:1px solid #E3E8F0;border-radius:14px;overflow:hidden;box-shadow:0 16px 38px rgba(12,35,64,.09)">
+        <aside style="flex:none;width:188px;background:#0B1324;display:flex;flex-direction:column;position:relative">
+          <div style="position:absolute;inset:0;background:radial-gradient(300px 200px at 0% 4%,rgba(0,184,255,.20),transparent 70%);pointer-events:none"></div>
+          <div style="position:relative;padding:16px 16px 14px;border-bottom:1px solid rgba(255,255,255,.08)">
+            <img src="assets/ticvai-light-logo.png" alt="TICVAI" style="display:block;height:26px;width:auto">
+            <div style="font-size:9.5px;color:#7FA3C9;margin-top:2px">F&amp;B Management</div>
+          </div>
+          <nav style="position:relative;display:flex;flex-direction:column;gap:2px;padding:12px 10px">
+            <div style="display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:9px;background:linear-gradient(90deg,rgba(13,110,253,.30),rgba(0,184,255,.10));color:#fff;font-size:11.5px;font-weight:700;box-shadow:inset 2px 0 0 #00B8FF">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><rect x="3" y="3" width="7" height="7" rx="2"></rect><rect x="14" y="3" width="7" height="7" rx="2"></rect><rect x="3" y="14" width="7" height="7" rx="2"></rect><rect x="14" y="14" width="7" height="7" rx="2"></rect></svg>Overview</div>
+            <div style="display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><rect x="3" y="8" width="18" height="12" rx="2"></rect><path d="M3 8l2-4h14l2 4"></path></svg>Outlets</div>
+            <div style="display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><rect x="4" y="4" width="16" height="16" rx="3"></rect><path d="M9 9h6M9 13h6"></path></svg>Menus</div>
+            <div style="display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><rect x="2" y="5" width="20" height="14" rx="3"></rect><path d="M2 10h20"></path></svg>POS &amp; Devices</div>
+            <div style="display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M5 20h14M7 20V9a5 5 0 0 1 10 0v11"></path></svg>Kitchens &amp; Stations</div>
+            <div style="display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M4 6h16M4 12h10M4 18h7"></path></svg>Routing Rules</div>
+            <div style="height:1px;background:rgba(255,255,255,.09);margin:9px 8px"></div>
+            <div style="display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><circle cx="12" cy="12" r="3"></circle><path d="M12 3v3M12 18v3M3 12h3M18 12h3"></path></svg>Global Settings</div>
+          </nav>
+          <div style="position:relative;margin-top:auto;padding:12px;border-top:1px solid rgba(255,255,255,.08);font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#7FA3C9;line-height:1.7">TICVAI Group<br>Dubai Parks</div>
+        </aside>
+
+        <div style="flex:1;display:flex;flex-direction:column;min-width:0">
+          <header style="flex:none;height:54px;display:flex;align-items:center;gap:10px;padding:0 18px;background:#fff;border-bottom:1px solid #E8ECF3">
+            <div><div style="font-size:13.5px;font-weight:800;letter-spacing:-.01em">F&amp;B Command Center</div><div style="font-size:10px;color:#9AA5B6">22 outlets · 52 POS · 5 kitchens</div></div>
+            <div style="margin-left:auto;display:flex;align-items:center;gap:6px">
+              <div style="height:32px;display:flex;align-items:center;gap:7px;padding:0 11px;border:1px solid #E3E8F0;border-radius:8px;font-size:11px;font-weight:700;color:#5A6577">Dubai Park<span style="color:#9AA5B6">▾</span></div>
+              <div style="height:32px;display:flex;align-items:center;gap:7px;padding:0 11px;border:1px solid #E3E8F0;border-radius:8px;font-size:11px;font-weight:700;color:#5A6577">21 May 2026<span style="color:#9AA5B6">▾</span></div>
+              <div style="height:32px;display:flex;align-items:center;padding:0 12px;border-radius:8px;background:#0D6EFD;color:#fff;font-size:11px;font-weight:700">Live operations</div>
+            </div>
+          </header>
+
+          <div style="flex:1;padding:14px 16px;display:flex;flex-direction:column;gap:12px;min-height:0">
+            <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:10px">
+              <div style="background:#0B1324;border-radius:12px;padding:11px 13px"><div style="font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#7FA3C9">Sales today (AED)</div><div style="font-family:'IBM Plex Mono',monospace;font-size:20px;font-weight:600;color:#fff;margin-top:5px">245,430</div><div style="font-size:10px;color:#5FE0C4;margin-top:2px">▲ 18.6%</div></div>
+              <div style="background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:11px 13px"><div style="font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#94A0B4">Orders</div><div style="font-family:'IBM Plex Mono',monospace;font-size:20px;font-weight:600;margin-top:5px">1,248</div><div style="font-size:10px;color:#0E9F6E;margin-top:2px">▲ 12.4%</div></div>
+              <div style="background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:11px 13px"><div style="font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#94A0B4">Avg order (AED)</div><div style="font-family:'IBM Plex Mono',monospace;font-size:20px;font-weight:600;margin-top:5px">196.78</div><div style="font-size:10px;color:#0E9F6E;margin-top:2px">▲ 5.3%</div></div>
+              <div style="background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:11px 13px"><div style="font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#94A0B4">Prep time</div><div style="font-family:'IBM Plex Mono',monospace;font-size:20px;font-weight:600;margin-top:5px">12.4<span style="font-size:12px;color:#9AA5B6"> min</span></div><div style="font-size:10px;color:#B4530A;margin-top:2px">▲ 1.1 min</div></div>
+              <div style="background:#fff;border:1px solid #F3DFC0;border-radius:12px;padding:11px 13px"><div style="font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#8A4708">Unavailable items</div><div style="font-family:'IBM Plex Mono',monospace;font-size:20px;font-weight:600;margin-top:5px;color:#8A4708">14</div><div style="font-size:10px;color:#8A4708;margin-top:2px">7 critical stock alerts</div></div>
+            </div>
+
+            <div style="display:grid;grid-template-columns:1.25fr 1fr;gap:12px;flex:1;min-height:0">
+              <div style="background:#fff;border:1px solid #E8ECF3;border-radius:12px;display:flex;flex-direction:column;overflow:hidden">
+                <div style="flex:none;display:flex;align-items:baseline;justify-content:space-between;padding:12px 14px 10px"><div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Sales by outlet</div><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#9AA5B6">AED · today</span></div>
+                <div style="padding:2px 14px 12px;display:flex;flex-direction:column;gap:11px">
+                  <div><div style="display:flex;justify-content:space-between;font-size:11.5px;margin-bottom:4px"><span style="font-weight:600">Main Restaurant</span><span style="font-family:'IBM Plex Mono',monospace">96,240</span></div><div style="height:7px;border-radius:4px;background:#EEF2F7"><div style="width:100%;height:7px;border-radius:4px;background:#0D6EFD"></div></div></div>
+                  <div><div style="display:flex;justify-content:space-between;font-size:11.5px;margin-bottom:4px"><span style="font-weight:600">Coffee House</span><span style="font-family:'IBM Plex Mono',monospace">62,580</span></div><div style="height:7px;border-radius:4px;background:#EEF2F7"><div style="width:65%;height:7px;border-radius:4px;background:#0D6EFD"></div></div></div>
+                  <div><div style="display:flex;justify-content:space-between;font-size:11.5px;margin-bottom:4px"><span style="font-weight:600">VIP Lounge</span><span style="font-family:'IBM Plex Mono',monospace">50,250</span></div><div style="height:7px;border-radius:4px;background:#EEF2F7"><div style="width:52%;height:7px;border-radius:4px;background:#00B8FF"></div></div></div>
+                  <div><div style="display:flex;justify-content:space-between;font-size:11.5px;margin-bottom:4px"><span style="font-weight:600">Kiosk 1 · Park</span><span style="font-family:'IBM Plex Mono',monospace">22,540</span></div><div style="height:7px;border-radius:4px;background:#EEF2F7"><div style="width:23%;height:7px;border-radius:4px;background:#00B8FF"></div></div></div>
+                  <div><div style="display:flex;justify-content:space-between;font-size:11.5px;margin-bottom:4px"><span style="font-weight:600">Beach Kiosk</span><span style="font-family:'IBM Plex Mono',monospace">10,970</span></div><div style="height:7px;border-radius:4px;background:#EEF2F7"><div style="width:11%;height:7px;border-radius:4px;background:#C7D3E4"></div></div></div>
+                  <div><div style="display:flex;justify-content:space-between;font-size:11.5px;margin-bottom:4px"><span style="font-weight:600">Ice Cream Kiosk</span><span style="font-family:'IBM Plex Mono',monospace">8,420</span></div><div style="height:7px;border-radius:4px;background:#EEF2F7"><div style="width:9%;height:7px;border-radius:4px;background:#C7D3E4"></div></div></div>
+                  <div><div style="display:flex;justify-content:space-between;font-size:11.5px;margin-bottom:4px"><span style="font-weight:600">Wave Restaurant</span><span style="font-family:'IBM Plex Mono',monospace">6,180</span></div><div style="height:7px;border-radius:4px;background:#EEF2F7"><div style="width:6%;height:7px;border-radius:4px;background:#C7D3E4"></div></div></div>
+                </div>
+                <div style="margin-top:auto;border-top:1px solid #EDF1F6;padding:11px 14px;display:flex;flex-direction:column;gap:8px">
+                  <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Kitchen load</div>
+                  <div style="display:flex;align-items:center;gap:9px"><span style="font-size:11px;width:96px;color:#5A6577">Grill station</span><div style="flex:1;height:7px;border-radius:4px;background:#EEF2F7"><div style="width:78%;height:7px;border-radius:4px;background:#B4530A"></div></div><span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;width:34px;text-align:right">78%</span></div>
+                  <div style="display:flex;align-items:center;gap:9px"><span style="font-size:11px;width:96px;color:#5A6577">Fryer station</span><div style="flex:1;height:7px;border-radius:4px;background:#EEF2F7"><div style="width:62%;height:7px;border-radius:4px;background:#0D6EFD"></div></div><span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;width:34px;text-align:right">62%</span></div>
+                  <div style="display:flex;align-items:center;gap:9px"><span style="font-size:11px;width:96px;color:#5A6577">Beverage station</span><div style="flex:1;height:7px;border-radius:4px;background:#EEF2F7"><div style="width:45%;height:7px;border-radius:4px;background:#0D6EFD"></div></div><span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;width:34px;text-align:right">45%</span></div>
+                </div>
+              </div>
+
+              <div style="display:flex;flex-direction:column;gap:12px;min-height:0">
+                <div style="background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:9px">
+                  <div style="display:flex;align-items:baseline;justify-content:space-between"><div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Orders by channel</div><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#9AA5B6">1,248 orders</span></div>
+                  <div style="display:flex;height:9px;border-radius:5px;overflow:hidden"><div style="width:42%;background:#0D6EFD"></div><div style="width:23%;background:#00B8FF"></div><div style="width:17%;background:#5FE0C4"></div><div style="width:10%;background:#C7D3E4"></div><div style="width:8%;background:#E4EAF2"></div></div>
+                  <div style="display:flex;flex-direction:column;gap:6px">
+                    <div style="display:flex;align-items:center;gap:8px"><span style="width:8px;height:8px;border-radius:3px;background:#0D6EFD"></span><span style="font-size:11px;flex:1">Dine-in</span><span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px">42%</span></div>
+                    <div style="display:flex;align-items:center;gap:8px"><span style="width:8px;height:8px;border-radius:3px;background:#00B8FF"></span><span style="font-size:11px;flex:1">Takeaway</span><span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px">23%</span></div>
+                    <div style="display:flex;align-items:center;gap:8px"><span style="width:8px;height:8px;border-radius:3px;background:#5FE0C4"></span><span style="font-size:11px;flex:1">QR table order</span><span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px">17%</span></div>
+                    <div style="display:flex;align-items:center;gap:8px"><span style="width:8px;height:8px;border-radius:3px;background:#C7D3E4"></span><span style="font-size:11px;flex:1">Mobile app</span><span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px">10%</span></div>
+                    <div style="display:flex;align-items:center;gap:8px"><span style="width:8px;height:8px;border-radius:3px;background:#E4EAF2"></span><span style="font-size:11px;flex:1">Other</span><span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px">8%</span></div>
+                  </div>
+                </div>
+                <div style="flex:1;background:#fff;border:1px solid #E8ECF3;border-radius:12px;display:flex;flex-direction:column;overflow:hidden;min-height:0">
+                  <div style="padding:12px 14px 8px;font-size:12.5px;font-weight:800;letter-spacing:-.01em">Live outlet status</div>
+                  <div style="display:grid;grid-template-columns:1.3fr .8fr .7fr;padding:0 14px 7px;font-size:9px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:#94A0B4;border-bottom:1px solid #EDF1F6"><div>Outlet</div><div>Kitchen</div><div style="text-align:right">Status</div></div>
+                  <div style="display:grid;grid-template-columns:1.3fr .8fr .7fr;align-items:center;padding:8px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA"><div style="font-weight:600">Main Restaurant</div><div style="color:#5A6577">Kitchen A</div><div style="text-align:right"><span style="font-size:9.5px;font-weight:700;padding:2px 8px;border-radius:999px;background:#E8F6F0;color:#0B7A55">Open</span></div></div>
+                  <div style="display:grid;grid-template-columns:1.3fr .8fr .7fr;align-items:center;padding:8px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA"><div style="font-weight:600">Coffee House</div><div style="color:#5A6577">Coffee stn</div><div style="text-align:right"><span style="font-size:9.5px;font-weight:700;padding:2px 8px;border-radius:999px;background:#E8F6F0;color:#0B7A55">Open</span></div></div>
+                  <div style="display:grid;grid-template-columns:1.3fr .8fr .7fr;align-items:center;padding:8px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA"><div style="font-weight:600">Beach Kiosk</div><div style="color:#5A6577">Kitchen B</div><div style="text-align:right"><span style="font-size:9.5px;font-weight:700;padding:2px 8px;border-radius:999px;background:#FDECEC;color:#A81E1E">Closed</span></div></div>
+                  <div style="display:grid;grid-template-columns:1.3fr .8fr .7fr;align-items:center;padding:8px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA"><div style="font-weight:600">VIP Lounge</div><div style="color:#5A6577">Kitchen A</div><div style="text-align:right"><span style="font-size:9.5px;font-weight:700;padding:2px 8px;border-radius:999px;background:#E8F6F0;color:#0B7A55">Open</span></div></div>
+                  <div style="display:grid;grid-template-columns:1.3fr .8fr .7fr;align-items:center;padding:8px 14px;font-size:11.5px"><div style="font-weight:600">Food Truck 01</div><div style="color:#5A6577">Kitchen C</div><div style="text-align:right"><span style="font-size:9.5px;font-weight:700;padding:2px 8px;border-radius:999px;background:#FFF3E0;color:#8A4708">Sync pending</span></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;line-height:1.85;color:#7C8899">
+        <div><b style="color:#4A5566;font-weight:600">OPERATIONS</b> · listDiningOutlets · listMenus · listKitchenStations · listKitchenTickets</div>
+        <div><b style="color:#4A5566;font-weight:600">STATES</b> · loading · emptyNoResults · emptyNoAccess · error · <span style="color:#8A6D00">offline</span></div>
+        <div><b style="color:#4A5566;font-weight:600">ARRIVES WITH</b> · tenantId←session · parkId←filter · businessDate←default</div>
+        <div><b style="color:#4A5566;font-weight:600">GOES TO</b> · FNB-1B · FNB-1H · P15 Kitchen Display · <a href="#inv-1a">INV-1A</a></div>
+      </div>
+    </div>
+
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;font-weight:600;letter-spacing:.15em;color:#8494A8;text-transform:uppercase;margin:6px 0 4px;padding-bottom:9px;border-bottom:1px solid #DCE3ED">04 — Inventory &amp; Procurement · master &amp; stock control board</div>
+
+    <div id="inv-1a" data-screen-label="INV-1A" style="display:flex;flex-direction:column;gap:13px;scroll-margin-top:24px">
+      <div>
+        <div style="display:flex;align-items:baseline;gap:9px">
+          <span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#8494A8">INV-1A</span>
+          <span style="font-size:16.5px;font-weight:800;letter-spacing:-.015em">Enterprise Inventory Command Center</span>
+          <span style="font-size:9px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:2px 7px;border-radius:5px;background:#EEF2F7;color:#64748B">board 1 · wave 1</span>
+        </div>
+        <div style="font-size:12px;color:#6B7280;margin-top:3px">Stock value by business area, and the exceptions that will stop a sale or spoil.</div>
+      </div>
+
+      <div style="width:1280px;height:720px;display:flex;background:#F7F9FC;border:1px solid #E3E8F0;border-radius:14px;overflow:hidden;box-shadow:0 16px 38px rgba(12,35,64,.09)">
+        <aside style="flex:none;width:188px;background:#0B1324;display:flex;flex-direction:column;position:relative">
+          <div style="position:absolute;inset:0;background:radial-gradient(300px 200px at 0% 4%,rgba(0,184,255,.20),transparent 70%);pointer-events:none"></div>
+          <div style="position:relative;padding:16px 16px 14px;border-bottom:1px solid rgba(255,255,255,.08)">
+            <img src="assets/ticvai-light-logo.png" alt="TICVAI" style="display:block;height:26px;width:auto">
+            <div style="font-size:9.5px;color:#7FA3C9;margin-top:2px">Inventory &amp; Procurement</div>
+          </div>
+          <nav style="position:relative;display:flex;flex-direction:column;gap:2px;padding:12px 10px">
+            <div style="display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:9px;background:linear-gradient(90deg,rgba(13,110,253,.30),rgba(0,184,255,.10));color:#fff;font-size:11.5px;font-weight:700;box-shadow:inset 2px 0 0 #00B8FF">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M4 7l8-4 8 4v10l-8 4-8-4Z"></path></svg>Master &amp; Stock</div>
+            <div style="display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><rect x="3" y="8" width="18" height="12" rx="2"></rect><path d="M3 8l2-4h14l2 4"></path></svg>Warehouse Ops</div>
+            <div style="display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M4 8h12l-3-3M20 16H8l3 3"></path></svg>Transfers &amp; Counts</div>
+            <div style="display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><rect x="5" y="3" width="14" height="18" rx="2"></rect><path d="M9 8h6M9 12h6M9 16h3"></path></svg>Procurement</div>
+            <div style="display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><circle cx="9" cy="8" r="3.2"></circle><path d="M3 20a6 6 0 0 1 12 0"></path></svg>Sourcing &amp; PO</div>
+            <div style="display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"></path></svg>Planning &amp; Analytics</div>
+            <div style="height:1px;background:rgba(255,255,255,.09);margin:9px 8px"></div>
+            <div style="display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><circle cx="12" cy="12" r="3"></circle><path d="M12 3v3M12 18v3M3 12h3M18 12h3"></path></svg>Settings</div>
+          </nav>
+          <div style="position:relative;margin-top:auto;padding:12px;border-top:1px solid rgba(255,255,255,.08)">
+            <div style="display:flex;align-items:center;gap:9px">
+              <div style="width:28px;height:28px;border-radius:9px;background:linear-gradient(135deg,#0D6EFD,#00B8FF);color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800">FN</div>
+              <div style="line-height:1.25"><div style="font-size:11px;font-weight:700;color:#fff">Fatima Noor</div><div style="font-size:9.5px;color:#7FA3C9">Inventory Manager</div></div>
+            </div>
+          </div>
+        </aside>
+
+        <div style="flex:1;display:flex;flex-direction:column;min-width:0">
+          <header style="flex:none;height:54px;display:flex;align-items:center;gap:10px;padding:0 18px;background:#fff;border-bottom:1px solid #E8ECF3">
+            <div><div style="font-size:13.5px;font-weight:800;letter-spacing:-.01em">Inventory Command Center</div><div style="font-size:10px;color:#9AA5B6">12,842 items · 9,156 SKUs · 8 locations</div></div>
+            <div style="margin-left:auto;display:flex;align-items:center;gap:6px">
+              <div style="height:32px;display:flex;align-items:center;gap:7px;padding:0 11px;border:1px solid #E3E8F0;border-radius:8px;font-size:11px;font-weight:700;color:#5A6577">Dubai Park<span style="color:#9AA5B6">▾</span></div>
+              <div style="height:32px;display:flex;align-items:center;gap:7px;padding:0 11px;border:1px solid #E3E8F0;border-radius:8px;font-size:11px;font-weight:700;color:#5A6577">21 Apr – 21 May<span style="color:#9AA5B6">▾</span></div>
+              <div style="height:32px;display:flex;align-items:center;padding:0 12px;border-radius:8px;background:#0D6EFD;color:#fff;font-size:11px;font-weight:700">New item</div>
+            </div>
+          </header>
+
+          <div style="flex:1;padding:14px 16px;display:flex;flex-direction:column;gap:12px;min-height:0">
+            <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:10px">
+              <div style="background:#0B1324;border-radius:12px;padding:11px 13px"><div style="font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#7FA3C9">Inventory value (AED)</div><div style="font-family:'IBM Plex Mono',monospace;font-size:20px;font-weight:600;color:#fff;margin-top:5px">8.46M</div><div style="font-size:10px;color:#5FE0C4;margin-top:2px">▲ 2.8% vs last month</div></div>
+              <div style="background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:11px 13px"><div style="font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#94A0B4">Total items</div><div style="font-family:'IBM Plex Mono',monospace;font-size:20px;font-weight:600;margin-top:5px">12,842</div><div style="font-size:10px;color:#0E9F6E;margin-top:2px">▲ 1.3%</div></div>
+              <div style="background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:11px 13px"><div style="font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#94A0B4">Available (AED)</div><div style="font-family:'IBM Plex Mono',monospace;font-size:20px;font-weight:600;margin-top:5px">6.24M</div><div style="font-size:10px;color:#9AA5B6;margin-top:2px">73.8% of value</div></div>
+              <div style="background:#fff;border:1px solid #F3DFC0;border-radius:12px;padding:11px 13px"><div style="font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#8A4708">Low stock</div><div style="font-family:'IBM Plex Mono',monospace;font-size:20px;font-weight:600;margin-top:5px;color:#8A4708">142</div><div style="font-size:10px;color:#8A4708;margin-top:2px">▲ 8.1%</div></div>
+              <div style="background:#fff;border:1px solid #F1CFCF;border-radius:12px;padding:11px 13px"><div style="font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#A81E1E">Out of stock</div><div style="font-family:'IBM Plex Mono',monospace;font-size:20px;font-weight:600;margin-top:5px;color:#A81E1E">28</div><div style="font-size:10px;color:#A81E1E;margin-top:2px">▲ 3.2%</div></div>
+            </div>
+
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;flex:none">
+              <div style="background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:13px 14px;display:flex;flex-direction:column;gap:10px">
+                <div style="display:flex;align-items:baseline;justify-content:space-between"><div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Value by business area</div><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#9AA5B6">AED 8.46M</span></div>
+                <div style="display:flex;height:9px;border-radius:5px;overflow:hidden"><div style="width:33.7%;background:#0D6EFD"></div><div style="width:16.6%;background:#00B8FF"></div><div style="width:11.5%;background:#5FE0C4"></div><div style="width:8%;background:#C7D3E4"></div><div style="width:30.2%;background:#E4EAF2"></div></div>
+                <div style="display:flex;flex-direction:column;gap:7px">
+                  <div style="display:flex;align-items:center;gap:9px"><span style="width:8px;height:8px;border-radius:3px;background:#0D6EFD"></span><span style="font-size:11.5px;flex:1;font-weight:600">Retail</span><span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#5A6577">33.7%</span><span style="font-family:'IBM Plex Mono',monospace;font-size:11.5px;font-weight:600;width:74px;text-align:right">2.85M</span></div>
+                  <div style="display:flex;align-items:center;gap:9px"><span style="width:8px;height:8px;border-radius:3px;background:#00B8FF"></span><span style="font-size:11.5px;flex:1;font-weight:600">F&amp;B</span><span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#5A6577">16.6%</span><span style="font-family:'IBM Plex Mono',monospace;font-size:11.5px;font-weight:600;width:74px;text-align:right">1.42M</span></div>
+                  <div style="display:flex;align-items:center;gap:9px"><span style="width:8px;height:8px;border-radius:3px;background:#5FE0C4"></span><span style="font-size:11.5px;flex:1;font-weight:600">Operations</span><span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#5A6577">11.5%</span><span style="font-family:'IBM Plex Mono',monospace;font-size:11.5px;font-weight:600;width:74px;text-align:right">0.94M</span></div>
+                  <div style="display:flex;align-items:center;gap:9px"><span style="width:8px;height:8px;border-radius:3px;background:#C7D3E4"></span><span style="font-size:11.5px;flex:1;font-weight:600">Rental</span><span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#5A6577">8.0%</span><span style="font-family:'IBM Plex Mono',monospace;font-size:11.5px;font-weight:600;width:74px;text-align:right">0.68M</span></div>
+                  <div style="display:flex;align-items:center;gap:9px"><span style="width:8px;height:8px;border-radius:3px;background:#E4EAF2"></span><span style="font-size:11.5px;flex:1;font-weight:600">Other</span><span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#5A6577">30.2%</span><span style="font-family:'IBM Plex Mono',monospace;font-size:11.5px;font-weight:600;width:74px;text-align:right">2.57M</span></div>
+                </div>
+              </div>
+
+              <div style="background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:13px 14px;display:flex;flex-direction:column;gap:10px">
+                <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Inventory health</div>
+                <div style="display:flex;gap:9px">
+                  <div style="flex:1;border:1px solid #DFF0E8;background:#F4FBF7;border-radius:10px;padding:9px 11px"><div style="font-size:9px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:#0B7A55">Healthy</div><div style="font-family:'IBM Plex Mono',monospace;font-size:17px;font-weight:600;color:#0B7A55;margin-top:3px">78.2%</div></div>
+                  <div style="flex:1;border:1px solid #F3DFC0;background:#FFF8ED;border-radius:10px;padding:9px 11px"><div style="font-size:9px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:#8A4708">Warning</div><div style="font-family:'IBM Plex Mono',monospace;font-size:17px;font-weight:600;color:#8A4708;margin-top:3px">14.7%</div></div>
+                  <div style="flex:1;border:1px solid #F1CFCF;background:#FDF4F4;border-radius:10px;padding:9px 11px"><div style="font-size:9px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:#A81E1E">Critical</div><div style="font-family:'IBM Plex Mono',monospace;font-size:17px;font-weight:600;color:#A81E1E;margin-top:3px">7.1%</div></div>
+                </div>
+                <div style="border-top:1px solid #F1F4F9;padding-top:9px;display:flex;flex-direction:column;gap:7px">
+                  <div style="font-size:9.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#94A0B4">Top critical alerts</div>
+                  <div style="display:flex;align-items:center;gap:9px"><span style="width:6px;height:6px;border-radius:50%;background:#DC2626;flex:none"></span><span style="font-size:11.5px;flex:1">F&amp;B: 12 items expiring within 7 days</span><span style="font-size:10.5px;font-weight:700;color:#0D6EFD">View</span></div>
+                  <div style="display:flex;align-items:center;gap:9px"><span style="width:6px;height:6px;border-radius:50%;background:#DC2626;flex:none"></span><span style="font-size:11.5px;flex:1">Retail: 28 items out of stock</span><span style="font-size:10.5px;font-weight:700;color:#0D6EFD">View</span></div>
+                  <div style="display:flex;align-items:center;gap:9px"><span style="width:6px;height:6px;border-radius:50%;background:#B4530A;flex:none"></span><span style="font-size:11.5px;flex:1">Operations: 14 items below min stock</span><span style="font-size:10.5px;font-weight:700;color:#0D6EFD">View</span></div>
+                  <div style="display:flex;align-items:center;gap:9px"><span style="width:6px;height:6px;border-radius:50%;background:#B4530A;flex:none"></span><span style="font-size:11.5px;flex:1">3 purchase orders delayed from suppliers</span><span style="font-size:10.5px;font-weight:700;color:#0D6EFD">View</span></div>
+                </div>
+              </div>
+            </div>
+
+            <div style="flex:1;background:#fff;border:1px solid #E8ECF3;border-radius:12px;display:flex;flex-direction:column;overflow:hidden;min-height:0">
+              <div style="flex:none;display:flex;align-items:baseline;justify-content:space-between;padding:12px 14px 10px"><div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Recent movements</div><span style="font-size:10.5px;font-weight:700;color:#0D6EFD">All 1,248 transactions</span></div>
+              <div style="display:grid;grid-template-columns:.8fr .9fr 1.1fr 1fr .7fr .7fr .8fr;padding:0 14px 7px;font-size:9px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:#94A0B4;border-bottom:1px solid #EDF1F6"><div>Date</div><div>Txn no.</div><div>Item</div><div>Warehouse</div><div>Type</div><div style="text-align:right">Qty</div><div style="text-align:right">Balance</div></div>
+              <div style="display:grid;grid-template-columns:.8fr .9fr 1.1fr 1fr .7fr .7fr .8fr;align-items:center;padding:8px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA"><div style="font-family:'IBM Plex Mono',monospace;color:#6B7280">21 May 10:32</div><div style="font-family:'IBM Plex Mono',monospace;color:#0D6EFD">TRX-000548</div><div style="font-weight:600">Beef Patty 100g</div><div style="color:#5A6577">F&amp;B Cold Store</div><div style="color:#5A6577">GRN</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#0B7A55">+500</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">2,400</div></div>
+              <div style="display:grid;grid-template-columns:.8fr .9fr 1.1fr 1fr .7fr .7fr .8fr;align-items:center;padding:8px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA"><div style="font-family:'IBM Plex Mono',monospace;color:#6B7280">21 May 09:45</div><div style="font-family:'IBM Plex Mono',monospace;color:#0D6EFD">TRX-000547</div><div style="font-weight:600">Fresh Milk 1L</div><div style="color:#5A6577">F&amp;B Cold Store</div><div style="color:#5A6577">Issue</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#A81E1E">−120</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">380</div></div>
+              <div style="display:grid;grid-template-columns:.8fr .9fr 1.1fr 1fr .7fr .7fr .8fr;align-items:center;padding:8px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA"><div style="font-family:'IBM Plex Mono',monospace;color:#6B7280">21 May 09:20</div><div style="font-family:'IBM Plex Mono',monospace;color:#0D6EFD">TRX-000546</div><div style="font-weight:600">T-Shirt Black M</div><div style="color:#5A6577">Central Warehouse</div><div style="color:#5A6577">Transfer</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#A81E1E">−200</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">650</div></div>
+              <div style="display:grid;grid-template-columns:.8fr .9fr 1.1fr 1fr .7fr .7fr .8fr;align-items:center;padding:8px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA"><div style="font-family:'IBM Plex Mono',monospace;color:#6B7280">21 May 08:15</div><div style="font-family:'IBM Plex Mono',monospace;color:#0D6EFD">TRX-000545</div><div style="font-weight:600">Cap White</div><div style="color:#5A6577">Gift Shop Store</div><div style="color:#5A6577">Sale</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#A81E1E">−22</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">598</div></div>
+              <div style="display:grid;grid-template-columns:.8fr .9fr 1.1fr 1fr .7fr .7fr .8fr;align-items:center;padding:8px 14px;font-size:11.5px"><div style="font-family:'IBM Plex Mono',monospace;color:#6B7280">20 May 22:10</div><div style="font-family:'IBM Plex Mono',monospace;color:#0D6EFD">TRX-000544</div><div style="font-weight:600">Cleaning Liquid 5L</div><div style="color:#5A6577">Central Warehouse</div><div style="color:#5A6577">Adjust</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#0B7A55">+40</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">330</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;line-height:1.85;color:#7C8899">
+        <div><b style="color:#4A5566;font-weight:600">OPERATIONS</b> · listInventoryItems · getStockValuation · listStockMovements · getStockPositions</div>
+        <div><b style="color:#4A5566;font-weight:600">STATES</b> · loading · emptyFirstRun · emptyNoResults · emptyNoAccess · error</div>
+        <div><b style="color:#4A5566;font-weight:600">ARRIVES WITH</b> · tenantId←session · venueId←filter · dateRange←default</div>
+        <div><b style="color:#4A5566;font-weight:600">GOES TO</b> · <a href="#inv-6">INV-6</a> · INV-2 · INV-8 · INV-9</div>
+      </div>
+    </div>
+
+    <div id="inv-6" data-screen-label="INV-6" style="display:flex;flex-direction:column;gap:13px;scroll-margin-top:24px">
+      <div>
+        <div style="display:flex;align-items:baseline;gap:9px">
+          <span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#8494A8">INV-6</span>
+          <span style="font-size:16.5px;font-weight:800;letter-spacing:-.015em">Stock Position &amp; Real-Time Availability</span>
+          <span style="font-size:9px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:2px 7px;border-radius:5px;background:#FFF1E6;color:#9A5B00">lease-aware</span>
+        </div>
+        <div style="font-size:12px;color:#6B7280;margin-top:3px">On hand is not available. Reserved, on order and in transit are separate columns because a cashier and a buyer read different ones.</div>
+      </div>
+
+      <div style="width:1280px;height:720px;display:flex;background:#F7F9FC;border:1px solid #E3E8F0;border-radius:14px;overflow:hidden;box-shadow:0 16px 38px rgba(12,35,64,.09)">
+        <aside style="flex:none;width:188px;background:#0B1324;display:flex;flex-direction:column;position:relative">
+          <div style="position:absolute;inset:0;background:radial-gradient(300px 200px at 0% 4%,rgba(0,184,255,.20),transparent 70%);pointer-events:none"></div>
+          <div style="position:relative;padding:16px 16px 14px;border-bottom:1px solid rgba(255,255,255,.08)">
+            <img src="assets/ticvai-light-logo.png" alt="TICVAI" style="display:block;height:26px;width:auto">
+            <div style="font-size:9.5px;color:#7FA3C9;margin-top:2px">Inventory &amp; Procurement</div>
+          </div>
+          <nav style="position:relative;display:flex;flex-direction:column;gap:2px;padding:12px 10px">
+            <div style="display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:9px;background:linear-gradient(90deg,rgba(13,110,253,.30),rgba(0,184,255,.10));color:#fff;font-size:11.5px;font-weight:700;box-shadow:inset 2px 0 0 #00B8FF">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M4 7l8-4 8 4v10l-8 4-8-4Z"></path></svg>Master &amp; Stock</div>
+            <div style="display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><rect x="3" y="8" width="18" height="12" rx="2"></rect><path d="M3 8l2-4h14l2 4"></path></svg>Warehouse Ops</div>
+            <div style="display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M4 8h12l-3-3M20 16H8l3 3"></path></svg>Transfers &amp; Counts</div>
+            <div style="display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><rect x="5" y="3" width="14" height="18" rx="2"></rect><path d="M9 8h6M9 12h6M9 16h3"></path></svg>Procurement</div>
+            <div style="display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"></path></svg>Planning &amp; Analytics</div>
+          </nav>
+          <div style="position:relative;margin-top:auto;padding:12px;border-top:1px solid rgba(255,255,255,.08);font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#7FA3C9;line-height:1.7">842 items<br>8 locations<br>synced 10:31</div>
+        </aside>
+
+        <div style="flex:1;display:flex;flex-direction:column;min-width:0">
+          <header style="flex:none;height:54px;display:flex;align-items:center;gap:10px;padding:0 18px;background:#fff;border-bottom:1px solid #E8ECF3">
+            <div style="font-size:13.5px;font-weight:800;letter-spacing:-.01em">Stock Position</div>
+            <div style="display:flex;align-items:center;gap:8px;height:32px;flex:1;max-width:280px;margin-left:12px;border:1px solid #E3E8F0;border-radius:9px;background:#F7F9FC;padding:0 11px">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#9AA5B6" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.2-3.2"></path></svg>
+              <span style="font-size:11px;color:#9AA5B6">Search item, SKU, barcode…</span>
+            </div>
+            <div style="margin-left:auto;display:flex;align-items:center;gap:6px">
+              <div style="height:32px;display:flex;align-items:center;gap:7px;padding:0 11px;border:1px solid #E3E8F0;border-radius:8px;font-size:11px;font-weight:700;color:#5A6577">All warehouses<span style="color:#9AA5B6">▾</span></div>
+              <div style="height:32px;display:flex;align-items:center;gap:7px;padding:0 11px;border:1px solid #E3E8F0;border-radius:8px;font-size:11px;font-weight:700;color:#5A6577">All status<span style="color:#9AA5B6">▾</span></div>
+              <div style="height:32px;display:flex;align-items:center;padding:0 12px;border:1px solid #E3E8F0;border-radius:8px;font-size:11px;font-weight:700;color:#5A6577">Export</div>
+            </div>
+          </header>
+
+          <div style="flex:1;padding:14px 16px;display:flex;gap:12px;min-height:0">
+            <div style="flex:1;background:#fff;border:1px solid #E8ECF3;border-radius:12px;display:flex;flex-direction:column;overflow:hidden;min-width:0">
+              <div style="display:grid;grid-template-columns:1.3fr .9fr 1.1fr .7fr .7fr .7fr .7fr .7fr .8fr;padding:11px 14px 8px;font-size:9px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:#94A0B4;border-bottom:1px solid #EDF1F6"><div>Item</div><div>SKU</div><div>Warehouse</div><div style="text-align:right">On hand</div><div style="text-align:right">Reserved</div><div style="text-align:right">Available</div><div style="text-align:right">On order</div><div style="text-align:right">In transit</div><div style="text-align:right">Status</div></div>
+              <div style="display:grid;grid-template-columns:1.3fr .9fr 1.1fr .7fr .7fr .7fr .7fr .7fr .8fr;align-items:center;padding:8px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA"><div style="font-weight:600">Beef Patty 100g</div><div style="font-family:'IBM Plex Mono',monospace;color:#5A6577">BP-100G</div><div style="color:#5A6577">F&amp;B Cold Store</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">2,400</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#6B7280">400</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;font-weight:600">2,000</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#6B7280">1,000</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#6B7280">500</div><div style="text-align:right"><span style="font-size:9.5px;font-weight:700;padding:2px 8px;border-radius:999px;background:#E8F6F0;color:#0B7A55">Normal</span></div></div>
+              <div style="display:grid;grid-template-columns:1.3fr .9fr 1.1fr .7fr .7fr .7fr .7fr .7fr .8fr;align-items:center;padding:8px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA"><div style="font-weight:600">Fresh Milk 1L</div><div style="font-family:'IBM Plex Mono',monospace;color:#5A6577">MILK-1L</div><div style="color:#5A6577">F&amp;B Cold Store</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">1,230</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#6B7280">100</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;font-weight:600">1,130</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#6B7280">600</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#6B7280">—</div><div style="text-align:right"><span style="font-size:9.5px;font-weight:700;padding:2px 8px;border-radius:999px;background:#FFF3E0;color:#8A4708">Expiring</span></div></div>
+              <div style="display:grid;grid-template-columns:1.3fr .9fr 1.1fr .7fr .7fr .7fr .7fr .7fr .8fr;align-items:center;padding:8px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA"><div style="font-weight:600">T-Shirt Black M</div><div style="font-family:'IBM Plex Mono',monospace;color:#5A6577">TSH-BLK-M</div><div style="color:#5A6577">Central Warehouse</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">850</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#6B7280">100</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;font-weight:600">750</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#6B7280">—</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#6B7280">200</div><div style="text-align:right"><span style="font-size:9.5px;font-weight:700;padding:2px 8px;border-radius:999px;background:#E8F6F0;color:#0B7A55">Normal</span></div></div>
+              <div style="display:grid;grid-template-columns:1.3fr .9fr 1.1fr .7fr .7fr .7fr .7fr .7fr .8fr;align-items:center;padding:8px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA"><div style="font-weight:600">Cap White</div><div style="font-family:'IBM Plex Mono',monospace;color:#5A6577">CAP-WHT</div><div style="color:#5A6577">Gift Shop Store</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">620</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#6B7280">20</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;font-weight:600">600</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#6B7280">—</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#6B7280">—</div><div style="text-align:right"><span style="font-size:9.5px;font-weight:700;padding:2px 8px;border-radius:999px;background:#E8F6F0;color:#0B7A55">Normal</span></div></div>
+              <div style="display:grid;grid-template-columns:1.3fr .9fr 1.1fr .7fr .7fr .7fr .7fr .7fr .8fr;align-items:center;padding:8px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA"><div style="font-weight:600">Cleaning Liquid 5L</div><div style="font-family:'IBM Plex Mono',monospace;color:#5A6577">CL-5L</div><div style="color:#5A6577">Central Warehouse</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">330</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#6B7280">—</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;font-weight:600">330</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#6B7280">200</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#6B7280">—</div><div style="text-align:right"><span style="font-size:9.5px;font-weight:700;padding:2px 8px;border-radius:999px;background:#E8F6F0;color:#0B7A55">Normal</span></div></div>
+              <div style="display:grid;grid-template-columns:1.3fr .9fr 1.1fr .7fr .7fr .7fr .7fr .7fr .8fr;align-items:center;padding:8px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA"><div style="font-weight:600">LED Bulb 9W</div><div style="font-family:'IBM Plex Mono',monospace;color:#5A6577">LED-9W</div><div style="color:#5A6577">Central Warehouse</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">120</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#6B7280">—</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;font-weight:600">120</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#6B7280">—</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#6B7280">—</div><div style="text-align:right"><span style="font-size:9.5px;font-weight:700;padding:2px 8px;border-radius:999px;background:#FFF3E0;color:#8A4708">Low</span></div></div>
+              <div style="display:grid;grid-template-columns:1.3fr .9fr 1.1fr .7fr .7fr .7fr .7fr .7fr .8fr;align-items:center;padding:8px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA"><div style="font-weight:600">Souvenir Mug</div><div style="font-family:'IBM Plex Mono',monospace;color:#5A6577">MUG-6V</div><div style="color:#5A6577">Gift Shop Store</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">95</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#6B7280">5</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;font-weight:600">90</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#6B7280">—</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#6B7280">—</div><div style="text-align:right"><span style="font-size:9.5px;font-weight:700;padding:2px 8px;border-radius:999px;background:#FFF3E0;color:#8A4708">Low</span></div></div>
+              <div style="display:grid;grid-template-columns:1.3fr .9fr 1.1fr .7fr .7fr .7fr .7fr .7fr .8fr;align-items:center;padding:8px 14px;font-size:11.5px"><div style="font-weight:600">Sugar 1kg</div><div style="font-family:'IBM Plex Mono',monospace;color:#5A6577">SUGAR-1KG</div><div style="color:#5A6577">F&amp;B Dry Store</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">1,800</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#6B7280">100</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;font-weight:600">1,700</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#6B7280">—</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#6B7280">—</div><div style="text-align:right"><span style="font-size:9.5px;font-weight:700;padding:2px 8px;border-radius:999px;background:#E8F6F0;color:#0B7A55">Normal</span></div></div>
+              <div style="display:grid;grid-template-columns:1.3fr .9fr 1.1fr .7fr .7fr .7fr .7fr .7fr .8fr;align-items:center;padding:8px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA"><div style="font-weight:600">Chicken Breast 1kg</div><div style="font-family:'IBM Plex Mono',monospace;color:#5A6577">CHK-1KG</div><div style="color:#5A6577">F&amp;B Cold Store</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">940</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#6B7280">140</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;font-weight:600">800</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#6B7280">300</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#6B7280">—</div><div style="text-align:right"><span style="font-size:9.5px;font-weight:700;padding:2px 8px;border-radius:999px;background:#E8F6F0;color:#0B7A55">Normal</span></div></div>
+              <div style="display:grid;grid-template-columns:1.3fr .9fr 1.1fr .7fr .7fr .7fr .7fr .7fr .8fr;align-items:center;padding:8px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA"><div style="font-weight:600">Burger Bun 6pk</div><div style="font-family:'IBM Plex Mono',monospace;color:#5A6577">BUN-6PK</div><div style="color:#5A6577">F&amp;B Dry Store</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">620</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#6B7280">60</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;font-weight:600">560</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#6B7280">400</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#6B7280">120</div><div style="text-align:right"><span style="font-size:9.5px;font-weight:700;padding:2px 8px;border-radius:999px;background:#E8F6F0;color:#0B7A55">Normal</span></div></div>
+              <div style="display:grid;grid-template-columns:1.3fr .9fr 1.1fr .7fr .7fr .7fr .7fr .7fr .8fr;align-items:center;padding:8px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA"><div style="font-weight:600">Cooking Oil 5L</div><div style="font-family:'IBM Plex Mono',monospace;color:#5A6577">OIL-5L</div><div style="color:#5A6577">F&amp;B Dry Store</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">280</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#6B7280">—</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;font-weight:600">280</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#6B7280">200</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#6B7280">—</div><div style="text-align:right"><span style="font-size:9.5px;font-weight:700;padding:2px 8px;border-radius:999px;background:#FFF3E0;color:#8A4708">Low</span></div></div>
+              <div style="display:grid;grid-template-columns:1.3fr .9fr 1.1fr .7fr .7fr .7fr .7fr .7fr .8fr;align-items:center;padding:8px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA"><div style="font-weight:600">Plush Toy Mickey</div><div style="font-family:'IBM Plex Mono',monospace;color:#5A6577">PL-MIC-01</div><div style="color:#5A6577">Gift Shop Store</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">0</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#6B7280">—</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;font-weight:600">0</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#6B7280">600</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#6B7280">300</div><div style="text-align:right"><span style="font-size:9.5px;font-weight:700;padding:2px 8px;border-radius:999px;background:#FDECEC;color:#A81E1E">Out of stock</span></div></div>
+              <div style="display:grid;grid-template-columns:1.3fr .9fr 1.1fr .7fr .7fr .7fr .7fr .7fr .8fr;align-items:center;padding:8px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA"><div style="font-weight:600">Hoodie Grey L</div><div style="font-family:'IBM Plex Mono',monospace;color:#5A6577">HOD-GRY-L</div><div style="color:#5A6577">Central Warehouse</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">410</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#6B7280">40</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;font-weight:600">370</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#6B7280">—</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#6B7280">—</div><div style="text-align:right"><span style="font-size:9.5px;font-weight:700;padding:2px 8px;border-radius:999px;background:#E8F6F0;color:#0B7A55">Normal</span></div></div>
+              <div style="display:grid;grid-template-columns:1.3fr .9fr 1.1fr .7fr .7fr .7fr .7fr .7fr .8fr;align-items:center;padding:8px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA"><div style="font-weight:600">Keyring Metal</div><div style="font-family:'IBM Plex Mono',monospace;color:#5A6577">KEY-MTL</div><div style="color:#5A6577">Gift Shop Store</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">1,240</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#6B7280">80</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;font-weight:600">1,160</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#6B7280">—</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#6B7280">—</div><div style="text-align:right"><span style="font-size:9.5px;font-weight:700;padding:2px 8px;border-radius:999px;background:#E8F6F0;color:#0B7A55">Normal</span></div></div>
+              <div style="display:grid;grid-template-columns:1.3fr .9fr 1.1fr .7fr .7fr .7fr .7fr .7fr .8fr;align-items:center;padding:8px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA"><div style="font-weight:600">Paper Cup 12oz</div><div style="font-family:'IBM Plex Mono',monospace;color:#5A6577">CUP-12</div><div style="color:#5A6577">F&amp;B Dry Store</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">3,600</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#6B7280">200</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;font-weight:600">3,400</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#6B7280">2,000</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#6B7280">800</div><div style="text-align:right"><span style="font-size:9.5px;font-weight:700;padding:2px 8px;border-radius:999px;background:#E8F6F0;color:#0B7A55">Normal</span></div></div>
+              <div style="display:grid;grid-template-columns:1.3fr .9fr 1.1fr .7fr .7fr .7fr .7fr .7fr .8fr;align-items:center;padding:8px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA"><div style="font-weight:600">Ride Spare Bearing</div><div style="font-family:'IBM Plex Mono',monospace;color:#5A6577">BRG-6203</div><div style="color:#5A6577">Ops Spare Parts</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">36</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#6B7280">6</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;font-weight:600">30</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#6B7280">24</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#6B7280">—</div><div style="text-align:right"><span style="font-size:9.5px;font-weight:700;padding:2px 8px;border-radius:999px;background:#FFF3E0;color:#8A4708">Low</span></div></div>
+              <div style="display:grid;grid-template-columns:1.3fr .9fr 1.1fr .7fr .7fr .7fr .7fr .7fr .8fr;align-items:center;padding:8px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA"><div style="font-weight:600">Sunscreen SPF50</div><div style="font-family:'IBM Plex Mono',monospace;color:#5A6577">SUN-50</div><div style="color:#5A6577">Waterpark Store</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">150</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#6B7280">—</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;font-weight:600">150</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#6B7280">—</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#6B7280">—</div><div style="text-align:right"><span style="font-size:9.5px;font-weight:700;padding:2px 8px;border-radius:999px;background:#FFF3E0;color:#8A4708">Expiring</span></div></div>
+              <div style="margin-top:auto;display:grid;grid-template-columns:1.3fr .9fr 1.1fr .7fr .7fr .7fr .7fr .7fr .8fr;padding:11px 14px;font-size:11.5px;font-weight:600;background:#F7F9FC;border-top:1px solid #E8ECF3"><div>Total · 842 items</div><div></div><div></div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">7,415</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">725</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">6,690</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">2,600</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">850</div><div></div></div>
+              <div style="flex:none;display:flex;align-items:center;justify-content:space-between;padding:9px 14px;border-top:1px solid #EDF1F6;font-size:10.5px;color:#8494A8"><span style="font-family:'IBM Plex Mono',monospace">Showing 1 to 17 of 842 items</span><div style="display:flex;gap:4px;align-items:center"><span style="width:20px;height:20px;border-radius:6px;background:#0D6EFD;color:#fff;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700">1</span><span style="width:20px;height:20px;border-radius:6px;border:1px solid #E3E8F0;display:flex;align-items:center;justify-content:center;font-size:10px">2</span><span style="width:20px;height:20px;border-radius:6px;border:1px solid #E3E8F0;display:flex;align-items:center;justify-content:center;font-size:10px">3</span><span style="font-family:'IBM Plex Mono',monospace;margin-left:5px">50 pages</span></div></div>
+            </div>
+
+            <div style="flex:none;width:236px;display:flex;flex-direction:column;gap:12px">
+              <div style="background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:13px 14px">
+                <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Location utilisation</div>
+                <div style="display:flex;align-items:baseline;gap:6px;margin-top:8px"><span style="font-family:'IBM Plex Mono',monospace;font-size:26px;font-weight:600">68%</span><span style="font-size:10.5px;color:#9AA5B6">680 / 1,000 qty</span></div>
+                <div style="height:8px;border-radius:5px;background:#EEF2F7;margin-top:8px"><div style="width:68%;height:8px;border-radius:5px;background:#0D6EFD"></div></div>
+                <div style="margin-top:11px;display:flex;flex-direction:column;gap:6px;font-size:11px">
+                  <div style="display:flex;justify-content:space-between"><span style="color:#6B7280">On hand</span><span style="font-family:'IBM Plex Mono',monospace">680</span></div>
+                  <div style="display:flex;justify-content:space-between"><span style="color:#6B7280">Reserved</span><span style="font-family:'IBM Plex Mono',monospace">120</span></div>
+                  <div style="display:flex;justify-content:space-between"><span style="color:#6B7280">Available</span><span style="font-family:'IBM Plex Mono',monospace;font-weight:600">560</span></div>
+                </div>
+              </div>
+              <div style="background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:13px 14px;display:flex;flex-direction:column;gap:8px">
+                <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Exceptions in view</div>
+                <div style="display:flex;justify-content:space-between;font-size:11.5px"><span style="color:#6B7280">Low stock</span><span style="font-family:'IBM Plex Mono',monospace;color:#8A4708;font-weight:600">2</span></div>
+                <div style="display:flex;justify-content:space-between;font-size:11.5px"><span style="color:#6B7280">Expiring ≤ 7 days</span><span style="font-family:'IBM Plex Mono',monospace;color:#8A4708;font-weight:600">1</span></div>
+                <div style="display:flex;justify-content:space-between;font-size:11.5px"><span style="color:#6B7280">Negative on hand</span><span style="font-family:'IBM Plex Mono',monospace;color:#9AA5B6">0</span></div>
+                <div style="display:flex;justify-content:space-between;font-size:11.5px"><span style="color:#6B7280">Awaiting count</span><span style="font-family:'IBM Plex Mono',monospace;color:#9AA5B6">0</span></div>
+              </div>
+              <div style="margin-top:auto;background:#0B1324;border-radius:12px;padding:13px 14px;color:#C6D2E2">
+                <div style="font-size:9.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#7FD7FF">Contended stock</div>
+                <div style="font-size:11px;line-height:1.6;margin-top:6px">Reserved quantities are leases with a TTL. They return automatically on expiry, so available can rise without a movement being posted.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;line-height:1.85;color:#7C8899">
+        <div><b style="color:#4A5566;font-weight:600">OPERATIONS</b> · getStockPositions · listStockLocations · createStockMovement · lookupInventoryItem</div>
+        <div><b style="color:#4A5566;font-weight:600">STATES</b> · loading · emptyNoResults · emptyNoAccess · staleLease · error</div>
+        <div><b style="color:#4A5566;font-weight:600">ARRIVES WITH</b> · warehouseId←filter · itemId←deepLink · venueId←session</div>
+        <div><b style="color:#4A5566;font-weight:600">GOES TO</b> · <a href="#inv-1a">INV-1A</a> · INV-8 · INV-9 · <a href="#ret-1a">RET-1A</a></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1420,&quot;height&quot;:1100}}"></script>
+</body>
+</html>

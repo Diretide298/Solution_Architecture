@@ -1,0 +1,63 @@
+# Product — state model
+# Contract: catalogue.ProductLifecycleState
+# Checked by tools/check-states.py.
+
+entity: Product
+contract: catalogue
+enum: ProductLifecycleState
+enumKind: named
+enumSchema: ProductLifecycleState
+owner: catalogue
+initial:
+- draft
+terminal:
+- archived
+transitions:
+- from: draft
+  to: inReview
+  operation: transitionProductLifecycle
+  trigger: operation
+  guard: Complete enough to review
+- from: inReview
+  to: approved
+  operation: transitionProductLifecycle
+  trigger: operation
+  guard: Approver is not the author
+  requiresApproval: true
+- from: inReview
+  to: draft
+  operation: transitionProductLifecycle
+  trigger: operation
+  guard: Returned with comments
+- from: approved
+  to: live
+  operation: transitionProductLifecycle
+  trigger: operation
+  guard: On-sale window reached and prices exist
+  emits:
+  - catalogue.productPublished
+- from: live
+  to: withdrawn
+  operation: transitionProductLifecycle
+  trigger: operation
+  guard: Pulled from sale. **Existing entitlements are unaffected** — a withdrawn product is one nobody
+    may buy, not one nobody may use
+- from: withdrawn
+  to: live
+  operation: transitionProductLifecycle
+  trigger: operation
+  guard: Returned to sale
+  isReversal: true
+  emits:
+  - catalogue.productPublished
+- from: withdrawn
+  to: archived
+  trigger: timer
+  guard: No entitlements outstanding and the retention period passed
+- from: draft
+  to: archived
+  operation: transitionProductLifecycle
+  trigger: operation
+  guard: Abandoned before ever selling
+notes: '`withdrawn` is not `archived`. A product pulled from sale still has guests holding entitlements
+  against it, and archiving it would orphan them.'

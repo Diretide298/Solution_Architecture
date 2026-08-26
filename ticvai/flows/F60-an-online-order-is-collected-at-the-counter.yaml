@@ -1,0 +1,58 @@
+$schema: ./_schema.yaml
+id: F60
+name: An online order is collected at the counter
+actor: cashier
+capability: Omnichannel fulfilment
+wave: 1
+frequency: Routine.
+criticality: revenue
+primaryContract: orders
+contracts:
+- orders
+- retail
+- access
+platforms:
+- P04
+trigger:
+  description: A guest bought online and has come to collect. **The order exists and the guest is standing
+    there** — the till is a handover point, not a sale point.
+offlineBehaviour: '**Works offline against the cached order.** A collection is a handover, and the handover
+  is recorded locally and synced.'
+steps:
+- step: 1
+  screen: POS-012
+  action: The cashier finds the order.
+  operations:
+  - listOrders
+  outcome: '**Found by reference, name or the media the guest is carrying.** A guest who has lost their
+    confirmation still bought a ticket.'
+- step: 2
+  screen: POS-012
+  action: Merchandise is reserved against the order.
+  operations:
+  - reserveMerchandise
+  outcome: '**Reserved before handover, not after.** Two counters handing the same item to two guests
+    is the failure this prevents.'
+- step: 3
+  screen: POS-012
+  action: The goods are handed over.
+  operations:
+  - recordOrderHandover
+  outcome: '**`recordOrderHandover`, not `markOrderCollected`.** A staff handover and a guest self-collection
+    close the same clock for different reasons.'
+branches:
+- at: 2
+  condition: The item is out of stock at this counter.
+  behaviour: '`sourceFromStore` finds it elsewhere in the venue. **A collection that fails at the counter
+    is a refund the venue did not need to make.**'
+  severity: high
+  resolvedBy: createStockTransfer
+exitStates:
+- state: collected
+  description: Handed over and recorded.
+- state: sourcedElsewhere
+  description: Fulfilled from another location.
+- state: refunded
+  description: Could not be fulfilled. **Refunded at the counter rather than sent away.**
+notes: '**Written 24 August.** The counter had no navigation at all — `POS-012` declared no exits.'
+openQuestions: null

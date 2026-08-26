@@ -1,0 +1,35 @@
+id: LLD-AI layout draft
+title: AI layout draft — 2 transitions
+generatedBy: tools/derive-diagrams.py
+index: diagrams/hld/04-lifecycles.yaml
+source: states/ai-layout-draft.yaml
+entity: AI layout draft
+contract: ai
+enum: LayoutDraft.status
+enumKind: inline
+enumSchema: LayoutDraft
+enumProperty: status
+owner: ai
+initial:
+- parsing
+terminal:
+- previewReady
+- failed
+transitions:
+- from: parsing
+  to: previewReady
+  trigger: job
+  guard: '**Nothing is written to the seat map.** The draft enters the existing import pipeline at its
+    preview step, and a person commits it'
+- from: parsing
+  to: failed
+  trigger: job
+  guard: The plan could not be interpreted. **The reason names the regions it could not read**, so a
+    venue can crop or annotate rather than guess why
+notes: 'Deliberately short, and it ends at `previewReady` rather than at a seat map. **The generated
+  layout is a proposal into `seating.import_job`**, which already has a human commit step — because
+  a seat manifest is always wrong the first time in a way only a person looking at it will notice.
+
+
+  What happens after preview belongs to `import-job.yaml`, not here. Two models for one object would
+  let them disagree.'

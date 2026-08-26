@@ -1,0 +1,629 @@
+id: HLD
+title: TICVAI — the whole platform
+generatedBy: tools/derive-diagrams.py
+about: '**A multi-tenant venue platform.** One tenant operates several venues; a venue sells admission,
+  food, retail and experiences; a guest arrives, is admitted, spends and leaves.
+
+
+  **Five layers, one join.** Screens name operations, operations resolve against 28 OpenAPI contracts,
+  contracts persist to 26 schemas, and every artefact in the package is drawn by resolving against that
+  join rather than by being written twice.'
+scale:
+  operations: 1016
+  contracts: 28
+  tables: 374
+  tablesNote: '**Postgres tables only.** `status.json` reports 379 because it counts five non-table
+    stores. **They own no service and should not**: a cache entry is derived from something already
+    read, invalidated by an event already consumed, and losable without consequence. **Both numbers
+    are right and they count different things**, which is worth saying rather than letting a reader
+    find the difference.'
+  nonTableStores:
+  - cache:answer
+  - cache:embedding
+  - cache:idempotency
+  - cache:resolution
+  - qdrant:knowledge
+  schemas: 26
+  services: 16
+  platforms: 15
+  apps: 12
+  screens: 481
+  flows: 94
+  stateModels: 113
+  events: 29
+  decisions: 30
+  requirements: 3184
+  buildPercent: 0
+actors:
+- actor: guest
+  reaches:
+  - P01
+  - P02
+  - P05
+  operations: 48
+  note: Buys, arrives, is admitted, spends. **Never sees a staff surface** — `check-screens` refuses
+    a guest screen declaring a staff permission.
+- actor: venue staff
+  reaches:
+  - P04
+  - P06
+  - P07
+  - P08
+  - P15
+  - P16
+  operations: 220
+  note: Sells, admits, cooks, counts, configures. **Authority is carried by the person, not the device**
+    (ADR-0002) — which is what makes a shared handheld safe.
+- actor: partner
+  reaches:
+  - P10
+  operations: 19
+  note: Resellers and agents, with their own credit and settlement.
+- actor: platform operator
+  reaches:
+  - P09
+  - P12
+  operations: 0
+  note: Provisions tenants, watches cells, runs releases. **Softlabs, not the venue.**
+- actor: developer
+  reaches:
+  - P14
+  operations: 6
+  note: Third parties against the public API, rate-limited and quota'd.
+- actor: device
+  reaches:
+  - P07
+  - P15
+  operations: 5
+  note: Turnstiles, scanners, kitchen displays. **A device authenticates and does not authorise.**
+surfaces:
+- platform: P01
+  name: Guest Web — Storefront
+  audience: guest
+  operator: guest
+  app: guest-web
+  formFactor: web
+  offlineCapable: false
+  screens: 35
+  modules:
+  - access
+  - core
+  - marketing
+  - queue
+  - retail
+  - seating
+  - ticketing
+  callsServices:
+  - AccessService
+  - CatalogueService
+  - IdentityService
+  - LedgerService
+  - MarketingService
+  - OrderService
+  - RetailService
+  - VenueOpsService
+  - WhiteLabelService
+  ref: diagrams/lld/platforms/P01.yaml
+- platform: P02
+  name: Guest App — Mobile
+  audience: guest
+  operator: guest
+  app: guest-app
+  formFactor: mobileApp
+  offlineCapable: true
+  screens: 63
+  modules:
+  - access
+  - ai
+  - core
+  - fnb
+  - games
+  - marketing
+  - queue
+  - retail
+  - seating
+  - ticketing
+  callsServices:
+  - AccessService
+  - AiService
+  - CatalogueService
+  - CrossCellService
+  - FnbService
+  - IdentityService
+  - LedgerService
+  - MarketingService
+  - OrderService
+  - RetailService
+  - VenueOpsService
+  - WhiteLabelService
+  ref: diagrams/lld/platforms/P02.yaml
+- platform: P04
+  name: Venue POS — Terminal and Tablet
+  audience: staff
+  operator: venue
+  app: venue-pos
+  formFactor: posTerminal
+  offlineCapable: true
+  screens: 24
+  modules:
+  - analytics
+  - core
+  - fnb
+  - retail
+  - seating
+  - ticketing
+  callsServices:
+  - AccessService
+  - CatalogueService
+  - FnbService
+  - IdentityService
+  - InventoryService
+  - LedgerService
+  - MarketingService
+  - OrderService
+  - ReportingService
+  - RetailService
+  - TenancyService
+  - VenueOpsService
+  ref: diagrams/lld/platforms/P04.yaml
+- platform: P05
+  name: Guest Kiosk — Self-Service
+  audience: guest
+  operator: guest
+  app: guest-app
+  formFactor: kiosk
+  offlineCapable: false
+  screens: 17
+  modules:
+  - core
+  - fnb
+  - marketing
+  - retail
+  - ticketing
+  callsServices:
+  - AiService
+  - CatalogueService
+  - FnbService
+  - MarketingService
+  - OrderService
+  - RetailService
+  - WhiteLabelService
+  ref: diagrams/lld/platforms/P05.yaml
+- platform: P06
+  name: Venue Staff App — Operations
+  audience: staff
+  operator: venue
+  app: venue-staff-app
+  formFactor: mobileApp
+  offlineCapable: true
+  screens: 66
+  modules:
+  - access
+  - ai
+  - analytics
+  - core
+  - fnb
+  - inventory
+  - maintenance
+  - marketing
+  - queue
+  - ticketing
+  callsServices:
+  - AccessService
+  - AiService
+  - CatalogueService
+  - FnbService
+  - IdentityService
+  - InventoryService
+  - MarketingService
+  - OrderService
+  - ReportingService
+  - RetailService
+  - TenancyService
+  - VenueOpsService
+  ref: diagrams/lld/platforms/P06.yaml
+- platform: P07
+  name: Venue Scanner — Access Control
+  audience: staff
+  operator: venue
+  app: venue-scanner
+  formFactor: handheld
+  offlineCapable: true
+  screens: 11
+  modules:
+  - access
+  - core
+  callsServices:
+  - AccessService
+  - CrossCellService
+  - IdentityService
+  - OrderService
+  ref: diagrams/lld/platforms/P07.yaml
+- platform: P08
+  name: Venue Management — Back Office
+  audience: staff
+  operator: venue
+  app: venue-management-web
+  formFactor: web
+  offlineCapable: false
+  screens: 143
+  modules:
+  - access
+  - ai
+  - analytics
+  - core
+  - fnb
+  - inventory
+  - maintenance
+  - marketing
+  - queue
+  - resources
+  - retail
+  - seating
+  - ticketing
+  callsServices:
+  - AccessService
+  - AiService
+  - CatalogueService
+  - ControlService
+  - FnbService
+  - IdentityService
+  - InventoryService
+  - LedgerService
+  - MarketingService
+  - OrderService
+  - ReportingService
+  - RetailService
+  - TenancyService
+  - VenueOpsService
+  ref: diagrams/lld/platforms/P08.yaml
+- platform: P09
+  name: TICVAI Web — Platform Console
+  audience: platformAdmin
+  operator: ticvai
+  app: ticvai-web
+  formFactor: web
+  offlineCapable: false
+  screens: 37
+  modules:
+  - ai
+  - analytics
+  - core
+  - membership
+  callsServices:
+  - AiService
+  - ControlService
+  - CrossCellService
+  - IdentityService
+  - ReportingService
+  - TenancyService
+  - WhiteLabelService
+  ref: diagrams/lld/platforms/P09.yaml
+- platform: P10
+  name: Partner Web — Reseller Portal
+  audience: partner
+  operator: partner
+  app: partner-web
+  formFactor: web
+  offlineCapable: false
+  screens: 21
+  modules:
+  - partner
+  callsServices:
+  - CatalogueService
+  - ControlService
+  - IdentityService
+  - LedgerService
+  - MarketingService
+  - OrderService
+  - ReportingService
+  ref: diagrams/lld/platforms/P10.yaml
+- platform: P11
+  name: Accreditation Web — Applications
+  audience: public
+  operator: public
+  app: accreditation-web
+  formFactor: web
+  offlineCapable: false
+  screens: 8
+  modules:
+  - accreditation
+  callsServices:
+  - TenancyService
+  - VenueOpsService
+  ref: diagrams/lld/platforms/P11.yaml
+- platform: P12
+  name: Venue Support — Agent Console
+  audience: staff
+  operator: venue
+  app: venue-support-web
+  formFactor: web
+  offlineCapable: false
+  screens: 8
+  modules:
+  - analytics
+  - core
+  - marketing
+  callsServices:
+  - IdentityService
+  - LedgerService
+  - MarketingService
+  - ReportingService
+  ref: diagrams/lld/platforms/P12.yaml
+- platform: P13
+  name: Venue CMS — White Label
+  audience: staff
+  operator: venue
+  app: venue-management-web
+  formFactor: web
+  offlineCapable: false
+  screens: 20
+  modules:
+  - core
+  - fnb
+  - maintenance
+  - marketing
+  - membership
+  - ticketing
+  callsServices:
+  - ControlService
+  - FnbService
+  - IdentityService
+  - MarketingService
+  - OrderService
+  - VenueOpsService
+  - WhiteLabelService
+  ref: diagrams/lld/platforms/P13.yaml
+- platform: P14
+  name: Developer Portal
+  audience: partner
+  operator: partner
+  app: developer-portal-web
+  formFactor: web
+  offlineCapable: false
+  screens: 8
+  modules:
+  - developerApi
+  callsServices:
+  - ControlService
+  ref: diagrams/lld/platforms/P14.yaml
+- platform: P15
+  name: Kitchen Display — Pass and Stations
+  audience: staff
+  operator: venue
+  app: kitchen-display
+  formFactor: kiosk
+  offlineCapable: true
+  screens: 10
+  modules:
+  - fnb
+  callsServices:
+  - FnbService
+  - ReportingService
+  - TenancyService
+  ref: diagrams/lld/platforms/P15.yaml
+- platform: P16
+  name: Venue Analytics — Cross-Domain Reporting
+  audience: staff
+  operator: venue
+  app: venue-management-web
+  formFactor: web
+  offlineCapable: false
+  screens: 10
+  modules:
+  - ai
+  - analytics
+  callsServices:
+  - AiService
+  - CatalogueService
+  - IdentityService
+  - InventoryService
+  - MarketingService
+  - OrderService
+  - ReportingService
+  - TenancyService
+  ref: diagrams/lld/platforms/P16.yaml
+services:
+  count: 16
+  view: diagrams/hld/02-services.yaml
+  note: Sixteen deployable services in five tiers. **The data boundary decides where they split** —
+    no service spans a schema it does not own.
+  byTier:
+    foundation:
+    - IdentityService
+    - TenancyService
+    commerce:
+    - AccessService
+    - CatalogueService
+    - LedgerService
+    - OrderService
+    operations:
+    - FnbService
+    - InventoryService
+    - RetailService
+    - VenueOpsService
+    engagement:
+    - AiService
+    - MarketingService
+    platform:
+    - ControlService
+    - CrossCellService
+    - ReportingService
+    - WhiteLabelService
+stores:
+- store: postgres
+  operations: 1002
+  usedBy:
+  - service: CatalogueService
+    operations: 132
+  - service: ControlService
+    operations: 102
+  - service: VenueOpsService
+    operations: 102
+  - service: OrderService
+    operations: 97
+  - service: MarketingService
+    operations: 96
+  - service: FnbService
+    operations: 93
+  - service: LedgerService
+    operations: 54
+  - service: TenancyService
+    operations: 52
+  - service: InventoryService
+    operations: 50
+  - service: WhiteLabelService
+    operations: 50
+  - service: IdentityService
+    operations: 39
+  - service: RetailService
+    operations: 35
+  - service: AccessService
+    operations: 31
+  - service: ReportingService
+    operations: 28
+  - service: AiService
+    operations: 25
+  - service: CrossCellService
+    operations: 16
+  note: '**One Postgres per cell**, 26 schemas inside it. Not one database per tenant (ADR-0005) — tenancy
+    is a partition key, not a deployment boundary.'
+- store: redis
+  operations: 672
+  usedBy:
+  - service: CatalogueService
+    operations: 81
+  - service: FnbService
+    operations: 72
+  - service: OrderService
+    operations: 70
+  - service: VenueOpsService
+    operations: 66
+  - service: MarketingService
+    operations: 64
+  - service: ControlService
+    operations: 62
+  - service: TenancyService
+    operations: 37
+  - service: WhiteLabelService
+    operations: 37
+  - service: IdentityService
+    operations: 35
+  - service: LedgerService
+    operations: 30
+  - service: InventoryService
+    operations: 30
+  - service: RetailService
+    operations: 24
+  - service: AiService
+    operations: 21
+  - service: AccessService
+    operations: 17
+  - service: ReportingService
+    operations: 15
+  - service: CrossCellService
+    operations: 11
+  note: Sessions, resolution caches, idempotency. **Losable without consequence** — nothing treats a
+    cache entry as a source of truth.
+- store: postgres-analytical
+  operations: 20
+  usedBy:
+  - service: AiService
+    operations: 15
+  - service: ControlService
+    operations: 2
+  - service: ReportingService
+    operations: 2
+  - service: FnbService
+    operations: 1
+  note: Reporting and AI interactions. **Never the transactional primary** (ADR-0016).
+- store: qdrant
+  operations: 9
+  usedBy:
+  - service: AiService
+    operations: 9
+  note: Vector search for the concierge and semantic lookup.
+- store: derived
+  operations: 5
+  usedBy:
+  - service: FnbService
+    operations: 2
+  - service: InventoryService
+    operations: 2
+  - service: ReportingService
+    operations: 1
+  note: '**Computed, never stored.** `inventory.stock_level` is the example: a stored level and a movement
+    ledger that disagree is a stock count nobody can reconcile.'
+external:
+- system: Payment gateway
+  via:
+  - OrderService
+  reachedThrough: orders.payment
+  note: '**Tenant as merchant of record for phase 1**; PayFac deferred. The highest-consequence unresolved
+    payment assumption.'
+- system: UAE Pass and tenant SSO
+  via: IdentityService
+  note: A guest arrives verified in a way an email never is.
+- system: Messaging — SMS, WhatsApp, push, email
+  via:
+  - ControlService
+  - FnbService
+  - IdentityService
+  - MarketingService
+  - OrderService
+  - TenancyService
+  reachedThrough: marketing.message_dispatch
+  note: '**One dispatch table, six services.** A payment link from Order, a booking confirmation from
+    Order, an OTP from Identity, a rota change from Tenancy, an allergen alert from F&B, a campaign
+    from Marketing — **every one is somebody sending a message that was asked for.**
+
+
+    **A ticket purchase reaches messaging twice**: the payment link before tender and the confirmation
+    after. Neither goes through Marketing.'
+- system: Queue systems
+  via: VenueOpsService
+  note: '**Adaptor-first** (ADR-0012). The platform holds what the venue''s own queue system reports.'
+- system: AI providers
+  via:
+  - AiService
+  - ReportingService
+  reachedThrough: ai.interaction
+  note: 'BYOK, budgeted and metered. **Read-only against the transactional core** (ADR-0020).
+
+
+    **Reporting reaches it too** — the governed pair. A natural-language query *is* an AI interaction,
+    which is why `reporting` may write `ai.interaction` and nothing else outside AiService may.'
+- system: Webhooks out
+  via:
+  - ControlService
+  reachedThrough: control.webhook_subscription
+  note: Third parties subscribe; replay is available.
+regions:
+  model: one cell per jurisdiction
+  note: '**A cell is a deployment and a legal boundary at once** (ADR-0001). UAE data residency is required
+    and DESC review shapes it.
+
+
+    **Only CrossCellService reaches another region**, and it moves a pseudonymous guest link rather
+    than a guest (ADR-0010) — which is what makes a membership work in another country without moving
+    anybody''s personal data.'
+  unresolved: CF-64 — the cloud provider is undecided, and every concrete infrastructure artefact depends
+    on it
+layers:
+- layer: frontend
+  holds: 477 screens, 93 flows, 15 platforms, 12 apps
+- layer: contracts
+  holds: 1016 operations across 28 contracts — the join
+- layer: backend
+  holds: 374 tables in 26 schemas, 910 relationships
+- layer: domain
+  holds: 113 state models, 29 events
+- layer: decisions
+  holds: 29 ADRs, 148 conflicts closed, 6 open
+views:
+  services: diagrams/hld/02-services.yaml
+  hierarchy: diagrams/hld/01-hierarchy.yaml
+  perService: diagrams/lld/services/
+  perPlatform: diagrams/lld/platforms/
+honestly: '**Build is 0%.** 379 tables specified and none written; design is 93% of in-scope requirements.
+  **The gap between the two is the entire risk**, and no diagram in this folder changes it.'

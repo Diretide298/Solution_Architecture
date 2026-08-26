@@ -1,0 +1,68 @@
+$schema: ./_schema.yaml
+id: F73
+name: A till is configured and its cash rules set
+actor: venueManager
+capability: POS configuration
+wave: 1
+frequency: Routine.
+criticality: financial
+primaryContract: tenancy
+contracts:
+- tenancy
+- shift
+platforms:
+- P04
+trigger:
+  description: A new till arrives, or an existing one needs different cash limits. **Configuration is
+    a back-office act performed at the till.**
+offlineBehaviour: '**None of it works offline.** A configuration change applied locally is a configuration
+  only that device believes.'
+steps:
+- step: 1
+  screen: POS-016
+  action: The till is configured.
+  operations:
+  - configureWorkstation
+  outcome: '**A workstation is a scope** — it holds a profile, an offline policy and a deposit box,
+    and none of those travel with the person.'
+- step: 2
+  screen: POS-019
+  action: Shift policy is set.
+  operations:
+  - getVenueSettings
+  - setVenueSettings
+  outcome: '**Venue scope, not workstation.** Every till in a venue closes to the same rules or the
+    variance report compares nothing.'
+  crossesDevice: true
+- step: 3
+  screen: POS-015
+  action: Cash limits and the drawer ceiling are set.
+  operations:
+  - listCashMovements
+  - listDepositBoxes
+  outcome: '**A ceiling on the drawer is a security control.** F32 step 4 is the safe drop it forces.'
+  crossesDevice: true
+- step: 4
+  screen: POS-018
+  action: Safe drop destinations are allocated.
+  operations:
+  - withdrawFromDepositBox
+  outcome: '**A box per till per shift.** Two tills sharing a box is two cashiers answering for one
+    variance.'
+  crossesDevice: true
+branches:
+- at: 2
+  condition: A shift is open on the till.
+  behaviour: '**Refused.** Changing the rules under an open shift means it closes against rules it did
+    not open under.'
+  severity: high
+  resolvedBy: configureWorkstation
+exitStates:
+- state: configured
+  description: Till ready, policy set, box allocated.
+- state: deferred
+  description: '**A shift is open. The change waits.**'
+notes: '**Written 24 August.** The four POS configuration screens had never been walked together, and
+  **`setVenueSettings` at venue scope beside `configureWorkstation` at workstation scope is the distinction
+  the flow makes visible.**'
+openQuestions: null

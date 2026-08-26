@@ -1,0 +1,149 @@
+$schema: ./_schema.yaml
+id: F28
+name: A temperature excursion is caught and signed off
+actor: storekeeper
+capability: Food safety and HACCP compliance
+wave: 2
+frequency: Several times a day in every venue with a kitchen — most readings pass and the flow ends
+  at step 2.
+criticality: safety
+primaryContract: fnb
+contracts:
+- fnb
+- inventory
+- identity
+platforms:
+- P06
+- P15
+- P08
+trigger:
+  description: 'A scheduled check falls due, or a delivery arrives at the door. **The platform raises
+    the check; nobody remembers to.**
+
+    '
+offlineBehaviour: '**Steps 1 to 4 work offline and must.** A walk-in freezer is where the signal is
+  worst and the readings matter most — a check nobody can record is a check nobody takes. Readings journal
+  locally and sync on return.
+
+  **Signing is online only.** A signature is a named act with legal weight, and one applied against
+  a stale corrective action is a signature on the wrong finding.
+
+  '
+steps:
+- step: 1
+  screen: EMP-062
+  action: The check falls due and appears on the storekeeper's list.
+  operations:
+  - getHaccpStatus
+  outcome: 'Checks due, checks missed, and open actions. **A missed check counts the same as a failed
+    one** — a log with a gap cannot be told apart from a log nobody kept.
+
+    '
+- step: 2
+  screen: EMP-067
+  action: They read the unit and record the temperature.
+  operations:
+  - logTemperature
+  outcome: 'In range, and the flow ends here. **This is what happens almost every time**, and the flow
+    is written so that the ordinary path is two steps.
+
+    '
+- step: 3
+  screen: EMP-067
+  action: The reading is out of range. The platform opens a corrective action against it.
+  operations:
+  - logTemperature
+  outcome: '**The reading is kept, not refused.** Deleting a bad reading is the one thing an inspector
+    looks for, and an operation that rejects it teaches a kitchen to stop taking readings.
+
+    '
+- step: 4
+  screen: EMP-067
+  action: They act — discard, rework, quarantine — and record what they did.
+  operations:
+  - signCorrectiveAction
+  outcome: '`open` becomes `actioned`. **Not signed yet, and this is the state most findings sit in.**
+
+    '
+- step: 5
+  screen: EMP-067
+  action: They put their name to it.
+  operations:
+  - signCorrectiveAction
+  outcome: '`actioned` becomes `signed`. **The signature is the record** — *discarded and reset* with
+    nobody against it is not a corrective action.
+
+    '
+- step: 6
+  screen: BO-044
+  action: The venue manager reviews open and unsigned findings before service.
+  operations:
+  - getHaccpStatus
+  - signCorrectiveAction
+  outcome: '**Unsigned actions are the number that matters on this screen.** A year of unsigned entries
+    is what an inspection finds, and nobody notices until then.
+
+    '
+branches:
+- at: 3
+  condition: The severity is critical and the person who found it is the person on shift.
+  behaviour: '**Escalated rather than signed.** A supervisor signs what a cook should not, and the refusal
+    is in the state model rather than in a policy document — `signCorrectiveAction` returns 409 with
+    the escalation path named.
+
+    '
+  severity: high
+  resolvedBy: signCorrectiveAction
+- at: 2
+  condition: The check was not taken at all.
+  behaviour: 'Recorded as `notTaken`. **A check that did not happen is itself a finding** — the alternative
+    is a gap, and a gap and a clean log look identical to an inspector.
+
+    '
+  severity: medium
+  resolvedBy: logTemperature
+- at: 1
+  condition: A delivery arrives warm rather than a scheduled check falling due.
+  behaviour: 'Enters at `EMP-065` through `logColdChain` instead. **The reading is taken before the
+    receipt is posted** — once stock is received it has entered the kitchen, and a claim against a supplier
+    needs the reading that refused it.
+
+    '
+  severity: medium
+  resolvedBy: logColdChain
+- at: 5
+  condition: The device is offline when they try to sign.
+  behaviour: '**The action stays `actioned` and the signature waits.** Everything else in this flow
+    queues offline; a signature does not, because one applied against a stale finding is a signature
+    on the wrong thing.
+
+    '
+  severity: low
+  resolvedBy: signCorrectiveAction
+exitStates:
+- state: inRange
+  description: The reading was in range and nothing else happened. **The common case, and the flow is
+    written so it is two steps.**
+- state: signed
+  description: A finding was raised, actioned and signed by a named principal. **The signature is the
+    record.**
+- state: escalated
+  description: A critical finding signed by a supervisor rather than by the person who found it.
+- state: rejectedAtDoor
+  description: A delivery refused with the reading that refused it — **taken before the receipt was
+    posted**, because a claim against a supplier needs it.
+notes: '**Written 20 August from boards 5G and 5J of the client F&B pack.** The boards draw `safetyBreach`
+  and `correctiveActionOpen` as screen states, and **nothing in 947 operations touched food safety**
+  — HACCP records are a UAE regulatory obligation and they are inspected.
+
+  **The flow is written so the ordinary path is two steps.** A compliance flow that takes six steps
+  to record a normal reading is a compliance flow a kitchen works around, and a worked-around compliance
+  flow produces exactly the gap it exists to prevent.
+
+  '
+openQuestions: '**Who signs when a venue runs a single-person kitchen at night?** The escalation rule
+  assumes a supervisor is reachable, and a small outlet at 23:00 may have nobody. Worth a client answer
+  before build rather than a default that either blocks the cook or lets them sign their own critical
+  finding.
+
+  '

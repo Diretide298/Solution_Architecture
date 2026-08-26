@@ -1,0 +1,404 @@
+id: LLD-ReportingService
+title: ReportingService — 29 operations, 13 tables
+generatedBy: tools/derive-diagrams.py
+tier: platform
+index: diagrams/hld/02-services.yaml
+why: '**Reads almost everything and writes only its own definitions.** Separate because it is the one
+  service that should never touch the transactional primary — ADR-0016 read-write separation exists
+  for this.'
+scale: Analytical. Runs against the replica and the analytical store.
+ifDown: Down stops dashboards. **Nothing operational depends on it.**
+coverage:
+  operations: 29
+  inAFlow: 18
+  percent: 62%
+  note: '**Flow coverage is how much of this service a journey has walked.** A service under 40% is
+    unwalked rather than under-documented.'
+schemas:
+- schema: reporting
+  tables: 13
+  stores:
+  - derived
+  - postgres
+  largestTable: reporting.report_definition
+operationsByContract:
+- contract: reporting
+  count: 29
+  operations:
+  - operation: acknowledgeAlert
+    verb: POST
+    path: /alerts/{alertId}/acknowledge
+    scope: venue
+    permission: REPORT_VIEW_VENUE
+    offline: true
+    reads: 3
+    writes: 2
+  - operation: askReportingQuestion
+    verb: POST
+    path: /reports/ask
+    scope: venue
+    permission: REPORT_VIEW_VENUE
+    offline: false
+    reads: 5
+    writes: 4
+  - operation: cancelReportExecution
+    verb: DELETE
+    path: /report-executions/{executionId}
+    scope: venue
+    permission: REPORT_VIEW_VENUE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: createDashboard
+    verb: POST
+    path: /dashboards
+    scope: tenant
+    permission: REPORT_MANAGE
+    offline: false
+    reads: 3
+    writes: 3
+  - operation: createReport
+    verb: POST
+    path: /reports
+    scope: venue
+    permission: REPORT_MANAGE
+    offline: false
+    reads: 5
+    writes: 5
+  - operation: createReportSchedule
+    verb: POST
+    path: /report-schedules
+    scope: venue
+    permission: REPORT_SCHEDULE
+    offline: false
+    reads: 3
+    writes: 3
+  - operation: deleteReport
+    verb: DELETE
+    path: /reports/{reportId}
+    scope: venue
+    permission: REPORT_MANAGE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: deleteReportSchedule
+    verb: DELETE
+    path: /report-schedules/{scheduleId}
+    scope: venue
+    permission: REPORT_SCHEDULE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: exportReportResult
+    verb: POST
+    path: /report-executions/{executionId}/export
+    scope: venue
+    permission: REPORT_EXPORT
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: getDashboard
+    verb: GET
+    path: /dashboards/{dashboardId}
+    scope: venue
+    permission: REPORT_VIEW_VENUE
+    offline: false
+    reads: 2
+    writes: 0
+  - operation: getReport
+    verb: GET
+    path: /reports/{reportId}
+    scope: venue
+    permission: REPORT_VIEW_VENUE
+    offline: false
+    reads: 4
+    writes: 0
+  - operation: getReportExecution
+    verb: GET
+    path: /report-executions/{executionId}
+    scope: venue
+    permission: REPORT_VIEW_VENUE
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: getReportExport
+    verb: GET
+    path: /report-exports/{exportId}
+    scope: venue
+    permission: REPORT_EXPORT
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: getReportResult
+    verb: GET
+    path: /report-executions/{executionId}/result
+    scope: venue
+    permission: REPORT_VIEW_VENUE
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: getSupplierPerformance
+    verb: GET
+    path: /suppliers/{supplierId}/performance
+    scope: venue
+    permission: REPORT_VIEW
+    offline: false
+    reads: 4
+    writes: 0
+  - operation: listAlertRules
+    verb: GET
+    path: /alert-rules
+    scope: venue
+    permission: REPORT_VIEW_VENUE
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listAlerts
+    verb: GET
+    path: /alerts
+    scope: venue
+    permission: REPORT_VIEW_VENUE
+    offline: false
+    reads: 2
+    writes: 0
+  - operation: listDashboards
+    verb: GET
+    path: /dashboards
+    scope: venue
+    permission: REPORT_VIEW_VENUE
+    offline: false
+    reads: 2
+    writes: 0
+  - operation: listReportExecutions
+    verb: GET
+    path: /report-executions
+    scope: venue
+    permission: REPORT_VIEW_VENUE
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listReportFields
+    verb: GET
+    path: /report-fields
+    scope: venue
+    permission: REPORT_VIEW_VENUE
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listReportSchedules
+    verb: GET
+    path: /report-schedules
+    scope: venue
+    permission: REPORT_VIEW_VENUE
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listReports
+    verb: GET
+    path: /reports
+    scope: venue
+    permission: REPORT_VIEW_VENUE
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listSeededReports
+    verb: GET
+    path: /reports/seeded
+    scope: venue
+    permission: REPORT_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: runReport
+    verb: POST
+    path: /reports/{reportId}/run
+    scope: venue
+    permission: REPORT_VIEW_VENUE
+    offline: false
+    reads: 4
+    writes: 2
+  - operation: saveNaturalLanguageQuery
+    verb: POST
+    path: /reports/ask/{conversationId}/save
+    scope: venue
+    permission: REPORT_MANAGE
+    offline: false
+    reads: 7
+    writes: 6
+  - operation: setAlertRule
+    verb: PUT
+    path: /alert-rules
+    scope: venue
+    permission: REPORT_MANAGE
+    offline: false
+    reads: 3
+    writes: 2
+  - operation: updateDashboard
+    verb: PUT
+    path: /dashboards/{dashboardId}
+    scope: tenant
+    permission: REPORT_MANAGE
+    offline: false
+    reads: 3
+    writes: 3
+  - operation: updateReport
+    verb: PUT
+    path: /reports/{reportId}
+    scope: venue
+    permission: REPORT_MANAGE
+    offline: false
+    reads: 5
+    writes: 5
+  - operation: updateReportSchedule
+    verb: PATCH
+    path: /report-schedules/{scheduleId}
+    scope: venue
+    permission: REPORT_SCHEDULE
+    offline: false
+    reads: 3
+    writes: 3
+tables:
+- table: reporting.alert
+  columns: 12
+  store: postgres
+  parent: null
+  writtenBy:
+  - reporting
+  foreignWriters: null
+- table: reporting.alert_rule
+  columns: 12
+  store: postgres
+  parent: null
+  writtenBy:
+  - reporting
+  foreignWriters: null
+- table: reporting.dashboard
+  columns: 9
+  store: postgres
+  parent: null
+  writtenBy:
+  - reporting
+  foreignWriters: null
+- table: reporting.dashboard_tile
+  columns: 7
+  store: postgres
+  parent: null
+  writtenBy:
+  - reporting
+  foreignWriters: null
+- table: reporting.execution
+  columns: 15
+  store: postgres
+  parent: null
+  writtenBy:
+  - reporting
+  foreignWriters: null
+- table: reporting.export
+  columns: 11
+  store: postgres
+  parent: null
+  writtenBy:
+  - reporting
+  foreignWriters: null
+- table: reporting.report_column
+  columns: 8
+  store: postgres
+  parent: null
+  writtenBy:
+  - reporting
+  foreignWriters: null
+- table: reporting.report_definition
+  columns: 18
+  store: postgres
+  parent: null
+  writtenBy:
+  - reporting
+  foreignWriters: null
+- table: reporting.report_field
+  columns: 1
+  store: derived
+  parent: null
+  writtenBy: []
+  foreignWriters: null
+- table: reporting.report_filter
+  columns: 7
+  store: postgres
+  parent: null
+  writtenBy:
+  - reporting
+  foreignWriters: null
+- table: reporting.report_parameter
+  columns: 6
+  store: postgres
+  parent: null
+  writtenBy:
+  - reporting
+  foreignWriters: null
+- table: reporting.schedule
+  columns: 16
+  store: postgres
+  parent: null
+  writtenBy:
+  - reporting
+  foreignWriters: null
+- table: reporting.schedule_recipient
+  columns: 3
+  store: postgres
+  parent: null
+  writtenBy:
+  - reporting
+  foreignWriters: null
+readsFrom:
+- service: AiService
+  operations: 4
+- service: InventoryService
+  operations: 4
+- service: IdentityService
+  operations: 2
+writesOutside:
+- service: AiService
+  operations: 2
+  why: '**The owner defines the row; this service may only append to it.**'
+screens:
+- P04:POS-008 Reports
+- P04:POS-009 Staff Roster
+- P04:POS-020 Shift Exceptions & Alerts
+- P06:EMP-070 Inventory Exceptions, AI Replenishment & Action Center
+- P08:BO-010 Promotions & Coupons
+- P08:BO-029 Report Builder
+- P08:BO-036 Device Registry
+- P08:BO-058 Reporting Home
+- P08:BO-059 Sales Reports
+- P08:BO-060 Attendance & Footfall
+- P08:BO-061 Scheduled Reports
+- P08:BO-083 Suppliers
+- P08:BO-115 Category, Brand & Merchandise Hierarchy
+- P08:BO-118 Campaign & Audience Management
+- P08:BO-125 Product & Category Button Configuration
+- P08:BO-126 Deployment, Preview & Audit
+- P08:BO-133 Offline Alerts, Limits & Audit
+- P08:BO-141 Operational Alerts, AI Replenishment & Action Center
+- P09:ADM-031 Security & Compliance Dashboard
+- P10:PTR-018 Reports & Sales Performance
+- P12:SUP-008 Agent Performance & SLA View
+- P15:KIT-010 Kitchen Performance, AI & Operational Optimization
+- P16:ANL-001 Executive Command Center
+- P16:ANL-002 Sales, Revenue & Channel
+- P16:ANL-003 Operational Performance
+- P16:ANL-004 Product Performance
+- P16:ANL-005 Cost, Margin & Profitability
+- P16:ANL-006 Inventory & Waste Intelligence
+- P16:ANL-007 Guest & Conversion Intelligence
+- P16:ANL-008 Demand Forecasting
+- P16:ANL-009 AI Assistant & Action Center
+flows:
+- F106 A security dashboard surfaces something and it is investigated
+- F107 A report is defined, scheduled and delivered
+- F20 A manager asks a question and gets an answer
+- F33 A till goes offline and comes back
+- F74 A shift closes and the day is reported
+- F77 A promotion is built, bundled, published and measured
+- F78 A supplier is set up and a catalogue is priced and published
+- F82 A month is analysed from incrementality to a scheduled report
+- F90 An audience is built, offered to, and the result is judged
+- F95 A fleet is watched, a fault is found, and a station is fixed

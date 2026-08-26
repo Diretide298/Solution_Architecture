@@ -1,0 +1,71 @@
+$schema: ./_schema.yaml
+id: F71
+name: A device is prepared, used and handed over
+actor: technician
+capability: Device lifecycle in a venue
+wave: 1
+frequency: Routine.
+criticality: operational
+primaryContract: tenancy
+contracts:
+- tenancy
+- catalogue
+- access
+platforms:
+- P06
+trigger:
+  description: A handheld comes off charge and has to be ready before a session. **A device that is
+    not ready is a lane that does not open.**
+offlineBehaviour: '**Preparation needs the network by definition** — the whole point is to load what
+  the device will need when it has none.'
+steps:
+- step: 1
+  screen: EMP-043
+  action: The device is checked and registered.
+  operations:
+  - listDevices
+  outcome: '**A heartbeat is the test.** `testPeripheral` was drawn on the client board and resolves
+    here — a separate test would report a different truth from the one the fleet view reads.'
+- step: 2
+  screen: EMP-018
+  action: It pulls its offline package.
+  operations:
+  - getLatestBundle
+  - listCatalogueBundles
+  - reportBundleApplied
+  outcome: '**`reportBundleApplied` closes the loop.** A device that pulled a bundle and never confirmed
+    it is a device the fleet view believes is current.'
+  crossesDevice: true
+- step: 3
+  screen: EMP-049
+  action: At the end of the session the journal is handed over.
+  operations:
+  - listScans
+  - syncScans
+  outcome: '**Handed over, not just synced.** A device passed to the next shift with an unsynced journal
+    carries somebody else’s scans.'
+  crossesDevice: true
+branches:
+- at: 2
+  condition: The bundle is stale and the network is gone.
+  behaviour: '**The device is not issued.** ADR-0013 makes the till and the scanner local-first, and
+    local-first with a stale catalogue is worse than no device.'
+  severity: high
+  resolvedBy: getLatestBundle
+- at: 3
+  condition: The journal will not sync.
+  behaviour: '**A technician job, not a supervisor one.** Connectivity is IT; deciding whether a scan
+    stands is not — CF-159 settled that split.'
+  severity: medium
+  resolvedBy: syncScans
+exitStates:
+- state: ready
+  description: Registered, bundle current, issued.
+- state: heldBack
+  description: '**Stale bundle. Not issued.**'
+- state: handedOver
+  description: Journal synced, device passed on.
+notes: '**Written 24 August.** `EMP-043` — device settings — declared `getGuestProfile`, `getGuestLoyalty`,
+  `getConsentHistory` and `adjustLoyaltyPoints`. **A device-settings screen that could read a guest’s
+  consent history and adjust their points.** Seven operations removed.'
+openQuestions: null

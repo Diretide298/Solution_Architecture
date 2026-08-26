@@ -1,0 +1,71 @@
+$schema: ./_schema.yaml
+id: F79
+name: A workstation is registered, configured and rolled out
+actor: technician
+capability: A workstation is registered, configured and rolled out
+wave: 2
+frequency: As the venue needs it.
+criticality: operational
+primaryContract: tenancy
+contracts:
+- tenancy
+- platform-ops
+platforms:
+- P08
+trigger:
+  description: A new till arrives in a box, or an old one needs a new configuration.
+offlineBehaviour: '**Deployment needs the network by definition.** A config pushed to a device nobody
+  can reach is a config that has not been pushed.'
+steps:
+- step: 1
+  screen: BO-126
+  action: Deployment, Preview & Audit.
+  operations:
+  - deployConfigurationProfile
+  - listAuditRecords
+  - listSaleBoards
+  - listWorkstations
+  - startRollout
+  - updateSaleBoard
+  outcome: '**Drawn by the client as POS-1F.** 6 operations on this step.'
+- step: 2
+  screen: BO-036
+  action: Device Registry.
+  operations:
+  - adjustLoyaltyPoints
+  - deployConfigurationProfile
+  - getConsentHistory
+  - getGuestConsents
+  - getGuestLoyalty
+  - getWorkstation
+  outcome: '**Drawn by the client as POS-1A.** 13 operations on this step.'
+  crossesDevice: true
+- step: 3
+  screen: BO-124
+  action: Layout & Journey Builder.
+  operations:
+  - createSaleBoard
+  - deployConfigurationProfile
+  - listAuditRecords
+  - recordDeviceHeartbeat
+  - updateSaleBoard
+  outcome: '**Drawn by the client as POS-1B.** 5 operations on this step.'
+  crossesDevice: true
+branches:
+- at: 1
+  condition: A step in the chain is not licensed for this tenant.
+  behaviour: '**The chain stops at the module boundary.** `requiresModule` on each screen decides —
+    a tenant without the retail licence does not see the retail half, and the journey is shorter rather
+    than broken.'
+  severity: medium
+  resolvedBy: getModuleEnablement
+exitStates:
+- state: completed
+  description: The chain ran as the client drew it.
+- state: stoppedAtModule
+  description: '**A licence boundary, not a failure.**'
+notes: '**POS board 1, the fleet loop.** `getWorkstationHealth`, `setConfigurationProfile` and `deployConfigurationProfile`
+  were built on 20 August from this same board and had never been walked together. **Derived from the
+  client''s own `GOES TO` edges**, not from an inferred path — a pair of frames the client linked is
+  evidence; a chain assembled from unrelated pairs is a guess.'
+openQuestions: null

@@ -1,0 +1,44 @@
+# API client — state model
+# Contract: public-api.ApiClient.status
+
+entity: API client
+contract: public-api
+enum: ApiClient.status
+enumKind: inline
+enumSchema: ApiClient
+enumProperty: status
+owner: public-api
+initial:
+- active
+terminal:
+- revoked
+transitions:
+- from: active
+  to: suspended
+  operation: revokeApiCredential
+  trigger: operation
+  guard: '**Quota breach, security event or a licence lapsing.** Reversible — a suspension is a conversation,
+    a revocation is not'
+- from: suspended
+  to: active
+  operation: rotateApiCredential
+  trigger: operation
+  guard: Resolved
+  isReversal: true
+- from: active
+  to: revoked
+  operation: revokeApiCredential
+  trigger: operation
+  guard: '**Terminal, and active tokens die with it.** Revoking the credential while leaving tokens
+    alive is a revocation that takes an hour to mean anything'
+- from: suspended
+  to: revoked
+  operation: revokeApiCredential
+  trigger: operation
+  guard: Never resolved
+notes: '**`revoked` is terminal and the record stays.** An audit asking who called what last March needs
+  the client to still resolve.
+
+
+  **Suspension is reversible and revocation is not**, which is the whole reason both exist — an over-quota
+  integrator should not need to re-onboard.'

@@ -1,0 +1,73 @@
+id: LLD-Resource
+title: Resource — 9 transitions
+generatedBy: tools/derive-diagrams.py
+index: diagrams/hld/04-lifecycles.yaml
+source: states/resource.yaml
+entity: Resource
+contract: resources
+enum: Resource.status
+enumKind: inline
+enumSchema: Resource
+enumProperty: status
+owner: resources
+initial:
+- available
+terminal:
+- retired
+transitions:
+- from: available
+  to: booked
+  operation: bookResource
+  trigger: operation
+  guard: Reserved for a window
+- from: booked
+  to: checkedOut
+  operation: checkOutResource
+  trigger: operation
+  guard: With a guest
+- from: checkedOut
+  to: available
+  operation: checkInResource
+  trigger: operation
+  guard: Returned in good condition
+  isReversal: true
+- from: checkedOut
+  to: maintenance
+  operation: checkInResource
+  trigger: operation
+  guard: '**Returned damaged.** Blocked from further booking — a returned item going straight back into
+    the pool with a cracked wheel is how the second guest gets hurt'
+- from: booked
+  to: available
+  operation: bookResource
+  trigger: operation
+  guard: The booking was cancelled
+  isReversal: true
+- from: available
+  to: maintenance
+  operation: createResource
+  trigger: operation
+  guard: Taken out for scheduled work
+- from: maintenance
+  to: available
+  operation: createResource
+  trigger: operation
+  guard: Repaired
+  isReversal: true
+- from: maintenance
+  to: retired
+  operation: createResource
+  trigger: operation
+  guard: Beyond repair
+- from: available
+  to: retired
+  operation: createResource
+  trigger: operation
+  guard: Withdrawn
+notes: '**`maintenance` is reachable from `checkedOut` directly**, because that is where damage is found
+  — and routing it through `available` first would mean a window in which the next guest could book
+  a broken item.
+
+
+  **`retired` is terminal and the resource stays readable.** A booking from last season still resolves
+  to the cabana it was for.'

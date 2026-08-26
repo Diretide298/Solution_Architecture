@@ -1,0 +1,52 @@
+# Table visit — state model
+# Contract: fnb.TableVisit.status
+# Checked by tools/check-states.py.
+
+entity: Table visit
+contract: fnb
+enum: TableVisit.status
+enumKind: inline
+enumSchema: TableVisit
+enumProperty: status
+owner: fnb
+initial:
+- open
+terminal:
+- settled
+- merged
+- cancelled
+transitions:
+- from: open
+  to: billRequested
+  operation: requestBill
+  trigger: operation
+  guard: The party asked to pay. **The kitchen stops accepting additions**
+- from: billRequested
+  to: open
+  operation: openTableVisit
+  trigger: operation
+  guard: They ordered something else after asking for the bill. Common, and it must work
+  isReversal: true
+- from: billRequested
+  to: settled
+  operation: closeTableVisit
+  trigger: operation
+  guard: Paid and closed
+- from: open
+  to: merged
+  operation: mergeTableVisits
+  trigger: operation
+  guard: '**Joined to another table.** Two tables that became one party, and the bills follow'
+- from: open
+  to: cancelled
+  operation: clearTable
+  trigger: operation
+  guard: Opened in error, or the party left before ordering
+- from: open
+  to: settled
+  operation: closeTableVisit
+  trigger: operation
+  guard: Paid without asking — a guest who went to the counter
+notes: '`billRequested` returning to `open` is the transition that gets omitted and always happens.
+  **A party that asks for the bill and then orders another round is normal**, and a system that refuses
+  is a system staff route around.'

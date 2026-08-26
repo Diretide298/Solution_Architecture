@@ -1,0 +1,1134 @@
+id: LLD-orders
+title: orders — 78 operations
+generatedBy: tools/derive-diagrams.py
+index: diagrams/hld/03-contracts.yaml
+tier: spine
+service: OrderService
+operations:
+- operation: abandonCart
+  verb: DELETE
+  path: /carts/{cartId}
+  scope: venue
+  permission: null
+  audience: null
+  offline: false
+  reads:
+  - cache:idempotency
+  - orders.cart
+  writes:
+  - cache:idempotency
+  - catalogue.inventory_lease
+  - orders.cart
+- operation: addCartLine
+  verb: POST
+  path: /carts/{cartId}/lines
+  scope: venue
+  permission: null
+  audience: null
+  offline: false
+  reads:
+  - cache:idempotency
+  - catalogue.envelope
+  - catalogue.performance
+  - catalogue.variant
+  writes:
+  - cache:idempotency
+  - catalogue.inventory_lease
+  - orders.cart
+  - orders.cart_line
+- operation: addTip
+  verb: POST
+  path: /payments/{paymentId}/tip
+  scope: workstation
+  permission: ORDER_MODIFY
+  audience: null
+  offline: true
+  reads:
+  - cache:idempotency
+  - orders.payment
+  writes:
+  - cache:idempotency
+  - orders.payment
+- operation: appendEntitlementToMedia
+  verb: POST
+  path: /media/{mediaCode}/entitlements
+  scope: workstation
+  permission: ORDER_CREATE
+  audience: null
+  offline: false
+  reads:
+  - access.entitlement
+  - cache:idempotency
+  - orders.order_line
+  - orders.payment
+  - orders.sales_order
+  writes:
+  - access.entitlement
+  - cache:idempotency
+  - orders.order_line
+  - orders.payment
+  - orders.sales_order
+- operation: applyManualDiscount
+  verb: POST
+  path: /orders/{orderId}/discounts
+  scope: workstation
+  permission: ORDER_DISCOUNT
+  audience: null
+  offline: true
+  reads:
+  - cache:idempotency
+  - orders.order_line
+  - orders.payment
+  - orders.sales_order
+  writes:
+  - cache:idempotency
+  - orders.order_line
+  - orders.payment
+  - orders.sales_order
+- operation: approveRefund
+  verb: POST
+  path: /refunds/{refundId}/approve
+  scope: venue
+  permission: ORDER_REFUND_APPROVE
+  audience: null
+  offline: false
+  reads:
+  - cache:idempotency
+  - orders.refund
+  writes:
+  - cache:idempotency
+  - orders.refund
+- operation: authoriseStoredValue
+  verb: POST
+  path: /stored-value/authorisations
+  scope: venue
+  permission: ORDER_CREATE
+  audience:
+  - staff
+  - guest
+  - device
+  offline: false
+  reads:
+  - promotions.voucher
+  - retail.gift_card
+  - retail.wallet
+  writes:
+  - cache:idempotency
+  - orders.stored_value_authorisation
+- operation: cancelReservation
+  verb: DELETE
+  path: /reservations/{reservationId}
+  scope: venue
+  permission: ORDER_CANCEL
+  audience: null
+  offline: false
+  reads:
+  - cache:idempotency
+  - orders.reservation
+  writes:
+  - cache:idempotency
+  - orders.reservation
+- operation: capturePayment
+  verb: POST
+  path: /payments/{paymentId}/capture
+  scope: workstation
+  permission: ORDER_CREATE
+  audience: null
+  offline: false
+  reads:
+  - cache:idempotency
+  - ledger.fx_rate
+  - orders.payment
+  writes:
+  - cache:idempotency
+  - orders.payment
+- operation: captureStoredValue
+  verb: POST
+  path: /stored-value/authorisations/{authorisationId}/capture
+  scope: venue
+  permission: ORDER_CREATE
+  audience:
+  - staff
+  - device
+  offline: false
+  reads:
+  - orders.stored_value_authorisation
+  writes:
+  - cache:idempotency
+  - orders.stored_value_authorisation
+  - retail.wallet_transaction
+- operation: checkoutCart
+  verb: POST
+  path: /carts/{cartId}/checkout
+  scope: venue
+  permission: null
+  audience: null
+  offline: false
+  reads:
+  - cache:idempotency
+  - catalogue.inventory_lease
+  - orders.cart
+  - orders.cart_line
+  writes:
+  - cache:idempotency
+  - orders.cart
+  - orders.order_line
+  - orders.sales_order
+- operation: claimCart
+  verb: POST
+  path: /carts/{cartId}/claim
+  scope: venue
+  permission: null
+  audience: null
+  offline: false
+  reads:
+  - cache:idempotency
+  - orders.cart
+  - pii.subject
+  writes:
+  - cache:idempotency
+  - orders.cart
+  - orders.cart_line
+- operation: claimTicketTransfer
+  verb: POST
+  path: /ticket-transfers/{transferId}/claim
+  scope: venue
+  permission: null
+  audience: null
+  offline: false
+  reads:
+  - access.entitlement
+  - cache:idempotency
+  - orders.ticket_transfer
+  writes:
+  - access.entitlement
+  - cache:idempotency
+  - orders.ticket_transfer
+- operation: convertReservation
+  verb: POST
+  path: /reservations/{reservationId}/convert
+  scope: workstation
+  permission: ORDER_CREATE
+  audience: null
+  offline: false
+  reads:
+  - cache:idempotency
+  - orders.order_line
+  - orders.payment
+  - orders.sales_order
+  writes:
+  - cache:idempotency
+  - orders.order_line
+  - orders.payment
+  - orders.sales_order
+- operation: convertToTermProduct
+  verb: POST
+  path: /orders/{orderId}/convert-to-term
+  scope: venue
+  permission: ORDER_MODIFY
+  audience:
+  - staff
+  - guest
+  offline: false
+  reads:
+  - cache:idempotency
+  - catalogue.product
+  - orders.sales_order
+  writes:
+  - cache:idempotency
+  - orders.sales_order
+- operation: createBulkRefund
+  verb: POST
+  path: /refunds/bulk
+  scope: venue
+  permission: ORDER_REFUND_BULK
+  audience: null
+  offline: false
+  reads:
+  - cache:idempotency
+  - orders.refund
+  writes:
+  - cache:idempotency
+  - orders.refund
+- operation: createCart
+  verb: POST
+  path: /carts
+  scope: venue
+  permission: null
+  audience: null
+  offline: false
+  reads:
+  - cache:idempotency
+  - pii.subject
+  - platform.scope_node
+  writes:
+  - cache:idempotency
+  - orders.cart
+- operation: createOrder
+  verb: POST
+  path: /orders
+  scope: workstation
+  permission: ORDER_CREATE
+  audience: null
+  offline: true
+  reads:
+  - cache:idempotency
+  - orders.order_line
+  - orders.payment
+  - orders.sales_order
+  writes:
+  - cache:idempotency
+  - orders.order_line
+  - orders.payment
+  - orders.sales_order
+- operation: createPayment
+  verb: POST
+  path: /payments
+  scope: workstation
+  permission: ORDER_CREATE
+  audience: null
+  offline: true
+  reads:
+  - cache:idempotency
+  - ledger.fx_rate
+  - orders.payment
+  - orders.sales_order
+  writes:
+  - cache:idempotency
+  - ledger.entry
+  - ledger.journal_entry
+  - orders.payment
+- operation: createPaymentLink
+  verb: POST
+  path: /payment-links
+  scope: venue
+  permission: ORDER_CREATE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - orders.payment_provider
+  - orders.sales_order
+  writes:
+  - cache:idempotency
+  - marketing.message_dispatch
+  - orders.sales_order
+- operation: createRefund
+  verb: POST
+  path: /orders/{orderId}/refunds
+  scope: venue
+  permission: ORDER_REFUND
+  audience: null
+  offline: false
+  reads:
+  - cache:idempotency
+  - orders.payment
+  - orders.refund
+  - orders.sales_order
+  writes:
+  - cache:idempotency
+  - ledger.entry
+  - ledger.journal_entry
+  - orders.refund
+- operation: createRefundRequest
+  verb: POST
+  path: /refund-requests
+  scope: venue
+  permission: null
+  audience: null
+  offline: false
+  reads:
+  - cache:idempotency
+  - orders.refund_policy
+  - orders.sales_order
+  writes:
+  - cache:idempotency
+  - orders.refund
+- operation: createResaleListing
+  verb: POST
+  path: /resale-listings
+  scope: venue
+  permission: ORDER_CREATE
+  audience:
+  - staff
+  - guest
+  offline: false
+  reads:
+  - access.entitlement
+  - cache:idempotency
+  - catalogue.entitlement_template
+  - orders.sales_order
+  writes:
+  - cache:idempotency
+  - orders.resale_listing
+- operation: createReservation
+  verb: POST
+  path: /reservations
+  scope: venue
+  permission: ORDER_CREATE
+  audience: null
+  offline: false
+  reads:
+  - cache:idempotency
+  - orders.reservation
+  writes:
+  - cache:idempotency
+  - orders.reservation
+- operation: exchangeOrderLines
+  verb: POST
+  path: /orders/{orderId}/exchanges
+  scope: venue
+  permission: ORDER_EXCHANGE
+  audience: null
+  offline: false
+  reads:
+  - cache:idempotency
+  - orders.sales_order
+  writes:
+  - cache:idempotency
+  - orders.sales_order
+- operation: extendCart
+  verb: POST
+  path: /carts/{cartId}/extend
+  scope: venue
+  permission: null
+  audience: null
+  offline: false
+  reads:
+  - cache:idempotency
+  - catalogue.inventory_lease
+  - orders.cart
+  writes:
+  - cache:idempotency
+  - catalogue.inventory_lease
+  - orders.cart
+- operation: extendReservation
+  verb: POST
+  path: /reservations/{reservationId}/extend
+  scope: venue
+  permission: ORDER_CREATE
+  audience: null
+  offline: false
+  reads:
+  - cache:idempotency
+  - orders.reservation
+  writes:
+  - cache:idempotency
+  - orders.reservation
+- operation: getB2bCredit
+  verb: GET
+  path: /b2b-accounts/{accountId}/credit
+  scope: venue
+  permission: ORDER_VIEW
+  audience: null
+  offline: false
+  reads:
+  - orders.b2b_credit
+  writes: []
+- operation: getCart
+  verb: GET
+  path: /carts/{cartId}
+  scope: venue
+  permission: null
+  audience: null
+  offline: false
+  reads:
+  - catalogue.envelope
+  - catalogue.inventory_lease
+  - orders.cart
+  - orders.cart_line
+  - promotions.promotion
+  writes: []
+- operation: getGroupBooking
+  verb: GET
+  path: /group-bookings/{groupBookingId}
+  scope: venue
+  permission: ORDER_VIEW
+  audience:
+  - staff
+  - guest
+  offline: false
+  reads:
+  - orders.group_booking
+  - orders.sales_order
+  - pii.subject
+  writes: []
+- operation: getMediaEntitlements
+  verb: GET
+  path: /media/{mediaCode}/entitlements
+  scope: venue
+  permission: ORDER_VIEW
+  audience: null
+  offline: false
+  reads:
+  - access.entitlement
+  - access.scan_event
+  - catalogue.entitlement_template
+  - orders.sales_order
+  - pii.subject
+  writes: []
+- operation: getOrder
+  verb: GET
+  path: /orders/{orderId}
+  scope: venue
+  permission: ORDER_VIEW
+  audience: null
+  offline: true
+  reads:
+  - orders.order_line
+  - orders.payment
+  - orders.sales_order
+  writes: []
+- operation: getOrderStatement
+  verb: GET
+  path: /orders/{orderId}/statement
+  scope: venue
+  permission: ORDER_VIEW
+  audience: null
+  offline: false
+  reads:
+  - ledger.entry
+  - orders.payment
+  - orders.refund
+  - orders.sales_order
+  writes: []
+- operation: getPaymentLink
+  verb: GET
+  path: /payment-links/{token}
+  scope: venue
+  permission: ORDER_VIEW
+  audience:
+  - guest
+  - anonymous
+  offline: false
+  reads:
+  - orders.order_line
+  - orders.payment_link
+  - orders.reservation
+  - orders.sales_order
+  - platform.scope_node
+  writes: []
+- operation: getRefundPolicy
+  verb: GET
+  path: /venues/{venueId}/refund-policy
+  scope: venue
+  permission: ORDER_VIEW
+  audience: null
+  offline: true
+  reads:
+  - cache:resolution
+  - orders.refund_policy
+  writes:
+  - cache:resolution
+- operation: getReservation
+  verb: GET
+  path: /reservations/{reservationId}
+  scope: venue
+  permission: ORDER_VIEW
+  audience: null
+  offline: false
+  reads:
+  - orders.reservation
+  writes: []
+- operation: holdOrder
+  verb: POST
+  path: /orders/{orderId}/hold
+  scope: workstation
+  permission: ORDER_MODIFY
+  audience: null
+  offline: true
+  reads:
+  - cache:idempotency
+  - orders.order_line
+  - orders.payment
+  - orders.sales_order
+  writes:
+  - cache:idempotency
+  - orders.order_line
+  - orders.payment
+  - orders.sales_order
+- operation: inquirePaymentStatus
+  verb: POST
+  path: /payments/{paymentId}/inquiry
+  scope: workstation
+  permission: ORDER_CREATE
+  audience: null
+  offline: false
+  reads:
+  - cache:idempotency
+  - orders.payment
+  writes:
+  - cache:idempotency
+  - orders.payment
+- operation: issueInvitation
+  verb: POST
+  path: /invitations
+  scope: venue
+  permission: ORDER_CREATE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - catalogue.product
+  - identity.principal
+  - orders.invitation_allowance
+  writes:
+  - access.entitlement
+  - cache:idempotency
+  - orders.invitation
+  - orders.invitation_allowance
+- operation: issueWalletPass
+  verb: POST
+  path: /wallet-passes
+  scope: venue
+  permission: ORDER_VIEW
+  audience:
+  - staff
+  - guest
+  offline: false
+  reads:
+  - access.entitlement
+  - cache:idempotency
+  - orders.ticket_template
+  writes:
+  - cache:idempotency
+  - orders.wallet_pass
+- operation: listAbandonedCarts
+  verb: GET
+  path: /carts/abandoned
+  scope: venue
+  permission: MARKETING_MANAGE
+  audience: null
+  offline: false
+  reads:
+  - orders.cart
+  - orders.cart_line
+  - pii.subject_contact
+  writes: []
+- operation: listChargebacks
+  verb: GET
+  path: /chargebacks
+  scope: venue
+  permission: ORDER_REFUND_APPROVE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - orders.chargeback
+  - orders.payment
+  writes: []
+- operation: listFraudRules
+  verb: GET
+  path: /fraud-rules
+  scope: tenant
+  permission: ORDER_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - orders.fraud_rule
+  writes: []
+- operation: listInvitationAllowances
+  verb: GET
+  path: /invitations/allowances
+  scope: venue
+  permission: ORDER_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - identity.principal
+  - orders.invitation_allowance
+  writes: []
+- operation: listMyOrders
+  verb: GET
+  path: /my/orders
+  scope: tenant
+  permission: null
+  audience:
+  - guest
+  offline: false
+  reads:
+  - orders.order_line
+  - orders.sales_order
+  - pii.subject
+  writes: []
+- operation: listOrderRefunds
+  verb: GET
+  path: /orders/{orderId}/refunds
+  scope: venue
+  permission: ORDER_VIEW
+  audience: null
+  offline: true
+  reads:
+  - orders.refund
+  writes: []
+- operation: listOrders
+  verb: GET
+  path: /orders
+  scope: venue
+  permission: ORDER_VIEW
+  audience: null
+  offline: true
+  reads:
+  - orders.order_line
+  - orders.sales_order
+  writes: []
+- operation: listPaymentProviders
+  verb: GET
+  path: /payment-providers
+  scope: venue
+  permission: ORDER_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - orders.payment_provider
+  - orders.payment_routing
+  writes: []
+- operation: listPaymentTokens
+  verb: GET
+  path: /payment-tokens
+  scope: venue
+  permission: ORDER_VIEW
+  audience:
+  - staff
+  - guest
+  offline: false
+  reads:
+  - orders.payment_token
+  writes: []
+- operation: listReservations
+  verb: GET
+  path: /reservations
+  scope: venue
+  permission: ORDER_VIEW
+  audience: null
+  offline: false
+  reads:
+  - orders.reservation
+  writes: []
+- operation: listSyncRejections
+  verb: GET
+  path: /sync/rejections
+  scope: venue
+  permission: ORDER_VIEW
+  audience: null
+  offline: false
+  reads:
+  - sync.rejection
+  writes: []
+- operation: modifyOrder
+  verb: POST
+  path: /orders/{orderId}/modify
+  scope: venue
+  permission: ORDER_MODIFY
+  audience: null
+  offline: false
+  reads:
+  - cache:idempotency
+  - orders.order_line
+  - orders.payment
+  - orders.sales_order
+  writes:
+  - cache:idempotency
+  - orders.order_line
+  - orders.payment
+  - orders.sales_order
+- operation: openGuestCreditAccount
+  verb: POST
+  path: /guest-credit-accounts
+  scope: venue
+  permission: ORDER_CREATE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - pii.subject
+  writes:
+  - cache:idempotency
+- operation: overrideCreditLimit
+  verb: POST
+  path: /b2b-accounts/{accountId}/credit/override
+  scope: venue
+  permission: CREDIT_OVERRIDE
+  audience: null
+  offline: false
+  reads:
+  - cache:idempotency
+  - orders.b2b_credit
+  - orders.credit_override
+  writes:
+  - cache:idempotency
+  - orders.b2b_credit
+  - orders.credit_override
+- operation: payByLink
+  verb: POST
+  path: /payment-links/{token}/pay
+  scope: venue
+  permission: ORDER_CREATE
+  audience:
+  - guest
+  - anonymous
+  offline: false
+  reads:
+  - cache:idempotency
+  - orders.payment_link
+  - orders.payment_provider
+  - orders.reservation
+  - orders.sales_order
+  writes:
+  - access.entitlement
+  - cache:idempotency
+  - orders.payment
+  - orders.payment_link
+  - orders.reservation
+  - orders.sales_order
+- operation: printTicketProof
+  verb: POST
+  path: /ticket-templates/{templateId}/proof
+  scope: venue
+  permission: ORDER_REPRINT
+  audience:
+  - staff
+  offline: true
+  reads:
+  - cache:idempotency
+  - catalogue.product
+  - orders.ticket_template
+  writes:
+  - cache:idempotency
+- operation: pushWalletPassUpdate
+  verb: POST
+  path: /wallet-passes/{passId}/push
+  scope: venue
+  permission: ORDER_MODIFY
+  audience:
+  - staff
+  - service
+  offline: false
+  reads:
+  - access.entitlement
+  - cache:idempotency
+  - orders.wallet_pass
+  writes:
+  - cache:idempotency
+  - orders.wallet_pass
+- operation: quoteUpgrade
+  verb: POST
+  path: /orders/{orderId}/upgrade-quote
+  scope: venue
+  permission: ORDER_MODIFY
+  audience:
+  - staff
+  - guest
+  offline: false
+  reads:
+  - access.entitlement
+  - catalogue.price
+  - catalogue.product
+  - orders.sales_order
+  writes: []
+- operation: reissueEntitlement
+  verb: POST
+  path: /entitlements/{entitlementId}/reissue
+  scope: venue
+  permission: ORDER_EXCHANGE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - access.entitlement
+  - cache:idempotency
+  - catalogue.product
+  writes:
+  - access.entitlement
+  - cache:idempotency
+- operation: releaseStoredValue
+  verb: POST
+  path: /stored-value/authorisations/{authorisationId}/release
+  scope: venue
+  permission: ORDER_CREATE
+  audience:
+  - staff
+  - device
+  offline: false
+  reads:
+  - orders.stored_value_authorisation
+  writes:
+  - cache:idempotency
+  - orders.stored_value_authorisation
+- operation: removeCartLine
+  verb: DELETE
+  path: /carts/{cartId}/lines/{lineId}
+  scope: venue
+  permission: null
+  audience: null
+  offline: false
+  reads:
+  - cache:idempotency
+  - orders.cart_line
+  writes:
+  - cache:idempotency
+  - catalogue.inventory_lease
+  - orders.cart_line
+- operation: reprintOrder
+  verb: POST
+  path: /orders/{orderId}/reprints
+  scope: venue
+  permission: ORDER_REPRINT
+  audience: null
+  offline: true
+  reads:
+  - cache:idempotency
+  - orders.sales_order
+  writes:
+  - cache:idempotency
+  - orders.sales_order
+- operation: rescheduleOrder
+  verb: POST
+  path: /orders/{orderId}/reschedule
+  scope: venue
+  permission: ORDER_RESCHEDULE
+  audience: null
+  offline: false
+  reads:
+  - cache:idempotency
+  - orders.sales_order
+  writes:
+  - cache:idempotency
+  - orders.sales_order
+- operation: resendPaymentLink
+  verb: POST
+  path: /payment-links/{linkId}/resend
+  scope: venue
+  permission: ORDER_MODIFY
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - orders.payment_link
+  - pii.subject
+  writes:
+  - cache:idempotency
+  - marketing.message_dispatch
+  - orders.payment_link
+- operation: respondToChargeback
+  verb: POST
+  path: /chargebacks/{chargebackId}/respond
+  scope: venue
+  permission: ORDER_REFUND_APPROVE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - access.scan_event
+  - cache:idempotency
+  - orders.chargeback
+  - orders.payment
+  - orders.sales_order
+  writes:
+  - cache:idempotency
+  - ledger.entry
+  - orders.chargeback
+- operation: resumeOrder
+  verb: POST
+  path: /orders/{orderId}/resume
+  scope: workstation
+  permission: ORDER_MODIFY
+  audience: null
+  offline: false
+  reads:
+  - cache:idempotency
+  - orders.order_line
+  - orders.payment
+  - orders.sales_order
+  writes:
+  - cache:idempotency
+  - orders.order_line
+  - orders.payment
+  - orders.sales_order
+- operation: setB2bCreditLimit
+  verb: PUT
+  path: /b2b-accounts/{accountId}/credit
+  scope: venue
+  permission: CREDIT_MANAGE
+  audience: null
+  offline: false
+  reads:
+  - cache:idempotency
+  - orders.b2b_credit
+  writes:
+  - cache:idempotency
+  - orders.b2b_credit
+- operation: setFraudRules
+  verb: PUT
+  path: /fraud-rules
+  scope: tenant
+  permission: ORDER_MODIFY
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - orders.fraud_rule
+  writes:
+  - cache:idempotency
+  - cache:resolution
+  - orders.fraud_rule
+- operation: setPaymentProvider
+  verb: PUT
+  path: /payment-providers
+  scope: venue
+  permission: TENANT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - orders.payment_provider
+  writes:
+  - cache:idempotency
+  - orders.payment_provider
+  - orders.payment_routing
+- operation: setRefundPolicy
+  verb: PUT
+  path: /venues/{venueId}/refund-policy
+  scope: venue
+  permission: REGION_CONFIGURE
+  audience: null
+  offline: false
+  reads:
+  - cache:idempotency
+  - orders.refund_policy
+  writes:
+  - cache:idempotency
+  - cache:resolution
+  - orders.refund_policy
+- operation: shareEntitlement
+  verb: POST
+  path: /entitlements/{entitlementId}/share
+  scope: venue
+  permission: ORDER_MODIFY
+  audience:
+  - staff
+  - guest
+  offline: false
+  reads:
+  - access.entitlement
+  - cache:idempotency
+  - catalogue.entitlement_template
+  - identity.grant
+  writes:
+  - access.entitlement
+  - cache:idempotency
+  - identity.grant
+- operation: splitOrder
+  verb: POST
+  path: /orders/{orderId}/split
+  scope: venue
+  permission: ORDER_MODIFY
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - orders.order_line
+  - orders.payment
+  - orders.sales_order
+  writes:
+  - cache:idempotency
+  - orders.order_line
+  - orders.sales_order
+- operation: storePaymentToken
+  verb: POST
+  path: /payment-tokens
+  scope: venue
+  permission: ORDER_CREATE
+  audience:
+  - staff
+  - guest
+  offline: false
+  reads:
+  - cache:idempotency
+  - marketing.consent_record
+  - orders.payment_provider
+  writes:
+  - cache:idempotency
+  - marketing.consent_record
+  - orders.payment_token
+- operation: syncOrders
+  verb: POST
+  path: /sync/orders
+  scope: workstation
+  permission: ORDER_CREATE
+  audience: null
+  offline: false
+  reads:
+  - orders.sales_order
+  writes:
+  - orders.sales_order
+- operation: transferOrderTickets
+  verb: POST
+  path: /orders/{orderId}/transfer
+  scope: venue
+  permission: null
+  audience: null
+  offline: false
+  reads:
+  - access.entitlement
+  - cache:idempotency
+  - orders.ticket_transfer
+  writes:
+  - access.entitlement
+  - cache:idempotency
+  - orders.ticket_transfer
+- operation: updateCartLine
+  verb: PATCH
+  path: /carts/{cartId}/lines/{lineId}
+  scope: venue
+  permission: null
+  audience: null
+  offline: false
+  reads:
+  - cache:idempotency
+  - catalogue.envelope
+  - orders.cart_line
+  writes:
+  - cache:idempotency
+  - catalogue.inventory_lease
+  - orders.cart_line
+- operation: voidOrder
+  verb: POST
+  path: /orders/{orderId}/voids
+  scope: venue
+  permission: ORDER_VOID
+  audience: null
+  offline: true
+  reads:
+  - cache:idempotency
+  - orders.order_line
+  - orders.payment
+  - orders.sales_order
+  writes:
+  - cache:idempotency
+  - orders.order_line
+  - orders.payment
+  - orders.sales_order
+- operation: voidPayment
+  verb: POST
+  path: /payments/{paymentId}/void
+  scope: venue
+  permission: PAYMENT_VOID
+  audience: null
+  offline: false
+  reads:
+  - cache:idempotency
+  - orders.payment
+  writes:
+  - cache:idempotency
+  - orders.payment

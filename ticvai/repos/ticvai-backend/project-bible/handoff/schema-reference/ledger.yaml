@@ -1,0 +1,472 @@
+# ledger — derived from the API contracts, not hand-written
+# Migration: V0008
+#
+# Columns come from schema properties. Types are inferred: format uuid to uuid,
+# date-time to timestamptz, ULID patterns to char(26), Money to numeric(18,4).
+# What is NOT here: partitioning, RLS policies, indexes, the PII split. That is
+# storage design and lives in the migration scripts.
+
+module: ledger
+migration: V0008
+tableCount: 13
+columnCount: 136
+tables:
+  ledger.account:
+    derivedFrom: Account
+    columns:
+    - name: id
+      type: uuid
+      required: true
+    - name: code
+      type: varchar(64)
+      required: true
+    - name: external_code
+      type: text
+      required: false
+      description: Code in the client's own chart. Used on export so their team sees their codes.
+    - name: name
+      type: varchar(200)
+      required: true
+    - name: type
+      type: jsonb
+      required: true
+    - name: parent_id
+      type: uuid
+      required: false
+    - name: legal_entity_id
+      type: uuid
+      required: true
+    - name: currency
+      type: char(3)
+      required: false
+    - name: is_postable
+      type: boolean
+      required: true
+      description: False for parent accounts, which aggregate only.
+    - name: is_active
+      type: boolean
+      required: true
+    - name: balance
+      type: numeric(18,4)
+      required: false
+  ledger.account_mapping:
+    derivedFrom: AccountMapping
+    columns:
+    - name: event_type
+      type: jsonb
+      required: true
+    - name: debit_account_id
+      type: uuid
+      required: true
+    - name: credit_account_id
+      type: uuid
+      required: true
+    - name: venue_id
+      type: uuid
+      required: false
+      description: Null applies the mapping to every venue in the region.
+  ledger.cost_center:
+    derivedFrom: CostCenter
+    columns:
+    - name: id
+      type: uuid
+      required: true
+    - name: code
+      type: text
+      required: true
+    - name: name
+      type: text
+      required: true
+    - name: parent_id
+      type: uuid
+      required: false
+    - name: venue_id
+      type: uuid
+      required: false
+    - name: is_active
+      type: boolean
+      required: false
+  ledger.entry:
+    derivedFrom: LedgerEntry
+    columns:
+    - name: id
+      type: text
+      required: true
+    - name: journal_entry_id
+      type: text
+      required: true
+    - name: account_id
+      type: uuid
+      required: true
+    - name: account_code
+      type: text
+      required: false
+    - name: debit
+      type: numeric(18,4)
+      required: true
+    - name: credit
+      type: numeric(18,4)
+      required: true
+    - name: venue_id
+      type: uuid
+      required: false
+    - name: cost_center_id
+      type: uuid
+      required: false
+    - name: source
+      type: jsonb
+      required: false
+    - name: source_id
+      type: text
+      required: false
+    - name: description
+      type: text
+      required: false
+    - name: posted_at
+      type: timestamptz
+      required: true
+  ledger.fiscal_period:
+    derivedFrom: FiscalPeriod
+    columns:
+    - name: id
+      type: uuid
+      required: true
+    - name: legal_entity_id
+      type: uuid
+      required: true
+    - name: name
+      type: text
+      required: true
+    - name: start_date
+      type: date
+      required: true
+    - name: end_date
+      type: date
+      required: true
+    - name: status
+      type: jsonb
+      required: true
+    - name: closed_by_principal_id
+      type: uuid
+      required: false
+    - name: closed_at
+      type: timestamptz
+      required: false
+  ledger.journal_entry:
+    derivedFrom: JournalEntry
+    columns:
+    - name: id
+      type: text
+      required: true
+    - name: entry_number
+      type: text
+      required: true
+    - name: fiscal_period_id
+      type: uuid
+      required: true
+    - name: status
+      type: jsonb
+      required: true
+    - name: source
+      type: jsonb
+      required: true
+    - name: source_id
+      type: text
+      required: false
+      description: The order, refund or run that generated this entry.
+    - name: description
+      type: text
+      required: true
+    - name: reference
+      type: text
+      required: false
+    - name: lines
+      type: jsonb
+      required: true
+    - name: total_debit
+      type: numeric(18,4)
+      required: true
+    - name: total_credit
+      type: numeric(18,4)
+      required: true
+    - name: posted_by_principal_id
+      type: uuid
+      required: false
+    - name: approved_by_principal_id
+      type: uuid
+      required: false
+    - name: reversal_of_entry_id
+      type: text
+      required: false
+    - name: reversed_by_entry_id
+      type: text
+      required: false
+    - name: created_at
+      type: timestamptz
+      required: true
+    - name: posted_at
+      type: timestamptz
+      required: false
+  ledger.legal_entity:
+    derivedFrom: LegalEntity
+    columns:
+    - name: id
+      type: uuid
+      required: true
+    - name: code
+      type: varchar(64)
+      required: true
+    - name: name
+      type: varchar(200)
+      required: true
+    - name: country_code
+      type: text
+      required: true
+    - name: currency
+      type: char(3)
+      required: true
+    - name: currency_scale
+      type: integer
+      required: true
+    - name: tax_registration_number
+      type: text
+      required: false
+    - name: fiscal_year_start_month
+      type: integer
+      required: true
+    - name: region_ids
+      type: jsonb
+      required: false
+    - name: is_active
+      type: boolean
+      required: false
+  ledger.price_variance:
+    derivedFrom: PriceVariance
+    columns:
+    - name: id
+      type: text
+      required: true
+    - name: order_id
+      type: text
+      required: true
+    - name: order_line_id
+      type: text
+      required: true
+    - name: venue_id
+      type: uuid
+      required: true
+    - name: variant_id
+      type: uuid
+      required: false
+    - name: quoted_price
+      type: numeric(18,4)
+      required: true
+    - name: server_price
+      type: numeric(18,4)
+      required: true
+    - name: variance
+      type: numeric(18,4)
+      required: true
+    - name: catalogue_bundle_version
+      type: text
+      required: false
+      description: The bundle the terminal priced from. Turns "the price was wrong" into "the terminal
+        was two bundles behind", which is actionable.
+    - name: is_exception
+      type: boolean
+      required: true
+      description: Above the venue's configured variance threshold.
+    - name: review_status
+      type: jsonb
+      required: false
+    - name: review_outcome
+      type: text
+      required: false
+    - name: reviewed_by_principal_id
+      type: uuid
+      required: false
+    - name: journal_entry_id
+      type: text
+      required: false
+    - name: occurred_at
+      type: timestamptz
+      required: true
+  ledger.recognition_schedule:
+    derivedFrom: RecognitionSchedule
+    columns:
+    - name: id
+      type: uuid
+      required: true
+    - name: name
+      type: varchar(200)
+      required: true
+    - name: method
+      type: jsonb
+      required: true
+    - name: product_kinds
+      type: jsonb
+      required: true
+    - name: deferred_account_id
+      type: uuid
+      required: false
+    - name: recognised_account_id
+      type: uuid
+      required: false
+    - name: breakage_account_id
+      type: uuid
+      required: false
+    - name: breakage_after_days
+      type: integer
+      required: false
+      description: Days after expiry at which unredeemed value becomes breakage.
+    - name: is_active
+      type: boolean
+      required: false
+  ledger.settlement:
+    derivedFrom: Settlement
+    columns:
+    - name: id
+      type: uuid
+      required: true
+    - name: provider_name
+      type: text
+      required: true
+    - name: period_start
+      type: date
+      required: true
+    - name: period_end
+      type: date
+      required: true
+    - name: status
+      type: jsonb
+      required: true
+    - name: line_count
+      type: integer
+      required: false
+    - name: matched_count
+      type: integer
+      required: false
+    - name: exception_count
+      type: integer
+      required: false
+    - name: provider_gross
+      type: numeric(18,4)
+      required: false
+    - name: provider_fees
+      type: numeric(18,4)
+      required: false
+    - name: provider_net
+      type: numeric(18,4)
+      required: false
+    - name: ledger_gross
+      type: numeric(18,4)
+      required: false
+    - name: difference
+      type: numeric(18,4)
+      required: false
+    - name: ingested_at
+      type: timestamptz
+      required: true
+    - name: completed_at
+      type: timestamptz
+      required: false
+  ledger.settlement_exception:
+    derivedFrom: SettlementException
+    columns:
+    - name: id
+      type: text
+      required: true
+    - name: settlement_id
+      type: uuid
+      required: true
+    - name: kind
+      type: text
+      required: true
+    - name: provider_reference
+      type: text
+      required: true
+    - name: payment_id
+      type: text
+      required: false
+    - name: amount
+      type: numeric(18,4)
+      required: true
+    - name: expected_amount
+      type: numeric(18,4)
+      required: false
+    - name: resolution
+      type: text
+      required: false
+    - name: resolved_by_principal_id
+      type: uuid
+      required: false
+    - name: resolved_at
+      type: timestamptz
+      required: false
+  ledger.tax_code:
+    derivedFrom: TaxCode
+    columns:
+    - name: id
+      type: uuid
+      required: true
+    - name: code
+      type: varchar(64)
+      required: true
+    - name: name
+      type: varchar(200)
+      required: true
+    - name: country_code
+      type: text
+      required: true
+    - name: rate
+      type: numeric
+      required: true
+    - name: compound_on_tax_code_id
+      type: uuid
+      required: false
+      description: When set, this tax applies to the base **plus** the referenced tax, not to the base
+        alone. Ordering is explicit rather than implied.
+    - name: is_inclusive
+      type: boolean
+      required: false
+      description: True when the displayed price already contains this tax.
+    - name: account_id
+      type: uuid
+      required: false
+    - name: effective_from
+      type: date
+      required: true
+    - name: effective_to
+      type: date
+      required: false
+    - name: is_active
+      type: boolean
+      required: true
+  ledger.tax_exemption:
+    derivedFrom: TaxExemption
+    columns:
+    - name: id
+      type: uuid
+      required: true
+    - name: scope
+      type: text
+      required: true
+    - name: scope_ref
+      type: text
+      required: false
+      description: Identifier of the exempt subject, matching `scope`.
+    - name: tax_code_id
+      type: uuid
+      required: true
+    - name: reason
+      type: varchar(500)
+      required: true
+    - name: certificate_reference
+      type: text
+      required: false
+    - name: valid_from
+      type: date
+      required: false
+    - name: valid_to
+      type: date
+      required: false

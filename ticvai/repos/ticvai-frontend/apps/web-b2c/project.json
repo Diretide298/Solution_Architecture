@@ -1,0 +1,15 @@
+{
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "name": "web-b2c",
+  "sourceRoot": "apps/web-b2c/src",
+  "projectType": "application",
+  "tags": ["type:app", "platform:web"],
+  "targets": {
+    "lint": { "executor": "@nx/eslint:lint" },
+    "test": { "executor": "@nx/vite:test" },
+    "typecheck": {
+      "executor": "nx:run-commands",
+      "options": { "command": "tsc -p apps/web-b2c/tsconfig.json --noEmit" }
+    }
+  }
+}

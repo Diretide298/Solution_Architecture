@@ -1,0 +1,1414 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>P01 Guest Web — wireframe board</title>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+/* **The Claude Design system, applied to the generated boards on 24 August.**
+   Three client packs render at 1280x700 in this system and 385 screens rendered as
+   dashed-box wireframes — and **a client reviewing both reads the difference as *those screens
+   are not done*.** The information is identical either way; the fidelity is what was being
+   judged.
+
+   Tokens are the packs': #0B1324 rail, #0D6EFD primary, #00B8FF accent, Manrope for UI,
+   IBM Plex Mono for figures and codes. */
+:root{--ink:#0B1324;--mut:#5A6577;--dim:#9AA5B6;--line:#E8ECF3;--edge:#E3E8F0;
+--brand:#0D6EFD;--accent:#00B8FF;--rail:#0B1324;--paper:#FFF;--wash:#F7F9FC;
+--ok:#0E9F6E;--okbg:#E8F6F0;--okline:#BFE3D2;--warn:#8A6D00;--warnbg:#FFF7E6;
+--bad:#A81E1E;--badbg:#FDECEC}
+*{box-sizing:border-box}
+body{margin:0;background:#F2F5F9;color:var(--ink);
+font-family:Manrope,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:13px;line-height:1.55}
+a{color:inherit}
+.wrap{max-width:1420px;margin:0 auto;padding:22px 34px 90px}
+.home{font-size:11.5px;color:var(--mut);text-decoration:none;letter-spacing:.02em}
+.head{display:flex;align-items:baseline;justify-content:space-between;gap:20px;
+margin:14px 0 6px;padding-bottom:16px;border-bottom:2px solid var(--ink)}
+.mark{font-size:13px;font-weight:800;letter-spacing:.16em;
+background:linear-gradient(90deg,var(--brand),var(--accent));-webkit-background-clip:text;
+background-clip:text;color:transparent}
+h1{font-size:19px;font-weight:800;letter-spacing:-.015em;margin:0}
+.meta{font-size:11px;color:var(--mut);font-family:'IBM Plex Mono',ui-monospace,monospace;line-height:1.7}
+.lede{font-size:12.5px;color:var(--mut);max-width:82ch;margin:16px 0 0;line-height:1.65}
+.grp{font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:11px;font-weight:600;
+letter-spacing:.14em;color:var(--dim);text-transform:uppercase;margin:52px 0 18px;
+padding-bottom:9px;border-bottom:1px solid var(--line)}
+.stack{display:flex;flex-direction:column;gap:52px}
+.scr{display:flex;flex-direction:column;gap:13px;scroll-margin-top:24px}
+.hdr{display:flex;align-items:baseline;gap:9px;flex-wrap:wrap}
+.code{font-family:'IBM Plex Mono',monospace;font-size:12px;color:#8494A8}
+.ttl{font-size:16.5px;font-weight:800;letter-spacing:-.015em}
+.pur{font-size:12px;color:#6B7280;margin-top:3px;max-width:96ch}
+.pill{font-size:9px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;
+padding:2px 7px;border-radius:5px;background:#EEF3FA;color:#4A5A70}
+.pill.named{background:var(--warnbg);color:var(--warn)}
+.pill.off{background:var(--okbg);color:var(--ok)}
+
+/* the frame — 1280x700, the packs' dimension */
+.frame{width:1280px;height:700px;display:flex;background:var(--wash);border:1px solid var(--edge);
+border-radius:14px;overflow:hidden;box-shadow:0 16px 38px rgba(12,35,64,.09)}
+.rail{flex:none;width:180px;background:var(--rail);display:flex;flex-direction:column;position:relative}
+.rail::before{content:'';position:absolute;inset:0;
+background:radial-gradient(300px 200px at 0% 4%,rgba(0,184,255,.20),transparent 70%);pointer-events:none}
+.brand{position:relative;padding:15px 14px 13px;border-bottom:1px solid rgba(255,255,255,.08)}
+.brand b{display:block;font-size:14px;font-weight:800;letter-spacing:.1em;
+background:linear-gradient(90deg,#4DA3FF,var(--accent));-webkit-background-clip:text;
+background-clip:text;color:transparent}
+.brand span{display:block;font-size:9.5px;color:#7FA3C9;margin-top:5px}
+.nav{position:relative;display:flex;flex-direction:column;gap:2px;padding:11px 9px}
+.nav i{display:block;padding:8px 10px;border-radius:9px;font-size:11.5px;font-style:normal;color:#8FA8C4}
+.nav i.on{background:linear-gradient(90deg,rgba(13,110,253,.30),rgba(0,184,255,.10));
+color:#fff;font-weight:700}
+.body{flex:1;display:flex;flex-direction:column;min-width:0}
+.top{flex:none;height:54px;display:flex;align-items:center;gap:12px;padding:0 18px;
+background:var(--paper);border-bottom:1px solid var(--line)}
+.top h2{font-size:13.5px;font-weight:800;letter-spacing:-.01em;margin:0}
+.top small{display:block;font-size:10px;color:var(--dim);font-weight:500}
+.acts{margin-left:auto;display:flex;gap:6px}
+.chip{height:32px;display:flex;align-items:center;gap:6px;padding:0 11px;border:1px solid var(--edge);
+border-radius:8px;font-size:11px;font-weight:700;color:var(--mut);background:var(--paper)}
+.chip.live{background:var(--okbg);border-color:var(--okline);color:var(--ok)}
+.chip.live::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--ok)}
+.chip.cta{background:var(--brand);border-color:var(--brand);color:#fff}
+.canvas{flex:1;display:flex;flex-direction:column;gap:12px;padding:14px 16px;min-height:0;overflow:hidden}
+.kpis{flex:none;display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.kpi{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:11px 13px;
+display:flex;flex-direction:column;gap:4px}
+.kpi b{font-size:9.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--dim)}
+.kpi span{font-family:'IBM Plex Mono',monospace;font-size:19px;font-weight:600;letter-spacing:-.02em}
+.panel{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:12px 14px;
+display:flex;flex-direction:column;gap:8px;min-height:0}
+.panel > b{font-size:11px;font-weight:800;letter-spacing:-.005em}
+.panel .why{font-size:10px;color:#7C8899;font-style:italic;line-height:1.5}
+.kind{font-family:'IBM Plex Mono',monospace;font-size:9px;color:var(--dim);
+letter-spacing:.06em;text-transform:uppercase}
+.rows{display:flex;flex-direction:column;gap:6px}
+.row{display:grid;grid-template-columns:1.6fr 1fr 1fr .7fr;gap:10px;align-items:center;
+padding:7px 0;border-top:1px solid #F0F3F8}
+.row:first-child{border-top:0;font-size:9.5px;font-weight:700;letter-spacing:.06em;
+text-transform:uppercase;color:var(--dim)}
+.bar{height:7px;border-radius:4px;background:#EDF1F7}
+.bar i{display:block;height:100%;border-radius:4px;
+background:linear-gradient(90deg,var(--brand),var(--accent))}
+.side{flex:none;width:250px;display:flex;flex-direction:column;gap:10px}
+.two{flex:1;display:flex;gap:12px;min-height:0}
+.grow{flex:1;min-width:0}
+.strip{flex:none;height:26px;display:flex;align-items:center;gap:8px;padding:0 18px;
+background:var(--warnbg);color:var(--warn);font-size:10px;font-weight:700;
+letter-spacing:.05em;text-transform:uppercase;border-bottom:1px solid #F0E0B8}
+.dark .frame{background:#0A1524}
+.dark .top{background:#0E2A4C;border-color:#1E3A5F;color:#E6F0FA}
+.dark .top small{color:#7FA3C9}
+.dark .canvas{background:#0A1524}
+.dark .kpi,.dark .panel{background:#0E2A4C;border-color:#1E3A5F;color:#E6F0FA}
+.dark .row{border-color:#193353}
+.dark .chip{background:#0E2A4C;border-color:#1E3A5F;color:#9FC0E0}
+
+.foot{font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:10px;line-height:1.85;color:#7C8899}
+.foot b{color:#4A5566;font-weight:600}
+.foot .warn{color:var(--warn)}
+.bottom{margin-top:64px;padding-top:16px;border-top:1px solid var(--line);
+display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
+</style></head><body>
+<div class="wrap">
+  <a class="home" href="TICVAI%20Wireframe%20Boards.dc.html">&larr; All boards</a>
+  <div class="head">
+    <div><span class="mark">TICVAI</span>
+      <h1>P01 · Guest Web — Storefront <span style="font-weight:600;color:#6B7280">(46 screens)</span></h1></div>
+    <div class="meta">guest · web · guest-web</div>
+  </div>
+  <p class="lede"></p>
+  <div class="grp">01 — Discovery &amp; Browse · 4 screens</div><div class="stack">
+      <div id="web-001" class="scr">
+        <div>
+          <div class="hdr"><span class="code">WEB-001</span>
+            <span class="ttl">Home / Landing</span></div>
+          <div class="pur">Show a guest what is on and give them one obvious way to start booking.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>Guest</b><span>Discovery &amp; Browse</span></div><nav class="nav"><i class="">What&#x27;s on</i><i class="on">My tickets</i><i class="">Food &amp; drink</i><i class="">Map</i><i class="">Help</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Home / Landing</h2>
+                <small>Guest Web · wave 1 · compact</small></div>
+              <div class="acts"><div class="chip">Sign in</div><div class="chip cta">Basket</div></div>
+            </div>
+            
+            <div class="canvas">
+              
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">banner</span><div class="strip" style="height:auto;padding:6px 10px;border:0">notice</div><span class="why">Only when isInMaintenance. Tenant-branded, never a generic error page</span></div><div class="panel"><span class="kind">cardList</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">Section order comes from tenant configuration (WLB-011), not from code. A section referencing a disabled module must not render at all</span></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; getTenantAppStatus · getTenantConfig · listProducts</div>
+          <div><b>STATES</b> &middot; <span class="">loading · emptyFirstRun · emptyNoResults · emptyNoAccess · error</span></div>
+          
+          <div><b>GOES TO</b> &middot; entry point · WEB-002 · WEB-003 · WEB-004 · WEB-016 · WEB-036</div>
+        </div>
+      </div>
+      <div id="web-002" class="scr">
+        <div>
+          <div class="hdr"><span class="code">WEB-002</span>
+            <span class="ttl">Event &amp; Attraction Listing</span></div>
+          <div class="pur">Browse and filter everything bookable.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>Guest</b><span>Discovery &amp; Browse</span></div><nav class="nav"><i class="">What&#x27;s on</i><i class="on">My tickets</i><i class="">Food &amp; drink</i><i class="">Map</i><i class="">Help</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Event &amp; Attraction Listing</h2>
+                <small>Guest Web · wave 1 · compact</small></div>
+              <div class="acts"><div class="chip">Sign in</div><div class="chip cta">Basket</div></div>
+            </div>
+            
+            <div class="canvas">
+              
+              <div class="two"><div class="grow"><div class="panel"><b>Search events and attractions</b><div class="chip">Search events and attractions</div></div><div class="panel"><b>Category</b><div class="chip">Category</div></div><div class="panel"><b>Date</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">Format from region settings, not a locale guess</span></div></div><div class="side"><div class="panel"><span class="kind">cardList</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">Cursor pagination. Infinite scroll with an explicit load-more fallback</span></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; listProducts · listPerformances · searchCatalogue</div>
+          <div><b>STATES</b> &middot; <span class="">loading · emptyFirstRun · emptyNoResults · emptyNoAccess · error</span></div>
+          <div><b>ARRIVES WITH</b> &middot; eventId&larr;deepLink</div>
+          <div><b>GOES TO</b> &middot; WEB-001 · WEB-003 · WEB-004</div>
+        </div>
+      </div>
+      <div id="web-003" class="scr">
+        <div>
+          <div class="hdr"><span class="code">WEB-003</span>
+            <span class="ttl">Search Results</span></div>
+          <div class="pur">Find something when the guest does not know what it is called.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>Guest</b><span>Discovery &amp; Browse</span></div><nav class="nav"><i class="">What&#x27;s on</i><i class="on">My tickets</i><i class="">Food &amp; drink</i><i class="">Map</i><i class="">Help</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Search Results</h2>
+                <small>Guest Web · wave 1 · compact</small></div>
+              <div class="acts"><div class="chip">Sign in</div><div class="chip cta">Basket</div></div>
+            </div>
+            
+            <div class="canvas">
+              
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">searchField</span><div class="chip">Search</div></div><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; searchCatalogue · listProducts</div>
+          <div><b>STATES</b> &middot; <span class="">loading · emptyFirstRun · emptyNoResults · emptyNoAccess · error</span></div>
+          
+          <div><b>GOES TO</b> &middot; WEB-001 · WEB-002 · WEB-004</div>
+        </div>
+      </div>
+      <div id="web-004" class="scr">
+        <div>
+          <div class="hdr"><span class="code">WEB-004</span>
+            <span class="ttl">Event / Attraction Detail</span></div>
+          <div class="pur">Decide whether to book this.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>Guest</b><span>Discovery &amp; Browse</span></div><nav class="nav"><i class="">What&#x27;s on</i><i class="on">My tickets</i><i class="">Food &amp; drink</i><i class="">Map</i><i class="">Help</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Event / Attraction Detail</h2>
+                <small>Guest Web · wave 1 · compact</small></div>
+              <div class="acts"><div class="chip">Sign in</div><div class="chip cta">Basket</div></div>
+            </div>
+            
+            <div class="canvas">
+              
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">detailPanel</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><span class="kind">banner</span><div class="strip" style="height:auto;padding:6px 10px;border:0">notice</div><span class="why">Shown only when withdrawn — reachable via a stale link but no longer sellable. A silent 404 on a shared link is a bad guest experience</span></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; getProduct · listPerformances</div>
+          <div><b>STATES</b> &middot; <span class="">loading · emptyFirstRun · emptyNoAccess · error</span></div>
+          <div><b>ARRIVES WITH</b> &middot; eventId&larr;WEB-002, productId&larr;WEB-001</div>
+          <div><b>GOES TO</b> &middot; WEB-001 · WEB-002 · WEB-003 · WEB-005</div>
+        </div>
+      </div></div><div class="grp">02 — Booking &amp; Selection · 5 screens</div><div class="stack">
+      <div id="web-005" class="scr">
+        <div>
+          <div class="hdr"><span class="code">WEB-005</span>
+            <span class="ttl">Ticket Type Selection</span></div>
+          <div class="pur">Choose which ticket and how many.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>Guest</b><span>Booking &amp; Selection</span></div><nav class="nav"><i class="">What&#x27;s on</i><i class="on">My tickets</i><i class="">Food &amp; drink</i><i class="">Map</i><i class="">Help</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Ticket Type Selection</h2>
+                <small>Guest Web · wave 1 · compact</small></div>
+              <div class="acts"><div class="chip">Sign in</div><div class="chip cta">Basket</div></div>
+            </div>
+            
+            <div class="canvas">
+              
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">cardList</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">Each row is a variant with a stepper. Price updates live</span></div><div class="panel"><span class="kind">banner</span><div class="strip" style="height:auto;padding:6px 10px;border:0">notice</div><span class="why">Shows near-miss offers — &quot;add one more for the family rate&quot;. Uses the rejected list, which exists precisely so this can be said</span></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; evaluatePromotions · listProductVariants</div>
+          <div><b>STATES</b> &middot; <span class="">loading · emptyFirstRun · emptyNoResults · emptyNoAccess · error</span></div>
+          <div><b>ARRIVES WITH</b> &middot; productId&larr;WEB-004</div>
+          <div><b>GOES TO</b> &middot; WEB-001 · WEB-006 · WEB-007 · WEB-008 · WEB-010</div>
+        </div>
+      </div>
+      <div id="web-006" class="scr">
+        <div>
+          <div class="hdr"><span class="code">WEB-006</span>
+            <span class="ttl">Date &amp; Session Selection</span></div>
+          <div class="pur">Pick a date and time that has capacity.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>Guest</b><span>Booking &amp; Selection</span></div><nav class="nav"><i class="">What&#x27;s on</i><i class="on">My tickets</i><i class="">Food &amp; drink</i><i class="">Map</i><i class="">Help</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Date &amp; Session Selection</h2>
+                <small>Guest Web · wave 1 · compact</small></div>
+              <div class="acts"><div class="chip">Sign in</div><div class="chip cta">Basket</div></div>
+            </div>
+            
+            <div class="canvas">
+              
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">datePicker</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">Sold-out dates disabled with a reason on hover, not hidden</span></div><div class="panel"><span class="kind">cardList</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">Session times with remaining counts. Availability is per channel — a session showing sold out here may still have counter allocation, which is correct behaviour and not a</span></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; getAvailability · acquireLease</div>
+          <div><b>STATES</b> &middot; <span class="">loading · emptyFirstRun · emptyNoResults · emptyNoAccess · error</span></div>
+          
+          <div><b>GOES TO</b> &middot; WEB-001 · WEB-005 · WEB-007 · WEB-008 · WEB-010</div>
+        </div>
+      </div>
+      <div id="web-007" class="scr">
+        <div>
+          <div class="hdr"><span class="code">WEB-007</span>
+            <span class="ttl">Seat Map Selection</span></div>
+          <div class="pur">Choose specific seats.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>Guest</b><span>Booking &amp; Selection</span></div><nav class="nav"><i class="">What&#x27;s on</i><i class="on">My tickets</i><i class="">Food &amp; drink</i><i class="">Map</i><i class="">Help</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Seat Map Selection</h2>
+                <small>Guest Web · wave 2 · compact</small></div>
+              <div class="acts"><div class="chip">Sign in</div><div class="chip cta">Basket</div></div>
+            </div>
+            
+            <div class="canvas">
+              
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">seatMap</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><span class="kind">banner</span><div class="strip" style="height:auto;padding:6px 10px;border:0">notice</div><span class="why">Hold countdown, always visible. A selection that expires silently while a guest enters card details is the worst outcome in this flow</span></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; createSeatHold · getSeatAvailability</div>
+          <div><b>STATES</b> &middot; <span class="">loading · emptyFirstRun · emptyNoAccess · error</span></div>
+          <div><b>ARRIVES WITH</b> &middot; performanceId&larr;deepLink</div>
+          <div><b>GOES TO</b> &middot; WEB-001 · WEB-005 · WEB-006 · WEB-008 · WEB-010</div>
+        </div>
+      </div>
+      <div id="web-008" class="scr">
+        <div>
+          <div class="hdr"><span class="code">WEB-008</span>
+            <span class="ttl">Add-ons &amp; Upsell</span></div>
+          <div class="pur">See add-ons &amp; upsell for this venue.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>Guest</b><span>Booking &amp; Selection</span></div><nav class="nav"><i class="">What&#x27;s on</i><i class="on">My tickets</i><i class="">Food &amp; drink</i><i class="">Map</i><i class="">Help</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Add-ons &amp; Upsell</h2>
+                <small>Guest Web · wave 2 · compact</small></div>
+              <div class="acts"><div class="chip">Sign in</div><div class="chip cta">Basket</div></div>
+            </div>
+            
+            <div class="canvas">
+              
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">detailPanel</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">Implied by the detail template — not declared on the screen.</span></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; addCartLine · getUpsellSuggestions</div>
+          <div><b>STATES</b> &middot; <span class="">loading · emptyFirstRun · emptyNoAccess · error</span></div>
+          <div><b>ARRIVES WITH</b> &middot; cartId&larr;session</div>
+          <div><b>GOES TO</b> &middot; WEB-001 · WEB-005 · WEB-006 · WEB-007</div>
+        </div>
+      </div>
+      <div id="web-009" class="scr">
+        <div>
+          <div class="hdr"><span class="code">WEB-009</span>
+            <span class="ttl">Wishlist</span></div>
+          <div class="pur">Find the right one quickly, and act on it without opening it.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>Guest</b><span>Booking &amp; Selection</span></div><nav class="nav"><i class="">What&#x27;s on</i><i class="on">My tickets</i><i class="">Food &amp; drink</i><i class="">Map</i><i class="">Help</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Wishlist</h2>
+                <small>Guest Web · wave 3 · compact</small></div>
+              <div class="acts"><div class="chip">Sign in</div><div class="chip cta">Basket</div></div>
+            </div>
+            
+            <div class="canvas">
+              
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">detailPanel</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">Implied by the detail template — not declared on the screen.</span></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; getWishlist · addToWishlist · removeFromWishlist</div>
+          <div><b>STATES</b> &middot; <span class="">loading · emptyFirstRun · error</span></div>
+          <div><b>ARRIVES WITH</b> &middot; itemId&larr;deepLink, subjectId&larr;session</div>
+          <div><b>GOES TO</b> &middot; WEB-001 · WEB-005 · WEB-006 · WEB-007</div>
+        </div>
+      </div></div><div class="grp">03 — Cart &amp; Checkout · 5 screens</div><div class="stack">
+      <div id="web-010" class="scr">
+        <div>
+          <div class="hdr"><span class="code">WEB-010</span>
+            <span class="ttl">Shopping Cart</span></div>
+          <div class="pur">Review and confirm what is being bought.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>Guest</b><span>Cart &amp; Checkout</span></div><nav class="nav"><i class="">What&#x27;s on</i><i class="on">My tickets</i><i class="">Food &amp; drink</i><i class="">Map</i><i class="">Help</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Shopping Cart</h2>
+                <small>Guest Web · wave 1 · compact</small></div>
+              <div class="acts"><div class="chip">Sign in</div><div class="chip cta">Basket</div></div>
+            </div>
+            
+            <div class="canvas">
+              
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">cartPanel</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><b>Promo code</b><div class="chip">Promo code</div></div><div class="panel"><span class="kind">banner</span><div class="strip" style="height:auto;padding:6px 10px;border:0">notice</div><span class="why">When a code does not apply, say which condition failed. &quot;Expired&quot; and &quot;already used&quot; are very different conversations</span></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; getCart · addCartLine · updateCartLine · removeCartLine +5</div>
+          <div><b>STATES</b> &middot; <span class="">loading · emptyFirstRun · emptyNoAccess · error</span></div>
+          <div><b>ARRIVES WITH</b> &middot; cartId&larr;WEB-008, code&larr;deepLink, lineId&larr;deepLink</div>
+          <div><b>GOES TO</b> &middot; WEB-001 · WEB-011 · WEB-012 · WEB-013</div>
+        </div>
+      </div>
+      <div id="web-011" class="scr">
+        <div>
+          <div class="hdr"><span class="code">WEB-011</span>
+            <span class="ttl">Guest Details &amp; Attendee Forms</span></div>
+          <div class="pur">Collect who is coming and how to reach them.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>Guest</b><span>Cart &amp; Checkout</span></div><nav class="nav"><i class="">What&#x27;s on</i><i class="on">My tickets</i><i class="">Food &amp; drink</i><i class="">Map</i><i class="">Help</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Guest Details &amp; Attendee Forms</h2>
+                <small>Guest Web · wave 1 · compact</small></div>
+              <div class="acts"><div class="chip">Sign in</div><div class="chip cta">Basket</div></div>
+            </div>
+            
+            <div class="canvas">
+              
+              <div class="two"><div class="grow"><div class="panel"><b>Full name</b><div class="chip">Full name</div></div><div class="panel"><b>Email</b><div class="chip">Email</div></div><div class="panel"><b>Mobile</b><div class="chip">Mobile</div></div></div><div class="side"><div class="panel"><span class="kind">detailPanel</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">Per-attendee fields appear only where the entitlement is name-bound. Most are not — identity and entitlement are separate concerns</span></div><div class="panel"><span class="kind">consentBlock</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">Marketing consent is opt-in and unticked. Transactional is required for service and is presented differently, not as a choice dressed as one</span></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; addToWishlist · getWishlist · listGuestDevices · recordConsent +6</div>
+          <div><b>STATES</b> &middot; <span class="">loading · emptyFirstRun · emptyNoAccess · error</span></div>
+          <div><b>ARRIVES WITH</b> &middot; deviceId&larr;deepLink, itemId&larr;deepLink, subjectId&larr;session</div>
+          <div><b>GOES TO</b> &middot; WEB-001 · WEB-010 · WEB-012 · WEB-013</div>
+        </div>
+      </div>
+      <div id="web-012" class="scr">
+        <div>
+          <div class="hdr"><span class="code">WEB-012</span>
+            <span class="ttl">Checkout — Payment</span></div>
+          <div class="pur">Take payment and create the order.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>Guest</b><span>Cart &amp; Checkout</span></div><nav class="nav"><i class="">What&#x27;s on</i><i class="on">My tickets</i><i class="">Food &amp; drink</i><i class="">Map</i><i class="">Help</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Checkout — Payment</h2>
+                <small>Guest Web · wave 1 · compact</small></div>
+              <div class="acts"><div class="chip">Sign in</div><div class="chip cta">Basket</div></div>
+            </div>
+            
+            <div class="canvas">
+              
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">paymentTerminal</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><span class="kind">cartPanel</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">Order summary stays visible throughout. Never collapsed behind a link</span></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; transferOrderTickets · createOrder · createPayment · getOrder</div>
+          <div><b>STATES</b> &middot; <span class="">loading · emptyFirstRun · emptyNoAccess · error</span></div>
+          <div><b>ARRIVES WITH</b> &middot; orderId&larr;deepLink</div>
+          <div><b>GOES TO</b> &middot; WEB-001 · WEB-010 · WEB-011 · WEB-013</div>
+        </div>
+      </div>
+      <div id="web-013" class="scr">
+        <div>
+          <div class="hdr"><span class="code">WEB-013</span>
+            <span class="ttl">Order Confirmation</span></div>
+          <div class="pur">Confirm the purchase and deliver the tickets.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>Guest</b><span>Cart &amp; Checkout</span></div><nav class="nav"><i class="">What&#x27;s on</i><i class="on">My tickets</i><i class="">Food &amp; drink</i><i class="">Map</i><i class="">Help</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Order Confirmation</h2>
+                <small>Guest Web · wave 1 · compact</small></div>
+              <div class="acts"><div class="chip">Sign in</div><div class="chip cta">Basket</div></div>
+            </div>
+            
+            <div class="canvas">
+              
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">banner</span><div class="strip" style="height:auto;padding:6px 10px;border:0">notice</div><span class="why">Confirmation with the order number prominent</span></div><div class="panel"><span class="kind">detailPanel</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><b>Add to wallet</b><div class="chip">Add to wallet</div></div></div><div class="side"><div class="panel"><b>Resend confirmation</b><div class="chip">Resend confirmation</div></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; transferOrderTickets · getOrder · reprintOrder</div>
+          <div><b>STATES</b> &middot; <span class="">loading · emptyFirstRun · emptyNoAccess · error</span></div>
+          <div><b>ARRIVES WITH</b> &middot; orderId&larr;WEB-012</div>
+          <div><b>GOES TO</b> &middot; WEB-001 · WEB-010 · WEB-011 · WEB-012 · WEB-018</div>
+        </div>
+      </div>
+      <div id="web-014" class="scr">
+        <div>
+          <div class="hdr"><span class="code">WEB-014</span>
+            <span class="ttl">Pay for a Booking</span></div>
+          <div class="pur">Pay for a booking somebody else took, without an account.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>Guest</b><span>Cart &amp; Checkout</span></div><nav class="nav"><i class="">What&#x27;s on</i><i class="on">My tickets</i><i class="">Food &amp; drink</i><i class="">Map</i><i class="">Help</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Pay for a Booking</h2>
+                <small>Guest Web · wave 1 · compact</small></div>
+              <div class="acts"><div class="chip">Sign in</div><div class="chip cta">Basket</div></div>
+            </div>
+            
+            <div class="canvas">
+              
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">detailPanel</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">Venue, lines, total. **What they are paying for, before how to pay** — a guest who booked by phone may not recognise a reference number.</span></div><div class="panel"><span class="kind">banner</span><div class="strip" style="height:auto;padding:6px 10px;border:0">notice</div><span class="why">The deadline, counted in time remaining rather than as a timestamp. **Expires in 46 minutes** is actionable; **expires at 14:32** needs arithmetic.</span></div><div class="panel"><b>Email for your tickets (optional)</b><div class="chip">Email for your tickets (optional)</div><span class="why">**Optional, and only to send the ticket.** Requiring an account before taking money is how a paid booking becomes an abandoned one.</span></div></div><div class="side"><div class="panel"><b>Pay now</b><div class="chip cta">Pay now</div></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; getPaymentLink · payByLink</div>
+          <div><b>STATES</b> &middot; <span class="">loading · emptyFirstRun · emptyNoAccess · error · expired · alreadyPaid · superseded</span></div>
+          <div><b>ARRIVES WITH</b> &middot; token&larr;deepLink</div>
+          <div><b>GOES TO</b> &middot; WEB-013</div>
+        </div>
+      </div></div><div class="grp">04 — High-Demand Access · 1 screens</div><div class="stack">
+      <div id="web-015" class="scr">
+        <div>
+          <div class="hdr"><span class="code">WEB-015</span>
+            <span class="ttl">Virtual Waiting Room</span></div>
+          <div class="pur">Virtual Waiting Room — the screen a person opens when they need to deal with virtual waiting room.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>Guest</b><span>High-Demand Access</span></div><nav class="nav"><i class="">What&#x27;s on</i><i class="on">My tickets</i><i class="">Food &amp; drink</i><i class="">Map</i><i class="">Help</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Virtual Waiting Room</h2>
+                <small>Guest Web · wave 2 · compact</small></div>
+              <div class="acts"><div class="chip">Sign in</div><div class="chip cta">Basket</div></div>
+            </div>
+            
+            <div class="canvas">
+              
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">detailPanel</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">Implied by the detail template — not declared on the screen.</span></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; joinQueue · getQueueEntry · getWaitTimes</div>
+          <div><b>STATES</b> &middot; <span class="">loading · emptyFirstRun · error</span></div>
+          <div><b>ARRIVES WITH</b> &middot; entryId&larr;deepLink</div>
+          <div><b>GOES TO</b> &middot; WEB-001</div>
+        </div>
+      </div></div><div class="grp">05 — Account &amp; Self-Service · 5 screens</div><div class="stack">
+      <div id="web-016" class="scr">
+        <div>
+          <div class="hdr"><span class="code">WEB-016</span>
+            <span class="ttl">Login / Register</span></div>
+          <div class="pur">Get a guest into the app, fast, on a device that may be shared.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>Guest</b><span>Account &amp; Self-Service</span></div><nav class="nav"><i class="">What&#x27;s on</i><i class="on">My tickets</i><i class="">Food &amp; drink</i><i class="">Map</i><i class="">Help</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Login / Register</h2>
+                <small>Guest Web · wave 1 · compact</small></div>
+              <div class="acts"><div class="chip">Sign in</div><div class="chip cta">Basket</div></div>
+            </div>
+            
+            <div class="canvas">
+              
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">searchField</span><div class="chip">Search</div></div><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; registerGuest · completeSsoAuthorization · enrolMfaMethod · getGuestSession +15</div>
+          <div><b>STATES</b> &middot; <span class="">loading · emptyFirstRun · emptyNoResults · error</span></div>
+          <div><b>ARRIVES WITH</b> &middot; cartId&larr;session, challengeId&larr;deepLink, methodId&larr;deepLink</div>
+          <div><b>GOES TO</b> &middot; WEB-001 · WEB-017 · WEB-018 · WEB-019</div>
+        </div>
+      </div>
+      <div id="web-017" class="scr">
+        <div>
+          <div class="hdr"><span class="code">WEB-017</span>
+            <span class="ttl">My Account Dashboard</span></div>
+          <div class="pur">The screen this app sits on. Everything else is entered from here and returns to it.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>Guest</b><span>Account &amp; Self-Service</span></div><nav class="nav"><i class="">What&#x27;s on</i><i class="on">My tickets</i><i class="">Food &amp; drink</i><i class="">Map</i><i class="">Help</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>My Account Dashboard</h2>
+                <small>Guest Web · wave 1 · compact</small></div>
+              <div class="acts"><div class="chip">Sign in</div><div class="chip cta">Basket</div></div>
+            </div>
+            
+            <div class="canvas">
+              
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">metricTile</span><div class="rows"><div class="bar"><i style="width:78%"></i></div><div class="bar"><i style="width:54%"></i></div><div class="bar"><i style="width:92%"></i></div><div class="bar"><i style="width:36%"></i></div><div class="bar"><i style="width:61%"></i></div></div></div><div class="panel"><span class="kind">chart</span><div class="rows"><div class="bar"><i style="width:78%"></i></div><div class="bar"><i style="width:54%"></i></div><div class="bar"><i style="width:92%"></i></div><div class="bar"><i style="width:36%"></i></div><div class="bar"><i style="width:61%"></i></div></div></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; addToWishlist · getWishlist · listGuestDevices · recordConsent +3</div>
+          <div><b>STATES</b> &middot; <span class="">loading · emptyFirstRun · error</span></div>
+          <div><b>ARRIVES WITH</b> &middot; deviceId&larr;deepLink, itemId&larr;deepLink, subjectId&larr;session</div>
+          <div><b>GOES TO</b> &middot; WEB-001 · WEB-016 · WEB-018 · WEB-019</div>
+        </div>
+      </div>
+      <div id="web-018" class="scr">
+        <div>
+          <div class="hdr"><span class="code">WEB-018</span>
+            <span class="ttl">My Tickets</span></div>
+          <div class="pur">Find my tickets for this venue.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>Guest</b><span>Account &amp; Self-Service</span></div><nav class="nav"><i class="">What&#x27;s on</i><i class="on">My tickets</i><i class="">Food &amp; drink</i><i class="">Map</i><i class="">Help</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>My Tickets</h2>
+                <small>Guest Web · wave 1 · compact</small></div>
+              <div class="acts"><div class="chip">Sign in</div><div class="chip cta">Basket</div></div>
+            </div>
+            
+            <div class="canvas">
+              
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">detailPanel</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">Implied by the detail template — not declared on the screen.</span></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; listMyEntitlements · getEntitlement · getEntitlementCredential · getEntitlementHistory +1</div>
+          <div><b>STATES</b> &middot; <span class="">loading · emptyFirstRun · error</span></div>
+          <div><b>ARRIVES WITH</b> &middot; entitlementId&larr;deepLink</div>
+          <div><b>GOES TO</b> &middot; WEB-001 · WEB-016 · WEB-017 · WEB-019</div>
+        </div>
+      </div>
+      <div id="web-019" class="scr">
+        <div>
+          <div class="hdr"><span class="code">WEB-019</span>
+            <span class="ttl">Order History</span></div>
+          <div class="pur">Find order history for this venue.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>Guest</b><span>Account &amp; Self-Service</span></div><nav class="nav"><i class="">What&#x27;s on</i><i class="on">My tickets</i><i class="">Food &amp; drink</i><i class="">Map</i><i class="">Help</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Order History</h2>
+                <small>Guest Web · wave 1 · compact</small></div>
+              <div class="acts"><div class="chip">Sign in</div><div class="chip cta">Basket</div></div>
+            </div>
+            
+            <div class="canvas">
+              
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">searchField</span><div class="chip">Search</div></div><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; transferOrderTickets · listMyOrders</div>
+          <div><b>STATES</b> &middot; <span class="">loading · emptyFirstRun · emptyNoResults · error</span></div>
+          <div><b>ARRIVES WITH</b> &middot; orderId&larr;deepLink</div>
+          <div><b>GOES TO</b> &middot; WEB-001 · WEB-016 · WEB-017 · WEB-018</div>
+        </div>
+      </div>
+      <div id="web-020" class="scr">
+        <div>
+          <div class="hdr"><span class="code">WEB-020</span>
+            <span class="ttl">Profile &amp; Preferences</span></div>
+          <div class="pur">Change how profile behaves here, and see which level the current value came from.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>Guest</b><span>Account &amp; Self-Service</span></div><nav class="nav"><i class="">What&#x27;s on</i><i class="on">My tickets</i><i class="">Food &amp; drink</i><i class="">Map</i><i class="">Help</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Profile &amp; Preferences</h2>
+                <small>Guest Web · wave 1 · compact</small></div>
+              <div class="acts"><div class="chip">Sign in</div><div class="chip cta">Basket</div></div>
+            </div>
+            
+            <div class="canvas">
+              
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">detailPanel</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">Implied by the detail template — not declared on the screen.</span></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; getGuestProfile · updateMyProfile · recordConsent · listConsentPurposes +1</div>
+          <div><b>STATES</b> &middot; <span class="">loading · emptyFirstRun · error</span></div>
+          <div><b>ARRIVES WITH</b> &middot; subjectId&larr;session</div>
+          <div><b>GOES TO</b> &middot; WEB-001 · WEB-016 · WEB-017 · WEB-018</div>
+        </div>
+      </div></div><div class="grp">06 — Membership, Loyalty &amp; Value · 5 screens</div><div class="stack">
+      <div id="web-021" class="scr">
+        <div>
+          <div class="hdr"><span class="code">WEB-021</span>
+            <span class="ttl">Wallet &amp; Gift Cards</span></div>
+          <div class="pur">See wallet &amp; gift cards for this venue.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>Guest</b><span>Membership, Loyalty &amp; Value</span></div><nav class="nav"><i class="">What&#x27;s on</i><i class="on">My tickets</i><i class="">Food &amp; drink</i><i class="">Map</i><i class="">Help</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Wallet &amp; Gift Cards</h2>
+                <small>Guest Web · wave 2 · compact</small></div>
+              <div class="acts"><div class="chip">Sign in</div><div class="chip cta">Basket</div></div>
+            </div>
+            
+            <div class="canvas">
+              
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">detailPanel</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">Implied by the detail template — not declared on the screen.</span></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; getWallet · listWalletTransactions · getGiftCard</div>
+          <div><b>STATES</b> &middot; <span class="">loading · emptyFirstRun · emptyNoAccess · error</span></div>
+          <div><b>ARRIVES WITH</b> &middot; cardCode&larr;deepLink, subjectId&larr;session</div>
+          <div><b>GOES TO</b> &middot; WEB-001 · WEB-022 · WEB-023 · WEB-024</div>
+        </div>
+      </div>
+      <div id="web-022" class="scr">
+        <div>
+          <div class="hdr"><span class="code">WEB-022</span>
+            <span class="ttl">Membership Plans</span></div>
+          <div class="pur">Membership Plans — the screen a person opens when they need to deal with membership plans.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>Guest</b><span>Membership, Loyalty &amp; Value</span></div><nav class="nav"><i class="">What&#x27;s on</i><i class="on">My tickets</i><i class="">Food &amp; drink</i><i class="">Map</i><i class="">Help</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Membership Plans</h2>
+                <small>Guest Web · wave 2 · compact</small></div>
+              <div class="acts"><div class="chip">Sign in</div><div class="chip cta">Basket</div></div>
+            </div>
+            
+            <div class="canvas">
+              
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">detailPanel</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">Implied by the detail template — not declared on the screen.</span></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; listProducts · getProduct · getMyMemberships · listGuestMemberships</div>
+          <div><b>STATES</b> &middot; <span class="">loading · emptyFirstRun · emptyNoAccess · error</span></div>
+          <div><b>ARRIVES WITH</b> &middot; productId&larr;WEB-001</div>
+          <div><b>GOES TO</b> &middot; WEB-001 · WEB-021 · WEB-023 · WEB-024</div>
+        </div>
+      </div>
+      <div id="web-023" class="scr">
+        <div>
+          <div class="hdr"><span class="code">WEB-023</span>
+            <span class="ttl">Membership Management</span></div>
+          <div class="pur">Work with membership management for this venue.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>Guest</b><span>Membership, Loyalty &amp; Value</span></div><nav class="nav"><i class="">What&#x27;s on</i><i class="on">My tickets</i><i class="">Food &amp; drink</i><i class="">Map</i><i class="">Help</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Membership Management</h2>
+                <small>Guest Web · wave 2 · compact</small></div>
+              <div class="acts"><div class="chip">Sign in</div><div class="chip cta">Basket</div></div>
+            </div>
+            
+            <div class="canvas">
+              
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">textField</span><div class="chip">Search</div></div><div class="panel"><span class="kind">primaryButton</span><div class="chip cta">primaryButton</div></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; transferOrderTickets · getMyMemberships · listGuestMemberships</div>
+          <div><b>STATES</b> &middot; <span class="">loading · emptyFirstRun · error</span></div>
+          <div><b>ARRIVES WITH</b> &middot; orderId&larr;deepLink</div>
+          <div><b>GOES TO</b> &middot; WEB-001 · WEB-021 · WEB-022 · WEB-024</div>
+        </div>
+      </div>
+      <div id="web-024" class="scr">
+        <div>
+          <div class="hdr"><span class="code">WEB-024</span>
+            <span class="ttl">Loyalty &amp; Rewards</span></div>
+          <div class="pur">See loyalty &amp; rewards for this venue.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>Guest</b><span>Membership, Loyalty &amp; Value</span></div><nav class="nav"><i class="">What&#x27;s on</i><i class="on">My tickets</i><i class="">Food &amp; drink</i><i class="">Map</i><i class="">Help</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Loyalty &amp; Rewards</h2>
+                <small>Guest Web · wave 3 · compact</small></div>
+              <div class="acts"><div class="chip">Sign in</div><div class="chip cta">Basket</div></div>
+            </div>
+            
+            <div class="canvas">
+              
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">detailPanel</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">Implied by the detail template — not declared on the screen.</span></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; addToWishlist · getWishlist · listGuestDevices · recordConsent +3</div>
+          <div><b>STATES</b> &middot; <span class="">loading · emptyFirstRun · error</span></div>
+          <div><b>ARRIVES WITH</b> &middot; deviceId&larr;deepLink, itemId&larr;deepLink, subjectId&larr;session</div>
+          <div><b>GOES TO</b> &middot; WEB-001 · WEB-021 · WEB-022 · WEB-023</div>
+        </div>
+      </div>
+      <div id="web-043" class="scr">
+        <div>
+          <div class="hdr"><span class="code">WEB-043</span>
+            <span class="ttl">Loyalty &amp; Rewards</span></div>
+          <div class="pur">Points, tier, and what the next one needs.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>Guest</b><span>Membership, Loyalty &amp; Value</span></div><nav class="nav"><i class="">What&#x27;s on</i><i class="on">My tickets</i><i class="">Food &amp; drink</i><i class="">Map</i><i class="">Help</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Loyalty &amp; Rewards</h2>
+                <small>Guest Web · wave 2 · compact</small></div>
+              <div class="acts"><div class="chip">Sign in</div><div class="chip cta">Basket</div></div>
+            </div>
+            
+            <div class="canvas">
+              
+              <div class="two"><div class="grow"><div class="panel"><b>Loyalty &amp; Rewards</b><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div></div><div class="panel"><b>Detail</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; getLoyaltyPosition · listLoyaltyProgrammes · listPromotions · evaluatePromotions</div>
+          <div><b>STATES</b> &middot; <span class="">loading · emptyFirstRun · emptyNoResults · emptyNoAccess · error</span></div>
+          
+          <div><b>GOES TO</b> &middot; WEB-001</div>
+        </div>
+      </div></div><div class="grp">07 — Engagement &amp; Support · 6 screens</div><div class="stack">
+      <div id="web-025" class="scr">
+        <div>
+          <div class="hdr"><span class="code">WEB-025</span>
+            <span class="ttl">Help Centre / FAQ</span></div>
+          <div class="pur">Answer a question without needing a person.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>Guest</b><span>Engagement &amp; Support</span></div><nav class="nav"><i class="">What&#x27;s on</i><i class="on">My tickets</i><i class="">Food &amp; drink</i><i class="">Map</i><i class="">Help</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Help Centre / FAQ</h2>
+                <small>Guest Web · wave 1 · compact</small></div>
+              <div class="acts"><div class="chip">Sign in</div><div class="chip cta">Basket</div></div>
+            </div>
+            
+            <div class="canvas">
+              
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">detailPanel</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">Implied by the detail template — not declared on the screen.</span></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; getTenantAppStatus</div>
+          <div><b>STATES</b> &middot; <span class="">loading · emptyFirstRun · error</span></div>
+          
+          <div><b>GOES TO</b> &middot; WEB-001 · WEB-026 · WEB-027 · WEB-028</div>
+        </div>
+      </div>
+      <div id="web-026" class="scr">
+        <div>
+          <div class="hdr"><span class="code">WEB-026</span>
+            <span class="ttl">Survey &amp; Feedback</span></div>
+          <div class="pur">Work with survey &amp; feedback for this venue.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>Guest</b><span>Engagement &amp; Support</span></div><nav class="nav"><i class="">What&#x27;s on</i><i class="on">My tickets</i><i class="">Food &amp; drink</i><i class="">Map</i><i class="">Help</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Survey &amp; Feedback</h2>
+                <small>Guest Web · wave 3 · compact</small></div>
+              <div class="acts"><div class="chip">Sign in</div><div class="chip cta">Basket</div></div>
+            </div>
+            
+            <div class="canvas">
+              
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">detailPanel</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">Implied by the detail template — not declared on the screen.</span></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; submitReview</div>
+          <div><b>STATES</b> &middot; <span class="">loading · emptyFirstRun · error</span></div>
+          
+          <div><b>GOES TO</b> &middot; WEB-001 · WEB-025 · WEB-027 · WEB-028</div>
+        </div>
+      </div>
+      <div id="web-027" class="scr">
+        <div>
+          <div class="hdr"><span class="code">WEB-027</span>
+            <span class="ttl">Newsletter Subscription</span></div>
+          <div class="pur">Record newsletter subscription for this venue.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>Guest</b><span>Engagement &amp; Support</span></div><nav class="nav"><i class="">What&#x27;s on</i><i class="on">My tickets</i><i class="">Food &amp; drink</i><i class="">Map</i><i class="">Help</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Newsletter Subscription</h2>
+                <small>Guest Web · wave 2 · compact</small></div>
+              <div class="acts"><div class="chip">Sign in</div><div class="chip cta">Basket</div></div>
+            </div>
+            
+            <div class="canvas">
+              
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">detailPanel</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">Implied by the detail template — not declared on the screen.</span></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; recordConsent · addToWishlist · getWishlist · listGuestDevices +3</div>
+          <div><b>STATES</b> &middot; <span class="">loading · emptyFirstRun · error</span></div>
+          <div><b>ARRIVES WITH</b> &middot; deviceId&larr;deepLink, itemId&larr;deepLink, subjectId&larr;session</div>
+          <div><b>GOES TO</b> &middot; WEB-001 · WEB-025 · WEB-026 · WEB-028</div>
+        </div>
+      </div>
+      <div id="web-028" class="scr">
+        <div>
+          <div class="hdr"><span class="code">WEB-028</span>
+            <span class="ttl">Contact &amp; Venue Information</span></div>
+          <div class="pur">Find contact &amp; venue information for this venue.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>Guest</b><span>Engagement &amp; Support</span></div><nav class="nav"><i class="">What&#x27;s on</i><i class="on">My tickets</i><i class="">Food &amp; drink</i><i class="">Map</i><i class="">Help</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Contact &amp; Venue Information</h2>
+                <small>Guest Web · wave 1 · compact</small></div>
+              <div class="acts"><div class="chip">Sign in</div><div class="chip cta">Basket</div></div>
+            </div>
+            
+            <div class="canvas">
+              
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">textField</span><div class="chip">Search</div></div><div class="panel"><span class="kind">primaryButton</span><div class="chip cta">primaryButton</div></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; getTenantAppStatus</div>
+          <div><b>STATES</b> &middot; <span class="">loading · emptyFirstRun · error</span></div>
+          
+          <div><b>GOES TO</b> &middot; WEB-001 · WEB-025 · WEB-026 · WEB-027</div>
+        </div>
+      </div>
+      <div id="web-044" class="scr">
+        <div>
+          <div class="hdr"><span class="code">WEB-044</span>
+            <span class="ttl">AI Concierge</span></div>
+          <div class="pur">Ask, and be answered or handed to a person.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>Guest</b><span>Engagement &amp; Support</span></div><nav class="nav"><i class="">What&#x27;s on</i><i class="on">My tickets</i><i class="">Food &amp; drink</i><i class="">Map</i><i class="">Help</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>AI Concierge</h2>
+                <small>Guest Web · wave 2 · compact</small></div>
+              <div class="acts"><div class="chip">Sign in</div><div class="chip cta">Basket</div></div>
+            </div>
+            
+            <div class="canvas">
+              
+              <div class="two"><div class="grow"><div class="panel"><b>AI Concierge</b><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div></div><div class="panel"><b>Detail</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; createAiConversation · sendAiMessage · handoverToAgent · requestSuggestion</div>
+          <div><b>STATES</b> &middot; <span class="">loading · emptyFirstRun · emptyNoResults · emptyNoAccess · error</span></div>
+          <div><b>ARRIVES WITH</b> &middot; conversationId&larr;deepLink</div>
+          <div><b>GOES TO</b> &middot; WEB-001</div>
+        </div>
+      </div>
+      <div id="web-046" class="scr">
+        <div>
+          <div class="hdr"><span class="code">WEB-046</span>
+            <span class="ttl">In-Venue Notifications</span></div>
+          <div class="pur">Queue calls, order updates, venue notices.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>Guest</b><span>Engagement &amp; Support</span></div><nav class="nav"><i class="">What&#x27;s on</i><i class="on">My tickets</i><i class="">Food &amp; drink</i><i class="">Map</i><i class="">Help</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>In-Venue Notifications</h2>
+                <small>Guest Web · wave 2 · compact</small></div>
+              <div class="acts"><div class="chip">Sign in</div><div class="chip cta">Basket</div></div>
+            </div>
+            
+            <div class="canvas">
+              
+              <div class="two"><div class="grow"><div class="panel"><b>In-Venue Notifications</b><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div></div><div class="panel"><b>Detail</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; claimLocationSession</div>
+          <div><b>STATES</b> &middot; <span class="">loading · emptyFirstRun · emptyNoResults · emptyNoAccess · error</span></div>
+          
+          <div><b>GOES TO</b> &middot; WEB-001</div>
+        </div>
+      </div></div><div class="grp">08 — System States · 1 screens</div><div class="stack">
+      <div id="web-029" class="scr">
+        <div>
+          <div class="hdr"><span class="code">WEB-029</span>
+            <span class="ttl">Error / Sold Out / Maintenance</span></div>
+          <div class="pur">Say what is wrong in a way that tells the person whether to wait or leave.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>Guest</b><span>System States</span></div><nav class="nav"><i class="">What&#x27;s on</i><i class="on">My tickets</i><i class="">Food &amp; drink</i><i class="">Map</i><i class="">Help</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Error / Sold Out / Maintenance</h2>
+                <small>Guest Web · wave 1 · compact</small></div>
+              <div class="acts"><div class="chip">Sign in</div><div class="chip cta">Basket</div></div>
+            </div>
+            
+            <div class="canvas">
+              
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">detailPanel</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">Implied by the detail template — not declared on the screen.</span></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; getTenantAppStatus</div>
+          <div><b>STATES</b> &middot; <span class="">loading · emptyFirstRun · error</span></div>
+          
+          <div><b>GOES TO</b> &middot; WEB-001</div>
+        </div>
+      </div></div><div class="grp">09 — Ticketing · 3 screens</div><div class="stack">
+      <div id="web-030" class="scr">
+        <div>
+          <div class="hdr"><span class="code">WEB-030</span>
+            <span class="ttl">Ticket Transfer</span></div>
+          <div class="pur">Send a ticket to someone else, and see what you have sent.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>Guest</b><span>Ticketing</span></div><nav class="nav"><i class="">What&#x27;s on</i><i class="on">My tickets</i><i class="">Food &amp; drink</i><i class="">Map</i><i class="">Help</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Ticket Transfer</h2>
+                <small>Guest Web · wave 1 · compact</small></div>
+              <div class="acts"><div class="chip">Sign in</div><div class="chip cta">Basket</div></div>
+            </div>
+            
+            <div class="canvas">
+              
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div></div><div class="panel"><span class="kind">searchField</span><div class="chip">Search</div><span class="why">Implied by the list template — not declared on the screen.</span></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; transferOrderTickets · claimTicketTransfer · listOrders</div>
+          <div><b>STATES</b> &middot; <span class="">loading · emptyFirstRun · emptyNoResults · emptyNoAccess · error</span></div>
+          <div><b>ARRIVES WITH</b> &middot; orderId&larr;deepLink, transferId&larr;deepLink</div>
+          <div><b>GOES TO</b> &middot; WEB-001 · WEB-031 · WEB-035</div>
+        </div>
+      </div>
+      <div id="web-031" class="scr">
+        <div>
+          <div class="hdr"><span class="code">WEB-031</span>
+            <span class="ttl">My Reservations</span></div>
+          <div class="pur">What you have booked and not yet paid for.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>Guest</b><span>Ticketing</span></div><nav class="nav"><i class="">What&#x27;s on</i><i class="on">My tickets</i><i class="">Food &amp; drink</i><i class="">Map</i><i class="">Help</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>My Reservations</h2>
+                <small>Guest Web · wave 2 · compact</small></div>
+              <div class="acts"><div class="chip">Sign in</div><div class="chip cta">Basket</div></div>
+            </div>
+            
+            <div class="canvas">
+              
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div></div><div class="panel"><span class="kind">searchField</span><div class="chip">Search</div><span class="why">Implied by the list template — not declared on the screen.</span></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; listReservations · getReservation · cancelReservation</div>
+          <div><b>STATES</b> &middot; <span class="">loading · emptyFirstRun · emptyNoResults · emptyNoAccess · error</span></div>
+          <div><b>ARRIVES WITH</b> &middot; reservationId&larr;deepLink</div>
+          <div><b>GOES TO</b> &middot; WEB-001 · WEB-030 · WEB-035</div>
+        </div>
+      </div>
+      <div id="web-035" class="scr">
+        <div>
+          <div class="hdr"><span class="code">WEB-035</span>
+            <span class="ttl">Multi-Currency &amp; Pricing</span></div>
+          <div class="pur">Compare prices in your own currency before you travel.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>Guest</b><span>Ticketing</span></div><nav class="nav"><i class="">What&#x27;s on</i><i class="on">My tickets</i><i class="">Food &amp; drink</i><i class="">Map</i><i class="">Help</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Multi-Currency &amp; Pricing</h2>
+                <small>Guest Web · wave 1 · compact</small></div>
+              <div class="acts"><div class="chip">Sign in</div><div class="chip cta">Basket</div></div>
+            </div>
+            
+            <div class="canvas">
+              
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div></div><div class="panel"><span class="kind">searchField</span><div class="chip">Search</div><span class="why">Implied by the list template — not declared on the screen.</span></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; listFxRates · listProducts</div>
+          <div><b>STATES</b> &middot; <span class="">loading · emptyFirstRun · emptyNoResults · emptyNoAccess · error</span></div>
+          
+          <div><b>GOES TO</b> &middot; WEB-001 · WEB-030 · WEB-031</div>
+        </div>
+      </div></div><div class="grp">10 — Promotions · 1 screens</div><div class="stack">
+      <div id="web-032" class="scr">
+        <div>
+          <div class="hdr"><span class="code">WEB-032</span>
+            <span class="ttl">Offers &amp; Promotions</span></div>
+          <div class="pur">What is on, and what applies to you.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>Guest</b><span>Promotions</span></div><nav class="nav"><i class="">What&#x27;s on</i><i class="on">My tickets</i><i class="">Food &amp; drink</i><i class="">Map</i><i class="">Help</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Offers &amp; Promotions</h2>
+                <small>Guest Web · wave 2 · compact</small></div>
+              <div class="acts"><div class="chip">Sign in</div><div class="chip cta">Basket</div></div>
+            </div>
+            
+            <div class="canvas">
+              
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div></div><div class="panel"><span class="kind">searchField</span><div class="chip">Search</div><span class="why">Implied by the list template — not declared on the screen.</span></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; listPromotions · getPromotion · evaluatePromotions</div>
+          <div><b>STATES</b> &middot; <span class="">loading · emptyFirstRun · emptyNoResults · emptyNoAccess · error</span></div>
+          <div><b>ARRIVES WITH</b> &middot; promotionId&larr;deepLink</div>
+          <div><b>GOES TO</b> &middot; WEB-001</div>
+        </div>
+      </div></div><div class="grp">11 — Retail · 2 screens</div><div class="stack">
+      <div id="web-033" class="scr">
+        <div>
+          <div class="hdr"><span class="code">WEB-033</span>
+            <span class="ttl">Shop</span></div>
+          <div class="pur">Merchandise, browsable before you arrive.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>Guest</b><span>Retail</span></div><nav class="nav"><i class="">What&#x27;s on</i><i class="on">My tickets</i><i class="">Food &amp; drink</i><i class="">Map</i><i class="">Help</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Shop</h2>
+                <small>Guest Web · wave 2 · compact</small></div>
+              <div class="acts"><div class="chip">Sign in</div><div class="chip cta">Basket</div></div>
+            </div>
+            
+            <div class="canvas">
+              
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div></div><div class="panel"><span class="kind">searchField</span><div class="chip">Search</div><span class="why">Implied by the list template — not declared on the screen.</span></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; listMerchandise · lookupMerchandise · reserveMerchandise · addCartLine</div>
+          <div><b>STATES</b> &middot; <span class="">loading · emptyFirstRun · emptyNoResults · emptyNoAccess · error</span></div>
+          <div><b>ARRIVES WITH</b> &middot; cartId&larr;session, outletId&larr;deepLink</div>
+          <div><b>GOES TO</b> &middot; WEB-001</div>
+        </div>
+      </div>
+      <div id="web-042" class="scr">
+        <div>
+          <div class="hdr"><span class="code">WEB-042</span>
+            <span class="ttl">Retail &amp; Shop and Drop</span></div>
+          <div class="pur">Buy merchandise and collect it on the way out.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>Guest</b><span>Retail</span></div><nav class="nav"><i class="">What&#x27;s on</i><i class="on">My tickets</i><i class="">Food &amp; drink</i><i class="">Map</i><i class="">Help</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Retail &amp; Shop and Drop</h2>
+                <small>Guest Web · wave 2 · compact</small></div>
+              <div class="acts"><div class="chip">Sign in</div><div class="chip cta">Basket</div></div>
+            </div>
+            
+            <div class="canvas">
+              
+              <div class="two"><div class="grow"><div class="panel"><b>Retail &amp; Shop and Drop</b><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div></div><div class="panel"><b>Detail</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; listMerchandise · lookupMerchandise · reserveMerchandise · lookupShopAndDrop</div>
+          <div><b>STATES</b> &middot; <span class="">loading · emptyFirstRun · emptyNoResults · emptyNoAccess · error</span></div>
+          <div><b>ARRIVES WITH</b> &middot; outletId&larr;deepLink</div>
+          <div><b>GOES TO</b> &middot; WEB-001</div>
+        </div>
+      </div></div><div class="grp">12 — Support · 2 screens</div><div class="stack">
+      <div id="web-034" class="scr">
+        <div>
+          <div class="hdr"><span class="code">WEB-034</span>
+            <span class="ttl">Lost &amp; Found</span></div>
+          <div class="pur">Report something you left behind.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>Guest</b><span>Support</span></div><nav class="nav"><i class="">What&#x27;s on</i><i class="on">My tickets</i><i class="">Food &amp; drink</i><i class="">Map</i><i class="">Help</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Lost &amp; Found</h2>
+                <small>Guest Web · wave 3 · compact</small></div>
+              <div class="acts"><div class="chip">Sign in</div><div class="chip cta">Basket</div></div>
+            </div>
+            
+            <div class="canvas">
+              
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div></div><div class="panel"><span class="kind">searchField</span><div class="chip">Search</div><span class="why">Implied by the list template — not declared on the screen.</span></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; listMyCases · raiseMyCase · replyToMyCase</div>
+          <div><b>STATES</b> &middot; <span class="">loading · emptyFirstRun · emptyNoResults · emptyNoAccess · error</span></div>
+          <div><b>ARRIVES WITH</b> &middot; caseId&larr;deepLink</div>
+          <div><b>GOES TO</b> &middot; WEB-001</div>
+        </div>
+      </div>
+      <div id="web-045" class="scr">
+        <div>
+          <div class="hdr"><span class="code">WEB-045</span>
+            <span class="ttl">Help Centre &amp; Accessibility</span></div>
+          <div class="pur">Answers, policies and the accessibility statement.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>Guest</b><span>Support</span></div><nav class="nav"><i class="">What&#x27;s on</i><i class="on">My tickets</i><i class="">Food &amp; drink</i><i class="">Map</i><i class="">Help</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Help Centre &amp; Accessibility</h2>
+                <small>Guest Web · wave 2 · compact</small></div>
+              <div class="acts"><div class="chip">Sign in</div><div class="chip cta">Basket</div></div>
+            </div>
+            
+            <div class="canvas">
+              
+              <div class="two"><div class="grow"><div class="panel"><b>Help Centre &amp; Accessibility</b><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div></div><div class="panel"><b>Detail</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; listFaqs · listContentPages</div>
+          <div><b>STATES</b> &middot; <span class="">loading · emptyFirstRun · emptyNoResults · emptyNoAccess · error</span></div>
+          
+          <div><b>GOES TO</b> &middot; WEB-001</div>
+        </div>
+      </div></div><div class="grp">13 — In-venue Services · 6 screens</div><div class="stack">
+      <div id="web-036" class="scr">
+        <div>
+          <div class="hdr"><span class="code">WEB-036</span>
+            <span class="ttl">F&amp;B — Browse &amp; Order</span></div>
+          <div class="pur">Order food from a table, a lounger or a seat.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>Guest</b><span>In-venue Services</span></div><nav class="nav"><i class="">What&#x27;s on</i><i class="on">My tickets</i><i class="">Food &amp; drink</i><i class="">Map</i><i class="">Help</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>F&amp;B — Browse &amp; Order</h2>
+                <small>Guest Web · wave 2 · compact</small></div>
+              <div class="acts"><div class="chip">Sign in</div><div class="chip cta">Basket</div></div>
+            </div>
+            
+            <div class="canvas">
+              
+              <div class="two"><div class="grow"><div class="panel"><b>F&amp;B — Browse &amp; Order</b><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div></div><div class="panel"><b>Detail</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; getGuestMenu · listDiningOutlets · listModifierGroups · claimLocationSession +3</div>
+          <div><b>STATES</b> &middot; <span class="">loading · emptyFirstRun · emptyNoResults · emptyNoAccess · error</span></div>
+          <div><b>ARRIVES WITH</b> &middot; outletId&larr;deepLink, venueId&larr;session</div>
+          <div><b>GOES TO</b> &middot; WEB-001</div>
+        </div>
+      </div>
+      <div id="web-037" class="scr">
+        <div>
+          <div class="hdr"><span class="code">WEB-037</span>
+            <span class="ttl">Menu Item Detail</span></div>
+          <div class="pur">What is in it, and what may be changed.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>Guest</b><span>In-venue Services</span></div><nav class="nav"><i class="">What&#x27;s on</i><i class="on">My tickets</i><i class="">Food &amp; drink</i><i class="">Map</i><i class="">Help</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Menu Item Detail</h2>
+                <small>Guest Web · wave 2 · compact</small></div>
+              <div class="acts"><div class="chip">Sign in</div><div class="chip cta">Basket</div></div>
+            </div>
+            
+            <div class="canvas">
+              
+              <div class="two"><div class="grow"><div class="panel"><b>Menu Item Detail</b><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div></div><div class="panel"><b>Detail</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; getGuestMenu · listModifierGroups</div>
+          <div><b>STATES</b> &middot; <span class="">loading · emptyFirstRun · emptyNoResults · emptyNoAccess · error</span></div>
+          <div><b>ARRIVES WITH</b> &middot; outletId&larr;deepLink</div>
+          <div><b>GOES TO</b> &middot; WEB-001</div>
+        </div>
+      </div>
+      <div id="web-038" class="scr">
+        <div>
+          <div class="hdr"><span class="code">WEB-038</span>
+            <span class="ttl">F&amp;B — Order Tracking</span></div>
+          <div class="pur">Watch it being made, and settle the bill.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>Guest</b><span>In-venue Services</span></div><nav class="nav"><i class="">What&#x27;s on</i><i class="on">My tickets</i><i class="">Food &amp; drink</i><i class="">Map</i><i class="">Help</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>F&amp;B — Order Tracking</h2>
+                <small>Guest Web · wave 2 · compact</small></div>
+              <div class="acts"><div class="chip">Sign in</div><div class="chip cta">Basket</div></div>
+            </div>
+            
+            <div class="canvas">
+              
+              <div class="two"><div class="grow"><div class="panel"><b>F&amp;B — Order Tracking</b><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div></div><div class="panel"><b>Detail</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; getGuestOrderStatus · getGuestBill · claimTableSession</div>
+          <div><b>STATES</b> &middot; <span class="">loading · emptyFirstRun · emptyNoResults · emptyNoAccess · error</span></div>
+          <div><b>ARRIVES WITH</b> &middot; orderId&larr;deepLink, sessionId&larr;deepLink, venueId&larr;session</div>
+          <div><b>GOES TO</b> &middot; WEB-001</div>
+        </div>
+      </div>
+      <div id="web-039" class="scr">
+        <div>
+          <div class="hdr"><span class="code">WEB-039</span>
+            <span class="ttl">Venue Map &amp; Wait Times</span></div>
+          <div class="pur">Where things are, and how long they take.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>Guest</b><span>In-venue Services</span></div><nav class="nav"><i class="">What&#x27;s on</i><i class="on">My tickets</i><i class="">Food &amp; drink</i><i class="">Map</i><i class="">Help</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Venue Map &amp; Wait Times</h2>
+                <small>Guest Web · wave 2 · compact</small></div>
+              <div class="acts"><div class="chip">Sign in</div><div class="chip cta">Basket</div></div>
+            </div>
+            
+            <div class="canvas">
+              
+              <div class="two"><div class="grow"><div class="panel"><b>Venue Map &amp; Wait Times</b><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div></div><div class="panel"><b>Detail</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; getVenueMap · getVenueMapGraph · getWaitTimes · listQueues</div>
+          <div><b>STATES</b> &middot; <span class="">loading · emptyFirstRun · emptyNoResults · emptyNoAccess · error</span></div>
+          <div><b>ARRIVES WITH</b> &middot; mapId&larr;deepLink, venueId&larr;session</div>
+          <div><b>GOES TO</b> &middot; WEB-001</div>
+        </div>
+      </div>
+      <div id="web-040" class="scr">
+        <div>
+          <div class="hdr"><span class="code">WEB-040</span>
+            <span class="ttl">Virtual Queue</span></div>
+          <div class="pur">Hold a place without standing in one.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>Guest</b><span>In-venue Services</span></div><nav class="nav"><i class="">What&#x27;s on</i><i class="on">My tickets</i><i class="">Food &amp; drink</i><i class="">Map</i><i class="">Help</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Virtual Queue</h2>
+                <small>Guest Web · wave 2 · compact</small></div>
+              <div class="acts"><div class="chip">Sign in</div><div class="chip cta">Basket</div></div>
+            </div>
+            
+            <div class="canvas">
+              
+              <div class="two"><div class="grow"><div class="panel"><b>Virtual Queue</b><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div></div><div class="panel"><b>Detail</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; joinQueue · getQueueEntry · leaveQueue · getWaitTimes</div>
+          <div><b>STATES</b> &middot; <span class="">loading · emptyFirstRun · emptyNoResults · emptyNoAccess · error</span></div>
+          <div><b>ARRIVES WITH</b> &middot; entryId&larr;deepLink</div>
+          <div><b>GOES TO</b> &middot; WEB-001</div>
+        </div>
+      </div>
+      <div id="web-041" class="scr">
+        <div>
+          <div class="hdr"><span class="code">WEB-041</span>
+            <span class="ttl">Parking — Reserve &amp; Pay</span></div>
+          <div class="pur">Reserve a facility before arriving.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>Guest</b><span>In-venue Services</span></div><nav class="nav"><i class="">What&#x27;s on</i><i class="on">My tickets</i><i class="">Food &amp; drink</i><i class="">Map</i><i class="">Help</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Parking — Reserve &amp; Pay</h2>
+                <small>Guest Web · wave 2 · compact</small></div>
+              <div class="acts"><div class="chip">Sign in</div><div class="chip cta">Basket</div></div>
+            </div>
+            
+            <div class="canvas">
+              
+              <div class="two"><div class="grow"><div class="panel"><b>Parking — Reserve &amp; Pay</b><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div></div><div class="panel"><b>Detail</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; listParkingFacilities · createParkingEntitlement · updateParkingEntitlement</div>
+          <div><b>STATES</b> &middot; <span class="">loading · emptyFirstRun · emptyNoResults · emptyNoAccess · error</span></div>
+          <div><b>ARRIVES WITH</b> &middot; entitlementId&larr;deepLink, venueId&larr;session</div>
+          <div><b>GOES TO</b> &middot; WEB-001</div>
+        </div>
+      </div></div>
+  <div class="bottom">
+    <span>Generated by tools/derive-wireframes.py from screens/P01-guest-web-storefront.yaml — do not hand-edit</span>
+    <span>P01 · 46 screens · 13 groups</span>
+  </div>
+</div></body></html>

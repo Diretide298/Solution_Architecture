@@ -1,0 +1,43 @@
+# Game card — state model
+# Contract: games.GameCard.status
+# Checked by tools/check-states.py.
+
+entity: Game card
+contract: games
+enum: GameCard.status
+enumKind: inline
+enumSchema: GameCard
+enumProperty: status
+owner: games
+initial:
+- active
+terminal:
+- expired
+- transferred
+transitions:
+- from: active
+  to: blocked
+  operation: adjustGameCard
+  trigger: operation
+  guard: Lost, suspected fraud, or a disputed balance. **Credits preserved**
+- from: blocked
+  to: active
+  operation: adjustGameCard
+  trigger: operation
+  guard: Unblocked, or reissued to the same guest
+  isReversal: true
+- from: active
+  to: expired
+  trigger: timer
+  guard: '**Credits on an expired card are the venue’s liability question, not a technical one** — whether
+    they are forfeited is a policy nobody has stated'
+- from: active
+  to: transferred
+  operation: transferGameCard
+  trigger: operation
+  guard: Balance moved to another card. The old one stops working immediately
+notes: 'Credits live on the card and on the server, and they will disagree — the card wins for plays
+  already taken, because the guest played.
+
+
+  **An unlinked card is lost money when lost.** Whether a card must be linked to a guest is open (F18).'

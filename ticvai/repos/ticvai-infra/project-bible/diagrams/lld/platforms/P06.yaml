@@ -1,0 +1,2000 @@
+id: LLD-P06
+title: P06 Venue Staff App — Operations — 66 screens
+generatedBy: tools/derive-diagrams.py
+index: diagrams/hld/00-platform.yaml
+audience: staff
+operator: venue
+app: venue-staff-app
+formFactor: mobileApp
+runtime: reactNative
+offlineCapable: true
+deployment:
+  target: iOS / Android native
+  distribution: MDM, not a public store
+  bundleUpdate: on launch
+  hosting: in-cell
+  storeReview: false
+  deviceOwnership: venue-owned or BYOD
+  networkAssumption: venue wifi, dead zones expected
+  releaseCadence: fortnightly
+why: null
+modulesUsed:
+- module: core
+  screens: 18
+- module: fnb
+  screens: 11
+- module: maintenance
+  screens: 8
+- module: ticketing
+  screens: 7
+- module: inventory
+  screens: 7
+- module: access
+  screens: 4
+- module: ai
+  screens: 4
+- module: marketing
+  screens: 4
+- module: queue
+  screens: 2
+- module: analytics
+  screens: 1
+servicesCalled:
+- service: VenueOpsService
+  operationCalls: 87
+- service: OrderService
+  operationCalls: 68
+- service: FnbService
+  operationCalls: 44
+- service: TenancyService
+  operationCalls: 33
+- service: AccessService
+  operationCalls: 23
+- service: InventoryService
+  operationCalls: 18
+- service: CatalogueService
+  operationCalls: 17
+- service: IdentityService
+  operationCalls: 16
+- service: MarketingService
+  operationCalls: 15
+- service: AiService
+  operationCalls: 8
+- service: RetailService
+  operationCalls: 2
+- service: ReportingService
+  operationCalls: 2
+coverage:
+  screens: 66
+  inAFlow: 43
+  drawn: 66
+  note: '**A screen in no flow has been specified and never walked.** Every flow written in this package
+    has found a defect.'
+screens:
+- screen: EMP-001
+  name: Sign in
+  module: Operations
+  requiresModule: core
+  wave: 1
+  density: comfortable
+  operations:
+  - getCurrentSession
+  - getGuestSession
+  - listMfaMethods
+  - listSsoProviders
+  - login
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams:
+  - sessionId<-session
+  goesTo:
+  - EMP-002
+  - EMP-003
+  - EMP-048
+  boardFrames: null
+  wireframe: wireframes/P06 Venue Staff App.dc.html#emp-001
+  inFlows:
+  - F08 Steward works a shift on the employee app
+  - F64 A steward signs in and takes a venue and a role
+- screen: EMP-002
+  name: Select venue & role
+  module: Operations
+  requiresModule: core
+  wave: 1
+  density: comfortable
+  operations:
+  - getCurrentSession
+  - getGuestSession
+  - listMfaMethods
+  - listRoles
+  - listSsoProviders
+  - selectRole
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams:
+  - sessionId<-session
+  goesTo:
+  - EMP-001
+  - EMP-003
+  - EMP-048
+  boardFrames: null
+  wireframe: wireframes/P06 Venue Staff App.dc.html#emp-002
+  inFlows:
+  - F08 Steward works a shift on the employee app
+  - F64 A steward signs in and takes a venue and a role
+- screen: EMP-003
+  name: Home — on duty
+  module: Operations
+  requiresModule: maintenance
+  wave: 1
+  density: comfortable
+  operations:
+  - acceptShiftVariance
+  - approveShiftOpen
+  - closeShift
+  - getCurrentShift
+  - getIncident
+  - getShift
+  - listCashMovements
+  - listIncidents
+  - listShifts
+  - openShift
+  - recordAuthorityNotification
+  - recordNoSale
+  - reopenShift
+  - reportIncident
+  - resumeShift
+  - suspendShift
+  - updateIncident
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams:
+  - incidentId<-deepLink
+  - shiftId<-session
+  goesTo:
+  - EMP-001
+  - EMP-002
+  - EMP-004
+  - EMP-048
+  - EMP-051
+  - EMP-052
+  - EMP-053
+  - EMP-054
+  - EMP-055
+  - EMP-056
+  - EMP-057
+  - EMP-058
+  - EMP-059
+  - EMP-060
+  - EMP-061
+  - EMP-062
+  - EMP-063
+  - EMP-064
+  - EMP-065
+  - EMP-066
+  - EMP-067
+  - EMP-068
+  - EMP-069
+  - EMP-070
+  boardFrames: null
+  wireframe: wireframes/P06 Venue Staff App.dc.html#emp-003
+  inFlows:
+  - F08 Steward works a shift on the employee app
+  - F64 A steward signs in and takes a venue and a role
+- screen: EMP-048
+  name: Opening checklist
+  module: Operations
+  requiresModule: maintenance
+  wave: 1
+  density: comfortable
+  operations:
+  - createInspectionTemplate
+  - listInspectionTemplates
+  - listInspections
+  - submitInspection
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams: []
+  goesTo:
+  - EMP-001
+  - EMP-002
+  - EMP-003
+  boardFrames: null
+  wireframe: wireframes/P06 Venue Staff App.dc.html#emp-048
+  inFlows:
+  - F08 Steward works a shift on the employee app
+  - F64 A steward signs in and takes a venue and a role
+- screen: EMP-009
+  name: End shift
+  module: Operations
+  requiresModule: core
+  wave: 1
+  density: comfortable
+  operations:
+  - acceptShiftVariance
+  - approveShiftOpen
+  - closeShift
+  - createCashMovement
+  - getCurrentShift
+  - getShift
+  - listCashMovements
+  - listShifts
+  - openShift
+  - recordNoSale
+  - reopenShift
+  - resumeShift
+  - suspendShift
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams:
+  - shiftId<-session
+  goesTo:
+  - EMP-001
+  - EMP-002
+  - EMP-003
+  boardFrames: null
+  wireframe: wireframes/P06 Venue Staff App.dc.html#emp-009
+  inFlows:
+  - F08 Steward works a shift on the employee app
+  - F72 A shift ends and the summary is read
+- screen: EMP-010
+  name: Scan — ready
+  module: Operations
+  requiresModule: access
+  wave: 1
+  density: comfortable
+  operations:
+  - getOfflinePackage
+  - listScans
+  - lookupTicket
+  - overrideAccess
+  - syncScans
+  - validateAccess
+  - validateGroupAccess
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  - offline
+  - outcomeAdmitted
+  - outcomeDenied
+  - overrideDialog
+  offlineState: true
+  entryParams: []
+  goesTo:
+  - EMP-001
+  - EMP-002
+  - EMP-003
+  boardFrames: null
+  wireframe: wireframes/P06 Venue Staff App.dc.html#emp-010
+  inFlows: null
+- screen: EMP-014
+  name: Ticket lookup
+  module: Operations
+  requiresModule: ticketing
+  wave: 1
+  density: comfortable
+  operations:
+  - applyManualDiscount
+  - createOrder
+  - createRefund
+  - exchangeOrderLines
+  - getOrder
+  - getOrderStatement
+  - holdOrder
+  - listOrderRefunds
+  - listOrders
+  - modifyOrder
+  - reprintOrder
+  - rescheduleOrder
+  - resumeOrder
+  - voidOrder
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams:
+  - orderId<-deepLink
+  goesTo:
+  - EMP-001
+  - EMP-002
+  - EMP-003
+  boardFrames: null
+  wireframe: wireframes/P06 Venue Staff App.dc.html#emp-014
+  inFlows: null
+- screen: EMP-015
+  name: Group scan
+  module: Operations
+  requiresModule: access
+  wave: 2
+  density: comfortable
+  operations:
+  - getOfflinePackage
+  - listScans
+  - lookupTicket
+  - overrideAccess
+  - syncScans
+  - validateAccess
+  - validateGroupAccess
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams: []
+  goesTo:
+  - EMP-001
+  - EMP-002
+  - EMP-003
+  boardFrames: null
+  wireframe: wireframes/P06 Venue Staff App.dc.html#emp-015
+  inFlows: null
+- screen: EMP-017
+  name: Sync & reconciliation
+  module: Operations
+  requiresModule: access
+  wave: 1
+  density: comfortable
+  operations:
+  - getOfflinePackage
+  - listScans
+  - listSyncRejections
+  - lookupTicket
+  - overrideAccess
+  - syncOrders
+  - syncScans
+  - validateAccess
+  - validateGroupAccess
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams: []
+  goesTo:
+  - EMP-001
+  - EMP-002
+  - EMP-003
+  boardFrames: null
+  wireframe: wireframes/P06 Venue Staff App.dc.html#emp-017
+  inFlows:
+  - F72 A shift ends and the summary is read
+- screen: EMP-018
+  name: Offline package
+  module: Operations
+  requiresModule: ticketing
+  wave: 1
+  density: comfortable
+  operations:
+  - getLatestBundle
+  - listCatalogueBundles
+  - reportBundleApplied
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams:
+  - version<-deepLink
+  goesTo:
+  - EMP-001
+  - EMP-002
+  - EMP-003
+  boardFrames: null
+  wireframe: wireframes/P06 Venue Staff App.dc.html#emp-018
+  inFlows:
+  - F71 A device is prepared, used and handed over
+- screen: EMP-004
+  name: Task list
+  module: Operations
+  requiresModule: maintenance
+  wave: 1
+  density: comfortable
+  operations:
+  - acceptWorkOrder
+  - attachWorkOrderEvidence
+  - cancelWorkOrder
+  - closeWorkOrder
+  - completeWorkOrder
+  - getWorkOrder
+  - listWorkOrders
+  - pauseWorkOrder
+  - recordWorkOrderParts
+  - recordWorkOrderTime
+  - rejectWorkOrder
+  - resumeWorkOrder
+  - startWorkOrder
+  - updateWorkOrder
+  - verifyWorkOrder
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams:
+  - workOrderId<-deepLink
+  goesTo:
+  - EMP-001
+  - EMP-002
+  - EMP-003
+  - EMP-005
+  boardFrames: null
+  wireframe: wireframes/P06 Venue Staff App.dc.html#emp-004
+  inFlows:
+  - F08 Steward works a shift on the employee app
+  - F12 Asset fails and closes a queue
+  - F65 A task is raised, worked and handed over
+- screen: EMP-005
+  name: Task detail
+  module: Operations
+  requiresModule: maintenance
+  wave: 1
+  density: comfortable
+  operations:
+  - acceptWorkOrder
+  - attachWorkOrderEvidence
+  - cancelWorkOrder
+  - closeWorkOrder
+  - completeWorkOrder
+  - getWorkOrder
+  - listWorkOrders
+  - pauseWorkOrder
+  - recordWorkOrderParts
+  - recordWorkOrderTime
+  - rejectWorkOrder
+  - resumeWorkOrder
+  - startWorkOrder
+  - updateWorkOrder
+  - verifyWorkOrder
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams:
+  - workOrderId<-deepLink
+  goesTo:
+  - EMP-001
+  - EMP-002
+  - EMP-003
+  - EMP-007
+  boardFrames: null
+  wireframe: wireframes/P06 Venue Staff App.dc.html#emp-005
+  inFlows:
+  - F08 Steward works a shift on the employee app
+  - F12 Asset fails and closes a queue
+  - F15 A part is needed and ordered
+  - F65 A task is raised, worked and handed over
+- screen: EMP-006
+  name: Raise a task
+  module: Operations
+  requiresModule: maintenance
+  wave: 1
+  density: comfortable
+  operations:
+  - acceptWorkOrder
+  - attachWorkOrderEvidence
+  - cancelWorkOrder
+  - closeWorkOrder
+  - completeWorkOrder
+  - createWorkOrder
+  - getWorkOrder
+  - listWorkOrders
+  - pauseWorkOrder
+  - recordWorkOrderParts
+  - recordWorkOrderTime
+  - rejectWorkOrder
+  - resumeWorkOrder
+  - startWorkOrder
+  - updateWorkOrder
+  - verifyWorkOrder
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams:
+  - workOrderId<-deepLink
+  goesTo:
+  - EMP-001
+  - EMP-002
+  - EMP-003
+  boardFrames: null
+  wireframe: wireframes/P06 Venue Staff App.dc.html#emp-006
+  inFlows:
+  - F65 A task is raised, worked and handed over
+- screen: EMP-007
+  name: Handover notes
+  module: Operations
+  requiresModule: core
+  wave: 2
+  density: comfortable
+  operations:
+  - acknowledgeAnnouncement
+  - getAnnouncementReach
+  - listAnnouncements
+  - publishAnnouncement
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams:
+  - announcementId<-deepLink
+  goesTo:
+  - EMP-001
+  - EMP-002
+  - EMP-003
+  - EMP-009
+  boardFrames: null
+  wireframe: wireframes/P06 Venue Staff App.dc.html#emp-007
+  inFlows:
+  - F08 Steward works a shift on the employee app
+  - F65 A task is raised, worked and handed over
+- screen: EMP-008
+  name: Shift summary
+  module: Operations
+  requiresModule: core
+  wave: 2
+  density: comfortable
+  operations:
+  - getCurrentShift
+  - getShift
+  - listCashMovements
+  - listShifts
+  - suspendShift
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams:
+  - shiftId<-session
+  goesTo:
+  - EMP-001
+  - EMP-002
+  - EMP-003
+  boardFrames: null
+  wireframe: wireframes/P06 Venue Staff App.dc.html#emp-008
+  inFlows:
+  - F72 A shift ends and the summary is read
+- screen: EMP-019
+  name: AI assistant — home
+  module: Operations
+  requiresModule: ai
+  wave: 1
+  density: comfortable
+  operations:
+  - createAiConversation
+  - listAiConversations
+  - sendAiMessage
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams:
+  - conversationId<-deepLink
+  goesTo:
+  - EMP-001
+  - EMP-002
+  - EMP-003
+  boardFrames: null
+  wireframe: wireframes/P06 Venue Staff App.dc.html#emp-019
+  inFlows:
+  - F101 A staff member asks the assistant and it answers from the venue
+- screen: EMP-020
+  name: AI assistant — answer
+  module: Operations
+  requiresModule: ai
+  wave: 1
+  density: comfortable
+  operations:
+  - createAiConversation
+  - listAiConversations
+  - sendAiMessage
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams:
+  - conversationId<-deepLink
+  goesTo:
+  - EMP-001
+  - EMP-002
+  - EMP-003
+  boardFrames: null
+  wireframe: wireframes/P06 Venue Staff App.dc.html#emp-020
+  inFlows:
+  - F101 A staff member asks the assistant and it answers from the venue
+  - F20 A manager asks a question and gets an answer
+- screen: EMP-031
+  name: Queue monitor
+  module: Operations
+  requiresModule: queue
+  wave: 2
+  density: comfortable
+  operations:
+  - callNextParties
+  - getQueue
+  - getWaitTimes
+  - listQueueEntries
+  - listQueues
+  - setQueueStatus
+  - setWaitTime
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams:
+  - queueId<-deepLink
+  goesTo:
+  - EMP-001
+  - EMP-002
+  - EMP-003
+  boardFrames: null
+  wireframe: wireframes/P06 Venue Staff App.dc.html#emp-031
+  inFlows:
+  - F67 A queue is monitored and capacity is held
+- screen: EMP-032
+  name: Manual wait entry
+  module: Operations
+  requiresModule: queue
+  wave: 2
+  density: comfortable
+  operations:
+  - getQueue
+  - getWaitTimes
+  - listQueueEntries
+  - listQueues
+  - setWaitTime
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams:
+  - queueId<-deepLink
+  goesTo:
+  - EMP-001
+  - EMP-002
+  - EMP-003
+  boardFrames: null
+  wireframe: wireframes/P06 Venue Staff App.dc.html#emp-032
+  inFlows:
+  - F21 A ride queue fills and a guest is redirected
+  - F67 A queue is monitored and capacity is held
+- screen: EMP-033
+  name: Capacity view
+  module: Operations
+  requiresModule: ticketing
+  wave: 2
+  density: comfortable
+  operations:
+  - createEnvelope
+  - getChannelAllocations
+  - listEnvelopes
+  - releaseChannelAllocation
+  - setChannelAllocations
+  - updateEnvelope
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams:
+  - envelopeId<-deepLink
+  goesTo:
+  - EMP-001
+  - EMP-002
+  - EMP-003
+  boardFrames: null
+  wireframe: wireframes/P06 Venue Staff App.dc.html#emp-033
+  inFlows:
+  - F67 A queue is monitored and capacity is held
+- screen: EMP-034
+  name: Walk-up sale
+  module: Operations
+  requiresModule: ticketing
+  wave: 2
+  density: comfortable
+  operations:
+  - applyManualDiscount
+  - createOrder
+  - createRefund
+  - exchangeOrderLines
+  - getOrder
+  - getOrderStatement
+  - getProduct
+  - holdOrder
+  - listAlternativeCodes
+  - listOrderRefunds
+  - listOrders
+  - listProductVariants
+  - listProducts
+  - modifyOrder
+  - reprintOrder
+  - rescheduleOrder
+  - resolveProductByCode
+  - resumeOrder
+  - setAlternativeCodes
+  - setProductAttributes
+  - transitionProductLifecycle
+  - voidOrder
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams:
+  - orderId<-deepLink
+  - productId<-deepLink
+  goesTo:
+  - EMP-001
+  - EMP-002
+  - EMP-003
+  boardFrames: null
+  wireframe: wireframes/P06 Venue Staff App.dc.html#emp-034
+  inFlows:
+  - F66 A walk-up sale is taken on a handheld
+- screen: EMP-035
+  name: Payment on device
+  module: Operations
+  requiresModule: ticketing
+  wave: 2
+  density: comfortable
+  operations:
+  - addTip
+  - capturePayment
+  - createPayment
+  - inquirePaymentStatus
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams:
+  - paymentId<-deepLink
+  goesTo:
+  - EMP-001
+  - EMP-002
+  - EMP-003
+  boardFrames: null
+  wireframe: wireframes/P06 Venue Staff App.dc.html#emp-035
+  inFlows:
+  - F66 A walk-up sale is taken on a handheld
+- screen: EMP-036
+  name: Issue media
+  module: Operations
+  requiresModule: ticketing
+  wave: 2
+  density: comfortable
+  operations:
+  - appendEntitlementToMedia
+  - getMediaAsset
+  - getMediaEntitlements
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams:
+  - mediaCode<-deepLink
+  - mediaId<-deepLink
+  goesTo:
+  - EMP-001
+  - EMP-002
+  - EMP-003
+  boardFrames: null
+  wireframe: wireframes/P06 Venue Staff App.dc.html#emp-036
+  inFlows:
+  - F66 A walk-up sale is taken on a handheld
+- screen: EMP-037
+  name: Notifications
+  module: Operations
+  requiresModule: core
+  wave: 1
+  density: comfortable
+  operations:
+  - acknowledgeAnnouncement
+  - getAnnouncementReach
+  - listAnnouncements
+  - publishAnnouncement
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams:
+  - announcementId<-deepLink
+  goesTo:
+  - EMP-001
+  - EMP-002
+  - EMP-003
+  boardFrames: null
+  wireframe: wireframes/P06 Venue Staff App.dc.html#emp-037
+  inFlows: null
+- screen: EMP-039
+  name: Announcements
+  module: Operations
+  requiresModule: core
+  wave: 2
+  density: comfortable
+  operations:
+  - acknowledgeAnnouncement
+  - getAnnouncementReach
+  - listAnnouncements
+  - publishAnnouncement
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams:
+  - announcementId<-deepLink
+  goesTo:
+  - EMP-001
+  - EMP-002
+  - EMP-003
+  boardFrames: null
+  wireframe: wireframes/P06 Venue Staff App.dc.html#emp-039
+  inFlows: null
+- screen: EMP-047
+  name: Emergency mode
+  module: Operations
+  requiresModule: core
+  wave: 1
+  density: comfortable
+  operations:
+  - acknowledgeAnnouncement
+  - getAnnouncementReach
+  - listAnnouncements
+  - publishAnnouncement
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams:
+  - announcementId<-deepLink
+  goesTo:
+  - EMP-001
+  - EMP-002
+  - EMP-003
+  boardFrames: null
+  wireframe: wireframes/P06 Venue Staff App.dc.html#emp-047
+  inFlows:
+  - F69 An incident is reported, escalated and closed
+- screen: EMP-050
+  name: Post-incident restore
+  module: Operations
+  requiresModule: maintenance
+  wave: 2
+  density: comfortable
+  operations:
+  - getIncident
+  - listIncidents
+  - recordAuthorityNotification
+  - updateIncident
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams:
+  - incidentId<-deepLink
+  goesTo:
+  - EMP-001
+  - EMP-002
+  - EMP-003
+  boardFrames: null
+  wireframe: wireframes/P06 Venue Staff App.dc.html#emp-050
+  inFlows:
+  - F69 An incident is reported, escalated and closed
+- screen: EMP-021
+  name: Roster
+  module: Operations
+  requiresModule: core
+  wave: 1
+  density: comfortable
+  operations:
+  - listRotaAssignments
+  - requestShiftSwap
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams:
+  - assignmentId<-deepLink
+  goesTo:
+  - EMP-001
+  - EMP-002
+  - EMP-003
+  boardFrames: null
+  wireframe: wireframes/P06 Venue Staff App.dc.html#emp-021
+  inFlows:
+  - F68 A rota is published, worked and swapped
+- screen: EMP-022
+  name: My rota
+  module: Operations
+  requiresModule: core
+  wave: 1
+  density: comfortable
+  operations:
+  - listRotaAssignments
+  - requestShiftSwap
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams:
+  - assignmentId<-deepLink
+  goesTo:
+  - EMP-001
+  - EMP-002
+  - EMP-003
+  boardFrames: null
+  wireframe: wireframes/P06 Venue Staff App.dc.html#emp-022
+  inFlows:
+  - F68 A rota is published, worked and swapped
+- screen: EMP-023
+  name: Swap request
+  module: Operations
+  requiresModule: core
+  wave: 2
+  density: comfortable
+  operations:
+  - listRotaAssignments
+  - requestShiftSwap
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams:
+  - assignmentId<-deepLink
+  goesTo:
+  - EMP-001
+  - EMP-002
+  - EMP-003
+  boardFrames: null
+  wireframe: wireframes/P06 Venue Staff App.dc.html#emp-023
+  inFlows:
+  - F68 A rota is published, worked and swapped
+- screen: EMP-024
+  name: Clock in / out
+  module: Operations
+  requiresModule: core
+  wave: 1
+  density: comfortable
+  operations:
+  - amendAttendance
+  - listAttendance
+  - recordAttendance
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams:
+  - recordId<-deepLink
+  goesTo:
+  - EMP-001
+  - EMP-002
+  - EMP-003
+  boardFrames: null
+  wireframe: wireframes/P06 Venue Staff App.dc.html#emp-024
+  inFlows:
+  - F68 A rota is published, worked and swapped
+- screen: EMP-025
+  name: Break management
+  module: Operations
+  requiresModule: core
+  wave: 2
+  density: comfortable
+  operations:
+  - listAttendance
+  - recordAttendance
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams:
+  - recordId<-deepLink
+  goesTo:
+  - EMP-001
+  - EMP-002
+  - EMP-003
+  boardFrames: null
+  wireframe: wireframes/P06 Venue Staff App.dc.html#emp-025
+  inFlows:
+  - F68 A rota is published, worked and swapped
+- screen: EMP-026
+  name: Incident report
+  module: Operations
+  requiresModule: maintenance
+  wave: 1
+  density: comfortable
+  operations:
+  - getIncident
+  - listIncidents
+  - recordAuthorityNotification
+  - reportIncident
+  - updateIncident
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams:
+  - incidentId<-deepLink
+  goesTo:
+  - EMP-001
+  - EMP-002
+  - EMP-003
+  - EMP-004
+  boardFrames: null
+  wireframe: wireframes/P06 Venue Staff App.dc.html#emp-026
+  inFlows:
+  - F12 Asset fails and closes a queue
+  - F69 An incident is reported, escalated and closed
+- screen: EMP-027
+  name: Incident detail
+  module: Operations
+  requiresModule: maintenance
+  wave: 2
+  density: comfortable
+  operations:
+  - getIncident
+  - listIncidents
+  - updateIncident
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams:
+  - incidentId<-deepLink
+  goesTo:
+  - EMP-001
+  - EMP-002
+  - EMP-003
+  boardFrames: null
+  wireframe: wireframes/P06 Venue Staff App.dc.html#emp-027
+  inFlows:
+  - F69 An incident is reported, escalated and closed
+- screen: EMP-028
+  name: Lost & found
+  module: Operations
+  requiresModule: marketing
+  wave: 2
+  density: comfortable
+  operations:
+  - addCaseMessage
+  - createCase
+  - escalateCase
+  - getCase
+  - listCases
+  - reopenCase
+  - updateCase
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams:
+  - caseId<-deepLink
+  goesTo:
+  - EMP-001
+  - EMP-002
+  - EMP-003
+  boardFrames: null
+  wireframe: wireframes/P06 Venue Staff App.dc.html#emp-028
+  inFlows:
+  - F70 A guest needs help and something is lost
+- screen: EMP-029
+  name: Guest assistance
+  module: Operations
+  requiresModule: marketing
+  wave: 2
+  density: comfortable
+  operations:
+  - addCaseMessage
+  - createCase
+  - escalateCase
+  - getCase
+  - getIncident
+  - listCases
+  - listIncidents
+  - recordAuthorityNotification
+  - reopenCase
+  - reportIncident
+  - updateCase
+  - updateIncident
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams:
+  - caseId<-deepLink
+  - incidentId<-deepLink
+  goesTo:
+  - EMP-001
+  - EMP-002
+  - EMP-003
+  boardFrames: null
+  wireframe: wireframes/P06 Venue Staff App.dc.html#emp-029
+  inFlows:
+  - F70 A guest needs help and something is lost
+- screen: EMP-030
+  name: Venue map
+  module: Operations
+  requiresModule: ticketing
+  wave: 2
+  density: comfortable
+  operations:
+  - getVenueMap
+  - getVenueMapLive
+  - listDeliveryLocations
+  - listDiningOutlets
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams:
+  - mapId<-deepLink
+  - venueId<-session
+  goesTo:
+  - EMP-001
+  - EMP-002
+  - EMP-003
+  boardFrames: null
+  wireframe: wireframes/P06 Venue Staff App.dc.html#emp-030
+  inFlows:
+  - F70 A guest needs help and something is lost
+- screen: EMP-038
+  name: Broadcast to team
+  module: Operations
+  requiresModule: core
+  wave: 2
+  density: comfortable
+  operations:
+  - acknowledgeAnnouncement
+  - getAnnouncementReach
+  - listAnnouncements
+  - publishAnnouncement
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams:
+  - announcementId<-deepLink
+  goesTo:
+  - EMP-001
+  - EMP-002
+  - EMP-003
+  boardFrames: null
+  wireframe: wireframes/P06 Venue Staff App.dc.html#emp-038
+  inFlows: null
+- screen: EMP-040
+  name: Knowledge base
+  module: Operations
+  requiresModule: ai
+  wave: 2
+  density: comfortable
+  operations:
+  - semanticSearch
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams: []
+  goesTo:
+  - EMP-001
+  - EMP-002
+  - EMP-003
+  boardFrames: null
+  wireframe: wireframes/P06 Venue Staff App.dc.html#emp-040
+  inFlows:
+  - F101 A staff member asks the assistant and it answers from the venue
+- screen: EMP-041
+  name: Training
+  module: Operations
+  requiresModule: ai
+  wave: 3
+  density: comfortable
+  operations:
+  - semanticSearch
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams: []
+  goesTo:
+  - EMP-001
+  - EMP-002
+  - EMP-003
+  boardFrames: null
+  wireframe: wireframes/P06 Venue Staff App.dc.html#emp-041
+  inFlows: null
+- screen: EMP-042
+  name: Profile
+  module: Operations
+  requiresModule: core
+  wave: 1
+  density: comfortable
+  operations:
+  - getCurrentSession
+  - getGuestSession
+  - listMfaMethods
+  - listSsoProviders
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams:
+  - sessionId<-session
+  goesTo:
+  - EMP-001
+  - EMP-002
+  - EMP-003
+  boardFrames: null
+  wireframe: wireframes/P06 Venue Staff App.dc.html#emp-042
+  inFlows: null
+- screen: EMP-043
+  name: Device settings
+  module: Operations
+  requiresModule: marketing
+  wave: 1
+  density: comfortable
+  operations:
+  - listDevices
+  - registerDevice
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams:
+  - subjectId<-session
+  goesTo:
+  - EMP-001
+  - EMP-002
+  - EMP-003
+  boardFrames: null
+  wireframe: wireframes/P06 Venue Staff App.dc.html#emp-043
+  inFlows:
+  - F71 A device is prepared, used and handed over
+- screen: EMP-044
+  name: Accessibility
+  module: Operations
+  requiresModule: core
+  wave: 2
+  density: comfortable
+  operations: []
+  states:
+  - emptyFirstRun
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams: []
+  goesTo:
+  - EMP-001
+  - EMP-002
+  - EMP-003
+  boardFrames: null
+  wireframe: wireframes/P06 Venue Staff App.dc.html#emp-044
+  inFlows: null
+- screen: EMP-045
+  name: Arabic / RTL
+  module: Operations
+  requiresModule: core
+  wave: 1
+  density: comfortable
+  operations: []
+  states:
+  - emptyFirstRun
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams: []
+  goesTo:
+  - EMP-001
+  - EMP-002
+  - EMP-003
+  boardFrames: null
+  wireframe: wireframes/P06 Venue Staff App.dc.html#emp-045
+  inFlows: null
+- screen: EMP-046
+  name: Sign out
+  module: Operations
+  requiresModule: core
+  wave: 1
+  density: comfortable
+  operations:
+  - logout
+  states:
+  - emptyFirstRun
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams: []
+  goesTo:
+  - EMP-001
+  - EMP-002
+  - EMP-003
+  boardFrames: null
+  wireframe: wireframes/P06 Venue Staff App.dc.html#emp-046
+  inFlows: null
+- screen: EMP-049
+  name: Hand over the journal
+  module: Operations
+  requiresModule: access
+  wave: 1
+  density: comfortable
+  operations:
+  - listScans
+  - syncScans
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams: []
+  goesTo:
+  - EMP-001
+  - EMP-002
+  - EMP-003
+  boardFrames: null
+  wireframe: wireframes/P06 Venue Staff App.dc.html#emp-049
+  inFlows:
+  - F71 A device is prepared, used and handed over
+- screen: EMP-051
+  name: Restaurant Service Command Center
+  module: Floor Service
+  requiresModule: fnb
+  wave: 2
+  density: comfortable
+  operations:
+  - getTableMap
+  - listFnbOrders
+  - listTableReservations
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams:
+  - venueId<-session
+  - outletId<-EMP-003
+  goesTo: []
+  boardFrames: null
+  wireframe: wireframes/P06 Venue Staff App.dc.html#emp-051
+  inFlows: null
+- screen: EMP-052
+  name: Floor Plan & Table Map
+  module: Floor Service
+  requiresModule: fnb
+  wave: 2
+  density: comfortable
+  operations:
+  - getTableMap
+  - setTableLayout
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams:
+  - venueId<-session
+  - outletId<-EMP-003
+  goesTo: []
+  boardFrames: null
+  wireframe: wireframes/P06 Venue Staff App.dc.html#emp-052
+  inFlows: null
+- screen: EMP-053
+  name: Table & Seating Configuration
+  module: Floor Service
+  requiresModule: fnb
+  wave: 2
+  density: comfortable
+  operations:
+  - setTableLayout
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams:
+  - venueId<-session
+  - outletId<-EMP-003
+  goesTo: []
+  boardFrames: null
+  wireframe: wireframes/P06 Venue Staff App.dc.html#emp-053
+  inFlows: null
+- screen: EMP-054
+  name: Reservation Calendar & Timeline
+  module: Floor Service
+  requiresModule: fnb
+  wave: 2
+  density: comfortable
+  operations:
+  - listTableReservations
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams:
+  - venueId<-session
+  goesTo: []
+  boardFrames: null
+  wireframe: wireframes/P06 Venue Staff App.dc.html#emp-054
+  inFlows: null
+- screen: EMP-055
+  name: Create / Edit Reservation
+  module: Floor Service
+  requiresModule: fnb
+  wave: 2
+  density: comfortable
+  operations:
+  - createTableReservation
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams:
+  - venueId<-session
+  goesTo: []
+  boardFrames: null
+  wireframe: wireframes/P06 Venue Staff App.dc.html#emp-055
+  inFlows: null
+- screen: EMP-056
+  name: Walk-In & Waitlist Management
+  module: Floor Service
+  requiresModule: fnb
+  wave: 2
+  density: comfortable
+  operations:
+  - joinRestaurantWaitlist
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams:
+  - venueId<-session
+  goesTo: []
+  boardFrames: null
+  wireframe: wireframes/P06 Venue Staff App.dc.html#emp-056
+  inFlows: null
+- screen: EMP-057
+  name: Guest Profile & Dining History
+  module: Floor Service
+  requiresModule: marketing
+  wave: 2
+  density: comfortable
+  operations:
+  - getGuestProfile
+  - listOrders
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams:
+  - venueId<-session
+  - subjectId<-EMP-003
+  goesTo: []
+  boardFrames: null
+  wireframe: wireframes/P06 Venue Staff App.dc.html#emp-057
+  inFlows: null
+- screen: EMP-058
+  name: Live Table & Service Management
+  module: Floor Service
+  requiresModule: fnb
+  wave: 2
+  density: comfortable
+  operations:
+  - createFnbOrder
+  - fireCourse
+  - holdCourse
+  - joinRestaurantWaitlist
+  - mergeTableVisits
+  - moveTableVisit
+  - notifyServer
+  - notifyWaitlistParty
+  - openTableVisit
+  - quoteWaitTime
+  - reassignServer
+  - seatTableReservation
+  - setServiceStage
+  - setTableCombinations
+  - transferTableVisit
+  - updateTableVisit
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams:
+  - venueId<-session
+  - visitId<-EMP-003
+  - reservationId<-deepLink
+  - entryId<-deepLink
+  - outletId<-session
+  - ticketId<-deepLink
+  goesTo:
+  - EMP-059
+  boardFrames:
+  - FNB-4A
+  - FNB-4B
+  - FNB-4H
+  wireframe: wireframes/FnB Board 4.dc.html#fnb-4a
+  inFlows:
+  - F29 A table is seated, coursed and split
+  - F80 A table is configured, reserved, seated and billed
+  - F94 A restaurant floor is set up before service
+- screen: EMP-059
+  name: Table Order, Bill & Payment Management
+  module: Floor Service
+  requiresModule: fnb
+  wave: 2
+  density: comfortable
+  operations:
+  - closeTableVisit
+  - compItem
+  - createFnbOrder
+  - createPayment
+  - getBill
+  - splitBill
+  - transferOrderItems
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams:
+  - venueId<-session
+  - visitId<-EMP-003
+  goesTo:
+  - EMP-058
+  boardFrames:
+  - FNB-4J
+  wireframe: wireframes/FnB Board 4.dc.html#fnb-4j
+  inFlows:
+  - F29 A table is seated, coursed and split
+  - F80 A table is configured, reserved, seated and billed
+- screen: EMP-060
+  name: Reservation & Table Performance
+  module: Floor Service
+  requiresModule: fnb
+  wave: 2
+  density: comfortable
+  operations:
+  - getTableMap
+  - listTableReservations
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams:
+  - venueId<-session
+  - outletId<-EMP-003
+  goesTo: []
+  boardFrames:
+  - FNB-4C
+  wireframe: wireframes/FnB Board 4.dc.html#fnb-4c
+  inFlows:
+  - F80 A table is configured, reserved, seated and billed
+  - F94 A restaurant floor is set up before service
+- screen: EMP-061
+  name: Retail Inventory Command Center
+  module: Stock on the Floor
+  requiresModule: inventory
+  wave: 2
+  density: comfortable
+  operations:
+  - getStockPositions
+  - listStockMovements
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams:
+  - venueId<-session
+  goesTo: []
+  boardFrames:
+  - FNB-4D
+  - FNB-4E
+  wireframe: wireframes/FnB Board 4.dc.html#fnb-4d
+  inFlows:
+  - F80 A table is configured, reserved, seated and billed
+  - F94 A restaurant floor is set up before service
+- screen: EMP-062
+  name: Store Stock & SKU Availability
+  module: Stock on the Floor
+  requiresModule: fnb
+  wave: 2
+  density: comfortable
+  operations:
+  - getHaccpStatus
+  - getStockPositions
+  - logTemperature
+  - setItemAvailability
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams:
+  - venueId<-session
+  - itemId<-EMP-003
+  goesTo:
+  - EMP-067
+  boardFrames:
+  - FNB-5J
+  wireframe: wireframes/FnB Board 5.dc.html#fnb-5j
+  inFlows:
+  - F28 A temperature excursion is caught and signed off
+- screen: EMP-063
+  name: Requisition & Smart Store Replenishment
+  module: Stock on the Floor
+  requiresModule: inventory
+  wave: 2
+  density: comfortable
+  operations:
+  - createRequisition
+  - listRequisitions
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams:
+  - venueId<-session
+  goesTo: []
+  boardFrames:
+  - FNB-4F
+  wireframe: wireframes/FnB Board 4.dc.html#fnb-4f
+  inFlows: null
+- screen: EMP-064
+  name: Store-to-Store & Warehouse Transfers
+  module: Stock on the Floor
+  requiresModule: inventory
+  wave: 2
+  density: comfortable
+  operations:
+  - createStockTransfer
+  - listStockLocations
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams:
+  - venueId<-session
+  goesTo: []
+  boardFrames:
+  - FNB-4G
+  wireframe: wireframes/FnB Board 4.dc.html#fnb-4g
+  inFlows: null
+- screen: EMP-065
+  name: Receiving & Store Put-Away
+  module: Stock on the Floor
+  requiresModule: inventory
+  wave: 2
+  density: comfortable
+  operations:
+  - createGoodsReceipt
+  - getStockTransfer
+  - logColdChain
+  - rejectReceivedGoods
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams:
+  - venueId<-session
+  - receiptId<-EMP-003
+  - transferId<-deepLink
+  goesTo: []
+  boardFrames:
+  - FNB-5G
+  wireframe: wireframes/FnB Board 5.dc.html#fnb-5g
+  inFlows:
+  - F35 Stock arrives short and an oversell is resolved
+- screen: EMP-066
+  name: Stock Count & Cycle Count Management
+  module: Stock on the Floor
+  requiresModule: inventory
+  wave: 2
+  density: comfortable
+  operations:
+  - enterCountLine
+  - getCountVariance
+  - postStockCount
+  - requestRecount
+  - setDailyCount
+  - startStockCount
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams:
+  - venueId<-session
+  - countId<-EMP-003
+  goesTo: []
+  boardFrames: null
+  wireframe: wireframes/P06 Venue Staff App.dc.html#emp-066
+  inFlows:
+  - F30 A count is entered, varied and posted
+- screen: EMP-067
+  name: Damage, Loss, Shrinkage & Stock Adjustment
+  module: Stock on the Floor
+  requiresModule: fnb
+  wave: 2
+  density: comfortable
+  operations:
+  - createStockMovement
+  - logTemperature
+  - recordWaste
+  - signCorrectiveAction
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams:
+  - venueId<-session
+  - outletId<-EMP-003
+  - actionId<-deepLink
+  goesTo: []
+  boardFrames:
+  - FNB-5E
+  wireframe: wireframes/FnB Board 5.dc.html#fnb-5e
+  inFlows:
+  - F28 A temperature excursion is caught and signed off
+- screen: EMP-068
+  name: Reservation, Allocation & Omnichannel Inventory
+  module: Stock on the Floor
+  requiresModule: inventory
+  wave: 2
+  density: comfortable
+  operations:
+  - getStockPositions
+  - reserveMerchandise
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams:
+  - venueId<-session
+  - outletId<-EMP-003
+  goesTo: []
+  boardFrames: null
+  wireframe: wireframes/P06 Venue Staff App.dc.html#emp-068
+  inFlows: null
+- screen: EMP-069
+  name: Barcode, RFID, Serialized Stock & Traceability
+  module: Stock on the Floor
+  requiresModule: inventory
+  wave: 2
+  density: comfortable
+  operations:
+  - listSerialisedItems
+  - lookupMerchandise
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams:
+  - venueId<-session
+  goesTo: []
+  boardFrames: null
+  wireframe: wireframes/P06 Venue Staff App.dc.html#emp-069
+  inFlows: null
+- screen: EMP-070
+  name: Inventory Exceptions, AI Replenishment & Action Center
+  module: Stock on the Floor
+  requiresModule: analytics
+  wave: 2
+  density: comfortable
+  operations:
+  - acknowledgeAlert
+  - createRequisition
+  - listAlerts
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams:
+  - venueId<-session
+  - alertId<-EMP-003
+  goesTo: []
+  boardFrames: null
+  wireframe: wireframes/P06 Venue Staff App.dc.html#emp-070
+  inFlows: null

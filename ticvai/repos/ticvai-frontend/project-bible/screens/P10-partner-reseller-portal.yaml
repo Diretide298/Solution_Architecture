@@ -1,0 +1,1707 @@
+# P10 — Partner & Reseller Portal
+# Generated from handoff/page-inventory.md. Layout, states and purpose are TODO.
+# Validated against _schema.yaml; component kinds from _components.yaml.
+
+platform:
+  code: P10
+  audience: partner
+  formFactor: web
+  shortName: Partner Web
+  name: Partner Web — Reseller Portal
+  surface: partner
+  runtime: reactWeb
+  offlineCapable: false
+  themes:
+  - light
+  directions:
+  - ltr
+  - rtl
+  screenCount: 21
+  app: partner-web
+  appStatus: not scaffolded
+  packages:
+  - design-tokens
+  - ui
+  - api-client
+  deployment:
+    target: browser
+    distribution: served from the cell
+    bundleUpdate: immediate on deploy
+    hosting: in-cell, in-region
+    storeReview: false
+    deviceOwnership: partner device, unmanaged
+    networkAssumption: public internet
+    releaseCadence: monthly — partners integrate against it
+  operator: partner
+  wireframeBoard: wireframes/P10 Partner Web.dc.html
+  wireframeBoardNote: '**The generated board for the whole platform.** Individual screens keep the client-pack
+    anchor where one exists — a screen the client drew should open the client''s frame — and this renders
+    every screen on the platform including the ones no pack covers.
+
+
+    **Declared 24 August.** The file was written from the first generation and nothing pointed at it:
+    `check-wireframes` has no unmatched-board concept, so the Python suite passed while the viewer flagged
+    an orphan. **A board nobody references is a board nobody reviews.**'
+screens:
+- id: PTR-001
+  name: Partner Login / MFA
+  module: TODO
+  purpose: Get someone into the app, fast, on a device that may be shared.
+  wave: 2
+  layout:
+    template: list
+    regions:
+    - name: contentBody
+      components:
+      - kind: searchField
+      - kind: dataTable
+  states:
+    loading: Detail loads
+    emptyFirstRun: Not found — it may have been deleted or moved out of scope
+    emptyNoResults: TODO — the filter matched nothing. The action widens or clears, never creates.
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
+    error: Could not load. Editing is blocked
+  wireframe:
+    status: generated
+    board: wireframes/P10 Partner Web.dc.html#ptr-001
+  capability: C35
+  apis:
+  - operationId: login
+    contract: identity
+    purpose: from page inventory
+    trigger: onLoad
+  - operationId: getB2bCredit
+    contract: orders
+    purpose: From the flow it appears in
+    trigger: onLoad
+  - operationId: forceLogout
+    contract: identity
+    purpose: Supervisor termination of an abandoned session
+    trigger: onAction
+  - operationId: getCurrentSession
+    contract: identity
+    purpose: Current session and effective permissions
+    trigger: onLoad
+  - operationId: getGuestSession
+    contract: identity
+    purpose: Read the current guest session
+    trigger: onLoad
+  - operationId: listActiveSessions
+    contract: identity
+    purpose: List active sessions
+    trigger: onLoad
+  - operationId: listMfaMethods
+    contract: identity
+    purpose: Enrolled MFA methods
+    trigger: onLoad
+  - operationId: listSsoProviders
+    contract: identity
+    purpose: Identity providers configured for this tenant
+    trigger: onLoad
+  - operationId: overrideCreditLimit
+    contract: orders
+    purpose: Authorise an order beyond the credit limit
+    trigger: onAction
+  - operationId: revokeAllSessions
+    contract: identity
+    purpose: Revoke every session in scope
+    trigger: onAction
+  - operationId: setB2bCreditLimit
+    contract: orders
+    purpose: Set a partner credit limit
+    trigger: onAction
+  - operationId: listPartnerAgreements
+    contract: subscription
+    purpose: Commercial agreements with B2B partners
+    trigger: onLoad
+  implementation:
+    app: partner-web
+    route: /general/partner-login-mfa
+    component: apps/partner-web/src/routes/general/PartnerLoginMfaList.tsx
+    status: notStarted
+  navigation:
+    isEntryPoint: true
+    inferred: true
+    exitTo:
+    - PTR-002
+    - PTR-003
+    - PTR-004
+    - PTR-005
+    fromFlows: true
+  notes: States derived from the screen pattern on 17 August, not individually considered — sound for
+    a list, a form or a money screen, and worth revisiting where this screen is unusual. Purpose derived
+    from the screen name and its operations on 17 August, not from a requirement.
+  density: compact
+  entryState:
+    params:
+    - name: accountId
+      from: deepLink
+    - name: sessionId
+      from: session
+    coldEntry: TODO — what this screen shows when somebody arrives with no upstream screen.
+  requiresModule: partner
+- id: PTR-002
+  name: Partner Dashboard
+  module: TODO
+  purpose: The screen this app sits on. Everything else is entered from here and returns to it.
+  wave: 2
+  layout:
+    template: dashboard
+    regions:
+    - name: contentBody
+      components:
+      - kind: metricTile
+      - kind: chart
+  states:
+    loading: List skeleton; the count renders first
+    emptyFirstRun: Nothing matches. Distinguishes an empty filter from an empty dataset
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
+    error: Could not load
+  wireframe:
+    status: generated
+    board: wireframes/P10 Partner Web.dc.html#ptr-002
+  capability: C34
+  apis:
+  - operationId: listOrders
+    contract: orders
+    purpose: from page inventory
+    trigger: onLoad
+  - operationId: getB2bCredit
+    contract: orders
+    purpose: from page inventory
+    trigger: onLoad
+  - operationId: applyManualDiscount
+    contract: orders
+    purpose: Apply a discount a cashier chose
+    trigger: onAction
+  - operationId: createOrder
+    contract: orders
+    purpose: Create an order
+    trigger: onAction
+  - operationId: exchangeOrderLines
+    contract: orders
+    purpose: Exchange lines for different products or dates
+    trigger: onAction
+  - operationId: getOrder
+    contract: orders
+    purpose: Read an order
+    trigger: onLoad
+  - operationId: getOrderStatement
+    contract: orders
+    purpose: Full financial history of an order
+    trigger: onLoad
+  - operationId: holdOrder
+    contract: orders
+    purpose: Park a sale and free the till
+    trigger: onAction
+  - operationId: listOrderRefunds
+    contract: orders
+    purpose: List refunds against an order
+    trigger: onLoad
+  - operationId: modifyOrder
+    contract: orders
+    purpose: Add or remove lines on an existing order
+    trigger: onAction
+  - operationId: overrideCreditLimit
+    contract: orders
+    purpose: Authorise an order beyond the credit limit
+    trigger: onAction
+  - operationId: reprintOrder
+    contract: orders
+    purpose: Reprint or resend tickets
+    trigger: onAction
+  - operationId: rescheduleOrder
+    contract: orders
+    purpose: Move an order to another performance
+    trigger: onAction
+  - operationId: resumeOrder
+    contract: orders
+    purpose: Bring a parked sale back to a till
+    trigger: onAction
+  - operationId: setB2bCreditLimit
+    contract: orders
+    purpose: Set a partner credit limit
+    trigger: onAction
+  - operationId: voidOrder
+    contract: orders
+    purpose: Void an order
+    trigger: onAction
+  implementation:
+    app: partner-web
+    route: /general/partner-dashboard
+    component: apps/partner-web/src/routes/general/PartnerDashboard.tsx
+    status: notStarted
+  navigation:
+    entryFrom:
+    - PTR-001
+    inferred: true
+    exitTo:
+    - PTR-001
+    - PTR-003
+    - PTR-004
+    - PTR-007
+    flowDerived: true
+  notes: States derived from the screen pattern on 17 August, not individually considered — sound for
+    a list, a form or a money screen, and worth revisiting where this screen is unusual. Purpose derived
+    from the screen name and its operations on 17 August, not from a requirement. **createRefund removed
+    18 August** — attached by module resemblance, not by what this screen does. A screen that does not
+    handle money should not be able to move it (CF-87's class).
+  density: compact
+  entryState:
+    params:
+    - name: accountId
+      from: PTR-001
+    - name: orderId
+      from: deepLink
+    coldEntry: '**A guest opening an order link weeks later.** Shows the order if it still resolves;
+      if it was refunded or the performance passed, says which and offers the order list rather than
+      an error.'
+  requiresModule: partner
+- id: PTR-003
+  name: Profile & Company Details
+  module: TODO
+  purpose: What we hold about staff, and what they can change.
+  wave: 2
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+  states:
+    loading: Current values, with the level each resolves from
+    emptyFirstRun: Nothing set at this level — the inherited value is shown and labelled as inherited
+      (ADR-0018)
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
+    error: '**Could not load. Saving is blocked**, because a value saved over an unread one silently
+      overwrites what someone else set'
+  wireframe:
+    status: generated
+    board: wireframes/P10 Partner Web.dc.html#ptr-003
+  capability: C56
+  apis:
+  - operationId: getPrincipal
+    contract: identity
+    purpose: from page inventory
+    trigger: onLoad
+  - operationId: createPrincipal
+    contract: identity
+    purpose: Create a principal
+    trigger: onAction
+  - operationId: listPrincipals
+    contract: identity
+    purpose: List principals
+    trigger: onLoad
+  - operationId: updatePrincipal
+    contract: identity
+    purpose: Update or deactivate a principal
+    trigger: onAction
+  implementation:
+    app: partner-web
+    route: /general/profile-and-company-details
+    component: apps/partner-web/src/routes/general/ProfileAndCompanyDetailsDetail.tsx
+    status: notStarted
+  navigation:
+    entryFrom:
+    - PTR-001
+    inferred: true
+    exitTo:
+    - PTR-001
+    - PTR-002
+    - PTR-004
+  notes: States derived from the screen pattern on 17 August, not individually considered — sound for
+    a list, a form or a money screen, and worth revisiting where this screen is unusual. Purpose derived
+    from the screen name and its operations on 17 August, not from a requirement.
+  density: compact
+  entryState:
+    params:
+    - name: principalId
+      from: session
+    coldEntry: Resolves from the session; a cold arrival is the ordinary case.
+  requiresModule: partner
+- id: PTR-004
+  name: Notifications
+  module: TODO
+  purpose: Work with notifications for this venue.
+  wave: 3
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+  states:
+    loading: Detail loads
+    emptyFirstRun: Not found — it may have been deleted or moved out of scope
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
+    error: Could not load. Editing is blocked
+  wireframe:
+    status: generated
+    board: wireframes/P10 Partner Web.dc.html#ptr-004
+  capability: C59
+  apis:
+  - operationId: sendTransactionalMessage
+    contract: marketing-crm
+    purpose: from page inventory
+    trigger: onLoad
+  - operationId: getMessageStatus
+    contract: marketing-crm
+    purpose: Delivery status of one message
+    trigger: onLoad
+  implementation:
+    app: partner-web
+    route: /general/notifications
+    component: apps/partner-web/src/routes/general/NotificationsDetail.tsx
+    status: notStarted
+  navigation:
+    entryFrom:
+    - PTR-001
+    inferred: true
+    exitTo:
+    - PTR-001
+    - PTR-002
+    - PTR-003
+  notes: States derived from the screen pattern on 17 August, not individually considered — sound for
+    a list, a form or a money screen, and worth revisiting where this screen is unusual. Purpose derived
+    from the screen name and its operations on 17 August, not from a requirement.
+  density: compact
+  entryState:
+    params:
+    - name: messageId
+      from: deepLink
+    coldEntry: TODO — what this screen shows when somebody arrives with no upstream screen.
+  requiresModule: partner
+- id: PTR-005
+  name: Inventory & Allocation View
+  module: TODO
+  purpose: See inventory & allocation view for this venue.
+  wave: 2
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+  states:
+    loading: Detail loads
+    emptyFirstRun: Not found — it may have been deleted or moved out of scope
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
+    error: Could not load. Editing is blocked
+  wireframe:
+    status: generated
+    board: wireframes/P10 Partner Web.dc.html#ptr-005
+  capability: C103
+  apis:
+  - operationId: getChannelAllocations
+    contract: catalogue
+    purpose: from page inventory
+    trigger: onLoad
+  - operationId: createOrder
+    contract: orders
+    purpose: From the flow it appears in
+    trigger: onLoad
+  - operationId: applyManualDiscount
+    contract: orders
+    purpose: Apply a discount a cashier chose
+    trigger: onAction
+  - operationId: createEnvelope
+    contract: catalogue
+    purpose: Create a capacity envelope
+    trigger: onAction
+  - operationId: exchangeOrderLines
+    contract: orders
+    purpose: Exchange lines for different products or dates
+    trigger: onAction
+  - operationId: getOrder
+    contract: orders
+    purpose: Read an order
+    trigger: onLoad
+  - operationId: getOrderStatement
+    contract: orders
+    purpose: Full financial history of an order
+    trigger: onLoad
+  - operationId: holdOrder
+    contract: orders
+    purpose: Park a sale and free the till
+    trigger: onAction
+  - operationId: listEnvelopes
+    contract: catalogue
+    purpose: List capacity envelopes
+    trigger: onLoad
+  - operationId: listOrderRefunds
+    contract: orders
+    purpose: List refunds against an order
+    trigger: onLoad
+  - operationId: listOrders
+    contract: orders
+    purpose: List orders
+    trigger: onLoad
+  - operationId: modifyOrder
+    contract: orders
+    purpose: Add or remove lines on an existing order
+    trigger: onAction
+  - operationId: releaseChannelAllocation
+    contract: catalogue
+    purpose: Return unsold channel allocation to the general pool
+    trigger: onAction
+  - operationId: reprintOrder
+    contract: orders
+    purpose: Reprint or resend tickets
+    trigger: onAction
+  - operationId: rescheduleOrder
+    contract: orders
+    purpose: Move an order to another performance
+    trigger: onAction
+  - operationId: resumeOrder
+    contract: orders
+    purpose: Bring a parked sale back to a till
+    trigger: onAction
+  - operationId: setChannelAllocations
+    contract: catalogue
+    purpose: Allocate envelope capacity across channels
+    trigger: onAction
+  - operationId: updateEnvelope
+    contract: catalogue
+    purpose: Amend an envelope
+    trigger: onAction
+  - operationId: voidOrder
+    contract: orders
+    purpose: Void an order
+    trigger: onAction
+  implementation:
+    app: partner-web
+    route: /general/inventory-and-allocation-view
+    component: apps/partner-web/src/routes/general/InventoryAndAllocationViewDetail.tsx
+    status: notStarted
+  navigation:
+    entryFrom:
+    - PTR-001
+    inferred: true
+    exitTo:
+    - PTR-001
+    - PTR-002
+    - PTR-003
+    - PTR-008
+    fromFlows: true
+  notes: States derived from the screen pattern on 17 August, not individually considered — sound for
+    a list, a form or a money screen, and worth revisiting where this screen is unusual. Purpose derived
+    from the screen name and its operations on 17 August, not from a requirement. **createRefund removed
+    18 August** — attached by module resemblance, not by what this screen does. A screen that does not
+    handle money should not be able to move it (CF-87's class).
+  density: compact
+  entryState:
+    params:
+    - name: envelopeId
+      from: deepLink
+    - name: orderId
+      from: deepLink
+    coldEntry: '**A guest opening an order link weeks later.** Shows the order if it still resolves;
+      if it was refunded or the performance passed, says which and offers the order list rather than
+      an error.'
+  requiresModule: partner
+- id: PTR-006
+  name: Product Catalog (B2B Pricing)
+  module: TODO
+  purpose: Find product catalog (b2b pricing) for this venue.
+  wave: 2
+  layout:
+    template: list
+    regions:
+    - name: contentBody
+      components:
+      - kind: searchField
+      - kind: dataTable
+  states:
+    loading: List skeleton; the count renders first
+    emptyFirstRun: Nothing matches. Distinguishes an empty filter from an empty dataset
+    emptyNoResults: TODO — the filter matched nothing. The action widens or clears, never creates.
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
+    error: Could not load
+  wireframe:
+    status: generated
+    board: wireframes/P10 Partner Web.dc.html#ptr-006
+  capability: C85
+  apis:
+  - operationId: listProducts
+    contract: catalogue
+    purpose: from page inventory
+    trigger: onLoad
+  - operationId: getPriceList
+    contract: catalogue
+    purpose: from page inventory
+    trigger: onLoad
+  - operationId: copyPriceList
+    contract: catalogue
+    purpose: Copy a price list, optionally with an adjustment
+    trigger: onAction
+  - operationId: createPriceList
+    contract: catalogue
+    purpose: Create a price list
+    trigger: onAction
+  - operationId: createProduct
+    contract: catalogue
+    purpose: Create a product
+    trigger: onAction
+  - operationId: getProduct
+    contract: catalogue
+    purpose: Read a product
+    trigger: onLoad
+  - operationId: listAlternativeCodes
+    contract: catalogue
+    purpose: External identifiers for a product
+    trigger: onLoad
+  - operationId: listPriceLists
+    contract: catalogue
+    purpose: List price lists
+    trigger: onLoad
+  - operationId: listPrices
+    contract: catalogue
+    purpose: List prices in a list
+    trigger: onLoad
+  - operationId: listProductVariants
+    contract: catalogue
+    purpose: List generated variants
+    trigger: onLoad
+  - operationId: resolveProductByCode
+    contract: catalogue
+    purpose: Resolve a partner code to a product
+    trigger: onLoad
+  - operationId: setAlternativeCodes
+    contract: catalogue
+    purpose: Set external identifiers
+    trigger: onAction
+  - operationId: setPrices
+    contract: catalogue
+    purpose: Set prices in bulk
+    trigger: onAction
+  - operationId: setProductAttributes
+    contract: catalogue
+    purpose: Set the attribute axes for a product
+    trigger: onAction
+  - operationId: transitionProductLifecycle
+    contract: catalogue
+    purpose: Move a product through its lifecycle
+    trigger: onAction
+  - operationId: updatePriceList
+    contract: catalogue
+    purpose: Amend a price list
+    trigger: onAction
+  - operationId: updateProduct
+    contract: catalogue
+    purpose: Update a product
+    trigger: onAction
+  implementation:
+    app: partner-web
+    route: /general/product-catalog-b2b-pricing
+    component: apps/partner-web/src/routes/general/ProductCatalogB2bPricingList.tsx
+    status: notStarted
+  navigation:
+    entryFrom:
+    - PTR-001
+    inferred: true
+    exitTo:
+    - PTR-001
+    - PTR-002
+    - PTR-003
+  notes: States derived from the screen pattern on 17 August, not individually considered — sound for
+    a list, a form or a money screen, and worth revisiting where this screen is unusual. Purpose derived
+    from the screen name and its operations on 17 August, not from a requirement.
+  density: compact
+  entryState:
+    params:
+    - name: priceListId
+      from: deepLink
+    - name: productId
+      from: deepLink
+    coldEntry: '**A shared product link after the product retired.** Shows what replaced it where a
+      successor exists, and the catalogue where none does.'
+  requiresModule: partner
+- id: PTR-007
+  name: Availability Search
+  module: TODO
+  purpose: Find something when the guest does not know what it is called.
+  wave: 2
+  layout:
+    template: list
+    regions:
+    - name: contentBody
+      components:
+      - kind: searchField
+      - kind: dataTable
+  states:
+    loading: Detail loads
+    emptyFirstRun: Not found — it may have been deleted or moved out of scope
+    emptyNoResults: TODO — the filter matched nothing. The action widens or clears, never creates.
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
+    error: Could not load
+  wireframe:
+    status: generated
+    board: wireframes/P10 Partner Web.dc.html#ptr-007
+  capability: C81
+  implementation:
+    app: partner-web
+    route: /general/availability-search
+    component: apps/partner-web/src/routes/general/AvailabilitySearchList.tsx
+    status: notStarted
+  apis:
+  - operationId: getAvailability
+    contract: catalogue
+    purpose: Per-performance capacity on the B2B channel
+    trigger: onLoad
+  navigation:
+    entryFrom:
+    - PTR-001
+    - PTR-002
+    inferred: true
+    exitTo:
+    - PTR-001
+    - PTR-002
+    - PTR-003
+    - PTR-008
+    flowDerived: true
+  notes: States derived from the screen pattern on 17 August, not individually considered — sound for
+    a list, a form or a money screen, and worth revisiting where this screen is unusual. Purpose derived
+    from the screen name and its operations on 17 August, not from a requirement.
+  density: compact
+  requiresModule: partner
+- id: PTR-008
+  name: Booking Creation
+  module: TODO
+  purpose: Add booking creation for this venue.
+  wave: 2
+  layout:
+    template: form
+    regions:
+    - name: contentBody
+      components:
+      - kind: textField
+      - kind: primaryButton
+  states:
+    loading: List skeleton; the count renders first
+    emptyFirstRun: Nothing matches. Distinguishes an empty filter from an empty dataset
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
+    error: Could not load . Actions on the list are disabled
+  wireframe:
+    status: generated
+    board: wireframes/P10 Partner Web.dc.html#ptr-008
+  capability: C02
+  apis:
+  - operationId: createOrder
+    contract: orders
+    purpose: from page inventory
+    trigger: onLoad
+  - operationId: listOrders
+    contract: orders
+    purpose: From the flow it appears in
+    trigger: onLoad
+  - operationId: applyManualDiscount
+    contract: orders
+    purpose: Apply a discount a cashier chose
+    trigger: onAction
+  - operationId: createRefund
+    contract: orders
+    purpose: Refund an order, wholly or in part
+    trigger: onAction
+  - operationId: exchangeOrderLines
+    contract: orders
+    purpose: Exchange lines for different products or dates
+    trigger: onAction
+  - operationId: getOrder
+    contract: orders
+    purpose: Read an order
+    trigger: onLoad
+  - operationId: getOrderStatement
+    contract: orders
+    purpose: Full financial history of an order
+    trigger: onLoad
+  - operationId: holdOrder
+    contract: orders
+    purpose: Park a sale and free the till
+    trigger: onAction
+  - operationId: listOrderRefunds
+    contract: orders
+    purpose: List refunds against an order
+    trigger: onLoad
+  - operationId: modifyOrder
+    contract: orders
+    purpose: Add or remove lines on an existing order
+    trigger: onAction
+  - operationId: reprintOrder
+    contract: orders
+    purpose: Reprint or resend tickets
+    trigger: onAction
+  - operationId: rescheduleOrder
+    contract: orders
+    purpose: Move an order to another performance
+    trigger: onAction
+  - operationId: resumeOrder
+    contract: orders
+    purpose: Bring a parked sale back to a till
+    trigger: onAction
+  - operationId: voidOrder
+    contract: orders
+    purpose: Void an order
+    trigger: onAction
+  implementation:
+    app: partner-web
+    route: /general/booking-creation
+    component: apps/partner-web/src/routes/general/BookingCreationForm.tsx
+    status: notStarted
+  navigation:
+    entryFrom:
+    - PTR-001
+    - PTR-007
+    inferred: true
+    exitTo:
+    - PTR-001
+    - PTR-002
+    - PTR-003
+    - PTR-016
+    flowDerived: true
+    fromFlows: true
+  notes: 'States derived from the screen pattern on 17 August, not individually considered — sound for
+    a list, a form or a money screen, and worth revisiting where this screen is unusual. Purpose derived
+    from the screen name and its operations on 17 August, not from a requirement. **Cross-platform navigation
+    removed 24 August**: SCN-003. **A till does not navigate to a back office and a guest app does not
+    navigate to either** — those are device handovers, and a flow declares them with `crossesDevice`
+    rather than a screen pretending there is a link.'
+  density: compact
+  entryState:
+    params:
+    - name: orderId
+      from: deepLink
+    coldEntry: '**A guest opening an order link weeks later.** Shows the order if it still resolves;
+      if it was refunded or the performance passed, says which and offers the order list rather than
+      an error.'
+  requiresModule: partner
+- id: PTR-009
+  name: Group / Bulk Booking
+  module: TODO
+  purpose: Work with group / bulk booking for this venue.
+  wave: 3
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+  states:
+    loading: Detail loads
+    emptyFirstRun: Not found — it may have been deleted or moved out of scope
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
+    error: Could not load. Editing is blocked
+  wireframe:
+    status: generated
+    board: wireframes/P10 Partner Web.dc.html#ptr-009
+  capability: C54
+  apis:
+  - operationId: allocateBlockedSeats
+    contract: seating
+    purpose: from page inventory
+    trigger: onLoad
+  - operationId: createSeatBlock
+    contract: seating
+    purpose: Block seats from sale
+    trigger: onAction
+  - operationId: listSeatBlocks
+    contract: seating
+    purpose: List seat blocks
+    trigger: onLoad
+  - operationId: releaseSeatBlock
+    contract: seating
+    purpose: Release a block back to sale
+    trigger: onAction
+  implementation:
+    app: partner-web
+    route: /general/group-bulk-booking
+    component: apps/partner-web/src/routes/general/GroupBulkBookingDetail.tsx
+    status: notStarted
+  navigation:
+    entryFrom:
+    - PTR-001
+    inferred: true
+    exitTo:
+    - PTR-001
+    - PTR-002
+    - PTR-003
+  notes: States derived from the screen pattern on 17 August, not individually considered — sound for
+    a list, a form or a money screen, and worth revisiting where this screen is unusual. Purpose derived
+    from the screen name and its operations on 17 August, not from a requirement.
+  density: compact
+  entryState:
+    params:
+    - name: blockId
+      from: deepLink
+    coldEntry: TODO — what this screen shows when somebody arrives with no upstream screen.
+  requiresModule: partner
+- id: PTR-010
+  name: Cart & Quote
+  module: TODO
+  purpose: Work with cart & quote for this venue.
+  wave: 3
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+  states:
+    loading: Detail loads
+    emptyFirstRun: Not found — it may have been deleted or moved out of scope
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
+    error: Could not load. Editing is blocked
+  wireframe:
+    status: generated
+    board: wireframes/P10 Partner Web.dc.html#ptr-010
+  capability: C02
+  apis:
+  - operationId: evaluatePromotions
+    contract: promotions
+    purpose: from page inventory
+    trigger: onLoad
+  - operationId: analysePromotionConflicts
+    contract: promotions
+    purpose: Analyse stacking against live promotions
+    trigger: onLoad
+  - operationId: createPromotion
+    contract: promotions
+    purpose: Create a promotion
+    trigger: onAction
+  - operationId: endPromotion
+    contract: promotions
+    purpose: End a promotion early
+    trigger: onAction
+  - operationId: getPromotion
+    contract: promotions
+    purpose: Read a promotion
+    trigger: onLoad
+  - operationId: getPromotionUsage
+    contract: promotions
+    purpose: Redemption count and discount given
+    trigger: onLoad
+  - operationId: listPromotions
+    contract: promotions
+    purpose: List promotions
+    trigger: onLoad
+  - operationId: pausePromotion
+    contract: promotions
+    purpose: Pause a live promotion
+    trigger: onAction
+  - operationId: publishPromotion
+    contract: promotions
+    purpose: Publish a promotion
+    trigger: onAction
+  - operationId: unschedulePromotion
+    contract: promotions
+    purpose: Pull a scheduled promotion before it starts
+    trigger: onAction
+  - operationId: updatePromotion
+    contract: promotions
+    purpose: Amend a promotion
+    trigger: onAction
+  - operationId: getCart
+    contract: orders
+    purpose: The cart, priced and checked, right now
+    trigger: onLoad
+  - operationId: addCartLine
+    contract: orders
+    purpose: Add something
+    trigger: onAction
+  - operationId: updateCartLine
+    contract: orders
+    purpose: Change a quantity
+    trigger: onAction
+  - operationId: removeCartLine
+    contract: orders
+    purpose: Take something out
+    trigger: onAction
+  - operationId: checkoutCart
+    contract: orders
+    purpose: Turn the cart into an order
+    trigger: onAction
+  implementation:
+    app: partner-web
+    route: /general/cart-and-quote
+    component: apps/partner-web/src/routes/general/CartAndQuoteDetail.tsx
+    status: notStarted
+  navigation:
+    entryFrom:
+    - PTR-001
+    inferred: true
+    exitTo:
+    - PTR-001
+    - PTR-002
+    - PTR-003
+  notes: States derived from the screen pattern on 17 August, not individually considered — sound for
+    a list, a form or a money screen, and worth revisiting where this screen is unusual. Purpose derived
+    from the screen name and its operations on 17 August, not from a requirement.
+  density: compact
+  entryState:
+    params:
+    - name: cartId
+      from: session
+    - name: lineId
+      from: deepLink
+    - name: promotionId
+      from: deepLink
+    coldEntry: TODO — what this screen shows when somebody arrives with no upstream screen.
+  requiresModule: partner
+- id: PTR-011
+  name: Quote Management
+  module: TODO
+  purpose: Find quote management for this venue.
+  wave: 3
+  layout:
+    template: form
+    regions:
+    - name: contentBody
+      components:
+      - kind: textField
+      - kind: primaryButton
+  states:
+    loading: Current values, with the level each resolves from
+    emptyFirstRun: Nothing set at this level — the inherited value is shown and labelled as inherited
+      (ADR-0018)
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
+    error: '**Could not load. Saving is blocked**, because a value saved over an unread one silently
+      overwrites what someone else set'
+  wireframe:
+    status: generated
+    board: wireframes/P10 Partner Web.dc.html#ptr-011
+  openQuestions:
+  - No contract — quotes are procurement-side only
+  implementation:
+    app: partner-web
+    route: /general/quote-management
+    component: apps/partner-web/src/routes/general/QuoteManagementForm.tsx
+    status: notStarted
+  navigation:
+    entryFrom:
+    - PTR-001
+    inferred: true
+    exitTo:
+    - PTR-001
+    - PTR-002
+    - PTR-003
+  notes: States derived from the screen pattern on 17 August, not individually considered — sound for
+    a list, a form or a money screen, and worth revisiting where this screen is unusual. Purpose derived
+    from the screen name and its operations on 17 August, not from a requirement.
+  apis:
+  - operationId: listPartnerAgreements
+    contract: subscription
+    purpose: Commercial agreements with B2B partners
+    trigger: onLoad
+  - operationId: getCommissionStatement
+    contract: subscription
+    purpose: What the partner earned and what is owed
+    trigger: onLoad
+  density: compact
+  entryState:
+    params:
+    - name: agreementId
+      from: deepLink
+    coldEntry: TODO — what this screen shows when somebody arrives with no upstream screen.
+  requiresModule: partner
+- id: PTR-012
+  name: Checkout / Credit Purchase
+  module: TODO
+  purpose: Take the money, and be unambiguous about whether it worked.
+  wave: 2
+  layout:
+    template: wizard
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+      - kind: primaryButton
+  states:
+    loading: Detail loads
+    emptyFirstRun: Not found — it may have been deleted or moved out of scope
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
+    error: Could not load. Editing is blocked
+  wireframe:
+    status: generated
+    board: wireframes/P10 Partner Web.dc.html#ptr-012
+  capability: C04
+  apis:
+  - operationId: createPayment
+    contract: orders
+    purpose: from page inventory
+    trigger: onLoad
+  - operationId: addTip
+    contract: orders
+    purpose: Record a tip against a payment
+    trigger: onAction
+  - operationId: capturePayment
+    contract: orders
+    purpose: Capture a previously authorised payment
+    trigger: onAction
+  - operationId: inquirePaymentStatus
+    contract: orders
+    purpose: Ask the provider what actually happened
+    trigger: onAction
+  implementation:
+    app: partner-web
+    route: /general/checkout-credit-purchase
+    component: apps/partner-web/src/routes/general/CheckoutCreditPurchaseWizard.tsx
+    status: notStarted
+  navigation:
+    entryFrom:
+    - PTR-001
+    inferred: true
+    exitTo:
+    - PTR-001
+    - PTR-002
+    - PTR-003
+  notes: States derived from the screen pattern on 17 August, not individually considered — sound for
+    a list, a form or a money screen, and worth revisiting where this screen is unusual. Purpose derived
+    from the screen name and its operations on 17 August, not from a requirement. **The strongest multi-currency
+    case in the platform.** A partner is billed in `PartnerAgreement.settlementCurrency`, which is often
+    not the venue's — a UK operator selling a Dubai attraction is invoiced in GBP against sales booked
+    in AED. **`creditLimit` is in the settlement currency**, so a limit in the wrong currency is a limit
+    that moves with the exchange rate. Which rate converts the sale is `fxPolicy` and it is a commercial
+    term, not a default.
+  density: compact
+  entryState:
+    params:
+    - name: paymentId
+      from: deepLink
+    coldEntry: TODO — what this screen shows when somebody arrives with no upstream screen.
+  requiresModule: partner
+- id: PTR-013
+  name: Credit Limit & Balance
+  module: TODO
+  purpose: See credit limit & balance for this venue.
+  wave: 2
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+  states:
+    loading: Detail loads
+    emptyFirstRun: Not found — it may have been deleted or moved out of scope
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
+    error: Could not load
+  wireframe:
+    status: generated
+    board: wireframes/P10 Partner Web.dc.html#ptr-013
+  capability: C34
+  apis:
+  - operationId: getB2bCredit
+    contract: orders
+    purpose: from page inventory
+    trigger: onLoad
+  - operationId: overrideCreditLimit
+    contract: orders
+    purpose: Authorise an order beyond the credit limit
+    trigger: onAction
+  - operationId: setB2bCreditLimit
+    contract: orders
+    purpose: Set a partner credit limit
+    trigger: onAction
+  implementation:
+    app: partner-web
+    route: /general/credit-limit-and-balance
+    component: apps/partner-web/src/routes/general/CreditLimitAndBalanceDetail.tsx
+    status: notStarted
+  navigation:
+    entryFrom:
+    - PTR-001
+    inferred: true
+    exitTo:
+    - PTR-001
+    - PTR-002
+    - PTR-003
+  notes: States derived from the screen pattern on 17 August, not individually considered — sound for
+    a list, a form or a money screen, and worth revisiting where this screen is unusual. Purpose derived
+    from the screen name and its operations on 17 August, not from a requirement.
+  density: compact
+  entryState:
+    params:
+    - name: accountId
+      from: PTR-001
+    coldEntry: Resolves from the session; a cold arrival is the ordinary case.
+  requiresModule: partner
+- id: PTR-014
+  name: Settlement & Payment History
+  module: TODO
+  purpose: Take the money, and be unambiguous about whether it worked.
+  wave: 3
+  layout:
+    template: list
+    regions:
+    - name: contentBody
+      components:
+      - kind: searchField
+      - kind: dataTable
+  states:
+    loading: Figures load; the expected total renders last
+    emptyFirstRun: Nothing in the period — reported as a result, not an empty screen
+    emptyNoResults: TODO — the filter matched nothing. The action widens or clears, never creates.
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
+    error: '**Could not load. Every action that moves money is blocked** — a figure nobody read must
+      not be reconciled against'
+  wireframe:
+    status: generated
+    board: wireframes/P10 Partner Web.dc.html#ptr-014
+  capability: C50
+  apis:
+  - operationId: listSettlements
+    contract: finance
+    purpose: from page inventory
+    trigger: onLoad
+  - operationId: getSettlement
+    contract: finance
+    purpose: Settlement detail with match results
+    trigger: onLoad
+  - operationId: ingestSettlementFile
+    contract: finance
+    purpose: Ingest a provider settlement file
+    trigger: onAction
+  - operationId: listSettlementExceptions
+    contract: finance
+    purpose: Unmatched or mismatched settlement lines
+    trigger: onLoad
+  - operationId: resolveSettlementException
+    contract: finance
+    purpose: Resolve a settlement exception
+    trigger: onAction
+  implementation:
+    app: partner-web
+    route: /general/settlement-and-payment-history
+    component: apps/partner-web/src/routes/general/SettlementAndPaymentHistoryList.tsx
+    status: notStarted
+  navigation:
+    entryFrom:
+    - PTR-001
+    inferred: true
+    exitTo:
+    - PTR-001
+    - PTR-002
+    - PTR-003
+  notes: States derived from the screen pattern on 17 August, not individually considered — sound for
+    a list, a form or a money screen, and worth revisiting where this screen is unusual. Purpose derived
+    from the screen name and its operations on 17 August, not from a requirement.
+  density: compact
+  entryState:
+    params:
+    - name: settlementId
+      from: deepLink
+    coldEntry: TODO — what this screen shows when somebody arrives with no upstream screen.
+  requiresModule: partner
+- id: PTR-015
+  name: Order History
+  module: TODO
+  purpose: Find order history for this venue.
+  wave: 2
+  layout:
+    template: list
+    regions:
+    - name: contentBody
+      components:
+      - kind: searchField
+      - kind: dataTable
+  states:
+    loading: List skeleton; the count renders first
+    emptyFirstRun: Nothing matches. Distinguishes an empty filter from an empty dataset
+    emptyNoResults: TODO — the filter matched nothing. The action widens or clears, never creates.
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
+    error: Could not load
+  wireframe:
+    status: generated
+    board: wireframes/P10 Partner Web.dc.html#ptr-015
+  capability: C34
+  apis:
+  - operationId: listOrders
+    contract: orders
+    purpose: from page inventory
+    trigger: onLoad
+  - operationId: getOrderStatement
+    contract: orders
+    purpose: from page inventory
+    trigger: onLoad
+  - operationId: applyManualDiscount
+    contract: orders
+    purpose: Apply a discount a cashier chose
+    trigger: onAction
+  - operationId: createOrder
+    contract: orders
+    purpose: Create an order
+    trigger: onAction
+  - operationId: createRefund
+    contract: orders
+    purpose: Refund an order, wholly or in part
+    trigger: onAction
+  - operationId: exchangeOrderLines
+    contract: orders
+    purpose: Exchange lines for different products or dates
+    trigger: onAction
+  - operationId: getOrder
+    contract: orders
+    purpose: Read an order
+    trigger: onLoad
+  - operationId: holdOrder
+    contract: orders
+    purpose: Park a sale and free the till
+    trigger: onAction
+  - operationId: listOrderRefunds
+    contract: orders
+    purpose: List refunds against an order
+    trigger: onLoad
+  - operationId: modifyOrder
+    contract: orders
+    purpose: Add or remove lines on an existing order
+    trigger: onAction
+  - operationId: reprintOrder
+    contract: orders
+    purpose: Reprint or resend tickets
+    trigger: onAction
+  - operationId: rescheduleOrder
+    contract: orders
+    purpose: Move an order to another performance
+    trigger: onAction
+  - operationId: resumeOrder
+    contract: orders
+    purpose: Bring a parked sale back to a till
+    trigger: onAction
+  - operationId: voidOrder
+    contract: orders
+    purpose: Void an order
+    trigger: onAction
+  implementation:
+    app: partner-web
+    route: /general/order-history
+    component: apps/partner-web/src/routes/general/OrderHistoryList.tsx
+    status: notStarted
+  navigation:
+    entryFrom:
+    - PTR-001
+    inferred: true
+    exitTo:
+    - PTR-001
+    - PTR-002
+    - PTR-003
+    fromFlows: true
+  notes: 'States derived from the screen pattern on 17 August, not individually considered — sound for
+    a list, a form or a money screen, and worth revisiting where this screen is unusual. Purpose derived
+    from the screen name and its operations on 17 August, not from a requirement. **Cross-platform navigation
+    removed 24 August**: BO-008. **A till does not navigate to a back office and a guest app does not
+    navigate to either** — those are device handovers, and a flow declares them with `crossesDevice`
+    rather than a screen pretending there is a link.'
+  density: compact
+  entryState:
+    params:
+    - name: orderId
+      from: deepLink
+    coldEntry: '**A guest opening an order link weeks later.** Shows the order if it still resolves;
+      if it was refunded or the performance passed, says which and offers the order list rather than
+      an error.'
+  requiresModule: partner
+- id: PTR-016
+  name: Voucher / Ticket Download
+  module: TODO
+  purpose: Work with voucher / ticket download for this venue.
+  wave: 2
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+  states:
+    loading: Detail loads
+    emptyFirstRun: Not found — it may have been deleted or moved out of scope
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
+    error: Could not load. Editing is blocked
+  wireframe:
+    status: generated
+    board: wireframes/P10 Partner Web.dc.html#ptr-016
+  capability: C09
+  apis:
+  - operationId: reprintOrder
+    contract: orders
+    purpose: from page inventory
+    trigger: onLoad
+  - operationId: applyManualDiscount
+    contract: orders
+    purpose: Apply a discount a cashier chose
+    trigger: onAction
+  - operationId: createOrder
+    contract: orders
+    purpose: Create an order
+    trigger: onAction
+  - operationId: exchangeOrderLines
+    contract: orders
+    purpose: Exchange lines for different products or dates
+    trigger: onAction
+  - operationId: getOrder
+    contract: orders
+    purpose: Read an order
+    trigger: onLoad
+  - operationId: getOrderStatement
+    contract: orders
+    purpose: Full financial history of an order
+    trigger: onLoad
+  - operationId: holdOrder
+    contract: orders
+    purpose: Park a sale and free the till
+    trigger: onAction
+  - operationId: listOrderRefunds
+    contract: orders
+    purpose: List refunds against an order
+    trigger: onLoad
+  - operationId: listOrders
+    contract: orders
+    purpose: List orders
+    trigger: onLoad
+  - operationId: modifyOrder
+    contract: orders
+    purpose: Add or remove lines on an existing order
+    trigger: onAction
+  - operationId: rescheduleOrder
+    contract: orders
+    purpose: Move an order to another performance
+    trigger: onAction
+  - operationId: resumeOrder
+    contract: orders
+    purpose: Bring a parked sale back to a till
+    trigger: onAction
+  - operationId: voidOrder
+    contract: orders
+    purpose: Void an order
+    trigger: onAction
+  implementation:
+    app: partner-web
+    route: /general/voucher-ticket-download
+    component: apps/partner-web/src/routes/general/VoucherTicketDownloadDetail.tsx
+    status: notStarted
+  navigation:
+    entryFrom:
+    - PTR-001
+    - PTR-008
+    inferred: true
+    exitTo:
+    - PTR-001
+    - PTR-002
+    - PTR-003
+  notes: States derived from the screen pattern on 17 August, not individually considered — sound for
+    a list, a form or a money screen, and worth revisiting where this screen is unusual. Purpose derived
+    from the screen name and its operations on 17 August, not from a requirement. **createRefund removed
+    18 August** — attached by module resemblance, not by what this screen does. A screen that does not
+    handle money should not be able to move it (CF-87's class).
+  density: compact
+  entryState:
+    params:
+    - name: orderId
+      from: PTR-008
+    coldEntry: Resolves from the session; a cold arrival is the ordinary case.
+  requiresModule: partner
+- id: PTR-017
+  name: Commission Statement
+  module: TODO
+  purpose: Answer a question about commission with numbers someone can check.
+  wave: 3
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+  states:
+    loading: Detail loads
+    emptyFirstRun: Not found — it may have been deleted or moved out of scope
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
+    error: Could not load
+  wireframe:
+    status: generated
+    board: wireframes/P10 Partner Web.dc.html#ptr-017
+  openQuestions:
+  - No contract — commission not modelled
+  implementation:
+    app: partner-web
+    route: /general/commission-statement
+    component: apps/partner-web/src/routes/general/CommissionStatementDetail.tsx
+    status: notStarted
+  navigation:
+    entryFrom:
+    - PTR-001
+    inferred: true
+    exitTo:
+    - PTR-001
+    - PTR-002
+    - PTR-003
+  notes: States derived from the screen pattern on 17 August, not individually considered — sound for
+    a list, a form or a money screen, and worth revisiting where this screen is unusual. Purpose derived
+    from the screen name and its operations on 17 August, not from a requirement.
+  apis:
+  - operationId: getCommissionStatement
+    contract: subscription
+    purpose: What the partner earned and what is owed
+    trigger: onLoad
+  - operationId: listPartnerAgreements
+    contract: subscription
+    purpose: Commercial agreements with B2B partners
+    trigger: onLoad
+  density: compact
+  entryState:
+    params:
+    - name: agreementId
+      from: deepLink
+    coldEntry: TODO — what this screen shows when somebody arrives with no upstream screen.
+  requiresModule: partner
+- id: PTR-018
+  name: Reports & Sales Performance
+  module: TODO
+  purpose: Answer a question about reports with numbers someone can check.
+  wave: 3
+  layout:
+    template: dashboard
+    regions:
+    - name: contentBody
+      components:
+      - kind: metricTile
+      - kind: chart
+  states:
+    loading: Detail loads
+    emptyFirstRun: Not found — it may have been deleted or moved out of scope
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
+    error: Could not load. Editing is blocked
+  wireframe:
+    status: generated
+    board: wireframes/P10 Partner Web.dc.html#ptr-018
+  capability: C21
+  apis:
+  - operationId: runReport
+    contract: reporting
+    purpose: from page inventory
+    trigger: onLoad
+  - operationId: askReportingQuestion
+    contract: reporting
+    purpose: Natural-language reporting query
+    trigger: onAction
+  - operationId: createReport
+    contract: reporting
+    purpose: Create a custom report definition
+    trigger: onAction
+  - operationId: deleteReport
+    contract: reporting
+    purpose: Retire a report definition
+    trigger: onAction
+  - operationId: getFinancialReport
+    contract: finance
+    purpose: P&L, balance sheet or cash flow
+    trigger: onLoad
+  - operationId: getReport
+    contract: reporting
+    purpose: Read a report definition
+    trigger: onLoad
+  - operationId: listReports
+    contract: reporting
+    purpose: List available report definitions
+    trigger: onLoad
+  - operationId: saveNaturalLanguageQuery
+    contract: reporting
+    purpose: Save a natural-language answer as a report definition
+    trigger: onAction
+  - operationId: updateReport
+    contract: reporting
+    purpose: Publish a new version of a definition
+    trigger: onAction
+  implementation:
+    app: partner-web
+    route: /general/reports-and-sales-performance
+    component: apps/partner-web/src/routes/general/ReportsAndSalesPerformanceDashboard.tsx
+    status: notStarted
+  navigation:
+    entryFrom:
+    - PTR-001
+    inferred: true
+    exitTo:
+    - PTR-001
+    - PTR-002
+    - PTR-003
+  notes: States derived from the screen pattern on 17 August, not individually considered — sound for
+    a list, a form or a money screen, and worth revisiting where this screen is unusual. Purpose derived
+    from the screen name and its operations on 17 August, not from a requirement.
+  density: compact
+  entryState:
+    params:
+    - name: conversationId
+      from: deepLink
+    - name: reportId
+      from: deepLink
+    coldEntry: A conversation link an agent opens from a notification. Resolves, or says it was closed
+      and by whom.
+  requiresModule: partner
+- id: PTR-019
+  name: API Credentials & Integration
+  module: TODO
+  purpose: API Credentials & Integration — the screen a person opens when they need to deal with api
+    credentials & integration.
+  wave: 3
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+  states:
+    loading: Detail loads
+    emptyFirstRun: Not found — it may have been deleted or moved out of scope
+    error: Could not load
+  wireframe:
+    status: generated
+    board: wireframes/P10 Partner Web.dc.html#ptr-019
+  openQuestions:
+  - Blocked — Developer & API workshop
+  implementation:
+    app: partner-web
+    route: /general/api-credentials-and-integration
+    component: apps/partner-web/src/routes/general/ApiCredentialsAndIntegrationDetail.tsx
+    status: notStarted
+  navigation:
+    entryFrom:
+    - PTR-001
+    inferred: true
+    exitTo:
+    - PTR-001
+    - PTR-002
+    - PTR-003
+  notes: States derived from the screen pattern on 17 August, not individually considered — sound for
+    a list, a form or a money screen, and worth revisiting where this screen is unusual. Purpose derived
+    from the screen name and its operations on 17 August, not from a requirement.
+  density: compact
+  requiresModule: partner
+- id: PTR-020
+  name: Sub-Agent Management
+  module: TODO
+  purpose: Add sub-agent management for this venue.
+  wave: 3
+  layout:
+    template: form
+    regions:
+    - name: contentBody
+      components:
+      - kind: textField
+      - kind: primaryButton
+  states:
+    loading: Current values, with the level each resolves from
+    emptyFirstRun: Nothing set at this level — the inherited value is shown and labelled as inherited
+      (ADR-0018)
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
+    error: '**Could not load. Saving is blocked**, because a value saved over an unread one silently
+      overwrites what someone else set'
+  wireframe:
+    status: generated
+    board: wireframes/P10 Partner Web.dc.html#ptr-020
+  capability: C56
+  apis:
+  - operationId: createGrant
+    contract: identity
+    purpose: from page inventory
+    trigger: onLoad
+  - operationId: deleteGrant
+    contract: identity
+    purpose: Remove a grant
+    trigger: onAction
+  - operationId: listGrants
+    contract: identity
+    purpose: List grants for a principal or role
+    trigger: onLoad
+  implementation:
+    app: partner-web
+    route: /general/sub-agent-management
+    component: apps/partner-web/src/routes/general/SubAgentManagementForm.tsx
+    status: notStarted
+  navigation:
+    entryFrom:
+    - PTR-001
+    inferred: true
+    exitTo:
+    - PTR-001
+    - PTR-002
+    - PTR-003
+  notes: States derived from the screen pattern on 17 August, not individually considered — sound for
+    a list, a form or a money screen, and worth revisiting where this screen is unusual. Purpose derived
+    from the screen name and its operations on 17 August, not from a requirement.
+  density: compact
+  entryState:
+    params:
+    - name: grantId
+      from: deepLink
+    coldEntry: TODO — what this screen shows when somebody arrives with no upstream screen.
+  requiresModule: partner
+- id: PTR-021
+  name: Support & Contact
+  module: TODO
+  purpose: Answer a question without needing a person.
+  wave: 3
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+  states:
+    loading: Detail loads
+    emptyFirstRun: Not found — it may have been deleted or moved out of scope
+    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
+    error: Could not load. Editing is blocked
+  wireframe:
+    status: generated
+    board: wireframes/P10 Partner Web.dc.html#ptr-021
+  capability: C32
+  apis:
+  - operationId: createCase
+    contract: marketing-crm
+    purpose: from page inventory
+    trigger: onLoad
+  - operationId: addCaseMessage
+    contract: marketing-crm
+    purpose: Add a message or internal note
+    trigger: onAction
+  - operationId: escalateCase
+    contract: marketing-crm
+    purpose: Escalate a case
+    trigger: onAction
+  - operationId: getCase
+    contract: marketing-crm
+    purpose: Read a case with its thread
+    trigger: onLoad
+  - operationId: listCases
+    contract: marketing-crm
+    purpose: List service cases
+    trigger: onLoad
+  - operationId: reopenCase
+    contract: marketing-crm
+    purpose: Reopen a resolved case
+    trigger: onAction
+  - operationId: updateCase
+    contract: marketing-crm
+    purpose: Assign, reprioritise or resolve a case
+    trigger: onAction
+  implementation:
+    app: partner-web
+    route: /general/support-and-contact
+    component: apps/partner-web/src/routes/general/SupportAndContactDetail.tsx
+    status: notStarted
+  navigation:
+    entryFrom:
+    - PTR-001
+    inferred: true
+    exitTo:
+    - PTR-001
+    - PTR-002
+    - PTR-003
+  notes: States derived from the screen pattern on 17 August, not individually considered — sound for
+    a list, a form or a money screen, and worth revisiting where this screen is unusual. Purpose derived
+    from the screen name and its operations on 17 August, not from a requirement.
+  density: compact
+  entryState:
+    params:
+    - name: caseId
+      from: deepLink
+    coldEntry: TODO — what this screen shows when somebody arrives with no upstream screen.
+  requiresModule: partner

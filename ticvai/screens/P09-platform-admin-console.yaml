@@ -1,0 +1,3218 @@
+# P09 — Platform Admin Console
+# Generated from handoff/page-inventory.md. Layout, states and purpose are TODO.
+# Validated against _schema.yaml; component kinds from _components.yaml.
+
+platform:
+  code: P09
+  audience: platformAdmin
+  formFactor: web
+  shortName: TICVAI Web
+  name: TICVAI Web — Platform Console
+  surface: platformAdmin
+  runtime: reactWeb
+  offlineCapable: false
+  themes:
+  - light
+  - dark
+  directions:
+  - ltr
+  - rtl
+  screenCount: 37
+  app: ticvai-web
+  appStatus: not scaffolded
+  packages:
+  - design-tokens
+  - ui
+  - api-client
+  deployment:
+    target: browser, desktop
+    distribution: served from the Control Plane
+    bundleUpdate: immediate on deploy
+    hosting: Control Plane, outside every cell
+    storeReview: false
+    deviceOwnership: platform staff device
+    networkAssumption: corporate network, IP-restricted
+    releaseCadence: weekly
+  operator: ticvai
+  wireframeBoard: wireframes/P09 TICVAI Web.dc.html
+  wireframeBoardNote: '**The generated board for the whole platform.** Individual screens keep the client-pack
+    anchor where one exists — a screen the client drew should open the client''s frame — and this renders
+    every screen on the platform including the ones no pack covers.
+
+
+    **Declared 24 August.** The file was written from the first generation and nothing pointed at it:
+    `check-wireframes` has no unmatched-board concept, so the Python suite passed while the viewer flagged
+    an orphan. **A board nobody references is a board nobody reviews.**'
+screens:
+- id: ADM-001
+  name: Platform Login / MFA
+  module: TODO
+  purpose: Get someone into the app, fast, on a device that may be shared.
+  wave: 1
+  layout:
+    template: list
+    regions:
+    - name: contentBody
+      components:
+      - kind: searchField
+      - kind: dataTable
+  states:
+    loading: Checking the session
+    emptyFirstRun: —
+    emptyNoResults: '**The filter matched nothing, and the data is still there.** The action widens
+      or clears it — distinct from first run, which has nothing to match, and **a screen that shows
+      the same panel for both sends somebody looking for data they already filtered out.**'
+    emptyNoAccess: '**Says which permission is missing, and never renders as an empty list.** This screen
+      needs `SESSION_FORCE_LOGOUT` to use sessions; a person without it sees the reason and who to ask,
+      because an empty table reads as *there is no data* and sends somebody to support with the wrong
+      question.
+
+
+      **Authority is carried by the person, not the device** (ADR-0002) — so signing in again on the
+      same terminal is the way through.'
+    error: Sign-in failed. Wrong credentials read differently from an unreachable directory
+  wireframe:
+    status: generated
+    board: wireframes/P09 TICVAI Web.dc.html#adm-001
+  capability: C35
+  apis:
+  - operationId: login
+    contract: identity
+    purpose: from page inventory
+    trigger: onLoad
+  - operationId: forceLogout
+    contract: identity
+    purpose: Supervisor termination of an abandoned session
+    trigger: onAction
+  - operationId: getCurrentSession
+    contract: identity
+    purpose: Current session and effective permissions
+    trigger: onLoad
+  - operationId: getGuestSession
+    contract: identity
+    purpose: Read the current guest session
+    trigger: onLoad
+  - operationId: listActiveSessions
+    contract: identity
+    purpose: List active sessions
+    trigger: onLoad
+  - operationId: listMfaMethods
+    contract: identity
+    purpose: Enrolled MFA methods
+    trigger: onLoad
+  - operationId: listSsoProviders
+    contract: identity
+    purpose: Identity providers configured for this tenant
+    trigger: onLoad
+  - operationId: revokeAllSessions
+    contract: identity
+    purpose: Revoke every session in scope
+    trigger: onAction
+  implementation:
+    app: ticvai-web
+    route: /general/platform-login-mfa
+    component: apps/ticvai-web/src/routes/general/PlatformLoginMfaList.tsx
+    status: notStarted
+  navigation:
+    entryFrom:
+    - ADM-002
+    inferred: true
+    exitTo:
+    - ADM-002
+    - ADM-003
+    - ADM-004
+  notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
+  density: compact
+  entryState:
+    params:
+    - name: sessionId
+      from: session
+    coldEntry: Resolves from the session; a cold arrival is the ordinary case.
+  requiresModule: core
+  statesDerived: true
+- id: ADM-002
+  name: Platform Dashboard
+  module: TODO
+  purpose: The screen this app sits on. Everything else is entered from here and returns to it.
+  wave: 1
+  layout:
+    template: dashboard
+    regions:
+    - name: contentBody
+      components:
+      - kind: metricTile
+      - kind: chart
+  states:
+    loading: Tiles skeleton; tenant count first
+    emptyFirstRun: No tenants yet — a new installation, not an error
+    emptyNoAccess: '**Says which permission is missing, and never renders as an empty list.** This screen
+      needs `PLATFORM_CELL_VIEW`, `PLATFORM_TENANT_VIEW`, `USER_MANAGE` to read platforms; a person
+      without it sees the reason and who to ask, because an empty table reads as *there is no data*
+      and sends somebody to support with the wrong question.
+
+
+      **Authority is carried by the person, not the device** (ADR-0002) — so signing in again on the
+      same terminal is the way through.
+
+
+      **Also reached when `membership` is not licensed.** The tenant has not bought this module, which
+      is a commercial answer and not a permission one — say which, because the person to ask is different.'
+    error: Each tile fails independently. **One dead cell must not blank the console that manages it**
+  wireframe:
+    status: generated
+    board: wireframes/P09 TICVAI Web.dc.html#adm-002
+  capability: C95
+  apis:
+  - operationId: listTenants
+    contract: subscription
+    purpose: from page inventory
+    trigger: onLoad
+  - operationId: getEntitlementUsage
+    contract: subscription
+    purpose: Usage against licensed limits
+    trigger: onLoad
+  - operationId: getSsoConfig
+    contract: identity
+    purpose: Read SSO configuration
+    trigger: onLoad
+  - operationId: getTenant
+    contract: subscription
+    purpose: Read a tenant with cells and subscription
+    trigger: onLoad
+  - operationId: getTenantLicences
+    contract: subscription
+    purpose: What a tenant is licensed to use
+    trigger: onLoad
+  - operationId: listTenantCells
+    contract: subscription
+    purpose: List a tenant's cells
+    trigger: onLoad
+  implementation:
+    app: ticvai-web
+    route: /general/platform-dashboard
+    component: apps/ticvai-web/src/routes/general/PlatformDashboard.tsx
+    status: notStarted
+  navigation:
+    isEntryPoint: true
+    exitTo:
+    - ADM-001
+    - ADM-003
+    - ADM-004
+    - ADM-005
+    - ADM-006
+    - ADM-007
+    - ADM-008
+    - ADM-012
+    inferred: true
+  notes: 'Purpose derived from the screen name and its operations on 17 August, not from a requirement.
+    **Removed 24 August**: generateInvoice, getSubscription, getUsageMetering, listSubscriptionInvoices,
+    previewSubscriptionChange, setSubscription. **Eleven P09 screens carried the same nine subscription
+    operations** — a platform dashboard, a tenant directory and a rate-limit console all able to preview
+    a subscription change. **Bulk-attach residue at platform scale**, and each screen now keeps only
+    what it is for. **Removed 24 August**: addLicenceAddOn, createTenant, provisionCell, reactivateTenant,
+    removeLicenceAddOn, setSsoConfig, suspendTenant, terminateTenant, updateTenant. **`ADM-015 API Rate
+    Limit & Quota Management` could create and terminate tenants.** The 18 August bulk attach reached
+    the platform console too — provisioning, licensing and SSO were on every screen that mentioned a
+    tenant.'
+  density: compact
+  entryState:
+    params:
+    - name: tenantId
+      from: session
+    coldEntry: Resolves from the session; a cold arrival is the ordinary case.
+  requiresModule: membership
+  statesDerived: true
+- id: ADM-003
+  name: Cross-Tenant Health Dashboard
+  module: TODO
+  purpose: The screen this app sits on. Everything else is entered from here and returns to it.
+  wave: 2
+  layout:
+    template: dashboard
+    regions:
+    - name: contentBody
+      components:
+      - kind: metricTile
+      - kind: chart
+  states:
+    loading: Cells report in parallel; slow ones are shown as pending rather than held for
+    emptyFirstRun: —
+    emptyNoAccess: '**Says which permission is missing, and never renders as an empty list.** This screen
+      needs `PLATFORM_CELL_MANAGE`, `PLATFORM_CELL_VIEW`, `TICKET_LOOKUP` to manage platforms; a person
+      without it sees the reason and who to ask, because an empty table reads as *there is no data*
+      and sends somebody to support with the wrong question.
+
+
+      **Authority is carried by the person, not the device** (ADR-0002) — so signing in again on the
+      same terminal is the way through.
+
+
+      **Also reached when `membership` is not licensed.** The tenant has not bought this module, which
+      is a commercial answer and not a permission one — say which, because the person to ask is different.'
+    error: '**A cell that does not answer is the finding, not an error.** It is rendered unreachable
+      with its last-known state and the age of it'
+  wireframe:
+    status: generated
+    board: wireframes/P09 TICVAI Web.dc.html#adm-003
+  capability: C95
+  apis:
+  - operationId: getCellHealth
+    contract: subscription
+    purpose: from page inventory
+    trigger: onLoad
+  - operationId: cancelDecommission
+    contract: subscription
+    purpose: Halt a decommission
+    trigger: onAction
+  - operationId: decommissionCell
+    contract: subscription
+    purpose: Begin decommissioning a cell
+    trigger: onAction
+  - operationId: getCell
+    contract: subscription
+    purpose: Read a cell
+    trigger: onLoad
+  - operationId: getCellCapacity
+    contract: subscription
+    purpose: Load against headroom
+    trigger: onLoad
+  - operationId: listCellJobs
+    contract: subscription
+    purpose: Provisioning, migration and maintenance jobs
+    trigger: onLoad
+  - operationId: updateCellTier
+    contract: subscription
+    purpose: Change a cell's tier
+    trigger: onAction
+  - operationId: propagateRedemptionRight
+    contract: cross-cell
+    purpose: Propagate a right from the issuing cell to a consuming cell
+    trigger: onAction
+  - operationId: getRedemptionRight
+    contract: cross-cell
+    purpose: Read a redemption right
+    trigger: onLoad
+  - operationId: reconcileRedemptions
+    contract: cross-cell
+    purpose: Report consumption back to the issuing cell
+    trigger: onAction
+  implementation:
+    app: ticvai-web
+    route: /general/cross-tenant-health-dashboard
+    component: apps/ticvai-web/src/routes/general/CrossTenantHealthDashboard.tsx
+    status: notStarted
+  navigation:
+    entryFrom:
+    - ADM-002
+    inferred: true
+    exitTo:
+    - ADM-001
+    - ADM-002
+    - ADM-004
+    fromFlows: true
+  notes: 'Purpose derived from the screen name and its operations on 17 August, not from a requirement.
+    **Cross-platform navigation removed 24 August**: SCN-003. **A till does not navigate to a back office
+    and a guest app does not navigate to either** — those are device handovers, and a flow declares
+    them with `crossesDevice` rather than a screen pretending there is a link.'
+  density: compact
+  entryState:
+    params:
+    - name: cellId
+      from: deepLink
+    - name: rightId
+      from: deepLink
+    coldEntry: '**A platform-admin link resolves against the tenant in the link and refuses if the operator
+      does not hold that tenant.** A link is not authorisation. If the target is gone the screen says
+      so and returns to the directory — **an admin console that silently shows the wrong tenant is worse
+      than one that shows nothing.** Arrives with `cellId`, `rightId`.'
+  requiresModule: membership
+  statesDerived: true
+- id: ADM-004
+  name: Platform Audit Log
+  module: TODO
+  purpose: Find platform audit log for this venue.
+  wave: 2
+  layout:
+    template: list
+    regions:
+    - name: contentBody
+      components:
+      - kind: searchField
+      - kind: dataTable
+  states:
+    loading: Paged from the analytical replica
+    emptyFirstRun: No events for this filter
+    emptyNoResults: '**The filter matched nothing, and the data is still there.** The action widens
+      or clears it — distinct from first run, which has nothing to match, and **a screen that shows
+      the same panel for both sends somebody looking for data they already filtered out.**'
+    emptyNoAccess: '**Says which permission is missing, and never renders as an empty list.** This screen
+      needs `AI_AUDIT_VIEW` to read ais; a person without it sees the reason and who to ask, because
+      an empty table reads as *there is no data* and sends somebody to support with the wrong question.
+
+
+      **Authority is carried by the person, not the device** (ADR-0002) — so signing in again on the
+      same terminal is the way through.
+
+
+      **Also reached when `ai` is not licensed.** The tenant has not bought this module, which is a
+      commercial answer and not a permission one — say which, because the person to ask is different.'
+    error: Log unavailable. **The console says so rather than showing an empty log** — an empty audit
+      trail and a broken one look identical and mean opposite things
+  wireframe:
+    status: generated
+    board: wireframes/P09 TICVAI Web.dc.html#adm-004
+  capability: C97
+  openQuestions:
+  - No contract — Control Plane audit not specified
+  implementation:
+    app: ticvai-web
+    route: /general/platform-audit-log
+    component: apps/ticvai-web/src/routes/general/PlatformAuditLogList.tsx
+    status: notStarted
+  navigation:
+    entryFrom:
+    - ADM-002
+    inferred: true
+    exitTo:
+    - ADM-001
+    - ADM-002
+    - ADM-003
+  apis:
+  - operationId: listAiInteractions
+    contract: ai
+    purpose: Every prompt, response and action
+    trigger: onLoad
+  notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
+  density: compact
+  requiresModule: ai
+  statesDerived: true
+- id: ADM-005
+  name: Tenant Directory
+  module: TODO
+  purpose: Find the right one quickly, and act on it without opening it.
+  wave: 1
+  layout:
+    template: list
+    regions:
+    - name: contentBody
+      components:
+      - kind: searchField
+      - kind: dataTable
+  states:
+    loading: List skeleton
+    emptyFirstRun: No tenants match
+    emptyNoResults: '**The filter matched nothing, and the data is still there.** The action widens
+      or clears it — distinct from first run, which has nothing to match, and **a screen that shows
+      the same panel for both sends somebody looking for data they already filtered out.**'
+    emptyNoAccess: '**Says which permission is missing, and never renders as an empty list.** This screen
+      needs `PLATFORM_CELL_MANAGE`, `PLATFORM_CELL_VIEW`, `PLATFORM_TENANT_MANAGE` and 3 more to manage
+      platforms; a person without it sees the reason and who to ask, because an empty table reads as
+      *there is no data* and sends somebody to support with the wrong question.
+
+
+      **Authority is carried by the person, not the device** (ADR-0002) — so signing in again on the
+      same terminal is the way through.
+
+
+      **Also reached when `membership` is not licensed.** The tenant has not bought this module, which
+      is a commercial answer and not a permission one — say which, because the person to ask is different.'
+    error: Could not load
+  wireframe:
+    status: generated
+    board: wireframes/P09 TICVAI Web.dc.html#adm-005
+  capability: C95
+  apis:
+  - operationId: listTenants
+    contract: subscription
+    purpose: from page inventory
+    trigger: onLoad
+  - operationId: addLicenceAddOn
+    contract: subscription
+    purpose: License a module outside the plan
+    trigger: onAction
+  - operationId: createTenant
+    contract: subscription
+    purpose: Create a tenant
+    trigger: onAction
+  - operationId: getEntitlementUsage
+    contract: subscription
+    purpose: Usage against licensed limits
+    trigger: onLoad
+  - operationId: getSsoConfig
+    contract: identity
+    purpose: Read SSO configuration
+    trigger: onLoad
+  - operationId: getTenant
+    contract: subscription
+    purpose: Read a tenant with cells and subscription
+    trigger: onLoad
+  - operationId: getTenantLicences
+    contract: subscription
+    purpose: What a tenant is licensed to use
+    trigger: onLoad
+  - operationId: listTenantCells
+    contract: subscription
+    purpose: List a tenant's cells
+    trigger: onLoad
+  - operationId: provisionCell
+    contract: subscription
+    purpose: Provision a cell for a region
+    trigger: onAction
+  - operationId: reactivateTenant
+    contract: subscription
+    purpose: Lift a suspension
+    trigger: onAction
+  - operationId: removeLicenceAddOn
+    contract: subscription
+    purpose: Remove an add-on
+    trigger: onAction
+  - operationId: setSsoConfig
+    contract: identity
+    purpose: Configure an identity provider
+    trigger: onAction
+  - operationId: suspendTenant
+    contract: subscription
+    purpose: Suspend a tenant
+    trigger: onAction
+  - operationId: terminateTenant
+    contract: subscription
+    purpose: Begin termination
+    trigger: onAction
+  - operationId: updateTenant
+    contract: subscription
+    purpose: Amend tenant details
+    trigger: onAction
+  implementation:
+    app: ticvai-web
+    route: /general/tenant-directory
+    component: apps/ticvai-web/src/routes/general/TenantDirectoryList.tsx
+    status: notStarted
+  navigation:
+    entryFrom:
+    - ADM-002
+    inferred: true
+    exitTo:
+    - ADM-001
+    - ADM-002
+    - ADM-003
+    - ADM-012
+    fromFlows: true
+  notes: 'Purpose derived from the screen name and its operations on 17 August, not from a requirement.
+    **Removed 24 August**: generateInvoice, getSubscription, getUsageMetering, listSubscriptionInvoices,
+    previewSubscriptionChange, setSubscription. **Eleven P09 screens carried the same nine subscription
+    operations** — a platform dashboard, a tenant directory and a rate-limit console all able to preview
+    a subscription change. **Bulk-attach residue at platform scale**, and each screen now keeps only
+    what it is for.'
+  density: compact
+  entryState:
+    params:
+    - name: tenantId
+      from: ADM-002
+    coldEntry: Resolves from the session; a cold arrival is the ordinary case.
+  requiresModule: membership
+  statesDerived: true
+- id: ADM-006
+  name: Tenant Hierarchy Explorer
+  module: TODO
+  purpose: See tenant hierarchy explorer for this venue.
+  wave: 1
+  layout:
+    template: list
+    regions:
+    - name: contentBody
+      components:
+      - kind: searchField
+      - kind: dataTable
+  states:
+    loading: Tree loads lazily below region
+    emptyFirstRun: A tenant with one venue — shown flat rather than as a tree of one
+    emptyNoResults: '**The filter matched nothing, and the data is still there.** The action widens
+      or clears it — distinct from first run, which has nothing to match, and **a screen that shows
+      the same panel for both sends somebody looking for data they already filtered out.**'
+    emptyNoAccess: '**Says which permission is missing, and never renders as an empty list.** This screen
+      needs `PLATFORM_CELL_VIEW`, `PLATFORM_TENANT_MANAGE`, `PLATFORM_TENANT_VIEW` and 3 more to read
+      platforms; a person without it sees the reason and who to ask, because an empty table reads as
+      *there is no data* and sends somebody to support with the wrong question.
+
+
+      **Authority is carried by the person, not the device** (ADR-0002) — so signing in again on the
+      same terminal is the way through.
+
+
+      **Also reached when `membership` is not licensed.** The tenant has not bought this module, which
+      is a commercial answer and not a permission one — say which, because the person to ask is different.'
+    error: Partial. Branches that failed are marked, not hidden
+  wireframe:
+    status: generated
+    board: wireframes/P09 TICVAI Web.dc.html#adm-006
+  capability: C20
+  implementation:
+    app: ticvai-web
+    route: /general/tenant-hierarchy-explorer
+    component: apps/ticvai-web/src/routes/general/TenantHierarchyExplorerList.tsx
+    status: notStarted
+  navigation:
+    entryFrom:
+    - ADM-002
+    inferred: true
+    exitTo:
+    - ADM-001
+    - ADM-002
+    - ADM-003
+    - ADM-007
+    fromFlows: true
+  apis:
+  - operationId: getSsoConfig
+    contract: identity
+    purpose: Read SSO configuration
+    trigger: onLoad
+  - operationId: listTenants
+    contract: subscription
+    purpose: List tenants
+    trigger: onLoad
+  - operationId: getEntitlementUsage
+    contract: subscription
+    purpose: Usage against licensed limits
+    trigger: onLoad
+  - operationId: getTenant
+    contract: subscription
+    purpose: Read a tenant with cells and subscription
+    trigger: onLoad
+  - operationId: getTenantLicences
+    contract: subscription
+    purpose: What a tenant is licensed to use
+    trigger: onLoad
+  - operationId: listTenantCells
+    contract: subscription
+    purpose: List a tenant's cells
+    trigger: onLoad
+  - operationId: updateTenant
+    contract: subscription
+    purpose: Amend tenant details
+    trigger: onAction
+  - operationId: listScopeNodes
+    contract: tenancy
+    purpose: List scope nodes visible to the session
+    trigger: onLoad
+  - operationId: createScopeNode
+    contract: tenancy
+    purpose: Create a scope node
+    trigger: onAction
+  notes: 'Purpose derived from the screen name and its operations on 17 August, not from a requirement.
+    **Removed 24 August**: generateInvoice, getSubscription, getUsageMetering, listSubscriptionInvoices,
+    previewSubscriptionChange, setSubscription. **Eleven P09 screens carried the same nine subscription
+    operations** — a platform dashboard, a tenant directory and a rate-limit console all able to preview
+    a subscription change. **Bulk-attach residue at platform scale**, and each screen now keeps only
+    what it is for. **Removed 24 August**: addLicenceAddOn, createTenant, provisionCell, reactivateTenant,
+    removeLicenceAddOn, setSsoConfig, suspendTenant, terminateTenant. **`ADM-015 API Rate Limit & Quota
+    Management` could create and terminate tenants.** The 18 August bulk attach reached the platform
+    console too — provisioning, licensing and SSO were on every screen that mentioned a tenant.'
+  density: compact
+  entryState:
+    params:
+    - name: tenantId
+      from: ADM-002
+    coldEntry: Resolves from the session; a cold arrival is the ordinary case.
+  requiresModule: membership
+  statesDerived: true
+- id: ADM-007
+  name: Module & Feature Entitlement
+  module: TODO
+  purpose: See module & feature entitlement for this venue.
+  wave: 1
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+  states:
+    loading: Entitlements resolve against the plan
+    emptyFirstRun: All modules enabled — the maximum plan
+    emptyNoAccess: '**Says which permission is missing, and never renders as an empty list.** This screen
+      needs `PLATFORM_CELL_VIEW`, `PLATFORM_TENANT_MANAGE`, `PLATFORM_TENANT_VIEW` and 1 more to read
+      platforms; a person without it sees the reason and who to ask, because an empty table reads as
+      *there is no data* and sends somebody to support with the wrong question.
+
+
+      **Authority is carried by the person, not the device** (ADR-0002) — so signing in again on the
+      same terminal is the way through.
+
+
+      **Also reached when `membership` is not licensed.** The tenant has not bought this module, which
+      is a commercial answer and not a permission one — say which, because the person to ask is different.'
+    error: Could not resolve. **Editing is blocked**, because saving against an unknown current state
+      overwrites what nobody read
+  wireframe:
+    status: generated
+    board: wireframes/P09 TICVAI Web.dc.html#adm-007
+  capability: C75
+  apis:
+  - operationId: getTenantLicences
+    contract: subscription
+    purpose: from page inventory
+    trigger: onLoad
+  - operationId: addLicenceAddOn
+    contract: subscription
+    purpose: License a module outside the plan
+    trigger: onAction
+  - operationId: getEntitlementUsage
+    contract: subscription
+    purpose: Usage against licensed limits
+    trigger: onLoad
+  - operationId: getSsoConfig
+    contract: identity
+    purpose: Read SSO configuration
+    trigger: onLoad
+  - operationId: getSubscription
+    contract: subscription
+    purpose: Read the current subscription
+    trigger: onLoad
+  - operationId: getTenant
+    contract: subscription
+    purpose: Read a tenant with cells and subscription
+    trigger: onLoad
+  - operationId: listTenantCells
+    contract: subscription
+    purpose: List a tenant's cells
+    trigger: onLoad
+  - operationId: listTenants
+    contract: subscription
+    purpose: List tenants
+    trigger: onLoad
+  - operationId: removeLicenceAddOn
+    contract: subscription
+    purpose: Remove an add-on
+    trigger: onAction
+  implementation:
+    app: ticvai-web
+    route: /general/module-and-feature-entitlement
+    component: apps/ticvai-web/src/routes/general/ModuleAndFeatureEntitlementDetail.tsx
+    status: notStarted
+  navigation:
+    entryFrom:
+    - ADM-002
+    inferred: true
+    exitTo:
+    - ADM-001
+    - ADM-002
+    - ADM-003
+    fromFlows: true
+  notes: 'Purpose derived from the screen name and its operations on 17 August, not from a requirement.
+    **Cross-platform navigation removed 24 August**: BO-074. **A till does not navigate to a back office
+    and a guest app does not navigate to either** — those are device handovers, and a flow declares
+    them with `crossesDevice` rather than a screen pretending there is a link. **Removed 24 August**:
+    generateInvoice, getUsageMetering, listSubscriptionInvoices, previewSubscriptionChange, setSubscription.
+    **Eleven P09 screens carried the same nine subscription operations** — a platform dashboard, a tenant
+    directory and a rate-limit console all able to preview a subscription change. **Bulk-attach residue
+    at platform scale**, and each screen now keeps only what it is for. **Removed 24 August**: createTenant,
+    provisionCell, reactivateTenant, setSsoConfig, suspendTenant, terminateTenant, updateTenant. **`ADM-015
+    API Rate Limit & Quota Management` could create and terminate tenants.** The 18 August bulk attach
+    reached the platform console too — provisioning, licensing and SSO were on every screen that mentioned
+    a tenant.'
+  density: compact
+  entryState:
+    params:
+    - name: tenantId
+      from: ADM-002
+    coldEntry: Resolves from the session; a cold arrival is the ordinary case.
+  requiresModule: membership
+  statesDerived: true
+- id: ADM-008
+  name: Subscription & Plan Management
+  module: TODO
+  purpose: Find subscription & plan management for this venue.
+  wave: 1
+  layout:
+    template: form
+    regions:
+    - name: contentBody
+      components:
+      - kind: textField
+      - kind: primaryButton
+  states:
+    loading: Plans and the current subscription
+    emptyFirstRun: —
+    emptyNoAccess: '**Says which permission is missing, and never renders as an empty list.** This screen
+      needs `PARTNER_MANAGE`, `PLATFORM_BILLING_MANAGE`, `PLATFORM_BILLING_VIEW` and 5 more to manage
+      partners; a person without it sees the reason and who to ask, because an empty table reads as
+      *there is no data* and sends somebody to support with the wrong question.
+
+
+      **Authority is carried by the person, not the device** (ADR-0002) — so signing in again on the
+      same terminal is the way through.
+
+
+      **Also reached when `membership` is not licensed.** The tenant has not bought this module, which
+      is a commercial answer and not a permission one — say which, because the person to ask is different.'
+    error: Save failed. The subscription is unchanged and says so
+  wireframe:
+    status: generated
+    board: wireframes/P09 TICVAI Web.dc.html#adm-008
+  capability: C74
+  apis:
+  - operationId: listPlans
+    contract: subscription
+    purpose: from page inventory
+    trigger: onLoad
+  - operationId: setSubscription
+    contract: subscription
+    purpose: from page inventory
+    trigger: onLoad
+  - operationId: createPlan
+    contract: subscription
+    purpose: Create a subscription plan
+    trigger: onAction
+  - operationId: createPlanVersion
+    contract: subscription
+    purpose: Publish a new version of a plan
+    trigger: onAction
+  - operationId: generateInvoice
+    contract: subscription
+    purpose: Generate an invoice for a period
+    trigger: onAction
+  - operationId: getEntitlementUsage
+    contract: subscription
+    purpose: Usage against licensed limits
+    trigger: onLoad
+  - operationId: getPlan
+    contract: subscription
+    purpose: Read a plan
+    trigger: onLoad
+  - operationId: getSsoConfig
+    contract: identity
+    purpose: Read SSO configuration
+    trigger: onLoad
+  - operationId: getSubscription
+    contract: subscription
+    purpose: Read the current subscription
+    trigger: onLoad
+  - operationId: getTenant
+    contract: subscription
+    purpose: Read a tenant with cells and subscription
+    trigger: onLoad
+  - operationId: getTenantLicences
+    contract: subscription
+    purpose: What a tenant is licensed to use
+    trigger: onLoad
+  - operationId: getUsageMetering
+    contract: subscription
+    purpose: Metered usage for a period
+    trigger: onLoad
+  - operationId: listSubscriptionInvoices
+    contract: subscription
+    purpose: List subscription invoices
+    trigger: onLoad
+  - operationId: listTenantCells
+    contract: subscription
+    purpose: List a tenant's cells
+    trigger: onLoad
+  - operationId: listTenants
+    contract: subscription
+    purpose: List tenants
+    trigger: onLoad
+  - operationId: previewSubscriptionChange
+    contract: subscription
+    purpose: Preview the effect of a plan change
+    trigger: onAction
+  - operationId: listPartnerAgreements
+    contract: subscription
+    purpose: Commercial agreements with B2B partners
+    trigger: onLoad
+  - operationId: createPartnerAgreement
+    contract: subscription
+    purpose: Agree commercial terms with a partner
+    trigger: onAction
+  - operationId: updatePartnerAgreement
+    contract: subscription
+    purpose: Amend, suspend or terminate
+    trigger: onAction
+  implementation:
+    app: ticvai-web
+    route: /general/subscription-and-plan-management
+    component: apps/ticvai-web/src/routes/general/SubscriptionAndPlanManagementForm.tsx
+    status: notStarted
+  navigation:
+    entryFrom:
+    - ADM-002
+    inferred: true
+    exitTo:
+    - ADM-001
+    - ADM-002
+    - ADM-003
+  notes: 'Purpose derived from the screen name and its operations on 17 August, not from a requirement.
+    **Removed 24 August**: addLicenceAddOn, createTenant, provisionCell, reactivateTenant, removeLicenceAddOn,
+    setSsoConfig, suspendTenant, terminateTenant, updateTenant. **`ADM-015 API Rate Limit & Quota Management`
+    could create and terminate tenants.** The 18 August bulk attach reached the platform console too
+    — provisioning, licensing and SSO were on every screen that mentioned a tenant.'
+  density: compact
+  entryState:
+    params:
+    - name: agreementId
+      from: deepLink
+    - name: planId
+      from: deepLink
+    - name: tenantId
+      from: ADM-002
+    coldEntry: '**A platform-admin link resolves against the tenant in the link and refuses if the operator
+      does not hold that tenant.** A link is not authorisation. If the target is gone the screen says
+      so and returns to the directory — **an admin console that silently shows the wrong tenant is worse
+      than one that shows nothing.** Arrives with `agreementId`, `planId`.'
+  requiresModule: membership
+  statesDerived: true
+- id: ADM-009
+  name: Tenant Billing & Invoicing
+  module: TODO
+  purpose: Find tenant billing & invoicing for this venue.
+  wave: 2
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+  states:
+    loading: Invoices, newest first
+    emptyFirstRun: No invoices — a tenant inside its first period
+    emptyNoAccess: '**Says which permission is missing, and never renders as an empty list.** This screen
+      needs `PLATFORM_BILLING_MANAGE`, `PLATFORM_BILLING_VIEW`, `PLATFORM_CELL_VIEW` and 2 more to manage
+      platforms; a person without it sees the reason and who to ask, because an empty table reads as
+      *there is no data* and sends somebody to support with the wrong question.
+
+
+      **Authority is carried by the person, not the device** (ADR-0002) — so signing in again on the
+      same terminal is the way through.
+
+
+      **Also reached when `membership` is not licensed.** The tenant has not bought this module, which
+      is a commercial answer and not a permission one — say which, because the person to ask is different.'
+    error: 'Billing unavailable. **Read-only failure**: no invoice may be issued from a screen that
+      cannot list them'
+  wireframe:
+    status: generated
+    board: wireframes/P09 TICVAI Web.dc.html#adm-009
+  capability: C74
+  apis:
+  - operationId: listSubscriptionInvoices
+    contract: subscription
+    purpose: from page inventory
+    trigger: onLoad
+  - operationId: generateInvoice
+    contract: subscription
+    purpose: Generate an invoice for a period
+    trigger: onAction
+  - operationId: getEntitlementUsage
+    contract: subscription
+    purpose: Usage against licensed limits
+    trigger: onLoad
+  - operationId: getSsoConfig
+    contract: identity
+    purpose: Read SSO configuration
+    trigger: onLoad
+  - operationId: getSubscription
+    contract: subscription
+    purpose: Read the current subscription
+    trigger: onLoad
+  - operationId: getTenant
+    contract: subscription
+    purpose: Read a tenant with cells and subscription
+    trigger: onLoad
+  - operationId: getTenantLicences
+    contract: subscription
+    purpose: What a tenant is licensed to use
+    trigger: onLoad
+  - operationId: listTenantCells
+    contract: subscription
+    purpose: List a tenant's cells
+    trigger: onLoad
+  - operationId: listTenants
+    contract: subscription
+    purpose: List tenants
+    trigger: onLoad
+  implementation:
+    app: ticvai-web
+    route: /general/tenant-billing-and-invoicing
+    component: apps/ticvai-web/src/routes/general/TenantBillingAndInvoicingDetail.tsx
+    status: notStarted
+  navigation:
+    entryFrom:
+    - ADM-002
+    inferred: true
+    exitTo:
+    - ADM-001
+    - ADM-002
+    - ADM-003
+  notes: 'Purpose derived from the screen name and its operations on 17 August, not from a requirement.
+    **Removed 24 August**: getUsageMetering, previewSubscriptionChange, setSubscription. **Eleven P09
+    screens carried the same nine subscription operations** — a platform dashboard, a tenant directory
+    and a rate-limit console all able to preview a subscription change. **Bulk-attach residue at platform
+    scale**, and each screen now keeps only what it is for. **Removed 24 August**: addLicenceAddOn,
+    createTenant, provisionCell, reactivateTenant, removeLicenceAddOn, setSsoConfig, suspendTenant,
+    terminateTenant, updateTenant. **`ADM-015 API Rate Limit & Quota Management` could create and terminate
+    tenants.** The 18 August bulk attach reached the platform console too — provisioning, licensing
+    and SSO were on every screen that mentioned a tenant.'
+  density: compact
+  entryState:
+    params:
+    - name: tenantId
+      from: ADM-002
+    coldEntry: Resolves from the session; a cold arrival is the ordinary case.
+  requiresModule: membership
+  statesDerived: true
+- id: ADM-010
+  name: Usage Metering
+  module: TODO
+  purpose: See usage metering for this venue.
+  wave: 2
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+  states:
+    loading: Metering aggregates from the analytical replica
+    emptyFirstRun: No usage in the period
+    emptyNoAccess: '**Says which permission is missing, and never renders as an empty list.** This screen
+      needs `PLATFORM_CELL_VIEW`, `PLATFORM_TENANT_VIEW`, `USER_MANAGE` to read platforms; a person
+      without it sees the reason and who to ask, because an empty table reads as *there is no data*
+      and sends somebody to support with the wrong question.
+
+
+      **Authority is carried by the person, not the device** (ADR-0002) — so signing in again on the
+      same terminal is the way through.
+
+
+      **Also reached when `membership` is not licensed.** The tenant has not bought this module, which
+      is a commercial answer and not a permission one — say which, because the person to ask is different.'
+    error: Metering unavailable. Shows the last complete period rather than nothing
+  wireframe:
+    status: generated
+    board: wireframes/P09 TICVAI Web.dc.html#adm-010
+  capability: C74
+  apis:
+  - operationId: getUsageMetering
+    contract: subscription
+    purpose: from page inventory
+    trigger: onLoad
+  - operationId: getEntitlementUsage
+    contract: subscription
+    purpose: Usage against licensed limits
+    trigger: onLoad
+  - operationId: getSsoConfig
+    contract: identity
+    purpose: Read SSO configuration
+    trigger: onLoad
+  - operationId: getTenant
+    contract: subscription
+    purpose: Read a tenant with cells and subscription
+    trigger: onLoad
+  - operationId: getTenantLicences
+    contract: subscription
+    purpose: What a tenant is licensed to use
+    trigger: onLoad
+  - operationId: listTenantCells
+    contract: subscription
+    purpose: List a tenant's cells
+    trigger: onLoad
+  - operationId: listTenants
+    contract: subscription
+    purpose: List tenants
+    trigger: onLoad
+  implementation:
+    app: ticvai-web
+    route: /general/usage-metering
+    component: apps/ticvai-web/src/routes/general/UsageMeteringDetail.tsx
+    status: notStarted
+  navigation:
+    entryFrom:
+    - ADM-002
+    inferred: true
+    exitTo:
+    - ADM-001
+    - ADM-002
+    - ADM-003
+  notes: 'Purpose derived from the screen name and its operations on 17 August, not from a requirement.
+    **Removed 24 August**: generateInvoice, getSubscription, listSubscriptionInvoices, previewSubscriptionChange,
+    setSubscription. **Eleven P09 screens carried the same nine subscription operations** — a platform
+    dashboard, a tenant directory and a rate-limit console all able to preview a subscription change.
+    **Bulk-attach residue at platform scale**, and each screen now keeps only what it is for. **Removed
+    24 August**: addLicenceAddOn, createTenant, provisionCell, reactivateTenant, removeLicenceAddOn,
+    setSsoConfig, suspendTenant, terminateTenant, updateTenant. **`ADM-015 API Rate Limit & Quota Management`
+    could create and terminate tenants.** The 18 August bulk attach reached the platform console too
+    — provisioning, licensing and SSO were on every screen that mentioned a tenant.'
+  density: compact
+  entryState:
+    params:
+    - name: tenantId
+      from: ADM-002
+    coldEntry: Resolves from the session; a cold arrival is the ordinary case.
+  requiresModule: membership
+  statesDerived: true
+- id: ADM-011
+  name: Licence & Seat Management
+  module: TODO
+  purpose: See licence & seat management for this venue.
+  wave: 2
+  layout:
+    template: form
+    regions:
+    - name: contentBody
+      components:
+      - kind: textField
+      - kind: primaryButton
+  states:
+    loading: Licences and consumption
+    emptyFirstRun: No seats allocated
+    emptyNoAccess: '**Says which permission is missing, and never renders as an empty list.** This screen
+      needs `PLATFORM_CELL_VIEW`, `PLATFORM_TENANT_MANAGE`, `PLATFORM_TENANT_VIEW` and 1 more to read
+      platforms; a person without it sees the reason and who to ask, because an empty table reads as
+      *there is no data* and sends somebody to support with the wrong question.
+
+
+      **Authority is carried by the person, not the device** (ADR-0002) — so signing in again on the
+      same terminal is the way through.
+
+
+      **Also reached when `membership` is not licensed.** The tenant has not bought this module, which
+      is a commercial answer and not a permission one — say which, because the person to ask is different.'
+    error: Could not load
+  wireframe:
+    status: generated
+    board: wireframes/P09 TICVAI Web.dc.html#adm-011
+  capability: C75
+  apis:
+  - operationId: getEntitlementUsage
+    contract: subscription
+    purpose: from page inventory
+    trigger: onLoad
+  - operationId: addLicenceAddOn
+    contract: subscription
+    purpose: License a module outside the plan
+    trigger: onAction
+  - operationId: getSsoConfig
+    contract: identity
+    purpose: Read SSO configuration
+    trigger: onLoad
+  - operationId: getSubscription
+    contract: subscription
+    purpose: Read the current subscription
+    trigger: onLoad
+  - operationId: getTenant
+    contract: subscription
+    purpose: Read a tenant with cells and subscription
+    trigger: onLoad
+  - operationId: getTenantLicences
+    contract: subscription
+    purpose: What a tenant is licensed to use
+    trigger: onLoad
+  - operationId: listTenantCells
+    contract: subscription
+    purpose: List a tenant's cells
+    trigger: onLoad
+  - operationId: listTenants
+    contract: subscription
+    purpose: List tenants
+    trigger: onLoad
+  - operationId: previewSubscriptionChange
+    contract: subscription
+    purpose: Preview the effect of a plan change
+    trigger: onAction
+  - operationId: removeLicenceAddOn
+    contract: subscription
+    purpose: Remove an add-on
+    trigger: onAction
+  - operationId: setSubscription
+    contract: subscription
+    purpose: Assign or change a subscription
+    trigger: onAction
+  implementation:
+    app: ticvai-web
+    route: /general/licence-and-seat-management
+    component: apps/ticvai-web/src/routes/general/LicenceAndSeatManagementForm.tsx
+    status: notStarted
+  navigation:
+    entryFrom:
+    - ADM-002
+    inferred: true
+    exitTo:
+    - ADM-001
+    - ADM-002
+    - ADM-003
+  notes: 'Purpose derived from the screen name and its operations on 17 August, not from a requirement.
+    **Removed 24 August**: generateInvoice, getUsageMetering, listSubscriptionInvoices. **Eleven P09
+    screens carried the same nine subscription operations** — a platform dashboard, a tenant directory
+    and a rate-limit console all able to preview a subscription change. **Bulk-attach residue at platform
+    scale**, and each screen now keeps only what it is for. **Removed 24 August**: createTenant, provisionCell,
+    reactivateTenant, setSsoConfig, suspendTenant, terminateTenant, updateTenant. **`ADM-015 API Rate
+    Limit & Quota Management` could create and terminate tenants.** The 18 August bulk attach reached
+    the platform console too — provisioning, licensing and SSO were on every screen that mentioned a
+    tenant.'
+  density: compact
+  entryState:
+    params:
+    - name: tenantId
+      from: ADM-002
+    coldEntry: Resolves from the session; a cold arrival is the ordinary case.
+  requiresModule: membership
+  statesDerived: true
+- id: ADM-012
+  name: Tenant Isolation & Resource Pool
+  module: TODO
+  purpose: Work with tenant isolation & resource pool for this venue.
+  wave: 1
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+  states:
+    loading: Cell and pool state
+    emptyFirstRun: —
+    emptyNoAccess: '**Says which permission is missing, and never renders as an empty list.** This screen
+      needs `PLATFORM_CELL_MANAGE`, `PLATFORM_CELL_VIEW`, `PLATFORM_TENANT_VIEW` and 1 more to manage
+      platforms; a person without it sees the reason and who to ask, because an empty table reads as
+      *there is no data* and sends somebody to support with the wrong question.
+
+
+      **Authority is carried by the person, not the device** (ADR-0002) — so signing in again on the
+      same terminal is the way through.
+
+
+      **Also reached when `membership` is not licensed.** The tenant has not bought this module, which
+      is a commercial answer and not a permission one — say which, because the person to ask is different.'
+    error: '**Provisioning is disabled while the current state is unknown.** A second cell provisioned
+      because the first was invisible is the expensive mistake'
+  wireframe:
+    status: generated
+    board: wireframes/P09 TICVAI Web.dc.html#adm-012
+  capability: C96
+  apis:
+  - operationId: provisionCell
+    contract: subscription
+    purpose: from page inventory
+    trigger: onLoad
+  - operationId: getEntitlementUsage
+    contract: subscription
+    purpose: Usage against licensed limits
+    trigger: onLoad
+  - operationId: getSsoConfig
+    contract: identity
+    purpose: Read SSO configuration
+    trigger: onLoad
+  - operationId: getTenant
+    contract: subscription
+    purpose: Read a tenant with cells and subscription
+    trigger: onLoad
+  - operationId: getTenantLicences
+    contract: subscription
+    purpose: What a tenant is licensed to use
+    trigger: onLoad
+  - operationId: listTenantCells
+    contract: subscription
+    purpose: List a tenant's cells
+    trigger: onLoad
+  - operationId: listTenants
+    contract: subscription
+    purpose: List tenants
+    trigger: onLoad
+  - operationId: getCellCapacity
+    contract: subscription
+    purpose: Load against headroom
+    trigger: onLoad
+  implementation:
+    app: ticvai-web
+    route: /general/tenant-isolation-and-resource-pool
+    component: apps/ticvai-web/src/routes/general/TenantIsolationAndResourcePoolDetail.tsx
+    status: notStarted
+  navigation:
+    entryFrom:
+    - ADM-002
+    inferred: true
+    exitTo:
+    - ADM-001
+    - ADM-002
+    - ADM-003
+    - ADM-006
+    fromFlows: true
+  notes: 'Purpose derived from the screen name and its operations on 17 August, not from a requirement.
+    **Removed 24 August**: generateInvoice, getSubscription, getUsageMetering, listSubscriptionInvoices,
+    previewSubscriptionChange, setSubscription. **Eleven P09 screens carried the same nine subscription
+    operations** — a platform dashboard, a tenant directory and a rate-limit console all able to preview
+    a subscription change. **Bulk-attach residue at platform scale**, and each screen now keeps only
+    what it is for. **Removed 24 August**: addLicenceAddOn, createTenant, reactivateTenant, removeLicenceAddOn,
+    setSsoConfig, suspendTenant, terminateTenant, updateTenant. **`ADM-015 API Rate Limit & Quota Management`
+    could create and terminate tenants.** The 18 August bulk attach reached the platform console too
+    — provisioning, licensing and SSO were on every screen that mentioned a tenant.'
+  density: compact
+  entryState:
+    params:
+    - name: cellId
+      from: deepLink
+    - name: tenantId
+      from: ADM-002
+    coldEntry: '**A platform-admin link resolves against the tenant in the link and refuses if the operator
+      does not hold that tenant.** A link is not authorisation. If the target is gone the screen says
+      so and returns to the directory — **an admin console that silently shows the wrong tenant is worse
+      than one that shows nothing.** Arrives with `cellId`.'
+  requiresModule: membership
+  statesDerived: true
+- id: ADM-013
+  name: Tenant Performance Monitor
+  module: TODO
+  purpose: See tenant performance monitor for this venue.
+  wave: 2
+  layout:
+    template: dashboard
+    regions:
+    - name: contentBody
+      components:
+      - kind: metricTile
+      - kind: chart
+  states:
+    loading: Metrics stream in; the shape renders first
+    emptyFirstRun: No traffic in the window — for a tenant before go-live this is correct
+    emptyNoAccess: '**Says which permission is missing, and never renders as an empty list.** This screen
+      needs `PLATFORM_CELL_MANAGE`, `PLATFORM_CELL_VIEW` to manage platforms; a person without it sees
+      the reason and who to ask, because an empty table reads as *there is no data* and sends somebody
+      to support with the wrong question.
+
+
+      **Authority is carried by the person, not the device** (ADR-0002) — so signing in again on the
+      same terminal is the way through.
+
+
+      **Also reached when `membership` is not licensed.** The tenant has not bought this module, which
+      is a commercial answer and not a permission one — say which, because the person to ask is different.'
+    error: Metrics unavailable. The cell may be healthy and unobserved, and the screen distinguishes
+      the two
+  wireframe:
+    status: generated
+    board: wireframes/P09 TICVAI Web.dc.html#adm-013
+  capability: C96
+  apis:
+  - operationId: getCellHealth
+    contract: subscription
+    purpose: from page inventory
+    trigger: onLoad
+  - operationId: cancelDecommission
+    contract: subscription
+    purpose: Halt a decommission
+    trigger: onAction
+  - operationId: decommissionCell
+    contract: subscription
+    purpose: Begin decommissioning a cell
+    trigger: onAction
+  - operationId: getCell
+    contract: subscription
+    purpose: Read a cell
+    trigger: onLoad
+  - operationId: getCellCapacity
+    contract: subscription
+    purpose: Load against headroom
+    trigger: onLoad
+  - operationId: listCellJobs
+    contract: subscription
+    purpose: Provisioning, migration and maintenance jobs
+    trigger: onLoad
+  - operationId: updateCellTier
+    contract: subscription
+    purpose: Change a cell's tier
+    trigger: onAction
+  implementation:
+    app: ticvai-web
+    route: /general/tenant-performance-monitor
+    component: apps/ticvai-web/src/routes/general/TenantPerformanceMonitorDashboard.tsx
+    status: notStarted
+  navigation:
+    entryFrom:
+    - ADM-002
+    inferred: true
+    exitTo:
+    - ADM-001
+    - ADM-002
+    - ADM-003
+  notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
+  density: compact
+  entryState:
+    params:
+    - name: cellId
+      from: deepLink
+    coldEntry: '**A platform-admin link resolves against the tenant in the link and refuses if the operator
+      does not hold that tenant.** A link is not authorisation. If the target is gone the screen says
+      so and returns to the directory — **an admin console that silently shows the wrong tenant is worse
+      than one that shows nothing.** Arrives with `cellId`.'
+  requiresModule: membership
+  statesDerived: true
+- id: ADM-014
+  name: Auto-Scaling Configuration
+  module: TODO
+  purpose: Change how auto-scaling behaves here, and see which level the current value came from.
+  wave: 3
+  layout:
+    template: form
+    regions:
+    - name: contentBody
+      components:
+      - kind: textField
+      - kind: primaryButton
+  states:
+    loading: Current sizing and headroom
+    emptyFirstRun: —
+    emptyNoAccess: '**Says which permission is missing, and never renders as an empty list.** This screen
+      needs `PLATFORM_CELL_MANAGE`, `PLATFORM_CELL_VIEW` to manage platforms; a person without it sees
+      the reason and who to ask, because an empty table reads as *there is no data* and sends somebody
+      to support with the wrong question.
+
+
+      **Authority is carried by the person, not the device** (ADR-0002) — so signing in again on the
+      same terminal is the way through.
+
+
+      **Also reached when `membership` is not licensed.** The tenant has not bought this module, which
+      is a commercial answer and not a permission one — say which, because the person to ask is different.'
+    error: Could not read capacity. Scaling changes are blocked
+  wireframe:
+    status: generated
+    board: wireframes/P09 TICVAI Web.dc.html#adm-014
+  capability: C96
+  openQuestions:
+  - No contract — infrastructure, Terraform not API
+  implementation:
+    app: ticvai-web
+    route: /general/auto-scaling-configuration
+    component: apps/ticvai-web/src/routes/general/AutoScalingConfigurationForm.tsx
+    status: notStarted
+  navigation:
+    entryFrom:
+    - ADM-002
+    inferred: true
+    exitTo:
+    - ADM-001
+    - ADM-002
+    - ADM-003
+  apis:
+  - operationId: getCellCapacity
+    contract: subscription
+    purpose: Load against headroom
+    trigger: onLoad
+  - operationId: cancelDecommission
+    contract: subscription
+    purpose: Halt a decommission
+    trigger: onAction
+  - operationId: decommissionCell
+    contract: subscription
+    purpose: Begin decommissioning a cell
+    trigger: onAction
+  - operationId: getCell
+    contract: subscription
+    purpose: Read a cell
+    trigger: onLoad
+  - operationId: getCellHealth
+    contract: subscription
+    purpose: Cell health and schema version
+    trigger: onLoad
+  - operationId: listCellJobs
+    contract: subscription
+    purpose: Provisioning, migration and maintenance jobs
+    trigger: onLoad
+  - operationId: updateCellTier
+    contract: subscription
+    purpose: Change a cell's tier
+    trigger: onAction
+  notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
+  density: compact
+  entryState:
+    params:
+    - name: cellId
+      from: deepLink
+    coldEntry: '**A platform-admin link resolves against the tenant in the link and refuses if the operator
+      does not hold that tenant.** A link is not authorisation. If the target is gone the screen says
+      so and returns to the directory — **an admin console that silently shows the wrong tenant is worse
+      than one that shows nothing.** Arrives with `cellId`.'
+  requiresModule: membership
+  statesDerived: true
+- id: ADM-015
+  name: API Rate Limit & Quota Management
+  module: TODO
+  purpose: See api rate limit & quota management for this venue.
+  wave: 3
+  layout:
+    template: form
+    regions:
+    - name: contentBody
+      components:
+      - kind: textField
+      - kind: primaryButton
+  states:
+    loading: Limits per plan
+    emptyFirstRun: No custom limits — the plan default applies
+    emptyNoAccess: '**Says which permission is missing, and never renders as an empty list.** This screen
+      needs `DEVELOPER_ADMIN`, `DEVELOPER_VIEW`, `PLATFORM_CELL_VIEW` and 2 more to administer developers;
+      a person without it sees the reason and who to ask, because an empty table reads as *there is
+      no data* and sends somebody to support with the wrong question.
+
+
+      **Authority is carried by the person, not the device** (ADR-0002) — so signing in again on the
+      same terminal is the way through.
+
+
+      **Also reached when `membership` is not licensed.** The tenant has not bought this module, which
+      is a commercial answer and not a permission one — say which, because the person to ask is different.'
+    error: Could not load
+  wireframe:
+    status: generated
+    board: wireframes/P09 TICVAI Web.dc.html#adm-015
+  openQuestions:
+  - Blocked — Developer & API workshop
+  implementation:
+    app: ticvai-web
+    route: /general/api-rate-limit-and-quota-management
+    component: apps/ticvai-web/src/routes/general/ApiRateLimitAndQuotaManagementForm.tsx
+    status: notStarted
+  navigation:
+    entryFrom:
+    - ADM-002
+    inferred: true
+    exitTo:
+    - ADM-001
+    - ADM-002
+    - ADM-003
+  apis:
+  - operationId: getTenantLicences
+    contract: subscription
+    purpose: What a tenant is licensed to use
+    trigger: onLoad
+  - operationId: getEntitlementUsage
+    contract: subscription
+    purpose: Usage against licensed limits
+    trigger: onLoad
+  - operationId: getSsoConfig
+    contract: identity
+    purpose: Read SSO configuration
+    trigger: onLoad
+  - operationId: getTenant
+    contract: subscription
+    purpose: Read a tenant with cells and subscription
+    trigger: onLoad
+  - operationId: listTenantCells
+    contract: subscription
+    purpose: List a tenant's cells
+    trigger: onLoad
+  - operationId: listTenants
+    contract: subscription
+    purpose: List tenants
+    trigger: onLoad
+  - operationId: setApiQuota
+    contract: public-api
+    purpose: Rate limits and throttling per client
+    trigger: onAction
+  - operationId: getApiUsage
+    contract: public-api
+    purpose: Calls, errors, latency and success rate
+    trigger: onLoad
+  - operationId: listApiClients
+    contract: public-api
+    purpose: Registered clients for this developer
+    trigger: onLoad
+  notes: 'Purpose derived from the screen name and its operations on 17 August, not from a requirement.
+    **Removed 24 August**: generateInvoice, getSubscription, getUsageMetering, listSubscriptionInvoices,
+    previewSubscriptionChange, setSubscription. **Eleven P09 screens carried the same nine subscription
+    operations** — a platform dashboard, a tenant directory and a rate-limit console all able to preview
+    a subscription change. **Bulk-attach residue at platform scale**, and each screen now keeps only
+    what it is for. **Removed 24 August**: addLicenceAddOn, createTenant, provisionCell, reactivateTenant,
+    removeLicenceAddOn, setSsoConfig, suspendTenant, terminateTenant, updateTenant. **`ADM-015 API Rate
+    Limit & Quota Management` could create and terminate tenants.** The 18 August bulk attach reached
+    the platform console too — provisioning, licensing and SSO were on every screen that mentioned a
+    tenant. **`setApiQuota` wired 24 August.** This screen is named *API Rate Limit & Quota Management*
+    and **declared no quota operation at all** — it carried nine subscription operations and six tenant-lifecycle
+    ones instead. **The screen for the job could not do the job**, and only writing F105 against it
+    surfaced that.'
+  density: compact
+  entryState:
+    params:
+    - name: tenantId
+      from: ADM-002
+    coldEntry: Resolves from the session; a cold arrival is the ordinary case.
+  requiresModule: membership
+  statesDerived: true
+- id: ADM-016
+  name: White-Label Branding Management
+  module: TODO
+  purpose: See white-label branding management for this venue.
+  wave: 2
+  layout:
+    template: form
+    regions:
+    - name: contentBody
+      components:
+      - kind: textField
+      - kind: primaryButton
+  states:
+    loading: Tenant config and its published version
+    emptyFirstRun: Never published — draft only
+    emptyNoAccess: '**Says which permission is missing, and never renders as an empty list.** This screen
+      needs `TENANT_CONFIGURE`, `TENANT_PUBLISH` to configure tenants; a person without it sees the
+      reason and who to ask, because an empty table reads as *there is no data* and sends somebody to
+      support with the wrong question.
+
+
+      **Authority is carried by the person, not the device** (ADR-0002) — so signing in again on the
+      same terminal is the way through.'
+    error: Could not load. **Publishing is blocked**
+  wireframe:
+    status: generated
+    board: wireframes/P09 TICVAI Web.dc.html#adm-016
+  capability: C57
+  apis:
+  - operationId: createPreview
+    contract: white-label
+    purpose: Generate a preview link
+    trigger: onAction
+  - operationId: diffConfigVersion
+    contract: white-label
+    purpose: Compare a version against the working draft
+    trigger: onLoad
+  - operationId: getAppIcons
+    contract: white-label
+    purpose: Read app icon set
+    trigger: onLoad
+  - operationId: getBrandIdentity
+    contract: white-label
+    purpose: Read brand identity
+    trigger: onLoad
+  - operationId: getTheme
+    contract: white-label
+    purpose: Read colour theme
+    trigger: onLoad
+  - operationId: listConfigVersions
+    contract: white-label
+    purpose: Version history
+    trigger: onLoad
+  - operationId: publishTenantConfig
+    contract: white-label
+    purpose: Publish the working draft
+    trigger: onAction
+  - operationId: restoreConfigVersion
+    contract: white-label
+    purpose: Restore a previous version
+    trigger: onAction
+  - operationId: setAppIcons
+    contract: white-label
+    purpose: Set app icons
+    trigger: onAction
+  - operationId: setBrandIdentity
+    contract: white-label
+    purpose: Set logo, favicon and splash
+    trigger: onAction
+  - operationId: setTheme
+    contract: white-label
+    purpose: Set colour theme
+    trigger: onAction
+  implementation:
+    app: ticvai-web
+    route: /general/white-label-branding-management
+    component: apps/ticvai-web/src/routes/general/WhiteLabelBrandingManagementForm.tsx
+    status: notStarted
+  navigation:
+    entryFrom:
+    - ADM-002
+    inferred: true
+    exitTo:
+    - ADM-001
+    - ADM-002
+    - ADM-003
+  notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
+    **30 operations removed 24 August.** Every white-label screen across P09, P12 and P13 declared the
+    **identical 41 operations** — a Typography screen that could create banners and a Component Preview
+    that could set FAQs. **The worst instance of the 18 August bulk attach found so far**, and only
+    walking the white-label journey surfaced it.
+  density: compact
+  entryState:
+    params:
+    - name: bannerId
+      from: deepLink
+    - name: pageId
+      from: deepLink
+    - name: policyKind
+      from: deepLink
+    - name: version
+      from: deepLink
+    coldEntry: '**A version link is expected to point at something superseded — that is what versions
+      are for.** The screen opens the requested version read-only, says it is not current, and links
+      to the one that is. **An old version is history, not an error.** Arrives with `bannerId`, `pageId`,
+      `policyKind`.'
+  requiresModule: core
+  statesDerived: true
+- id: ADM-017
+  name: Domain & Certificate Management
+  module: TODO
+  purpose: See domain & certificate management for this venue.
+  wave: 2
+  layout:
+    template: form
+    regions:
+    - name: contentBody
+      components:
+      - kind: textField
+      - kind: primaryButton
+  states:
+    loading: Domains and certificate expiry
+    emptyFirstRun: No custom domain — the tenant is on a subpath
+    emptyNoAccess: '**Says which permission is missing, and never renders as an empty list.** This screen
+      needs `TENANT_CONFIGURE` to configure tenants; a person without it sees the reason and who to
+      ask, because an empty table reads as *there is no data* and sends somebody to support with the
+      wrong question.
+
+
+      **Authority is carried by the person, not the device** (ADR-0002) — so signing in again on the
+      same terminal is the way through.'
+    error: Certificate status unknown. **An expiring certificate nobody can see is an outage with a
+      date on it**
+  wireframe:
+    status: generated
+    board: wireframes/P09 TICVAI Web.dc.html#adm-017
+  capability: C96
+  openQuestions:
+  - No contract — not specified
+  implementation:
+    app: ticvai-web
+    route: /general/domain-and-certificate-management
+    component: apps/ticvai-web/src/routes/general/DomainAndCertificateManagementForm.tsx
+    status: notStarted
+  navigation:
+    entryFrom:
+    - ADM-002
+    inferred: true
+    exitTo:
+    - ADM-001
+    - ADM-002
+    - ADM-003
+  apis:
+  - operationId: listCustomDomains
+    contract: white-label
+    purpose: The domains this tenant has claimed
+    trigger: onLoad
+  - operationId: claimCustomDomain
+    contract: white-label
+    purpose: Claim a domain and get a verification token
+    trigger: onAction
+  - operationId: verifyCustomDomain
+    contract: white-label
+    purpose: Check the record and issue the certificate
+    trigger: onAction
+  - operationId: releaseCustomDomain
+    contract: white-label
+    purpose: Give the domain up
+    trigger: onAction
+  notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
+    **41 operations removed 24 August.** Every white-label screen across P09, P12 and P13 declared the
+    **identical 41 operations** — a Typography screen that could create banners and a Component Preview
+    that could set FAQs. **The worst instance of the 18 August bulk attach found so far**, and only
+    walking the white-label journey surfaced it. **Rebuilt 24 August.** This screen declared 41 operations
+    and **not one was about a domain** — it carried the bulk-attached white-label set, and no domain
+    or certificate operation existed anywhere in the package. **A white-label platform whose tenants
+    cannot use their own domain is white-label in name only.**
+  density: compact
+  entryState:
+    params:
+    - name: bannerId
+      from: deepLink
+    - name: pageId
+      from: deepLink
+    - name: policyKind
+      from: deepLink
+    - name: version
+      from: deepLink
+    - name: domainId
+      from: deepLink
+      optional: true
+    coldEntry: '**A version link is expected to point at something superseded — that is what versions
+      are for.** The screen opens the requested version read-only, says it is not current, and links
+      to the one that is. **An old version is history, not an error.** Arrives with `bannerId`, `pageId`,
+      `policyKind`.'
+  requiresModule: core
+  statesDerived: true
+- id: ADM-018
+  name: Localisation & Language Pack
+  module: TODO
+  purpose: Configure localisation & language pack for this venue.
+  wave: 2
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+  states:
+    loading: Language packs and completeness
+    emptyFirstRun: One language
+    emptyNoAccess: '**Says which permission is missing, and never renders as an empty list.** This screen
+      needs `TENANT_CONFIGURE` to configure tenants; a person without it sees the reason and who to
+      ask, because an empty table reads as *there is no data* and sends somebody to support with the
+      wrong question.
+
+
+      **Authority is carried by the person, not the device** (ADR-0002) — so signing in again on the
+      same terminal is the way through.'
+    error: Could not load
+  wireframe:
+    status: generated
+    board: wireframes/P09 TICVAI Web.dc.html#adm-018
+  capability: C57
+  apis:
+  - operationId: setLanguages
+    contract: white-label
+    purpose: from page inventory
+    trigger: onLoad
+  - operationId: listFaqs
+    contract: white-label
+    purpose: List FAQs
+    trigger: onLoad
+  - operationId: listPolicies
+    contract: white-label
+    purpose: List legal policies
+    trigger: onLoad
+  - operationId: setFaqs
+    contract: white-label
+    purpose: Set FAQ categories and entries
+    trigger: onAction
+  - operationId: setPolicy
+    contract: white-label
+    purpose: Publish a policy version
+    trigger: onAction
+  implementation:
+    app: ticvai-web
+    route: /general/localisation-and-language-pack
+    component: apps/ticvai-web/src/routes/general/LocalisationAndLanguagePackDetail.tsx
+    status: notStarted
+  navigation:
+    entryFrom:
+    - ADM-002
+    inferred: true
+    exitTo:
+    - ADM-001
+    - ADM-002
+    - ADM-003
+  notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
+    **36 operations removed 24 August.** Every white-label screen across P09, P12 and P13 declared the
+    **identical 41 operations** — a Typography screen that could create banners and a Component Preview
+    that could set FAQs. **The worst instance of the 18 August bulk attach found so far**, and only
+    walking the white-label journey surfaced it.
+  density: compact
+  entryState:
+    params:
+    - name: bannerId
+      from: deepLink
+    - name: pageId
+      from: deepLink
+    - name: policyKind
+      from: deepLink
+    - name: version
+      from: deepLink
+    coldEntry: '**A version link is expected to point at something superseded — that is what versions
+      are for.** The screen opens the requested version read-only, says it is not current, and links
+      to the one that is. **An old version is history, not an error.** Arrives with `bannerId`, `pageId`,
+      `policyKind`.'
+  requiresModule: core
+  statesDerived: true
+- id: ADM-019
+  name: Global Configuration & Defaults
+  module: TODO
+  purpose: Change how global behaves here, and see which level the current value came from.
+  wave: 2
+  layout:
+    template: form
+    regions:
+    - name: contentBody
+      components:
+      - kind: textField
+      - kind: primaryButton
+  states:
+    loading: Defaults resolved at platform level
+    emptyFirstRun: —
+    emptyNoAccess: '**Says which permission is missing, and never renders as an empty list.** This screen
+      needs `PLATFORM_PLAN_MANAGE`, `PLATFORM_TENANT_VIEW` to manage platforms; a person without it
+      sees the reason and who to ask, because an empty table reads as *there is no data* and sends somebody
+      to support with the wrong question.
+
+
+      **Authority is carried by the person, not the device** (ADR-0002) — so signing in again on the
+      same terminal is the way through.
+
+
+      **Also reached when `membership` is not licensed.** The tenant has not bought this module, which
+      is a commercial answer and not a permission one — say which, because the person to ask is different.'
+    error: Could not load. **Editing blocked** — a default saved over an unread one propagates to every
+      tenant
+  wireframe:
+    status: generated
+    board: wireframes/P09 TICVAI Web.dc.html#adm-019
+  capability: C95
+  openQuestions:
+  - No contract — platform defaults not specified
+  implementation:
+    app: ticvai-web
+    route: /general/global-configuration-and-defaults
+    component: apps/ticvai-web/src/routes/general/GlobalConfigurationAndDefaultsForm.tsx
+    status: notStarted
+  navigation:
+    entryFrom:
+    - ADM-002
+    inferred: true
+    exitTo:
+    - ADM-001
+    - ADM-002
+    - ADM-003
+  apis:
+  - operationId: listPlans
+    contract: subscription
+    purpose: List subscription plans
+    trigger: onLoad
+  - operationId: createPlan
+    contract: subscription
+    purpose: Create a subscription plan
+    trigger: onAction
+  - operationId: createPlanVersion
+    contract: subscription
+    purpose: Publish a new version of a plan
+    trigger: onAction
+  - operationId: getPlan
+    contract: subscription
+    purpose: Read a plan
+    trigger: onLoad
+  notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
+  density: compact
+  entryState:
+    params:
+    - name: planId
+      from: deepLink
+    coldEntry: '**A platform-admin link resolves against the tenant in the link and refuses if the operator
+      does not hold that tenant.** A link is not authorisation. If the target is gone the screen says
+      so and returns to the directory — **an admin console that silently shows the wrong tenant is worse
+      than one that shows nothing.** Arrives with `planId`.'
+  requiresModule: membership
+  statesDerived: true
+- id: ADM-020
+  name: Platform User Directory
+  module: TODO
+  purpose: Find the right one quickly, and act on it without opening it.
+  wave: 1
+  layout:
+    template: list
+    regions:
+    - name: contentBody
+      components:
+      - kind: searchField
+      - kind: dataTable
+  states:
+    loading: Principals, paged
+    emptyFirstRun: No users match
+    emptyNoResults: '**The filter matched nothing, and the data is still there.** The action widens
+      or clears it — distinct from first run, which has nothing to match, and **a screen that shows
+      the same panel for both sends somebody looking for data they already filtered out.**'
+    emptyNoAccess: '**Says which permission is missing, and never renders as an empty list.** This screen
+      needs `USER_MANAGE` to manage users; a person without it sees the reason and who to ask, because
+      an empty table reads as *there is no data* and sends somebody to support with the wrong question.
+
+
+      **Authority is carried by the person, not the device** (ADR-0002) — so signing in again on the
+      same terminal is the way through.'
+    error: Could not load
+  wireframe:
+    status: generated
+    board: wireframes/P09 TICVAI Web.dc.html#adm-020
+  capability: C56
+  apis:
+  - operationId: listPrincipals
+    contract: identity
+    purpose: from page inventory
+    trigger: onLoad
+  - operationId: createPrincipal
+    contract: identity
+    purpose: Create a principal
+    trigger: onAction
+  - operationId: getPrincipal
+    contract: identity
+    purpose: Read a principal
+    trigger: onLoad
+  - operationId: updatePrincipal
+    contract: identity
+    purpose: Update or deactivate a principal
+    trigger: onAction
+  implementation:
+    app: ticvai-web
+    route: /general/platform-user-directory
+    component: apps/ticvai-web/src/routes/general/PlatformUserDirectoryList.tsx
+    status: notStarted
+  navigation:
+    entryFrom:
+    - ADM-002
+    inferred: true
+    exitTo:
+    - ADM-001
+    - ADM-002
+    - ADM-003
+  notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
+  density: compact
+  entryState:
+    params:
+    - name: principalId
+      from: session
+    coldEntry: Resolves from the session; a cold arrival is the ordinary case.
+  requiresModule: core
+  statesDerived: true
+- id: ADM-021
+  name: Platform Role Management
+  module: TODO
+  purpose: Find platform role management for this venue.
+  wave: 1
+  layout:
+    template: form
+    regions:
+    - name: contentBody
+      components:
+      - kind: textField
+      - kind: primaryButton
+  states:
+    loading: Roles and their permission sets
+    emptyFirstRun: No custom roles — the platform defaults apply
+    emptyNoAccess: '**Says which permission is missing, and never renders as an empty list.** This screen
+      needs `ROLE_MANAGE` to manage roles; a person without it sees the reason and who to ask, because
+      an empty table reads as *there is no data* and sends somebody to support with the wrong question.
+
+
+      **Authority is carried by the person, not the device** (ADR-0002) — so signing in again on the
+      same terminal is the way through.'
+    error: Could not load. Role editing is blocked
+  wireframe:
+    status: generated
+    board: wireframes/P09 TICVAI Web.dc.html#adm-021
+  capability: C56
+  apis:
+  - operationId: listRoles
+    contract: identity
+    purpose: from page inventory
+    trigger: onLoad
+  - operationId: createRole
+    contract: identity
+    purpose: from page inventory
+    trigger: onLoad
+  implementation:
+    app: ticvai-web
+    route: /general/platform-role-management
+    component: apps/ticvai-web/src/routes/general/PlatformRoleManagementForm.tsx
+    status: notStarted
+  navigation:
+    entryFrom:
+    - ADM-002
+    inferred: true
+    exitTo:
+    - ADM-001
+    - ADM-002
+    - ADM-003
+  notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
+  density: compact
+  requiresModule: core
+  statesDerived: true
+- id: ADM-022
+  name: Release & Version Management
+  module: TODO
+  purpose: Find release & version management for this venue.
+  wave: 2
+  layout:
+    template: form
+    regions:
+    - name: contentBody
+      components:
+      - kind: textField
+      - kind: primaryButton
+  states:
+    loading: Releases, newest first
+    emptyFirstRun: No releases — before the first build
+    emptyNoAccess: '**Says which permission is missing, and never renders as an empty list.** This screen
+      needs `PLATFORM_RELEASE_MANAGE`, `PLATFORM_RELEASE_PROMOTE`, `PLATFORM_RELEASE_VIEW` to manage
+      platforms; a person without it sees the reason and who to ask, because an empty table reads as
+      *there is no data* and sends somebody to support with the wrong question.
+
+
+      **Authority is carried by the person, not the device** (ADR-0002) — so signing in again on the
+      same terminal is the way through.'
+    error: Could not load
+  wireframe:
+    status: generated
+    board: wireframes/P09 TICVAI Web.dc.html#adm-022
+  capability: C96
+  openQuestions:
+  - No contract — new scope, 30 Jul
+  implementation:
+    app: ticvai-web
+    route: /general/release-and-version-management
+    component: apps/ticvai-web/src/routes/general/ReleaseAndVersionManagementForm.tsx
+    status: notStarted
+  apis:
+  - operationId: listReleases
+    contract: platform-ops
+    purpose: Release list
+    trigger: onLoad
+  - operationId: getRelease
+    contract: platform-ops
+    purpose: Release detail with rollout state
+    trigger: onLoad
+  - operationId: getReleaseReadiness
+    contract: platform-ops
+    purpose: Which gates pass and which block
+    trigger: onLoad
+  - operationId: createRelease
+    contract: platform-ops
+    purpose: Cut a release
+    trigger: onAction
+  - operationId: promoteRelease
+    contract: platform-ops
+    purpose: Promote a release to the next environment
+    trigger: onAction
+  - operationId: rejectRelease
+    contract: platform-ops
+    purpose: Reject a release back a stage
+    trigger: onAction
+  - operationId: withdrawRelease
+    contract: platform-ops
+    purpose: Withdraw a release
+    trigger: onAction
+  navigation:
+    entryFrom:
+    - ADM-002
+    inferred: true
+    exitTo:
+    - ADM-001
+    - ADM-002
+    - ADM-003
+    - ADM-027
+    flowDerived: true
+  notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
+  density: compact
+  entryState:
+    params:
+    - name: releaseId
+      from: deepLink
+    coldEntry: '**A platform-admin link resolves against the tenant in the link and refuses if the operator
+      does not hold that tenant.** A link is not authorisation. If the target is gone the screen says
+      so and returns to the directory — **an admin console that silently shows the wrong tenant is worse
+      than one that shows nothing.** Arrives with `releaseId`.'
+  requiresModule: core
+  statesDerived: true
+- id: ADM-023
+  name: Staging Promotion & Approval
+  module: TODO
+  purpose: Work with staging promotion & approval for this venue.
+  wave: 2
+  layout:
+    template: wizard
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+      - kind: primaryButton
+  states:
+    loading: Readiness checks run in parallel and each reports separately
+    emptyFirstRun: —
+    emptyNoAccess: '**Says which permission is missing, and never renders as an empty list.** This screen
+      needs `PLATFORM_RELEASE_MANAGE`, `PLATFORM_RELEASE_PROMOTE`, `PLATFORM_RELEASE_VIEW` to manage
+      platforms; a person without it sees the reason and who to ask, because an empty table reads as
+      *there is no data* and sends somebody to support with the wrong question.
+
+
+      **Authority is carried by the person, not the device** (ADR-0002) — so signing in again on the
+      same terminal is the way through.'
+    error: '**A readiness check that cannot run is a failed check, not a passed one.** Promotion is
+      blocked'
+  wireframe:
+    status: generated
+    board: wireframes/P09 TICVAI Web.dc.html#adm-023
+  capability: C96
+  openQuestions:
+  - No contract — new scope, 30 Jul
+  implementation:
+    app: ticvai-web
+    route: /general/staging-promotion-and-approval
+    component: apps/ticvai-web/src/routes/general/StagingPromotionAndApprovalWizard.tsx
+    status: notStarted
+  apis:
+  - operationId: promoteRelease
+    contract: platform-ops
+    purpose: Promote with an approver
+    trigger: onLoad
+  - operationId: getReleaseReadiness
+    contract: platform-ops
+    purpose: Checked before the request is offered
+    trigger: onLoad
+  - operationId: createRelease
+    contract: platform-ops
+    purpose: Cut a release
+    trigger: onAction
+  - operationId: getRelease
+    contract: platform-ops
+    purpose: Read a release with its rollout state
+    trigger: onLoad
+  - operationId: listReleases
+    contract: platform-ops
+    purpose: List releases
+    trigger: onLoad
+  - operationId: rejectRelease
+    contract: platform-ops
+    purpose: Reject a release back a stage
+    trigger: onAction
+  - operationId: withdrawRelease
+    contract: platform-ops
+    purpose: Withdraw a release
+    trigger: onAction
+  navigation:
+    entryFrom:
+    - ADM-002
+    - ADM-027
+    inferred: true
+    exitTo:
+    - ADM-001
+    - ADM-002
+    - ADM-003
+    - ADM-029
+    flowDerived: true
+  notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
+  density: compact
+  entryState:
+    params:
+    - name: releaseId
+      from: deepLink
+    coldEntry: '**A platform-admin link resolves against the tenant in the link and refuses if the operator
+      does not hold that tenant.** A link is not authorisation. If the target is gone the screen says
+      so and returns to the directory — **an admin console that silently shows the wrong tenant is worse
+      than one that shows nothing.** Arrives with `releaseId`.'
+  requiresModule: core
+  statesDerived: true
+- id: ADM-024
+  name: Release Notification Composer
+  module: TODO
+  purpose: Push live release notification composer for this venue.
+  wave: 3
+  layout:
+    template: form
+    regions:
+    - name: contentBody
+      components:
+      - kind: textField
+      - kind: primaryButton
+  states:
+    loading: Composer with the release notes prefilled
+    emptyFirstRun: —
+    emptyNoAccess: '**Says which permission is missing, and never renders as an empty list.** This screen
+      needs `PLATFORM_RELEASE_MANAGE`, `PLATFORM_RELEASE_VIEW` to manage platforms; a person without
+      it sees the reason and who to ask, because an empty table reads as *there is no data* and sends
+      somebody to support with the wrong question.
+
+
+      **Authority is carried by the person, not the device** (ADR-0002) — so signing in again on the
+      same terminal is the way through.'
+    error: Send failed. The draft is kept
+  wireframe:
+    status: generated
+    board: wireframes/P09 TICVAI Web.dc.html#adm-024
+  capability: C96
+  openQuestions:
+  - No contract — new scope, 30 Jul
+  implementation:
+    app: ticvai-web
+    route: /general/release-notification-composer
+    component: apps/ticvai-web/src/routes/general/ReleaseNotificationComposerForm.tsx
+    status: notStarted
+  apis:
+  - operationId: publishSupportNotice
+    contract: platform-ops
+    purpose: Compose and publish a notice
+    trigger: onLoad
+  - operationId: listSupportNotices
+    contract: platform-ops
+    purpose: End-of-support notices
+    trigger: onLoad
+  navigation:
+    entryFrom:
+    - ADM-002
+    inferred: true
+    exitTo:
+    - ADM-001
+    - ADM-002
+    - ADM-003
+  notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
+  density: compact
+  requiresModule: core
+  statesDerived: true
+- id: ADM-025
+  name: Tenant Upgrade Scheduler
+  module: TODO
+  purpose: Find tenant upgrade scheduler for this venue.
+  wave: 2
+  layout:
+    template: form
+    regions:
+    - name: contentBody
+      components:
+      - kind: textField
+      - kind: primaryButton
+  states:
+    loading: Scheduled upgrades by window
+    emptyFirstRun: Nothing scheduled
+    emptyNoAccess: '**Says which permission is missing, and never renders as an empty list.** This screen
+      needs `PLATFORM_RELEASE_MANAGE`, `PLATFORM_RELEASE_VIEW` to manage platforms; a person without
+      it sees the reason and who to ask, because an empty table reads as *there is no data* and sends
+      somebody to support with the wrong question.
+
+
+      **Authority is carried by the person, not the device** (ADR-0002) — so signing in again on the
+      same terminal is the way through.'
+    error: Could not load. Scheduling is blocked
+  wireframe:
+    status: generated
+    board: wireframes/P09 TICVAI Web.dc.html#adm-025
+  capability: C96
+  openQuestions:
+  - No contract — new scope, 30 Jul
+  implementation:
+    app: ticvai-web
+    route: /general/tenant-upgrade-scheduler
+    component: apps/ticvai-web/src/routes/general/TenantUpgradeSchedulerForm.tsx
+    status: notStarted
+  apis:
+  - operationId: listUpgradeSchedules
+    contract: platform-ops
+    purpose: Scheduled tenant upgrades
+    trigger: onLoad
+  - operationId: scheduleTenantUpgrade
+    contract: platform-ops
+    purpose: Schedule or defer
+    trigger: onLoad
+  navigation:
+    entryFrom:
+    - ADM-002
+    inferred: true
+    exitTo:
+    - ADM-001
+    - ADM-002
+    - ADM-003
+  notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
+  density: compact
+  requiresModule: core
+  statesDerived: true
+- id: ADM-026
+  name: End-of-Support Notice Management
+  module: TODO
+  purpose: Answer a question without needing a person.
+  wave: 3
+  layout:
+    template: form
+    regions:
+    - name: contentBody
+      components:
+      - kind: textField
+      - kind: primaryButton
+  states:
+    loading: Notices and their affected versions
+    emptyFirstRun: No notices
+    emptyNoAccess: '**Says which permission is missing, and never renders as an empty list.** This screen
+      needs `PLATFORM_RELEASE_MANAGE`, `PLATFORM_RELEASE_VIEW` to manage platforms; a person without
+      it sees the reason and who to ask, because an empty table reads as *there is no data* and sends
+      somebody to support with the wrong question.
+
+
+      **Authority is carried by the person, not the device** (ADR-0002) — so signing in again on the
+      same terminal is the way through.'
+    error: Could not load
+  wireframe:
+    status: generated
+    board: wireframes/P09 TICVAI Web.dc.html#adm-026
+  capability: C96
+  openQuestions:
+  - No contract — new scope, 30 Jul
+  implementation:
+    app: ticvai-web
+    route: /general/end-of-support-notice-management
+    component: apps/ticvai-web/src/routes/general/EndOfSupportNoticeManagementForm.tsx
+    status: notStarted
+  apis:
+  - operationId: listSupportNotices
+    contract: platform-ops
+    purpose: End-of-support notices
+    trigger: onLoad
+  - operationId: publishSupportNotice
+    contract: platform-ops
+    purpose: Publish an end-of-support notice
+    trigger: onAction
+  navigation:
+    entryFrom:
+    - ADM-002
+    inferred: true
+    exitTo:
+    - ADM-001
+    - ADM-002
+    - ADM-003
+  notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
+  density: compact
+  requiresModule: core
+  statesDerived: true
+- id: ADM-027
+  name: Database Migration Console
+  module: TODO
+  purpose: Find database migration console for this venue.
+  wave: 1
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+  states:
+    loading: Migration plan and per-cell state
+    emptyFirstRun: No migrations pending — every cell is at the current schema
+    emptyNoAccess: '**Says which permission is missing, and never renders as an empty list.** This screen
+      needs `PLATFORM_MIGRATION_APPLY`, `PLATFORM_MIGRATION_VIEW` to use platforms; a person without
+      it sees the reason and who to ask, because an empty table reads as *there is no data* and sends
+      somebody to support with the wrong question.
+
+
+      **Authority is carried by the person, not the device** (ADR-0002) — so signing in again on the
+      same terminal is the way through.'
+    error: '**Partial state is the normal case mid-rollout.** Cells that could not be reached are listed
+      as unknown rather than assumed current'
+  wireframe:
+    status: generated
+    board: wireframes/P09 TICVAI Web.dc.html#adm-027
+  capability: C96
+  openQuestions:
+  - No contract — the unowned orchestrator
+  implementation:
+    app: ticvai-web
+    route: /general/database-migration-console
+    component: apps/ticvai-web/src/routes/general/DatabaseMigrationConsoleDetail.tsx
+    status: notStarted
+  apis:
+  - operationId: listMigrations
+    contract: platform-ops
+    purpose: The migration register
+    trigger: onLoad
+  - operationId: planMigration
+    contract: platform-ops
+    purpose: Plan without applying — the safety step
+    trigger: onLoad
+  - operationId: applyMigration
+    contract: platform-ops
+    purpose: Apply a reviewed plan
+    trigger: onLoad
+  - operationId: getVersionSkew
+    contract: platform-ops
+    purpose: Schema and application version per cell
+    trigger: onLoad
+  - operationId: getMigrationRun
+    contract: platform-ops
+    purpose: Migration run progress per cell
+    trigger: onLoad
+  - operationId: rollbackMigrationRun
+    contract: platform-ops
+    purpose: Roll a migration run back
+    trigger: onAction
+  navigation:
+    entryFrom:
+    - ADM-002
+    - ADM-022
+    inferred: true
+    exitTo:
+    - ADM-001
+    - ADM-002
+    - ADM-003
+    - ADM-023
+    flowDerived: true
+  notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
+  density: compact
+  entryState:
+    params:
+    - name: runId
+      from: deepLink
+    coldEntry: '**A platform-admin link resolves against the tenant in the link and refuses if the operator
+      does not hold that tenant.** A link is not authorisation. If the target is gone the screen says
+      so and returns to the directory — **an admin console that silently shows the wrong tenant is worse
+      than one that shows nothing.** Arrives with `runId`.'
+  requiresModule: core
+  statesDerived: true
+- id: ADM-028
+  name: Environment Registry
+  module: TODO
+  purpose: Find environment registry for this venue.
+  wave: 2
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+  states:
+    loading: Environments and their cells
+    emptyFirstRun: No environments registered
+    emptyNoAccess: '**Says which permission is missing, and never renders as an empty list.** This screen
+      needs `PLATFORM_RELEASE_MANAGE`, `PLATFORM_RELEASE_VIEW` to manage platforms; a person without
+      it sees the reason and who to ask, because an empty table reads as *there is no data* and sends
+      somebody to support with the wrong question.
+
+
+      **Authority is carried by the person, not the device** (ADR-0002) — so signing in again on the
+      same terminal is the way through.'
+    error: Could not load
+  wireframe:
+    status: generated
+    board: wireframes/P09 TICVAI Web.dc.html#adm-028
+  capability: C96
+  openQuestions:
+  - No contract — not specified
+  implementation:
+    app: ticvai-web
+    route: /general/environment-registry
+    component: apps/ticvai-web/src/routes/general/EnvironmentRegistryDetail.tsx
+    status: notStarted
+  apis:
+  - operationId: listEnvironments
+    contract: platform-ops
+    purpose: Environment registry
+    trigger: onLoad
+  - operationId: registerEnvironment
+    contract: platform-ops
+    purpose: Register an environment
+    trigger: onLoad
+  navigation:
+    entryFrom:
+    - ADM-002
+    inferred: true
+    exitTo:
+    - ADM-001
+    - ADM-002
+    - ADM-003
+  notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
+  density: compact
+  requiresModule: core
+  statesDerived: true
+- id: ADM-029
+  name: Deployment Monitor
+  module: TODO
+  purpose: Find deployment monitor for this venue.
+  wave: 2
+  layout:
+    template: dashboard
+    regions:
+    - name: contentBody
+      components:
+      - kind: metricTile
+      - kind: chart
+  states:
+    loading: Rollouts and jobs, live
+    emptyFirstRun: Nothing deploying
+    emptyNoAccess: '**Says which permission is missing, and never renders as an empty list.** This screen
+      needs `PLATFORM_CELL_MANAGE`, `PLATFORM_CELL_VIEW`, `PLATFORM_RELEASE_PROMOTE` and 1 more to manage
+      platforms; a person without it sees the reason and who to ask, because an empty table reads as
+      *there is no data* and sends somebody to support with the wrong question.
+
+
+      **Authority is carried by the person, not the device** (ADR-0002) — so signing in again on the
+      same terminal is the way through.
+
+
+      **Also reached when `membership` is not licensed.** The tenant has not bought this module, which
+      is a commercial answer and not a permission one — say which, because the person to ask is different.'
+    error: '**A rollout whose state cannot be read is paused, not continued.** Continuing blind is how
+      a bad release reaches every cell'
+  wireframe:
+    status: generated
+    board: wireframes/P09 TICVAI Web.dc.html#adm-029
+  capability: C96
+  apis:
+  - operationId: listCellJobs
+    contract: subscription
+    purpose: from page inventory
+    trigger: onLoad
+  - operationId: listRollouts
+    contract: platform-ops
+    purpose: Rollouts in flight
+    trigger: onLoad
+  - operationId: getRollout
+    contract: platform-ops
+    purpose: Per-cell progress
+    trigger: onLoad
+  - operationId: pauseRollout
+    contract: platform-ops
+    purpose: Halt before the next cell
+    trigger: onLoad
+  - operationId: rollbackRollout
+    contract: platform-ops
+    purpose: Revert, where every migration is reversible
+    trigger: onLoad
+  - operationId: cancelDecommission
+    contract: subscription
+    purpose: Halt a decommission
+    trigger: onAction
+  - operationId: decommissionCell
+    contract: subscription
+    purpose: Begin decommissioning a cell
+    trigger: onAction
+  - operationId: getCell
+    contract: subscription
+    purpose: Read a cell
+    trigger: onLoad
+  - operationId: getCellCapacity
+    contract: subscription
+    purpose: Load against headroom
+    trigger: onLoad
+  - operationId: getCellHealth
+    contract: subscription
+    purpose: Cell health and schema version
+    trigger: onLoad
+  - operationId: startRollout
+    contract: platform-ops
+    purpose: Start or continue a rollout
+    trigger: onAction
+  - operationId: updateCellTier
+    contract: subscription
+    purpose: Change a cell's tier
+    trigger: onAction
+  implementation:
+    app: ticvai-web
+    route: /general/deployment-monitor
+    component: apps/ticvai-web/src/routes/general/DeploymentMonitorDashboard.tsx
+    status: notStarted
+  navigation:
+    entryFrom:
+    - ADM-002
+    - ADM-023
+    inferred: true
+    exitTo:
+    - ADM-001
+    - ADM-002
+    - ADM-003
+  notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
+  density: compact
+  entryState:
+    params:
+    - name: cellId
+      from: deepLink
+    - name: rolloutId
+      from: deepLink
+    coldEntry: '**A platform-admin link resolves against the tenant in the link and refuses if the operator
+      does not hold that tenant.** A link is not authorisation. If the target is gone the screen says
+      so and returns to the directory — **an admin console that silently shows the wrong tenant is worse
+      than one that shows nothing.** Arrives with `cellId`, `rolloutId`.'
+  requiresModule: membership
+  statesDerived: true
+- id: ADM-030
+  name: Infrastructure Sizing & Scaling Policy
+  module: TODO
+  purpose: See infrastructure sizing & scaling policy for this venue.
+  wave: 3
+  layout:
+    template: form
+    regions:
+    - name: contentBody
+      components:
+      - kind: textField
+      - kind: primaryButton
+  states:
+    loading: Cells and their headroom
+    emptyFirstRun: —
+    emptyNoAccess: '**Says which permission is missing, and never renders as an empty list.** This screen
+      needs `PLATFORM_CELL_MANAGE`, `PLATFORM_CELL_VIEW` to manage platforms; a person without it sees
+      the reason and who to ask, because an empty table reads as *there is no data* and sends somebody
+      to support with the wrong question.
+
+
+      **Authority is carried by the person, not the device** (ADR-0002) — so signing in again on the
+      same terminal is the way through.
+
+
+      **Also reached when `membership` is not licensed.** The tenant has not bought this module, which
+      is a commercial answer and not a permission one — say which, because the person to ask is different.'
+    error: Could not read. Sizing changes are blocked
+  wireframe:
+    status: generated
+    board: wireframes/P09 TICVAI Web.dc.html#adm-030
+  capability: C96
+  openQuestions:
+  - No contract — Terraform
+  implementation:
+    app: ticvai-web
+    route: /general/infrastructure-sizing-and-scaling-policy
+    component: apps/ticvai-web/src/routes/general/InfrastructureSizingAndScalingPolicyForm.tsx
+    status: notStarted
+  navigation:
+    entryFrom:
+    - ADM-002
+    inferred: true
+    exitTo:
+    - ADM-001
+    - ADM-002
+    - ADM-003
+  apis:
+  - operationId: getCellCapacity
+    contract: subscription
+    purpose: Load against headroom
+    trigger: onLoad
+  - operationId: cancelDecommission
+    contract: subscription
+    purpose: Halt a decommission
+    trigger: onAction
+  - operationId: decommissionCell
+    contract: subscription
+    purpose: Begin decommissioning a cell
+    trigger: onAction
+  - operationId: getCell
+    contract: subscription
+    purpose: Read a cell
+    trigger: onLoad
+  - operationId: getCellHealth
+    contract: subscription
+    purpose: Cell health and schema version
+    trigger: onLoad
+  - operationId: listCellJobs
+    contract: subscription
+    purpose: Provisioning, migration and maintenance jobs
+    trigger: onLoad
+  - operationId: updateCellTier
+    contract: subscription
+    purpose: Change a cell's tier
+    trigger: onAction
+  notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
+  density: compact
+  entryState:
+    params:
+    - name: cellId
+      from: deepLink
+    coldEntry: '**A platform-admin link resolves against the tenant in the link and refuses if the operator
+      does not hold that tenant.** A link is not authorisation. If the target is gone the screen says
+      so and returns to the directory — **an admin console that silently shows the wrong tenant is worse
+      than one that shows nothing.** Arrives with `cellId`.'
+  requiresModule: membership
+  statesDerived: true
+- id: ADM-031
+  name: Security & Compliance Dashboard
+  module: TODO
+  purpose: The screen this app sits on. Everything else is entered from here and returns to it.
+  wave: 3
+  layout:
+    template: dashboard
+    regions:
+    - name: contentBody
+      components:
+      - kind: metricTile
+      - kind: chart
+  states:
+    loading: Compliance dashboards
+    emptyFirstRun: No findings — reported as a result, not an empty screen
+    emptyNoAccess: '**Says which permission is missing, and never renders as an empty list.** This screen
+      needs `REPORT_MANAGE`, `REPORT_VIEW_VENUE` to manage reports; a person without it sees the reason
+      and who to ask, because an empty table reads as *there is no data* and sends somebody to support
+      with the wrong question.
+
+
+      **Authority is carried by the person, not the device** (ADR-0002) — so signing in again on the
+      same terminal is the way through.
+
+
+      **Also reached when `analytics` is not licensed.** The tenant has not bought this module, which
+      is a commercial answer and not a permission one — say which, because the person to ask is different.'
+    error: Could not load. **An unreadable compliance dashboard is not a clean one**
+  wireframe:
+    status: generated
+    board: wireframes/P09 TICVAI Web.dc.html#adm-031
+  capability: C97
+  openQuestions:
+  - No contract — not specified
+  implementation:
+    app: ticvai-web
+    route: /general/security-and-compliance-dashboard
+    component: apps/ticvai-web/src/routes/general/SecurityAndComplianceDashboard.tsx
+    status: notStarted
+  navigation:
+    entryFrom:
+    - ADM-002
+    inferred: true
+    exitTo:
+    - ADM-001
+    - ADM-002
+    - ADM-003
+  apis:
+  - operationId: listDashboards
+    contract: reporting
+    purpose: List dashboards
+    trigger: onLoad
+  - operationId: getDashboard
+    contract: reporting
+    purpose: Read a dashboard with tile data
+    trigger: onLoad
+  - operationId: createDashboard
+    contract: reporting
+    purpose: Create a dashboard
+    trigger: onAction
+  - operationId: updateDashboard
+    contract: reporting
+    purpose: Update a dashboard
+    trigger: onAction
+  notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
+  density: compact
+  entryState:
+    params:
+    - name: dashboardId
+      from: deepLink
+    coldEntry: '**A platform-admin link resolves against the tenant in the link and refuses if the operator
+      does not hold that tenant.** A link is not authorisation. If the target is gone the screen says
+      so and returns to the directory — **an admin console that silently shows the wrong tenant is worse
+      than one that shows nothing.** Arrives with `dashboardId`.'
+  requiresModule: analytics
+  statesDerived: true
+- id: ADM-032
+  name: WAF & Security Policy View
+  module: TODO
+  purpose: See waf & security policy view for this venue.
+  wave: 3
+  layout:
+    template: form
+    regions:
+    - name: contentBody
+      components:
+      - kind: textField
+      - kind: primaryButton
+  states:
+    loading: Policy and cell health
+    emptyFirstRun: —
+    emptyNoAccess: '**Says which permission is missing, and never renders as an empty list.** This screen
+      needs `PLATFORM_CELL_MANAGE`, `PLATFORM_CELL_VIEW` to manage platforms; a person without it sees
+      the reason and who to ask, because an empty table reads as *there is no data* and sends somebody
+      to support with the wrong question.
+
+
+      **Authority is carried by the person, not the device** (ADR-0002) — so signing in again on the
+      same terminal is the way through.
+
+
+      **Also reached when `membership` is not licensed.** The tenant has not bought this module, which
+      is a commercial answer and not a permission one — say which, because the person to ask is different.'
+    error: Could not load
+  wireframe:
+    status: generated
+    board: wireframes/P09 TICVAI Web.dc.html#adm-032
+  capability: C96
+  openQuestions:
+  - No contract — infrastructure
+  implementation:
+    app: ticvai-web
+    route: /general/waf-and-security-policy-view
+    component: apps/ticvai-web/src/routes/general/WafAndSecurityPolicyViewForm.tsx
+    status: notStarted
+  navigation:
+    entryFrom:
+    - ADM-002
+    inferred: true
+    exitTo:
+    - ADM-001
+    - ADM-002
+    - ADM-003
+  apis:
+  - operationId: getCellHealth
+    contract: subscription
+    purpose: Cell health and schema version
+    trigger: onLoad
+  - operationId: cancelDecommission
+    contract: subscription
+    purpose: Halt a decommission
+    trigger: onAction
+  - operationId: decommissionCell
+    contract: subscription
+    purpose: Begin decommissioning a cell
+    trigger: onAction
+  - operationId: getCell
+    contract: subscription
+    purpose: Read a cell
+    trigger: onLoad
+  - operationId: getCellCapacity
+    contract: subscription
+    purpose: Load against headroom
+    trigger: onLoad
+  - operationId: listCellJobs
+    contract: subscription
+    purpose: Provisioning, migration and maintenance jobs
+    trigger: onLoad
+  - operationId: updateCellTier
+    contract: subscription
+    purpose: Change a cell's tier
+    trigger: onAction
+  notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
+  density: compact
+  entryState:
+    params:
+    - name: cellId
+      from: deepLink
+    coldEntry: '**A platform-admin link resolves against the tenant in the link and refuses if the operator
+      does not hold that tenant.** A link is not authorisation. If the target is gone the screen says
+      so and returns to the directory — **an admin console that silently shows the wrong tenant is worse
+      than one that shows nothing.** Arrives with `cellId`.'
+  requiresModule: membership
+  statesDerived: true
+- id: ADM-033
+  name: Backup & DR Status
+  module: TODO
+  purpose: See backup & dr status for this venue.
+  wave: 2
+  layout:
+    template: dashboard
+    regions:
+    - name: contentBody
+      components:
+      - kind: metricTile
+      - kind: chart
+  states:
+    loading: Backup and DR state per cell
+    emptyFirstRun: —
+    emptyNoAccess: '**Says which permission is missing, and never renders as an empty list.** This screen
+      needs `PLATFORM_CELL_MANAGE`, `PLATFORM_CELL_VIEW` to manage platforms; a person without it sees
+      the reason and who to ask, because an empty table reads as *there is no data* and sends somebody
+      to support with the wrong question.
+
+
+      **Authority is carried by the person, not the device** (ADR-0002) — so signing in again on the
+      same terminal is the way through.
+
+
+      **Also reached when `membership` is not licensed.** The tenant has not bought this module, which
+      is a commercial answer and not a permission one — say which, because the person to ask is different.'
+    error: '**Backup status unknown is the alarm.** A cell whose last backup cannot be confirmed is
+      shown as at risk, not as fine'
+  wireframe:
+    status: generated
+    board: wireframes/P09 TICVAI Web.dc.html#adm-033
+  capability: C96
+  apis:
+  - operationId: getCellHealth
+    contract: subscription
+    purpose: from page inventory
+    trigger: onLoad
+  - operationId: cancelDecommission
+    contract: subscription
+    purpose: Halt a decommission
+    trigger: onAction
+  - operationId: decommissionCell
+    contract: subscription
+    purpose: Begin decommissioning a cell
+    trigger: onAction
+  - operationId: getCell
+    contract: subscription
+    purpose: Read a cell
+    trigger: onLoad
+  - operationId: getCellCapacity
+    contract: subscription
+    purpose: Load against headroom
+    trigger: onLoad
+  - operationId: listCellJobs
+    contract: subscription
+    purpose: Provisioning, migration and maintenance jobs
+    trigger: onLoad
+  - operationId: updateCellTier
+    contract: subscription
+    purpose: Change a cell's tier
+    trigger: onAction
+  implementation:
+    app: ticvai-web
+    route: /general/backup-and-dr-status
+    component: apps/ticvai-web/src/routes/general/BackupAndDrStatusDashboard.tsx
+    status: notStarted
+  navigation:
+    entryFrom:
+    - ADM-002
+    inferred: true
+    exitTo:
+    - ADM-001
+    - ADM-002
+    - ADM-003
+  notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
+  density: compact
+  entryState:
+    params:
+    - name: cellId
+      from: deepLink
+    coldEntry: '**A platform-admin link resolves against the tenant in the link and refuses if the operator
+      does not hold that tenant.** A link is not authorisation. If the target is gone the screen says
+      so and returns to the directory — **an admin console that silently shows the wrong tenant is worse
+      than one that shows nothing.** Arrives with `cellId`.'
+  requiresModule: membership
+  statesDerived: true
+- id: ADM-034
+  name: Archival Job Monitor
+  module: TODO
+  purpose: Find archival job monitor for this venue.
+  wave: 3
+  layout:
+    template: dashboard
+    regions:
+    - name: contentBody
+      components:
+      - kind: metricTile
+      - kind: chart
+  states:
+    loading: Archival jobs
+    emptyFirstRun: No jobs
+    emptyNoAccess: '**Says which permission is missing, and never renders as an empty list.** This screen
+      needs `PLATFORM_CELL_MANAGE`, `PLATFORM_CELL_VIEW` to manage platforms; a person without it sees
+      the reason and who to ask, because an empty table reads as *there is no data* and sends somebody
+      to support with the wrong question.
+
+
+      **Authority is carried by the person, not the device** (ADR-0002) — so signing in again on the
+      same terminal is the way through.
+
+
+      **Also reached when `membership` is not licensed.** The tenant has not bought this module, which
+      is a commercial answer and not a permission one — say which, because the person to ask is different.'
+    error: Could not load
+  wireframe:
+    status: generated
+    board: wireframes/P09 TICVAI Web.dc.html#adm-034
+  capability: C96
+  openQuestions:
+  - No contract — retention not specified
+  implementation:
+    app: ticvai-web
+    route: /general/archival-job-monitor
+    component: apps/ticvai-web/src/routes/general/ArchivalJobMonitorDashboard.tsx
+    status: notStarted
+  navigation:
+    entryFrom:
+    - ADM-002
+    inferred: true
+    exitTo:
+    - ADM-001
+    - ADM-002
+    - ADM-003
+  apis:
+  - operationId: listCellJobs
+    contract: subscription
+    purpose: Provisioning, migration and maintenance jobs
+    trigger: onLoad
+  - operationId: cancelDecommission
+    contract: subscription
+    purpose: Halt a decommission
+    trigger: onAction
+  - operationId: decommissionCell
+    contract: subscription
+    purpose: Begin decommissioning a cell
+    trigger: onAction
+  - operationId: getCell
+    contract: subscription
+    purpose: Read a cell
+    trigger: onLoad
+  - operationId: getCellCapacity
+    contract: subscription
+    purpose: Load against headroom
+    trigger: onLoad
+  - operationId: getCellHealth
+    contract: subscription
+    purpose: Cell health and schema version
+    trigger: onLoad
+  - operationId: updateCellTier
+    contract: subscription
+    purpose: Change a cell's tier
+    trigger: onAction
+  notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
+  density: compact
+  entryState:
+    params:
+    - name: cellId
+      from: deepLink
+    coldEntry: '**A platform-admin link resolves against the tenant in the link and refuses if the operator
+      does not hold that tenant.** A link is not authorisation. If the target is gone the screen says
+      so and returns to the directory — **an admin console that silently shows the wrong tenant is worse
+      than one that shows nothing.** Arrives with `cellId`.'
+  requiresModule: membership
+  statesDerived: true
+- id: ADM-035
+  name: Support & Escalation Console
+  module: TODO
+  purpose: Answer a question without needing a person.
+  wave: 3
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+  states:
+    loading: Open escalations
+    emptyFirstRun: Nothing open
+    emptyNoAccess: '**Says which permission is missing, and never renders as an empty list.** This screen
+      needs `PLATFORM_RELEASE_MANAGE`, `PLATFORM_RELEASE_VIEW` to manage platforms; a person without
+      it sees the reason and who to ask, because an empty table reads as *there is no data* and sends
+      somebody to support with the wrong question.
+
+
+      **Authority is carried by the person, not the device** (ADR-0002) — so signing in again on the
+      same terminal is the way through.'
+    error: Could not load
+  wireframe:
+    status: generated
+    board: wireframes/P09 TICVAI Web.dc.html#adm-035
+  openQuestions:
+  - No contract — overlaps P12
+  implementation:
+    app: ticvai-web
+    route: /general/support-and-escalation-console
+    component: apps/ticvai-web/src/routes/general/SupportAndEscalationConsoleDetail.tsx
+    status: notStarted
+  navigation:
+    entryFrom:
+    - ADM-002
+    inferred: true
+    exitTo:
+    - ADM-001
+    - ADM-002
+    - ADM-003
+  apis:
+  - operationId: listSupportNotices
+    contract: platform-ops
+    purpose: End-of-support notices
+    trigger: onLoad
+  - operationId: publishSupportNotice
+    contract: platform-ops
+    purpose: Publish an end-of-support notice
+    trigger: onAction
+  notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
+  density: compact
+  requiresModule: core
+  statesDerived: true
+- id: ADM-036
+  name: Platform Notification Broadcast
+  module: TODO
+  purpose: Push live platform notification broadcast for this venue.
+  wave: 3
+  layout:
+    template: form
+    regions:
+    - name: contentBody
+      components:
+      - kind: textField
+      - kind: primaryButton
+  states:
+    loading: Composer, with the audience resolved
+    emptyFirstRun: —
+    emptyNoAccess: '**Says which permission is missing, and never renders as an empty list.** This screen
+      needs `PLATFORM_RELEASE_MANAGE`, `PLATFORM_RELEASE_VIEW` to manage platforms; a person without
+      it sees the reason and who to ask, because an empty table reads as *there is no data* and sends
+      somebody to support with the wrong question.
+
+
+      **Authority is carried by the person, not the device** (ADR-0002) — so signing in again on the
+      same terminal is the way through.'
+    error: Send failed. **Nothing partially sent** — the broadcast is atomic or it is not sent
+  wireframe:
+    status: generated
+    board: wireframes/P09 TICVAI Web.dc.html#adm-036
+  capability: C96
+  openQuestions:
+  - No contract — not specified
+  implementation:
+    app: ticvai-web
+    route: /general/platform-notification-broadcast
+    component: apps/ticvai-web/src/routes/general/PlatformNotificationBroadcastForm.tsx
+    status: notStarted
+  navigation:
+    entryFrom:
+    - ADM-002
+    inferred: true
+    exitTo:
+    - ADM-001
+    - ADM-002
+    - ADM-003
+  apis:
+  - operationId: publishSupportNotice
+    contract: platform-ops
+    purpose: Publish an end-of-support notice
+    trigger: onAction
+  - operationId: listSupportNotices
+    contract: platform-ops
+    purpose: End-of-support notices
+    trigger: onLoad
+  notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
+  density: compact
+  requiresModule: core
+  statesDerived: true
+- id: ADM-037
+  name: AI Provider & Credentials
+  module: AI
+  purpose: Configure which model a tenant uses, hold the key, and prove it works before anyone relies
+    on it.
+  capability: C00
+  wave: 1
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+  apis:
+  - operationId: listAiProviders
+    contract: ai
+    purpose: Configured providers and their order
+    trigger: onLoad
+  - operationId: setAiProvider
+    contract: ai
+    purpose: Configure a provider
+    trigger: onAction
+  - operationId: setAiCredential
+    contract: ai
+    purpose: Store or rotate a provider key
+    trigger: onAction
+  - operationId: testAiProvider
+    contract: ai
+    purpose: Check the key works before anyone relies on it
+    trigger: onAction
+  states:
+    loading: Providers by scope, with the level each resolves from
+    emptyFirstRun: No provider configured — **the assistant is off, not broken**, and the screen says
+      which
+    emptyNoAccess: '**Says which permission is missing, and never renders as an empty list.** This screen
+      needs `AI_CONFIGURE` to configure ais; a person without it sees the reason and who to ask, because
+      an empty table reads as *there is no data* and sends somebody to support with the wrong question.
+
+
+      **Authority is carried by the person, not the device** (ADR-0002) — so signing in again on the
+      same terminal is the way through.
+
+
+      **Also reached when `ai` is not licensed.** The tenant has not bought this module, which is a
+      commercial answer and not a permission one — say which, because the person to ask is different.'
+    error: '**Could not load. Saving is blocked.** A provider saved over an unread one can point a tenant
+      at a model in the wrong jurisdiction'
+  navigation:
+    exitTo:
+    - ADM-001
+    inferred: true
+  implementation:
+    app: ticvai-web
+    route: /ai/providers
+    component: apps/ticvai-web/src/routes/AiProviderCredentials.tsx
+    status: notStarted
+  wireframe:
+    status: generated
+    board: wireframes/P09 TICVAI Web.dc.html#adm-037
+  notes: Added 17 August. **The key is entered once and never returned** — the screen shows a reference,
+    a rotation date and a last-verified date, never a secret. Test before activate. **Not on the wireframe
+    board.**
+  density: compact
+  entryState:
+    params:
+    - name: providerId
+      from: deepLink
+    coldEntry: '**A platform-admin link resolves against the tenant in the link and refuses if the operator
+      does not hold that tenant.** A link is not authorisation. If the target is gone the screen says
+      so and returns to the directory — **an admin console that silently shows the wrong tenant is worse
+      than one that shows nothing.** Arrives with `providerId`.'
+  requiresModule: ai
+  statesDerived: true

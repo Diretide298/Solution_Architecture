@@ -1,0 +1,2739 @@
+/* Styles for the layer switch and the views the frontend and backend layers
+   add. Loaded after styles.css, so the few overrides here win. */
+
+/* ── layer switch ───────────────────────────────────────────────── */
+/* Each layer carries its own accent, so the shell says which part of the
+   system is on screen without the label having to be read. */
+body { --layer: var(--accent); --layer-soft: var(--accent-soft); }
+body[data-layer="frontend"] { --layer: var(--layer-frontend); --layer-soft: color-mix(in srgb, var(--layer-frontend) 16%, transparent); }
+body[data-layer="contracts"] { --layer: var(--accent); --layer-soft: var(--accent-soft); }
+body[data-layer="domain"] { --layer: var(--ok); --layer-soft: color-mix(in srgb, var(--ok) 16%, transparent); }
+body[data-layer="backend"] { --layer: var(--warning); --layer-soft: color-mix(in srgb, var(--warning) 16%, transparent); }
+body[data-layer="decisions"] { --layer: var(--accent); --layer-soft: color-mix(in srgb, var(--accent) 16%, transparent); }
+
+.seg-layer button { padding: 5px 13px; font-weight: 550; }
+.seg-layer button.active { background: var(--layer-soft); color: var(--layer); }
+
+.brand-mark { background: linear-gradient(135deg, var(--layer), var(--satellite)); }
+.tree-file.selected { background: var(--layer-soft); color: var(--layer); }
+.search-trigger { min-width: 120px; }
+
+.tree-file-code { flex: none; font-family: var(--mono); font-size: 10.5px; color: var(--text-faint); }
+.tree-file.selected .tree-file-code { color: inherit; }
+
+/* ── sheet views: screen, apps, routing ─────────────────────────── */
+.sheet { overflow: hidden; }
+.sheet-body {
+  position: absolute;
+  inset: 46px 0 0 0;
+  overflow: auto;
+  padding: 8px 20px 40px;
+}
+.inline-legend { margin-top: 18px; display: flex; flex-direction: column; gap: 3px; }
+
+
+/* ── the galaxy field ───────────────────────────────── */
+/* The one surface in the viewer that does not follow the theme, and the one
+   place that is a decision rather than an oversight: the additive glow this
+   picture is built from does not survive a light background. Both themes get
+   the same deep field, which is also why galaxy.js carries its own palette
+   instead of reading the custom properties like every other renderer. */
+.galaxy-field {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  /* Day. The same shape as the night field and the same reason for it — lit
+     from the middle, darkening outward — but inverted, because on this ground
+     the picture is drawn by *subtracting* light rather than adding it. The
+     centre is the palest part, so it is where the ink reads strongest, which
+     is what makes the middle the focus in both themes.
+
+     Built on --bg-canvas (#f5f5f5) rather than a tint of its own. The first cut
+     of this was a pale teal, which made the one view in the app with its own
+     background colour — a reader moving between the graph and any other day
+     surface saw the ground change under them. Night can afford its own value
+     because it is *deeper* than the canvas rather than a different hue. */
+  background: var(--field-day);
+  /* Against the viewport, not the canvas. See field.py: it makes the field one
+     painting shared with whatever is behind it, and lights all five galaxy
+     views from the same point rather than each from the middle of its own
+     panel. Requires that no ancestor carries a transform or a filter. */
+  background-attachment: fixed;
+  /* nothing here pans or pinches — the scene has no camera the reader owns —
+     but the canvas must not hand a tap to the page either */
+  touch-action: none;
+}
+
+/* Night. The original field. */
+:root[data-theme="dark"] .galaxy-field {
+  background: radial-gradient(120% 92% at 50% 46%,
+    #16262C 0%, #111A1F 38%, #0D1113 72%, #0A0C0E 100%);
+  background-attachment: fixed;
+}
+
+/* The toolbar floats over whatever the view is showing and its scrim has to
+   fade from that. styles.css already handles "this view is a canvas"; these
+   views are a canvas *and* a sheet, so both cases need saying. */
+.view:has(> .galaxy-field:not([hidden])) .graph-toolbar {
+  background: linear-gradient(#EDF4F8 55%, transparent);
+}
+:root[data-theme="dark"] .view:has(> .galaxy-field:not([hidden])) .graph-toolbar {
+  background: linear-gradient(#0E171B 55%, transparent);
+}
+.view.sheet:has(> .galaxy-field[hidden]) .graph-toolbar {
+  background: linear-gradient(var(--bg) 60%, transparent);
+}
+
+/* Chrome sitting on the night field. This used to apply in both themes,
+   because the field was dark in both; the day field is pale now, so the day
+   toolbar keeps its ordinary ink and only the night one is overridden here.
+   Left unconditional it would put near-white controls on a near-white sphere,
+   which is the same bug this rule was written to fix, mirrored. */
+:root[data-theme="dark"] .view:has(> .galaxy-field:not([hidden])) .graph-toolbar .graph-hint { color: #8FB3B1; }
+:root[data-theme="dark"] .view:has(> .galaxy-field:not([hidden])) .graph-toolbar .toggle { color: #9CAFAE; }
+:root[data-theme="dark"] .view:has(> .galaxy-field:not([hidden])) .graph-toolbar .seg {
+  background: rgba(255, 255, 255, .05);
+  border-color: rgba(255, 255, 255, .10);
+}
+:root[data-theme="dark"] .view:has(> .galaxy-field:not([hidden])) .graph-toolbar .seg button { color: #9CAFAE; }
+:root[data-theme="dark"] .view:has(> .galaxy-field:not([hidden])) .graph-toolbar .seg button:hover { color: #DCECEB; }
+:root[data-theme="dark"] .view:has(> .galaxy-field:not([hidden])) .graph-toolbar .seg button.active {
+  background: rgba(72, 207, 203, .16);
+  color: #9EE7E4;
+}
+/* The one control on these views whose popup the page does not draw.
+   A native <select> list is painted by the browser, and the browser picks its
+   colours from `color-scheme` — which is light while the viewer is in day
+   mode. So the closed control took the near-white ink the dark field needs and
+   the open list rendered that same near-white on the browser's white, which is
+   thirty invisible rows. `color-scheme: dark` is the property that tells the
+   browser to paint the popup to match; the option rule underneath it is for
+   the browsers that honour explicit colours instead. */
+:root[data-theme="dark"] .view:has(> .galaxy-field:not([hidden])) .graph-toolbar .scope-select {
+  background: rgba(255, 255, 255, .05);
+  border-color: rgba(255, 255, 255, .12);
+  color: #DCECEB;
+  color-scheme: dark;
+}
+:root[data-theme="dark"] .view:has(> .galaxy-field:not([hidden])) .graph-toolbar .scope-select option {
+  background: #16232A;
+  color: #DCECEB;
+}
+:root[data-theme="dark"] .view:has(> .galaxy-field:not([hidden])) .graph-toolbar .ghost-btn {
+  background: rgba(255, 255, 255, .05);
+  border-color: rgba(255, 255, 255, .12);
+  color: #9CAFAE;
+}
+
+/* Docked across the foot on a bottom-up scrim, as the design has it. A box in
+   the corner would sit on top of the thing it is describing — and on a sphere
+   there is no corner that is not part of the diagram. */
+.galaxy-legend {
+  left: 0; right: 0; bottom: 0;
+  max-width: none;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 5px 18px;
+  padding: 26px 18px 13px;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  backdrop-filter: none;
+  /* Day: the scrim fades up out of the pale field, so the key sits on the
+     picture rather than in a box on top of it — same construction, opposite
+     ground. */
+  background: linear-gradient(to top, rgba(237, 244, 248, .94) 34%, rgba(237, 244, 248, 0));
+  color: var(--text-dim);
+  font-size: 11.5px;
+}
+:root[data-theme="dark"] .galaxy-legend {
+  background: linear-gradient(to top, rgba(8, 11, 12, .93) 34%, rgba(8, 11, 12, 0));
+  color: #9CAFAE;
+}
+.galaxy-legend .legend-dot { width: 8px; height: 8px; }
+/* The trailing note is a sentence about the whole picture, not another key, so
+   it takes its own line under the dots rather than competing with them. */
+.galaxy-legend .legend-row:not(:has(.legend-dot)) {
+  margin-top: 0;
+  flex-basis: 100%;
+  color: var(--text-faint);
+  font-size: 10.5px;
+}
+:root[data-theme="dark"] .galaxy-legend .legend-row:not(:has(.legend-dot)) {
+  color: #78908E;
+}
+
+/* ── drag to pan ────────────────────────────────────────────────── */
+/* The journey track and the wider sheets pan by dragging, like the canvases.
+   Text stays selectable until a drag actually starts. */
+.journey-body,
+.sheet-body { cursor: grab; }
+.journey-body.dragging,
+.sheet-body.dragging {
+  cursor: grabbing;
+  user-select: none;
+}
+/* Only the step track should move sideways. The title, chips and notes are
+   prose about the whole flow, so they stay pinned to the left edge. */
+.journey-head,
+.journey-section-label,
+.journey-questions {
+  position: sticky;
+  left: 0;
+}
+
+/* things you can act on keep their own cursor */
+.journey-body .step-card,
+.journey-body .step-op,
+.sheet-body .api-row,
+.sheet-body .route-row,
+.sheet-body .nav-pill,
+.sheet-body .routing-name { cursor: pointer; }
+
+/* ── screen: the layout board ───────────────────────────────────── */
+.screen-board { display: flex; flex-wrap: wrap; gap: 12px; margin: 8px 0 22px; }
+.region-card {
+  flex: 1 1 260px;
+  max-width: 420px;
+  border: 1px solid var(--border);
+  background: var(--bg-panel);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+.region-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 11px;
+  background: var(--bg-raised);
+  border-bottom: 1px solid var(--border);
+}
+.region-name { font-weight: 600; font-size: 12.5px; }
+.region-ref {
+  padding: 1px 6px;
+  border-radius: 10px;
+  background: var(--layer-soft);
+  color: var(--layer);
+  font-family: var(--mono);
+  font-size: 10.5px;
+}
+.region-count { margin-left: auto; color: var(--text-faint); font-size: 11px; }
+
+.component-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 7px;
+  padding: 6px 11px;
+  border-bottom: 1px solid var(--border-soft);
+  font-size: 12px;
+}
+.component-row:last-child { border-bottom: 0; }
+.component-kind { font-family: var(--mono); font-size: 11.5px; color: var(--spine); }
+.component-label { color: var(--text); }
+.component-binds {
+  padding: 1px 5px;
+  border-radius: 4px;
+  background: color-mix(in srgb, var(--satellite) 10%, transparent);
+  color: var(--satellite);
+  font-family: var(--mono);
+  font-size: 10.5px;
+}
+.component-perm { color: var(--permission); font-family: var(--mono); font-size: 10px; }
+.component-notes {
+  flex-basis: 100%;
+  color: var(--text-faint);
+  font-size: 11.5px;
+  line-height: 1.55;
+}
+
+/* ── screen: the four states ────────────────────────────────────── */
+.state-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 10px;
+  margin: 8px 0 22px;
+}
+.state-card {
+  padding: 10px 13px;
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--text-faint);
+  background: var(--bg-panel);
+  border-radius: var(--radius);
+}
+.state-card.loading { border-left-color: var(--info); }
+.state-card.empty { border-left-color: var(--warning); }
+.state-card.error { border-left-color: var(--error); }
+.state-card.offline { border-left-color: var(--patch); }
+.state-card.denied { border-left-color: var(--permission); }
+/* a required state with nothing declared is the finding, so it looks like one */
+.state-card.missing {
+  border-style: dashed;
+  background: color-mix(in srgb, var(--error) 6%, transparent);
+}
+.state-head { display: flex; align-items: baseline; gap: 8px; margin-bottom: 4px; }
+.state-name { font-weight: 600; font-size: 12px; }
+.state-when { color: var(--text-faint); font-size: 10.5px; }
+.state-desc { color: var(--text-dim); font-size: 12px; line-height: 1.55; }
+.state-card.missing .state-desc { color: var(--error); font-style: italic; }
+
+/* ── screen: operations and navigation ──────────────────────────── */
+.api-list { margin: 8px 0 22px; border: 1px solid var(--border); border-radius: 6px; overflow: hidden; }
+.api-row {
+  display: flex;
+  align-items: baseline;
+  gap: 9px;
+  padding: 7px 11px;
+  border-bottom: 1px solid var(--border-soft);
+  font-size: 12px;
+  cursor: pointer;
+}
+.api-row:last-child { border-bottom: 0; }
+.api-row:hover { background: var(--bg-hover); }
+.api-row.unknown .api-id { color: var(--error); text-decoration: line-through; }
+.api-trigger {
+  flex: none;
+  min-width: 62px;
+  padding: 2px 6px;
+  border-radius: 4px;
+  background: var(--bg-raised);
+  color: var(--text-faint);
+  font-size: 9.5px;
+  letter-spacing: 0.05em;
+  text-align: center;
+  text-transform: uppercase;
+}
+.api-trigger.onLoad { color: var(--info); }
+.api-trigger.onAction { color: var(--satellite); }
+.api-trigger.background, .api-trigger.onInterval { color: var(--patch); }
+.api-id { font-family: var(--mono); font-size: 11.5px; }
+.api-purpose { color: var(--text-dim); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.api-contract { margin-left: auto; flex: none; color: var(--text-faint); font-size: 11px; }
+
+.nav-row { display: flex; flex-wrap: wrap; gap: 26px; margin: 8px 0 22px; }
+.nav-side { flex: 1 1 300px; }
+.nav-label {
+  margin-bottom: 6px;
+  color: var(--text-faint);
+  font-size: 10px;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+.nav-none { color: var(--text-faint); }
+.nav-pill {
+  display: inline-block;
+  margin: 0 5px 5px 0;
+  padding: 3px 9px;
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  background: var(--bg-raised);
+  color: var(--text-dim);
+  font: inherit;
+  font-size: 11.5px;
+  cursor: pointer;
+}
+.nav-pill:hover { border-color: var(--layer); color: var(--layer); }
+.nav-pill.unknown { border-color: var(--error); color: var(--error); }
+
+.impl-card {
+  max-width: 900px;
+  margin: 8px 0 22px;
+  padding: 9px 12px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--bg-panel);
+}
+.impl-row { display: flex; gap: 12px; padding: 3px 0; font-size: 12px; }
+.impl-label { min-width: 78px; color: var(--text-faint); }
+.impl-row code { color: var(--text-dim); font-family: var(--mono); font-size: 11.5px; }
+
+/* ── apps ───────────────────────────────────────────────────────── */
+.app-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(330px, 1fr)); gap: 14px; }
+.app-card {
+  padding: 12px 14px;
+  border: 1px solid var(--border);
+  border-top: 3px solid var(--satellite);
+  border-radius: 8px;
+  background: var(--bg-panel);
+}
+.app-card.pending { border-top-color: var(--warning); }
+.app-head { display: flex; align-items: baseline; gap: 10px; margin-bottom: 9px; }
+.app-name { font-family: var(--mono); font-weight: 600; font-size: 13.5px; }
+.app-status { margin-left: auto; font-size: 10.5px; }
+.app-status.ok { color: var(--satellite); }
+.app-status.warn { color: var(--warning); }
+.app-meta { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 10px; }
+
+.wave-bar { display: flex; gap: 2px; height: 20px; margin-bottom: 11px; }
+.wave-seg {
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  border-radius: 3px;
+  background: var(--spine);
+  color: var(--ink-on-fill);
+  font-size: 10px;
+  font-weight: 600;
+}
+.wave-seg.wave2 { background: var(--satellite); }
+.wave-seg.wave3 { background: var(--shared); }
+.wave-seg.wave4 { background: var(--patch); }
+
+.app-contracts { margin-bottom: 10px; }
+.app-routes summary { padding: 4px 0; color: var(--text-dim); font-size: 12px; cursor: pointer; }
+.route-row {
+  display: flex;
+  align-items: baseline;
+  gap: 9px;
+  padding: 4px 0;
+  border-top: 1px solid var(--border-soft);
+  font-size: 11.5px;
+  cursor: pointer;
+}
+.route-row:hover .route-id { color: var(--layer); }
+.route-id { flex: none; color: var(--text-faint); font-family: var(--mono); }
+.route-path {
+  overflow: hidden;
+  color: var(--text-dim);
+  font-family: var(--mono);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.route-status { margin-left: auto; flex: none; color: var(--text-faint); font-size: 10.5px; }
+
+/* ── routing ────────────────────────────────────────────────────── */
+.adr-file { margin-top: 6px; color: var(--text-faint); font-family: var(--mono); font-size: 11px; }
+.routing-table { max-width: 900px; margin: 8px 0; }
+.routing-row { display: flex; align-items: center; gap: 12px; padding: 3px 0; }
+.routing-name {
+  flex: none;
+  width: 130px;
+  border: 0;
+  background: none;
+  color: var(--text-dim);
+  font: inherit;
+  font-family: var(--mono);
+  font-size: 12px;
+  text-align: right;
+  cursor: pointer;
+}
+.routing-name:hover { color: var(--layer); }
+.routing-name.unknown { color: var(--text-faint); }
+.routing-bar { display: flex; gap: 1px; height: 17px; overflow: hidden; border-radius: 3px; }
+.routing-seg {
+  display: grid;
+  place-items: center;
+  min-width: 0;
+  overflow: hidden;
+  color: var(--ink-on-fill);
+  font-size: 10px;
+  font-weight: 600;
+}
+.routing-total {
+  flex: none;
+  width: 34px;
+  color: var(--text-faint);
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+}
+
+/* A key you have to scroll to reach is not a key — on arrival the chart was
+   four unexplained colours. The sheet lays its children out in a column so the
+   table can be sent after the legend without moving anything in the markup. */
+#routing-body { display: flex; flex-direction: column; }
+#routing-body .routing-table { order: 1; }
+#routing-body .inline-legend {
+  flex-flow: row wrap;
+  align-items: center;
+  gap: 4px 18px;
+  margin: 4px 0 8px;
+}
+/* the trailing sentence is a note, not a swatch, so it takes its own line */
+#routing-body .inline-legend .legend-row:not(:has(.legend-dot)) {
+  flex-basis: 100%;
+  color: var(--text-faint);
+}
+/* a segment boundary you can see is the other half of telling the fills apart */
+#routing-body .routing-bar { gap: 2px; }
+
+/* app.js paints these fills from its own KINDS table, inline on each element,
+   so restating them from here means outranking the style attribute. The legend
+   dots come off the same table in the same order, which is why they go by
+   position — there is no class on them to go by. */
+#routing-body .routing-seg[title$="primary (write)"],
+#routing-body .inline-legend .legend-row:nth-child(1) .legend-dot {
+  background: var(--route-write) !important;
+}
+#routing-body .routing-seg[title$="primary (read)"],
+#routing-body .inline-legend .legend-row:nth-child(2) .legend-dot {
+  background: var(--route-primary) !important;
+}
+#routing-body .routing-seg[title$="replica"],
+#routing-body .inline-legend .legend-row:nth-child(3) .legend-dot {
+  background: var(--route-replica) !important;
+}
+#routing-body .routing-seg[title$="analytical"],
+#routing-body .inline-legend .legend-row:nth-child(4) .legend-dot {
+  background: var(--route-analytical) !important;
+}
+#routing-body .routing-seg[title$="primary (write)"] { color: var(--route-write-ink); }
+#routing-body .routing-seg[title$="primary (read)"] { color: var(--route-primary-ink); }
+#routing-body .routing-seg[title$="replica"] { color: var(--route-replica-ink); }
+#routing-body .routing-seg[title$="analytical"] { color: var(--route-analytical-ink); }
+
+/* an inferred link is a hint, not a fact — it should not read as one */
+.link-item.inferred .link-name { border-bottom: 1px dashed var(--text-faint); }
+.nav-pill.inferred { border-style: dashed; }
+.nav-note { max-width: 780px; margin-left: 0; }
+
+/* ── deployment, declared per platform ──────────────────────────── */
+.deploy-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 8px;
+  margin: 8px 0 22px;
+  max-width: 1100px;
+}
+.deploy-cell {
+  padding: 8px 11px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--bg-panel);
+}
+.deploy-cell.warn { border-color: color-mix(in srgb, var(--warning) 55%, transparent); }
+.deploy-label {
+  margin-bottom: 3px;
+  color: var(--text-faint);
+  font-size: 10px;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+.deploy-value { color: var(--text-dim); font-size: 12px; line-height: 1.45; }
+/* what a migration actually says about a table, as opposed to what is planned */
+.ddl-card {
+  margin: 2px 10px 10px;
+  padding: 7px 10px;
+  border: 1px solid color-mix(in srgb, var(--satellite) 40%, transparent);
+  border-radius: 6px;
+  background: color-mix(in srgb, var(--satellite) 6%, transparent);
+}
+.ddl-card .impl-row { gap: 8px; font-size: 11.5px; }
+.ddl-card .impl-label { min-width: 84px; }
+.ddl-card code { color: var(--satellite); }
+
+.pane-note {
+  margin: 4px 10px 12px;
+  color: var(--text-faint);
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+/* ── migrations: the SQL that actually exists ───────────────────── */
+.migration-card {
+  margin-bottom: 12px;
+  padding: 11px 14px;
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--satellite);
+  border-radius: 8px;
+  background: var(--bg-panel);
+}
+.migration-title { color: var(--text-dim); font-size: 12.5px; }
+.migration-tables { display: flex; flex-wrap: wrap; gap: 0; }
+.migration-tables .nav-pill { font-family: var(--mono); font-size: 11px; }
+.stat-figure { font-size: 17px; font-weight: 600; color: var(--text); }
+.doc-card { margin-top: 22px; max-width: 900px; }
+/* a table already in the database reads as settled; a planned one does not */
+.tree-file.written .tree-file-name { color: var(--text); }
+
+/* ── design boards: the exported UI/UX HTML ─────────────────────── */
+/* The boards are laid out for a full desktop window, so the frame renders at
+   that size and is scaled down — shrinking the viewport instead would trigger
+   their own responsive rules and show a layout nobody designed. */
+.board-card {
+  margin: 0 0 18px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--bg-panel);
+  overflow: hidden;
+  max-width: 1100px;
+}
+.board-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 12px;
+  border-bottom: 1px solid var(--border-soft);
+  background: var(--bg-raised);
+}
+.board-title { display: flex; align-items: baseline; gap: 7px; font-size: 13.5px; }
+.board-rev {
+  font-family: var(--mono);
+  font-size: 10.5px;
+  color: var(--text-faint);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 0 4px;
+}
+.board-meta { display: flex; align-items: center; gap: 8px; margin-left: auto; }
+.board-platform {
+  font-size: 11px;
+  color: var(--satellite);
+  border: 1px solid var(--satellite);
+  border-radius: 20px;
+  padding: 1px 8px;
+}
+/* the platform is read off the file name, so it is drawn like every other
+   inferred link in the viewer: dashed */
+.board-platform.inferred {
+  color: var(--text-dim);
+  border-style: dashed;
+  border-color: var(--border);
+}
+.board-size { font-size: 11px; color: var(--text-faint); font-family: var(--mono); }
+.board-open {
+  font-size: 11.5px;
+  color: var(--accent);
+  text-decoration: none;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 2px 8px;
+}
+.board-open:hover { background: var(--accent-soft); border-color: var(--accent); }
+.board-page { font-size: 11.5px; padding: 2px 8px; }
+
+.board-stage {
+  position: relative;
+  overflow: hidden;
+  background: #fff;
+}
+.board-frame {
+  border: 0;
+  transform-origin: top left;
+  display: block;
+}
+.board-note {
+  margin: 0;
+  padding: 7px 12px;
+  border-top: 1px solid var(--border-soft);
+  font-size: 11.5px;
+  color: var(--text-faint);
+}
+.board-empty { margin: 0 0 14px; }
+.tree-file.board-row .tree-file-code { color: var(--text-faint); }
+.tree-file.board-row .tree-file-name { color: var(--text); }
+
+/* ── domain layer: states and events ────────────────────────────────── */
+/* The states view is canvas; what needs styling is the right pane that
+   explains a transition, and the event catalogue, which is a sheet. */
+
+.transition-item { display: block; padding: 8px 10px; }
+.transition-head {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.transition-arrow {
+  font-family: var(--mono);
+  font-size: 11.5px;
+  color: var(--text);
+}
+.tag {
+  font-size: 10px;
+  border-radius: 999px;
+  padding: 1px 7px;
+  border: 1px solid var(--border);
+  color: var(--text-faint);
+}
+.tag.reversal {
+  color: var(--shared);
+  border-color: color-mix(in srgb, var(--shared) 45%, transparent);
+}
+.tag.approval {
+  color: var(--accent);
+  border-color: color-mix(in srgb, var(--accent) 45%, transparent);
+}
+.tag.critical {
+  color: var(--error);
+  border-color: color-mix(in srgb, var(--error) 45%, transparent);
+}
+
+.link-op {
+  display: block;
+  margin-top: 5px;
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--spine);
+  background: none;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  text-align: left;
+}
+.link-op:hover { text-decoration: underline; }
+.link-op:disabled {
+  color: var(--error);
+  cursor: not-allowed;
+  text-decoration: line-through;
+}
+.link-trigger {
+  margin-top: 4px;
+  font-size: 11px;
+  color: var(--satellite);
+}
+/* the guard is the reason the move is allowed, and the reason states/ exists */
+.link-guard {
+  margin-top: 5px;
+  font-size: 11.5px;
+  line-height: 1.5;
+  color: var(--text-dim);
+}
+.link-guard code {
+  font-family: var(--mono);
+  font-size: 10.5px;
+  color: var(--satellite);
+}
+.emit-chip {
+  display: inline-block;
+  margin: 6px 5px 0 0;
+  font-size: 10.5px;
+  font-family: var(--mono);
+  color: var(--permission);
+  background: color-mix(in srgb, var(--permission) 10%, transparent);
+  border: 1px solid color-mix(in srgb, var(--permission) 35%, transparent);
+  border-radius: 999px;
+  padding: 2px 9px;
+  cursor: pointer;
+}
+.emit-chip:hover { background: color-mix(in srgb, var(--permission) 20%, transparent); }
+.emit-chip.missing {
+  color: var(--error);
+  border-color: var(--error);
+  background: none;
+  cursor: not-allowed;
+}
+.pane-warn {
+  margin: 10px 0;
+  padding: 9px 11px;
+  font-size: 11.5px;
+  line-height: 1.55;
+  color: var(--text-dim);
+  border-left: 3px solid var(--error);
+  background: color-mix(in srgb, var(--error) 7%, transparent);
+  border-radius: 0 6px 6px 0;
+}
+
+/* ── the event catalogue ───────────────────────────────────────────── */
+.event-card {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg-panel);
+  padding: 13px 15px;
+  margin-bottom: 12px;
+}
+.event-head { display: flex; align-items: center; gap: 9px; }
+.event-name {
+  font-family: var(--mono);
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--text);
+  background: none;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+}
+.event-name:hover { color: var(--accent); }
+.event-version { font-size: 11px; color: var(--text-faint); }
+.event-desc {
+  margin-top: 5px;
+  font-size: 12px;
+  line-height: 1.55;
+  color: var(--text-dim);
+}
+
+/* publisher on the left, consumers on the right, the transition in between —
+   the shape of the claim the event makes */
+.event-wire {
+  display: grid;
+  grid-template-columns: minmax(120px, auto) minmax(90px, 1fr) minmax(160px, 2fr);
+  align-items: center;
+  gap: 12px;
+  margin-top: 11px;
+}
+.event-side-label {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-faint);
+  margin-bottom: 5px;
+}
+.event-arrow { text-align: center; }
+.event-arrow-line {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--border), transparent);
+  margin-bottom: 5px;
+}
+.event-arrow-note {
+  font-size: 10.5px;
+  color: var(--text-faint);
+  line-height: 1.4;
+}
+.event-chips { display: flex; flex-wrap: wrap; gap: 5px; }
+.context-chip {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--text-dim);
+  background: var(--bg-raised);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 3px 9px;
+  cursor: pointer;
+}
+.context-chip:hover { border-color: var(--accent); color: var(--text); }
+/* a consumer the business breaks without: dead-lettering it is a page */
+.context-chip.critical {
+  color: var(--shared);
+  border-color: color-mix(in srgb, var(--shared) 50%, transparent);
+  background: color-mix(in srgb, var(--shared) 9%, transparent);
+}
+.context-chip.unknown {
+  color: var(--error);
+  border-style: dashed;
+  cursor: not-allowed;
+}
+.event-warn {
+  margin-top: 10px;
+  font-size: 11.5px;
+  line-height: 1.5;
+  color: var(--text-dim);
+  border-left: 3px solid var(--warning);
+  padding: 6px 10px;
+  background: color-mix(in srgb, var(--warning) 7%, transparent);
+  border-radius: 0 6px 6px 0;
+}
+.emit-source { margin-bottom: 7px; }
+.emit-source .link-op { display: inline-block; margin: 0 8px 0 0; }
+.emit-source .link-trigger { display: inline; margin: 0; }
+
+.domain-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 8px;
+  font-size: 12px;
+}
+.domain-table th {
+  text-align: left;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-faint);
+  font-weight: 500;
+  padding: 5px 10px 5px 0;
+  border-bottom: 1px solid var(--border);
+}
+.domain-table td {
+  padding: 6px 10px 6px 0;
+  border-bottom: 1px solid var(--border-soft);
+  vertical-align: top;
+  line-height: 1.5;
+}
+.domain-table td.mono { font-family: var(--mono); font-size: 11px; }
+.domain-table td.strong { color: var(--text); }
+.domain-table td.dim { color: var(--text-dim); }
+.domain-table td.missing { color: var(--error); font-weight: 600; }
+.domain-table tr.critical-row td:last-child { color: var(--shared); font-size: 11px; }
+
+/* a state model with no enum behind it, or an event nothing emits */
+.tree-file.problem .tree-file-name { color: var(--warning); }
+.tree-file.machine-row .tree-file-count,
+.tree-file.event-row .tree-file-count,
+.tree-file.context-row .tree-file-count {
+  font-family: var(--mono);
+  font-size: 10.5px;
+}
+.tree-file.enum-row .tree-file-name { font-family: var(--mono); font-size: 11.5px; }
+.tree-file.enum-row .tree-file-count { color: var(--warning); }
+
+/* ── hover tips ─────────────────────────────────────────────────────── */
+/* The browser's own title= takes about a second, cannot be styled and cannot
+   hold a heading. This can, and it draws from the delivery's own descriptions
+   wherever there is one. */
+.tip-panel {
+  position: fixed;
+  z-index: 90;
+  max-width: 330px;
+  padding: 9px 12px 10px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg-raised);
+  box-shadow: var(--shadow-2);
+  pointer-events: none;
+  font-size: 12px;
+  line-height: 1.5;
+}
+.tip-title {
+  font-weight: 650;
+  font-size: 12px;
+  color: var(--text);
+  margin-bottom: 3px;
+}
+.tip-body { color: var(--text-dim); white-space: pre-wrap; }
+.tip-body b { color: var(--text); font-weight: 600; }
+.tip-body code {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--layer);
+}
+.tip-extra {
+  margin-top: 6px;
+  padding-top: 6px;
+  border-top: 1px solid var(--border-soft);
+  font-family: var(--mono);
+  font-size: 10.5px;
+  color: var(--text-faint);
+}
+/* anything explainable says so, quietly */
+[data-tip]:not(button):not(td):not(input) { cursor: help; }
+
+/* ── wireframes ─────────────────────────────────────────────────────── */
+/* Named for exactly what they draw, so unlike a design board there is no
+   caveat to show — the chip says so rather than warning. */
+.wireframe-card .board-platform {
+  color: var(--satellite);
+  border-color: color-mix(in srgb, var(--satellite) 40%, transparent);
+  background: color-mix(in srgb, var(--satellite) 8%, transparent);
+}
+
+/* ── lineage ─────────────────────────────────────────────────────────── */
+/* The join between the contracts and the tables. An unresolved row is drawn
+   rather than dropped, so it needs to read as "nobody knows" and not as
+   "nothing here" — hence a dimmed row with an explicit chip, not a blank. */
+.lineage-group { border-bottom: 1px solid var(--border-soft); }
+.lineage-group[open] { padding-bottom: 8px; }
+.lineage-group-head {
+  display: flex; align-items: baseline; gap: 10px;
+  padding: 9px 4px; cursor: pointer; list-style: none;
+}
+.lineage-group-head::-webkit-details-marker { display: none; }
+.lineage-group-name { font-weight: 600; color: var(--layer); font-size: 13px; }
+.lineage-group-count { font-size: 11px; color: var(--text-faint); font-family: var(--mono); }
+
+.lineage-row {
+  display: grid; grid-template-columns: 210px 1fr; gap: 8px 14px;
+  padding: 7px 4px 7px 16px; align-items: baseline;
+  border-top: 1px solid var(--border-soft);
+}
+.lineage-row.unresolved { opacity: 0.62; }
+.lineage-op {
+  font-family: var(--mono); font-size: 12px; color: var(--text);
+  background: none; border: 0; padding: 0; text-align: left; cursor: pointer;
+}
+.lineage-op:hover { color: var(--layer); text-decoration: underline; }
+.lineage-meta { display: flex; flex-wrap: wrap; gap: 6px; align-items: baseline; }
+.lineage-path { font-family: var(--mono); font-size: 11px; color: var(--text-faint); }
+.lineage-routing, .lineage-scope, .lineage-offline, .lineage-service {
+  font-size: 10px; padding: 1px 6px; border-radius: 999px;
+  border: 1px solid var(--border); color: var(--text-dim); white-space: nowrap;
+}
+.lineage-routing { border-width: 1px; font-family: var(--mono); }
+/* Same four targets as the routing chart, so the same four colours — a chip
+   reading "primary" was outlined in the error red over here while the chart
+   was being talked out of it. app.js sets the border inline; the tip title is
+   the only thing on the element that says which target it is. */
+.lineage-routing[data-tip-title$="write"] { border-color: var(--route-write) !important; }
+.lineage-routing[data-tip-title$="primary"] { border-color: var(--route-primary) !important; }
+.lineage-routing[data-tip-title$="replica"] { border-color: var(--route-replica) !important; }
+.lineage-routing[data-tip-title$="analytical"] { border-color: var(--route-analytical) !important; }
+.lineage-offline { color: var(--satellite); border-color: color-mix(in srgb, var(--satellite) 40%, transparent); }
+.lineage-service { color: var(--layer); border-color: color-mix(in srgb, var(--layer) 34%, transparent); }
+
+.lineage-tables { grid-column: 2; display: flex; flex-wrap: wrap; gap: 5px; align-items: center; }
+.lineage-tables.wrap { grid-column: 1 / -1; padding: 4px 0 12px; }
+.lineage-label { font-size: 10px; color: var(--text-faint); text-transform: uppercase; letter-spacing: 0.06em; }
+.lineage-table {
+  font-family: var(--mono); font-size: 10.5px; padding: 2px 7px;
+  border-radius: 4px; border: 1px solid var(--border-soft);
+  background: var(--bg-panel); color: var(--text-dim); cursor: pointer;
+}
+.lineage-table:hover { border-color: var(--layer); color: var(--text); }
+/* written, not merely read — the direction is the whole point of the view */
+.lineage-table.write {
+  color: var(--error); border-color: color-mix(in srgb, var(--error) 34%, transparent);
+  background: color-mix(in srgb, var(--error) 7%, transparent);
+}
+.lineage-table.unknown { text-decoration: line-through; opacity: 0.6; }
+.lineage-table.contested { box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--warning) 55%, transparent); }
+.lineage-count {
+  margin-left: 5px; font-weight: 700; color: var(--warning);
+}
+.lineage-unresolved-chip {
+  font-size: 10.5px; color: var(--text-faint); font-style: italic;
+  border: 1px dashed var(--border); border-radius: 4px; padding: 2px 7px;
+}
+.lineage-service-card {
+  padding: 10px 4px; border-bottom: 1px solid var(--border-soft);
+}
+.lineage-note {
+  padding: 6px 4px 10px; font-size: 12px; line-height: 1.6; color: var(--text-dim);
+  max-width: 76ch;
+}
+.lineage-note b { color: var(--text); }
+
+/* ── waves ───────────────────────────────────────────────────────────── */
+.wave-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+  gap: 12px; padding: 4px 0 14px;
+}
+.wave-card {
+  border: 1px solid var(--border-soft); border-radius: 8px;
+  padding: 10px 12px; background: var(--bg-panel);
+}
+.wave-card-head { display: flex; align-items: baseline; gap: 8px; margin-bottom: 8px; }
+.wave-platform { font-family: var(--mono); font-size: 11px; color: var(--layer); font-weight: 650; }
+.wave-platform-name { font-size: 12px; color: var(--text-dim); }
+.wave-count { margin-left: auto; font-size: 11px; color: var(--text-faint); font-family: var(--mono); }
+.wave-cells { display: flex; flex-wrap: wrap; gap: 4px; }
+.wave-cell {
+  font-family: var(--mono); font-size: 10px; padding: 3px 6px;
+  border-radius: 4px; border: 1px solid var(--border-soft);
+  background: transparent; color: var(--text-faint); cursor: pointer;
+}
+.wave-cell:hover { border-color: var(--layer); color: var(--text); }
+/* it names an operation AND the operation resolves to a table — buildable end to end */
+.wave-cell.reaches-data {
+  color: var(--layer); border-color: color-mix(in srgb, var(--layer) 40%, transparent);
+  background: color-mix(in srgb, var(--layer) 8%, transparent);
+}
+/* somebody can draw it and nobody can build it */
+.wave-cell.unbuildable {
+  color: var(--error); border-color: color-mix(in srgb, var(--error) 30%, transparent);
+  border-style: dashed; background: transparent;
+}
+
+/* ── decisions ───────────────────────────────────────────────────────── */
+.adr-card {
+  border-bottom: 1px solid var(--border-soft); padding: 12px 4px;
+}
+.adr-card-head { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+.adr-number { font-family: var(--mono); font-size: 11px; color: var(--layer); font-weight: 650; }
+.adr-title {
+  background: none; border: 0; padding: 0; cursor: pointer;
+  font-size: 14px; font-weight: 600; color: var(--text); text-align: left;
+}
+.adr-title:hover { color: var(--layer); text-decoration: underline; }
+.adr-status {
+  font-size: 10px; padding: 1px 7px; border-radius: 999px;
+  border: 1px solid var(--border); color: var(--text-dim); text-transform: lowercase;
+}
+.adr-status.accepted { color: var(--ok); border-color: color-mix(in srgb, var(--ok) 40%, transparent); }
+/* Accepted and partly superseded is the case that misleads: it reads as
+   current in a list, and the part that was superseded is not. */
+.adr-status.partial { color: var(--warning); border-color: color-mix(in srgb, var(--warning) 50%, transparent); }
+.adr-date { margin-left: auto; font-size: 11px; color: var(--text-faint); font-family: var(--mono); }
+.adr-decision {
+  margin: 7px 0 0; font-size: 12.5px; line-height: 1.65; color: var(--text-dim); max-width: 84ch;
+}
+.adr-decision b { color: var(--text); }
+.adr-decision code { font-family: var(--mono); font-size: 11.5px; color: var(--layer); }
+.adr-meta { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+.adr-constrains, .adr-amended {
+  font-size: 10px; padding: 1px 7px; border-radius: 4px;
+  border: 1px solid var(--border-soft); color: var(--text-faint); font-family: var(--mono);
+}
+.adr-amended { color: var(--warning); border-color: color-mix(in srgb, var(--warning) 40%, transparent); }
+
+/* the permission spec, executed rather than listed */
+.vector-card {
+  border: 1px solid var(--border-soft); border-radius: 8px;
+  padding: 10px 12px; margin-bottom: 8px; background: var(--bg-panel);
+}
+.vector-card.failed { border-color: color-mix(in srgb, var(--error) 55%, transparent); }
+.vector-head { display: flex; align-items: baseline; gap: 10px; }
+.vector-id { font-family: var(--mono); font-size: 11px; color: var(--layer); font-weight: 650; }
+.vector-proves { font-size: 12.5px; color: var(--text); }
+.vector-verdict {
+  margin-left: auto; font-family: var(--mono); font-size: 10.5px;
+  padding: 1px 8px; border-radius: 999px; border: 1px solid var(--border);
+}
+.vector-verdict.pass { color: var(--ok); border-color: color-mix(in srgb, var(--ok) 42%, transparent); }
+.vector-verdict.fail { color: var(--error); border-color: color-mix(in srgb, var(--error) 50%, transparent); }
+.vector-grants { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 8px; }
+.vector-grant {
+  display: inline-flex; align-items: baseline; gap: 6px;
+  font-family: var(--mono); font-size: 10.5px; padding: 2px 8px;
+  border-radius: 4px; border: 1px solid var(--border-soft); color: var(--text-dim);
+}
+.vector-grant.allow { border-color: color-mix(in srgb, var(--ok) 35%, transparent); }
+.vector-grant.allow b { color: var(--ok); }
+.vector-grant.deny { border-color: color-mix(in srgb, var(--error) 35%, transparent); }
+.vector-grant.deny b { color: var(--error); }
+.vector-grant.none { font-style: italic; border-style: dashed; }
+.vector-scope { color: var(--text-faint); }
+.vector-query {
+  display: flex; align-items: baseline; gap: 8px; margin-top: 7px;
+  font-family: var(--mono); font-size: 10.5px; color: var(--text-dim);
+}
+.vector-label { text-transform: uppercase; letter-spacing: 0.07em; font-size: 9.5px; color: var(--text-faint); }
+
+/* the artefact audit — the one register that counts what is absent */
+.gap-name { font-size: 12px; color: var(--text-dim); }
+.gap-name.missing { color: var(--error); font-weight: 600; }
+.gap-name.partial { color: var(--warning); }
+/* Blocked is open, but not open on us — the bar and the name say so in the
+   colour used elsewhere for "real, and not here yet". */
+.gap-name.blocked { color: var(--info); font-weight: 600; }
+
+.doc-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 10px; padding: 4px 0 14px;
+}
+.doc-card {
+  display: flex; flex-direction: column; gap: 5px; text-align: left;
+  border: 1px solid var(--border-soft); border-radius: 8px;
+  padding: 11px 13px; background: var(--bg-panel); cursor: pointer;
+}
+.doc-card:hover { border-color: var(--layer); }
+.doc-title { font-size: 13px; font-weight: 600; color: var(--text); }
+.doc-lead {
+  font-size: 11.5px; line-height: 1.55; color: var(--text-dim);
+  display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;
+}
+.doc-meta {
+  display: flex; justify-content: space-between; gap: 8px;
+  font-family: var(--mono); font-size: 10px; color: var(--text-faint);
+}
+.doc-source {
+  font-family: var(--mono); font-size: 12px; line-height: 1.7;
+  white-space: pre-wrap; color: var(--text-dim); padding: 4px 0;
+}
+
+/* the frame lifted out of a platform board, as opposed to the structure-only
+   render generated from the screen definition — different claims, so they must
+   be distinguishable at a glance */
+.board-platform.from-board {
+  color: var(--spine);
+  border-color: color-mix(in srgb, var(--spine) 42%, transparent);
+  background: color-mix(in srgb, var(--spine) 9%, transparent);
+}
+.wireframe-alt { margin: 6px 0 20px; }
+.wireframe-alt > summary {
+  cursor: pointer; font-size: 11.5px; color: var(--text-faint);
+  padding: 6px 2px; list-style: none;
+}
+.wireframe-alt > summary::-webkit-details-marker { display: none; }
+.wireframe-alt > summary::before { content: "▸ "; }
+.wireframe-alt[open] > summary::before { content: "▾ "; }
+.wireframe-alt > summary:hover { color: var(--text-dim); }
+
+/* â”€â”€ a journey as its screens, in order â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* Each step's frame lifted out of the platform board it is drawn on, rather
+   than the flat flow render generated from the same step list this page has
+   already drawn above. */
+.journey-frames { display: flex; flex-direction: column; gap: 14px; padding: 4px 0 16px; }
+.journey-frame-card {
+  border: 1px solid var(--border-soft); border-radius: 9px;
+  background: var(--bg-panel); overflow: hidden;
+}
+.journey-frame-head {
+  display: flex; align-items: baseline; gap: 9px;
+  padding: 9px 12px; border-bottom: 1px solid var(--border-soft);
+}
+.journey-frame-step {
+  flex: none; width: 20px; height: 20px; border-radius: 5px;
+  background: var(--layer-soft); color: var(--layer);
+  font-family: var(--mono); font-size: 11px; font-weight: 700;
+  display: inline-flex; align-items: center; justify-content: center;
+}
+.journey-frame-name {
+  background: none; border: 0; padding: 0; cursor: pointer; text-align: left;
+  font-size: 12.5px; font-weight: 600; color: var(--text);
+}
+.journey-frame-name:hover { color: var(--layer); text-decoration: underline; }
+.journey-frame-platform {
+  margin-left: auto; font-family: var(--mono); font-size: 10px;
+  color: var(--text-faint); border: 1px solid var(--border-soft);
+  border-radius: 4px; padding: 1px 6px;
+}
+.journey-frame-action {
+  padding: 7px 12px 0; font-size: 11.5px; color: var(--text-dim);
+}
+
+/* routing filled from the workbook because the JSON export lost it */
+.lineage-routing.from-workbook { border-style: dashed; }
+.lineage-procedure {
+  font-family: var(--mono); font-size: 10px; padding: 1px 6px;
+  border-radius: 999px; border: 1px solid color-mix(in srgb, var(--patch) 45%, transparent);
+  color: var(--patch); white-space: nowrap;
+}
+/* a table no operation in any contract reaches */
+.lineage-table.unreached {
+  border-style: dashed; color: var(--text-faint);
+  background: transparent;
+}
+
+/* â”€â”€ what a screen reaches â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* The frontend end of the operation-to-table join. */
+.reach-card {
+  border: 1px solid var(--border-soft); border-radius: 8px;
+  background: var(--bg-panel); padding: 10px 13px; margin: 8px 0 22px;
+  max-width: 1100px;
+}
+.reach-row { display: flex; gap: 12px; padding: 5px 0; align-items: baseline; }
+.reach-label {
+  flex: none; min-width: 108px; font-size: 10px; letter-spacing: 0.07em;
+  text-transform: uppercase; color: var(--text-faint);
+}
+.reach-values { display: flex; flex-wrap: wrap; gap: 5px; align-items: center; }
+/* The operations the lineage never resolved. Amber rather than red: nothing is
+   broken, the delivery simply does not say — and the row exists so the table
+   count above cannot be read as a total when it is only a floor. */
+.reach-label.warn { color: var(--warning); }
+
+/* The rest of a contract's operations, a page at a time. Full width and last
+   in the group, so it reads as the end of the list rather than a row in it. */
+.lineage-more {
+  display: block; width: 100%;
+  margin: 6px 0 2px;
+  padding: 7px 10px;
+  background: transparent;
+  border: 1px dashed var(--border);
+  border-radius: 6px;
+  color: var(--text-dim);
+  font-size: 11px;
+  cursor: pointer;
+}
+.lineage-more:hover { border-color: var(--accent); color: var(--text); }
+
+.warn-note {
+  border-left: 2px solid color-mix(in srgb, var(--warning) 55%, transparent);
+  padding-left: 9px;
+}
+
+/* the reverse index in the right-hand pane */
+.link-weight.writes { color: var(--error); }
+
+/* ── phone ──────────────────────────────────────────────────────────── */
+/* The shell breakpoints are argued in styles.css; this is the same 760px seen
+   from the content side. Loaded after styles.css, so the view rules that
+   have to be undone are undone here or not at all. */
+@media (max-width: 760px) {
+  /* 20px each side is 10% of a 390px viewport spent on nothing */
+  .sheet-body {
+    padding: 8px 12px calc(40px + env(safe-area-inset-bottom, 0px));
+  }
+
+  /* Every multi-column grid here was sized for a pane 600px and wider. At 366px
+     of content the second column can only be bought out of the first. */
+  .wave-grid,
+  .doc-grid,
+  .state-grid,
+  .app-grid,
+  .deploy-grid,
+  .event-wire {
+    grid-template-columns: 1fr;
+  }
+
+  .screen-board { flex-direction: column; }
+  .region-card { max-width: none; }
+
+  /* the operation and what it touches, stacked — 210px of label column is more
+     than half the width, and the tables are the point of the row */
+  .lineage-row { grid-template-columns: 1fr; }
+  .lineage-tables { grid-column: 1; }
+
+  /* the contract name reads as a heading over its bar rather than a column */
+  .routing-row { flex-wrap: wrap; gap: 4px 10px; }
+  .routing-name { width: auto; text-align: left; }
+  .routing-bar { flex: none; min-width: 40%; }
+
+  .reach-row { display: block; }
+  .reach-label { min-width: 0; display: block; margin-bottom: 3px; }
+
+  /* a real table is the one thing here that cannot be made to stack, so it
+     scrolls inside itself; the page never does */
+  .domain-table {
+    display: block;
+    overflow-x: auto;
+    scrollbar-width: thin;
+  }
+
+  .nav-note, .reach-card, .routing-table, .board-card { max-width: none; }
+
+  /* ── design boards and wireframes ─────────────────────────────────── */
+  /* frameStage clamps the scale rather than following the container down to
+     0.27; see the note there. The stage takes the overflow that buys, and the
+     full-size link is promoted from a footnote to the obvious way in. */
+  .board-stage {
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+  }
+  .board-head { flex-wrap: wrap; gap: 6px 8px; }
+  .board-meta { margin-left: 0; width: 100%; }
+  .board-open {
+    flex: 1;
+    text-align: center;
+    padding: 7px 8px;
+    font-size: 12.5px;
+    border-color: var(--accent);
+    background: var(--accent-soft);
+  }
+}
+
+/* ── accounts and validation ─────────────────────────────────────────
+   The verdict block sits inside views that are otherwise read-only, so it is
+   deliberately quiet until there is something to say. A page full of loud
+   "not reviewed" boxes would train people to stop seeing them. */
+
+.verdict-box { margin: 20px 0 8px; max-width: 900px; }
+.verdict-body {
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  padding: 11px 13px;
+  background: color-mix(in srgb, var(--bg-panel) 60%, transparent);
+}
+
+.verdict-current { display: flex; align-items: center; gap: 9px; flex-wrap: wrap; }
+.verdict-chip {
+  font-size: 11px; font-weight: 600; letter-spacing: .02em;
+  padding: 3px 9px; border-radius: 999px;
+  border: 1px solid var(--border); color: var(--text-dim);
+}
+.verdict-chip.approved {
+  color: var(--ok);
+  border-color: color-mix(in srgb, var(--ok) 45%, transparent);
+  background: color-mix(in srgb, var(--ok) 12%, transparent);
+}
+.verdict-chip.rejected {
+  color: var(--error);
+  border-color: color-mix(in srgb, var(--error) 45%, transparent);
+  background: color-mix(in srgb, var(--error) 12%, transparent);
+}
+.verdict-chip\.needs-work, .verdict-chip[class~="needs-work"] {
+  color: var(--warning);
+  border-color: color-mix(in srgb, var(--warning) 45%, transparent);
+  background: color-mix(in srgb, var(--warning) 12%, transparent);
+}
+.verdict-chip.none { color: var(--text-faint); border-style: dashed; }
+.verdict-by { font-size: 11.5px; color: var(--text-faint); }
+.verdict-note {
+  flex: 1 0 100%;
+  margin: 6px 0 0; font-size: 12.5px; color: var(--text-dim); line-height: 1.6;
+}
+
+/* how it got here — smaller than the current verdict, because it is context */
+.verdict-history { margin-top: 11px; border-top: 1px solid var(--border); padding-top: 9px; }
+.verdict-history-head {
+  font-size: 10px; text-transform: uppercase; letter-spacing: .07em;
+  color: var(--text-faint); margin-bottom: 6px;
+}
+.verdict-history-row {
+  display: grid;
+  grid-template-columns: 10px minmax(70px, auto) minmax(80px, auto) auto;
+  gap: 4px 9px; align-items: baseline;
+  font-size: 11.5px; color: var(--text-faint);
+  padding: 3px 0;
+}
+.verdict-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--text-faint); }
+.verdict-dot.approved { background: var(--ok); }
+.verdict-dot.rejected { background: var(--error); }
+.verdict-dot[class~="needs-work"] { background: var(--warning); }
+.verdict-history-what { color: var(--text-dim); }
+.verdict-history-note { grid-column: 2 / -1; color: var(--text-faint); line-height: 1.55; }
+
+.verdict-signin {
+  display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+  margin-top: 11px; padding-top: 9px; border-top: 1px solid var(--border);
+  font-size: 12.5px; color: var(--text-faint);
+}
+
+.verdict-form { margin-top: 11px; padding-top: 10px; border-top: 1px solid var(--border); }
+.verdict-note-input {
+  width: 100%; box-sizing: border-box;
+  background: var(--bg); color: var(--text);
+  border: 1px solid var(--border); border-radius: 6px;
+  padding: 7px 9px; font-size: 12.5px; font-family: inherit;
+  resize: vertical;
+}
+.verdict-note-input:focus { outline: none; border-color: var(--accent); }
+/* Pick, then submit. The chips select; the button on the right is what writes
+   the row. Verdicts are append-only, so a mistaken one cannot be withdrawn —
+   only argued with by a later row — and a deliberate second action is cheap
+   against that. The submit sits apart from the three, with a gap between, so
+   it never reads as a fourth verdict. */
+.verdict-actions-row {
+  display: flex; gap: 14px; margin-top: 8px;
+  align-items: center; flex-wrap: wrap; justify-content: space-between;
+}
+.verdict-buttons { display: flex; gap: 7px; flex-wrap: wrap; }
+.verdict-set { cursor: pointer; }
+.verdict-set.approved:hover { border-color: var(--ok); color: var(--ok); }
+.verdict-set.rejected:hover { border-color: var(--error); color: var(--error); }
+.verdict-set[class~="needs-work"]:hover { border-color: var(--warning); color: var(--warning); }
+
+/* Chosen, not yet recorded. Filled rather than outlined, so "selected" and
+   "submitted" never look alike. */
+.verdict-set.chosen.approved {
+  background: color-mix(in srgb, var(--ok) 20%, transparent);
+  border-color: var(--ok); color: var(--ok);
+}
+.verdict-set.chosen.rejected {
+  background: color-mix(in srgb, var(--error) 20%, transparent);
+  border-color: var(--error); color: var(--error);
+}
+.verdict-set.chosen[class~="needs-work"] {
+  background: color-mix(in srgb, var(--warning) 20%, transparent);
+  border-color: var(--warning); color: var(--warning);
+}
+
+.verdict-submit {
+  border-color: var(--accent);
+  color: var(--accent);
+  font-weight: 600;
+}
+.verdict-submit:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--accent) 16%, transparent);
+}
+.verdict-submit:disabled { opacity: 0.4; cursor: not-allowed; border-color: var(--border); color: var(--text-faint); }
+/* Recording a rejection is the one that is hardest to undo — it should not be
+   the same colour as recording an approval. */
+.verdict-submit.rejected:not(:disabled) { border-color: var(--error); color: var(--error); }
+.verdict-submit.rejected:hover:not(:disabled) { background: color-mix(in srgb, var(--error) 16%, transparent); }
+
+.verdict-message { font-size: 11.5px; color: var(--text-faint); margin-left: 4px; }
+
+/* ── the account button and panel ──────────────────────────────────── */
+.account-toggle { font-size: 10.5px; font-weight: 700; letter-spacing: .02em; }
+.account-toggle.signed-in {
+  border-color: color-mix(in srgb, var(--accent) 55%, transparent);
+  color: var(--accent);
+  background: var(--accent-soft);
+}
+.account-initials { line-height: 1; }
+
+.account-dialog {
+  width: min(520px, 92vw);
+  max-height: 86vh; overflow-y: auto;
+  margin: 8vh auto 0;
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 20px 22px;
+  box-shadow: var(--shadow-3);
+}
+.account-title { margin: 0 0 12px; font-size: 16px; color: var(--text); }
+
+.invite-row { display: flex; gap: 7px; align-items: center; margin-top: 8px; flex-wrap: wrap; }
+.invite-row .auth-input { flex: 1 1 200px; margin: 0; }
+.invite-link-row { display: flex; gap: 7px; margin-top: 6px; }
+.invite-link-row .auth-input { flex: 1; margin: 0; font-size: 11.5px; }
+
+.invite-list { margin-top: 6px; }
+.invite-row-item {
+  display: grid;
+  grid-template-columns: 74px 1fr auto auto;
+  gap: 9px; align-items: center;
+  padding: 6px 0; font-size: 12px;
+  border-bottom: 1px solid var(--border);
+}
+.invite-state {
+  font-size: 10px; text-transform: uppercase; letter-spacing: .06em;
+  color: var(--text-faint);
+}
+.invite-row-item.open .invite-state { color: var(--accent); }
+.invite-row-item.redeemed .invite-state { color: var(--ok); }
+.invite-row-item.expired .invite-state,
+.invite-row-item.revoked .invite-state { color: var(--text-faint); }
+.invite-row-item.expired, .invite-row-item.revoked { opacity: .55; }
+.invite-who { color: var(--text-dim); overflow-wrap: anywhere; }
+.invite-role { color: var(--text-faint); font-size: 11px; }
+
+/* ── the standalone auth pages ─────────────────────────────────────── */
+/* ── the pages that are not the app shell ───────────────────────────── */
+/* styles.css puts `overflow: hidden` on html and body, which is right for the
+   viewer: it is a fixed shell whose panes scroll individually, and a document
+   that scrolled underneath them would be a second scrollbar with nothing in
+   it. Every standalone page loads the same stylesheet and inherited that, so
+   anything past the fold was simply unreachable — no scrollbar, no wheel, no
+   keyboard. The admin page ran out of room first, being the longest.
+
+   Body is already `height: 100%` from that rule, so giving it `overflow-y:
+   auto` makes it the scroll container. That leaves the sticky header sticky,
+   which a scrolling wrapper inside it would not. */
+.auth-page, .admin-page { height: 100%; overflow-y: auto; overflow-x: hidden; }
+
+.auth-page {
+  display: grid; place-items: start center;
+  min-height: 100vh; padding: 8vh 16px 40px;
+  background: var(--bg);
+  position: relative;
+  overflow: hidden;
+}
+/* Fixed rather than absolute so the mesh covers the viewport even when a short
+   card leaves the page shorter than the screen. It takes no pointer events at
+   all: a background that can steal a click from a password field is a bug. */
+.auth-bg {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  pointer-events: none;
+  display: block;
+}
+.auth-card, .auth-page > *:not(.auth-bg) { position: relative; z-index: 1; }
+.auth-card {
+  width: min(440px, 100%);
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 26px 26px 22px;
+}
+.auth-brand { margin-bottom: 18px; }
+.auth-title { margin: 0 0 10px; font-size: 18px; color: var(--text); }
+.auth-note { font-size: 12.5px; color: var(--text-dim); line-height: 1.65; margin: 0 0 14px; }
+.auth-fine { color: var(--text-faint); font-size: 11.5px; }
+.auth-label {
+  display: block; margin: 12px 0 4px;
+  font-size: 10px; text-transform: uppercase; letter-spacing: .07em;
+  color: var(--text-faint);
+}
+.auth-input {
+  width: 100%; box-sizing: border-box;
+  background: var(--bg); color: var(--text);
+  border: 1px solid var(--border); border-radius: 6px;
+  padding: 8px 10px; font-size: 13px; font-family: inherit;
+}
+.auth-input:focus { outline: none; border-color: var(--accent); }
+.auth-error {
+  margin: 12px 0 0; padding: 8px 10px;
+  font-size: 12.5px; line-height: 1.55;
+  color: var(--error);
+  border: 1px solid color-mix(in srgb, var(--error) 40%, transparent);
+  background: color-mix(in srgb, var(--error) 10%, transparent);
+  border-radius: 6px;
+}
+.auth-button {
+  display: block; width: 100%; margin-top: 16px;
+  padding: 9px 14px;
+  font-size: 13px; font-family: inherit; text-align: center; text-decoration: none;
+  color: var(--bg); background: var(--accent);
+  border: 1px solid var(--accent); border-radius: 6px;
+  cursor: pointer;
+}
+.auth-button:hover { filter: brightness(1.08); }
+.auth-button:disabled { opacity: .6; cursor: default; }
+.auth-button-quiet {
+  color: var(--text-dim); background: transparent; border-color: var(--border);
+}
+.auth-button-quiet:hover { color: var(--text); border-color: var(--text-faint); filter: none; }
+
+@media (max-width: 760px) {
+  .account-dialog { margin-top: 0; border-radius: 0; min-height: 100vh; }
+  .verdict-history-row { grid-template-columns: 10px 1fr; }
+  .verdict-history-when { grid-column: 2; }
+}
+
+/* ── the accounts page ───────────────────────────────────────────────
+   Its own page rather than a panel in the viewer: managing people is a
+   different job from reading contracts, and it wants room for a table. */
+
+/* No ground of its own — deliberately nothing here.
+   This carried `background: var(--bg)`, which at night lost to
+   `:root[data-theme="dark"] body` and by day won, so the standalone pages sat
+   on flat grey while every other surface was on the field. The class is on
+   <body> itself, so `transparent` is not the fix either — it still outranks
+   the body rule and leaves the page with no ground at all. Declaring nothing
+   lets `body { background: var(--field-day) }` through in both themes. */
+/* Same height as the viewer's first chrome row, and the same lockup inside it,
+   so the mark does not jump when a reader follows a link off the main view. The
+   height is set rather than left to the padding: the bar's contents differ page
+   to page and a bar measured by whatever is tallest inside it is a bar that
+   changes height for reasons nobody can see. */
+.admin-bar {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 14px;
+  height: var(--brand-bar-h);
+  padding: 0 18px;
+  /* The viewer's chrome is dark in both themes on purpose — it is where the app
+     talks about itself, and it should not move when you change how you are
+     reading. These bars were following the theme instead, so the same strip of
+     screen was charcoal on one page and near-white on the next. Same tokens
+     now, which is also why the text below is named rather than inherited: on a
+     surface that does not follow the theme, neither can the ink. */
+  background: var(--chrome-1);
+  border-bottom: 1px solid var(--chrome-border);
+  color: var(--chrome-text);
+  position: sticky; top: 0; z-index: 5;
+}
+.admin-bar-right { display: flex; align-items: center; gap: 12px; }
+
+/* The lockup replaced a 22px mark and the word "Atlas" beside it. It carries
+   the wordmark itself, so the text went with it, and what is left after it is
+   the one thing that differs page to page — which page this is. The rule keeps
+   that reading as a subtitle to the brand rather than a second label floating
+   next to it. */
+.admin-bar .brand { gap: 10px; }
+
+/* The bar is dark in both themes now, so the day cut — which is the wordmark in
+   black ink, for a light surface — has nothing to sit on. It would be invisible
+   rather than merely wrong. The white-ink cut is correct on this bar in both
+   themes, the same way the viewer's chrome ships one image and no pair. */
+.admin-bar .brand-lockup-day { display: none; }
+.admin-bar .brand-lockup-night { display: block; }
+
+.admin-bar .brand-sub {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  color: var(--chrome-muted);
+  padding-left: 10px;
+  border-left: 1px solid color-mix(in srgb, var(--chrome-text) 20%, transparent);
+  line-height: 1.7;
+}
+
+@media (max-width: 640px) {
+  /* The subtitle is the first thing to go: the page's own heading says the
+     same thing one line further down. */
+  /* Both shrink together, so the proportion the bar was designed at holds. */
+  .admin-bar { height: 52px; }
+  .admin-bar .brand-lockup { height: 34px; }
+  .admin-bar .brand-sub { display: none; }
+
+  /* The right-hand group is this page's whole navigation — four chips naming
+     the four other pages, plus who you are signed in as. It is `flex: 0 0 auto`
+     by default and the bar is `justify-content: space-between`, so once the
+     chips are wider than what the wordmark leaves them the group simply hangs
+     off the right of the bar. Measured on platforms.html at 414px and 360px
+     and on admin.html at 360px: the group ended at x=423 in a 414px window,
+     with the document reporting no overflow at all — the bar clips it, so
+     there is nothing to scroll and "Back to the viewer" is unreachable.
+
+     A scrolling strip rather than a wrap, for the same reason the chrome rails
+     scroll: the bar has a fixed height here and a second row of chips would
+     have to come out of the page. The brand holds its size and the strip
+     yields, which is the right way round — the wordmark is one tap target
+     (it links to the viewer) and the strip is five. */
+  .admin-bar .brand { flex: none; }
+  .admin-bar-right {
+    /* Shrink but do not grow, and NO `justify-content: flex-end` — that pair is
+       the trap here. A flex container that is both end-justified and scrollable
+       puts its overflow off the *start* edge, and a scroll container cannot be
+       scrolled backwards past its own origin: the first chips become
+       permanently unreachable, which is the bug this block is fixing, moved to
+       the other end of the bar. With `0 1 auto` the group is still pushed right
+       by the bar's own `space-between` while it fits, and once it does not it
+       shrinks in place and scrolls from the left like every other strip. */
+    flex: 0 1 auto;
+    min-width: 0;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scrollbar-width: none;
+  }
+  .admin-bar-right::-webkit-scrollbar { display: none; }
+  .admin-bar-right > * { flex: none; }
+}
+.admin-who { font-size: 12px; color: var(--chrome-muted); }
+
+/* Chips live on the chrome here, not on a panel, so they take the chrome's ink
+   rather than the page's — the base .chip is drawn for a surface that follows
+   the theme and goes to near-black text on charcoal in day. */
+.admin-bar .chip {
+  background: color-mix(in srgb, var(--chrome-text) 8%, transparent);
+  border-color: color-mix(in srgb, var(--chrome-text) 22%, transparent);
+  color: var(--chrome-muted);
+}
+.admin-bar .chip:hover {
+  background: color-mix(in srgb, var(--chrome-text) 15%, transparent);
+  border-color: color-mix(in srgb, var(--chrome-text) 40%, transparent);
+  color: var(--chrome-text);
+}
+.admin-main { max-width: 940px; margin: 0 auto; padding: 22px 18px 60px; }
+
+/* ── review activity ────────────────────────────────────────────────── */
+/* Wider than the other standalone pages: this one carries a seven-column
+   reviewer table and a thirty-bar chart, and squeezing those into 940px to
+   match admin.html would cost more than the consistency is worth. */
+.reviews-main { max-width: 1180px; }
+
+.stat-strip {
+  display: grid; gap: 10px; margin-bottom: 18px;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+}
+.stat-card {
+  border: 1px solid var(--border); border-radius: 9px;
+  background: var(--bg-panel); padding: 14px 16px;
+}
+.stat-value {
+  font-size: 27px; color: var(--text); line-height: 1.05;
+  font-variant-numeric: tabular-nums;
+}
+.stat-label {
+  margin-top: 5px; font-size: 10px; letter-spacing: 0.07em;
+  text-transform: uppercase; color: var(--text-faint);
+}
+.stat-hint { margin-top: 5px; font-size: 11px; color: var(--text-dim); }
+
+.chart { width: 100%; height: 168px; display: block; color: var(--text-faint); }
+.chart-tick { font-size: 9px; fill: var(--text-faint); }
+.chart-legend { display: flex; gap: 14px; margin-top: 6px; }
+
+.reviews-filters { margin-bottom: 4px; }
+
+/* Disagreement. Amber down the side rather than red: two people reading the
+   same thing differently is the review working, not a fault. */
+.contested-row {
+  display: grid; grid-template-columns: minmax(0, 1fr) 90px minmax(0, 1.4fr);
+  gap: 12px; align-items: center;
+  padding: 9px 11px; margin-bottom: 6px;
+  border: 1px solid var(--border);
+  border-left: 2px solid color-mix(in srgb, var(--warning) 60%, transparent);
+  border-radius: 7px; background: var(--bg-raised);
+}
+.contested-opinions { display: flex; flex-wrap: wrap; gap: 6px; justify-content: flex-end; }
+
+.people-row {
+  display: grid; gap: 12px; align-items: center;
+  grid-template-columns: minmax(0, 1.5fr) 120px 110px 78px 130px 90px 110px;
+  padding: 9px 4px; border-bottom: 1px solid var(--border);
+  font-size: 12px; color: var(--text-dim);
+}
+.people-head {
+  font-size: 10px; letter-spacing: 0.06em; text-transform: uppercase;
+  color: var(--text-faint); border-bottom-color: var(--text-faint);
+}
+.people-who { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.people-name { color: var(--text); font-size: 12.5px; }
+.people-role { font-size: 10.5px; color: var(--text-faint); }
+.people-count { display: flex; align-items: center; gap: 8px; }
+.people-count b { color: var(--text); font-variant-numeric: tabular-nums; min-width: 26px; }
+.people-bar { flex: 1; height: 4px; border-radius: 2px; background: var(--bg-raised); overflow: hidden; }
+.people-bar-fill { display: block; height: 100%; background: var(--accent); }
+.people-mix { display: flex; height: 8px; border-radius: 4px; overflow: hidden; background: var(--bg-raised); }
+.people-mix-seg { display: block; height: 100%; }
+.people-num { font-variant-numeric: tabular-nums; font-size: 11.5px; }
+
+.response-row {
+  display: grid; gap: 12px; align-items: baseline;
+  grid-template-columns: 104px minmax(0, 1fr) 96px 150px;
+  padding: 8px 4px; border-bottom: 1px solid var(--border);
+}
+.response-row:hover { background: var(--bg-hover); }
+.response-note { display: block; font-size: 11.5px; color: var(--text-dim); line-height: 1.5; margin-top: 2px; }
+.response-note-empty { color: var(--text-faint); font-style: italic; }
+
+@media (max-width: 900px) {
+  /* The mix bar and the cadence are the first to go: on a narrow screen the
+     name, the count and the last-seen carry the story. */
+  .people-row { grid-template-columns: minmax(0, 1fr) 90px 80px; }
+  .people-row > :nth-child(n + 4) { display: none; }
+  .people-head > :nth-child(n + 4) { display: none; }
+  .response-row { grid-template-columns: 96px minmax(0, 1fr); }
+  .response-row > :nth-child(n + 3) { display: none; }
+  .contested-row { grid-template-columns: minmax(0, 1fr); }
+  .contested-opinions { justify-content: flex-start; }
+}
+
+/* ── sign-off overview ──────────────────────────────────────────────── */
+/* Four cards, one per kind of thing a verdict is about. The bar fills from
+   empty rather than showing a percentage, because at 654 operations a single
+   verdict is 0.15% and a number that never moves says less than a bar that
+   does. Whatever is left of the bar is what nobody has looked at. */
+.signoff-grid {
+  display: grid; gap: 10px; margin-top: 14px;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+}
+.signoff-card {
+  text-align: left; font: inherit; cursor: pointer;
+  border: 1px solid var(--border); border-radius: 8px;
+  background: var(--bg-raised); padding: 12px 13px;
+}
+.signoff-card:hover { border-color: var(--text-faint); }
+.signoff-card.active { border-color: var(--accent); background: var(--bg-hover); }
+.signoff-card-label {
+  font-size: 10px; letter-spacing: 0.07em; text-transform: uppercase;
+  color: var(--text-faint);
+}
+.signoff-card-count {
+  font-size: 19px; color: var(--text); margin: 5px 0 8px;
+  font-variant-numeric: tabular-nums;
+}
+.signoff-bar {
+  display: flex; height: 5px; border-radius: 3px; overflow: hidden;
+  background: var(--bg-panel); border: 1px solid var(--border);
+}
+.signoff-bar-part.approved { background: var(--ok); }
+.signoff-bar-part.rejected { background: var(--error); }
+.signoff-bar-part[class~="needs-work"] { background: var(--warning); }
+.signoff-card-legend { display: flex; gap: 10px; margin-top: 8px; flex-wrap: wrap; }
+.signoff-legend-item {
+  display: inline-flex; align-items: center; gap: 4px;
+  font-size: 11px; color: var(--text-dim); font-variant-numeric: tabular-nums;
+}
+
+.signoff-controls {
+  display: flex; gap: 12px; align-items: center; flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+.signoff-filter { flex: 1 1 200px; min-width: 0; }
+.signoff-toggle {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: 11.5px; color: var(--text-dim); cursor: pointer;
+}
+
+/* An anchor rather than a button: a row is a link into the viewer, and a
+   reviewer working through a list wants to open several in tabs. */
+.signoff-row {
+  display: grid; gap: 12px; align-items: center; text-decoration: none;
+  grid-template-columns: 104px minmax(0, 1fr) 130px 160px;
+  padding: 7px 4px; border-bottom: 1px solid var(--border);
+  color: var(--text-dim);
+}
+.signoff-row:hover { background: var(--bg-hover); }
+.signoff-row-main { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.signoff-row-name { color: var(--text); font-size: 12.5px; }
+.signoff-row-detail {
+  font-family: var(--mono); font-size: 10.5px; color: var(--text-faint);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.signoff-row-group { font-size: 11px; color: var(--text-faint); }
+.signoff-row-who {
+  display: flex; flex-direction: column; gap: 2px;
+  font-size: 11px; text-align: right; justify-self: end;
+}
+.signoff-row-when { color: var(--text-faint); font-size: 10px; }
+
+@media (max-width: 760px) {
+  /* The reviewer and the module are the first things to go: on a phone the
+     verdict and the name are the whole point, and the rest is a tap away. */
+  .signoff-row { grid-template-columns: 92px minmax(0, 1fr); }
+  .signoff-row-group, .signoff-row-who { display: none; }
+}
+.admin-panel {
+  border: 1px solid var(--border); border-radius: 9px;
+  background: var(--bg-panel);
+  padding: 18px 20px; margin-bottom: 18px;
+}
+.admin-heading {
+  margin: 0 0 8px; font-size: 14px; color: var(--text);
+  display: flex; align-items: baseline; gap: 9px;
+}
+.admin-count { font-size: 11.5px; font-weight: 400; color: var(--text-faint); }
+.admin-table { margin-top: 10px; }
+.admin-row {
+  display: grid; gap: 10px; align-items: center;
+  padding: 8px 0; border-bottom: 1px solid var(--border);
+  font-size: 12.5px;
+}
+.admin-row:last-child { border-bottom: 0; }
+.invite-row-item.admin-row { grid-template-columns: 78px 1fr auto 150px 88px; }
+/* Seven cells: name, address, role, verdict count, enable/disable, the reset
+   link and the session control. The count has to match what the row appends —
+   an extra cell against a six-column template does not widen the row, it wraps
+   onto an implicit second one and reads as a layout bug. */
+.account-row { grid-template-columns: 0.85fr 1.4fr 104px 84px 78px 118px 108px; }
+.account-row.disabled { opacity: .5; }
+/* The confirm for ending somebody's sessions takes the whole row rather than
+   its column. It has to fit a sentence saying which of the two buttons beside
+   each other was just pressed, and 108px is not a sentence. */
+.account-sessions-ask {
+  grid-column: 1 / -1;
+  display: flex; align-items: center; flex-wrap: wrap; gap: 8px;
+  padding: 2px 0 4px;
+}
+.account-sessions-ask p { margin: 0; flex: 1 1 280px; }
+
+/* The reset link takes the whole row for the same reason the confirm above
+   does: it is a URL somebody has to select and copy, and a 118px column is not
+   a URL. Appended to the row rather than to the cell so the grid, not the cell,
+   is what it spans. */
+.account-reset-link {
+  grid-column: 1 / -1;
+  display: flex; align-items: center; flex-wrap: wrap; gap: 8px;
+  padding: 2px 0 6px;
+}
+.account-reset-link input {
+  flex: 1 1 320px;
+  min-width: 0;
+  font-family: var(--mono);
+  font-size: 11.5px;
+}
+.account-reset-link p { margin: 0; flex: 1 1 100%; }
+.account-name { color: var(--text); }
+.admin-when { color: var(--text-faint); font-size: 11.5px; }
+.admin-role { padding: 3px 6px; font-size: 11.5px; }
+.auth-ok {
+  margin: 12px 0 0; padding: 8px 10px;
+  font-size: 12.5px; color: var(--ok);
+  border: 1px solid color-mix(in srgb, var(--ok) 40%, transparent);
+  background: color-mix(in srgb, var(--ok) 10%, transparent);
+  border-radius: 6px;
+}
+.auth-pre {
+  margin: 6px 0 14px; padding: 9px 11px;
+  background: var(--bg); border: 1px solid var(--border); border-radius: 6px;
+  font-size: 12px; font-family: ui-monospace, Menlo, monospace;
+  color: var(--text-dim); overflow-x: auto;
+}
+
+@media (max-width: 760px) {
+  .admin-main { padding: 14px 12px 40px; }
+  .admin-panel { padding: 14px; }
+  .invite-row-item.admin-row, .account-row {
+    grid-template-columns: 1fr auto; row-gap: 4px;
+  }
+  .admin-when { grid-column: 1 / -1; }
+}
+
+/* ── the review table ─────────────────────────────────────────────────
+   A log read as a table: every column sortable, the note given room
+   because it is the part worth reading, and completed rows dimmed rather
+   than removed so "was this ever dealt with" stays answerable. */
+.review-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12.5px;
+  table-layout: fixed;
+}
+.review-table th,
+.review-table td {
+  padding: 6px 8px;
+  text-align: left;
+  vertical-align: top;
+  border-bottom: 1px solid var(--tint-2);
+  overflow-wrap: anywhere;
+}
+.review-table thead th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: var(--panel);
+  border-bottom: 1px solid var(--line);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.review-table thead th.sorted { color: var(--text); }
+
+.rt-sort {
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  letter-spacing: inherit;
+  text-transform: inherit;
+  padding: 0;
+  cursor: pointer;
+}
+.rt-sort:hover { color: var(--text); }
+.rt-arrow { margin-left: 4px; }
+
+.review-row:hover { background: var(--tint-1); }
+/* Dimmed, not hidden. The filter above is how somebody says they want only
+   the open ones; this is how the table still shows that work was finished. */
+.review-row.done { opacity: 0.5; }
+
+.rt-when { width: 108px; }
+.rt-verdict { width: 96px; }
+.rt-tag { width: 88px; }
+.rt-kind { width: 84px; }
+.rt-artefact { width: 17%; }
+.rt-note { width: auto; }
+.rt-who { width: 120px; }
+.rt-done { width: 132px; }
+
+.rt-when-text,
+.rt-kind-text,
+.rt-who-text { color: var(--muted); white-space: nowrap; }
+.rt-artefact-link {
+  font-family: var(--mono, ui-monospace, monospace);
+  color: var(--accent);
+  text-decoration: none;
+}
+.rt-artefact-link:hover { text-decoration: underline; }
+.rt-note-text { color: var(--text); }
+.rt-none { color: var(--muted); opacity: 0.7; font-style: italic; }
+
+/* Which side of the house it lands on. Same two colours everywhere they
+   appear — here, on the verdict block, and in the export legend. */
+.verdict-tag-chip,
+.rt-done-chip,
+.rt-open-chip {
+  display: inline-block;
+  padding: 1px 8px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.verdict-tag-chip.frontend { background: color-mix(in srgb, var(--accent) 16%, transparent); color: var(--accent); }
+.verdict-tag-chip.backend { background: color-mix(in srgb, var(--teal) 16%, transparent); color: var(--teal); }
+.rt-done-chip { background: color-mix(in srgb, var(--ok) 14%, transparent); color: var(--ok); }
+.rt-open-chip { background: var(--tint-2); color: var(--muted); }
+
+.rt-done-stamp { display: block; }
+.rt-done-by {
+  display: block;
+  margin-top: 2px;
+  font-size: 11px;
+  color: var(--muted);
+}
+.rt-done-button { margin-top: 5px; font-size: 11px; padding: 2px 8px; }
+
+/* The tag picker on the verdict form. */
+.verdict-tag-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+.verdict-tag-label {
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.verdict-tag-buttons { display: flex; gap: 4px; }
+.chip.verdict-tag { font-size: 11px; padding: 2px 10px; opacity: 0.6; }
+.chip.verdict-tag.chosen { opacity: 1; }
+.chip.verdict-tag.frontend.chosen {
+  background: color-mix(in srgb, var(--accent) 18%, transparent);
+  color: var(--accent);
+  border-color: color-mix(in srgb, var(--accent) 40%, transparent);
+}
+.chip.verdict-tag.backend.chosen {
+  background: color-mix(in srgb, var(--teal) 18%, transparent);
+  color: var(--teal);
+  border-color: color-mix(in srgb, var(--teal) 40%, transparent);
+}
+.verdict-done-chip {
+  display: inline-block;
+  margin-left: 8px;
+  padding: 1px 8px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 600;
+  background: color-mix(in srgb, var(--ok) 14%, transparent);
+  color: var(--ok);
+}
+
+@media (max-width: 1100px) {
+  .rt-kind, .rt-who { display: none; }
+}
+
+/* Inside the table the verdict is a label, not a paragraph: "Needs work"
+   wrapped to two lines and broke out of its own pill. */
+.review-table .verdict-chip { white-space: nowrap; }
+
+/* Whose review a row belongs to. The team's is the unmarked case — it is most
+   of the table, and a chip on every row would be noise rather than a signal. */
+.rt-audience { width: 78px; }
+.rt-audience-chip {
+  display: inline-block;
+  padding: 1px 8px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.rt-audience-chip.client { background: color-mix(in srgb, var(--orange) 16%, transparent); color: var(--orange); }
+
+/* The client's standing verdict, beside the team's rather than under it. */
+.verdict-client-track {
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px dashed var(--line);
+}
+.verdict-track-label {
+  margin-right: 6px;
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--orange);
+}
+.verdict-as-client {
+  margin: 0 0 6px;
+  font-size: 11.5px;
+  color: var(--orange);
+}
+
+@media (max-width: 1100px) {
+  .rt-audience { width: 62px; }
+}
+
+/* Discard: the one control on the page that destroys something, so it is the
+   one that stays quiet until it is armed. */
+.rt-discard {
+  margin-top: 5px;
+  margin-left: 6px;
+  font-size: 11px;
+  padding: 2px 8px;
+  opacity: 0.55;
+}
+.rt-discard:hover { opacity: 1; }
+.rt-discard.armed {
+  opacity: 1;
+  background: color-mix(in srgb, var(--error) 18%, transparent);
+  color: var(--error);
+  border-color: color-mix(in srgb, var(--error) 45%, transparent);
+}
+
+/* Discard, inside a verdict block. Deliberately not a chip: it is not one of
+   the things you are being offered, it is a way out of one you already took. */
+.verdict-discard {
+  display: block;
+  margin-top: 8px;
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  font-size: 11px;
+  color: var(--muted);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  cursor: pointer;
+  opacity: 0.7;
+}
+.verdict-discard:hover { opacity: 1; }
+.verdict-discard.armed { color: var(--error); opacity: 1; font-weight: 600; }
+
+/* Sent back: finished once, and not accepted. Amber rather than red — it is
+   not a verdict, it is a piece of work returned. */
+.rt-sentback-chip {
+  display: inline-block;
+  padding: 1px 8px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 600;
+  white-space: nowrap;
+  background: color-mix(in srgb, var(--warning) 16%, transparent);
+  color: var(--warning);
+}
+.rt-sentback-note {
+  display: block;
+  margin-top: 3px;
+  font-size: 11px;
+  line-height: 1.35;
+  color: var(--warning);
+  opacity: 0.85;
+}
+
+.rt-sendback { display: block; }
+.rt-sendback-open { margin-top: 5px; font-size: 11px; padding: 2px 8px; }
+.rt-sendback-form { display: block; margin-top: 5px; }
+textarea.rt-sendback-note {
+  display: block;
+  width: 100%;
+  margin: 0 0 4px;
+  padding: 4px 6px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: var(--panel);
+  color: var(--text);
+  font: inherit;
+  font-size: 11px;
+  opacity: 1;
+  resize: vertical;
+}
+.rt-sendback-send { font-size: 11px; padding: 2px 8px; }
+.rt-sendback-send:not(:disabled) {
+  background: color-mix(in srgb, var(--warning) 16%, transparent);
+  color: var(--warning);
+  border-color: color-mix(in srgb, var(--warning) 40%, transparent);
+}
+.rt-sendback-cancel { font-size: 11px; padding: 2px 8px; margin-left: 4px; opacity: 0.6; }
+
+/* The status column carries a note now, so it needs the room. */
+.rt-done { width: 190px; }
+
+/* ── naming somebody in a note ────────────────────────────────────────
+   The menu is anchored to the textarea's wrapper, so the wrapper is the
+   thing that has to establish a positioning context. */
+.verdict-note-wrap { position: relative; }
+
+.mention-menu {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 100%;
+  z-index: 40;
+  margin-top: 2px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel);
+  box-shadow: var(--shadow-2);
+  overflow: hidden;
+}
+.mention-option {
+  display: flex;
+  gap: 8px;
+  align-items: baseline;
+  width: 100%;
+  padding: 5px 9px;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  font-size: 12px;
+  text-align: left;
+  cursor: pointer;
+}
+.mention-option.active,
+.mention-option:hover { background: color-mix(in srgb, var(--accent) 14%, transparent); }
+.mention-handle {
+  font-family: var(--mono, ui-monospace, monospace);
+  color: var(--accent);
+}
+.mention-name { color: var(--muted); }
+.mention-role {
+  margin-left: auto;
+  padding: 0 6px;
+  border-radius: 999px;
+  font-size: 10px;
+  background: color-mix(in srgb, var(--orange) 16%, transparent);
+  color: var(--orange);
+}
+
+/* A handle inside a note that has been written. */
+.note-mention {
+  padding: 0 3px;
+  border-radius: 4px;
+  background: color-mix(in srgb, var(--accent) 14%, transparent);
+  color: var(--accent);
+  font-weight: 600;
+}
+
+/* The inbox. */
+.mentions-panel .admin-heading { display: flex; align-items: center; gap: 10px; }
+.mentions-read { margin-left: auto; font-size: 11px; padding: 2px 10px; }
+
+.mention-row {
+  position: relative;
+  padding: 8px 10px 8px 22px;
+  border-bottom: 1px solid var(--tint-2);
+  font-size: 12.5px;
+}
+.mention-row:last-child { border-bottom: 0; }
+.mention-row.unread { background: color-mix(in srgb, var(--accent) 5%, transparent); }
+.mention-dot {
+  position: absolute;
+  left: 8px;
+  top: 14px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--accent);
+}
+.mention-line {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: baseline;
+  margin-bottom: 3px;
+}
+.mention-by { font-weight: 600; }
+.mention-what { display: inline-flex; gap: 8px; align-items: baseline; }
+
+/* A note has named you. On the account button, because that is the one thing
+   in view on every layer — the inbox itself needs room the topbar has not got,
+   so what comes to you is the fact that there is something to read. */
+.account-toggle.has-mentions::after {
+  content: '';
+  position: absolute;
+  top: 3px;
+  right: 3px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 0 2px var(--bg);
+}
+.account-toggle { position: relative; }
+
+.auth-button-loud {
+  border-color: color-mix(in srgb, var(--accent) 50%, transparent);
+  color: var(--accent);
+}
+
+/* ── the bell ────────────────────────────────────────
+   Its own control beside the account button. Being named is something
+   that happened to you; who you are signed in as is not, and the two
+   want different actions behind them. */
+.bell-toggle {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.icon-bell {
+  width: 14px;
+  height: 14px;
+  display: block;
+}
+.bell-toggle.has-mentions { color: var(--accent); border-color: var(--accent); }
+
+/* Sits on the corner of the button rather than inside it: the count is about
+   the bell, and one drawn within a 26px square leaves no room for the bell. */
+.bell-count {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  min-width: 14px;
+  height: 14px;
+  padding: 0 3px;
+  border-radius: 999px;
+  background: var(--accent);
+  color: var(--ink-on-accent);
+  font-size: 9.5px;
+  font-weight: 700;
+  line-height: 14px;
+  text-align: center;
+  box-shadow: 0 0 0 2px var(--bg);
+}
+
+.bell-dialog { max-width: 460px; }
+.bell-list {
+  margin: 4px 0 10px;
+  max-height: 52vh;
+  overflow-y: auto;
+  /* So a list longer than the box reads as cut off rather than as finished. */
+  mask-image: linear-gradient(to bottom, #000 calc(100% - 14px), transparent 100%);
+}
+.bell-list::-webkit-scrollbar { width: 8px; }
+.bell-list::-webkit-scrollbar-thumb {
+  background: var(--tint-3);
+  border-radius: 4px;
+}
+
+.bell-row {
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--tint-2);
+  font-size: 12.5px;
+  line-height: 1.4;
+}
+.bell-row:last-child { border-bottom: 0; }
+
+/* The empty state. Quieter than a row and without the divider, so it reads as
+   the absence of rows rather than as one more of them. */
+.bell-empty {
+  margin: 0;
+  padding: 18px 10px 20px;
+  font-size: 12.5px;
+  line-height: 1.55;
+  color: var(--text-faint);
+  text-align: center;
+}
+.bell-empty-handle {
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--accent);
+  white-space: nowrap;
+}
+/* The list fades its last 14px so a long one reads as cut off. There is
+   nothing to cut off here, and the fade would land on the sentence. */
+.bell-list:has(.bell-empty) { mask-image: none; }
+.bell-row.unread {
+  background: color-mix(in srgb, var(--accent) 6%, transparent);
+  border-left: 2px solid var(--accent);
+  padding-left: 8px;
+}
+.bell-row-head {
+  display: flex;
+  gap: 8px;
+  align-items: baseline;
+  margin-bottom: 2px;
+}
+.bell-who { font-weight: 600; }
+.bell-target {
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  font-family: var(--mono, ui-monospace, monospace);
+  font-size: 11.5px;
+  color: var(--accent);
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+/* ── how the team answered ───────────────────────────────
+   The tracker's "Our verdict" column, in the tracker's own colours:
+   green for the two that mean the thing exists now, slate for a
+   question answered, khaki for a point taken, grey for nothing to do.
+   Written the way the verdict chips are — tinted fill, matching border —
+   so the two columns read as the same kind of object. */
+.response-chip {
+  display: inline-block;
+  font-size: 11px; font-weight: 600; letter-spacing: .02em;
+  padding: 2px 9px; border-radius: 999px;
+  border: 1px solid var(--border);
+  white-space: nowrap;
+}
+.response-chip.built {
+  color: var(--state-built);
+  border-color: color-mix(in srgb, var(--state-built) 45%, transparent);
+  background: color-mix(in srgb, var(--state-built) 14%, transparent);
+}
+.response-chip.wired {
+  color: var(--state-wired);
+  border-color: color-mix(in srgb, var(--state-wired) 45%, transparent);
+  background: color-mix(in srgb, var(--state-wired) 14%, transparent);
+}
+.response-chip.answered {
+  color: var(--state-answered);
+  border-color: color-mix(in srgb, var(--state-answered) 45%, transparent);
+  background: color-mix(in srgb, var(--state-answered) 16%, transparent);
+}
+.response-chip.accepted {
+  color: var(--state-accepted);
+  border-color: color-mix(in srgb, var(--state-accepted) 45%, transparent);
+  background: color-mix(in srgb, var(--state-accepted) 14%, transparent);
+}
+.response-chip.approved-no-action {
+  color: var(--state-neutral);
+  border-color: color-mix(in srgb, var(--state-neutral) 45%, transparent);
+  background: color-mix(in srgb, var(--state-neutral) 12%, transparent);
+}
+
+/* The picker, folded behind Respond so five chips are not on every row. */
+.response-picker {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 3px;
+  margin-top: 5px;
+}
+.chip.response-set { font-size: 10.5px; padding: 2px 7px; opacity: 0.8; }
+.chip.response-set:hover { opacity: 1; }
+.chip.response-set.built:hover { color: var(--state-built); border-color: var(--state-built); }
+.chip.response-set.wired:hover { color: var(--state-wired); border-color: var(--state-wired); }
+.chip.response-set.answered:hover { color: var(--state-answered); border-color: var(--state-answered); }
+.chip.response-set.accepted:hover { color: var(--state-accepted); border-color: var(--state-accepted); }
+.chip.response-set.approved-no-action:hover { color: var(--state-neutral); border-color: var(--state-neutral); }
+.chip.response-cancel { font-size: 10.5px; padding: 2px 7px; opacity: 0.5; }
+
+/* ── the decisions layer ───────────────────────────────────────────── */
+/* Four views where there was a file tree. Colours come from the existing
+   verdict palette so a Superseded decision reads the same here as a rejected
+   verdict does on the review pages — one vocabulary, not two. */
+
+/* Timeline ─ the sequence is the argument, so the spine is the strongest
+   line on the page and the dates are headings rather than cell text. */
+.timeline { padding: 6px 2px 40px; position: relative; }
+.timeline::before {
+  content: ''; position: absolute; left: 118px; top: 0; bottom: 34px;
+  width: 1px; background: var(--line);
+}
+.timeline-day {
+  font-size: 11px; letter-spacing: 0.04em; text-transform: uppercase;
+  color: var(--dim); margin: 22px 0 10px; padding-left: 138px;
+}
+.timeline-day:first-child { margin-top: 4px; }
+.timeline-day.undated { color: var(--text-faint); opacity: 0.75; }
+.timeline-row {
+  position: relative; display: flex; gap: 12px; align-items: flex-start;
+  padding: 9px 12px 9px 138px; border-radius: 8px;
+}
+.timeline-row.clickable { cursor: pointer; }
+.timeline-row.clickable:hover { background: var(--hover); }
+.timeline-dot {
+  position: absolute; left: 114px; top: 15px; width: 9px; height: 9px;
+  border-radius: 50%; background: var(--border-strong);
+  box-shadow: 0 0 0 3px var(--bg);
+}
+.timeline-row.adr .timeline-dot { background: var(--accent); }
+.timeline-row.conflict .timeline-dot { background: var(--warning); }
+.timeline-main { min-width: 0; flex: 1; }
+.timeline-head { display: flex; gap: 9px; align-items: baseline; flex-wrap: wrap; }
+.timeline-id { font-size: 11.5px; color: var(--accent); flex: none; }
+.timeline-row.conflict .timeline-id { color: var(--warning); }
+.timeline-title { font-size: 13px; }
+.timeline-note {
+  margin: 3px 0 0; font-size: 12px; color: var(--dim); line-height: 1.5;
+}
+.timeline-verdict {
+  font-size: 10px; padding: 1px 7px; border-radius: 999px;
+  border: 1px solid currentColor; opacity: 0.85; flex: none;
+}
+
+/* The four states that matter, and they mean the same thing wherever a
+   reader meets them. */
+.timeline-verdict.accepted, .supersede-verdict.accepted, .decision-verdict.accepted { color: var(--ok); }
+.timeline-verdict.proposed, .supersede-verdict.proposed, .decision-verdict.proposed { color: var(--warning); }
+.timeline-verdict.superseded, .supersede-verdict.superseded, .decision-verdict.superseded { color: var(--error); }
+.timeline-verdict.withdrawn, .supersede-verdict.withdrawn, .decision-verdict.withdrawn { color: var(--text-faint); }
+
+/* Supersession ─ cards rather than a force graph. Nine nodes and a dozen
+   edges is a list with arrows; a physics layout would move on every load and
+   say less. */
+.supersede { display: flex; flex-direction: column; gap: 12px; padding: 8px 2px 40px; }
+.supersede-card {
+  border: 1px solid var(--line); border-left-width: 3px;
+  border-radius: 10px; padding: 12px 14px; cursor: pointer;
+}
+.supersede-card:hover { background: var(--hover); }
+.supersede-card.superseded { border-left-color: var(--error); }
+.supersede-card.accepted { border-left-color: var(--ok); }
+.supersede-card.proposed { border-left-color: var(--warning); }
+.supersede-head { display: flex; gap: 10px; align-items: baseline; flex-wrap: wrap; }
+.supersede-id { font-size: 11.5px; color: var(--accent); }
+.supersede-title { font-size: 13px; flex: 1; min-width: 0; }
+.supersede-verdict { font-size: 10px; padding: 1px 7px; border-radius: 999px; border: 1px solid currentColor; }
+.supersede-warn {
+  margin: 8px 0 0; font-size: 12px; line-height: 1.5;
+  color: var(--warning); background: color-mix(in srgb, var(--warning) 9%, transparent);
+  border-radius: 6px; padding: 7px 10px;
+}
+.supersede-note, .supersede-prose {
+  margin: 7px 0 0; font-size: 12px; color: var(--dim); line-height: 1.5;
+}
+.supersede-edge { display: flex; gap: 8px; align-items: baseline; margin-top: 7px; font-size: 12px; }
+.supersede-edge-label {
+  font-size: 10px; text-transform: uppercase; letter-spacing: 0.04em;
+  color: var(--dim); min-width: 86px;
+}
+.supersede-edge.replaced-by .supersede-edge-label { color: var(--error); }
+.supersede-edge.replaces .supersede-edge-label { color: var(--ok); }
+.supersede-link {
+  background: none; border: none; padding: 0; cursor: pointer; text-align: left;
+  color: inherit; font: inherit; font-size: 12px; text-decoration: underline;
+  text-decoration-color: var(--line); text-underline-offset: 3px;
+}
+.supersede-link:hover { text-decoration-color: currentColor; }
+
+/* Register ─ a dataset, so a table. Wide content scrolls inside the table
+   rather than pushing the page sideways. */
+.register-table {
+  width: 100%; border-collapse: collapse; font-size: 12.5px; margin-bottom: 22px;
+}
+.register-table th {
+  text-align: left; font-size: 10px; text-transform: uppercase;
+  letter-spacing: 0.04em; color: var(--dim); font-weight: 500;
+  padding: 6px 10px; border-bottom: 1px solid var(--line);
+  position: sticky; top: 0; background: var(--bg); z-index: 1;
+}
+.register-row td {
+  padding: 8px 10px; border-bottom: 1px solid var(--line-soft);
+  vertical-align: top; line-height: 1.5;
+}
+.register-row:hover { background: var(--hover); }
+.register-id { white-space: nowrap; }
+.register-id code { color: var(--accent); font-size: 11.5px; }
+.register-issue { max-width: 640px; }
+.register-owner, .register-since { white-space: nowrap; color: var(--dim); }
+.register-none { color: var(--dim); }
+.register-chip {
+  font-size: 10px; padding: 1px 7px; border-radius: 999px;
+  border: 1px solid currentColor; white-space: nowrap;
+}
+/* Open is the one worth seeing from across the room. */
+.register-chip.open-client, .register-chip.open-softlabs, .register-chip.open { color: var(--warning); }
+.register-chip.closed { color: var(--ok); }
+.register-chip.withdrawn { color: var(--text-faint); }
+
+/* Decision ─ prose, which is the point of the layer. Measured column, because
+   a 1600px line of body text is not readable at any font size. */
+.decision-head { margin-bottom: 16px; }
+.decision-title { font-size: 19px; margin: 0 0 8px; line-height: 1.35; }
+.decision-meta { display: flex; gap: 10px; align-items: baseline; flex-wrap: wrap; }
+.decision-verdict { font-size: 10.5px; padding: 1px 8px; border-radius: 999px; border: 1px solid currentColor; }
+.decision-date { font-size: 12px; color: var(--dim); }
+.decision-links {
+  display: flex; flex-wrap: wrap; gap: 10px 26px; padding: 12px 14px;
+  border: 1px solid var(--line); border-radius: 10px; margin-bottom: 20px;
+}
+.decision-link-group { min-width: 240px; }
+.decision-link-head {
+  font-size: 10px; text-transform: uppercase; letter-spacing: 0.04em;
+  color: var(--dim); margin-bottom: 5px;
+}
+.decision-link {
+  display: flex; gap: 8px; align-items: baseline; font-size: 12px;
+  padding: 3px 0; background: none; border: none; color: inherit;
+  text-align: left; width: 100%;
+}
+.decision-link code { color: var(--accent); font-size: 11.5px; flex: none; }
+.decision-link.clickable { cursor: pointer; }
+.decision-link.clickable:hover { color: var(--accent); }
+.decision-link:disabled { opacity: 0.5; cursor: default; }
+.decision-fact { display: flex; gap: 10px; font-size: 12px; padding: 3px 0; min-width: 240px; }
+.decision-fact-label {
+  font-size: 10px; text-transform: uppercase; letter-spacing: 0.04em;
+  color: var(--dim); min-width: 84px; flex: none;
+}
+.decision-prose { max-width: 74ch; padding-bottom: 48px; }
+/* A heading scale, rather than the browser's — an <h2> inside a 13px column is
+   two-thirds the size of the page title if nobody says otherwise, and every
+   level below it collapses into the body text. The rule under the top two is
+   what actually separates one section of a contract from the next; the smaller
+   levels use weight and colour instead, because a rule every four lines is
+   noise rather than structure. */
+.md-head { margin: 26px 0 9px; line-height: 1.3; font-weight: 650; letter-spacing: -0.01em; }
+.md-head:first-child { margin-top: 0; }
+.md-h1 {
+  font-size: 17px;
+  padding-bottom: 6px;
+  border-bottom: 2px solid var(--accent-line);
+}
+.md-h2 {
+  font-size: 14.5px;
+  padding-bottom: 5px;
+  border-bottom: 1px solid var(--border);
+}
+.md-h3 { font-size: 13px; color: var(--accent); }
+.md-h4, .md-h5, .md-h6 {
+  font-size: 11px; text-transform: uppercase; letter-spacing: 0.07em;
+  color: var(--text-faint);
+}
+
+/* ── tables ─────────────────────────────────────────────────────────
+   Every contract opens with one — tier, matrix domain, requirements,
+   capabilities, who consumes it — and it is the densest thing on the page, so
+   it gets rules on every row rather than an outline and a hope. It scrolls
+   inside its own box: a wide table must not push the prose column sideways. */
+.md-table-wrap { overflow-x: auto; margin: 0 0 16px; }
+.md-table {
+  border-collapse: collapse;
+  width: 100%;
+  font-size: 12.5px;
+  line-height: 1.55;
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+.md-table th,
+.md-table td {
+  padding: 7px 11px;
+  border-bottom: 1px solid var(--border-soft);
+  text-align: left;
+  vertical-align: top;
+}
+.md-table thead th {
+  background: var(--bg-raised);
+  border-bottom: 1px solid var(--border);
+  font-size: 10.5px; font-weight: 600;
+  text-transform: uppercase; letter-spacing: 0.06em;
+  color: var(--label);
+  white-space: nowrap;
+}
+.md-table tbody tr:last-child > * { border-bottom: 0; }
+.md-table tbody tr:hover { background: var(--tint-1); }
+/* A two-column table is a label/value list, and the left column is the label
+   whether or not the file bothered to mark it up as a header. */
+.md-table tbody td:first-child {
+  color: var(--text);
+  font-weight: 550;
+  white-space: nowrap;
+}
+.md-table tbody td:first-child b { font-weight: 650; }
+.md-p { margin: 0 0 12px; font-size: 13px; line-height: 1.65; }
+.md-list { margin: 0 0 12px; padding-left: 20px; }
+.md-list li { font-size: 13px; line-height: 1.65; margin-bottom: 5px; }
+.md-quote {
+  margin: 0 0 12px; padding: 8px 14px; border-left: 3px solid var(--accent);
+  background: color-mix(in srgb, var(--accent) 7%, transparent); font-size: 13px; line-height: 1.6;
+}
+.md-code {
+  margin: 0 0 14px; padding: 10px 12px; border-radius: 8px; overflow-x: auto;
+  background: var(--code-bg); border: 1px solid var(--line);
+  font-size: 11.5px; line-height: 1.5;
+}
+
+.md-adr {
+  color: var(--accent); text-decoration: underline;
+  text-decoration-color: color-mix(in srgb, var(--accent) 40%, transparent); text-underline-offset: 3px;
+}
+.md-adr:hover { text-decoration-color: currentColor; }
+.md-rule { border: none; border-top: 1px solid var(--line); margin: 24px 0; }
+/* Inline code carries the mono, a tint and an edge. Set in the body face with
+   nothing around it, `x-ticvai-permission` and the sentence holding it were the
+   same object — which is most of why a page of this prose read as one slab. */
+.md :not(pre) > code {
+  font-family: var(--mono);
+  font-size: 0.88em;
+  padding: 1px 5px;
+  border-radius: 4px;
+  background: var(--accent-soft);
+  border: 1px solid color-mix(in srgb, var(--accent-bright) 18%, transparent);
+  color: var(--accent);
+  word-break: break-word;
+}
+.md-table :not(pre) > code { background: transparent; border: 0; padding: 0; }
+.md-p b, .md-list b { color: var(--text); font-weight: 650; }
+.md-p i, .md-list i { color: inherit; opacity: 0.92; }
+
+/* ── where a table hangs ───────────────────────────────────────────── */
+/* The chain to the schema root, drawn as a path rather than a list — the
+   indent and the rule are what make it read as "belongs to". */
+.lineage-card { padding-top: 4px; }
+.lineage-chain { display: flex; flex-direction: column; gap: 0; margin: 4px 0 8px; }
+.lineage-step {
+  position: relative; display: flex; gap: 8px; align-items: baseline;
+  padding: 5px 0 5px 16px;
+}
+.lineage-step:not(:first-child)::before {
+  content: ''; position: absolute; left: 4px; top: 0; bottom: 50%;
+  border-left: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  width: 8px; border-bottom-left-radius: 4px;
+}
+.lineage-step.self { padding-left: 0; }
+.lineage-via {
+  font-size: 10.5px; color: var(--dim); font-family: var(--mono, monospace);
+  flex: none;
+}
+.lineage-name {
+  background: none; border: none; padding: 0; font: inherit; font-size: 12px;
+  color: inherit; cursor: pointer; text-align: left;
+  text-decoration: underline; text-decoration-color: var(--line);
+  text-underline-offset: 3px;
+}
+.lineage-name:hover { color: var(--accent); text-decoration-color: currentColor; }
+.lineage-step.self .lineage-name {
+  cursor: default; text-decoration: none; color: var(--dim);
+}
+.lineage-tag {
+  font-size: 9.5px; text-transform: uppercase; letter-spacing: 0.04em;
+  color: var(--ok); border: 1px solid currentColor; border-radius: 999px; padding: 0 6px;
+}
+.lineage-tag.cycle { color: var(--error); }
+.lineage-root-note {
+  margin: 4px 0 8px; font-size: 11.5px; line-height: 1.5; color: var(--dim);
+}
+.lineage-anchor-row { align-items: flex-start; }
+.lineage-anchors { display: flex; flex-wrap: wrap; gap: 5px; }
+.lineage-anchor {
+  font-size: 10.5px; padding: 1px 8px; border-radius: 999px; cursor: pointer;
+  background: none; color: var(--accent); border: 1px solid color-mix(in srgb, var(--accent) 35%, transparent);
+}
+.lineage-anchor:hover { border-color: currentColor; background: color-mix(in srgb, var(--accent) 10%, transparent); }
+
+
+/* ── the lockup on an auth card ─────────────────────────────────────
+   One image carrying the mark and the wordmark together. The card is white by
+   day and near-black by night, so the black-wordmark cut and the white-ink cut
+   both ship and CSS picks one — swapping `src` would blank it on every toggle. */
+/* Centred and given room. This card is the whole page — there is nothing to
+   sit beside, so a lockup tucked into the top-left corner reads as a header
+   for content that is not there. Capped by width as well as height so the
+   lockup cannot outgrow a narrow card on a phone. */
+.auth-brand {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 26px;
+}
+.auth-lockup {
+  height: 52px;
+  width: auto;
+  max-width: 100%;
+  display: block;
+}
+.auth-lockup-night { display: none; }
+:root[data-theme="dark"] .auth-lockup-day { display: none; }
+:root[data-theme="dark"] .auth-lockup-night { display: block; }

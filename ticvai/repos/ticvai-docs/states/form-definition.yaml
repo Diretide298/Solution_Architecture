@@ -1,0 +1,39 @@
+# Form definition — state model
+# Contract: marketing-crm.FormDefinition.status
+
+entity: Form definition
+contract: marketing-crm
+enum: FormDefinition.status
+enumKind: inline
+enumSchema: FormDefinition
+enumProperty: status
+owner: marketing-crm
+initial:
+- draft
+terminal:
+- retired
+transitions:
+- from: draft
+  to: published
+  trigger: operation
+  guard: '**Immutable from here.** A change creates a new version, because 2.15.13 requires the exact
+    accepted version retained'
+- from: published
+  to: superseded
+  trigger: operation
+  guard: A newer version published. **This one stays readable forever** — submissions against it must
+    still resolve
+- from: published
+  to: retired
+  trigger: operation
+  guard: Withdrawn with no replacement
+- from: superseded
+  to: retired
+  trigger: operation
+  guard: No longer offered
+- from: draft
+  to: retired
+  trigger: operation
+  guard: Abandoned before publication
+notes: '**`superseded` is not `retired`.** A superseded version is not offered and is still the version
+  thousands of guests signed against — **deleting it destroys the evidence the waiver exists to be.**'

@@ -1,0 +1,34 @@
+# Merchandise reservation — state model
+# Contract: retail.MerchandiseReservation.status
+# Checked by tools/check-states.py.
+
+entity: Merchandise reservation
+contract: retail
+enum: MerchandiseReservation.status
+enumKind: inline
+enumSchema: MerchandiseReservation
+enumProperty: status
+owner: retail
+initial:
+- reserved
+terminal:
+- collected
+- expired
+- cancelled
+transitions:
+- from: reserved
+  to: collected
+  operation: collectMerchandiseReservation
+  trigger: operation
+  guard: Picked up and paid, or already paid
+- from: reserved
+  to: expired
+  trigger: timer
+  guard: '**Stock returns to sale.** A reservation nobody collects is stock nobody can buy'
+- from: reserved
+  to: cancelled
+  operation: cancelMerchandiseReservation
+  trigger: operation
+  guard: Released by the guest or by staff
+notes: Holds stock at an outlet. **The outlet gates it, not the venue** (14 August) — reserving against
+  venue-wide stock promises an item the shop does not have.

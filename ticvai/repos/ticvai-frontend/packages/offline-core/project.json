@@ -1,0 +1,15 @@
+{
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "name": "offline-core",
+  "sourceRoot": "packages/offline-core/src",
+  "projectType": "library",
+  "tags": ["type:package", "scope:offline-core"],
+  "targets": {
+    "lint": { "executor": "@nx/eslint:lint" },
+    "test": { "executor": "@nx/vite:test" },
+    "typecheck": {
+      "executor": "nx:run-commands",
+      "options": { "command": "tsc -p packages/offline-core/tsconfig.json --noEmit" }
+    }
+  }
+}

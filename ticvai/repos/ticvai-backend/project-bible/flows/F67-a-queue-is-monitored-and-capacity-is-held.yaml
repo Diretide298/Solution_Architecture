@@ -1,0 +1,71 @@
+$schema: ./_schema.yaml
+id: F67
+name: A queue is monitored and capacity is held
+actor: supervisor
+capability: Queue and capacity management
+wave: 2
+frequency: Routine.
+criticality: safety
+primaryContract: queue
+contracts:
+- queue
+- access
+- tenancy
+platforms:
+- P06
+trigger:
+  description: An attraction is filling up and somebody has to decide whether to keep letting people
+    in.
+offlineBehaviour: '**Readings work offline; capacity decisions do not.** A venue-wide capacity call
+  made on one device with no signal is a call made without the other lanes.'
+steps:
+- step: 1
+  screen: EMP-031
+  action: The supervisor reads the queue.
+  operations:
+  - listQueues
+  - getQueue
+  - getWaitTimes
+  - listQueueEntries
+  outcome: '**Adaptor-first** (ADR-0012): the reading comes from whatever queue system the venue runs,
+    and the platform holds what it reports.'
+- step: 2
+  screen: EMP-032
+  action: The sensor is wrong, so a wait is entered by hand.
+  operations:
+  - setWaitTime
+  - getWaitTimes
+  outcome: '**A manual reading is a reading.** A supervisor standing at the queue is a better sensor
+    than a broken beam, and the source is recorded so nobody trusts the two equally later.'
+  crossesDevice: true
+- step: 3
+  screen: EMP-033
+  action: Capacity is checked against occupancy.
+  operations:
+  - listEnvelopes
+  - getChannelAllocations
+  - setChannelAllocations
+  outcome: '**Capacity is an envelope, not a headcount.**  allocates capacity across channels — holding
+    admission means taking it off the channels, which is a venue-wide act rather than a lane one.'
+  crossesDevice: true
+branches:
+- at: 3
+  condition: Occupancy reaches the safety limit.
+  behaviour: '**Channel allocations are pulled back rather than a lane refusing.** A capacity limit
+    enforced per lane is not a limit — releasing the allocation stops every channel at once, including
+    the web.'
+  severity: high
+  resolvedBy: releaseChannelAllocation
+exitStates:
+- state: withinCapacity
+  description: Normal operation.
+- state: holdingAdmission
+  description: '**Venue-wide, not lane-local.**'
+- state: sensorDistrusted
+  description: A manual reading overrode a sensor. **Recorded** — a beam overridden three times a day
+    is a beam to fix.
+notes: '**Written 24 August.** Capacity is the only decision in the platform that must not be taken
+  locally, and **nothing said so until this flow sat beside F61.** ** and  declared  and ** — a handheld
+  that could invent a queue. Removed. And **capacity turned out to be an envelope across channels, not
+  an occupancy count** — which is a better answer than the one this flow was drafted with.'
+openQuestions: null

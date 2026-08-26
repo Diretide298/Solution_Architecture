@@ -1,0 +1,48 @@
+# Shift swap — state model
+# Contract: workforce.ShiftSwap.status
+# Checked by tools/check-states.py.
+
+entity: Shift swap
+contract: workforce
+enum: ShiftSwap.status
+enumKind: inline
+enumSchema: ShiftSwap
+enumProperty: status
+owner: workforce
+initial:
+- awaitingPeer
+terminal:
+- approved
+- rejected
+- withdrawn
+transitions:
+- from: awaitingPeer
+  to: awaitingApproval
+  trigger: cascade
+  guard: '**The other person accepted.** Only then does a supervisor see it'
+- from: awaitingPeer
+  to: rejected
+  trigger: cascade
+  guard: The peer declined. **The supervisor is never troubled**
+- from: awaitingApproval
+  to: approved
+  operation: decideApprovalRequest
+  trigger: operation
+  guard: Granted. The rota changes
+- from: awaitingApproval
+  to: rejected
+  operation: decideApprovalRequest
+  trigger: operation
+  guard: Refused, with a reason
+- from: awaitingPeer
+  to: withdrawn
+  operation: revokeApprovalDelegation
+  trigger: operation
+  guard: Withdrawn by the requester
+- from: awaitingApproval
+  to: withdrawn
+  operation: revokeApprovalDelegation
+  trigger: operation
+  guard: Withdrawn before the decision
+notes: '**Both parties before the supervisor.** A swap approved against someone who never agreed is
+  a gap in the rota nobody notices until the shift starts.'

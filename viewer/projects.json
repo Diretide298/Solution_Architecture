@@ -1,0 +1,23 @@
+{
+  "$comment": [
+    "Which packages this viewer reads, and where they are. One entry per project.",
+    "`root` is resolved against the viewer directory, so \"../ticvai\" is the",
+    "package beside it. The viewer and the packages are separate repositories",
+    "checked out side by side; neither contains the other.",
+    "An absolute path works too — a package does not have to be near the viewer.",
+    "`id` is the first segment of every read: /pkg/<id>/index. Lowercase, hyphens,",
+    "no dots or slashes. `default` answers the pre-project /api/* routes.",
+    "Read once at startup; adding a project is a restart."
+  ],
+  "default": "ticvai",
+  "projects": [
+    {
+      "id": "ticvai",
+      "name": "TICVAI",
+      "root": "../ticvai",
+      "contracts": "contracts",
+      "active": true,
+      "note": "The venue platform delivery package — the one this viewer was written for."
+    }
+  ]
+}

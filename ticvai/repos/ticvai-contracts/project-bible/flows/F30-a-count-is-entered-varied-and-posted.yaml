@@ -1,0 +1,164 @@
+$schema: ./_schema.yaml
+id: F30
+name: A count is entered, varied and posted
+actor: storekeeper
+capability: Stock counting and variance
+wave: 2
+frequency: >
+  A daily count every morning; a full count weekly or monthly. **The daily one is twenty items and
+  ten minutes; the full one is a shift** — and the flow is the same shape at both sizes.
+criticality: financial
+primaryContract: inventory
+contracts: [inventory, fnb, approvals]
+platforms: [P06, P08]
+
+trigger:
+  description: >
+    A scheduled count falls due, or a supervisor opens one because a number looked wrong.
+    **`setDailyCount` names the twenty items that get counted every morning** — high-value and
+    high-variance, not a rotation, because a daily list that includes everything is a daily list
+    nobody completes.
+  operations: [startStockCount, setDailyCount]
+
+offlineBehaviour: >
+  **Steps 2 and 3 work offline and this is the flow that proves the rule.** Counting happens in a
+  store room, a cellar and a walk-in — **the three places in a venue with no signal.**
+
+  Lines journal locally and sync on return. **Posting needs the network**, because a post writes
+  movements against a theoretical figure that may have changed while the counter was in the cellar.
+
+steps:
+  - step: 1
+    screen: EMP-066
+    action: The storekeeper opens the count.
+    operations: [startStockCount]
+    outcome: >
+      A count in `open`, scoped to a location and an item set. **The theoretical position is not
+      snapshotted here** — it is captured per line, at entry.
+
+  - step: 2
+    screen: EMP-066
+    action: They count the shelf and enter each line.
+    operations: [enterCountLine]
+    outcome: >
+      **The theoretical quantity is snapshotted at entry, not at post.** Stock moves during a count,
+      and a variance computed at post time is measured against a different number from the one the
+      counter was standing in front of.
+
+  - step: 3
+    screen: EMP-066
+    action: A line is miskeyed. They count again and re-enter it.
+    operations: [enterCountLine]
+    outcome: >
+      **The second entry replaces the first.** A counter who miskeys and re-counts is the normal
+      case, and a model that refuses the second sends them to a supervisor to undo the first.
+
+  - step: 4
+    screen: BO-079
+    action: The supervisor reviews the variance.
+    operations: [getCountVariance]
+    outcome: >
+      Variance by line and by value. **A count with no variance is a count somebody did not do** —
+      real shelves are never exactly right, and a clean sheet is the first thing a stocktaker
+      queries.
+
+  - step: 5
+    screen: BO-079
+    action: Three lines look wrong. They send them back.
+    operations: [requestRecount]
+    outcome: >
+      **Scoped to lines, not the whole count.** Recounting four items is an hour; recounting a
+      cellar is a shift, and a model that only offers the second gets neither.
+
+  - step: 6
+    screen: EMP-066
+    action: The lines are recounted and re-entered.
+    operations: [enterCountLine]
+    outcome: >
+      Status `recounted`. **The original entry is kept beside the recount** — the pair is what
+      tells a venue whether the problem was the counter or the shelf.
+
+  - step: 7
+    screen: BO-079
+    action: The supervisor accepts and posts.
+    operations: [postStockCount]
+    outcome: >
+      **Movements are written, not levels.** `inventory.stock_level` is derived — four operations
+      wrote it directly until 20 August, and **a stored level and a movement ledger that disagree
+      is a stock count nobody can reconcile.**
+
+  - step: 8
+    screen: BO-137
+    action: The variance feeds theoretical-against-actual.
+    operations: [getCountVariance, listRecipes]
+    outcome: >
+      **Recipes say 400 portions; the count says 380.** The gap is waste, theft or a wrong recipe,
+      and this is the only place a venue finds out which.
+
+branches:
+  - at: 4
+    condition: The variance is above the venue's write-off threshold.
+    behaviour: >
+      Routes through `createApprovalRequest` before it can post. **One approval mechanism, not one
+      per thing approved** — CF-132 settled that, and a write-off is an approval request with a
+      different subject.
+    severity: high
+    resolvedBy: createApprovalRequest
+
+  - at: 2
+    condition: The counter is in a cellar with no signal.
+    behaviour: >
+      **Lines journal locally and the count stays open.** This is the ordinary case, not the edge —
+      and a count that cannot be entered where the stock is, is a count entered later from a piece
+      of paper.
+    severity: low
+    resolvedBy: enterCountLine
+
+  - at: 7
+    condition: Stock moved between entry and post — a sale, a transfer, a waste record.
+    behaviour: >
+      **The snapshotted theoretical is used, not the current one.** The count measures what was on
+      the shelf when somebody looked at it; **re-deriving at post time would silently absorb the
+      movement into the variance** and hide a real discrepancy.
+    severity: high
+    resolvedBy: postStockCount
+
+  - at: 1
+    condition: It is a daily count rather than a full one.
+    behaviour: >
+      Same flow, twenty lines. **`postsAdjustment` is false and should stay false** — a daily count
+      is a check, not a correction, and one that silently adjusts stock hides the shrinkage it
+      exists to find.
+    severity: medium
+    resolvedBy: setDailyCount
+
+exitStates:
+  - state: posted
+    description: Counted, varied, accepted and posted as movements. **The ordinary outcome.**
+  - state: postedAfterRecount
+    description: >
+      One or more lines recounted before posting. **A separate exit because the pair matters** —
+      the original and the recount together say whether the problem was the counter or the shelf.
+  - state: heldForApproval
+    description: >
+      Variance above threshold. The count is complete and unposted until somebody with the
+      authority signs it.
+  - state: abandoned
+    description: >
+      Opened and never finished. **Kept rather than deleted** — an abandoned count on a Friday is
+      itself a signal, and deleting it removes the evidence that counting is not happening.
+
+notes: >
+  **Written 24 August.** The counting operations were built the same week — `enterCountLine`,
+  `requestRecount`, `setDailyCount` — and **a count could be opened and posted with nothing
+  recording what was counted** until then.
+
+  **Step 7 is the one that matters and it is a rule this package already learned once.** Posting
+  writes movements; the level derives. Four operations wrote `inventory.stock_level` directly and
+  were rewired on 20 August, and `check-package` now refuses any write to a derived table.
+
+  **The flow crosses from a handheld in a cellar to a supervisor at a desk**, which is why the
+  offline boundary sits exactly where it does: everything the counter does works without a network
+  and everything the supervisor does does not.
+
+openQuestions: null

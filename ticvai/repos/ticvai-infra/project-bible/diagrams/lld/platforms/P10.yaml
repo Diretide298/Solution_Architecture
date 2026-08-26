@@ -1,0 +1,699 @@
+id: LLD-P10
+title: P10 Partner Web — Reseller Portal — 21 screens
+generatedBy: tools/derive-diagrams.py
+index: diagrams/hld/00-platform.yaml
+audience: partner
+operator: partner
+app: partner-web
+formFactor: web
+runtime: reactWeb
+offlineCapable: false
+deployment:
+  target: browser
+  distribution: served from the cell
+  bundleUpdate: immediate on deploy
+  hosting: in-cell, in-region
+  storeReview: false
+  deviceOwnership: partner device, unmanaged
+  networkAssumption: public internet
+  releaseCadence: monthly — partners integrate against it
+why: null
+modulesUsed:
+- module: partner
+  screens: 21
+servicesCalled:
+- service: OrderService
+  operationCalls: 85
+- service: CatalogueService
+  operationCalls: 39
+- service: IdentityService
+  operationCalls: 15
+- service: MarketingService
+  operationCalls: 9
+- service: ReportingService
+  operationCalls: 8
+- service: LedgerService
+  operationCalls: 6
+- service: ControlService
+  operationCalls: 5
+coverage:
+  screens: 21
+  inAFlow: 9
+  drawn: 21
+  note: '**A screen in no flow has been specified and never walked.** Every flow written in this package
+    has found a defect.'
+screens:
+- screen: PTR-001
+  name: Partner Login / MFA
+  module: TODO
+  requiresModule: partner
+  wave: 2
+  density: compact
+  operations:
+  - forceLogout
+  - getB2bCredit
+  - getCurrentSession
+  - getGuestSession
+  - listActiveSessions
+  - listMfaMethods
+  - listPartnerAgreements
+  - listSsoProviders
+  - login
+  - overrideCreditLimit
+  - revokeAllSessions
+  - setB2bCreditLimit
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - accountId<-deepLink
+  - sessionId<-session
+  goesTo:
+  - PTR-002
+  - PTR-003
+  - PTR-004
+  - PTR-005
+  boardFrames: null
+  wireframe: wireframes/P10 Partner Web.dc.html#ptr-001
+  inFlows:
+  - F10 Partner books, uses and settles
+  - F104 A platform operator signs in under MFA
+- screen: PTR-002
+  name: Partner Dashboard
+  module: TODO
+  requiresModule: partner
+  wave: 2
+  density: compact
+  operations:
+  - applyManualDiscount
+  - createOrder
+  - exchangeOrderLines
+  - getB2bCredit
+  - getOrder
+  - getOrderStatement
+  - holdOrder
+  - listOrderRefunds
+  - listOrders
+  - modifyOrder
+  - overrideCreditLimit
+  - reprintOrder
+  - rescheduleOrder
+  - resumeOrder
+  - setB2bCreditLimit
+  - voidOrder
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - accountId<-PTR-001
+  - orderId<-deepLink
+  goesTo:
+  - PTR-001
+  - PTR-003
+  - PTR-004
+  - PTR-007
+  boardFrames: null
+  wireframe: wireframes/P10 Partner Web.dc.html#ptr-002
+  inFlows:
+  - F03 Partner books on credit
+- screen: PTR-003
+  name: Profile & Company Details
+  module: TODO
+  requiresModule: partner
+  wave: 2
+  density: compact
+  operations:
+  - createPrincipal
+  - getPrincipal
+  - listPrincipals
+  - updatePrincipal
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - principalId<-session
+  goesTo:
+  - PTR-001
+  - PTR-002
+  - PTR-004
+  boardFrames: null
+  wireframe: wireframes/P10 Partner Web.dc.html#ptr-003
+  inFlows: null
+- screen: PTR-004
+  name: Notifications
+  module: TODO
+  requiresModule: partner
+  wave: 3
+  density: compact
+  operations:
+  - getMessageStatus
+  - sendTransactionalMessage
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - messageId<-deepLink
+  goesTo:
+  - PTR-001
+  - PTR-002
+  - PTR-003
+  boardFrames: null
+  wireframe: wireframes/P10 Partner Web.dc.html#ptr-004
+  inFlows: null
+- screen: PTR-005
+  name: Inventory & Allocation View
+  module: TODO
+  requiresModule: partner
+  wave: 2
+  density: compact
+  operations:
+  - applyManualDiscount
+  - createEnvelope
+  - createOrder
+  - exchangeOrderLines
+  - getChannelAllocations
+  - getOrder
+  - getOrderStatement
+  - holdOrder
+  - listEnvelopes
+  - listOrderRefunds
+  - listOrders
+  - modifyOrder
+  - releaseChannelAllocation
+  - reprintOrder
+  - rescheduleOrder
+  - resumeOrder
+  - setChannelAllocations
+  - updateEnvelope
+  - voidOrder
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - envelopeId<-deepLink
+  - orderId<-deepLink
+  goesTo:
+  - PTR-001
+  - PTR-002
+  - PTR-003
+  - PTR-008
+  boardFrames: null
+  wireframe: wireframes/P10 Partner Web.dc.html#ptr-005
+  inFlows:
+  - F10 Partner books, uses and settles
+- screen: PTR-006
+  name: Product Catalog (B2B Pricing)
+  module: TODO
+  requiresModule: partner
+  wave: 2
+  density: compact
+  operations:
+  - copyPriceList
+  - createPriceList
+  - createProduct
+  - getPriceList
+  - getProduct
+  - listAlternativeCodes
+  - listPriceLists
+  - listPrices
+  - listProductVariants
+  - listProducts
+  - resolveProductByCode
+  - setAlternativeCodes
+  - setPrices
+  - setProductAttributes
+  - transitionProductLifecycle
+  - updatePriceList
+  - updateProduct
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - priceListId<-deepLink
+  - productId<-deepLink
+  goesTo:
+  - PTR-001
+  - PTR-002
+  - PTR-003
+  boardFrames: null
+  wireframe: wireframes/P10 Partner Web.dc.html#ptr-006
+  inFlows: null
+- screen: PTR-007
+  name: Availability Search
+  module: TODO
+  requiresModule: partner
+  wave: 2
+  density: compact
+  operations:
+  - getAvailability
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - PTR-001
+  - PTR-002
+  - PTR-003
+  - PTR-008
+  boardFrames: null
+  wireframe: wireframes/P10 Partner Web.dc.html#ptr-007
+  inFlows:
+  - F03 Partner books on credit
+- screen: PTR-008
+  name: Booking Creation
+  module: TODO
+  requiresModule: partner
+  wave: 2
+  density: compact
+  operations:
+  - applyManualDiscount
+  - createOrder
+  - createRefund
+  - exchangeOrderLines
+  - getOrder
+  - getOrderStatement
+  - holdOrder
+  - listOrderRefunds
+  - listOrders
+  - modifyOrder
+  - reprintOrder
+  - rescheduleOrder
+  - resumeOrder
+  - voidOrder
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - orderId<-deepLink
+  goesTo:
+  - PTR-001
+  - PTR-002
+  - PTR-003
+  - PTR-016
+  boardFrames: null
+  wireframe: wireframes/P10 Partner Web.dc.html#ptr-008
+  inFlows:
+  - F03 Partner books on credit
+  - F10 Partner books, uses and settles
+- screen: PTR-009
+  name: Group / Bulk Booking
+  module: TODO
+  requiresModule: partner
+  wave: 3
+  density: compact
+  operations:
+  - allocateBlockedSeats
+  - createSeatBlock
+  - listSeatBlocks
+  - releaseSeatBlock
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - blockId<-deepLink
+  goesTo:
+  - PTR-001
+  - PTR-002
+  - PTR-003
+  boardFrames: null
+  wireframe: wireframes/P10 Partner Web.dc.html#ptr-009
+  inFlows: null
+- screen: PTR-010
+  name: Cart & Quote
+  module: TODO
+  requiresModule: partner
+  wave: 3
+  density: compact
+  operations:
+  - addCartLine
+  - analysePromotionConflicts
+  - checkoutCart
+  - createPromotion
+  - endPromotion
+  - evaluatePromotions
+  - getCart
+  - getPromotion
+  - getPromotionUsage
+  - listPromotions
+  - pausePromotion
+  - publishPromotion
+  - removeCartLine
+  - unschedulePromotion
+  - updateCartLine
+  - updatePromotion
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - cartId<-session
+  - lineId<-deepLink
+  - promotionId<-deepLink
+  goesTo:
+  - PTR-001
+  - PTR-002
+  - PTR-003
+  boardFrames: null
+  wireframe: wireframes/P10 Partner Web.dc.html#ptr-010
+  inFlows: null
+- screen: PTR-011
+  name: Quote Management
+  module: TODO
+  requiresModule: partner
+  wave: 3
+  density: compact
+  operations:
+  - getCommissionStatement
+  - listPartnerAgreements
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - agreementId<-deepLink
+  goesTo:
+  - PTR-001
+  - PTR-002
+  - PTR-003
+  boardFrames: null
+  wireframe: wireframes/P10 Partner Web.dc.html#ptr-011
+  inFlows: null
+- screen: PTR-012
+  name: Checkout / Credit Purchase
+  module: TODO
+  requiresModule: partner
+  wave: 2
+  density: compact
+  operations:
+  - addTip
+  - capturePayment
+  - createPayment
+  - inquirePaymentStatus
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - paymentId<-deepLink
+  goesTo:
+  - PTR-001
+  - PTR-002
+  - PTR-003
+  boardFrames: null
+  wireframe: wireframes/P10 Partner Web.dc.html#ptr-012
+  inFlows: null
+- screen: PTR-013
+  name: Credit Limit & Balance
+  module: TODO
+  requiresModule: partner
+  wave: 2
+  density: compact
+  operations:
+  - getB2bCredit
+  - overrideCreditLimit
+  - setB2bCreditLimit
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - accountId<-PTR-001
+  goesTo:
+  - PTR-001
+  - PTR-002
+  - PTR-003
+  boardFrames: null
+  wireframe: wireframes/P10 Partner Web.dc.html#ptr-013
+  inFlows: null
+- screen: PTR-014
+  name: Settlement & Payment History
+  module: TODO
+  requiresModule: partner
+  wave: 3
+  density: compact
+  operations:
+  - getSettlement
+  - ingestSettlementFile
+  - listSettlementExceptions
+  - listSettlements
+  - resolveSettlementException
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - settlementId<-deepLink
+  goesTo:
+  - PTR-001
+  - PTR-002
+  - PTR-003
+  boardFrames: null
+  wireframe: wireframes/P10 Partner Web.dc.html#ptr-014
+  inFlows:
+  - F99 A chargeback arrives and is defended
+- screen: PTR-015
+  name: Order History
+  module: TODO
+  requiresModule: partner
+  wave: 2
+  density: compact
+  operations:
+  - applyManualDiscount
+  - createOrder
+  - createRefund
+  - exchangeOrderLines
+  - getOrder
+  - getOrderStatement
+  - holdOrder
+  - listOrderRefunds
+  - listOrders
+  - modifyOrder
+  - reprintOrder
+  - rescheduleOrder
+  - resumeOrder
+  - voidOrder
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - orderId<-deepLink
+  goesTo:
+  - PTR-001
+  - PTR-002
+  - PTR-003
+  boardFrames: null
+  wireframe: wireframes/P10 Partner Web.dc.html#ptr-015
+  inFlows:
+  - F10 Partner books, uses and settles
+- screen: PTR-016
+  name: Voucher / Ticket Download
+  module: TODO
+  requiresModule: partner
+  wave: 2
+  density: compact
+  operations:
+  - applyManualDiscount
+  - createOrder
+  - exchangeOrderLines
+  - getOrder
+  - getOrderStatement
+  - holdOrder
+  - listOrderRefunds
+  - listOrders
+  - modifyOrder
+  - reprintOrder
+  - rescheduleOrder
+  - resumeOrder
+  - voidOrder
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - orderId<-PTR-008
+  goesTo:
+  - PTR-001
+  - PTR-002
+  - PTR-003
+  boardFrames: null
+  wireframe: wireframes/P10 Partner Web.dc.html#ptr-016
+  inFlows:
+  - F03 Partner books on credit
+- screen: PTR-017
+  name: Commission Statement
+  module: TODO
+  requiresModule: partner
+  wave: 3
+  density: compact
+  operations:
+  - getCommissionStatement
+  - listPartnerAgreements
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - agreementId<-deepLink
+  goesTo:
+  - PTR-001
+  - PTR-002
+  - PTR-003
+  boardFrames: null
+  wireframe: wireframes/P10 Partner Web.dc.html#ptr-017
+  inFlows: null
+- screen: PTR-018
+  name: Reports & Sales Performance
+  module: TODO
+  requiresModule: partner
+  wave: 3
+  density: compact
+  operations:
+  - askReportingQuestion
+  - createReport
+  - deleteReport
+  - getFinancialReport
+  - getReport
+  - listReports
+  - runReport
+  - saveNaturalLanguageQuery
+  - updateReport
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - conversationId<-deepLink
+  - reportId<-deepLink
+  goesTo:
+  - PTR-001
+  - PTR-002
+  - PTR-003
+  boardFrames: null
+  wireframe: wireframes/P10 Partner Web.dc.html#ptr-018
+  inFlows: null
+- screen: PTR-019
+  name: API Credentials & Integration
+  module: TODO
+  requiresModule: partner
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - PTR-001
+  - PTR-002
+  - PTR-003
+  boardFrames: null
+  wireframe: wireframes/P10 Partner Web.dc.html#ptr-019
+  inFlows: null
+- screen: PTR-020
+  name: Sub-Agent Management
+  module: TODO
+  requiresModule: partner
+  wave: 3
+  density: compact
+  operations:
+  - createGrant
+  - deleteGrant
+  - listGrants
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - grantId<-deepLink
+  goesTo:
+  - PTR-001
+  - PTR-002
+  - PTR-003
+  boardFrames: null
+  wireframe: wireframes/P10 Partner Web.dc.html#ptr-020
+  inFlows:
+  - F105 A rate limit is set and a developer hits it
+- screen: PTR-021
+  name: Support & Contact
+  module: TODO
+  requiresModule: partner
+  wave: 3
+  density: compact
+  operations:
+  - addCaseMessage
+  - createCase
+  - escalateCase
+  - getCase
+  - listCases
+  - reopenCase
+  - updateCase
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - caseId<-deepLink
+  goesTo:
+  - PTR-001
+  - PTR-002
+  - PTR-003
+  boardFrames: null
+  wireframe: wireframes/P10 Partner Web.dc.html#ptr-021
+  inFlows: null

@@ -1,0 +1,434 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>P07 Venue Scanner — wireframe board</title>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+/* **The Claude Design system, applied to the generated boards on 24 August.**
+   Three client packs render at 1280x700 in this system and 385 screens rendered as
+   dashed-box wireframes — and **a client reviewing both reads the difference as *those screens
+   are not done*.** The information is identical either way; the fidelity is what was being
+   judged.
+
+   Tokens are the packs': #0B1324 rail, #0D6EFD primary, #00B8FF accent, Manrope for UI,
+   IBM Plex Mono for figures and codes. */
+:root{--ink:#0B1324;--mut:#5A6577;--dim:#9AA5B6;--line:#E8ECF3;--edge:#E3E8F0;
+--brand:#0D6EFD;--accent:#00B8FF;--rail:#0B1324;--paper:#FFF;--wash:#F7F9FC;
+--ok:#0E9F6E;--okbg:#E8F6F0;--okline:#BFE3D2;--warn:#8A6D00;--warnbg:#FFF7E6;
+--bad:#A81E1E;--badbg:#FDECEC}
+*{box-sizing:border-box}
+body{margin:0;background:#F2F5F9;color:var(--ink);
+font-family:Manrope,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:13px;line-height:1.55}
+a{color:inherit}
+.wrap{max-width:1420px;margin:0 auto;padding:22px 34px 90px}
+.home{font-size:11.5px;color:var(--mut);text-decoration:none;letter-spacing:.02em}
+.head{display:flex;align-items:baseline;justify-content:space-between;gap:20px;
+margin:14px 0 6px;padding-bottom:16px;border-bottom:2px solid var(--ink)}
+.mark{font-size:13px;font-weight:800;letter-spacing:.16em;
+background:linear-gradient(90deg,var(--brand),var(--accent));-webkit-background-clip:text;
+background-clip:text;color:transparent}
+h1{font-size:19px;font-weight:800;letter-spacing:-.015em;margin:0}
+.meta{font-size:11px;color:var(--mut);font-family:'IBM Plex Mono',ui-monospace,monospace;line-height:1.7}
+.lede{font-size:12.5px;color:var(--mut);max-width:82ch;margin:16px 0 0;line-height:1.65}
+.grp{font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:11px;font-weight:600;
+letter-spacing:.14em;color:var(--dim);text-transform:uppercase;margin:52px 0 18px;
+padding-bottom:9px;border-bottom:1px solid var(--line)}
+.stack{display:flex;flex-direction:column;gap:52px}
+.scr{display:flex;flex-direction:column;gap:13px;scroll-margin-top:24px}
+.hdr{display:flex;align-items:baseline;gap:9px;flex-wrap:wrap}
+.code{font-family:'IBM Plex Mono',monospace;font-size:12px;color:#8494A8}
+.ttl{font-size:16.5px;font-weight:800;letter-spacing:-.015em}
+.pur{font-size:12px;color:#6B7280;margin-top:3px;max-width:96ch}
+.pill{font-size:9px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;
+padding:2px 7px;border-radius:5px;background:#EEF3FA;color:#4A5A70}
+.pill.named{background:var(--warnbg);color:var(--warn)}
+.pill.off{background:var(--okbg);color:var(--ok)}
+
+/* the frame — 1280x700, the packs' dimension */
+.frame{width:1280px;height:700px;display:flex;background:var(--wash);border:1px solid var(--edge);
+border-radius:14px;overflow:hidden;box-shadow:0 16px 38px rgba(12,35,64,.09)}
+.rail{flex:none;width:180px;background:var(--rail);display:flex;flex-direction:column;position:relative}
+.rail::before{content:'';position:absolute;inset:0;
+background:radial-gradient(300px 200px at 0% 4%,rgba(0,184,255,.20),transparent 70%);pointer-events:none}
+.brand{position:relative;padding:15px 14px 13px;border-bottom:1px solid rgba(255,255,255,.08)}
+.brand b{display:block;font-size:14px;font-weight:800;letter-spacing:.1em;
+background:linear-gradient(90deg,#4DA3FF,var(--accent));-webkit-background-clip:text;
+background-clip:text;color:transparent}
+.brand span{display:block;font-size:9.5px;color:#7FA3C9;margin-top:5px}
+.nav{position:relative;display:flex;flex-direction:column;gap:2px;padding:11px 9px}
+.nav i{display:block;padding:8px 10px;border-radius:9px;font-size:11.5px;font-style:normal;color:#8FA8C4}
+.nav i.on{background:linear-gradient(90deg,rgba(13,110,253,.30),rgba(0,184,255,.10));
+color:#fff;font-weight:700}
+.body{flex:1;display:flex;flex-direction:column;min-width:0}
+.top{flex:none;height:54px;display:flex;align-items:center;gap:12px;padding:0 18px;
+background:var(--paper);border-bottom:1px solid var(--line)}
+.top h2{font-size:13.5px;font-weight:800;letter-spacing:-.01em;margin:0}
+.top small{display:block;font-size:10px;color:var(--dim);font-weight:500}
+.acts{margin-left:auto;display:flex;gap:6px}
+.chip{height:32px;display:flex;align-items:center;gap:6px;padding:0 11px;border:1px solid var(--edge);
+border-radius:8px;font-size:11px;font-weight:700;color:var(--mut);background:var(--paper)}
+.chip.live{background:var(--okbg);border-color:var(--okline);color:var(--ok)}
+.chip.live::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--ok)}
+.chip.cta{background:var(--brand);border-color:var(--brand);color:#fff}
+.canvas{flex:1;display:flex;flex-direction:column;gap:12px;padding:14px 16px;min-height:0;overflow:hidden}
+.kpis{flex:none;display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.kpi{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:11px 13px;
+display:flex;flex-direction:column;gap:4px}
+.kpi b{font-size:9.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--dim)}
+.kpi span{font-family:'IBM Plex Mono',monospace;font-size:19px;font-weight:600;letter-spacing:-.02em}
+.panel{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:12px 14px;
+display:flex;flex-direction:column;gap:8px;min-height:0}
+.panel > b{font-size:11px;font-weight:800;letter-spacing:-.005em}
+.panel .why{font-size:10px;color:#7C8899;font-style:italic;line-height:1.5}
+.kind{font-family:'IBM Plex Mono',monospace;font-size:9px;color:var(--dim);
+letter-spacing:.06em;text-transform:uppercase}
+.rows{display:flex;flex-direction:column;gap:6px}
+.row{display:grid;grid-template-columns:1.6fr 1fr 1fr .7fr;gap:10px;align-items:center;
+padding:7px 0;border-top:1px solid #F0F3F8}
+.row:first-child{border-top:0;font-size:9.5px;font-weight:700;letter-spacing:.06em;
+text-transform:uppercase;color:var(--dim)}
+.bar{height:7px;border-radius:4px;background:#EDF1F7}
+.bar i{display:block;height:100%;border-radius:4px;
+background:linear-gradient(90deg,var(--brand),var(--accent))}
+.side{flex:none;width:250px;display:flex;flex-direction:column;gap:10px}
+.two{flex:1;display:flex;gap:12px;min-height:0}
+.grow{flex:1;min-width:0}
+.strip{flex:none;height:26px;display:flex;align-items:center;gap:8px;padding:0 18px;
+background:var(--warnbg);color:var(--warn);font-size:10px;font-weight:700;
+letter-spacing:.05em;text-transform:uppercase;border-bottom:1px solid #F0E0B8}
+.dark .frame{background:#0A1524}
+.dark .top{background:#0E2A4C;border-color:#1E3A5F;color:#E6F0FA}
+.dark .top small{color:#7FA3C9}
+.dark .canvas{background:#0A1524}
+.dark .kpi,.dark .panel{background:#0E2A4C;border-color:#1E3A5F;color:#E6F0FA}
+.dark .row{border-color:#193353}
+.dark .chip{background:#0E2A4C;border-color:#1E3A5F;color:#9FC0E0}
+
+.foot{font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:10px;line-height:1.85;color:#7C8899}
+.foot b{color:#4A5566;font-weight:600}
+.foot .warn{color:var(--warn)}
+.bottom{margin-top:64px;padding-top:16px;border-top:1px solid var(--line);
+display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
+</style></head><body>
+<div class="wrap">
+  <a class="home" href="TICVAI%20Wireframe%20Boards.dc.html">&larr; All boards</a>
+  <div class="head">
+    <div><span class="mark">TICVAI</span>
+      <h1>P07 · Venue Scanner — Access Control <span style="font-weight:600;color:#6B7280">(11 screens)</span></h1></div>
+    <div class="meta">staff · handheld · venue-scanner</div>
+  </div>
+  <p class="lede"></p>
+  <div class="grp">01 — Access · 11 screens</div><div class="stack">
+      <div id="scn-001" class="scr">
+        <div>
+          <div class="hdr"><span class="code">SCN-001</span>
+            <span class="ttl">Sign in</span><span class="pill off">offline</span></div>
+          <div class="pur">PIN or badge. Session carries the workstation.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>TICVAI</b><span>Access</span></div><nav class="nav"><i class="">Dashboard</i><i class="on">Access</i><i class="">Settings</i><i class="">Reports</i><i class="">People</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Sign in</h2>
+                <small>Venue Scanner · wave 1 · comfortable</small></div>
+              <div class="acts"><div class="chip">This venue &#9662;</div><div class="chip live">Live</div><div class="chip cta">Primary action</div></div>
+            </div>
+            <div class="strip">offline capable · works from the local journal</div>
+            <div class="canvas">
+              <div class="kpis"><div class="kpi"><b>Total</b><span>1,248</span></div><div class="kpi"><b>Active</b><span>978</span></div><div class="kpi"><b>Attention</b><span>142</span></div><div class="kpi"><b>Offline</b><span>12</span></div></div>
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">detailPanel</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">Structure from the wireframe board. Components not yet enumerated.</span></div><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">Implied by the detail template — not declared on the screen.</span></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; login · getCurrentShift · getCurrentSession · getGuestSession +4</div>
+          <div><b>STATES</b> &middot; <span class="warn">loading · emptyFirstRun · emptyNoAccess · error · offline</span></div>
+          <div><b>ARRIVES WITH</b> &middot; sessionId&larr;session, shiftId&larr;session</div>
+          <div><b>GOES TO</b> &middot; entry point · SCN-002 · SCN-003</div>
+        </div>
+      </div>
+      <div id="scn-002" class="scr">
+        <div>
+          <div class="hdr"><span class="code">SCN-002</span>
+            <span class="ttl">Access point &amp; direction</span><span class="pill off">offline</span></div>
+          <div class="pur">Confirm what this device is doing before it does it.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>TICVAI</b><span>Access</span></div><nav class="nav"><i class="">Dashboard</i><i class="on">Access</i><i class="">Settings</i><i class="">Reports</i><i class="">People</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Access point &amp; direction</h2>
+                <small>Venue Scanner · wave 1 · comfortable</small></div>
+              <div class="acts"><div class="chip">This venue &#9662;</div><div class="chip live">Live</div><div class="chip cta">Primary action</div></div>
+            </div>
+            <div class="strip">offline capable · works from the local journal</div>
+            <div class="canvas">
+              <div class="kpis"><div class="kpi"><b>Total</b><span>1,248</span></div><div class="kpi"><b>Active</b><span>978</span></div><div class="kpi"><b>Attention</b><span>142</span></div><div class="kpi"><b>Offline</b><span>12</span></div></div>
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">detailPanel</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">Structure from the wireframe board. Components not yet enumerated.</span></div><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">Implied by the detail template — not declared on the screen.</span></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; listAccessPoints · setTurnstileMode · getAccessPoint</div>
+          <div><b>STATES</b> &middot; <span class="warn">loading · emptyFirstRun · emptyNoAccess · error · offline</span></div>
+          <div><b>ARRIVES WITH</b> &middot; accessPointId&larr;deepLink</div>
+          <div><b>GOES TO</b> &middot; SCN-001 · SCN-003 · SCN-015</div>
+        </div>
+      </div>
+      <div id="scn-003" class="scr">
+        <div>
+          <div class="hdr"><span class="code">SCN-003</span>
+            <span class="ttl">Ready to scan</span><span class="pill off">offline</span></div>
+          <div class="pur">The screen the device sits on all day.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>TICVAI</b><span>Access</span></div><nav class="nav"><i class="">Dashboard</i><i class="on">Access</i><i class="">Settings</i><i class="">Reports</i><i class="">People</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Ready to scan</h2>
+                <small>Venue Scanner · wave 1 · comfortable</small></div>
+              <div class="acts"><div class="chip">This venue &#9662;</div><div class="chip live">Live</div><div class="chip cta">Primary action</div></div>
+            </div>
+            <div class="strip">offline capable · works from the local journal</div>
+            <div class="canvas">
+              <div class="kpis"><div class="kpi"><b>Total</b><span>1,248</span></div><div class="kpi"><b>Active</b><span>978</span></div><div class="kpi"><b>Attention</b><span>142</span></div><div class="kpi"><b>Offline</b><span>12</span></div></div>
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">detailPanel</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">Structure from the wireframe board. Components not yet enumerated.</span></div><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">Implied by the detail template — not declared on the screen.</span></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; listScans · syncScans · getOfflinePackage · lookupTicket +5</div>
+          <div><b>STATES</b> &middot; <span class="warn">loading · emptyFirstRun · emptyNoAccess · error · offline · outcomeAdmitted · outcomeDenied</span></div>
+          <div><b>ARRIVES WITH</b> &middot; mediaCode&larr;deepLink, rightId&larr;deepLink</div>
+          <div><b>GOES TO</b> &middot; SCN-001 · SCN-002 · SCN-003</div>
+        </div>
+      </div>
+      <div id="scn-007" class="scr">
+        <div>
+          <div class="hdr"><span class="code">SCN-007</span>
+            <span class="ttl">Group admission</span><span class="pill off">offline</span></div>
+          <div class="pur">Partial admission is the normal case, not the error.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>TICVAI</b><span>Access</span></div><nav class="nav"><i class="">Dashboard</i><i class="on">Access</i><i class="">Settings</i><i class="">Reports</i><i class="">People</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Group admission</h2>
+                <small>Venue Scanner · wave 1 · comfortable</small></div>
+              <div class="acts"><div class="chip">This venue &#9662;</div><div class="chip live">Live</div><div class="chip cta">Primary action</div></div>
+            </div>
+            <div class="strip">offline capable · works from the local journal</div>
+            <div class="canvas">
+              <div class="kpis"><div class="kpi"><b>Total</b><span>1,248</span></div><div class="kpi"><b>Active</b><span>978</span></div><div class="kpi"><b>Attention</b><span>142</span></div><div class="kpi"><b>Offline</b><span>12</span></div></div>
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">detailPanel</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">Structure from the wireframe board. Components not yet enumerated.</span></div><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">Implied by the detail template — not declared on the screen.</span></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; validateGroupAccess · getOfflinePackage · listScans · lookupTicket +3</div>
+          <div><b>STATES</b> &middot; <span class="warn">loading · emptyFirstRun · emptyNoAccess · error · offline</span></div>
+          
+          <div><b>GOES TO</b> &middot; SCN-001 · SCN-002 · SCN-003</div>
+        </div>
+      </div>
+      <div id="scn-008" class="scr">
+        <div>
+          <div class="hdr"><span class="code">SCN-008</span>
+            <span class="ttl">Manual entry</span><span class="pill off">offline</span></div>
+          <div class="pur">Damaged media, dead phone battery, printed slip.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>TICVAI</b><span>Access</span></div><nav class="nav"><i class="">Dashboard</i><i class="on">Access</i><i class="">Settings</i><i class="">Reports</i><i class="">People</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Manual entry</h2>
+                <small>Venue Scanner · wave 1 · comfortable</small></div>
+              <div class="acts"><div class="chip">This venue &#9662;</div><div class="chip live">Live</div><div class="chip cta">Primary action</div></div>
+            </div>
+            <div class="strip">offline capable · works from the local journal</div>
+            <div class="canvas">
+              <div class="kpis"><div class="kpi"><b>Total</b><span>1,248</span></div><div class="kpi"><b>Active</b><span>978</span></div><div class="kpi"><b>Attention</b><span>142</span></div><div class="kpi"><b>Offline</b><span>12</span></div></div>
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">detailPanel</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">Structure from the wireframe board. Components not yet enumerated.</span></div><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">Implied by the detail template — not declared on the screen.</span></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; lookupTicket · getOfflinePackage · listScans · overrideAccess +3</div>
+          <div><b>STATES</b> &middot; <span class="warn">loading · emptyFirstRun · emptyNoAccess · error · offline</span></div>
+          
+          <div><b>GOES TO</b> &middot; SCN-001 · SCN-002 · SCN-003</div>
+        </div>
+      </div>
+      <div id="scn-009" class="scr">
+        <div>
+          <div class="hdr"><span class="code">SCN-009</span>
+            <span class="ttl">Ticket lookup</span><span class="pill off">offline</span></div>
+          <div class="pur">Reads. Does not admit, does not decrement.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>TICVAI</b><span>Access</span></div><nav class="nav"><i class="">Dashboard</i><i class="on">Access</i><i class="">Settings</i><i class="">Reports</i><i class="">People</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Ticket lookup</h2>
+                <small>Venue Scanner · wave 1 · comfortable</small></div>
+              <div class="acts"><div class="chip">This venue &#9662;</div><div class="chip live">Live</div><div class="chip cta">Primary action</div></div>
+            </div>
+            <div class="strip">offline capable · works from the local journal</div>
+            <div class="canvas">
+              <div class="kpis"><div class="kpi"><b>Total</b><span>1,248</span></div><div class="kpi"><b>Active</b><span>978</span></div><div class="kpi"><b>Attention</b><span>142</span></div><div class="kpi"><b>Offline</b><span>12</span></div></div>
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">detailPanel</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">Structure from the wireframe board. Components not yet enumerated.</span></div><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">Implied by the detail template — not declared on the screen.</span></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; lookupTicket · getOfflinePackage · listScans · overrideAccess +3</div>
+          <div><b>STATES</b> &middot; <span class="warn">loading · emptyFirstRun · emptyNoAccess · error · offline</span></div>
+          
+          <div><b>GOES TO</b> &middot; SCN-001 · SCN-002 · SCN-003</div>
+        </div>
+      </div>
+      <div id="scn-011" class="scr">
+        <div>
+          <div class="hdr"><span class="code">SCN-011</span>
+            <span class="ttl">Delegated right</span><span class="pill off">offline</span></div>
+          <div class="pur">A ticket issued in another cell, redeemed here.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>TICVAI</b><span>Access</span></div><nav class="nav"><i class="">Dashboard</i><i class="on">Access</i><i class="">Settings</i><i class="">Reports</i><i class="">People</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Delegated right</h2>
+                <small>Venue Scanner · wave 1 · comfortable</small></div>
+              <div class="acts"><div class="chip">This venue &#9662;</div><div class="chip live">Live</div><div class="chip cta">Primary action</div></div>
+            </div>
+            <div class="strip">offline capable · works from the local journal</div>
+            <div class="canvas">
+              <div class="kpis"><div class="kpi"><b>Total</b><span>1,248</span></div><div class="kpi"><b>Active</b><span>978</span></div><div class="kpi"><b>Attention</b><span>142</span></div><div class="kpi"><b>Offline</b><span>12</span></div></div>
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">detailPanel</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">Structure from the wireframe board. Components not yet enumerated.</span></div><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">Implied by the detail template — not declared on the screen.</span></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; getRedemptionRight · consumeRedemptionRight</div>
+          <div><b>STATES</b> &middot; <span class="warn">loading · emptyFirstRun · emptyNoAccess · error · offline</span></div>
+          <div><b>ARRIVES WITH</b> &middot; rightId&larr;deepLink</div>
+          <div><b>GOES TO</b> &middot; SCN-001 · SCN-002 · SCN-003</div>
+        </div>
+      </div>
+      <div id="scn-013" class="scr">
+        <div>
+          <div class="hdr"><span class="code">SCN-013</span>
+            <span class="ttl">Offline journal</span><span class="pill off">offline</span></div>
+          <div class="pur">What the device decided, before anyone confirmed it.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>TICVAI</b><span>Access</span></div><nav class="nav"><i class="">Dashboard</i><i class="on">Access</i><i class="">Settings</i><i class="">Reports</i><i class="">People</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Offline journal</h2>
+                <small>Venue Scanner · wave 1 · comfortable</small></div>
+              <div class="acts"><div class="chip">This venue &#9662;</div><div class="chip live">Live</div><div class="chip cta">Primary action</div></div>
+            </div>
+            <div class="strip">offline capable · works from the local journal</div>
+            <div class="canvas">
+              <div class="kpis"><div class="kpi"><b>Total</b><span>1,248</span></div><div class="kpi"><b>Active</b><span>978</span></div><div class="kpi"><b>Attention</b><span>142</span></div><div class="kpi"><b>Offline</b><span>12</span></div></div>
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">detailPanel</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">Structure from the wireframe board. Components not yet enumerated.</span></div><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">Implied by the detail template — not declared on the screen.</span></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; listScans · getOfflinePackage · lookupTicket · overrideAccess +3</div>
+          <div><b>STATES</b> &middot; <span class="warn">loading · emptyFirstRun · emptyNoAccess · error · offline</span></div>
+          
+          <div><b>GOES TO</b> &middot; SCN-001 · SCN-002 · SCN-003</div>
+        </div>
+      </div>
+      <div id="scn-014" class="scr">
+        <div>
+          <div class="hdr"><span class="code">SCN-014</span>
+            <span class="ttl">Sync &amp; reconciliation</span><span class="pill off">offline</span></div>
+          <div class="pur">The screen nobody designs and everybody needs.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>TICVAI</b><span>Access</span></div><nav class="nav"><i class="">Dashboard</i><i class="on">Access</i><i class="">Settings</i><i class="">Reports</i><i class="">People</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Sync &amp; reconciliation</h2>
+                <small>Venue Scanner · wave 1 · comfortable</small></div>
+              <div class="acts"><div class="chip">This venue &#9662;</div><div class="chip live">Live</div><div class="chip cta">Primary action</div></div>
+            </div>
+            <div class="strip">offline capable · works from the local journal</div>
+            <div class="canvas">
+              <div class="kpis"><div class="kpi"><b>Total</b><span>1,248</span></div><div class="kpi"><b>Active</b><span>978</span></div><div class="kpi"><b>Attention</b><span>142</span></div><div class="kpi"><b>Offline</b><span>12</span></div></div>
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">detailPanel</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">Structure from the wireframe board. Components not yet enumerated.</span></div><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">Implied by the detail template — not declared on the screen.</span></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; syncScans · listSyncRejections · getOfflinePackage · listScans +5</div>
+          <div><b>STATES</b> &middot; <span class="warn">loading · emptyFirstRun · emptyNoAccess · error · offline</span></div>
+          
+          <div><b>GOES TO</b> &middot; SCN-001 · SCN-002 · SCN-003</div>
+        </div>
+      </div>
+      <div id="scn-015" class="scr">
+        <div>
+          <div class="hdr"><span class="code">SCN-015</span>
+            <span class="ttl">Offline package</span><span class="pill off">offline</span></div>
+          <div class="pur">Rule changes land here, not instantly.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>TICVAI</b><span>Access</span></div><nav class="nav"><i class="">Dashboard</i><i class="on">Access</i><i class="">Settings</i><i class="">Reports</i><i class="">People</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Offline package</h2>
+                <small>Venue Scanner · wave 1 · comfortable</small></div>
+              <div class="acts"><div class="chip">This venue &#9662;</div><div class="chip live">Live</div><div class="chip cta">Primary action</div></div>
+            </div>
+            <div class="strip">offline capable · works from the local journal</div>
+            <div class="canvas">
+              <div class="kpis"><div class="kpi"><b>Total</b><span>1,248</span></div><div class="kpi"><b>Active</b><span>978</span></div><div class="kpi"><b>Attention</b><span>142</span></div><div class="kpi"><b>Offline</b><span>12</span></div></div>
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">detailPanel</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">Structure from the wireframe board. Components not yet enumerated.</span></div><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">Implied by the detail template — not declared on the screen.</span></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; getOfflinePackage · listScans · lookupTicket · overrideAccess +3</div>
+          <div><b>STATES</b> &middot; <span class="warn">loading · emptyFirstRun · emptyNoAccess · error · offline</span></div>
+          
+          <div><b>GOES TO</b> &middot; SCN-001 · SCN-002 · SCN-003</div>
+        </div>
+      </div>
+      <div id="scn-016" class="scr">
+        <div>
+          <div class="hdr"><span class="code">SCN-016</span>
+            <span class="ttl">Gate mode</span><span class="pill off">offline</span></div>
+          <div class="pur">Podium operation. Changes what the gate does.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>TICVAI</b><span>Access</span></div><nav class="nav"><i class="">Dashboard</i><i class="on">Access</i><i class="">Settings</i><i class="">Reports</i><i class="">People</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Gate mode</h2>
+                <small>Venue Scanner · wave 1 · comfortable</small></div>
+              <div class="acts"><div class="chip">This venue &#9662;</div><div class="chip live">Live</div><div class="chip cta">Primary action</div></div>
+            </div>
+            <div class="strip">offline capable · works from the local journal</div>
+            <div class="canvas">
+              <div class="kpis"><div class="kpi"><b>Total</b><span>1,248</span></div><div class="kpi"><b>Active</b><span>978</span></div><div class="kpi"><b>Attention</b><span>142</span></div><div class="kpi"><b>Offline</b><span>12</span></div></div>
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">detailPanel</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">Structure from the wireframe board. Components not yet enumerated.</span></div><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">Implied by the detail template — not declared on the screen.</span></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; setTurnstileMode · getAccessPoint · listAccessPoints</div>
+          <div><b>STATES</b> &middot; <span class="warn">loading · emptyFirstRun · emptyNoAccess · error · offline</span></div>
+          <div><b>ARRIVES WITH</b> &middot; accessPointId&larr;deepLink</div>
+          <div><b>GOES TO</b> &middot; SCN-001 · SCN-002 · SCN-003</div>
+        </div>
+      </div></div>
+  <div class="bottom">
+    <span>Generated by tools/derive-wireframes.py from screens/P07-staff-scanner.yaml — do not hand-edit</span>
+    <span>P07 · 11 screens · 1 groups</span>
+  </div>
+</div></body></html>

@@ -1,0 +1,57 @@
+# Webhook subscription — state model
+# Contract: public-api.WebhookSubscription.status
+
+entity: Webhook subscription
+contract: public-api
+enum: WebhookSubscription.status
+enumKind: inline
+enumSchema: WebhookSubscription
+enumProperty: status
+owner: public-api
+initial:
+- pendingVerification
+terminal:
+- disabled
+transitions:
+- from: pendingVerification
+  to: active
+  operation: createWebhookSubscription
+  trigger: operation
+  guard: '**The endpoint answered the challenge.** An unverified endpoint is somebody else server being
+    sent a venue ticket sales'
+- from: active
+  to: failing
+  trigger: timer
+  guard: Consecutive failures. **Still retrying, and the developer is told now rather than at the end**
+- from: failing
+  to: active
+  trigger: timer
+  guard: The endpoint recovered
+  isReversal: true
+- from: failing
+  to: disabled
+  trigger: timer
+  guard: '**Failing long enough that retrying is a cost the platform carries for nothing.** A queue
+    growing against a dead endpoint'
+- from: active
+  to: paused
+  operation: createWebhookSubscription
+  trigger: operation
+  guard: Paused by the developer
+- from: paused
+  to: active
+  operation: createWebhookSubscription
+  trigger: operation
+  guard: Resumed
+  isReversal: true
+- from: pendingVerification
+  to: disabled
+  trigger: timer
+  guard: Never verified
+notes: '**`failing` exists so the developer is told before `disabled`**, not after. A subscription that
+  goes straight from active to disabled is one where the first anybody hears is when the integration
+  has already stopped.
+
+
+  **Replay is the recovery path** (13.3.19), which is why disabling is safe: nothing is lost, it is
+  just not being pushed.'

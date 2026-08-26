@@ -1,0 +1,206 @@
+$schema: ./_schema.yaml
+id: F29
+name: A table is seated, coursed and split
+actor: supervisor
+capability: Restaurant table service end to end
+wave: 2
+frequency: Every table, every service. **The single most-repeated journey in an F&B venue.**
+criticality: revenue
+primaryContract: fnb
+contracts:
+- fnb
+- orders
+- catalogue
+- identity
+platforms:
+- P06
+- P15
+- P04
+trigger:
+  description: 'A booking arrives, or four people walk in and the host has a table. **This flow covers
+    both** — a walk-in joins the waitlist and enters at step 2; a booking enters at step 1.
+
+    '
+  operations:
+  - listTableReservations
+  - joinRestaurantWaitlist
+offlineBehaviour: '**Steps 2 to 8 work offline.** A restaurant floor is where coverage is worst — a
+  terrace, a basement, a marquee — and **a handheld that stops taking orders mid-service is a handheld
+  the staff put down and replace with paper.**
+
+  **Splitting and payment need the network.** A split computed offline against a bill that changed is
+  two guests paying for one item, and the second payment is a refund somebody makes.
+
+  '
+steps:
+- step: 1
+  screen: EMP-058
+  action: The host seats the booking against a table.
+  operations:
+  - seatTableReservation
+  - openTableVisit
+  outcome: 'A visit opens on the table. **The reservation becomes a visit rather than staying a reservation**
+    — a booking that is still a booking while people are sitting at it is a table the system thinks
+    is free.
+
+    '
+- step: 2
+  screen: EMP-058
+  action: The server marks them seated and takes drinks.
+  operations:
+  - setServiceStage
+  - createFnbOrder
+  outcome: 'Stage `seated`, then `drinksOrdered`. **The stage is what makes a turn time real** — a table
+    `seated` fifty minutes and not ordered is a service problem, and open/closed cannot say so.
+
+    '
+- step: 3
+  screen: EMP-059
+  action: Food is ordered with courses.
+  operations:
+  - createFnbOrder
+  outcome: 'A kitchen ticket with `coursing` set from the outlet''s default. **Starters fire; mains
+    hold.**
+
+    '
+- step: 4
+  screen: KIT-002
+  action: The kitchen makes the starters and bumps them.
+  operations:
+  - setKitchenTicketStatus
+  - notifyServer
+  outcome: '**The pass calls the server rather than waiting to be noticed.** Food ready and nobody collecting
+    it is the commonest reason a plate goes out cold.
+
+    '
+  crossesDevice: true
+  note: '**A handover, not a navigation.** The server does not tap through to the kitchen display —
+    the ticket appears on a wall-mounted screen in another room. `check-flows` refused the step as an
+    undeclared navigation and it was right to: **a flow that crosses a device boundary and calls it
+    a link is a flow nobody has walked.**'
+- step: 5
+  screen: EMP-058
+  action: Starters cleared. The server judges the table is ready and fires the mains.
+  operations:
+  - fireCourse
+  - setServiceStage
+  outcome: '**The act this whole flow exists to prove.** `KitchenTicket.coursing` carried the policy
+    until 24 August and nothing fired anything — a venue could configure coursing and never course a
+    table.
+
+    '
+  crossesDevice: true
+  note: '**Back to the handheld.** The kitchen bumped the starters on a wall-mounted display; the server
+    fires the mains from their own device. **Two devices, one table** — and the flow says so rather
+    than pretending a link exists.'
+- step: 6
+  screen: KIT-002
+  action: One main comes back wrong. The station refires it.
+  operations:
+  - refireItem
+  outcome: '**`chargeable` false by default.** A refire the kitchen caused is not billable, and making
+    it opt-in stops a busy service quietly charging for its own mistakes.
+
+    '
+  crossesDevice: true
+  note: At the pass, on the kitchen display.
+- step: 7
+  screen: EMP-059
+  action: The server comps the delayed dish.
+  operations:
+  - compItem
+  outcome: '**A comp is not a discount.** Different budget, and a venue that cannot tell them apart
+    cannot tell a generous manager from a leaking till.
+
+    '
+  crossesDevice: true
+  note: '**The return handover.** The refire happened at the pass; the server learns of it through the
+    ticket and acts on their own device.'
+- step: 8
+  screen: EMP-059
+  action: The table asks to split four ways.
+  operations:
+  - getBill
+  - splitBill
+  outcome: 'Four bills. **Tax and service charge recompute per bill** — a split that apportions VAT
+    by percentage produces bills that do not sum, and the difference is a fils somebody explains.
+
+    '
+- step: 9
+  screen: EMP-059
+  action: Each guest pays their own.
+  operations:
+  - createPayment
+  - closeTableVisit
+  outcome: 'The visit closes. **Stage `cleared` releases the table to the floor plan**, and the waitlist
+    picks it up.
+
+    '
+branches:
+- at: 1
+  condition: There is no booking — four people walk in.
+  behaviour: 'Enters through the waitlist instead: `joinRestaurantWaitlist`, then `quoteWaitTime`, then
+    `notifyWaitlistParty` when a table frees. **The quote is computed, not typed** — a host guesses
+    low under pressure, and a quote wrong twice is a quote nobody believes.
+
+    '
+  severity: low
+  resolvedBy: quoteWaitTime
+- at: 2
+  condition: The party is larger than the table.
+  behaviour: '`setTableCombinations` says which tables push together and to what capacity. **Declared
+    rather than inferred** — a pillar or a step means two adjacent tables do not always combine, and
+    a host knows which pairs work where a floor plan does not.
+
+    '
+  severity: medium
+  resolvedBy: setTableCombinations
+- at: 5
+  condition: The table has gone quiet and is not ready for mains.
+  behaviour: '`holdCourse`. **A held course keeps its place in the rail** so the kitchen can see how
+    long it has waited — a held course nobody fires becomes a cold course nobody wants.
+
+    '
+  severity: low
+  resolvedBy: holdCourse
+- at: 6
+  condition: The shift changes mid-service.
+  behaviour: '`reassignServer`, and **the gratuity split follows the assignment.** A table reassigned
+    at 8pm and closed at 10pm has two servers with a claim on it.
+
+    '
+  severity: medium
+  resolvedBy: reassignServer
+- at: 8
+  condition: A guest moves from the bar and their drinks should follow.
+  behaviour: '`transferOrderItems` moves lines between bills. **The kitchen is not re-fired** — food
+    already made does not get made again because the bill moved.
+
+    '
+  severity: low
+  resolvedBy: transferOrderItems
+exitStates:
+- state: served
+  description: Table seated, coursed, paid and cleared. **The ordinary outcome.**
+- state: servedWithRecovery
+  description: 'A refire and a comp along the way. **A separate exit state because it is a different
+    night** — the same revenue, a worse service, and only one of the two shows in a takings report.
+
+    '
+- state: walkOut
+  description: 'The party left before paying. Visit closed unpaid against the shift, which is where
+    a write-off begins.
+
+    '
+notes: "**Written 24 August, and it is the first flow to walk the F&B work end to end.** 92 `fnb` operations\
+  \ reached 11% flow coverage before this — the contract had been checked operation by operation and\
+  \ never walked, which is the exact condition that hid the missing entitlement table in August and\
+  \ the payment link landing on the wrong screen.\n**Nine steps across three platforms.** A restaurant\
+  \ service is not one surface: the host is on a handheld, the kitchen is on a wall-mounted display,\
+  \ and payment may be on either. **A flow that stays on one platform is a flow that has not been walked.**\n\
+  \n  **Two steps cross a device boundary rather than a navigation.** `check-flows` refused them as\
+  \ undeclared links, and the refusal was correct — **a server on a handheld does not tap through to\
+  \ a wall-mounted kitchen display.** The ticket appears there. Marked `crossesDevice` so the checker\
+  \ can tell a handover from a missing link, which is a distinction the flow model did not previously\
+  \ have."
+openQuestions: null

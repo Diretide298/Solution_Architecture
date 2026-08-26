@@ -1,0 +1,132 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="640" viewBox="0 0 960 640">
+<style>.bg{fill:#FFF}.hd{fill:#0B1324;font-family:Arial;font-size:17px;font-weight:700}
+.sub{fill:#5A6577;font-family:Arial;font-size:11.5px}
+.s{font-family:Arial;font-size:11.5px;font-weight:700;fill:#0B1324}
+.n{font-family:"Courier New";font-size:9.5px;fill:#5A6577}
+.o{font-family:Arial;font-size:9px;fill:#5A6577}
+.warn{font-family:"Courier New";font-size:9px;fill:#A81E1E;font-weight:700}</style>
+<rect class="bg" x="0" y="0" width="960" height="640"/>
+<text class="hd" x="30" y="32">Twenty-six schemas, sixteen owners — and who else writes them</text>
+<text class="sub" x="30" y="54">One Postgres per cell. Segregation by domain, partitioning by scope_path. Amber where more than one contract writes.</text>
+<rect x="30" y="80" width="145" height="62" rx="7" fill="#EDEDED" stroke="#6B7280" stroke-width="2"/>
+<text class="s" x="40" y="99">control</text>
+<text class="n" x="40" y="114">41 tables</text>
+<text class="o" x="40" y="128">Control</text>
+<text class="warn" x="165" y="128" text-anchor="end">5 writers</text>
+<rect x="185" y="80" width="145" height="62" rx="7" fill="#FCE4D6" stroke="#B05A2A" stroke-width="2"/>
+<text class="s" x="195" y="99">marketing</text>
+<text class="n" x="195" y="114">37 tables</text>
+<text class="o" x="195" y="128">Marketing</text>
+<text class="warn" x="320" y="128" text-anchor="end">7 writers</text>
+<rect x="340" y="80" width="145" height="62" rx="7" fill="#FFF7E6" stroke="#8A6D00" stroke-width="1.2"/>
+<text class="s" x="350" y="99">fnb</text>
+<text class="n" x="350" y="114">34 tables</text>
+<text class="o" x="350" y="128">Fnb</text>
+<rect x="495" y="80" width="145" height="62" rx="7" fill="#DDEBF7" stroke="#2E74B5" stroke-width="2"/>
+<text class="s" x="505" y="99">orders</text>
+<text class="n" x="505" y="114">34 tables</text>
+<text class="o" x="505" y="128">Order</text>
+<text class="warn" x="630" y="128" text-anchor="end">6 writers</text>
+<rect x="650" y="80" width="145" height="62" rx="7" fill="#DDEBF7" stroke="#0D6EFD" stroke-width="2"/>
+<text class="s" x="660" y="99">platform</text>
+<text class="n" x="660" y="114">24 tables</text>
+<text class="o" x="660" y="128">Tenancy</text>
+<text class="warn" x="785" y="128" text-anchor="end">4 writers</text>
+<rect x="805" y="80" width="145" height="62" rx="7" fill="#FFF7E6" stroke="#8A6D00" stroke-width="2"/>
+<text class="s" x="815" y="99">inventory</text>
+<text class="n" x="815" y="114">19 tables</text>
+<text class="o" x="815" y="128">Inventory</text>
+<text class="warn" x="940" y="128" text-anchor="end">4 writers</text>
+<rect x="30" y="154" width="145" height="62" rx="7" fill="#DDEBF7" stroke="#2E74B5" stroke-width="2"/>
+<text class="s" x="40" y="173">catalogue</text>
+<text class="n" x="40" y="188">18 tables</text>
+<text class="o" x="40" y="202">Catalogue</text>
+<text class="warn" x="165" y="202" text-anchor="end">4 writers</text>
+<rect x="185" y="154" width="145" height="62" rx="7" fill="#DDEBF7" stroke="#2E74B5" stroke-width="2"/>
+<text class="s" x="195" y="173">ledger</text>
+<text class="n" x="195" y="188">18 tables</text>
+<text class="o" x="195" y="202">Ledger</text>
+<text class="warn" x="320" y="202" text-anchor="end">3 writers</text>
+<rect x="340" y="154" width="145" height="62" rx="7" fill="#DDEBF7" stroke="#0D6EFD" stroke-width="2"/>
+<text class="s" x="350" y="173">identity</text>
+<text class="n" x="350" y="188">16 tables</text>
+<text class="o" x="350" y="202">Identity</text>
+<text class="warn" x="475" y="202" text-anchor="end">4 writers</text>
+<rect x="495" y="154" width="145" height="62" rx="7" fill="#FCE4D6" stroke="#B05A2A" stroke-width="2"/>
+<text class="s" x="505" y="173">ai</text>
+<text class="n" x="505" y="188">15 tables</text>
+<text class="o" x="505" y="202">Ai</text>
+<text class="warn" x="630" y="202" text-anchor="end">2 writers</text>
+<rect x="650" y="154" width="145" height="62" rx="7" fill="#FFF7E6" stroke="#8A6D00" stroke-width="2"/>
+<text class="s" x="660" y="173">retail</text>
+<text class="n" x="660" y="188">14 tables</text>
+<text class="o" x="660" y="202">Retail</text>
+<text class="warn" x="785" y="202" text-anchor="end">2 writers</text>
+<rect x="805" y="154" width="145" height="62" rx="7" fill="#EDEDED" stroke="#6B7280" stroke-width="1.2"/>
+<text class="s" x="815" y="173">reporting</text>
+<text class="n" x="815" y="188">13 tables</text>
+<text class="o" x="815" y="202">Reporting</text>
+<rect x="30" y="228" width="145" height="62" rx="7" fill="#EDEDED" stroke="#6B7280" stroke-width="1.2"/>
+<text class="s" x="40" y="247">whitelabel</text>
+<text class="n" x="40" y="262">13 tables</text>
+<text class="o" x="40" y="276">WhiteLabel</text>
+<rect x="185" y="228" width="145" height="62" rx="7" fill="#DDEBF7" stroke="#2E74B5" stroke-width="1.2"/>
+<text class="s" x="195" y="247">promotions</text>
+<text class="n" x="195" y="262">11 tables</text>
+<text class="o" x="195" y="276">Catalogue</text>
+<rect x="340" y="228" width="145" height="62" rx="7" fill="#DDEBF7" stroke="#2E74B5" stroke-width="1.2"/>
+<text class="s" x="350" y="247">seating</text>
+<text class="n" x="350" y="262">11 tables</text>
+<text class="o" x="350" y="276">Catalogue</text>
+<rect x="495" y="228" width="145" height="62" rx="7" fill="#DDEBF7" stroke="#2E74B5" stroke-width="2"/>
+<text class="s" x="505" y="247">access</text>
+<text class="n" x="505" y="262">8 tables</text>
+<text class="o" x="505" y="276">Access</text>
+<text class="warn" x="630" y="276" text-anchor="end">3 writers</text>
+<rect x="650" y="228" width="145" height="62" rx="7" fill="#FFF7E6" stroke="#8A6D00" stroke-width="1.2"/>
+<text class="s" x="660" y="247">games</text>
+<text class="n" x="660" y="262">8 tables</text>
+<text class="o" x="660" y="276">VenueOps</text>
+<rect x="805" y="228" width="145" height="62" rx="7" fill="#FFF7E6" stroke="#8A6D00" stroke-width="1.2"/>
+<text class="s" x="815" y="247">maintenance</text>
+<text class="n" x="815" y="262">8 tables</text>
+<text class="o" x="815" y="276">VenueOps</text>
+<rect x="30" y="302" width="145" height="62" rx="7" fill="#DDEBF7" stroke="#0D6EFD" stroke-width="2"/>
+<text class="s" x="40" y="321">approvals</text>
+<text class="n" x="40" y="336">6 tables</text>
+<text class="o" x="40" y="350">Tenancy</text>
+<text class="warn" x="165" y="350" text-anchor="end">3 writers</text>
+<rect x="185" y="302" width="145" height="62" rx="7" fill="#DDEBF7" stroke="#0D6EFD" stroke-width="1.2"/>
+<text class="s" x="195" y="321">workforce</text>
+<text class="n" x="195" y="336">5 tables</text>
+<text class="o" x="195" y="350">Tenancy</text>
+<rect x="340" y="302" width="145" height="62" rx="7" fill="#FFF7E6" stroke="#8A6D00" stroke-width="1.2"/>
+<text class="s" x="350" y="321">assets</text>
+<text class="n" x="350" y="336">4 tables</text>
+<text class="o" x="350" y="350">VenueOps</text>
+<rect x="495" y="302" width="145" height="62" rx="7" fill="#DDEBF7" stroke="#0D6EFD" stroke-width="2"/>
+<text class="s" x="505" y="321">pii</text>
+<text class="n" x="505" y="336">4 tables</text>
+<text class="o" x="505" y="350">Identity</text>
+<text class="warn" x="630" y="350" text-anchor="end">3 writers</text>
+<rect x="650" y="302" width="145" height="62" rx="7" fill="#FFF7E6" stroke="#8A6D00" stroke-width="1.2"/>
+<text class="s" x="660" y="321">queue</text>
+<text class="n" x="660" y="336">4 tables</text>
+<text class="o" x="660" y="350">VenueOps</text>
+<rect x="805" y="302" width="145" height="62" rx="7" fill="#FFF7E6" stroke="#8A6D00" stroke-width="1.2"/>
+<text class="s" x="815" y="321">resources</text>
+<text class="n" x="815" y="336">4 tables</text>
+<text class="o" x="815" y="350">VenueOps</text>
+<rect x="30" y="376" width="145" height="62" rx="7" fill="#FFF7E6" stroke="#8A6D00" stroke-width="1.2"/>
+<text class="s" x="40" y="395">venuemap</text>
+<text class="n" x="40" y="410">4 tables</text>
+<text class="o" x="40" y="424">VenueOps</text>
+<rect x="185" y="376" width="145" height="62" rx="7" fill="#EDEDED" stroke="#6B7280" stroke-width="2"/>
+<text class="s" x="195" y="395">sync</text>
+<text class="n" x="195" y="410">1 tables</text>
+<text class="o" x="195" y="424">CrossCell</text>
+<text class="warn" x="320" y="424" text-anchor="end">2 writers</text>
+<text class="sub" x="30" y="466">22 tables are written by more than one contract and all 22 are correct — the owner defines the row, a foreign writer may only append.</text>
+<text class="sub" x="30" y="486">control is the largest schema at 41 tables and three writing contracts. It is the one worth splitting: developer accounts have a different audience and cadence.</text>
+<text class="sub" x="30" y="512">pii is separate from identity deliberately — and it has three writers, not one: identity mints the subject, access enrols a face, marketing updates a profile the subject owns.</text>
+</svg>

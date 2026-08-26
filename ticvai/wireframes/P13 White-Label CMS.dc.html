@@ -1,0 +1,872 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<div style="max-width:1400px;margin:0 auto;padding:14px 26px 0"><a href="TICVAI%20Wireframe%20Boards.dc.html" style="display:inline-flex;align-items:center;gap:7px;font-family:'IBM Plex Mono',monospace;font-size:10.5px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:#6E7681;text-decoration:none;border:1px solid #E5E7EB;border-radius:999px;padding:6px 13px;background:#FFFFFF">&#8592;&nbsp;All boards</a></div>
+
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+html,body{margin:0;padding:0;background:#EEF1F6;-webkit-font-smoothing:antialiased}
+*{box-sizing:border-box}
+a{color:#0D6EFD;text-decoration:none}a:hover{color:#0a55c7}
+</style>
+</helmet>
+
+<div style="font-family:Manrope,system-ui,sans-serif;color:#1F2937;background:#EEF1F6;padding:44px 40px 90px">
+  <div style="max-width:1880px;margin:0 auto">
+
+    <div style="display:flex;align-items:flex-start;gap:28px;flex-wrap:wrap;border-bottom:1px solid #DCE3ED;padding-bottom:26px">
+      <div style="flex:1;min-width:420px">
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600;letter-spacing:.14em;color:#0D6EFD;text-transform:uppercase">Platform 13 · Tenant CMS</div>
+        <h1 style="font-size:38px;font-weight:800;letter-spacing:-.02em;margin:8px 0 10px;line-height:1.05">White-Label CMS</h1>
+        <p style="font-size:14.5px;line-height:1.65;color:#4B5563;max-width:74ch;margin:0;text-wrap:pretty">Twenty screens inventoried and none defined — but this is the least original of the boards, and deliberately so. The client has already designed the white-label builder across six reference boards. What was missing was everything around it: translations, publishing, versioning, legal notices and who in the tenant may press publish.</p>
+      </div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-start">
+        <div style="background:#FFFFFF;border:1px solid #E5E7EB;border-radius:14px;padding:13px 17px;min-width:100px"><div style="font-family:'IBM Plex Mono',monospace;font-size:24px;font-weight:600;color:#0D6EFD;font-variant-numeric:tabular-nums">20</div><div style="font-size:10.5px;color:#6B7280;font-weight:600;margin-top:2px">screens</div></div><div style="background:#FFFFFF;border:1px solid #E5E7EB;border-radius:14px;padding:13px 17px;min-width:100px"><div style="font-family:'IBM Plex Mono',monospace;font-size:24px;font-weight:600;color:#C02626;font-variant-numeric:tabular-nums">0</div><div style="font-size:10.5px;color:#6B7280;font-weight:600;margin-top:2px">were defined</div></div><div style="background:#0C2340;border:1px solid #0C2340;border-radius:14px;padding:13px 17px;min-width:100px"><div style="font-family:'IBM Plex Mono',monospace;font-size:24px;font-weight:600;color:#00D4C4;font-variant-numeric:tabular-nums">6</div><div style="font-size:10.5px;color:#A9C2DC;font-weight:600;margin-top:2px">reference boards</div></div>
+      </div>
+    </div>
+
+    <div style="display:flex;gap:14px;flex-wrap:wrap;padding:18px 0 4px">
+      <div style="flex:1;min-width:300px;background:#FFFFFF;border:1px solid #E5E7EB;border-left:3px solid #0D6EFD;border-radius:12px;padding:14px 17px"><div style="font-size:11px;font-weight:800;letter-spacing:.08em;color:#0D6EFD;text-transform:uppercase">The builder already exists</div><p style="font-size:12.5px;line-height:1.6;color:#4B5563;margin:7px 0 0;text-wrap:pretty">Six delivered boards settle the live-preview device frame, the Publishing Status stepper and the brand controls. This board reuses them and fills in what surrounds them.</p></div><div style="flex:1;min-width:300px;background:#FFFFFF;border:1px solid #E5E7EB;border-left:3px solid #96650A;border-radius:12px;padding:14px 17px"><div style="font-size:11px;font-weight:800;letter-spacing:.08em;color:#96650A;text-transform:uppercase">One token set, three themes</div><p style="font-size:12.5px;line-height:1.6;color:#4B5563;margin:7px 0 0;text-wrap:pretty">Light guest, dark staff, light POS. The palette on CMS-002 renders all three. The alternative — three independent systems — costs three times the maintenance and guarantees a status pill drifts.</p></div><div style="flex:1;min-width:300px;background:#FFFFFF;border:1px solid #E5E7EB;border-left:3px solid #C02626;border-radius:12px;padding:14px 17px"><div style="font-size:11px;font-weight:800;letter-spacing:.08em;color:#C02626;text-transform:uppercase">CF-42 is not optional</div><p style="font-size:12.5px;line-height:1.6;color:#4B5563;margin:7px 0 0;text-wrap:pretty">The preview must toggle platform, theme and direction. RTL is a layout, and a tenant who cannot see their Arabic site before publishing it will publish a broken one.</p></div>
+    </div>
+
+    <div style="margin-top:30px;background:#FFFFFF;border:1px solid #E5E7EB;border-radius:16px;padding:22px 26px 24px">
+      <div style="font-size:11px;font-weight:800;letter-spacing:.1em;color:#0D6EFD;text-transform:uppercase">Flow map</div>
+      <p style="font-size:12.5px;line-height:1.6;color:#6B7280;margin:7px 0 18px;max-width:78ch;text-wrap:pretty">A tenant sets the brand once, edits content weekly, and publishes with an approval behind it.</p>
+      <div style="display:flex;flex-wrap:wrap;gap:18px;align-items:stretch"><div style="flex:1;min-width:200px;display:flex;flex-direction:column;gap:7px">
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;font-weight:600;letter-spacing:.13em;color:#0D6EFD;text-transform:uppercase">Set up once</div>
+    <div style="border:1px solid #0D6EFD55;border-radius:12px;background:#0D6EFD0A;padding:11px;display:flex;flex-direction:column;gap:6px;flex:1">
+      <a href="#cms-002" style="display:flex;gap:8px;align-items:center;border:1px solid #E5E7EB;border-radius:8px;padding:8px 10px;background:#FFFFFF" style-hover="border-color:#0D6EFD"><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#6E7681;flex:none">CMS-002</span><span style="font-size:10.5px;font-weight:700;color:#1F2937;line-height:1.25">Brand kit</span></a><a href="#cms-003" style="display:flex;gap:8px;align-items:center;border:1px solid #E5E7EB;border-radius:8px;padding:8px 10px;background:#FFFFFF" style-hover="border-color:#0D6EFD"><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#6E7681;flex:none">CMS-003</span><span style="font-size:10.5px;font-weight:700;color:#1F2937;line-height:1.25">Typography</span></a><a href="#cms-004" style="display:flex;gap:8px;align-items:center;border:1px solid #E5E7EB;border-radius:8px;padding:8px 10px;background:#FFFFFF" style-hover="border-color:#0D6EFD"><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#6E7681;flex:none">CMS-004</span><span style="font-size:10.5px;font-weight:700;color:#1F2937;line-height:1.25">Logo &amp; assets</span></a><a href="#cms-005" style="display:flex;gap:8px;align-items:center;border:1px solid #E5E7EB;border-radius:8px;padding:8px 10px;background:#FFFFFF" style-hover="border-color:#0D6EFD"><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#6E7681;flex:none">CMS-005</span><span style="font-size:10.5px;font-weight:700;color:#1F2937;line-height:1.25">Theme editor</span></a><a href="#cms-006" style="display:flex;gap:8px;align-items:center;border:1px solid #E5E7EB;border-radius:8px;padding:8px 10px;background:#FFFFFF" style-hover="border-color:#0D6EFD"><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#6E7681;flex:none">CMS-006</span><span style="font-size:10.5px;font-weight:700;color:#1F2937;line-height:1.25">Component preview</span></a>
+      <div style="font-size:10px;color:#6B7280;line-height:1.5;margin-top:2px">Tokens, not pictures. Every surface reads them.</div>
+    </div></div><div style="flex:1;min-width:200px;display:flex;flex-direction:column;gap:7px">
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;font-weight:600;letter-spacing:.13em;color:#6E7681;text-transform:uppercase">Edit weekly</div>
+    <div style="border:1px solid #E5E7EB;border-radius:12px;background:#F7F9FC;padding:11px;display:flex;flex-direction:column;gap:6px;flex:1">
+      <a href="#cms-007" style="display:flex;gap:8px;align-items:center;border:1px solid #E5E7EB;border-radius:8px;padding:8px 10px;background:#FFFFFF" style-hover="border-color:#0D6EFD"><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#6E7681;flex:none">CMS-007</span><span style="font-size:10.5px;font-weight:700;color:#1F2937;line-height:1.25">Page builder</span></a><a href="#cms-008" style="display:flex;gap:8px;align-items:center;border:1px solid #E5E7EB;border-radius:8px;padding:8px 10px;background:#FFFFFF" style-hover="border-color:#0D6EFD"><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#6E7681;flex:none">CMS-008</span><span style="font-size:10.5px;font-weight:700;color:#1F2937;line-height:1.25">Content blocks</span></a><a href="#cms-009" style="display:flex;gap:8px;align-items:center;border:1px solid #E5E7EB;border-radius:8px;padding:8px 10px;background:#FFFFFF" style-hover="border-color:#0D6EFD"><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#6E7681;flex:none">CMS-009</span><span style="font-size:10.5px;font-weight:700;color:#1F2937;line-height:1.25">Navigation</span></a><a href="#cms-010" style="display:flex;gap:8px;align-items:center;border:1px solid #E5E7EB;border-radius:8px;padding:8px 10px;background:#FFFFFF" style-hover="border-color:#0D6EFD"><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#6E7681;flex:none">CMS-010</span><span style="font-size:10.5px;font-weight:700;color:#1F2937;line-height:1.25">Media library</span></a><a href="#cms-013" style="display:flex;gap:8px;align-items:center;border:1px solid #E5E7EB;border-radius:8px;padding:8px 10px;background:#FFFFFF" style-hover="border-color:#0D6EFD"><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#6E7681;flex:none">CMS-013</span><span style="font-size:10.5px;font-weight:700;color:#1F2937;line-height:1.25">SEO</span></a>
+      <div style="font-size:10px;color:#6B7280;line-height:1.5;margin-top:2px">Blocks that read the catalogue cannot be edited into lying about it.</div>
+    </div></div><div style="flex:1;min-width:190px;display:flex;flex-direction:column;gap:7px">
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;font-weight:600;letter-spacing:.13em;color:#96650A;text-transform:uppercase">Language</div>
+    <div style="border:1px solid #96650A55;border-radius:12px;background:#96650A0A;padding:11px;display:flex;flex-direction:column;gap:6px;flex:1">
+      <a href="#cms-011" style="display:flex;gap:8px;align-items:center;border:1px solid #E5E7EB;border-radius:8px;padding:8px 10px;background:#FFFFFF" style-hover="border-color:#0D6EFD"><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#6E7681;flex:none">CMS-011</span><span style="font-size:10.5px;font-weight:700;color:#1F2937;line-height:1.25">Translations</span></a><a href="#cms-012" style="display:flex;gap:8px;align-items:center;border:1px solid #E5E7EB;border-radius:8px;padding:8px 10px;background:#FFFFFF" style-hover="border-color:#0D6EFD"><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#6E7681;flex:none">CMS-012</span><span style="font-size:10.5px;font-weight:700;color:#1F2937;line-height:1.25">RTL preview</span></a>
+      <div style="font-size:10px;color:#6B7280;line-height:1.5;margin-top:2px">94% is measured against a denominator nobody has counted.</div>
+    </div></div><div style="flex:1;min-width:200px;display:flex;flex-direction:column;gap:7px">
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;font-weight:600;letter-spacing:.13em;color:#C02626;text-transform:uppercase">Publish</div>
+    <div style="border:1px solid #C0262655;border-radius:12px;background:#C026260A;padding:11px;display:flex;flex-direction:column;gap:6px;flex:1">
+      <a href="#cms-014" style="display:flex;gap:8px;align-items:center;border:1px solid #E5E7EB;border-radius:8px;padding:8px 10px;background:#FFFFFF" style-hover="border-color:#0D6EFD"><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#6E7681;flex:none">CMS-014</span><span style="font-size:10.5px;font-weight:700;color:#1F2937;line-height:1.25">Publishing workflow</span></a><a href="#cms-015" style="display:flex;gap:8px;align-items:center;border:1px solid #E5E7EB;border-radius:8px;padding:8px 10px;background:#FFFFFF" style-hover="border-color:#0D6EFD"><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#6E7681;flex:none">CMS-015</span><span style="font-size:10.5px;font-weight:700;color:#1F2937;line-height:1.25">Version history</span></a><a href="#cms-018" style="display:flex;gap:8px;align-items:center;border:1px solid #E5E7EB;border-radius:8px;padding:8px 10px;background:#FFFFFF" style-hover="border-color:#0D6EFD"><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#6E7681;flex:none">CMS-018</span><span style="font-size:10.5px;font-weight:700;color:#1F2937;line-height:1.25">Consent &amp; legal</span></a><a href="#cms-019" style="display:flex;gap:8px;align-items:center;border:1px solid #E5E7EB;border-radius:8px;padding:8px 10px;background:#FFFFFF" style-hover="border-color:#0D6EFD"><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#6E7681;flex:none">CMS-019</span><span style="font-size:10.5px;font-weight:700;color:#1F2937;line-height:1.25">User access</span></a>
+      <div style="font-size:10px;color:#6B7280;line-height:1.5;margin-top:2px">014 should refuse a publish with blocking issues. Nothing yet says it does.</div>
+    </div></div><div style="flex:1;min-width:190px;display:flex;flex-direction:column;gap:7px">
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;font-weight:600;letter-spacing:.13em;color:#6E7681;text-transform:uppercase">Platform side</div>
+    <div style="border:1px solid #E5E7EB;border-radius:12px;background:#F7F9FC;padding:11px;display:flex;flex-direction:column;gap:6px;flex:1">
+      <a href="P09 Admin Web.dc.html#adm-016" style="display:flex;gap:8px;align-items:center;border:1px solid #E5E7EB;border-radius:8px;padding:8px 10px;background:#FFFFFF" style-hover="border-color:#0D6EFD"><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#6E7681;flex:none">ADM-016</span><span style="font-size:10.5px;font-weight:700;color:#1F2937;line-height:1.25">Reached from Admin</span></a><a href="P09 Admin Web.dc.html#adm-017" style="display:flex;gap:8px;align-items:center;border:1px solid #E5E7EB;border-radius:8px;padding:8px 10px;background:#FFFFFF" style-hover="border-color:#0D6EFD"><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#6E7681;flex:none">ADM-017</span><span style="font-size:10.5px;font-weight:700;color:#1F2937;line-height:1.25">Domain, platform half</span></a>
+      <div style="font-size:10px;color:#6B7280;line-height:1.5;margin-top:2px">Two screens, one record.</div>
+    </div></div></div>
+    </div>
+
+    
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600;letter-spacing:.14em;color:#6E7681;text-transform:uppercase;margin:48px 0 14px;padding-bottom:9px;border-bottom:1px solid #DCE3ED">01 — Overview</div>
+    
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(490px,1fr));gap:32px"><div id="cms-001" style="display:flex;flex-direction:column;gap:9px;scroll-margin-top:24px">
+    <div style="display:flex;align-items:baseline;gap:9px;flex-wrap:wrap;line-height:1.4">
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;font-weight:600;color:#0D6EFD">CMS-001</div>
+      <div style="font-size:15px;font-weight:800;letter-spacing:-.01em;color:#1F2937">Tenant Workspace</div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#6E7681">wave 2</div>
+      
+      
+    </div>
+    <div style="font-size:11.5px;color:#6B7280;line-height:1.5;max-width:62ch;margin-top:2px">Land a tenant somewhere that shows what is live and what is not.</div>
+    <div style="border:1px solid #DCE3ED;border-radius:13px;overflow:hidden;background:#FFFFFF;box-shadow:0 10px 26px rgba(12,35,64,.09)">
+    <div style="height:25px;background:#E6EBF2;border-bottom:1px solid #DCE3ED;display:flex;align-items:center;gap:7px;padding:0 11px">
+      <div style="display:flex;gap:4px"><div style="width:6px;height:6px;border-radius:50%;background:#C3CCDA"></div><div style="width:6px;height:6px;border-radius:50%;background:#C3CCDA"></div><div style="width:6px;height:6px;border-radius:50%;background:#C3CCDA"></div></div>
+      <div style="flex:1;background:#FFFFFF;border:1px solid #E5E7EB;border-radius:5px;height:14px;display:flex;align-items:center;padding:0 8px;font-family:'IBM Plex Mono',monospace;font-size:8.5px;color:#6E7681">cms.ticvai.com/</div>
+    </div>
+    <div style="display:flex;min-height:300px">
+      <div style="width:124px;flex:none;background:#0C2340;padding:12px 9px;display:flex;flex-direction:column;gap:2px">
+        <div style="display:flex;align-items:center;gap:7px;margin-bottom:10px"><div style="width:20px;height:20px;border-radius:6px;background:linear-gradient(135deg,#0D6EFD,#00B8FF);color:#fff;display:flex;align-items:center;justify-content:center;font-size:9.5px;font-weight:800">T</div><div style="font-size:10px;font-weight:800;color:#fff">CMS</div></div>
+        <div style="padding:6px 8px;border-radius:6px;background:rgba(255,255,255,.12);font-size:9.5px;font-weight:700;color:#fff;line-height:1.3">Overview</div><div style="padding:6px 8px;border-radius:6px;background:transparent;font-size:9.5px;font-weight:500;color:#8FB0D2;line-height:1.3">Brand</div><div style="padding:6px 8px;border-radius:6px;background:transparent;font-size:9.5px;font-weight:500;color:#8FB0D2;line-height:1.3">Content</div><div style="padding:6px 8px;border-radius:6px;background:transparent;font-size:9.5px;font-weight:500;color:#8FB0D2;line-height:1.3">Language</div><div style="padding:6px 8px;border-radius:6px;background:transparent;font-size:9.5px;font-weight:500;color:#8FB0D2;line-height:1.3">Publish</div>
+      </div>
+      <div style="flex:1;display:flex;flex-direction:column;min-width:0;background:#F7F9FC">
+        <div style="flex:none;min-height:36px;border-bottom:1px solid #E5E7EB;background:#FFFFFF;display:flex;align-items:center;gap:9px;padding:7px 14px">
+          <div style="flex:1;min-width:0"><div style="font-size:11.5px;font-weight:800;color:#1F2937">Tenant Workspace</div></div>
+          
+          <div style="width:20px;height:20px;border-radius:6px;background:linear-gradient(135deg,#0D6EFD,#00B8FF);flex:none"></div>
+        </div>
+        <div style="flex:1;padding:13px 14px;display:flex;flex-direction:column;gap:10px"><div style="display:flex;gap:8px;flex-wrap:wrap"><div style="flex:1;min-width:82px;border:1px solid #E5E7EB;border-radius:10px;background:#FFFFFF;padding:10px 12px"><div style="font-family:'IBM Plex Mono',monospace;font-size:17px;font-weight:600;color:#0D6EFD;font-variant-numeric:tabular-nums">3</div><div style="font-size:9.5px;color:#6B7280;font-weight:600;margin-top:2px">sites</div></div><div style="flex:1;min-width:82px;border:1px solid #E5E7EB;border-radius:10px;background:#FFFFFF;padding:10px 12px"><div style="font-family:'IBM Plex Mono',monospace;font-size:17px;font-weight:600;color:#96650A;font-variant-numeric:tabular-nums">2</div><div style="font-size:9.5px;color:#6B7280;font-weight:600;margin-top:2px">draft changes</div></div><div style="flex:1;min-width:82px;border:1px solid #E5E7EB;border-radius:10px;background:#FFFFFF;padding:10px 12px"><div style="font-family:'IBM Plex Mono',monospace;font-size:17px;font-weight:600;color:#0D6EFD;font-variant-numeric:tabular-nums">14 Aug</div><div style="font-size:9.5px;color:#6B7280;font-weight:600;margin-top:2px">last publish</div></div><div style="flex:1;min-width:82px;border:1px solid #E5E7EB;border-radius:10px;background:#FFFFFF;padding:10px 12px"><div style="font-family:'IBM Plex Mono',monospace;font-size:17px;font-weight:600;color:#0D6EFD;font-variant-numeric:tabular-nums">94%</div><div style="font-size:9.5px;color:#6B7280;font-weight:600;margin-top:2px">ar coverage</div></div></div><div style="border:1px solid #E5E7EB;border-radius:10px;background:#FFFFFF;overflow:hidden">
+    <div style="display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr;gap:9px;padding:8px 12px;background:#F7F9FC;border-bottom:1px solid #E5E7EB"><div style="font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.09em;color:#6E7681;text-transform:uppercase;text-align:left">Site</div><div style="font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.09em;color:#6E7681;text-transform:uppercase;text-align:left">Domain</div><div style="font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.09em;color:#6E7681;text-transform:uppercase;text-align:right">Version</div><div style="font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.09em;color:#6E7681;text-transform:uppercase;text-align:right">Status</div></div>
+    <div style="display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr;gap:9px;padding:9px 12px;border-bottom:1px solid #F1F4F8;align-items:center"><div style="font-size:10.5px;color:#1F2937;font-weight:700;text-align:left;">Gulf Parks main</div><div style="font-size:10.5px;color:#4B5563;font-weight:400;text-align:left;">tickets.gulfparks.ae</div><div style="font-size:10.5px;color:#4B5563;font-weight:400;text-align:right;font-family:'IBM Plex Mono',monospace;font-variant-numeric:tabular-nums">v18</div><div style="text-align:right"><span style="border:1px solid #0F7B4F55;background:#0F7B4F12;color:#0F7B4F;border-radius:6px;padding:2px 7px;font-size:9px;font-weight:700;letter-spacing:.03em;white-space:nowrap">LIVE</span></div></div><div style="display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr;gap:9px;padding:9px 12px;border-bottom:1px solid #F1F4F8;align-items:center"><div style="font-size:10.5px;color:#1F2937;font-weight:700;text-align:left;">Marina venue</div><div style="font-size:10.5px;color:#4B5563;font-weight:400;text-align:left;">marina.gulfparks.ae</div><div style="font-size:10.5px;color:#4B5563;font-weight:400;text-align:right;font-family:'IBM Plex Mono',monospace;font-variant-numeric:tabular-nums">v11</div><div style="text-align:right"><span style="border:1px solid #0F7B4F55;background:#0F7B4F12;color:#0F7B4F;border-radius:6px;padding:2px 7px;font-size:9px;font-weight:700;letter-spacing:.03em;white-space:nowrap">LIVE</span></div></div><div style="display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr;gap:9px;padding:9px 12px;border-bottom:1px solid #F1F4F8;align-items:center"><div style="font-size:10.5px;color:#1F2937;font-weight:700;text-align:left;">Winter campaign</div><div style="font-size:10.5px;color:#4B5563;font-weight:400;text-align:left;">—</div><div style="font-size:10.5px;color:#4B5563;font-weight:400;text-align:right;font-family:'IBM Plex Mono',monospace;font-variant-numeric:tabular-nums">draft</div><div style="text-align:right"><span style="border:1px solid #6E768155;background:#6E768112;color:#6E7681;border-radius:6px;padding:2px 7px;font-size:9px;font-weight:700;letter-spacing:.03em;white-space:nowrap">DRAFT</span></div></div>
+  </div></div>
+      </div>
+    </div></div>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#6E7681;line-height:1.6">getTenantSites</div>
+    <div style="display:flex;flex-wrap:wrap;gap:5px;align-items:center"><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#6E7681;letter-spacing:.06em">GOES TO</span><a href="#cms-002" style="border:1px solid #E5E7EB;border-radius:7px;padding:3px 8px;background:#FFFFFF;font-family:'IBM Plex Mono',monospace;font-size:9.5px;font-weight:600;color:#0D6EFD;white-space:nowrap" style-hover="border-color:#0D6EFD;background:#F2F7FF">CMS-002</a><a href="#cms-016" style="border:1px solid #E5E7EB;border-radius:7px;padding:3px 8px;background:#FFFFFF;font-family:'IBM Plex Mono',monospace;font-size:9.5px;font-weight:600;color:#0D6EFD;white-space:nowrap" style-hover="border-color:#0D6EFD;background:#F2F7FF">CMS-016</a></div>
+  </div></div>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600;letter-spacing:.14em;color:#6E7681;text-transform:uppercase;margin:48px 0 14px;padding-bottom:9px;border-bottom:1px solid #DCE3ED">02 — Brand</div>
+    <p style="font-size:12.5px;line-height:1.6;color:#6B7280;margin:0 0 18px;max-width:82ch;text-wrap:pretty">The delivered reference already settles these. Drawn here to show what the token set has to cover, and to make the one-system-three-themes decision visible.</p>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(490px,1fr));gap:32px"><div id="cms-002" style="display:flex;flex-direction:column;gap:9px;scroll-margin-top:24px">
+    <div style="display:flex;align-items:baseline;gap:9px;flex-wrap:wrap;line-height:1.4">
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;font-weight:600;color:#0D6EFD">CMS-002</div>
+      <div style="font-size:15px;font-weight:800;letter-spacing:-.01em;color:#1F2937">Brand Kit</div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#6E7681">wave 2</div>
+      
+      
+    </div>
+    <div style="font-size:11.5px;color:#6B7280;line-height:1.5;max-width:62ch;margin-top:2px">Set the things every surface reads.</div>
+    <div style="border:1px solid #DCE3ED;border-radius:13px;overflow:hidden;background:#FFFFFF;box-shadow:0 10px 26px rgba(12,35,64,.09)">
+    <div style="height:25px;background:#E6EBF2;border-bottom:1px solid #DCE3ED;display:flex;align-items:center;gap:7px;padding:0 11px">
+      <div style="display:flex;gap:4px"><div style="width:6px;height:6px;border-radius:50%;background:#C3CCDA"></div><div style="width:6px;height:6px;border-radius:50%;background:#C3CCDA"></div><div style="width:6px;height:6px;border-radius:50%;background:#C3CCDA"></div></div>
+      <div style="flex:1;background:#FFFFFF;border:1px solid #E5E7EB;border-radius:5px;height:14px;display:flex;align-items:center;padding:0 8px;font-family:'IBM Plex Mono',monospace;font-size:8.5px;color:#6E7681">cms.ticvai.com/</div>
+    </div>
+    <div style="display:flex;min-height:300px">
+      <div style="width:124px;flex:none;background:#0C2340;padding:12px 9px;display:flex;flex-direction:column;gap:2px">
+        <div style="display:flex;align-items:center;gap:7px;margin-bottom:10px"><div style="width:20px;height:20px;border-radius:6px;background:linear-gradient(135deg,#0D6EFD,#00B8FF);color:#fff;display:flex;align-items:center;justify-content:center;font-size:9.5px;font-weight:800">T</div><div style="font-size:10px;font-weight:800;color:#fff">CMS</div></div>
+        <div style="padding:6px 8px;border-radius:6px;background:transparent;font-size:9.5px;font-weight:500;color:#8FB0D2;line-height:1.3">Overview</div><div style="padding:6px 8px;border-radius:6px;background:rgba(255,255,255,.12);font-size:9.5px;font-weight:700;color:#fff;line-height:1.3">Brand</div><div style="padding:6px 8px;border-radius:6px;background:transparent;font-size:9.5px;font-weight:500;color:#8FB0D2;line-height:1.3">Content</div><div style="padding:6px 8px;border-radius:6px;background:transparent;font-size:9.5px;font-weight:500;color:#8FB0D2;line-height:1.3">Language</div><div style="padding:6px 8px;border-radius:6px;background:transparent;font-size:9.5px;font-weight:500;color:#8FB0D2;line-height:1.3">Publish</div>
+      </div>
+      <div style="flex:1;display:flex;flex-direction:column;min-width:0;background:#F7F9FC">
+        <div style="flex:none;min-height:36px;border-bottom:1px solid #E5E7EB;background:#FFFFFF;display:flex;align-items:center;gap:9px;padding:7px 14px">
+          <div style="flex:1;min-width:0"><div style="font-size:11.5px;font-weight:800;color:#1F2937">Brand Kit</div></div>
+          
+          <div style="width:20px;height:20px;border-radius:6px;background:linear-gradient(135deg,#0D6EFD,#00B8FF);flex:none"></div>
+        </div>
+        <div style="flex:1;padding:13px 14px;display:flex;flex-direction:column;gap:10px"><div style="display:grid;grid-template-columns:1fr 1fr;gap:11px"><div style="border:1px solid #E5E7EB;border-radius:11px;background:#FFFFFF;overflow:hidden">
+  <div style="padding:9px 12px;border-bottom:1px solid #E5E7EB;background:#F7F9FC"><div style="font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.12em;color:#6E7681;text-transform:uppercase">Palette</div></div>
+  <div style="padding:11px 12px"><div style="display:flex;gap:7px;flex-wrap:wrap"><div style="width:38px;height:38px;border-radius:9px;background:#0C2340;border:1px solid #E5E7EB"></div><div style="width:38px;height:38px;border-radius:9px;background:#0D6EFD;border:1px solid #E5E7EB"></div><div style="width:38px;height:38px;border-radius:9px;background:#00B8FF;border:1px solid #E5E7EB"></div><div style="width:38px;height:38px;border-radius:9px;background:#F7F9FC;border:1px solid #E5E7EB"></div><div style="width:38px;height:38px;border-radius:9px;background:#1F2937;border:1px solid #E5E7EB"></div></div><div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#6E7681;margin-top:8px">5 tokens · contrast checked</div></div></div><div style="border:1px solid #E5E7EB;border-radius:11px;background:#F7F9FC;padding:12px;display:flex;flex-direction:column;align-items:center;gap:8px">
+  <div style="display:flex;gap:6px"><div style="border:1px solid #0D6EFD;background:#F2F7FF;color:#0D6EFD;border-radius:8px;padding:5px 10px;font-size:10px;font-weight:700;white-space:nowrap">iOS</div><div style="border:1px solid #E5E7EB;background:#FFFFFF;color:#6B7280;border-radius:8px;padding:5px 10px;font-size:10px;font-weight:700;white-space:nowrap">Android</div><div style="border:1px solid #E5E7EB;background:#FFFFFF;color:#6B7280;border-radius:8px;padding:5px 10px;font-size:10px;font-weight:700;white-space:nowrap">Web</div><div style="border:1px solid #0D6EFD;background:#F2F7FF;color:#0D6EFD;border-radius:8px;padding:5px 10px;font-size:10px;font-weight:700;white-space:nowrap">LTR</div></div>
+  <div style="width:150px;border:1px solid #E5E7EB;border-radius:14px;background:#FFFFFF;overflow:hidden">
+    <div style="height:14px;background:#E6EBF2"></div>
+    <div style="padding:9px;display:flex;flex-direction:column;gap:6px;">
+      <div style="height:34px;border-radius:7px;background:repeating-linear-gradient(135deg,#E4EAF2,#E4EAF2 6px,#EDF1F7 6px,#EDF1F7 12px)"></div>
+      <div style="height:7px;width:70%;background:#E9EDF3;border-radius:3px"></div>
+      <div style="height:7px;width:52%;background:#E9EDF3;border-radius:3px"></div>
+      <div style="height:22px;border-radius:7px;background:linear-gradient(135deg,#0D6EFD,#00B8FF)"></div>
+    </div></div>
+  <div style="font-family:'IBM Plex Mono',monospace;font-size:9px;color:#6E7681">live preview</div></div></div><div style="border-left:3px solid #0D6EFD;background:#F2F7FF;border-radius:0 9px 9px 0;padding:10px 13px;font-size:10.5px;color:#12406E;line-height:1.55">These are tokens, not pictures. The same five values render the storefront, the app, the POS receipt and the kiosk — which is the argument for one token set with three themes rather than three systems.</div></div>
+      </div>
+    </div></div>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#6E7681;line-height:1.6">updateBrandKit</div>
+    <div style="display:flex;flex-wrap:wrap;gap:5px;align-items:center"><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#6E7681;letter-spacing:.06em">GOES TO</span><a href="#cms-003" style="border:1px solid #E5E7EB;border-radius:7px;padding:3px 8px;background:#FFFFFF;font-family:'IBM Plex Mono',monospace;font-size:9.5px;font-weight:600;color:#0D6EFD;white-space:nowrap" style-hover="border-color:#0D6EFD;background:#F2F7FF">CMS-003</a><a href="#cms-004" style="border:1px solid #E5E7EB;border-radius:7px;padding:3px 8px;background:#FFFFFF;font-family:'IBM Plex Mono',monospace;font-size:9.5px;font-weight:600;color:#0D6EFD;white-space:nowrap" style-hover="border-color:#0D6EFD;background:#F2F7FF">CMS-004</a></div>
+  </div><div id="cms-003" style="display:flex;flex-direction:column;gap:9px;scroll-margin-top:24px">
+    <div style="display:flex;align-items:baseline;gap:9px;flex-wrap:wrap;line-height:1.4">
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;font-weight:600;color:#0D6EFD">CMS-003</div>
+      <div style="font-size:15px;font-weight:800;letter-spacing:-.01em;color:#1F2937">Typography</div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#6E7681">wave 2</div>
+      
+      
+    </div>
+    <div style="font-size:11.5px;color:#6B7280;line-height:1.5;max-width:62ch;margin-top:2px">Choose the two typefaces and the scale under them.</div>
+    <div style="border:1px solid #DCE3ED;border-radius:13px;overflow:hidden;background:#FFFFFF;box-shadow:0 10px 26px rgba(12,35,64,.09)">
+    <div style="height:25px;background:#E6EBF2;border-bottom:1px solid #DCE3ED;display:flex;align-items:center;gap:7px;padding:0 11px">
+      <div style="display:flex;gap:4px"><div style="width:6px;height:6px;border-radius:50%;background:#C3CCDA"></div><div style="width:6px;height:6px;border-radius:50%;background:#C3CCDA"></div><div style="width:6px;height:6px;border-radius:50%;background:#C3CCDA"></div></div>
+      <div style="flex:1;background:#FFFFFF;border:1px solid #E5E7EB;border-radius:5px;height:14px;display:flex;align-items:center;padding:0 8px;font-family:'IBM Plex Mono',monospace;font-size:8.5px;color:#6E7681">cms.ticvai.com/</div>
+    </div>
+    <div style="display:flex;min-height:300px">
+      <div style="width:124px;flex:none;background:#0C2340;padding:12px 9px;display:flex;flex-direction:column;gap:2px">
+        <div style="display:flex;align-items:center;gap:7px;margin-bottom:10px"><div style="width:20px;height:20px;border-radius:6px;background:linear-gradient(135deg,#0D6EFD,#00B8FF);color:#fff;display:flex;align-items:center;justify-content:center;font-size:9.5px;font-weight:800">T</div><div style="font-size:10px;font-weight:800;color:#fff">CMS</div></div>
+        <div style="padding:6px 8px;border-radius:6px;background:transparent;font-size:9.5px;font-weight:500;color:#8FB0D2;line-height:1.3">Overview</div><div style="padding:6px 8px;border-radius:6px;background:rgba(255,255,255,.12);font-size:9.5px;font-weight:700;color:#fff;line-height:1.3">Brand</div><div style="padding:6px 8px;border-radius:6px;background:transparent;font-size:9.5px;font-weight:500;color:#8FB0D2;line-height:1.3">Content</div><div style="padding:6px 8px;border-radius:6px;background:transparent;font-size:9.5px;font-weight:500;color:#8FB0D2;line-height:1.3">Language</div><div style="padding:6px 8px;border-radius:6px;background:transparent;font-size:9.5px;font-weight:500;color:#8FB0D2;line-height:1.3">Publish</div>
+      </div>
+      <div style="flex:1;display:flex;flex-direction:column;min-width:0;background:#F7F9FC">
+        <div style="flex:none;min-height:36px;border-bottom:1px solid #E5E7EB;background:#FFFFFF;display:flex;align-items:center;gap:9px;padding:7px 14px">
+          <div style="flex:1;min-width:0"><div style="font-size:11.5px;font-weight:800;color:#1F2937">Typography</div></div>
+          
+          <div style="width:20px;height:20px;border-radius:6px;background:linear-gradient(135deg,#0D6EFD,#00B8FF);flex:none"></div>
+        </div>
+        <div style="flex:1;padding:13px 14px;display:flex;flex-direction:column;gap:10px"><div style="display:grid;grid-template-columns:repeat(3,1fr);gap:9px"><div style="border:1px solid #E5E7EB;border-radius:9px;background:#FFFFFF;padding:8px 11px"><div style="font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.1em;color:#6E7681;text-transform:uppercase">Display</div><div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#1F2937;margin-top:3px">Manrope 800</div></div><div style="border:1px solid #E5E7EB;border-radius:9px;background:#FFFFFF;padding:8px 11px"><div style="font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.1em;color:#6E7681;text-transform:uppercase">Body</div><div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#1F2937;margin-top:3px">Manrope 400</div></div><div style="border:1px solid #E5E7EB;border-radius:9px;background:#FFFFFF;padding:8px 11px"><div style="font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.1em;color:#6E7681;text-transform:uppercase">Numerals</div><div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#1F2937;margin-top:3px">IBM Plex Mono</div></div><div style="border:1px solid #E5E7EB;border-radius:9px;background:#FFFFFF;padding:8px 11px"><div style="font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.1em;color:#6E7681;text-transform:uppercase">Base size</div><div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#1F2937;margin-top:3px">16 px</div></div><div style="border:1px solid #E5E7EB;border-radius:9px;background:#FFFFFF;padding:8px 11px"><div style="font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.1em;color:#6E7681;text-transform:uppercase">Scale</div><div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#1F2937;margin-top:3px">1.25</div></div><div style="border:1px solid #E5E7EB;border-radius:9px;background:#FFFFFF;padding:8px 11px"><div style="font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.1em;color:#6E7681;text-transform:uppercase">Arabic face</div><div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#1F2937;margin-top:3px">IBM Plex Sans Arabic</div></div></div><div style="border-left:3px solid #96650A;background:#FDF8EE;border-radius:0 9px 9px 0;padding:10px 13px;font-size:10.5px;color:#5E4408;line-height:1.55">The Arabic face is not optional and it is not a fallback. A tenant who picks a Latin display face with no Arabic cut has chosen a broken RTL site without being told.</div><div style="display:flex;justify-content:flex-end;gap:8px"><div style="background:#FFFFFF;border:1px solid #E5E7EB;color:#4B5563;border-radius:9px;padding:8px 14px;font-size:10.5px;font-weight:800;white-space:nowrap;text-align:center">Discard</div><div style="background:linear-gradient(135deg,#0D6EFD,#00B8FF);border:0;color:#fff;border-radius:9px;padding:8px 14px;font-size:10.5px;font-weight:800;white-space:nowrap;text-align:center">Save</div></div></div>
+      </div>
+    </div></div>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#6E7681;line-height:1.6">updateTypography</div>
+    <div style="display:flex;flex-wrap:wrap;gap:5px;align-items:center"><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#6E7681;letter-spacing:.06em">GOES TO</span><a href="#cms-005" style="border:1px solid #E5E7EB;border-radius:7px;padding:3px 8px;background:#FFFFFF;font-family:'IBM Plex Mono',monospace;font-size:9.5px;font-weight:600;color:#0D6EFD;white-space:nowrap" style-hover="border-color:#0D6EFD;background:#F2F7FF">CMS-005</a></div>
+  </div><div id="cms-004" style="display:flex;flex-direction:column;gap:9px;scroll-margin-top:24px">
+    <div style="display:flex;align-items:baseline;gap:9px;flex-wrap:wrap;line-height:1.4">
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;font-weight:600;color:#0D6EFD">CMS-004</div>
+      <div style="font-size:15px;font-weight:800;letter-spacing:-.01em;color:#1F2937">Logo &amp; Assets</div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#6E7681">wave 2</div>
+      
+      
+    </div>
+    <div style="font-size:11.5px;color:#6B7280;line-height:1.5;max-width:62ch;margin-top:2px">Hold the marks every surface needs, at the sizes it needs them.</div>
+    <div style="border:1px solid #DCE3ED;border-radius:13px;overflow:hidden;background:#FFFFFF;box-shadow:0 10px 26px rgba(12,35,64,.09)">
+    <div style="height:25px;background:#E6EBF2;border-bottom:1px solid #DCE3ED;display:flex;align-items:center;gap:7px;padding:0 11px">
+      <div style="display:flex;gap:4px"><div style="width:6px;height:6px;border-radius:50%;background:#C3CCDA"></div><div style="width:6px;height:6px;border-radius:50%;background:#C3CCDA"></div><div style="width:6px;height:6px;border-radius:50%;background:#C3CCDA"></div></div>
+      <div style="flex:1;background:#FFFFFF;border:1px solid #E5E7EB;border-radius:5px;height:14px;display:flex;align-items:center;padding:0 8px;font-family:'IBM Plex Mono',monospace;font-size:8.5px;color:#6E7681">cms.ticvai.com/</div>
+    </div>
+    <div style="display:flex;min-height:300px">
+      <div style="width:124px;flex:none;background:#0C2340;padding:12px 9px;display:flex;flex-direction:column;gap:2px">
+        <div style="display:flex;align-items:center;gap:7px;margin-bottom:10px"><div style="width:20px;height:20px;border-radius:6px;background:linear-gradient(135deg,#0D6EFD,#00B8FF);color:#fff;display:flex;align-items:center;justify-content:center;font-size:9.5px;font-weight:800">T</div><div style="font-size:10px;font-weight:800;color:#fff">CMS</div></div>
+        <div style="padding:6px 8px;border-radius:6px;background:transparent;font-size:9.5px;font-weight:500;color:#8FB0D2;line-height:1.3">Overview</div><div style="padding:6px 8px;border-radius:6px;background:rgba(255,255,255,.12);font-size:9.5px;font-weight:700;color:#fff;line-height:1.3">Brand</div><div style="padding:6px 8px;border-radius:6px;background:transparent;font-size:9.5px;font-weight:500;color:#8FB0D2;line-height:1.3">Content</div><div style="padding:6px 8px;border-radius:6px;background:transparent;font-size:9.5px;font-weight:500;color:#8FB0D2;line-height:1.3">Language</div><div style="padding:6px 8px;border-radius:6px;background:transparent;font-size:9.5px;font-weight:500;color:#8FB0D2;line-height:1.3">Publish</div>
+      </div>
+      <div style="flex:1;display:flex;flex-direction:column;min-width:0;background:#F7F9FC">
+        <div style="flex:none;min-height:36px;border-bottom:1px solid #E5E7EB;background:#FFFFFF;display:flex;align-items:center;gap:9px;padding:7px 14px">
+          <div style="flex:1;min-width:0"><div style="font-size:11.5px;font-weight:800;color:#1F2937">Logo &amp; Assets</div></div>
+          
+          <div style="width:20px;height:20px;border-radius:6px;background:linear-gradient(135deg,#0D6EFD,#00B8FF);flex:none"></div>
+        </div>
+        <div style="flex:1;padding:13px 14px;display:flex;flex-direction:column;gap:10px"><div style="border:1px solid #E5E7EB;border-radius:10px;background:#FFFFFF;overflow:hidden">
+    <div style="display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr;gap:9px;padding:8px 12px;background:#F7F9FC;border-bottom:1px solid #E5E7EB"><div style="font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.09em;color:#6E7681;text-transform:uppercase;text-align:left">Asset</div><div style="font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.09em;color:#6E7681;text-transform:uppercase;text-align:left">Use</div><div style="font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.09em;color:#6E7681;text-transform:uppercase;text-align:left">Format</div><div style="font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.09em;color:#6E7681;text-transform:uppercase;text-align:right">Status</div></div>
+    <div style="display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr;gap:9px;padding:9px 12px;border-bottom:1px solid #F1F4F8;align-items:center"><div style="font-size:10.5px;color:#1F2937;font-weight:700;text-align:left;">Primary logo</div><div style="font-size:10.5px;color:#4B5563;font-weight:400;text-align:left;">header · light</div><div style="font-size:10.5px;color:#4B5563;font-weight:400;text-align:left;">SVG</div><div style="text-align:right"><span style="border:1px solid #0F7B4F55;background:#0F7B4F12;color:#0F7B4F;border-radius:6px;padding:2px 7px;font-size:9px;font-weight:700;letter-spacing:.03em;white-space:nowrap">OK</span></div></div><div style="display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr;gap:9px;padding:9px 12px;border-bottom:1px solid #F1F4F8;align-items:center"><div style="font-size:10.5px;color:#1F2937;font-weight:700;text-align:left;">Reversed logo</div><div style="font-size:10.5px;color:#4B5563;font-weight:400;text-align:left;">header · dark</div><div style="font-size:10.5px;color:#4B5563;font-weight:400;text-align:left;">SVG</div><div style="text-align:right"><span style="border:1px solid #0F7B4F55;background:#0F7B4F12;color:#0F7B4F;border-radius:6px;padding:2px 7px;font-size:9px;font-weight:700;letter-spacing:.03em;white-space:nowrap">OK</span></div></div><div style="display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr;gap:9px;padding:9px 12px;border-bottom:1px solid #F1F4F8;align-items:center"><div style="font-size:10.5px;color:#1F2937;font-weight:700;text-align:left;">App icon</div><div style="font-size:10.5px;color:#4B5563;font-weight:400;text-align:left;">1024²</div><div style="font-size:10.5px;color:#4B5563;font-weight:400;text-align:left;">PNG</div><div style="text-align:right"><span style="border:1px solid #0F7B4F55;background:#0F7B4F12;color:#0F7B4F;border-radius:6px;padding:2px 7px;font-size:9px;font-weight:700;letter-spacing:.03em;white-space:nowrap">OK</span></div></div><div style="display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr;gap:9px;padding:9px 12px;border-bottom:1px solid #F1F4F8;align-items:center"><div style="font-size:10.5px;color:#1F2937;font-weight:700;text-align:left;">Favicon</div><div style="font-size:10.5px;color:#4B5563;font-weight:400;text-align:left;">—</div><div style="font-size:10.5px;color:#4B5563;font-weight:400;text-align:left;">—</div><div style="text-align:right"><span style="border:1px solid #C0262655;background:#C0262612;color:#C02626;border-radius:6px;padding:2px 7px;font-size:9px;font-weight:700;letter-spacing:.03em;white-space:nowrap">MISSING</span></div></div><div style="display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr;gap:9px;padding:9px 12px;border-bottom:1px solid #F1F4F8;align-items:center"><div style="font-size:10.5px;color:#1F2937;font-weight:700;text-align:left;">Open Graph</div><div style="font-size:10.5px;color:#4B5563;font-weight:400;text-align:left;">1200×630</div><div style="font-size:10.5px;color:#4B5563;font-weight:400;text-align:left;">—</div><div style="text-align:right"><span style="border:1px solid #C0262655;background:#C0262612;color:#C02626;border-radius:6px;padding:2px 7px;font-size:9px;font-weight:700;letter-spacing:.03em;white-space:nowrap">MISSING</span></div></div>
+  </div><div style="border-left:3px solid #96650A;background:#FDF8EE;border-radius:0 9px 9px 0;padding:10px 13px;font-size:10.5px;color:#5E4408;line-height:1.55">Two missing assets will not stop a publish and will make every shared link look broken. The publish check on CMS-014 should refuse, and currently nothing says it does.</div></div>
+      </div>
+    </div></div>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#6E7681;line-height:1.6">uploadAsset</div>
+    <div style="display:flex;flex-wrap:wrap;gap:5px;align-items:center"><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#6E7681;letter-spacing:.06em">GOES TO</span><a href="#cms-014" style="border:1px solid #E5E7EB;border-radius:7px;padding:3px 8px;background:#FFFFFF;font-family:'IBM Plex Mono',monospace;font-size:9.5px;font-weight:600;color:#0D6EFD;white-space:nowrap" style-hover="border-color:#0D6EFD;background:#F2F7FF">CMS-014</a></div>
+  </div><div id="cms-005" style="display:flex;flex-direction:column;gap:9px;scroll-margin-top:24px">
+    <div style="display:flex;align-items:baseline;gap:9px;flex-wrap:wrap;line-height:1.4">
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;font-weight:600;color:#0D6EFD">CMS-005</div>
+      <div style="font-size:15px;font-weight:800;letter-spacing:-.01em;color:#1F2937">Theme Editor</div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#6E7681">wave 2</div>
+      
+      
+    </div>
+    <div style="font-size:11.5px;color:#6B7280;line-height:1.5;max-width:62ch;margin-top:2px">Tune the theme and watch it apply everywhere at once.</div>
+    <div style="border:1px solid #DCE3ED;border-radius:13px;overflow:hidden;background:#FFFFFF;box-shadow:0 10px 26px rgba(12,35,64,.09)">
+    <div style="height:25px;background:#E6EBF2;border-bottom:1px solid #DCE3ED;display:flex;align-items:center;gap:7px;padding:0 11px">
+      <div style="display:flex;gap:4px"><div style="width:6px;height:6px;border-radius:50%;background:#C3CCDA"></div><div style="width:6px;height:6px;border-radius:50%;background:#C3CCDA"></div><div style="width:6px;height:6px;border-radius:50%;background:#C3CCDA"></div></div>
+      <div style="flex:1;background:#FFFFFF;border:1px solid #E5E7EB;border-radius:5px;height:14px;display:flex;align-items:center;padding:0 8px;font-family:'IBM Plex Mono',monospace;font-size:8.5px;color:#6E7681">cms.ticvai.com/</div>
+    </div>
+    <div style="display:flex;min-height:300px">
+      <div style="width:124px;flex:none;background:#0C2340;padding:12px 9px;display:flex;flex-direction:column;gap:2px">
+        <div style="display:flex;align-items:center;gap:7px;margin-bottom:10px"><div style="width:20px;height:20px;border-radius:6px;background:linear-gradient(135deg,#0D6EFD,#00B8FF);color:#fff;display:flex;align-items:center;justify-content:center;font-size:9.5px;font-weight:800">T</div><div style="font-size:10px;font-weight:800;color:#fff">CMS</div></div>
+        <div style="padding:6px 8px;border-radius:6px;background:transparent;font-size:9.5px;font-weight:500;color:#8FB0D2;line-height:1.3">Overview</div><div style="padding:6px 8px;border-radius:6px;background:rgba(255,255,255,.12);font-size:9.5px;font-weight:700;color:#fff;line-height:1.3">Brand</div><div style="padding:6px 8px;border-radius:6px;background:transparent;font-size:9.5px;font-weight:500;color:#8FB0D2;line-height:1.3">Content</div><div style="padding:6px 8px;border-radius:6px;background:transparent;font-size:9.5px;font-weight:500;color:#8FB0D2;line-height:1.3">Language</div><div style="padding:6px 8px;border-radius:6px;background:transparent;font-size:9.5px;font-weight:500;color:#8FB0D2;line-height:1.3">Publish</div>
+      </div>
+      <div style="flex:1;display:flex;flex-direction:column;min-width:0;background:#F7F9FC">
+        <div style="flex:none;min-height:36px;border-bottom:1px solid #E5E7EB;background:#FFFFFF;display:flex;align-items:center;gap:9px;padding:7px 14px">
+          <div style="flex:1;min-width:0"><div style="font-size:11.5px;font-weight:800;color:#1F2937">Theme Editor</div></div>
+          
+          <div style="width:20px;height:20px;border-radius:6px;background:linear-gradient(135deg,#0D6EFD,#00B8FF);flex:none"></div>
+        </div>
+        <div style="flex:1;padding:13px 14px;display:flex;flex-direction:column;gap:10px"><div style="display:grid;grid-template-columns:1.1fr 1fr;gap:11px"><div style="border:1px solid #E5E7EB;border-radius:11px;background:#FFFFFF;overflow:hidden">
+  <div style="padding:9px 12px;border-bottom:1px solid #E5E7EB;background:#F7F9FC"><div style="font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.12em;color:#6E7681;text-transform:uppercase">Surfaces</div></div>
+  <div style="padding:11px 12px"><div style="display:flex;justify-content:space-between;gap:10px;padding:7px 0;border-bottom:1px solid #F1F4F8"><span style="font-size:10.5px;color:#6B7280">Ground</span><span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#1F2937;font-variant-numeric:tabular-nums">#F7F9FC</span></div><div style="display:flex;justify-content:space-between;gap:10px;padding:7px 0;border-bottom:1px solid #F1F4F8"><span style="font-size:10.5px;color:#6B7280">Card</span><span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#1F2937;font-variant-numeric:tabular-nums">#FFFFFF</span></div><div style="display:flex;justify-content:space-between;gap:10px;padding:7px 0;border-bottom:1px solid #F1F4F8"><span style="font-size:10.5px;color:#6B7280">Ink</span><span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#1F2937;font-variant-numeric:tabular-nums">#1F2937</span></div><div style="display:flex;justify-content:space-between;gap:10px;padding:7px 0;border-bottom:1px solid #F1F4F8"><span style="font-size:10.5px;color:#6B7280">Accent</span><span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#1F2937;font-variant-numeric:tabular-nums">#0D6EFD → #00B8FF</span></div><div style="display:flex;justify-content:space-between;gap:10px;padding:7px 0;border-bottom:1px solid #F1F4F8"><span style="font-size:10.5px;color:#6B7280">Radius</span><span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#1F2937;font-variant-numeric:tabular-nums">12 px</span></div></div></div><div style="border:1px solid #E5E7EB;border-radius:11px;background:#F7F9FC;padding:12px;display:flex;flex-direction:column;align-items:center;gap:8px">
+  <div style="display:flex;gap:6px"><div style="border:1px solid #0D6EFD;background:#F2F7FF;color:#0D6EFD;border-radius:8px;padding:5px 10px;font-size:10px;font-weight:700;white-space:nowrap">iOS</div><div style="border:1px solid #E5E7EB;background:#FFFFFF;color:#6B7280;border-radius:8px;padding:5px 10px;font-size:10px;font-weight:700;white-space:nowrap">Android</div><div style="border:1px solid #E5E7EB;background:#FFFFFF;color:#6B7280;border-radius:8px;padding:5px 10px;font-size:10px;font-weight:700;white-space:nowrap">Web</div><div style="border:1px solid #0D6EFD;background:#F2F7FF;color:#0D6EFD;border-radius:8px;padding:5px 10px;font-size:10px;font-weight:700;white-space:nowrap">LTR</div></div>
+  <div style="width:150px;border:1px solid #E5E7EB;border-radius:14px;background:#FFFFFF;overflow:hidden">
+    <div style="height:14px;background:#E6EBF2"></div>
+    <div style="padding:9px;display:flex;flex-direction:column;gap:6px;">
+      <div style="height:34px;border-radius:7px;background:repeating-linear-gradient(135deg,#E4EAF2,#E4EAF2 6px,#EDF1F7 6px,#EDF1F7 12px)"></div>
+      <div style="height:7px;width:70%;background:#E9EDF3;border-radius:3px"></div>
+      <div style="height:7px;width:52%;background:#E9EDF3;border-radius:3px"></div>
+      <div style="height:22px;border-radius:7px;background:linear-gradient(135deg,#0D6EFD,#00B8FF)"></div>
+    </div></div>
+  <div style="font-family:'IBM Plex Mono',monospace;font-size:9px;color:#6E7681">guest storefront</div></div></div><div style="border-left:3px solid #0D6EFD;background:#F2F7FF;border-radius:0 9px 9px 0;padding:10px 13px;font-size:10.5px;color:#12406E;line-height:1.55">Light guest surface, dark staff surface, light POS. Three themes of one token set — the alternative is three systems, three times the maintenance, and a status pill that drifts.</div></div>
+      </div>
+    </div></div>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#6E7681;line-height:1.6">updateTheme</div>
+    <div style="display:flex;flex-wrap:wrap;gap:5px;align-items:center"><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#6E7681;letter-spacing:.06em">GOES TO</span><a href="#cms-006" style="border:1px solid #E5E7EB;border-radius:7px;padding:3px 8px;background:#FFFFFF;font-family:'IBM Plex Mono',monospace;font-size:9.5px;font-weight:600;color:#0D6EFD;white-space:nowrap" style-hover="border-color:#0D6EFD;background:#F2F7FF">CMS-006</a></div>
+  </div><div id="cms-006" style="display:flex;flex-direction:column;gap:9px;scroll-margin-top:24px">
+    <div style="display:flex;align-items:baseline;gap:9px;flex-wrap:wrap;line-height:1.4">
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;font-weight:600;color:#0D6EFD">CMS-006</div>
+      <div style="font-size:15px;font-weight:800;letter-spacing:-.01em;color:#1F2937">Component Preview</div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#6E7681">wave 2</div>
+      
+      
+    </div>
+    <div style="font-size:11.5px;color:#6B7280;line-height:1.5;max-width:62ch;margin-top:2px">Check the theme against the components that carry it.</div>
+    <div style="border:1px solid #DCE3ED;border-radius:13px;overflow:hidden;background:#FFFFFF;box-shadow:0 10px 26px rgba(12,35,64,.09)">
+    <div style="height:25px;background:#E6EBF2;border-bottom:1px solid #DCE3ED;display:flex;align-items:center;gap:7px;padding:0 11px">
+      <div style="display:flex;gap:4px"><div style="width:6px;height:6px;border-radius:50%;background:#C3CCDA"></div><div style="width:6px;height:6px;border-radius:50%;background:#C3CCDA"></div><div style="width:6px;height:6px;border-radius:50%;background:#C3CCDA"></div></div>
+      <div style="flex:1;background:#FFFFFF;border:1px solid #E5E7EB;border-radius:5px;height:14px;display:flex;align-items:center;padding:0 8px;font-family:'IBM Plex Mono',monospace;font-size:8.5px;color:#6E7681">cms.ticvai.com/</div>
+    </div>
+    <div style="display:flex;min-height:300px">
+      <div style="width:124px;flex:none;background:#0C2340;padding:12px 9px;display:flex;flex-direction:column;gap:2px">
+        <div style="display:flex;align-items:center;gap:7px;margin-bottom:10px"><div style="width:20px;height:20px;border-radius:6px;background:linear-gradient(135deg,#0D6EFD,#00B8FF);color:#fff;display:flex;align-items:center;justify-content:center;font-size:9.5px;font-weight:800">T</div><div style="font-size:10px;font-weight:800;color:#fff">CMS</div></div>
+        <div style="padding:6px 8px;border-radius:6px;background:transparent;font-size:9.5px;font-weight:500;color:#8FB0D2;line-height:1.3">Overview</div><div style="padding:6px 8px;border-radius:6px;background:rgba(255,255,255,.12);font-size:9.5px;font-weight:700;color:#fff;line-height:1.3">Brand</div><div style="padding:6px 8px;border-radius:6px;background:transparent;font-size:9.5px;font-weight:500;color:#8FB0D2;line-height:1.3">Content</div><div style="padding:6px 8px;border-radius:6px;background:transparent;font-size:9.5px;font-weight:500;color:#8FB0D2;line-height:1.3">Language</div><div style="padding:6px 8px;border-radius:6px;background:transparent;font-size:9.5px;font-weight:500;color:#8FB0D2;line-height:1.3">Publish</div>
+      </div>
+      <div style="flex:1;display:flex;flex-direction:column;min-width:0;background:#F7F9FC">
+        <div style="flex:none;min-height:36px;border-bottom:1px solid #E5E7EB;background:#FFFFFF;display:flex;align-items:center;gap:9px;padding:7px 14px">
+          <div style="flex:1;min-width:0"><div style="font-size:11.5px;font-weight:800;color:#1F2937">Component Preview</div></div>
+          
+          <div style="width:20px;height:20px;border-radius:6px;background:linear-gradient(135deg,#0D6EFD,#00B8FF);flex:none"></div>
+        </div>
+        <div style="flex:1;padding:13px 14px;display:flex;flex-direction:column;gap:10px"><div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px"><div style="border:1px solid #E5E7EB;border-radius:11px;background:#FFFFFF;overflow:hidden">
+  <div style="padding:9px 12px;border-bottom:1px solid #E5E7EB;background:#F7F9FC"><div style="font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.12em;color:#6E7681;text-transform:uppercase">Status pills</div></div>
+  <div style="padding:11px 12px"><div style="display:flex;gap:5px;flex-wrap:wrap"><span style="border:1px solid #0F7B4F55;background:#0F7B4F12;color:#0F7B4F;border-radius:6px;padding:2px 7px;font-size:9px;font-weight:700;letter-spacing:.03em;white-space:nowrap">PUBLISHED</span><span style="border:1px solid #6E768155;background:#6E768112;color:#6E7681;border-radius:6px;padding:2px 7px;font-size:9px;font-weight:700;letter-spacing:.03em;white-space:nowrap">DRAFT</span><span style="border:1px solid #0D6EFD55;background:#0D6EFD12;color:#0D6EFD;border-radius:6px;padding:2px 7px;font-size:9px;font-weight:700;letter-spacing:.03em;white-space:nowrap">SCHEDULED</span><span style="border:1px solid #0F7B4F55;background:#0F7B4F12;color:#0F7B4F;border-radius:6px;padding:2px 7px;font-size:9px;font-weight:700;letter-spacing:.03em;white-space:nowrap">ACTIVE</span><span style="border:1px solid #C0262655;background:#C0262612;color:#C02626;border-radius:6px;padding:2px 7px;font-size:9px;font-weight:700;letter-spacing:.03em;white-space:nowrap">EXPIRED</span><span style="border:1px solid #0F7B4F55;background:#0F7B4F12;color:#0F7B4F;border-radius:6px;padding:2px 7px;font-size:9px;font-weight:700;letter-spacing:.03em;white-space:nowrap">ON DUTY</span><span style="border:1px solid #C0262655;background:#C0262612;color:#C02626;border-radius:6px;padding:2px 7px;font-size:9px;font-weight:700;letter-spacing:.03em;white-space:nowrap">CRITICAL</span></div></div></div><div style="border:1px solid #E5E7EB;border-radius:11px;background:#FFFFFF;overflow:hidden">
+  <div style="padding:9px 12px;border-bottom:1px solid #E5E7EB;background:#F7F9FC"><div style="font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.12em;color:#6E7681;text-transform:uppercase">Buttons</div></div>
+  <div style="padding:11px 12px"><div style="display:flex;gap:6px;flex-wrap:wrap"><div style="background:linear-gradient(135deg,#0D6EFD,#00B8FF);border:0;color:#fff;border-radius:9px;padding:8px 14px;font-size:10.5px;font-weight:800;white-space:nowrap;text-align:center">Primary</div><div style="background:#FFFFFF;border:1px solid #E5E7EB;color:#4B5563;border-radius:9px;padding:8px 14px;font-size:10.5px;font-weight:800;white-space:nowrap;text-align:center">Secondary</div></div></div></div><div style="border:1px solid #E5E7EB;border-radius:11px;background:#FFFFFF;overflow:hidden">
+  <div style="padding:9px 12px;border-bottom:1px solid #E5E7EB;background:#F7F9FC"><div style="font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.12em;color:#6E7681;text-transform:uppercase">Fields</div></div>
+  <div style="padding:11px 12px"><div style="border:1px solid #E5E7EB;border-radius:9px;background:#FFFFFF;padding:8px 11px"><div style="font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.1em;color:#6E7681;text-transform:uppercase">Label</div><div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#1F2937;margin-top:3px">value</div></div></div></div></div><div style="border-left:3px solid #0D6EFD;background:#F2F7FF;border-radius:0 9px 9px 0;padding:10px 13px;font-size:10.5px;color:#12406E;line-height:1.55">The status vocabulary is already consistent across both delivered references — Published, Draft, Scheduled, Active, Inactive, Expired, On Duty, Critical, Action Required. Adopt it rather than inventing per-screen wording.</div></div>
+      </div>
+    </div></div>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#6E7681;line-height:1.6">component preview</div>
+    <div style="display:flex;flex-wrap:wrap;gap:5px;align-items:center"><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#6E7681;letter-spacing:.06em">GOES TO</span><a href="#cms-005" style="border:1px solid #E5E7EB;border-radius:7px;padding:3px 8px;background:#FFFFFF;font-family:'IBM Plex Mono',monospace;font-size:9.5px;font-weight:600;color:#0D6EFD;white-space:nowrap" style-hover="border-color:#0D6EFD;background:#F2F7FF">CMS-005</a></div>
+  </div></div>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600;letter-spacing:.14em;color:#6E7681;text-transform:uppercase;margin:48px 0 14px;padding-bottom:9px;border-bottom:1px solid #DCE3ED">03 — Content</div>
+    
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(490px,1fr));gap:32px"><div id="cms-007" style="display:flex;flex-direction:column;gap:9px;scroll-margin-top:24px">
+    <div style="display:flex;align-items:baseline;gap:9px;flex-wrap:wrap;line-height:1.4">
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;font-weight:600;color:#0D6EFD">CMS-007</div>
+      <div style="font-size:15px;font-weight:800;letter-spacing:-.01em;color:#1F2937">Page Builder</div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#6E7681">wave 2</div>
+      
+      
+    </div>
+    <div style="font-size:11.5px;color:#6B7280;line-height:1.5;max-width:62ch;margin-top:2px">Assemble a storefront page from blocks the tenant cannot break.</div>
+    <div style="border:1px solid #DCE3ED;border-radius:13px;overflow:hidden;background:#FFFFFF;box-shadow:0 10px 26px rgba(12,35,64,.09)">
+    <div style="height:25px;background:#E6EBF2;border-bottom:1px solid #DCE3ED;display:flex;align-items:center;gap:7px;padding:0 11px">
+      <div style="display:flex;gap:4px"><div style="width:6px;height:6px;border-radius:50%;background:#C3CCDA"></div><div style="width:6px;height:6px;border-radius:50%;background:#C3CCDA"></div><div style="width:6px;height:6px;border-radius:50%;background:#C3CCDA"></div></div>
+      <div style="flex:1;background:#FFFFFF;border:1px solid #E5E7EB;border-radius:5px;height:14px;display:flex;align-items:center;padding:0 8px;font-family:'IBM Plex Mono',monospace;font-size:8.5px;color:#6E7681">cms.ticvai.com/</div>
+    </div>
+    <div style="display:flex;min-height:300px">
+      <div style="width:124px;flex:none;background:#0C2340;padding:12px 9px;display:flex;flex-direction:column;gap:2px">
+        <div style="display:flex;align-items:center;gap:7px;margin-bottom:10px"><div style="width:20px;height:20px;border-radius:6px;background:linear-gradient(135deg,#0D6EFD,#00B8FF);color:#fff;display:flex;align-items:center;justify-content:center;font-size:9.5px;font-weight:800">T</div><div style="font-size:10px;font-weight:800;color:#fff">CMS</div></div>
+        <div style="padding:6px 8px;border-radius:6px;background:transparent;font-size:9.5px;font-weight:500;color:#8FB0D2;line-height:1.3">Overview</div><div style="padding:6px 8px;border-radius:6px;background:transparent;font-size:9.5px;font-weight:500;color:#8FB0D2;line-height:1.3">Brand</div><div style="padding:6px 8px;border-radius:6px;background:rgba(255,255,255,.12);font-size:9.5px;font-weight:700;color:#fff;line-height:1.3">Content</div><div style="padding:6px 8px;border-radius:6px;background:transparent;font-size:9.5px;font-weight:500;color:#8FB0D2;line-height:1.3">Language</div><div style="padding:6px 8px;border-radius:6px;background:transparent;font-size:9.5px;font-weight:500;color:#8FB0D2;line-height:1.3">Publish</div>
+      </div>
+      <div style="flex:1;display:flex;flex-direction:column;min-width:0;background:#F7F9FC">
+        <div style="flex:none;min-height:36px;border-bottom:1px solid #E5E7EB;background:#FFFFFF;display:flex;align-items:center;gap:9px;padding:7px 14px">
+          <div style="flex:1;min-width:0"><div style="font-size:11.5px;font-weight:800;color:#1F2937">Page Builder</div></div>
+          
+          <div style="width:20px;height:20px;border-radius:6px;background:linear-gradient(135deg,#0D6EFD,#00B8FF);flex:none"></div>
+        </div>
+        <div style="flex:1;padding:13px 14px;display:flex;flex-direction:column;gap:10px"><div style="display:grid;grid-template-columns:1fr 1.1fr;gap:11px"><div style="border:1px solid #E5E7EB;border-radius:10px;background:#FFFFFF;overflow:hidden">
+  <div style="display:flex;align-items:center;gap:11px;padding:10px 12px;">
+    
+    <div style="width:3px;align-self:stretch;background:#0D6EFD;border-radius:2px;flex:none"></div>
+    <div style="flex:1;min-width:0"><div style="font-size:11px;font-weight:700;color:#1F2937;line-height:1.3">Hero</div><div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#6B7280;margin-top:2px">image · headline · CTA</div></div>
+    
+    
+  </div>
+  <div style="display:flex;align-items:center;gap:11px;padding:10px 12px;border-top:1px solid #F1F4F8">
+    
+    <div style="width:3px;align-self:stretch;background:#0D6EFD;border-radius:2px;flex:none"></div>
+    <div style="flex:1;min-width:0"><div style="font-size:11px;font-weight:700;color:#1F2937;line-height:1.3">Experience grid</div><div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#6B7280;margin-top:2px">auto from catalogue</div></div>
+    
+    
+  </div>
+  <div style="display:flex;align-items:center;gap:11px;padding:10px 12px;border-top:1px solid #F1F4F8">
+    
+    <div style="width:3px;align-self:stretch;background:#0D6EFD;border-radius:2px;flex:none"></div>
+    <div style="flex:1;min-width:0"><div style="font-size:11px;font-weight:700;color:#1F2937;line-height:1.3">Places</div><div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#6B7280;margin-top:2px">4 neighbourhoods</div></div>
+    
+    
+  </div>
+  <div style="display:flex;align-items:center;gap:11px;padding:10px 12px;border-top:1px solid #F1F4F8">
+    
+    <div style="width:3px;align-self:stretch;background:#6E7681;border-radius:2px;flex:none"></div>
+    <div style="flex:1;min-width:0"><div style="font-size:11px;font-weight:700;color:#1F2937;line-height:1.3">Offers strip</div><div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#6B7280;margin-top:2px">auto from promotions</div></div>
+    
+    
+  </div></div><div style="border:1px solid #E5E7EB;border-radius:11px;background:#F7F9FC;padding:12px;display:flex;flex-direction:column;align-items:center;gap:8px">
+  <div style="display:flex;gap:6px"><div style="border:1px solid #0D6EFD;background:#F2F7FF;color:#0D6EFD;border-radius:8px;padding:5px 10px;font-size:10px;font-weight:700;white-space:nowrap">iOS</div><div style="border:1px solid #E5E7EB;background:#FFFFFF;color:#6B7280;border-radius:8px;padding:5px 10px;font-size:10px;font-weight:700;white-space:nowrap">Android</div><div style="border:1px solid #E5E7EB;background:#FFFFFF;color:#6B7280;border-radius:8px;padding:5px 10px;font-size:10px;font-weight:700;white-space:nowrap">Web</div><div style="border:1px solid #0D6EFD;background:#F2F7FF;color:#0D6EFD;border-radius:8px;padding:5px 10px;font-size:10px;font-weight:700;white-space:nowrap">LTR</div></div>
+  <div style="width:150px;border:1px solid #E5E7EB;border-radius:14px;background:#FFFFFF;overflow:hidden">
+    <div style="height:14px;background:#E6EBF2"></div>
+    <div style="padding:9px;display:flex;flex-direction:column;gap:6px;">
+      <div style="height:34px;border-radius:7px;background:repeating-linear-gradient(135deg,#E4EAF2,#E4EAF2 6px,#EDF1F7 6px,#EDF1F7 12px)"></div>
+      <div style="height:7px;width:70%;background:#E9EDF3;border-radius:3px"></div>
+      <div style="height:7px;width:52%;background:#E9EDF3;border-radius:3px"></div>
+      <div style="height:22px;border-radius:7px;background:linear-gradient(135deg,#0D6EFD,#00B8FF)"></div>
+    </div></div>
+  <div style="font-family:'IBM Plex Mono',monospace;font-size:9px;color:#6E7681">page preview</div></div></div><div style="border-left:3px solid #0D6EFD;background:#F2F7FF;border-radius:0 9px 9px 0;padding:10px 13px;font-size:10.5px;color:#12406E;line-height:1.55">Blocks that read the catalogue cannot be edited into lying about it. That is the whole point of a builder over a page editor.</div></div>
+      </div>
+    </div></div>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#6E7681;line-height:1.6">updatePage</div>
+    <div style="display:flex;flex-wrap:wrap;gap:5px;align-items:center"><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#6E7681;letter-spacing:.06em">GOES TO</span><a href="#cms-008" style="border:1px solid #E5E7EB;border-radius:7px;padding:3px 8px;background:#FFFFFF;font-family:'IBM Plex Mono',monospace;font-size:9.5px;font-weight:600;color:#0D6EFD;white-space:nowrap" style-hover="border-color:#0D6EFD;background:#F2F7FF">CMS-008</a></div>
+  </div><div id="cms-008" style="display:flex;flex-direction:column;gap:9px;scroll-margin-top:24px">
+    <div style="display:flex;align-items:baseline;gap:9px;flex-wrap:wrap;line-height:1.4">
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;font-weight:600;color:#0D6EFD">CMS-008</div>
+      <div style="font-size:15px;font-weight:800;letter-spacing:-.01em;color:#1F2937">Content Blocks</div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#6E7681">wave 2</div>
+      
+      
+    </div>
+    <div style="font-size:11.5px;color:#6B7280;line-height:1.5;max-width:62ch;margin-top:2px">Define what a block can and cannot contain.</div>
+    <div style="border:1px solid #DCE3ED;border-radius:13px;overflow:hidden;background:#FFFFFF;box-shadow:0 10px 26px rgba(12,35,64,.09)">
+    <div style="height:25px;background:#E6EBF2;border-bottom:1px solid #DCE3ED;display:flex;align-items:center;gap:7px;padding:0 11px">
+      <div style="display:flex;gap:4px"><div style="width:6px;height:6px;border-radius:50%;background:#C3CCDA"></div><div style="width:6px;height:6px;border-radius:50%;background:#C3CCDA"></div><div style="width:6px;height:6px;border-radius:50%;background:#C3CCDA"></div></div>
+      <div style="flex:1;background:#FFFFFF;border:1px solid #E5E7EB;border-radius:5px;height:14px;display:flex;align-items:center;padding:0 8px;font-family:'IBM Plex Mono',monospace;font-size:8.5px;color:#6E7681">cms.ticvai.com/</div>
+    </div>
+    <div style="display:flex;min-height:300px">
+      <div style="width:124px;flex:none;background:#0C2340;padding:12px 9px;display:flex;flex-direction:column;gap:2px">
+        <div style="display:flex;align-items:center;gap:7px;margin-bottom:10px"><div style="width:20px;height:20px;border-radius:6px;background:linear-gradient(135deg,#0D6EFD,#00B8FF);color:#fff;display:flex;align-items:center;justify-content:center;font-size:9.5px;font-weight:800">T</div><div style="font-size:10px;font-weight:800;color:#fff">CMS</div></div>
+        <div style="padding:6px 8px;border-radius:6px;background:transparent;font-size:9.5px;font-weight:500;color:#8FB0D2;line-height:1.3">Overview</div><div style="padding:6px 8px;border-radius:6px;background:transparent;font-size:9.5px;font-weight:500;color:#8FB0D2;line-height:1.3">Brand</div><div style="padding:6px 8px;border-radius:6px;background:rgba(255,255,255,.12);font-size:9.5px;font-weight:700;color:#fff;line-height:1.3">Content</div><div style="padding:6px 8px;border-radius:6px;background:transparent;font-size:9.5px;font-weight:500;color:#8FB0D2;line-height:1.3">Language</div><div style="padding:6px 8px;border-radius:6px;background:transparent;font-size:9.5px;font-weight:500;color:#8FB0D2;line-height:1.3">Publish</div>
+      </div>
+      <div style="flex:1;display:flex;flex-direction:column;min-width:0;background:#F7F9FC">
+        <div style="flex:none;min-height:36px;border-bottom:1px solid #E5E7EB;background:#FFFFFF;display:flex;align-items:center;gap:9px;padding:7px 14px">
+          <div style="flex:1;min-width:0"><div style="font-size:11.5px;font-weight:800;color:#1F2937">Content Blocks</div></div>
+          
+          <div style="width:20px;height:20px;border-radius:6px;background:linear-gradient(135deg,#0D6EFD,#00B8FF);flex:none"></div>
+        </div>
+        <div style="flex:1;padding:13px 14px;display:flex;flex-direction:column;gap:10px"><div style="border:1px solid #E5E7EB;border-radius:10px;background:#FFFFFF;overflow:hidden">
+    <div style="display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr;gap:9px;padding:8px 12px;background:#F7F9FC;border-bottom:1px solid #E5E7EB"><div style="font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.09em;color:#6E7681;text-transform:uppercase;text-align:left">Block</div><div style="font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.09em;color:#6E7681;text-transform:uppercase;text-align:left">Fields</div><div style="font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.09em;color:#6E7681;text-transform:uppercase;text-align:left">Limits</div><div style="font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.09em;color:#6E7681;text-transform:uppercase;text-align:right">Used on</div></div>
+    <div style="display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr;gap:9px;padding:9px 12px;border-bottom:1px solid #F1F4F8;align-items:center"><div style="font-size:10.5px;color:#1F2937;font-weight:700;text-align:left;">Hero</div><div style="font-size:10.5px;color:#4B5563;font-weight:400;text-align:left;">image · headline · sub · CTA</div><div style="font-size:10.5px;color:#4B5563;font-weight:400;text-align:left;">headline 60 chars</div><div style="font-size:10.5px;color:#4B5563;font-weight:400;text-align:right;font-family:'IBM Plex Mono',monospace;font-variant-numeric:tabular-nums">4 pages</div></div><div style="display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr;gap:9px;padding:9px 12px;border-bottom:1px solid #F1F4F8;align-items:center"><div style="font-size:10.5px;color:#1F2937;font-weight:700;text-align:left;">Experience grid</div><div style="font-size:10.5px;color:#4B5563;font-weight:400;text-align:left;">source · count · filter</div><div style="font-size:10.5px;color:#4B5563;font-weight:400;text-align:left;">max 12</div><div style="font-size:10.5px;color:#4B5563;font-weight:400;text-align:right;font-family:'IBM Plex Mono',monospace;font-variant-numeric:tabular-nums">6 pages</div></div><div style="display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr;gap:9px;padding:9px 12px;border-bottom:1px solid #F1F4F8;align-items:center"><div style="font-size:10.5px;color:#1F2937;font-weight:700;text-align:left;">Rich text</div><div style="font-size:10.5px;color:#4B5563;font-weight:400;text-align:left;">body</div><div style="font-size:10.5px;color:#4B5563;font-weight:400;text-align:left;">no scripts</div><div style="font-size:10.5px;color:#4B5563;font-weight:400;text-align:right;font-family:'IBM Plex Mono',monospace;font-variant-numeric:tabular-nums">12 pages</div></div><div style="display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr;gap:9px;padding:9px 12px;border-bottom:1px solid #F1F4F8;align-items:center"><div style="font-size:10.5px;color:#1F2937;font-weight:700;text-align:left;">Offers strip</div><div style="font-size:10.5px;color:#4B5563;font-weight:400;text-align:left;">promotion source</div><div style="font-size:10.5px;color:#4B5563;font-weight:400;text-align:left;">auto</div><div style="font-size:10.5px;color:#4B5563;font-weight:400;text-align:right;font-family:'IBM Plex Mono',monospace;font-variant-numeric:tabular-nums">3 pages</div></div>
+  </div></div>
+      </div>
+    </div></div>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#6E7681;line-height:1.6">listContentBlocks</div>
+    <div style="display:flex;flex-wrap:wrap;gap:5px;align-items:center"><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#6E7681;letter-spacing:.06em">GOES TO</span><a href="#cms-007" style="border:1px solid #E5E7EB;border-radius:7px;padding:3px 8px;background:#FFFFFF;font-family:'IBM Plex Mono',monospace;font-size:9.5px;font-weight:600;color:#0D6EFD;white-space:nowrap" style-hover="border-color:#0D6EFD;background:#F2F7FF">CMS-007</a></div>
+  </div><div id="cms-009" style="display:flex;flex-direction:column;gap:9px;scroll-margin-top:24px">
+    <div style="display:flex;align-items:baseline;gap:9px;flex-wrap:wrap;line-height:1.4">
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;font-weight:600;color:#0D6EFD">CMS-009</div>
+      <div style="font-size:15px;font-weight:800;letter-spacing:-.01em;color:#1F2937">Navigation &amp; Menus</div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#6E7681">wave 2</div>
+      
+      
+    </div>
+    <div style="font-size:11.5px;color:#6B7280;line-height:1.5;max-width:62ch;margin-top:2px">Decide what appears in the header and the footer.</div>
+    <div style="border:1px solid #DCE3ED;border-radius:13px;overflow:hidden;background:#FFFFFF;box-shadow:0 10px 26px rgba(12,35,64,.09)">
+    <div style="height:25px;background:#E6EBF2;border-bottom:1px solid #DCE3ED;display:flex;align-items:center;gap:7px;padding:0 11px">
+      <div style="display:flex;gap:4px"><div style="width:6px;height:6px;border-radius:50%;background:#C3CCDA"></div><div style="width:6px;height:6px;border-radius:50%;background:#C3CCDA"></div><div style="width:6px;height:6px;border-radius:50%;background:#C3CCDA"></div></div>
+      <div style="flex:1;background:#FFFFFF;border:1px solid #E5E7EB;border-radius:5px;height:14px;display:flex;align-items:center;padding:0 8px;font-family:'IBM Plex Mono',monospace;font-size:8.5px;color:#6E7681">cms.ticvai.com/</div>
+    </div>
+    <div style="display:flex;min-height:300px">
+      <div style="width:124px;flex:none;background:#0C2340;padding:12px 9px;display:flex;flex-direction:column;gap:2px">
+        <div style="display:flex;align-items:center;gap:7px;margin-bottom:10px"><div style="width:20px;height:20px;border-radius:6px;background:linear-gradient(135deg,#0D6EFD,#00B8FF);color:#fff;display:flex;align-items:center;justify-content:center;font-size:9.5px;font-weight:800">T</div><div style="font-size:10px;font-weight:800;color:#fff">CMS</div></div>
+        <div style="padding:6px 8px;border-radius:6px;background:transparent;font-size:9.5px;font-weight:500;color:#8FB0D2;line-height:1.3">Overview</div><div style="padding:6px 8px;border-radius:6px;background:transparent;font-size:9.5px;font-weight:500;color:#8FB0D2;line-height:1.3">Brand</div><div style="padding:6px 8px;border-radius:6px;background:rgba(255,255,255,.12);font-size:9.5px;font-weight:700;color:#fff;line-height:1.3">Content</div><div style="padding:6px 8px;border-radius:6px;background:transparent;font-size:9.5px;font-weight:500;color:#8FB0D2;line-height:1.3">Language</div><div style="padding:6px 8px;border-radius:6px;background:transparent;font-size:9.5px;font-weight:500;color:#8FB0D2;line-height:1.3">Publish</div>
+      </div>
+      <div style="flex:1;display:flex;flex-direction:column;min-width:0;background:#F7F9FC">
+        <div style="flex:none;min-height:36px;border-bottom:1px solid #E5E7EB;background:#FFFFFF;display:flex;align-items:center;gap:9px;padding:7px 14px">
+          <div style="flex:1;min-width:0"><div style="font-size:11.5px;font-weight:800;color:#1F2937">Navigation &amp; Menus</div></div>
+          
+          <div style="width:20px;height:20px;border-radius:6px;background:linear-gradient(135deg,#0D6EFD,#00B8FF);flex:none"></div>
+        </div>
+        <div style="flex:1;padding:13px 14px;display:flex;flex-direction:column;gap:10px"><div style="border:1px solid #E5E7EB;border-radius:10px;background:#FFFFFF;padding:6px 0">
+  <div style="display:flex;align-items:center;gap:9px;padding:6px 12px 6px 12px;">
+    <span style="font-family:'IBM Plex Mono',monospace;font-size:9px;color:#6E7681;width:74px;flex:none">header</span>
+    <span style="font-size:10.5px;font-weight:600;color:#1F2937;flex:1">Main navigation</span>
+    
+  </div>
+  <div style="display:flex;align-items:center;gap:9px;padding:6px 12px 6px 29px;">
+    <span style="font-family:'IBM Plex Mono',monospace;font-size:9px;color:#6E7681;width:74px;flex:none">item</span>
+    <span style="font-size:10.5px;font-weight:600;color:#1F2937;flex:1">Experiences</span>
+    
+  </div>
+  <div style="display:flex;align-items:center;gap:9px;padding:6px 12px 6px 29px;">
+    <span style="font-family:'IBM Plex Mono',monospace;font-size:9px;color:#6E7681;width:74px;flex:none">item</span>
+    <span style="font-size:10.5px;font-weight:600;color:#1F2937;flex:1">What's On</span>
+    
+  </div>
+  <div style="display:flex;align-items:center;gap:9px;padding:6px 12px 6px 29px;">
+    <span style="font-family:'IBM Plex Mono',monospace;font-size:9px;color:#6E7681;width:74px;flex:none">item</span>
+    <span style="font-size:10.5px;font-weight:600;color:#1F2937;flex:1">Dining</span>
+    
+  </div>
+  <div style="display:flex;align-items:center;gap:9px;padding:6px 12px 6px 29px;">
+    <span style="font-family:'IBM Plex Mono',monospace;font-size:9px;color:#6E7681;width:74px;flex:none">item</span>
+    <span style="font-size:10.5px;font-weight:600;color:#1F2937;flex:1">Places</span>
+    
+  </div>
+  <div style="display:flex;align-items:center;gap:9px;padding:6px 12px 6px 12px;">
+    <span style="font-family:'IBM Plex Mono',monospace;font-size:9px;color:#6E7681;width:74px;flex:none">footer</span>
+    <span style="font-size:10.5px;font-weight:600;color:#1F2937;flex:1">Footer</span>
+    
+  </div>
+  <div style="display:flex;align-items:center;gap:9px;padding:6px 12px 6px 29px;">
+    <span style="font-family:'IBM Plex Mono',monospace;font-size:9px;color:#6E7681;width:74px;flex:none">group</span>
+    <span style="font-size:10.5px;font-weight:600;color:#1F2937;flex:1">Discover</span>
+    
+  </div>
+  <div style="display:flex;align-items:center;gap:9px;padding:6px 12px 6px 29px;">
+    <span style="font-family:'IBM Plex Mono',monospace;font-size:9px;color:#6E7681;width:74px;flex:none">group</span>
+    <span style="font-size:10.5px;font-weight:600;color:#1F2937;flex:1">Your visit</span>
+    
+  </div></div><div style="border-left:3px solid #96650A;background:#FDF8EE;border-radius:0 9px 9px 0;padding:10px 13px;font-size:10.5px;color:#5E4408;line-height:1.55">The guest app has a fixed five-tab shell and the web does not. A tenant who adds a seventh nav item breaks nothing on web and cannot be honoured on mobile at all.</div></div>
+      </div>
+    </div></div>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#6E7681;line-height:1.6">updateNavigation</div>
+    <div style="display:flex;flex-wrap:wrap;gap:5px;align-items:center"><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#6E7681;letter-spacing:.06em">GOES TO</span><a href="#cms-007" style="border:1px solid #E5E7EB;border-radius:7px;padding:3px 8px;background:#FFFFFF;font-family:'IBM Plex Mono',monospace;font-size:9.5px;font-weight:600;color:#0D6EFD;white-space:nowrap" style-hover="border-color:#0D6EFD;background:#F2F7FF">CMS-007</a></div>
+  </div><div id="cms-010" style="display:flex;flex-direction:column;gap:9px;scroll-margin-top:24px">
+    <div style="display:flex;align-items:baseline;gap:9px;flex-wrap:wrap;line-height:1.4">
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;font-weight:600;color:#0D6EFD">CMS-010</div>
+      <div style="font-size:15px;font-weight:800;letter-spacing:-.01em;color:#1F2937">Media Library</div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#6E7681">wave 2</div>
+      
+      
+    </div>
+    <div style="font-size:11.5px;color:#6B7280;line-height:1.5;max-width:62ch;margin-top:2px">Hold the imagery, and know where it is used.</div>
+    <div style="border:1px solid #DCE3ED;border-radius:13px;overflow:hidden;background:#FFFFFF;box-shadow:0 10px 26px rgba(12,35,64,.09)">
+    <div style="height:25px;background:#E6EBF2;border-bottom:1px solid #DCE3ED;display:flex;align-items:center;gap:7px;padding:0 11px">
+      <div style="display:flex;gap:4px"><div style="width:6px;height:6px;border-radius:50%;background:#C3CCDA"></div><div style="width:6px;height:6px;border-radius:50%;background:#C3CCDA"></div><div style="width:6px;height:6px;border-radius:50%;background:#C3CCDA"></div></div>
+      <div style="flex:1;background:#FFFFFF;border:1px solid #E5E7EB;border-radius:5px;height:14px;display:flex;align-items:center;padding:0 8px;font-family:'IBM Plex Mono',monospace;font-size:8.5px;color:#6E7681">cms.ticvai.com/</div>
+    </div>
+    <div style="display:flex;min-height:300px">
+      <div style="width:124px;flex:none;background:#0C2340;padding:12px 9px;display:flex;flex-direction:column;gap:2px">
+        <div style="display:flex;align-items:center;gap:7px;margin-bottom:10px"><div style="width:20px;height:20px;border-radius:6px;background:linear-gradient(135deg,#0D6EFD,#00B8FF);color:#fff;display:flex;align-items:center;justify-content:center;font-size:9.5px;font-weight:800">T</div><div style="font-size:10px;font-weight:800;color:#fff">CMS</div></div>
+        <div style="padding:6px 8px;border-radius:6px;background:transparent;font-size:9.5px;font-weight:500;color:#8FB0D2;line-height:1.3">Overview</div><div style="padding:6px 8px;border-radius:6px;background:transparent;font-size:9.5px;font-weight:500;color:#8FB0D2;line-height:1.3">Brand</div><div style="padding:6px 8px;border-radius:6px;background:rgba(255,255,255,.12);font-size:9.5px;font-weight:700;color:#fff;line-height:1.3">Content</div><div style="padding:6px 8px;border-radius:6px;background:transparent;font-size:9.5px;font-weight:500;color:#8FB0D2;line-height:1.3">Language</div><div style="padding:6px 8px;border-radius:6px;background:transparent;font-size:9.5px;font-weight:500;color:#8FB0D2;line-height:1.3">Publish</div>
+      </div>
+      <div style="flex:1;display:flex;flex-direction:column;min-width:0;background:#F7F9FC">
+        <div style="flex:none;min-height:36px;border-bottom:1px solid #E5E7EB;background:#FFFFFF;display:flex;align-items:center;gap:9px;padding:7px 14px">
+          <div style="flex:1;min-width:0"><div style="font-size:11.5px;font-weight:800;color:#1F2937">Media Library</div></div>
+          
+          <div style="width:20px;height:20px;border-radius:6px;background:linear-gradient(135deg,#0D6EFD,#00B8FF);flex:none"></div>
+        </div>
+        <div style="flex:1;padding:13px 14px;display:flex;flex-direction:column;gap:10px"><div style="border:1px solid #E5E7EB;border-radius:10px;background:#FFFFFF;overflow:hidden">
+    <div style="display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr;gap:9px;padding:8px 12px;background:#F7F9FC;border-bottom:1px solid #E5E7EB"><div style="font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.09em;color:#6E7681;text-transform:uppercase;text-align:left">Asset</div><div style="font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.09em;color:#6E7681;text-transform:uppercase;text-align:right">Size</div><div style="font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.09em;color:#6E7681;text-transform:uppercase;text-align:right">Used on</div><div style="font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.09em;color:#6E7681;text-transform:uppercase;text-align:right">Status</div></div>
+    <div style="display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr;gap:9px;padding:9px 12px;border-bottom:1px solid #F1F4F8;align-items:center"><div style="font-size:10.5px;color:#1F2937;font-weight:700;text-align:left;">aquarium-hero.jpg</div><div style="font-size:10.5px;color:#4B5563;font-weight:400;text-align:right;font-family:'IBM Plex Mono',monospace;font-variant-numeric:tabular-nums">2.4 MB</div><div style="font-size:10.5px;color:#4B5563;font-weight:400;text-align:right;font-family:'IBM Plex Mono',monospace;font-variant-numeric:tabular-nums">2 pages</div><div style="text-align:right"><span style="border:1px solid #0F7B4F55;background:#0F7B4F12;color:#0F7B4F;border-radius:6px;padding:2px 7px;font-size:9px;font-weight:700;letter-spacing:.03em;white-space:nowrap">IN USE</span></div></div><div style="display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr;gap:9px;padding:9px 12px;border-bottom:1px solid #F1F4F8;align-items:center"><div style="font-size:10.5px;color:#1F2937;font-weight:700;text-align:left;">desert-evening.jpg</div><div style="font-size:10.5px;color:#4B5563;font-weight:400;text-align:right;font-family:'IBM Plex Mono',monospace;font-variant-numeric:tabular-nums">1.8 MB</div><div style="font-size:10.5px;color:#4B5563;font-weight:400;text-align:right;font-family:'IBM Plex Mono',monospace;font-variant-numeric:tabular-nums">1 page</div><div style="text-align:right"><span style="border:1px solid #0F7B4F55;background:#0F7B4F12;color:#0F7B4F;border-radius:6px;padding:2px 7px;font-size:9px;font-weight:700;letter-spacing:.03em;white-space:nowrap">IN USE</span></div></div><div style="display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr;gap:9px;padding:9px 12px;border-bottom:1px solid #F1F4F8;align-items:center"><div style="font-size:10.5px;color:#1F2937;font-weight:700;text-align:left;">old-campaign.jpg</div><div style="font-size:10.5px;color:#4B5563;font-weight:400;text-align:right;font-family:'IBM Plex Mono',monospace;font-variant-numeric:tabular-nums">3.1 MB</div><div style="font-size:10.5px;color:#4B5563;font-weight:400;text-align:right;font-family:'IBM Plex Mono',monospace;font-variant-numeric:tabular-nums">—</div><div style="text-align:right"><span style="border:1px solid #6E768155;background:#6E768112;color:#6E7681;border-radius:6px;padding:2px 7px;font-size:9px;font-weight:700;letter-spacing:.03em;white-space:nowrap">UNUSED</span></div></div><div style="display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr;gap:9px;padding:9px 12px;border-bottom:1px solid #F1F4F8;align-items:center"><div style="font-size:10.5px;color:#1F2937;font-weight:700;text-align:left;">tunnel.jpg</div><div style="font-size:10.5px;color:#4B5563;font-weight:400;text-align:right;font-family:'IBM Plex Mono',monospace;font-variant-numeric:tabular-nums">8.2 MB</div><div style="font-size:10.5px;color:#4B5563;font-weight:400;text-align:right;font-family:'IBM Plex Mono',monospace;font-variant-numeric:tabular-nums">1 page</div><div style="text-align:right"><span style="border:1px solid #96650A55;background:#96650A12;color:#96650A;border-radius:6px;padding:2px 7px;font-size:9px;font-weight:700;letter-spacing:.03em;white-space:nowrap">TOO LARGE</span></div></div>
+  </div></div>
+      </div>
+    </div></div>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#6E7681;line-height:1.6">listMedia</div>
+    <div style="display:flex;flex-wrap:wrap;gap:5px;align-items:center"><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#6E7681;letter-spacing:.06em">GOES TO</span><a href="#cms-007" style="border:1px solid #E5E7EB;border-radius:7px;padding:3px 8px;background:#FFFFFF;font-family:'IBM Plex Mono',monospace;font-size:9.5px;font-weight:600;color:#0D6EFD;white-space:nowrap" style-hover="border-color:#0D6EFD;background:#F2F7FF">CMS-007</a></div>
+  </div><div id="cms-013" style="display:flex;flex-direction:column;gap:9px;scroll-margin-top:24px">
+    <div style="display:flex;align-items:baseline;gap:9px;flex-wrap:wrap;line-height:1.4">
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;font-weight:600;color:#0D6EFD">CMS-013</div>
+      <div style="font-size:15px;font-weight:800;letter-spacing:-.01em;color:#1F2937">SEO &amp; Metadata</div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#6E7681">wave 2</div>
+      
+      
+    </div>
+    <div style="font-size:11.5px;color:#6B7280;line-height:1.5;max-width:62ch;margin-top:2px">Control how a page looks everywhere it is not the page.</div>
+    <div style="border:1px solid #DCE3ED;border-radius:13px;overflow:hidden;background:#FFFFFF;box-shadow:0 10px 26px rgba(12,35,64,.09)">
+    <div style="height:25px;background:#E6EBF2;border-bottom:1px solid #DCE3ED;display:flex;align-items:center;gap:7px;padding:0 11px">
+      <div style="display:flex;gap:4px"><div style="width:6px;height:6px;border-radius:50%;background:#C3CCDA"></div><div style="width:6px;height:6px;border-radius:50%;background:#C3CCDA"></div><div style="width:6px;height:6px;border-radius:50%;background:#C3CCDA"></div></div>
+      <div style="flex:1;background:#FFFFFF;border:1px solid #E5E7EB;border-radius:5px;height:14px;display:flex;align-items:center;padding:0 8px;font-family:'IBM Plex Mono',monospace;font-size:8.5px;color:#6E7681">cms.ticvai.com/</div>
+    </div>
+    <div style="display:flex;min-height:300px">
+      <div style="width:124px;flex:none;background:#0C2340;padding:12px 9px;display:flex;flex-direction:column;gap:2px">
+        <div style="display:flex;align-items:center;gap:7px;margin-bottom:10px"><div style="width:20px;height:20px;border-radius:6px;background:linear-gradient(135deg,#0D6EFD,#00B8FF);color:#fff;display:flex;align-items:center;justify-content:center;font-size:9.5px;font-weight:800">T</div><div style="font-size:10px;font-weight:800;color:#fff">CMS</div></div>
+        <div style="padding:6px 8px;border-radius:6px;background:transparent;font-size:9.5px;font-weight:500;color:#8FB0D2;line-height:1.3">Overview</div><div style="padding:6px 8px;border-radius:6px;background:transparent;font-size:9.5px;font-weight:500;color:#8FB0D2;line-height:1.3">Brand</div><div style="padding:6px 8px;border-radius:6px;background:rgba(255,255,255,.12);font-size:9.5px;font-weight:700;color:#fff;line-height:1.3">Content</div><div style="padding:6px 8px;border-radius:6px;background:transparent;font-size:9.5px;font-weight:500;color:#8FB0D2;line-height:1.3">Language</div><div style="padding:6px 8px;border-radius:6px;background:transparent;font-size:9.5px;font-weight:500;color:#8FB0D2;line-height:1.3">Publish</div>
+      </div>
+      <div style="flex:1;display:flex;flex-direction:column;min-width:0;background:#F7F9FC">
+        <div style="flex:none;min-height:36px;border-bottom:1px solid #E5E7EB;background:#FFFFFF;display:flex;align-items:center;gap:9px;padding:7px 14px">
+          <div style="flex:1;min-width:0"><div style="font-size:11.5px;font-weight:800;color:#1F2937">SEO &amp; Metadata</div></div>
+          
+          <div style="width:20px;height:20px;border-radius:6px;background:linear-gradient(135deg,#0D6EFD,#00B8FF);flex:none"></div>
+        </div>
+        <div style="flex:1;padding:13px 14px;display:flex;flex-direction:column;gap:10px"><div style="display:grid;grid-template-columns:repeat(3,1fr);gap:9px"><div style="border:1px solid #E5E7EB;border-radius:9px;background:#FFFFFF;padding:8px 11px"><div style="font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.1em;color:#6E7681;text-transform:uppercase">Title</div><div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#1F2937;margin-top:3px">Dubai Aquarium | TICVAI</div></div><div style="border:1px solid #E5E7EB;border-radius:9px;background:#FFFFFF;padding:8px 11px"><div style="font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.1em;color:#6E7681;text-transform:uppercase">Description</div><div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#1F2937;margin-top:3px">62 of 155 chars</div></div><div style="border:1px solid #E5E7EB;border-radius:9px;background:#FFFFFF;padding:8px 11px"><div style="font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.1em;color:#6E7681;text-transform:uppercase">Canonical</div><div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#1F2937;margin-top:3px">tickets.gulfparks.ae/…</div></div><div style="border:1px solid #E5E7EB;border-radius:9px;background:#FFFFFF;padding:8px 11px"><div style="font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.1em;color:#6E7681;text-transform:uppercase">OG image</div><div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#C02626;margin-top:3px">missing</div></div><div style="border:1px solid #E5E7EB;border-radius:9px;background:#FFFFFF;padding:8px 11px"><div style="font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.1em;color:#6E7681;text-transform:uppercase">Index</div><div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#1F2937;margin-top:3px">allow</div></div><div style="border:1px solid #E5E7EB;border-radius:9px;background:#FFFFFF;padding:8px 11px"><div style="font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.1em;color:#6E7681;text-transform:uppercase">Sitemap</div><div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#1F2937;margin-top:3px">auto</div></div></div><div style="border-left:3px solid #96650A;background:#FDF8EE;border-radius:0 9px 9px 0;padding:10px 13px;font-size:10.5px;color:#5E4408;line-height:1.55">The Open Graph image is missing here and on CMS-004. Every shared link renders blank until it is not.</div><div style="display:flex;justify-content:flex-end;gap:8px"><div style="background:#FFFFFF;border:1px solid #E5E7EB;color:#4B5563;border-radius:9px;padding:8px 14px;font-size:10.5px;font-weight:800;white-space:nowrap;text-align:center">Discard</div><div style="background:linear-gradient(135deg,#0D6EFD,#00B8FF);border:0;color:#fff;border-radius:9px;padding:8px 14px;font-size:10.5px;font-weight:800;white-space:nowrap;text-align:center">Save</div></div></div>
+      </div>
+    </div></div>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#6E7681;line-height:1.6">updateSeo</div>
+    <div style="display:flex;flex-wrap:wrap;gap:5px;align-items:center"><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#6E7681;letter-spacing:.06em">GOES TO</span><a href="#cms-004" style="border:1px solid #E5E7EB;border-radius:7px;padding:3px 8px;background:#FFFFFF;font-family:'IBM Plex Mono',monospace;font-size:9.5px;font-weight:600;color:#0D6EFD;white-space:nowrap" style-hover="border-color:#0D6EFD;background:#F2F7FF">CMS-004</a></div>
+  </div></div>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600;letter-spacing:.14em;color:#6E7681;text-transform:uppercase;margin:48px 0 14px;padding-bottom:9px;border-bottom:1px solid #DCE3ED">04 — Language</div>
+    <p style="font-size:12.5px;line-height:1.6;color:#6B7280;margin:0 0 18px;max-width:82ch;text-wrap:pretty">CF-42 lives here. RTL is a layout, and mirroring is checked in the preview or it is checked by a customer.</p>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(490px,1fr));gap:32px"><div id="cms-011" style="display:flex;flex-direction:column;gap:9px;scroll-margin-top:24px">
+    <div style="display:flex;align-items:baseline;gap:9px;flex-wrap:wrap;line-height:1.4">
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;font-weight:600;color:#0D6EFD">CMS-011</div>
+      <div style="font-size:15px;font-weight:800;letter-spacing:-.01em;color:#1F2937">Translations</div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#6E7681">wave 2</div>
+      
+      
+    </div>
+    <div style="font-size:11.5px;color:#6B7280;line-height:1.5;max-width:62ch;margin-top:2px">Fill in what every language is missing.</div>
+    <div style="border:1px solid #DCE3ED;border-radius:13px;overflow:hidden;background:#FFFFFF;box-shadow:0 10px 26px rgba(12,35,64,.09)">
+    <div style="height:25px;background:#E6EBF2;border-bottom:1px solid #DCE3ED;display:flex;align-items:center;gap:7px;padding:0 11px">
+      <div style="display:flex;gap:4px"><div style="width:6px;height:6px;border-radius:50%;background:#C3CCDA"></div><div style="width:6px;height:6px;border-radius:50%;background:#C3CCDA"></div><div style="width:6px;height:6px;border-radius:50%;background:#C3CCDA"></div></div>
+      <div style="flex:1;background:#FFFFFF;border:1px solid #E5E7EB;border-radius:5px;height:14px;display:flex;align-items:center;padding:0 8px;font-family:'IBM Plex Mono',monospace;font-size:8.5px;color:#6E7681">cms.ticvai.com/</div>
+    </div>
+    <div style="display:flex;min-height:300px">
+      <div style="width:124px;flex:none;background:#0C2340;padding:12px 9px;display:flex;flex-direction:column;gap:2px">
+        <div style="display:flex;align-items:center;gap:7px;margin-bottom:10px"><div style="width:20px;height:20px;border-radius:6px;background:linear-gradient(135deg,#0D6EFD,#00B8FF);color:#fff;display:flex;align-items:center;justify-content:center;font-size:9.5px;font-weight:800">T</div><div style="font-size:10px;font-weight:800;color:#fff">CMS</div></div>
+        <div style="padding:6px 8px;border-radius:6px;background:transparent;font-size:9.5px;font-weight:500;color:#8FB0D2;line-height:1.3">Overview</div><div style="padding:6px 8px;border-radius:6px;background:transparent;font-size:9.5px;font-weight:500;color:#8FB0D2;line-height:1.3">Brand</div><div style="padding:6px 8px;border-radius:6px;background:transparent;font-size:9.5px;font-weight:500;color:#8FB0D2;line-height:1.3">Content</div><div style="padding:6px 8px;border-radius:6px;background:rgba(255,255,255,.12);font-size:9.5px;font-weight:700;color:#fff;line-height:1.3">Language</div><div style="padding:6px 8px;border-radius:6px;background:transparent;font-size:9.5px;font-weight:500;color:#8FB0D2;line-height:1.3">Publish</div>
+      </div>
+      <div style="flex:1;display:flex;flex-direction:column;min-width:0;background:#F7F9FC">
+        <div style="flex:none;min-height:36px;border-bottom:1px solid #E5E7EB;background:#FFFFFF;display:flex;align-items:center;gap:9px;padding:7px 14px">
+          <div style="flex:1;min-width:0"><div style="font-size:11.5px;font-weight:800;color:#1F2937">Translations</div></div>
+          
+          <div style="width:20px;height:20px;border-radius:6px;background:linear-gradient(135deg,#0D6EFD,#00B8FF);flex:none"></div>
+        </div>
+        <div style="flex:1;padding:13px 14px;display:flex;flex-direction:column;gap:10px"><div style="border:1px solid #E5E7EB;border-radius:10px;background:#FFFFFF;overflow:hidden">
+    <div style="display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr 1fr;gap:9px;padding:8px 12px;background:#F7F9FC;border-bottom:1px solid #E5E7EB"><div style="font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.09em;color:#6E7681;text-transform:uppercase;text-align:left">Language</div><div style="font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.09em;color:#6E7681;text-transform:uppercase;text-align:right">Coverage</div><div style="font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.09em;color:#6E7681;text-transform:uppercase;text-align:right">Missing</div><div style="font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.09em;color:#6E7681;text-transform:uppercase;text-align:left">Direction</div><div style="font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.09em;color:#6E7681;text-transform:uppercase;text-align:right">Status</div></div>
+    <div style="display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr 1fr;gap:9px;padding:9px 12px;border-bottom:1px solid #F1F4F8;align-items:center"><div style="font-size:10.5px;color:#1F2937;font-weight:700;text-align:left;">English</div><div style="font-size:10.5px;color:#4B5563;font-weight:400;text-align:right;font-family:'IBM Plex Mono',monospace;font-variant-numeric:tabular-nums">100%</div><div style="font-size:10.5px;color:#4B5563;font-weight:400;text-align:right;font-family:'IBM Plex Mono',monospace;font-variant-numeric:tabular-nums">0</div><div style="font-size:10.5px;color:#4B5563;font-weight:400;text-align:left;">LTR</div><div style="text-align:right"><span style="border:1px solid #0F7B4F55;background:#0F7B4F12;color:#0F7B4F;border-radius:6px;padding:2px 7px;font-size:9px;font-weight:700;letter-spacing:.03em;white-space:nowrap">PUBLISHED</span></div></div><div style="display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr 1fr;gap:9px;padding:9px 12px;border-bottom:1px solid #F1F4F8;align-items:center"><div style="font-size:10.5px;color:#1F2937;font-weight:700;text-align:left;">العربية</div><div style="font-size:10.5px;color:#4B5563;font-weight:400;text-align:right;font-family:'IBM Plex Mono',monospace;font-variant-numeric:tabular-nums">94%</div><div style="font-size:10.5px;color:#4B5563;font-weight:400;text-align:right;font-family:'IBM Plex Mono',monospace;font-variant-numeric:tabular-nums">412</div><div style="font-size:10.5px;color:#4B5563;font-weight:400;text-align:left;">RTL</div><div style="text-align:right"><span style="border:1px solid #0F7B4F55;background:#0F7B4F12;color:#0F7B4F;border-radius:6px;padding:2px 7px;font-size:9px;font-weight:700;letter-spacing:.03em;white-space:nowrap">PUBLISHED</span></div></div><div style="display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr 1fr;gap:9px;padding:9px 12px;border-bottom:1px solid #F1F4F8;align-items:center"><div style="font-size:10.5px;color:#1F2937;font-weight:700;text-align:left;">Русский</div><div style="font-size:10.5px;color:#4B5563;font-weight:400;text-align:right;font-family:'IBM Plex Mono',monospace;font-variant-numeric:tabular-nums">61%</div><div style="font-size:10.5px;color:#4B5563;font-weight:400;text-align:right;font-family:'IBM Plex Mono',monospace;font-variant-numeric:tabular-nums">2,684</div><div style="font-size:10.5px;color:#4B5563;font-weight:400;text-align:left;">LTR</div><div style="text-align:right"><span style="border:1px solid #96650A55;background:#96650A12;color:#96650A;border-radius:6px;padding:2px 7px;font-size:9px;font-weight:700;letter-spacing:.03em;white-space:nowrap">DRAFT</span></div></div>
+  </div><div style="border-left:3px solid #C02626;background:#FDF3F3;border-radius:0 9px 9px 0;padding:10px 13px;font-size:10.5px;color:#7A1F1F;line-height:1.55">There is no translation key inventory, so 94% is measured against a denominator nobody has counted. 38 localisation requirements sit behind this screen.</div></div>
+      </div>
+    </div></div>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#6E7681;line-height:1.6">listTranslations</div>
+    <div style="display:flex;flex-wrap:wrap;gap:5px;align-items:center"><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#6E7681;letter-spacing:.06em">GOES TO</span><a href="#cms-012" style="border:1px solid #E5E7EB;border-radius:7px;padding:3px 8px;background:#FFFFFF;font-family:'IBM Plex Mono',monospace;font-size:9.5px;font-weight:600;color:#0D6EFD;white-space:nowrap" style-hover="border-color:#0D6EFD;background:#F2F7FF">CMS-012</a></div>
+  </div><div id="cms-012" style="display:flex;flex-direction:column;gap:9px;scroll-margin-top:24px">
+    <div style="display:flex;align-items:baseline;gap:9px;flex-wrap:wrap;line-height:1.4">
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;font-weight:600;color:#0D6EFD">CMS-012</div>
+      <div style="font-size:15px;font-weight:800;letter-spacing:-.01em;color:#1F2937">RTL Preview</div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#6E7681">wave 2</div>
+      
+      <span style="border:1px solid #C0262655;background:#C0262612;color:#C02626;border-radius:6px;padding:2px 7px;font-size:9px;font-weight:700;letter-spacing:.03em;white-space:nowrap">CF-42</span>
+    </div>
+    <div style="font-size:11.5px;color:#6B7280;line-height:1.5;max-width:62ch;margin-top:2px">See the site as an Arabic reader sees it.</div>
+    <div style="border:1px solid #DCE3ED;border-radius:13px;overflow:hidden;background:#FFFFFF;box-shadow:0 10px 26px rgba(12,35,64,.09)">
+    <div style="height:25px;background:#E6EBF2;border-bottom:1px solid #DCE3ED;display:flex;align-items:center;gap:7px;padding:0 11px">
+      <div style="display:flex;gap:4px"><div style="width:6px;height:6px;border-radius:50%;background:#C3CCDA"></div><div style="width:6px;height:6px;border-radius:50%;background:#C3CCDA"></div><div style="width:6px;height:6px;border-radius:50%;background:#C3CCDA"></div></div>
+      <div style="flex:1;background:#FFFFFF;border:1px solid #E5E7EB;border-radius:5px;height:14px;display:flex;align-items:center;padding:0 8px;font-family:'IBM Plex Mono',monospace;font-size:8.5px;color:#6E7681">cms.ticvai.com/</div>
+    </div>
+    <div style="display:flex;min-height:300px">
+      <div style="width:124px;flex:none;background:#0C2340;padding:12px 9px;display:flex;flex-direction:column;gap:2px">
+        <div style="display:flex;align-items:center;gap:7px;margin-bottom:10px"><div style="width:20px;height:20px;border-radius:6px;background:linear-gradient(135deg,#0D6EFD,#00B8FF);color:#fff;display:flex;align-items:center;justify-content:center;font-size:9.5px;font-weight:800">T</div><div style="font-size:10px;font-weight:800;color:#fff">CMS</div></div>
+        <div style="padding:6px 8px;border-radius:6px;background:transparent;font-size:9.5px;font-weight:500;color:#8FB0D2;line-height:1.3">Overview</div><div style="padding:6px 8px;border-radius:6px;background:transparent;font-size:9.5px;font-weight:500;color:#8FB0D2;line-height:1.3">Brand</div><div style="padding:6px 8px;border-radius:6px;background:transparent;font-size:9.5px;font-weight:500;color:#8FB0D2;line-height:1.3">Content</div><div style="padding:6px 8px;border-radius:6px;background:rgba(255,255,255,.12);font-size:9.5px;font-weight:700;color:#fff;line-height:1.3">Language</div><div style="padding:6px 8px;border-radius:6px;background:transparent;font-size:9.5px;font-weight:500;color:#8FB0D2;line-height:1.3">Publish</div>
+      </div>
+      <div style="flex:1;display:flex;flex-direction:column;min-width:0;background:#F7F9FC">
+        <div style="flex:none;min-height:36px;border-bottom:1px solid #E5E7EB;background:#FFFFFF;display:flex;align-items:center;gap:9px;padding:7px 14px">
+          <div style="flex:1;min-width:0"><div style="font-size:11.5px;font-weight:800;color:#1F2937">RTL Preview</div></div>
+          
+          <div style="width:20px;height:20px;border-radius:6px;background:linear-gradient(135deg,#0D6EFD,#00B8FF);flex:none"></div>
+        </div>
+        <div style="flex:1;padding:13px 14px;display:flex;flex-direction:column;gap:10px"><div style="display:grid;grid-template-columns:1fr 1fr;gap:11px"><div style="border:1px solid #E5E7EB;border-radius:11px;background:#F7F9FC;padding:12px;display:flex;flex-direction:column;align-items:center;gap:8px">
+  <div style="display:flex;gap:6px"><div style="border:1px solid #0D6EFD;background:#F2F7FF;color:#0D6EFD;border-radius:8px;padding:5px 10px;font-size:10px;font-weight:700;white-space:nowrap">iOS</div><div style="border:1px solid #E5E7EB;background:#FFFFFF;color:#6B7280;border-radius:8px;padding:5px 10px;font-size:10px;font-weight:700;white-space:nowrap">Android</div><div style="border:1px solid #E5E7EB;background:#FFFFFF;color:#6B7280;border-radius:8px;padding:5px 10px;font-size:10px;font-weight:700;white-space:nowrap">Web</div><div style="border:1px solid #0D6EFD;background:#F2F7FF;color:#0D6EFD;border-radius:8px;padding:5px 10px;font-size:10px;font-weight:700;white-space:nowrap">LTR</div></div>
+  <div style="width:150px;border:1px solid #E5E7EB;border-radius:14px;background:#FFFFFF;overflow:hidden">
+    <div style="height:14px;background:#E6EBF2"></div>
+    <div style="padding:9px;display:flex;flex-direction:column;gap:6px;">
+      <div style="height:34px;border-radius:7px;background:repeating-linear-gradient(135deg,#E4EAF2,#E4EAF2 6px,#EDF1F7 6px,#EDF1F7 12px)"></div>
+      <div style="height:7px;width:70%;background:#E9EDF3;border-radius:3px"></div>
+      <div style="height:7px;width:52%;background:#E9EDF3;border-radius:3px"></div>
+      <div style="height:22px;border-radius:7px;background:linear-gradient(135deg,#0D6EFD,#00B8FF)"></div>
+    </div></div>
+  <div style="font-family:'IBM Plex Mono',monospace;font-size:9px;color:#6E7681">LTR</div></div><div style="border:1px solid #E5E7EB;border-radius:11px;background:#F7F9FC;padding:12px;display:flex;flex-direction:column;align-items:center;gap:8px">
+  <div style="display:flex;gap:6px"><div style="border:1px solid #0D6EFD;background:#F2F7FF;color:#0D6EFD;border-radius:8px;padding:5px 10px;font-size:10px;font-weight:700;white-space:nowrap">iOS</div><div style="border:1px solid #E5E7EB;background:#FFFFFF;color:#6B7280;border-radius:8px;padding:5px 10px;font-size:10px;font-weight:700;white-space:nowrap">Android</div><div style="border:1px solid #E5E7EB;background:#FFFFFF;color:#6B7280;border-radius:8px;padding:5px 10px;font-size:10px;font-weight:700;white-space:nowrap">Web</div><div style="border:1px solid #0D6EFD;background:#F2F7FF;color:#0D6EFD;border-radius:8px;padding:5px 10px;font-size:10px;font-weight:700;white-space:nowrap">RTL</div></div>
+  <div style="width:150px;border:1px solid #E5E7EB;border-radius:14px;background:#FFFFFF;overflow:hidden">
+    <div style="height:14px;background:#E6EBF2"></div>
+    <div style="padding:9px;display:flex;flex-direction:column;gap:6px;direction:rtl">
+      <div style="height:34px;border-radius:7px;background:repeating-linear-gradient(135deg,#E4EAF2,#E4EAF2 6px,#EDF1F7 6px,#EDF1F7 12px)"></div>
+      <div style="height:7px;width:70%;background:#E9EDF3;border-radius:3px"></div>
+      <div style="height:7px;width:52%;background:#E9EDF3;border-radius:3px"></div>
+      <div style="height:22px;border-radius:7px;background:linear-gradient(135deg,#0D6EFD,#00B8FF)"></div>
+    </div></div>
+  <div style="font-family:'IBM Plex Mono',monospace;font-size:9px;color:#6E7681">RTL</div></div></div><div style="border-left:3px solid #C02626;background:#FDF3F3;border-radius:0 9px 9px 0;padding:10px 13px;font-size:10.5px;color:#7A1F1F;line-height:1.55">CF-42: the preview must toggle platform, theme and direction. RTL is a layout — icons, carets, progress and the whole grid mirror — and a preview that cannot flip is not a preview.</div></div>
+      </div>
+    </div></div>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#6E7681;line-height:1.6">preview · CF-42</div>
+    <div style="display:flex;flex-wrap:wrap;gap:5px;align-items:center"><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#6E7681;letter-spacing:.06em">GOES TO</span><a href="#cms-011" style="border:1px solid #E5E7EB;border-radius:7px;padding:3px 8px;background:#FFFFFF;font-family:'IBM Plex Mono',monospace;font-size:9.5px;font-weight:600;color:#0D6EFD;white-space:nowrap" style-hover="border-color:#0D6EFD;background:#F2F7FF">CMS-011</a></div>
+  </div></div>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600;letter-spacing:.14em;color:#6E7681;text-transform:uppercase;margin:48px 0 14px;padding-bottom:9px;border-bottom:1px solid #DCE3ED">05 — Publish and govern</div>
+    
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(490px,1fr));gap:32px"><div id="cms-014" style="display:flex;flex-direction:column;gap:9px;scroll-margin-top:24px">
+    <div style="display:flex;align-items:baseline;gap:9px;flex-wrap:wrap;line-height:1.4">
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;font-weight:600;color:#0D6EFD">CMS-014</div>
+      <div style="font-size:15px;font-weight:800;letter-spacing:-.01em;color:#1F2937">Publishing Workflow</div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#6E7681">wave 2</div>
+      
+      
+    </div>
+    <div style="font-size:11.5px;color:#6B7280;line-height:1.5;max-width:62ch;margin-top:2px">Move a change from draft to live, with someone accountable.</div>
+    <div style="border:1px solid #DCE3ED;border-radius:13px;overflow:hidden;background:#FFFFFF;box-shadow:0 10px 26px rgba(12,35,64,.09)">
+    <div style="height:25px;background:#E6EBF2;border-bottom:1px solid #DCE3ED;display:flex;align-items:center;gap:7px;padding:0 11px">
+      <div style="display:flex;gap:4px"><div style="width:6px;height:6px;border-radius:50%;background:#C3CCDA"></div><div style="width:6px;height:6px;border-radius:50%;background:#C3CCDA"></div><div style="width:6px;height:6px;border-radius:50%;background:#C3CCDA"></div></div>
+      <div style="flex:1;background:#FFFFFF;border:1px solid #E5E7EB;border-radius:5px;height:14px;display:flex;align-items:center;padding:0 8px;font-family:'IBM Plex Mono',monospace;font-size:8.5px;color:#6E7681">cms.ticvai.com/</div>
+    </div>
+    <div style="display:flex;min-height:300px">
+      <div style="width:124px;flex:none;background:#0C2340;padding:12px 9px;display:flex;flex-direction:column;gap:2px">
+        <div style="display:flex;align-items:center;gap:7px;margin-bottom:10px"><div style="width:20px;height:20px;border-radius:6px;background:linear-gradient(135deg,#0D6EFD,#00B8FF);color:#fff;display:flex;align-items:center;justify-content:center;font-size:9.5px;font-weight:800">T</div><div style="font-size:10px;font-weight:800;color:#fff">CMS</div></div>
+        <div style="padding:6px 8px;border-radius:6px;background:transparent;font-size:9.5px;font-weight:500;color:#8FB0D2;line-height:1.3">Overview</div><div style="padding:6px 8px;border-radius:6px;background:transparent;font-size:9.5px;font-weight:500;color:#8FB0D2;line-height:1.3">Brand</div><div style="padding:6px 8px;border-radius:6px;background:transparent;font-size:9.5px;font-weight:500;color:#8FB0D2;line-height:1.3">Content</div><div style="padding:6px 8px;border-radius:6px;background:transparent;font-size:9.5px;font-weight:500;color:#8FB0D2;line-height:1.3">Language</div><div style="padding:6px 8px;border-radius:6px;background:rgba(255,255,255,.12);font-size:9.5px;font-weight:700;color:#fff;line-height:1.3">Publish</div>
+      </div>
+      <div style="flex:1;display:flex;flex-direction:column;min-width:0;background:#F7F9FC">
+        <div style="flex:none;min-height:36px;border-bottom:1px solid #E5E7EB;background:#FFFFFF;display:flex;align-items:center;gap:9px;padding:7px 14px">
+          <div style="flex:1;min-width:0"><div style="font-size:11.5px;font-weight:800;color:#1F2937">Publishing Workflow</div></div>
+          
+          <div style="width:20px;height:20px;border-radius:6px;background:linear-gradient(135deg,#0D6EFD,#00B8FF);flex:none"></div>
+        </div>
+        <div style="flex:1;padding:13px 14px;display:flex;flex-direction:column;gap:10px"><div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap"><div style="display:flex;align-items:center;gap:6px">
+  <div style="width:19px;height:19px;border-radius:50%;background:#0D6EFD;color:#fff;display:flex;align-items:center;justify-content:center;font-size:9.5px;font-weight:800">1</div>
+  <div style="font-size:10px;font-weight:600;color:#1F2937;white-space:nowrap">Draft</div>
+  <div style="width:16px;height:1px;background:#DCE3ED"></div></div><div style="display:flex;align-items:center;gap:6px">
+  <div style="width:19px;height:19px;border-radius:50%;background:#0D6EFD;color:#fff;display:flex;align-items:center;justify-content:center;font-size:9.5px;font-weight:800">2</div>
+  <div style="font-size:10px;font-weight:600;color:#1F2937;white-space:nowrap">Review</div>
+  <div style="width:16px;height:1px;background:#DCE3ED"></div></div><div style="display:flex;align-items:center;gap:6px">
+  <div style="width:19px;height:19px;border-radius:50%;background:#0D6EFD;color:#fff;display:flex;align-items:center;justify-content:center;font-size:9.5px;font-weight:800">3</div>
+  <div style="font-size:10px;font-weight:800;color:#1F2937;white-space:nowrap">Preview</div>
+  <div style="width:16px;height:1px;background:#DCE3ED"></div></div><div style="display:flex;align-items:center;gap:6px">
+  <div style="width:19px;height:19px;border-radius:50%;background:#E4E9F0;color:#6E7681;display:flex;align-items:center;justify-content:center;font-size:9.5px;font-weight:800">4</div>
+  <div style="font-size:10px;font-weight:600;color:#6E7681;white-space:nowrap">Publish</div>
+  </div></div><div style="border:1px solid #E5E7EB;border-radius:11px;background:#FFFFFF;overflow:hidden">
+  <div style="padding:9px 12px;border-bottom:1px solid #E5E7EB;background:#F7F9FC"><div style="font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.12em;color:#6E7681;text-transform:uppercase">Pending publish</div></div>
+  <div style="padding:11px 12px"><div style="display:flex;justify-content:space-between;gap:10px;padding:7px 0;border-bottom:1px solid #F1F4F8"><span style="font-size:10.5px;color:#6B7280">Pages changed</span><span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#1F2937;font-variant-numeric:tabular-nums">4</span></div><div style="display:flex;justify-content:space-between;gap:10px;padding:7px 0;border-bottom:1px solid #F1F4F8"><span style="font-size:10.5px;color:#6B7280">Assets added</span><span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#1F2937;font-variant-numeric:tabular-nums">2</span></div><div style="display:flex;justify-content:space-between;gap:10px;padding:7px 0;border-bottom:1px solid #F1F4F8"><span style="font-size:10.5px;color:#6B7280">Translations</span><span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#96650A;font-variant-numeric:tabular-nums">ar 94%</span></div><div style="display:flex;justify-content:space-between;gap:10px;padding:7px 0;border-bottom:1px solid #F1F4F8"><span style="font-size:10.5px;color:#6B7280">Blocking issues</span><span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#C02626;font-variant-numeric:tabular-nums">2</span></div><div style="display:flex;justify-content:space-between;gap:10px;padding:7px 0;border-bottom:1px solid #F1F4F8"><span style="font-size:10.5px;color:#6B7280">Approver</span><span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#C02626;font-variant-numeric:tabular-nums">required</span></div></div></div><div style="border-left:3px solid #96650A;background:#FDF8EE;border-radius:0 9px 9px 0;padding:10px 13px;font-size:10.5px;color:#5E4408;line-height:1.55">The client’s own Publishing Status stepper. Two blocking issues — a missing favicon and a missing OG image — should stop this publish, and the workflow is the only place that can enforce it.</div></div>
+      </div>
+    </div></div>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#6E7681;line-height:1.6">publishSite</div>
+    <div style="display:flex;flex-wrap:wrap;gap:5px;align-items:center"><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#6E7681;letter-spacing:.06em">GOES TO</span><a href="#cms-015" style="border:1px solid #E5E7EB;border-radius:7px;padding:3px 8px;background:#FFFFFF;font-family:'IBM Plex Mono',monospace;font-size:9.5px;font-weight:600;color:#0D6EFD;white-space:nowrap" style-hover="border-color:#0D6EFD;background:#F2F7FF">CMS-015</a></div>
+  </div><div id="cms-015" style="display:flex;flex-direction:column;gap:9px;scroll-margin-top:24px">
+    <div style="display:flex;align-items:baseline;gap:9px;flex-wrap:wrap;line-height:1.4">
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;font-weight:600;color:#0D6EFD">CMS-015</div>
+      <div style="font-size:15px;font-weight:800;letter-spacing:-.01em;color:#1F2937">Version History</div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#6E7681">wave 2</div>
+      
+      
+    </div>
+    <div style="font-size:11.5px;color:#6B7280;line-height:1.5;max-width:62ch;margin-top:2px">See what changed and go back if it was wrong.</div>
+    <div style="border:1px solid #DCE3ED;border-radius:13px;overflow:hidden;background:#FFFFFF;box-shadow:0 10px 26px rgba(12,35,64,.09)">
+    <div style="height:25px;background:#E6EBF2;border-bottom:1px solid #DCE3ED;display:flex;align-items:center;gap:7px;padding:0 11px">
+      <div style="display:flex;gap:4px"><div style="width:6px;height:6px;border-radius:50%;background:#C3CCDA"></div><div style="width:6px;height:6px;border-radius:50%;background:#C3CCDA"></div><div style="width:6px;height:6px;border-radius:50%;background:#C3CCDA"></div></div>
+      <div style="flex:1;background:#FFFFFF;border:1px solid #E5E7EB;border-radius:5px;height:14px;display:flex;align-items:center;padding:0 8px;font-family:'IBM Plex Mono',monospace;font-size:8.5px;color:#6E7681">cms.ticvai.com/</div>
+    </div>
+    <div style="display:flex;min-height:300px">
+      <div style="width:124px;flex:none;background:#0C2340;padding:12px 9px;display:flex;flex-direction:column;gap:2px">
+        <div style="display:flex;align-items:center;gap:7px;margin-bottom:10px"><div style="width:20px;height:20px;border-radius:6px;background:linear-gradient(135deg,#0D6EFD,#00B8FF);color:#fff;display:flex;align-items:center;justify-content:center;font-size:9.5px;font-weight:800">T</div><div style="font-size:10px;font-weight:800;color:#fff">CMS</div></div>
+        <div style="padding:6px 8px;border-radius:6px;background:transparent;font-size:9.5px;font-weight:500;color:#8FB0D2;line-height:1.3">Overview</div><div style="padding:6px 8px;border-radius:6px;background:transparent;font-size:9.5px;font-weight:500;color:#8FB0D2;line-height:1.3">Brand</div><div style="padding:6px 8px;border-radius:6px;background:transparent;font-size:9.5px;font-weight:500;color:#8FB0D2;line-height:1.3">Content</div><div style="padding:6px 8px;border-radius:6px;background:transparent;font-size:9.5px;font-weight:500;color:#8FB0D2;line-height:1.3">Language</div><div style="padding:6px 8px;border-radius:6px;background:rgba(255,255,255,.12);font-size:9.5px;font-weight:700;color:#fff;line-height:1.3">Publish</div>
+      </div>
+      <div style="flex:1;display:flex;flex-direction:column;min-width:0;background:#F7F9FC">
+        <div style="flex:none;min-height:36px;border-bottom:1px solid #E5E7EB;background:#FFFFFF;display:flex;align-items:center;gap:9px;padding:7px 14px">
+          <div style="flex:1;min-width:0"><div style="font-size:11.5px;font-weight:800;color:#1F2937">Version History</div></div>
+          
+          <div style="width:20px;height:20px;border-radius:6px;background:linear-gradient(135deg,#0D6EFD,#00B8FF);flex:none"></div>
+        </div>
+        <div style="flex:1;padding:13px 14px;display:flex;flex-direction:column;gap:10px"><div style="border:1px solid #E5E7EB;border-radius:10px;background:#FFFFFF;overflow:hidden">
+    <div style="display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr 1fr;gap:9px;padding:8px 12px;background:#F7F9FC;border-bottom:1px solid #E5E7EB"><div style="font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.09em;color:#6E7681;text-transform:uppercase;text-align:left">Version</div><div style="font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.09em;color:#6E7681;text-transform:uppercase;text-align:left">Published</div><div style="font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.09em;color:#6E7681;text-transform:uppercase;text-align:left">By</div><div style="font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.09em;color:#6E7681;text-transform:uppercase;text-align:right">Changes</div><div style="font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.09em;color:#6E7681;text-transform:uppercase;text-align:right">Status</div></div>
+    <div style="display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr 1fr;gap:9px;padding:9px 12px;border-bottom:1px solid #F1F4F8;align-items:center"><div style="font-size:10.5px;color:#1F2937;font-weight:700;text-align:left;">v18</div><div style="font-size:10.5px;color:#4B5563;font-weight:400;text-align:left;">14 Aug 09:00</div><div style="font-size:10.5px;color:#4B5563;font-weight:400;text-align:left;">S. Iqbal</div><div style="font-size:10.5px;color:#4B5563;font-weight:400;text-align:right;font-family:'IBM Plex Mono',monospace;font-variant-numeric:tabular-nums">4 pages</div><div style="text-align:right"><span style="border:1px solid #0F7B4F55;background:#0F7B4F12;color:#0F7B4F;border-radius:6px;padding:2px 7px;font-size:9px;font-weight:700;letter-spacing:.03em;white-space:nowrap">LIVE</span></div></div><div style="display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr 1fr;gap:9px;padding:9px 12px;border-bottom:1px solid #F1F4F8;align-items:center"><div style="font-size:10.5px;color:#1F2937;font-weight:700;text-align:left;">v17</div><div style="font-size:10.5px;color:#4B5563;font-weight:400;text-align:left;">2 Aug 09:00</div><div style="font-size:10.5px;color:#4B5563;font-weight:400;text-align:left;">S. Iqbal</div><div style="font-size:10.5px;color:#4B5563;font-weight:400;text-align:right;font-family:'IBM Plex Mono',monospace;font-variant-numeric:tabular-nums">1 page</div><div style="text-align:right"><span style="border:1px solid #6E768155;background:#6E768112;color:#6E7681;border-radius:6px;padding:2px 7px;font-size:9px;font-weight:700;letter-spacing:.03em;white-space:nowrap">SUPERSEDED</span></div></div><div style="display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr 1fr;gap:9px;padding:9px 12px;border-bottom:1px solid #F1F4F8;align-items:center"><div style="font-size:10.5px;color:#1F2937;font-weight:700;text-align:left;">v16</div><div style="font-size:10.5px;color:#4B5563;font-weight:400;text-align:left;">21 Jul</div><div style="font-size:10.5px;color:#4B5563;font-weight:400;text-align:left;">T. Bauer</div><div style="font-size:10.5px;color:#4B5563;font-weight:400;text-align:right;font-family:'IBM Plex Mono',monospace;font-variant-numeric:tabular-nums">12 pages</div><div style="text-align:right"><span style="border:1px solid #6E768155;background:#6E768112;color:#6E7681;border-radius:6px;padding:2px 7px;font-size:9px;font-weight:700;letter-spacing:.03em;white-space:nowrap">SUPERSEDED</span></div></div>
+  </div><div style="border-left:3px solid #96650A;background:#FDF8EE;border-radius:0 9px 9px 0;padding:10px 13px;font-size:10.5px;color:#5E4408;line-height:1.55">Rolling back content is safe. Rolling back a brand token is not — the app caches it, and a rollback that the app has not fetched leaves two surfaces disagreeing.</div></div>
+      </div>
+    </div></div>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#6E7681;line-height:1.6">listSiteVersions · rollbackSite</div>
+    <div style="display:flex;flex-wrap:wrap;gap:5px;align-items:center"><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#6E7681;letter-spacing:.06em">GOES TO</span><a href="#cms-014" style="border:1px solid #E5E7EB;border-radius:7px;padding:3px 8px;background:#FFFFFF;font-family:'IBM Plex Mono',monospace;font-size:9.5px;font-weight:600;color:#0D6EFD;white-space:nowrap" style-hover="border-color:#0D6EFD;background:#F2F7FF">CMS-014</a></div>
+  </div><div id="cms-016" style="display:flex;flex-direction:column;gap:9px;scroll-margin-top:24px">
+    <div style="display:flex;align-items:baseline;gap:9px;flex-wrap:wrap;line-height:1.4">
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;font-weight:600;color:#0D6EFD">CMS-016</div>
+      <div style="font-size:15px;font-weight:800;letter-spacing:-.01em;color:#1F2937">Site Settings</div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#6E7681">wave 2</div>
+      
+      <span style="border:1px solid #7A3FB855;background:#7A3FB812;color:#7A3FB8;border-radius:6px;padding:2px 7px;font-size:9px;font-weight:700;letter-spacing:.03em;white-space:nowrap">SCOPED SETTINGS</span>
+    </div>
+    <div style="font-size:11.5px;color:#6B7280;line-height:1.5;max-width:62ch;margin-top:2px">The values the whole site inherits from.</div>
+    <div style="border:1px solid #DCE3ED;border-radius:13px;overflow:hidden;background:#FFFFFF;box-shadow:0 10px 26px rgba(12,35,64,.09)">
+    <div style="height:25px;background:#E6EBF2;border-bottom:1px solid #DCE3ED;display:flex;align-items:center;gap:7px;padding:0 11px">
+      <div style="display:flex;gap:4px"><div style="width:6px;height:6px;border-radius:50%;background:#C3CCDA"></div><div style="width:6px;height:6px;border-radius:50%;background:#C3CCDA"></div><div style="width:6px;height:6px;border-radius:50%;background:#C3CCDA"></div></div>
+      <div style="flex:1;background:#FFFFFF;border:1px solid #E5E7EB;border-radius:5px;height:14px;display:flex;align-items:center;padding:0 8px;font-family:'IBM Plex Mono',monospace;font-size:8.5px;color:#6E7681">cms.ticvai.com/</div>
+    </div>
+    <div style="display:flex;min-height:300px">
+      <div style="width:124px;flex:none;background:#0C2340;padding:12px 9px;display:flex;flex-direction:column;gap:2px">
+        <div style="display:flex;align-items:center;gap:7px;margin-bottom:10px"><div style="width:20px;height:20px;border-radius:6px;background:linear-gradient(135deg,#0D6EFD,#00B8FF);color:#fff;display:flex;align-items:center;justify-content:center;font-size:9.5px;font-weight:800">T</div><div style="font-size:10px;font-weight:800;color:#fff">CMS</div></div>
+        <div style="padding:6px 8px;border-radius:6px;background:transparent;font-size:9.5px;font-weight:500;color:#8FB0D2;line-height:1.3">Overview</div><div style="padding:6px 8px;border-radius:6px;background:transparent;font-size:9.5px;font-weight:500;color:#8FB0D2;line-height:1.3">Brand</div><div style="padding:6px 8px;border-radius:6px;background:transparent;font-size:9.5px;font-weight:500;color:#8FB0D2;line-height:1.3">Content</div><div style="padding:6px 8px;border-radius:6px;background:transparent;font-size:9.5px;font-weight:500;color:#8FB0D2;line-height:1.3">Language</div><div style="padding:6px 8px;border-radius:6px;background:rgba(255,255,255,.12);font-size:9.5px;font-weight:700;color:#fff;line-height:1.3">Publish</div>
+      </div>
+      <div style="flex:1;display:flex;flex-direction:column;min-width:0;background:#F7F9FC">
+        <div style="flex:none;min-height:36px;border-bottom:1px solid #E5E7EB;background:#FFFFFF;display:flex;align-items:center;gap:9px;padding:7px 14px">
+          <div style="flex:1;min-width:0"><div style="font-size:11.5px;font-weight:800;color:#1F2937">Site Settings</div></div>
+          
+          <div style="width:20px;height:20px;border-radius:6px;background:linear-gradient(135deg,#0D6EFD,#00B8FF);flex:none"></div>
+        </div>
+        <div style="flex:1;padding:13px 14px;display:flex;flex-direction:column;gap:10px"><div style="display:grid;grid-template-columns:repeat(3,1fr);gap:9px"><div style="border:1px solid #E5E7EB;border-radius:9px;background:#FFFFFF;padding:8px 11px"><div style="font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.1em;color:#6E7681;text-transform:uppercase">Site name</div><div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#1F2937;margin-top:3px">Gulf Parks</div></div><div style="border:1px solid #E5E7EB;border-radius:9px;background:#FFFFFF;padding:8px 11px"><div style="font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.1em;color:#6E7681;text-transform:uppercase">Default language</div><div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#1F2937;margin-top:3px">English</div></div><div style="border:1px solid #E5E7EB;border-radius:9px;background:#FFFFFF;padding:8px 11px"><div style="font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.1em;color:#6E7681;text-transform:uppercase">Timezone</div><div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#1F2937;margin-top:3px">Asia/Dubai</div></div><div style="border:1px solid #E5E7EB;border-radius:9px;background:#FFFFFF;padding:8px 11px"><div style="font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.1em;color:#6E7681;text-transform:uppercase">Currency</div><div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#1F2937;margin-top:3px">AED</div></div><div style="border:1px solid #E5E7EB;border-radius:9px;background:#FFFFFF;padding:8px 11px"><div style="font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.1em;color:#6E7681;text-transform:uppercase">Cookie banner</div><div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#1F2937;margin-top:3px">on</div></div><div style="border:1px solid #E5E7EB;border-radius:9px;background:#FFFFFF;padding:8px 11px"><div style="font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.1em;color:#6E7681;text-transform:uppercase">Inherited from</div><div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#1F2937;margin-top:3px">Tenant — own value</div></div></div><div style="border-left:3px solid #96650A;background:#FDF8EE;border-radius:0 9px 9px 0;padding:10px 13px;font-size:10.5px;color:#5E4408;line-height:1.55">The fourteenth instance of the scoped settings template, and the same inheritance indicator ADR-0018 requires everywhere else.</div><div style="display:flex;justify-content:flex-end;gap:8px"><div style="background:#FFFFFF;border:1px solid #E5E7EB;color:#4B5563;border-radius:9px;padding:8px 14px;font-size:10.5px;font-weight:800;white-space:nowrap;text-align:center">Discard</div><div style="background:linear-gradient(135deg,#0D6EFD,#00B8FF);border:0;color:#fff;border-radius:9px;padding:8px 14px;font-size:10.5px;font-weight:800;white-space:nowrap;text-align:center">Save</div></div></div>
+      </div>
+    </div></div>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#6E7681;line-height:1.6">updateSiteSettings</div>
+    <div style="display:flex;flex-wrap:wrap;gap:5px;align-items:center"><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#6E7681;letter-spacing:.06em">GOES TO</span><a href="#cms-017" style="border:1px solid #E5E7EB;border-radius:7px;padding:3px 8px;background:#FFFFFF;font-family:'IBM Plex Mono',monospace;font-size:9.5px;font-weight:600;color:#0D6EFD;white-space:nowrap" style-hover="border-color:#0D6EFD;background:#F2F7FF">CMS-017</a></div>
+  </div><div id="cms-017" style="display:flex;flex-direction:column;gap:9px;scroll-margin-top:24px">
+    <div style="display:flex;align-items:baseline;gap:9px;flex-wrap:wrap;line-height:1.4">
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;font-weight:600;color:#0D6EFD">CMS-017</div>
+      <div style="font-size:15px;font-weight:800;letter-spacing:-.01em;color:#1F2937">Domain &amp; Certificate</div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#6E7681">wave 2</div>
+      
+      
+    </div>
+    <div style="font-size:11.5px;color:#6B7280;line-height:1.5;max-width:62ch;margin-top:2px">Point the tenant’s own domain at their site.</div>
+    <div style="border:1px solid #DCE3ED;border-radius:13px;overflow:hidden;background:#FFFFFF;box-shadow:0 10px 26px rgba(12,35,64,.09)">
+    <div style="height:25px;background:#E6EBF2;border-bottom:1px solid #DCE3ED;display:flex;align-items:center;gap:7px;padding:0 11px">
+      <div style="display:flex;gap:4px"><div style="width:6px;height:6px;border-radius:50%;background:#C3CCDA"></div><div style="width:6px;height:6px;border-radius:50%;background:#C3CCDA"></div><div style="width:6px;height:6px;border-radius:50%;background:#C3CCDA"></div></div>
+      <div style="flex:1;background:#FFFFFF;border:1px solid #E5E7EB;border-radius:5px;height:14px;display:flex;align-items:center;padding:0 8px;font-family:'IBM Plex Mono',monospace;font-size:8.5px;color:#6E7681">cms.ticvai.com/</div>
+    </div>
+    <div style="display:flex;min-height:300px">
+      <div style="width:124px;flex:none;background:#0C2340;padding:12px 9px;display:flex;flex-direction:column;gap:2px">
+        <div style="display:flex;align-items:center;gap:7px;margin-bottom:10px"><div style="width:20px;height:20px;border-radius:6px;background:linear-gradient(135deg,#0D6EFD,#00B8FF);color:#fff;display:flex;align-items:center;justify-content:center;font-size:9.5px;font-weight:800">T</div><div style="font-size:10px;font-weight:800;color:#fff">CMS</div></div>
+        <div style="padding:6px 8px;border-radius:6px;background:transparent;font-size:9.5px;font-weight:500;color:#8FB0D2;line-height:1.3">Overview</div><div style="padding:6px 8px;border-radius:6px;background:transparent;font-size:9.5px;font-weight:500;color:#8FB0D2;line-height:1.3">Brand</div><div style="padding:6px 8px;border-radius:6px;background:transparent;font-size:9.5px;font-weight:500;color:#8FB0D2;line-height:1.3">Content</div><div style="padding:6px 8px;border-radius:6px;background:transparent;font-size:9.5px;font-weight:500;color:#8FB0D2;line-height:1.3">Language</div><div style="padding:6px 8px;border-radius:6px;background:rgba(255,255,255,.12);font-size:9.5px;font-weight:700;color:#fff;line-height:1.3">Publish</div>
+      </div>
+      <div style="flex:1;display:flex;flex-direction:column;min-width:0;background:#F7F9FC">
+        <div style="flex:none;min-height:36px;border-bottom:1px solid #E5E7EB;background:#FFFFFF;display:flex;align-items:center;gap:9px;padding:7px 14px">
+          <div style="flex:1;min-width:0"><div style="font-size:11.5px;font-weight:800;color:#1F2937">Domain &amp; Certificate</div></div>
+          
+          <div style="width:20px;height:20px;border-radius:6px;background:linear-gradient(135deg,#0D6EFD,#00B8FF);flex:none"></div>
+        </div>
+        <div style="flex:1;padding:13px 14px;display:flex;flex-direction:column;gap:10px"><div style="border:1px solid #E5E7EB;border-radius:11px;background:#FFFFFF;overflow:hidden">
+  <div style="padding:9px 12px;border-bottom:1px solid #E5E7EB;background:#F7F9FC"><div style="font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.12em;color:#6E7681;text-transform:uppercase">tickets.gulfparks.ae</div></div>
+  <div style="padding:11px 12px"><div style="display:flex;justify-content:space-between;gap:10px;padding:7px 0;border-bottom:1px solid #F1F4F8"><span style="font-size:10.5px;color:#6B7280">DNS</span><span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#0F7B4F;font-variant-numeric:tabular-nums">verified</span></div><div style="display:flex;justify-content:space-between;gap:10px;padding:7px 0;border-bottom:1px solid #F1F4F8"><span style="font-size:10.5px;color:#6B7280">Certificate</span><span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#1F2937;font-variant-numeric:tabular-nums">issued · 88 days</span></div><div style="display:flex;justify-content:space-between;gap:10px;padding:7px 0;border-bottom:1px solid #F1F4F8"><span style="font-size:10.5px;color:#6B7280">Auto-renew</span><span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#1F2937;font-variant-numeric:tabular-nums">on</span></div><div style="display:flex;justify-content:space-between;gap:10px;padding:7px 0;border-bottom:1px solid #F1F4F8"><span style="font-size:10.5px;color:#6B7280">Redirect</span><span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#1F2937;font-variant-numeric:tabular-nums">www → apex</span></div></div></div><div style="border-left:3px solid #96650A;background:#FDF8EE;border-radius:0 9px 9px 0;padding:10px 13px;font-size:10.5px;color:#5E4408;line-height:1.55">The same object as ADM-017 on the platform console, seen from the tenant side. Two screens, one record, and the tenant cannot change what the platform has locked.</div></div>
+      </div>
+    </div></div>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#6E7681;line-height:1.6">updateDomain · ADM-017 is the platform side</div>
+    <div style="display:flex;flex-wrap:wrap;gap:5px;align-items:center"><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#6E7681;letter-spacing:.06em">GOES TO</span><a href="#cms-018" style="border:1px solid #E5E7EB;border-radius:7px;padding:3px 8px;background:#FFFFFF;font-family:'IBM Plex Mono',monospace;font-size:9.5px;font-weight:600;color:#0D6EFD;white-space:nowrap" style-hover="border-color:#0D6EFD;background:#F2F7FF">CMS-018</a></div>
+  </div><div id="cms-018" style="display:flex;flex-direction:column;gap:9px;scroll-margin-top:24px">
+    <div style="display:flex;align-items:baseline;gap:9px;flex-wrap:wrap;line-height:1.4">
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;font-weight:600;color:#0D6EFD">CMS-018</div>
+      <div style="font-size:15px;font-weight:800;letter-spacing:-.01em;color:#1F2937">Consent &amp; Legal</div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#6E7681">wave 2</div>
+      
+      
+    </div>
+    <div style="font-size:11.5px;color:#6B7280;line-height:1.5;max-width:62ch;margin-top:2px">Manage the notices every consent is captured against.</div>
+    <div style="border:1px solid #DCE3ED;border-radius:13px;overflow:hidden;background:#FFFFFF;box-shadow:0 10px 26px rgba(12,35,64,.09)">
+    <div style="height:25px;background:#E6EBF2;border-bottom:1px solid #DCE3ED;display:flex;align-items:center;gap:7px;padding:0 11px">
+      <div style="display:flex;gap:4px"><div style="width:6px;height:6px;border-radius:50%;background:#C3CCDA"></div><div style="width:6px;height:6px;border-radius:50%;background:#C3CCDA"></div><div style="width:6px;height:6px;border-radius:50%;background:#C3CCDA"></div></div>
+      <div style="flex:1;background:#FFFFFF;border:1px solid #E5E7EB;border-radius:5px;height:14px;display:flex;align-items:center;padding:0 8px;font-family:'IBM Plex Mono',monospace;font-size:8.5px;color:#6E7681">cms.ticvai.com/</div>
+    </div>
+    <div style="display:flex;min-height:300px">
+      <div style="width:124px;flex:none;background:#0C2340;padding:12px 9px;display:flex;flex-direction:column;gap:2px">
+        <div style="display:flex;align-items:center;gap:7px;margin-bottom:10px"><div style="width:20px;height:20px;border-radius:6px;background:linear-gradient(135deg,#0D6EFD,#00B8FF);color:#fff;display:flex;align-items:center;justify-content:center;font-size:9.5px;font-weight:800">T</div><div style="font-size:10px;font-weight:800;color:#fff">CMS</div></div>
+        <div style="padding:6px 8px;border-radius:6px;background:transparent;font-size:9.5px;font-weight:500;color:#8FB0D2;line-height:1.3">Overview</div><div style="padding:6px 8px;border-radius:6px;background:transparent;font-size:9.5px;font-weight:500;color:#8FB0D2;line-height:1.3">Brand</div><div style="padding:6px 8px;border-radius:6px;background:transparent;font-size:9.5px;font-weight:500;color:#8FB0D2;line-height:1.3">Content</div><div style="padding:6px 8px;border-radius:6px;background:transparent;font-size:9.5px;font-weight:500;color:#8FB0D2;line-height:1.3">Language</div><div style="padding:6px 8px;border-radius:6px;background:rgba(255,255,255,.12);font-size:9.5px;font-weight:700;color:#fff;line-height:1.3">Publish</div>
+      </div>
+      <div style="flex:1;display:flex;flex-direction:column;min-width:0;background:#F7F9FC">
+        <div style="flex:none;min-height:36px;border-bottom:1px solid #E5E7EB;background:#FFFFFF;display:flex;align-items:center;gap:9px;padding:7px 14px">
+          <div style="flex:1;min-width:0"><div style="font-size:11.5px;font-weight:800;color:#1F2937">Consent &amp; Legal</div></div>
+          
+          <div style="width:20px;height:20px;border-radius:6px;background:linear-gradient(135deg,#0D6EFD,#00B8FF);flex:none"></div>
+        </div>
+        <div style="flex:1;padding:13px 14px;display:flex;flex-direction:column;gap:10px"><div style="border:1px solid #E5E7EB;border-radius:10px;background:#FFFFFF;overflow:hidden">
+    <div style="display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr 1fr;gap:9px;padding:8px 12px;background:#F7F9FC;border-bottom:1px solid #E5E7EB"><div style="font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.09em;color:#6E7681;text-transform:uppercase;text-align:left">Notice</div><div style="font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.09em;color:#6E7681;text-transform:uppercase;text-align:left">Version</div><div style="font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.09em;color:#6E7681;text-transform:uppercase;text-align:left">Effective</div><div style="font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.09em;color:#6E7681;text-transform:uppercase;text-align:left">Requires renewal</div><div style="font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.09em;color:#6E7681;text-transform:uppercase;text-align:right">Status</div></div>
+    <div style="display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr 1fr;gap:9px;padding:9px 12px;border-bottom:1px solid #F1F4F8;align-items:center"><div style="font-size:10.5px;color:#1F2937;font-weight:700;text-align:left;">Privacy notice</div><div style="font-size:10.5px;color:#4B5563;font-weight:400;text-align:left;">v4</div><div style="font-size:10.5px;color:#4B5563;font-weight:400;text-align:left;">14 Aug</div><div style="font-size:10.5px;color:#4B5563;font-weight:400;text-align:left;">no</div><div style="text-align:right"><span style="border:1px solid #0F7B4F55;background:#0F7B4F12;color:#0F7B4F;border-radius:6px;padding:2px 7px;font-size:9px;font-weight:700;letter-spacing:.03em;white-space:nowrap">LIVE</span></div></div><div style="display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr 1fr;gap:9px;padding:9px 12px;border-bottom:1px solid #F1F4F8;align-items:center"><div style="font-size:10.5px;color:#1F2937;font-weight:700;text-align:left;">Cookie policy</div><div style="font-size:10.5px;color:#4B5563;font-weight:400;text-align:left;">v3</div><div style="font-size:10.5px;color:#4B5563;font-weight:400;text-align:left;">1 Jun</div><div style="font-size:10.5px;color:#4B5563;font-weight:400;text-align:left;">no</div><div style="text-align:right"><span style="border:1px solid #0F7B4F55;background:#0F7B4F12;color:#0F7B4F;border-radius:6px;padding:2px 7px;font-size:9px;font-weight:700;letter-spacing:.03em;white-space:nowrap">LIVE</span></div></div><div style="display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr 1fr;gap:9px;padding:9px 12px;border-bottom:1px solid #F1F4F8;align-items:center"><div style="font-size:10.5px;color:#1F2937;font-weight:700;text-align:left;">Marketing consent</div><div style="font-size:10.5px;color:#4B5563;font-weight:400;text-align:left;">v4</div><div style="font-size:10.5px;color:#4B5563;font-weight:400;text-align:left;">14 Aug</div><div style="font-size:10.5px;color:#4B5563;font-weight:400;text-align:left;">yes</div><div style="text-align:right"><span style="border:1px solid #0F7B4F55;background:#0F7B4F12;color:#0F7B4F;border-radius:6px;padding:2px 7px;font-size:9px;font-weight:700;letter-spacing:.03em;white-space:nowrap">LIVE</span></div></div><div style="display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr 1fr;gap:9px;padding:9px 12px;border-bottom:1px solid #F1F4F8;align-items:center"><div style="font-size:10.5px;color:#1F2937;font-weight:700;text-align:left;">Terms of sale</div><div style="font-size:10.5px;color:#4B5563;font-weight:400;text-align:left;">v5</div><div style="font-size:10.5px;color:#4B5563;font-weight:400;text-align:left;">—</div><div style="text-align:left"><span style="border:1px solid #6E768155;background:#6E768112;color:#6E7681;border-radius:6px;padding:2px 7px;font-size:9px;font-weight:700;letter-spacing:.03em;white-space:nowrap">DRAFT</span></div><div style="font-size:10.5px;color:#4B5563;font-weight:400;text-align:right;font-family:'IBM Plex Mono',monospace;font-variant-numeric:tabular-nums"></div></div>
+  </div><div style="border-left:3px solid #C02626;background:#FDF3F3;border-radius:0 9px 9px 0;padding:10px 13px;font-size:10.5px;color:#7A1F1F;line-height:1.55">Publishing a new notice version can invalidate consents captured against the old one. The consentBlock on WEB-011, GST and ACC-002 carries the version precisely so that this screen can answer the question.</div></div>
+      </div>
+    </div></div>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#6E7681;line-height:1.6">publishNotice · consentBlock</div>
+    <div style="display:flex;flex-wrap:wrap;gap:5px;align-items:center"><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#6E7681;letter-spacing:.06em">GOES TO</span><a href="#cms-019" style="border:1px solid #E5E7EB;border-radius:7px;padding:3px 8px;background:#FFFFFF;font-family:'IBM Plex Mono',monospace;font-size:9.5px;font-weight:600;color:#0D6EFD;white-space:nowrap" style-hover="border-color:#0D6EFD;background:#F2F7FF">CMS-019</a></div>
+  </div><div id="cms-019" style="display:flex;flex-direction:column;gap:9px;scroll-margin-top:24px">
+    <div style="display:flex;align-items:baseline;gap:9px;flex-wrap:wrap;line-height:1.4">
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;font-weight:600;color:#0D6EFD">CMS-019</div>
+      <div style="font-size:15px;font-weight:800;letter-spacing:-.01em;color:#1F2937">User Access</div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#6E7681">wave 2</div>
+      
+      
+    </div>
+    <div style="font-size:11.5px;color:#6B7280;line-height:1.5;max-width:62ch;margin-top:2px">Say who in the tenant may change what.</div>
+    <div style="border:1px solid #DCE3ED;border-radius:13px;overflow:hidden;background:#FFFFFF;box-shadow:0 10px 26px rgba(12,35,64,.09)">
+    <div style="height:25px;background:#E6EBF2;border-bottom:1px solid #DCE3ED;display:flex;align-items:center;gap:7px;padding:0 11px">
+      <div style="display:flex;gap:4px"><div style="width:6px;height:6px;border-radius:50%;background:#C3CCDA"></div><div style="width:6px;height:6px;border-radius:50%;background:#C3CCDA"></div><div style="width:6px;height:6px;border-radius:50%;background:#C3CCDA"></div></div>
+      <div style="flex:1;background:#FFFFFF;border:1px solid #E5E7EB;border-radius:5px;height:14px;display:flex;align-items:center;padding:0 8px;font-family:'IBM Plex Mono',monospace;font-size:8.5px;color:#6E7681">cms.ticvai.com/</div>
+    </div>
+    <div style="display:flex;min-height:300px">
+      <div style="width:124px;flex:none;background:#0C2340;padding:12px 9px;display:flex;flex-direction:column;gap:2px">
+        <div style="display:flex;align-items:center;gap:7px;margin-bottom:10px"><div style="width:20px;height:20px;border-radius:6px;background:linear-gradient(135deg,#0D6EFD,#00B8FF);color:#fff;display:flex;align-items:center;justify-content:center;font-size:9.5px;font-weight:800">T</div><div style="font-size:10px;font-weight:800;color:#fff">CMS</div></div>
+        <div style="padding:6px 8px;border-radius:6px;background:transparent;font-size:9.5px;font-weight:500;color:#8FB0D2;line-height:1.3">Overview</div><div style="padding:6px 8px;border-radius:6px;background:transparent;font-size:9.5px;font-weight:500;color:#8FB0D2;line-height:1.3">Brand</div><div style="padding:6px 8px;border-radius:6px;background:transparent;font-size:9.5px;font-weight:500;color:#8FB0D2;line-height:1.3">Content</div><div style="padding:6px 8px;border-radius:6px;background:transparent;font-size:9.5px;font-weight:500;color:#8FB0D2;line-height:1.3">Language</div><div style="padding:6px 8px;border-radius:6px;background:rgba(255,255,255,.12);font-size:9.5px;font-weight:700;color:#fff;line-height:1.3">Publish</div>
+      </div>
+      <div style="flex:1;display:flex;flex-direction:column;min-width:0;background:#F7F9FC">
+        <div style="flex:none;min-height:36px;border-bottom:1px solid #E5E7EB;background:#FFFFFF;display:flex;align-items:center;gap:9px;padding:7px 14px">
+          <div style="flex:1;min-width:0"><div style="font-size:11.5px;font-weight:800;color:#1F2937">User Access</div></div>
+          
+          <div style="width:20px;height:20px;border-radius:6px;background:linear-gradient(135deg,#0D6EFD,#00B8FF);flex:none"></div>
+        </div>
+        <div style="flex:1;padding:13px 14px;display:flex;flex-direction:column;gap:10px"><div style="border:1px solid #E5E7EB;border-radius:10px;background:#FFFFFF;overflow:hidden">
+    <div style="display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr;gap:9px;padding:8px 12px;background:#F7F9FC;border-bottom:1px solid #E5E7EB"><div style="font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.09em;color:#6E7681;text-transform:uppercase;text-align:left">User</div><div style="font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.09em;color:#6E7681;text-transform:uppercase;text-align:left">Role</div><div style="font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.09em;color:#6E7681;text-transform:uppercase;text-align:right">Can publish</div><div style="font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.09em;color:#6E7681;text-transform:uppercase;text-align:right">Scope</div></div>
+    <div style="display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr;gap:9px;padding:9px 12px;border-bottom:1px solid #F1F4F8;align-items:center"><div style="font-size:10.5px;color:#1F2937;font-weight:700;text-align:left;">S. Iqbal</div><div style="font-size:10.5px;color:#4B5563;font-weight:400;text-align:left;">Site editor</div><div style="text-align:right"><span style="border:1px solid #0F7B4F55;background:#0F7B4F12;color:#0F7B4F;border-radius:6px;padding:2px 7px;font-size:9px;font-weight:700;letter-spacing:.03em;white-space:nowrap">YES</span></div><div style="font-size:10.5px;color:#4B5563;font-weight:400;text-align:right;font-family:'IBM Plex Mono',monospace;font-variant-numeric:tabular-nums">Tenant</div></div><div style="display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr;gap:9px;padding:9px 12px;border-bottom:1px solid #F1F4F8;align-items:center"><div style="font-size:10.5px;color:#1F2937;font-weight:700;text-align:left;">T. Bauer</div><div style="font-size:10.5px;color:#4B5563;font-weight:400;text-align:left;">Contributor</div><div style="text-align:right"><span style="border:1px solid #6E768155;background:#6E768112;color:#6E7681;border-radius:6px;padding:2px 7px;font-size:9px;font-weight:700;letter-spacing:.03em;white-space:nowrap">NO</span></div><div style="font-size:10.5px;color:#4B5563;font-weight:400;text-align:right;font-family:'IBM Plex Mono',monospace;font-variant-numeric:tabular-nums">Marina venue</div></div><div style="display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr;gap:9px;padding:9px 12px;border-bottom:1px solid #F1F4F8;align-items:center"><div style="font-size:10.5px;color:#1F2937;font-weight:700;text-align:left;">ops@ticvai</div><div style="font-size:10.5px;color:#4B5563;font-weight:400;text-align:left;">Platform</div><div style="text-align:right"><span style="border:1px solid #0F7B4F55;background:#0F7B4F12;color:#0F7B4F;border-radius:6px;padding:2px 7px;font-size:9px;font-weight:700;letter-spacing:.03em;white-space:nowrap">YES</span></div><div style="font-size:10.5px;color:#4B5563;font-weight:400;text-align:right;font-family:'IBM Plex Mono',monospace;font-variant-numeric:tabular-nums">All</div></div>
+  </div></div>
+      </div>
+    </div></div>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#6E7681;line-height:1.6">assignSiteRole</div>
+    <div style="display:flex;flex-wrap:wrap;gap:5px;align-items:center"><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#6E7681;letter-spacing:.06em">GOES TO</span><a href="#cms-020" style="border:1px solid #E5E7EB;border-radius:7px;padding:3px 8px;background:#FFFFFF;font-family:'IBM Plex Mono',monospace;font-size:9.5px;font-weight:600;color:#0D6EFD;white-space:nowrap" style-hover="border-color:#0D6EFD;background:#F2F7FF">CMS-020</a></div>
+  </div><div id="cms-020" style="display:flex;flex-direction:column;gap:9px;scroll-margin-top:24px">
+    <div style="display:flex;align-items:baseline;gap:9px;flex-wrap:wrap;line-height:1.4">
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;font-weight:600;color:#0D6EFD">CMS-020</div>
+      <div style="font-size:15px;font-weight:800;letter-spacing:-.01em;color:#1F2937">Change Log</div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#6E7681">wave 2</div>
+      
+      
+    </div>
+    <div style="font-size:11.5px;color:#6B7280;line-height:1.5;max-width:62ch;margin-top:2px">See who changed what, before the publish that carried it.</div>
+    <div style="border:1px solid #DCE3ED;border-radius:13px;overflow:hidden;background:#FFFFFF;box-shadow:0 10px 26px rgba(12,35,64,.09)">
+    <div style="height:25px;background:#E6EBF2;border-bottom:1px solid #DCE3ED;display:flex;align-items:center;gap:7px;padding:0 11px">
+      <div style="display:flex;gap:4px"><div style="width:6px;height:6px;border-radius:50%;background:#C3CCDA"></div><div style="width:6px;height:6px;border-radius:50%;background:#C3CCDA"></div><div style="width:6px;height:6px;border-radius:50%;background:#C3CCDA"></div></div>
+      <div style="flex:1;background:#FFFFFF;border:1px solid #E5E7EB;border-radius:5px;height:14px;display:flex;align-items:center;padding:0 8px;font-family:'IBM Plex Mono',monospace;font-size:8.5px;color:#6E7681">cms.ticvai.com/</div>
+    </div>
+    <div style="display:flex;min-height:300px">
+      <div style="width:124px;flex:none;background:#0C2340;padding:12px 9px;display:flex;flex-direction:column;gap:2px">
+        <div style="display:flex;align-items:center;gap:7px;margin-bottom:10px"><div style="width:20px;height:20px;border-radius:6px;background:linear-gradient(135deg,#0D6EFD,#00B8FF);color:#fff;display:flex;align-items:center;justify-content:center;font-size:9.5px;font-weight:800">T</div><div style="font-size:10px;font-weight:800;color:#fff">CMS</div></div>
+        <div style="padding:6px 8px;border-radius:6px;background:transparent;font-size:9.5px;font-weight:500;color:#8FB0D2;line-height:1.3">Overview</div><div style="padding:6px 8px;border-radius:6px;background:transparent;font-size:9.5px;font-weight:500;color:#8FB0D2;line-height:1.3">Brand</div><div style="padding:6px 8px;border-radius:6px;background:transparent;font-size:9.5px;font-weight:500;color:#8FB0D2;line-height:1.3">Content</div><div style="padding:6px 8px;border-radius:6px;background:transparent;font-size:9.5px;font-weight:500;color:#8FB0D2;line-height:1.3">Language</div><div style="padding:6px 8px;border-radius:6px;background:rgba(255,255,255,.12);font-size:9.5px;font-weight:700;color:#fff;line-height:1.3">Publish</div>
+      </div>
+      <div style="flex:1;display:flex;flex-direction:column;min-width:0;background:#F7F9FC">
+        <div style="flex:none;min-height:36px;border-bottom:1px solid #E5E7EB;background:#FFFFFF;display:flex;align-items:center;gap:9px;padding:7px 14px">
+          <div style="flex:1;min-width:0"><div style="font-size:11.5px;font-weight:800;color:#1F2937">Change Log</div></div>
+          
+          <div style="width:20px;height:20px;border-radius:6px;background:linear-gradient(135deg,#0D6EFD,#00B8FF);flex:none"></div>
+        </div>
+        <div style="flex:1;padding:13px 14px;display:flex;flex-direction:column;gap:10px"><div style="border:1px solid #E5E7EB;border-radius:10px;background:#FFFFFF;overflow:hidden">
+    <div style="display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr;gap:9px;padding:8px 12px;background:#F7F9FC;border-bottom:1px solid #E5E7EB"><div style="font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.09em;color:#6E7681;text-transform:uppercase;text-align:left">When</div><div style="font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.09em;color:#6E7681;text-transform:uppercase;text-align:left">User</div><div style="font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.09em;color:#6E7681;text-transform:uppercase;text-align:left">Change</div><div style="font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.09em;color:#6E7681;text-transform:uppercase;text-align:right">Version</div></div>
+    <div style="display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr;gap:9px;padding:9px 12px;border-bottom:1px solid #F1F4F8;align-items:center"><div style="font-size:10.5px;color:#1F2937;font-weight:700;text-align:left;">13:40</div><div style="font-size:10.5px;color:#4B5563;font-weight:400;text-align:left;">S. Iqbal</div><div style="font-size:10.5px;color:#4B5563;font-weight:400;text-align:left;">Hero headline · Home</div><div style="font-size:10.5px;color:#4B5563;font-weight:400;text-align:right;font-family:'IBM Plex Mono',monospace;font-variant-numeric:tabular-nums">draft</div></div><div style="display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr;gap:9px;padding:9px 12px;border-bottom:1px solid #F1F4F8;align-items:center"><div style="font-size:10.5px;color:#1F2937;font-weight:700;text-align:left;">11:02</div><div style="font-size:10.5px;color:#4B5563;font-weight:400;text-align:left;">T. Bauer</div><div style="font-size:10.5px;color:#4B5563;font-weight:400;text-align:left;">Added desert-evening.jpg</div><div style="font-size:10.5px;color:#4B5563;font-weight:400;text-align:right;font-family:'IBM Plex Mono',monospace;font-variant-numeric:tabular-nums">draft</div></div><div style="display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr;gap:9px;padding:9px 12px;border-bottom:1px solid #F1F4F8;align-items:center"><div style="font-size:10.5px;color:#1F2937;font-weight:700;text-align:left;">09:00</div><div style="font-size:10.5px;color:#4B5563;font-weight:400;text-align:left;">S. Iqbal</div><div style="font-size:10.5px;color:#4B5563;font-weight:400;text-align:left;">Published</div><div style="font-size:10.5px;color:#4B5563;font-weight:400;text-align:right;font-family:'IBM Plex Mono',monospace;font-variant-numeric:tabular-nums">v18</div></div>
+  </div></div>
+      </div>
+    </div></div>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#6E7681;line-height:1.6">listSiteAudit</div>
+    <div style="display:flex;flex-wrap:wrap;gap:5px;align-items:center"><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#6E7681;letter-spacing:.06em">GOES TO</span><a href="#cms-016" style="border:1px solid #E5E7EB;border-radius:7px;padding:3px 8px;background:#FFFFFF;font-family:'IBM Plex Mono',monospace;font-size:9.5px;font-weight:600;color:#0D6EFD;white-space:nowrap" style-hover="border-color:#0D6EFD;background:#F2F7FF">CMS-016</a></div>
+  </div></div>
+
+    <div style="margin-top:54px;background:#FFFFFF;border:1px solid #E5E7EB;border-radius:16px;padding:26px 28px">
+      <div style="font-size:11px;font-weight:800;letter-spacing:.1em;color:#0D6EFD;text-transform:uppercase">Handed on</div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:26px;margin-top:16px">
+        <div><div style="font-size:14.5px;font-weight:800">Reuse the six boards</div><p style="font-size:12.5px;line-height:1.65;color:#4B5563;margin:6px 0 0;text-wrap:pretty">Nothing on CMS-002 to CMS-006 should be redesigned. They exist, they are coherent, and the job is extracting them into named components against one token set.</p></div><div><div style="font-size:14.5px;font-weight:800">What was actually missing</div><p style="font-size:12.5px;line-height:1.65;color:#4B5563;margin:6px 0 0;text-wrap:pretty">Translations, RTL preview, publishing workflow, version history, consent notice versions and tenant user access. None of those appear in the reference, and every one of them blocks a real publish.</p></div><div><div style="font-size:14.5px;font-weight:800">One record, two screens</div><p style="font-size:12.5px;line-height:1.65;color:#4B5563;margin:6px 0 0;text-wrap:pretty">CMS-017 and ADM-017 are the same domain object seen from the tenant side and the platform side. A tenant cannot change what the platform has locked, and the screen has to say which is which.</p></div>
+      </div></div>
+
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1920,&quot;height&quot;:1400}}"></script>
+</body>
+</html>

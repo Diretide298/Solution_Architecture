@@ -1,0 +1,68 @@
+$schema: ./_schema.yaml
+id: F97
+name: A cell is capacity-checked and a tenant is placed on it
+actor: platformAdmin
+capability: A cell is capacity-checked and a tenant is placed on it
+wave: 3
+frequency: As needed.
+criticality: operational
+primaryContract: platform-ops
+contracts:
+- platform-ops
+- cross-cell
+platforms:
+- P09
+trigger:
+  description: A new tenant needs a home, and the home has to be in the right jurisdiction.
+offlineBehaviour: None of it offline.
+steps:
+- step: 1
+  screen: ADM-012
+  action: Tenant Isolation & Resource Pool.
+  operations:
+  - getCellCapacity
+  - getEntitlementUsage
+  - getSsoConfig
+  outcome: 16 operations, 16 of them previously unwalked.
+  note: '**Corrected 24 August**: addLicenceAddOn, generateInvoice, getSubscription removed. **This
+    step was written against a screen carrying bulk-attached operations** — 121 were stripped from P09
+    the same day, and a flow that depended on them was depending on a defect.'
+- step: 2
+  screen: ADM-013
+  action: Tenant Performance Monitor.
+  operations:
+  - cancelDecommission
+  - decommissionCell
+  - getCell
+  - getCellCapacity
+  - getCellHealth
+  - listCellJobs
+  outcome: 7 operations, 7 of them previously unwalked.
+  crossesDevice: true
+- step: 3
+  screen: ADM-014
+  action: Auto-Scaling Configuration.
+  operations:
+  - cancelDecommission
+  - decommissionCell
+  - getCell
+  - getCellCapacity
+  - getCellHealth
+  - listCellJobs
+  outcome: 7 operations, 7 of them previously unwalked.
+  crossesDevice: true
+branches:
+- at: 1
+  condition: The acting principal lacks the permission at this scope.
+  behaviour: '**Refused at the first step, not the last.** ADR-0002 makes authorisation user-driven
+    — a person who gets three steps in and then cannot finish has been told the wrong thing.'
+  severity: medium
+  resolvedBy: resolvePermissions
+exitStates:
+- state: completed
+  description: The journey ran end to end.
+- state: refused
+  description: '**Stopped at a permission or a licence boundary**, with the reason named.'
+notes: '**ADR-0001 puts one cell per jurisdiction and ADR-0010 keeps entitlements crossing them pseudonymously.**
+  CrossCellService sits at 31% and **placement had never been walked.**'
+openQuestions: null

@@ -1,0 +1,6 @@
+node_modules/
+api/__pycache__/
+api/ticvai.db
+api/ticvai.db-shm
+api/ticvai.db-wal
+.versions/

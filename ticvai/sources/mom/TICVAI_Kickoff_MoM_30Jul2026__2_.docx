@@ -1,0 +1,262 @@
+**Minutes of Meeting**
+
+*TICVAI **Kickoff** — Technical Discovery **&** Architecture Workshop*
+
+| **Date** | 30 July 2026 | **Project** | TICVAI |
+| --- | --- | --- | --- |
+| **Meeting Type** | Technical Discovery & Architecture Workshop | **Prepared by** | Chinmay Parab |
+
+## **Primary Objective**
+
+To review the proposed TICVAI platform architecture, multi-tenancy model, governance approach, deployment strategy, versioning process, API structure, and base project setup.
+
+## **Participants**
+
+- TICVAI
+
+- Softlabs Team
+
+## **A****genda**
+
+- Review the proposed multi-tenant architecture
+
+- Discuss governance and tenant hierarchy
+
+- Review API structure and project setup
+
+- Discuss deployment and software release strategy
+
+- Define software versioning approach
+
+- Plan the next technical workshop
+
+# **Discussion Summary**
+
+**1. Overview of Architecture Presentation**
+
+Chinmay Parab opened the session, noting that the presentation had been prepared to cover both the current discussion topics and the topics originally planned for the following session. The presentation addressed:
+
+- Multi-tenancy architecture
+
+- Governance model
+
+- API structure
+
+- Base project setup
+
+*The objective was to provide a broader architectural view before proceeding with implementation-specific discussions.*
+
+**2. Proposed Multi-Tenant Hierarchy**
+
+The Softlabs team presented the proposed hierarchical structure for the platform:
+
+| Tenant   └─ Organization / Brand       └─ Region           └─ Branch               └─ Venue                   └─ Department |
+| --- |
+
+The purpose of this hierarchy is to provide:
+
+- Clear tenant separation
+
+- Better deployment management
+
+- Scalability for multiple organizations
+
+- Support for clients operating across several locations
+
+- Department-level isolation and access control
+
+The hierarchy was designed so that each client could manage multiple organizations, geographical regions, branches, venues, and departments within a single tenant.
+
+**3. Feedback on Organizational Structure**
+
+Chinmay requested feedback on the proposed hierarchy, specifically asking whether:
+
+- Additional hierarchy levels should be introduced
+
+- Existing levels should be merged
+
+- The current structure adequately supports future scalability
+
+Allam noted that TICVAI had already prepared a more detailed organizational hierarchy, and that:
+
+- The document would be shared after the meeting
+
+- The structure would be explained in detail
+
+- Both structures could then be compared before making a final architectural decision
+
+**Outcome:  **The existing proposal remains under review until the TICVAI structure is evaluated.
+
+**4. Deployment Workflow Discussion**
+
+Discussion shifted toward software deployment and release management. Allam proposed a structured deployment workflow centered on a staging environment:
+
+| Development   ↓ Staging Environment   ↓ Customer Notification   ↓ Customer Testing   ↓ Customer Approval   ↓ Production Deployment |
+| --- |
+
+Under this process:
+
+- New releases are first deployed to staging
+
+- Customers receive notifications whenever a new version becomes available, including:
+
+- New features
+
+- Bug fixes
+
+- Release notes
+
+- Customers validate functionality in staging
+
+- The release is promoted to production only after customer approval
+
+**Benefits Discussed**
+
+- Reduced production risk
+
+- Better customer confidence
+
+- Opportunity for user acceptance testing
+
+- Controlled production rollouts
+
+**5. Standardizing Deployment**
+
+Chinmay discussed simplifying deployments by reducing operational friction. Topics included:
+
+- Standardizing deployment processes
+
+- Standardizing database migrations
+
+- Automating repetitive deployment activities
+
+- Making production releases more seamless
+
+*Standardization was noted to significantly improve maintainability and reduce deployment complexity.*
+
+**6. Global Versioning Strategy**
+
+A significant portion of the discussion focused on version management.
+
+**Minor Releases**
+
+Qossai suggested that minor releases should:
+
+- Notify customers when available
+
+- Remain optional
+
+- Allow customers to postpone installation if new functionality is not immediately required
+
+Examples: small enhancements, minor bug fixes, and UI improvements.
+
+**Major Releases**
+
+Major platform releases would follow a different process, including:
+
+- Advance notification to customers
+
+- A defined support lifecycle
+
+- End-of-support announcements for older versions
+
+- Mandatory migration to the latest supported version
+
+Example discussed:
+
+| Version 3   ↓ End of Support Notice   ↓ Mandatory Upgrade   ↓ Version 4 |
+| --- |
+
+**7. Benefits of a Unified Platform Version**
+
+Qossai explained why maintaining a single supported version is beneficial. Supporting multiple production versions creates challenges including:
+
+- Increased maintenance effort
+
+- More difficult debugging
+
+- Longer support cycles
+
+- Higher development overhead
+
+- Complex feature management
+
+Maintaining a single supported version instead enables:
+
+- Faster bug resolution
+
+- Easier customer support
+
+- Simplified testing
+
+- Consistent deployments
+
+- Lower maintenance costs
+
+The Softlabs team agreed that this approach aligns with long-term platform maintainability.
+
+# **Decisions Made**
+
+**Multi-Tenant Architecture**
+
+- Retain the proposed tenant hierarchy for review
+
+- Compare it with the detailed TICVAI organizational structure before finalizing
+
+**Deployment Strategy**
+
+The team agreed on a staged deployment model where:
+
+- Releases are first deployed to staging
+
+- Customers validate changes
+
+- Production rollout occurs only after customer approval
+
+**Version Management**
+
+- Minor releases remain optional
+
+- Major releases become mandatory after the defined support period
+
+- Long-term objective: maintain one primary supported production version
+
+**Standardization**
+
+Deployment processes and database migration strategies should be standardized wherever possible to minimize release complexity.
+
+# **Action Items**
+
+| **Action Item** | **Owner** | **Status** |
+| --- | --- | --- |
+| Share detailed organizational hierarchy | TICVAI Team | **Pending** |
+| Review and compare hierarchy models | Softlabs & TICVAI | **Pending** |
+| Finalize multi-tenant architecture | Both Teams | **Pending** |
+| Define standardized deployment workflow | Softlabs Team | **In Progress** |
+| Document software versioning policy | Softlabs Team | **Pending** |
+| Standardize database migration process | Softlabs Team | **In Progress** |
+
+# **Next Meeting**
+
+**Date:  **Friday, 31 July 2026
+
+**Time:  **10:30 AM
+
+**Planned Topics**
+
+- API structures
+
+- Base project setup
+
+- Remaining architecture discussions
+
+- Additional technical topics to be circulated before the meeting
+
+# **Closing Remarks**
+
+The meeting concluded with agreement on the overall architectural direction for the TICVAI platform. Both teams aligned on the need for a scalable multi-tenant architecture, a standardized deployment process, and a simplified version management strategy that minimizes operational overhead while ensuring a consistent customer experience.
+
+Chinmay confirmed that the Minutes of Meeting and the agenda for the next session would be circulated via email before the following day's workshop.
+
+|  |  |  |
+| --- | --- | --- |

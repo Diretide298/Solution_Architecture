@@ -1,0 +1,145 @@
+# access — derived from the API contracts, not hand-written
+# Migration: V0007
+#
+# Columns come from schema properties. Types are inferred: format uuid to uuid,
+# date-time to timestamptz, ULID patterns to char(26), Money to numeric(18,4).
+# What is NOT here: partitioning, RLS policies, indexes, the PII split. That is
+# storage design and lives in the migration scripts.
+
+module: access
+migration: V0007
+tableCount: 4
+columnCount: 39
+tables:
+  access.access_point:
+    derivedFrom: AccessPoint
+    columns:
+    - name: id
+      type: uuid
+      required: true
+    - name: code
+      type: text
+      required: true
+    - name: name
+      type: text
+      required: true
+    - name: venue_id
+      type: uuid
+      required: true
+    - name: scope_path
+      type: text
+      required: false
+    - name: mode
+      type: jsonb
+      required: true
+    - name: direction
+      type: jsonb
+      required: false
+    - name: anti_passback_enabled
+      type: boolean
+      required: false
+    - name: is_active
+      type: boolean
+      required: true
+    - name: last_heartbeat_at
+      type: timestamptz
+      required: false
+  access.admission_profile:
+    derivedFrom: AdmissionProfile
+    columns:
+    - name: id
+      type: uuid
+      required: true
+    - name: code
+      type: varchar(64)
+      required: true
+    - name: name
+      type: varchar(200)
+      required: true
+    - name: open_minutes_before
+      type: integer
+      required: true
+      description: How long before a performance validation opens.
+    - name: close_minutes_after
+      type: integer
+      required: true
+    - name: max_duration_minutes
+      type: integer
+      required: false
+    - name: requires_exit_before_reentry
+      type: boolean
+      required: false
+    - name: max_reentries
+      type: integer
+      required: false
+    - name: allowed_access_point_ids
+      type: jsonb
+      required: false
+      description: Empty means any access point in the venue.
+  access.blacklist:
+    derivedFrom: BlacklistEntry
+    columns:
+    - name: media_code
+      type: text
+      required: true
+    - name: reason
+      type: text
+      required: true
+    - name: added_at
+      type: timestamptz
+      required: true
+    - name: added_by_principal_id
+      type: uuid
+      required: true
+    - name: expires_at
+      type: timestamptz
+      required: false
+  access.scan_event:
+    derivedFrom: ScanEvent
+    columns:
+    - name: id
+      type: text
+      required: true
+    - name: access_point_id
+      type: uuid
+      required: true
+    - name: venue_id
+      type: uuid
+      required: true
+    - name: scope_path
+      type: text
+      required: false
+    - name: ticket_id
+      type: text
+      required: false
+    - name: media_code
+      type: text
+      required: false
+    - name: outcome
+      type: jsonb
+      required: true
+    - name: deny_reason
+      type: jsonb
+      required: false
+    - name: direction
+      type: jsonb
+      required: true
+    - name: operator_principal_id
+      type: uuid
+      required: false
+    - name: device_id
+      type: uuid
+      required: false
+    - name: overridden_by_principal_id
+      type: uuid
+      required: false
+    - name: override_reason
+      type: text
+      required: false
+    - name: recorded_at
+      type: timestamptz
+      required: true
+    - name: synced_at
+      type: timestamptz
+      required: false
+      description: Null while pending. Differs from recordedAt for offline scans.

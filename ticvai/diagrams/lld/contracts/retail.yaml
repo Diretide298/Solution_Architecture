@@ -1,0 +1,476 @@
+id: LLD-retail
+title: retail — 35 operations
+generatedBy: tools/derive-diagrams.py
+index: diagrams/hld/03-contracts.yaml
+tier: satellite
+service: RetailService
+operations:
+- operation: activateGiftCard
+  verb: POST
+  path: /gift-cards/{giftCardId}/activate
+  scope: venue
+  permission: ORDER_CREATE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - retail.gift_card
+  writes:
+  - cache:idempotency
+  - retail.gift_card
+- operation: adjustWallet
+  verb: POST
+  path: /wallets/{subjectId}/adjust
+  scope: venue
+  permission: LEDGER_POST
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - retail.wallet
+  writes:
+  - cache:idempotency
+  - retail.wallet
+- operation: blockGiftCard
+  verb: POST
+  path: /gift-cards/{cardCode}/block
+  scope: venue
+  permission: PRICE_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - retail.gift_card
+  writes:
+  - cache:idempotency
+  - retail.gift_card
+- operation: cancelMerchandiseReservation
+  verb: POST
+  path: /merchandise-reservations/{reservationId}/cancel
+  scope: venue
+  permission: ORDER_CREATE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - platform.scope_node
+  writes:
+  - cache:idempotency
+  - inventory.movement
+- operation: closeWallet
+  verb: POST
+  path: /wallets/{walletId}/close
+  scope: venue
+  permission: ORDER_MODIFY
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - retail.wallet
+  - retail.wallet_transaction
+  writes:
+  - cache:idempotency
+  - retail.wallet
+- operation: collectMerchandiseReservation
+  verb: POST
+  path: /merchandise-reservations/{reservationId}/collect
+  scope: venue
+  permission: ORDER_CREATE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - platform.scope_node
+  writes:
+  - cache:idempotency
+  - inventory.movement
+- operation: collectShopAndDrop
+  verb: POST
+  path: /shop-and-drop/{dropId}/collect
+  scope: venue
+  permission: ORDER_MODIFY
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - retail.shop_and_drop
+  writes:
+  - cache:idempotency
+  - retail.shop_and_drop
+- operation: createMerchandise
+  verb: POST
+  path: /merchandise
+  scope: venue
+  permission: PRODUCT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - retail.merchandise
+  writes:
+  - cache:idempotency
+  - retail.merchandise
+- operation: createRetailExchange
+  verb: POST
+  path: /retail-exchanges
+  scope: venue
+  permission: ORDER_EXCHANGE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - retail.exchange
+  writes:
+  - cache:idempotency
+  - retail.exchange
+- operation: createRetailReturn
+  verb: POST
+  path: /retail-returns
+  scope: venue
+  permission: ORDER_REFUND
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - retail.return
+  writes:
+  - cache:idempotency
+  - retail.return
+- operation: createRetailSale
+  verb: POST
+  path: /retail-sales
+  scope: workstation
+  permission: ORDER_CREATE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - retail.sale
+  writes:
+  - cache:idempotency
+  - retail.sale
+- operation: createShopAndDrop
+  verb: POST
+  path: /shop-and-drop
+  scope: workstation
+  permission: ORDER_CREATE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - retail.shop_and_drop
+  writes:
+  - cache:idempotency
+  - retail.shop_and_drop
+- operation: disposeShopAndDrop
+  verb: POST
+  path: /shop-and-drop/{dropId}/dispose
+  scope: venue
+  permission: PRODUCT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - retail.shop_and_drop
+  writes:
+  - cache:idempotency
+  - retail.shop_and_drop
+- operation: getGiftCard
+  verb: GET
+  path: /gift-cards/{cardCode}
+  scope: venue
+  permission: ORDER_VIEW
+  audience:
+  - staff
+  - guest
+  offline: false
+  reads:
+  - retail.gift_card
+  writes: []
+- operation: getOutletStock
+  verb: GET
+  path: /outlets/{outletId}/stock-check
+  scope: venue
+  permission: PRODUCT_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - platform.outlet
+  writes: []
+- operation: getRetailSale
+  verb: GET
+  path: /retail-sales/{saleId}
+  scope: venue
+  permission: ORDER_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - retail.sale
+  writes: []
+- operation: getReturnPolicy
+  verb: GET
+  path: /outlets/{outletId}/return-policy
+  scope: venue
+  permission: ORDER_VIEW
+  audience:
+  - staff
+  offline: true
+  reads:
+  - cache:resolution
+  - retail.return_policy
+  writes:
+  - cache:resolution
+- operation: getWallet
+  verb: GET
+  path: /wallets/{subjectId}
+  scope: venue
+  permission: ORDER_VIEW
+  audience:
+  - staff
+  - guest
+  offline: false
+  reads:
+  - retail.wallet
+  writes: []
+- operation: issueGiftCard
+  verb: POST
+  path: /gift-cards
+  scope: workstation
+  permission: ORDER_CREATE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - retail.gift_card
+  writes:
+  - cache:idempotency
+  - retail.gift_card
+- operation: listMerchandise
+  verb: GET
+  path: /merchandise
+  scope: venue
+  permission: PRODUCT_VIEW
+  audience:
+  - staff
+  - guest
+  offline: true
+  reads:
+  - retail.merchandise
+  writes: []
+- operation: listRetailReturns
+  verb: GET
+  path: /retail-returns
+  scope: venue
+  permission: ORDER_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - retail.return
+  writes: []
+- operation: listRetailSales
+  verb: GET
+  path: /retail-sales
+  scope: venue
+  permission: ORDER_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - retail.sale
+  writes: []
+- operation: listWalletTransactions
+  verb: GET
+  path: /wallets/{subjectId}/transactions
+  scope: venue
+  permission: ORDER_VIEW
+  audience:
+  - staff
+  - guest
+  offline: false
+  reads:
+  - retail.wallet_transaction
+  writes: []
+- operation: lookupMerchandise
+  verb: GET
+  path: /merchandise/lookup
+  scope: venue
+  permission: PRODUCT_VIEW
+  audience:
+  - staff
+  - guest
+  offline: false
+  reads:
+  - retail.merchandise
+  writes: []
+- operation: lookupRetailSale
+  verb: GET
+  path: /retail-sales/lookup
+  scope: venue
+  permission: ORDER_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - retail.sale
+  writes: []
+- operation: lookupShopAndDrop
+  verb: GET
+  path: /shop-and-drop/lookup
+  scope: venue
+  permission: ORDER_VIEW
+  audience:
+  - staff
+  - guest
+  offline: false
+  reads:
+  - retail.shop_and_drop
+  writes: []
+- operation: redeemGiftCard
+  verb: POST
+  path: /gift-cards/{giftCardId}/redeem
+  scope: venue
+  permission: ORDER_CREATE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - retail.gift_card
+  writes:
+  - cache:idempotency
+  - retail.gift_card
+  - retail.wallet_transaction
+- operation: reinstateWallet
+  verb: POST
+  path: /wallets/{walletId}/reinstate
+  scope: venue
+  permission: ORDER_MODIFY
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - retail.wallet
+  writes:
+  - cache:idempotency
+  - retail.wallet
+- operation: reprintReceipt
+  verb: POST
+  path: /retail-sales/{saleId}/reprint
+  scope: venue
+  permission: ORDER_REPRINT
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - retail.sale
+  writes:
+  - cache:idempotency
+  - retail.sale
+- operation: reserveMerchandise
+  verb: POST
+  path: /outlets/{outletId}/reserve
+  scope: venue
+  permission: ORDER_CREATE
+  audience:
+  - staff
+  - guest
+  offline: false
+  reads:
+  - cache:idempotency
+  - retail.reservation
+  writes:
+  - cache:idempotency
+  - retail.reservation
+- operation: setReturnPolicy
+  verb: PUT
+  path: /outlets/{outletId}/return-policy
+  scope: venue
+  permission: REGION_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - retail.return_policy
+  writes:
+  - cache:idempotency
+  - cache:resolution
+  - retail.return_policy
+- operation: suspendWallet
+  verb: POST
+  path: /wallets/{walletId}/suspend
+  scope: venue
+  permission: ORDER_MODIFY
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - retail.wallet
+  writes:
+  - cache:idempotency
+  - retail.wallet
+- operation: topUpWallet
+  verb: POST
+  path: /wallets/{subjectId}/top-ups
+  scope: workstation
+  permission: ORDER_CREATE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - retail.wallet
+  writes:
+  - cache:idempotency
+  - retail.wallet
+- operation: transferWalletBalance
+  verb: POST
+  path: /wallets/{walletId}/transfer
+  scope: venue
+  permission: WALLET_MANAGE
+  audience:
+  - staff
+  - guest
+  offline: false
+  reads:
+  - cache:idempotency
+  - pii.subject
+  - retail.wallet
+  writes:
+  - cache:idempotency
+  - retail.wallet
+  - retail.wallet_transaction
+- operation: updateMerchandise
+  verb: PATCH
+  path: /merchandise/{merchandiseId}
+  scope: venue
+  permission: PRODUCT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - retail.merchandise
+  writes:
+  - cache:idempotency
+  - retail.merchandise

@@ -1,0 +1,587 @@
+{
+ "conflict:CF-105": [
+  "ai:closed"
+ ],
+ "conflict:CF-106": [
+  "ai:closed"
+ ],
+ "conflict:CF-107": [
+  "ai:closed"
+ ],
+ "conflict:CF-109": [
+  "ai:closed"
+ ],
+ "conflict:CF-113": [
+  "ai:closed"
+ ],
+ "conflict:CF-118": [
+  "ai:closed"
+ ],
+ "conflict:CF-119": [
+  "ai:closed"
+ ],
+ "conflict:CF-120": [
+  "ai:closed"
+ ],
+ "conflict:CF-123": [
+  "ai:closed"
+ ],
+ "conflict:CF-139": [
+  "ai:closed"
+ ],
+ "conflict:CF-14": [
+  "ai:closed"
+ ],
+ "conflict:CF-141": [
+  "ai:closed"
+ ],
+ "conflict:CF-144": [
+  "ai:closed"
+ ],
+ "conflict:CF-160": [
+  "ai:closed"
+ ],
+ "conflict:CF-166": [
+  "ai:open"
+ ],
+ "conflict:CF-17": [
+  "ai:closed"
+ ],
+ "conflict:CF-20": [
+  "ai:closed"
+ ],
+ "conflict:CF-41": [
+  "ai:closed"
+ ],
+ "conflict:CF-43": [
+  "ai:closed"
+ ],
+ "conflict:CF-57": [
+  "ai:closed"
+ ],
+ "conflict:CF-59": [
+  "ai:closed"
+ ],
+ "conflict:CF-61": [
+  "ai:closed"
+ ],
+ "conflict:CF-73": [
+  "ai:closed"
+ ],
+ "conflict:CF-74": [
+  "ai:closed"
+ ],
+ "conflict:CF-76": [
+  "ai:closed"
+ ],
+ "conflict:CF-78": [
+  "ai:closed"
+ ],
+ "conflict:CF-80": [
+  "ai:closed"
+ ],
+ "conflict:CF-88": [
+  "ai:closed"
+ ],
+ "conflict:CF-89": [
+  "ai:closed"
+ ],
+ "conflict:CF-90": [
+  "ai:closed"
+ ],
+ "conflict:CF-92": [
+  "ai:closed"
+ ],
+ "conflict:CF-93": [
+  "ai:closed"
+ ],
+ "conflict:CF-94": [
+  "ai:closed"
+ ],
+ "conflict:CF-96": [
+  "ai:closed"
+ ],
+ "document:docs/active/ai-scope-for-confirmation.md": [
+  "ai:names it"
+ ],
+ "document:docs/active/deep-audit-24-august.md": [
+  "ai:names it"
+ ],
+ "document:docs/active/full-layer-audit-20aug.md": [
+  "ai:names it"
+ ],
+ "document:docs/active/hierarchy-segregation-services.md": [
+  "ai:names it"
+ ],
+ "document:docs/active/optimisation-assessment.md": [
+  "ai:names it"
+ ],
+ "document:docs/active/optimisation-plan.md": [
+  "ai:names it"
+ ],
+ "document:docs/active/viewer-update-brief-20aug.md": [
+  "ai:names it"
+ ],
+ "document:docs/adr/0007-hybrid-repository-topology.md": [
+  "ai:names it"
+ ],
+ "document:docs/adr/0020-ai-isolation-boundary.md": [
+  "ai:names it"
+ ],
+ "document:docs/adr/0021-qdrant-partitioning.md": [
+  "ai:names it"
+ ],
+ "document:docs/adr/0023-pii-separation.md": [
+  "ai:names it"
+ ],
+ "document:docs/adr/0028-service-decomposition.md": [
+  "ai:names it"
+ ],
+ "document:docs/architecture/README.md": [
+  "ai:names it"
+ ],
+ "document:docs/architecture/ai-credentials.md": [
+  "ai:names it"
+ ],
+ "event:ai.ceilingApproaching": [
+  "ai:publishes"
+ ],
+ "event:approval.granted": [
+  "ai:consumes"
+ ],
+ "event:assets.documentIndexed": [
+  "ai:consumes"
+ ],
+ "event:catalogue.productPublished": [
+  "ai:consumes"
+ ],
+ "event:conversation.handedOver": [
+  "ai:consumes"
+ ],
+ "event:fnb.menuPublished": [
+  "ai:consumes"
+ ],
+ "event:maintenance.templatePublished": [
+  "ai:consumes"
+ ],
+ "event:marketing.caseClosed": [
+  "ai:consumes"
+ ],
+ "event:reporting.definitionPublished": [
+  "ai:consumes"
+ ],
+ "event:retail.merchandisePublished": [
+  "ai:consumes"
+ ],
+ "event:whitelabel.contentPublished": [
+  "ai:consumes"
+ ],
+ "flow:F100": [
+  "ai:steps through"
+ ],
+ "flow:F101": [
+  "ai:steps through"
+ ],
+ "flow:F106": [
+  "ai:steps through"
+ ],
+ "flow:F20": [
+  "ai:steps through"
+ ],
+ "flow:F24": [
+  "ai:steps through"
+ ],
+ "flow:F26": [
+  "ai:steps through"
+ ],
+ "flow:F49": [
+  "ai:steps through"
+ ],
+ "flow:F77": [
+  "ai:steps through"
+ ],
+ "flow:F82": [
+  "ai:steps through"
+ ],
+ "flow:F86": [
+  "ai:steps through"
+ ],
+ "flow:F90": [
+  "ai:steps through"
+ ],
+ "operation:askReportingQuestion": [
+  "ai:writes a domain table"
+ ],
+ "operation:createAiConversation": [
+  "ai:seed"
+ ],
+ "operation:createKnowledgeCollection": [
+  "ai:seed"
+ ],
+ "operation:decideProposedAction": [
+  "ai:seed"
+ ],
+ "operation:generateConfiguration": [
+  "ai:seed"
+ ],
+ "operation:generateVenueLayout": [
+  "ai:seed"
+ ],
+ "operation:getAiPolicy": [
+  "ai:seed"
+ ],
+ "operation:getAiUsage": [
+  "ai:seed"
+ ],
+ "operation:ingestKnowledgeDocument": [
+  "ai:seed"
+ ],
+ "operation:listAiConversations": [
+  "ai:seed"
+ ],
+ "operation:listAiInteractions": [
+  "ai:seed"
+ ],
+ "operation:listAiProviders": [
+  "ai:seed"
+ ],
+ "operation:listIndexJobs": [
+  "ai:seed"
+ ],
+ "operation:listIndexSources": [
+  "ai:seed"
+ ],
+ "operation:listKnowledgeCollections": [
+  "ai:seed"
+ ],
+ "operation:listProposedActions": [
+  "ai:seed"
+ ],
+ "operation:proposeTranslations": [
+  "ai:seed"
+ ],
+ "operation:proposeVenueLabels": [
+  "ai:seed"
+ ],
+ "operation:proposeWalkways": [
+  "ai:seed"
+ ],
+ "operation:recordSuggestionOutcome": [
+  "ai:seed"
+ ],
+ "operation:reindexSource": [
+  "ai:seed"
+ ],
+ "operation:removeIndexEntry": [
+  "ai:seed"
+ ],
+ "operation:requestSuggestion": [
+  "ai:seed"
+ ],
+ "operation:saveNaturalLanguageQuery": [
+  "ai:writes a domain table"
+ ],
+ "operation:semanticSearch": [
+  "ai:seed"
+ ],
+ "operation:sendAiMessage": [
+  "ai:seed"
+ ],
+ "operation:setAiCredential": [
+  "ai:seed"
+ ],
+ "operation:setAiPolicy": [
+  "ai:seed"
+ ],
+ "operation:setAiProvider": [
+  "ai:seed"
+ ],
+ "operation:setIndexSource": [
+  "ai:seed"
+ ],
+ "operation:setSuggestionProvider": [
+  "ai:seed"
+ ],
+ "operation:testAiProvider": [
+  "ai:seed"
+ ],
+ "screen:ADM-004": [
+  "ai:calls 1"
+ ],
+ "screen:ADM-037": [
+  "ai:calls 4"
+ ],
+ "screen:ANL-001": [
+  "ai:calls 1"
+ ],
+ "screen:ANL-008": [
+  "ai:calls 1"
+ ],
+ "screen:ANL-009": [
+  "ai:calls 3"
+ ],
+ "screen:ANL-010": [
+  "ai:calls 2"
+ ],
+ "screen:BO-029": [
+  "ai:calls 2"
+ ],
+ "screen:BO-058": [
+  "ai:calls 2"
+ ],
+ "screen:BO-059": [
+  "ai:calls 2"
+ ],
+ "screen:BO-060": [
+  "ai:calls 2"
+ ],
+ "screen:BO-061": [
+  "ai:calls 2"
+ ],
+ "screen:BO-088": [
+  "ai:calls 1"
+ ],
+ "screen:BO-091": [
+  "ai:calls 3"
+ ],
+ "screen:BO-093": [
+  "ai:calls 1"
+ ],
+ "screen:BO-115": [
+  "ai:calls 1"
+ ],
+ "screen:BO-117": [
+  "ai:calls 2"
+ ],
+ "screen:EMP-019": [
+  "ai:calls 3"
+ ],
+ "screen:EMP-020": [
+  "ai:calls 3"
+ ],
+ "screen:EMP-040": [
+  "ai:calls 1"
+ ],
+ "screen:EMP-041": [
+  "ai:calls 1"
+ ],
+ "screen:GST-031": [
+  "ai:calls 1"
+ ],
+ "screen:GST-032": [
+  "ai:calls 1"
+ ],
+ "screen:GST-033": [
+  "ai:calls 1"
+ ],
+ "screen:GST-052": [
+  "ai:calls 1"
+ ],
+ "screen:GST-054": [
+  "ai:calls 2"
+ ],
+ "screen:GST-059": [
+  "ai:calls 1"
+ ],
+ "screen:KIT-010": [
+  "ai:calls 1"
+ ],
+ "screen:KSK-015": [
+  "ai:calls 1"
+ ],
+ "screen:POS-008": [
+  "ai:calls 2"
+ ],
+ "screen:PTR-018": [
+  "ai:calls 2"
+ ],
+ "screen:SUP-008": [
+  "ai:calls 2"
+ ],
+ "screen:WEB-044": [
+  "ai:calls 3"
+ ],
+ "state:ai-index-job.yaml": [
+  "ai:domain contract"
+ ],
+ "state:ai-knowledge-document.yaml": [
+  "ai:domain contract"
+ ],
+ "state:ai-layout-draft.yaml": [
+  "ai:domain contract"
+ ],
+ "state:ai-proposed-action.yaml": [
+  "ai:domain contract"
+ ],
+ "state:approval-request.yaml": [
+  "ai:reached via approval.granted"
+ ],
+ "state:case.yaml": [
+  "ai:reached via marketing.caseClosed"
+ ],
+ "state:content.yaml": [
+  "ai:reached via whitelabel.contentPublished"
+ ],
+ "state:conversation.yaml": [
+  "ai:reached via conversation.handedOver"
+ ],
+ "state:media.yaml": [
+  "ai:reached via assets.documentIndexed"
+ ],
+ "state:product.yaml": [
+  "ai:reached via catalogue.productPublished"
+ ],
+ "state:schedule.yaml": [
+  "ai:reached via whitelabel.contentPublished"
+ ],
+ "table:ai.chunk_ref": [
+  "ai:owned"
+ ],
+ "table:ai.conversation": [
+  "ai:owned"
+ ],
+ "table:ai.index_entry": [
+  "ai:owned"
+ ],
+ "table:ai.index_job": [
+  "ai:owned"
+ ],
+ "table:ai.index_source": [
+  "ai:owned"
+ ],
+ "table:ai.interaction": [
+  "ai:owned"
+ ],
+ "table:ai.knowledge_collection": [
+  "ai:owned"
+ ],
+ "table:ai.knowledge_document": [
+  "ai:owned"
+ ],
+ "table:ai.layout_draft": [
+  "ai:owned"
+ ],
+ "table:ai.message": [
+  "ai:owned"
+ ],
+ "table:ai.policy": [
+  "ai:owned"
+ ],
+ "table:ai.proposed_action": [
+  "ai:owned"
+ ],
+ "table:ai.provider": [
+  "ai:owned"
+ ],
+ "table:ai.suggestion": [
+  "ai:owned"
+ ],
+ "table:ai.suggestion_outcome": [
+  "ai:owned"
+ ],
+ "table:assets.media_asset": [
+  "ai:read or written"
+ ],
+ "table:cache:answer": [
+  "ai:read or written"
+ ],
+ "table:cache:embedding": [
+  "ai:read or written"
+ ],
+ "table:cache:idempotency": [
+  "ai:read or written"
+ ],
+ "table:cache:resolution": [
+  "ai:read or written"
+ ],
+ "table:catalogue.attribute_axis": [
+  "ai:read or written"
+ ],
+ "table:catalogue.entitlement_template": [
+  "ai:read or written"
+ ],
+ "table:catalogue.envelope": [
+  "ai:read or written"
+ ],
+ "table:catalogue.event": [
+  "ai:read or written"
+ ],
+ "table:catalogue.performance": [
+  "ai:read or written"
+ ],
+ "table:catalogue.price": [
+  "ai:read or written"
+ ],
+ "table:catalogue.price_list": [
+  "ai:read or written"
+ ],
+ "table:catalogue.product": [
+  "ai:read or written"
+ ],
+ "table:control.content_block": [
+  "ai:read or written"
+ ],
+ "table:fnb.menu_item": [
+  "ai:read or written"
+ ],
+ "table:maintenance.inspection_template": [
+  "ai:read or written"
+ ],
+ "table:marketing.case": [
+  "ai:read or written"
+ ],
+ "table:marketing.loyalty_programme": [
+  "ai:read or written"
+ ],
+ "table:platform.region_settings": [
+  "ai:read or written"
+ ],
+ "table:platform.scope_node": [
+  "ai:read or written"
+ ],
+ "table:promotions.promotion": [
+  "ai:read or written"
+ ],
+ "table:qdrant:knowledge": [
+  "ai:read or written"
+ ],
+ "table:reporting.report_definition": [
+  "ai:read or written"
+ ],
+ "table:retail.merchandise": [
+  "ai:read or written"
+ ],
+ "table:seating.seat": [
+  "ai:read or written"
+ ],
+ "table:seating.seat_category": [
+  "ai:read or written"
+ ],
+ "table:seating.seat_map": [
+  "ai:read or written"
+ ],
+ "table:seating.seating_rules": [
+  "ai:read or written"
+ ],
+ "table:seating.section": [
+  "ai:read or written"
+ ],
+ "table:venuemap.import_job": [
+  "ai:read or written"
+ ],
+ "table:venuemap.map": [
+  "ai:read or written"
+ ],
+ "table:venuemap.point": [
+  "ai:read or written"
+ ],
+ "table:whitelabel.content_page": [
+  "ai:read or written"
+ ],
+ "table:whitelabel.faq_entry": [
+  "ai:read or written"
+ ],
+ "table:whitelabel.policy": [
+  "ai:read or written"
+ ]
+}

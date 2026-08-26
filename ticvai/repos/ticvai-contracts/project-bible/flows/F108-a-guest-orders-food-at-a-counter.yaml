@@ -1,0 +1,116 @@
+$schema: ./_schema.yaml
+id: F108
+name: A guest orders food at a counter and collects it
+actor: cashier
+capability: Counter-service food and drink
+wave: 2
+frequency: '**The most common F&B format in a venue** — a coffee kiosk, a burger counter, a bar, a stadium
+  concession.'
+criticality: revenue
+primaryContract: fnb
+contracts:
+- fnb
+- orders
+- promotions
+- catalogue
+platforms:
+- P04
+- P15
+trigger:
+  description: A guest at a counter wants food. **Until 24 August no till in the platform could take
+    that order** — the kitchen display received tickets, the back office configured the menu, and nothing
+    sold.
+offlineBehaviour: '**Selling and sending both work offline.** The menu is cached and the kitchen display
+  is on the same LAN, so a venue-wide outage stops both and a device outage stops neither.
+
+
+  **Configuration is refused offline.** A table layout edited on two disconnected tablets is two layouts,
+  and the room only has one.'
+steps:
+- step: 1
+  screen: POS-021
+  action: The cashier takes the order from the menu board.
+  operations:
+  - getGuestMenu
+  - listModifierGroups
+  - addCartLine
+  outcome: '**Sections in the order the outlet set them, not alphabetical.** A menu board that sorts
+    by name puts Desserts above Mains forever.'
+- step: 2
+  screen: POS-021
+  action: Modifiers are chosen — no onions, large, extra shot.
+  operations:
+  - listModifierGroups
+  - evaluatePromotions
+  outcome: '**The group is attached to the item, not chosen per sale.** *How would you like that cooked*
+    is one group on nine steaks.'
+- step: 3
+  screen: POS-005
+  action: The guest pays.
+  operations:
+  - createPayment
+  - createOrder
+  outcome: The same payment path as a ticket. **A till has one tender flow, not one per module.**
+- step: 4
+  screen: POS-022
+  action: The order goes to the pass.
+  operations:
+  - createFnbOrder
+  - listKitchenTickets
+  outcome: A kitchen ticket on the rail. **This is the step that did not exist** — `createFnbOrder`
+    was reachable from the guest app and the staff app and from no till.
+- step: 5
+  screen: KIT-002
+  action: The kitchen makes it and bumps it.
+  crossesDevice: true
+  operations:
+  - setKitchenTicketStatus
+  note: '**A handover, not a navigation.** The ticket appears on a wall-mounted display; nobody taps
+    through.'
+  outcome: Ready. The counter sees it on the same rail.
+- step: 6
+  screen: POS-022
+  action: The guest is called and takes it.
+  crossesDevice: true
+  operations:
+  - markOrderCollected
+  outcome: '**Order to ready is the kitchen’s number; ready to collected is the counter’s.** Food under
+    a lamp for nine minutes shows in neither alone.'
+branches:
+- at: 1
+  condition: An item was 86’d while the till was offline.
+  behaviour: '**Sold, then refused by the kitchen, then refunded at the counter.** Unavoidable — a cached
+    menu cannot know what the kitchen decided thirty seconds ago, and refusing to sell from cache would
+    stop the counter entirely.'
+  severity: medium
+  resolvedBy: setItemAvailability
+- at: 4
+  condition: The kitchen display is unreachable.
+  behaviour: '**The order is journaled and retries.** A counter that loses an order the guest has paid
+    for is the failure this prevents.'
+  severity: high
+  resolvedBy: createFnbOrder
+- at: 6
+  condition: Nobody collects it.
+  behaviour: '**Recorded as uncollected rather than closed.** An uncollected rate at a counter is a
+    calling or a signage problem, and closing it silently tells the venue nothing.'
+  severity: low
+  resolvedBy: markOrderCollected
+exitStates:
+- state: collected
+  description: Ordered, paid, made, collected. **The ordinary case.**
+- state: refundedUnavailable
+  description: An 86’d item sold from cache and refunded at the counter.
+- state: uncollected
+  description: '**Made and never taken.** Real, recurring, and worth counting.'
+notes: "**Written 24 August with the four screens it walks.** P04 had no F&B screens at all: a venue\
+  \ licensing `fnb` and running a coffee counter had a kitchen display, a back office and no way to\
+  \ take an order.\n\n**The client pack has the same gap.** Six F&B boards — board 3 is the kitchen,\
+  \ board 4 is table service, and none is a counter till. The placement on 20 August was faithful to\
+  \ a pack that never drew it, which is why only asking *where does a coffee counter sell* found it.\n\
+  \n  **Wave 2, not 1.** `check-flows` refused it at wave 1 because `KIT-002` is wave 2 — **a counter\
+  \ cannot ship before the kitchen display it sends to.** The four P04 screens are wave 1 and the journey\
+  \ is not, which is the correct shape: a till can be built early and cannot be used early."
+openQuestions: '**Does the client run counter service at all?** The pack suggests their F&B is table
+  service and kitchen, which would make this speculative rather than missing. Worth one question to
+  Qossai before it is built.'

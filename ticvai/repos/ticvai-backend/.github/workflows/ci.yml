@@ -1,0 +1,33 @@
+name: ci
+on: [push, pull_request]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env: { POSTGRES_PASSWORD: dev, POSTGRES_DB: ticvai_test }
+        options: >-
+          --health-cmd pg_isready --health-interval 10s
+          --health-timeout 5s --health-retries 5
+        ports: ['5432:5432']
+      redis:
+        image: redis:7-alpine
+        ports: ['6379:6379']
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with: { dotnet-version: '8.0.x' }
+      - run: dotnet restore
+      - run: dotnet build --no-restore -c Release
+
+      # Architecture tests are a build gate, not a suggestion. Module boundaries
+      # decay within weeks without automated enforcement, and extraction later
+      # becomes a rewrite rather than a week's work.
+      - name: Architecture tests
+        run: dotnet test tests/Ticvai.ArchitectureTests --no-build -c Release
+
+      - name: Unit tests
+        run: dotnet test tests/Ticvai.UnitTests --no-build -c Release
+      - name: Integration tests
+        run: dotnet test tests/Ticvai.IntegrationTests --no-build -c Release

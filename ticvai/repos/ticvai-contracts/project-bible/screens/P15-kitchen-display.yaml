@@ -1,0 +1,986 @@
+# P15 — Kitchen Display
+#
+# Board 3 of the client F&B design set, received 20 August 2026. Ten screens.
+# Its own platform because a kitchen display is used standing, must survive the network
+# going down, and nobody logs into it.
+#
+# Validated against _schema.yaml; component kinds from _components.yaml.
+
+platform:
+  code: P15
+  formFactor: kiosk
+  surface: staffFacing
+  runtime: reactWeb
+  themes:
+  - dark
+  directions:
+  - ltr
+  app: kitchen-display
+  appStatus: not scaffolded
+  operator: venue
+  deployment:
+    target: browser
+    distribution: served from the cell
+    bundleUpdate: on next idle
+    hosting: in-cell, in-region
+    storeReview: false
+    deviceOwnership: venue-owned, wall-mounted, never moved
+    networkAssumption: venue LAN, and it must survive losing it
+    releaseCadence: '**Deployed when the kitchen is closed, never during service.** A display that restarts
+      mid-service loses the rail a chef is reading.'
+  name: Kitchen Display — Pass and Stations
+  shortName: Kitchen Display
+  audience: staff
+  offlineCapable: true
+  screenCount: 10
+  notes: '**Its own platform, and the placement rule is what put it here.** Three questions decide where
+    a board screen rests, and a kitchen display answers all three differently from a back office: it
+    is used standing, it **must survive the network going down because the kitchen still has to send
+    food out**, and no existing platform does it — P08 had a `Kitchen Display` screen among 143 back-office
+    screens, which is a rail buried in a configuration tool.
+
+
+    **Nobody logs in.** It is on when the kitchen is open and resolves its station from the device assignment,
+    which is why every screen here is cold-entry and none of them has a sign-in.
+
+
+    **Dark theme only.** A kitchen is lit for cooking, not for reading, and a white screen at head height
+    in a service window is a light source.
+
+
+    **Depends on `offline-core`.**  refused the platform without it, and correctly — **an app that queues
+    writes without it does not queue them anywhere**, and every bump on this platform is a write that
+    has to survive a dropped network.'
+  packages:
+  - design-tokens
+  - ui
+  - api-client
+  - offline-core
+  wireframeBoard: wireframes/P15 Kitchen Display.dc.html
+  wireframeBoardNote: '**The generated board for the whole platform.** Individual screens keep the client-pack
+    anchor where one exists — a screen the client drew should open the client''s frame — and this renders
+    every screen on the platform including the ones no pack covers.
+
+
+    **Declared 24 August.** The file was written from the first generation and nothing pointed at it:
+    `check-wireframes` has no unmatched-board concept, so the Python suite passed while the viewer flagged
+    an orphan. **A board nobody references is a board nobody reviews.**'
+screens:
+- id: KIT-001
+  name: Kitchen Operations Command Center
+  module: Kitchen
+  wave: 2
+  purpose: Kitchen Operations Command Center — board 3 of the client F&B design set.
+  density: touchLarge
+  densityReason: '**Bumped by somebody with flour on their hands, read from two metres, in a room where
+    nobody is sitting down.** A kitchen display is not a back office at a different width.'
+  apis:
+  - operationId: listKitchenTickets
+    contract: fnb
+    purpose: Kitchen ticket queue
+    trigger: onLoad
+  - operationId: listKitchenStations
+    contract: fnb
+    purpose: List preparation stations and their routing
+    trigger: onLoad
+  - operationId: listFnbOrders
+    contract: fnb
+    purpose: List F&B orders
+    trigger: onLoad
+  states:
+    loading: The rail, oldest ticket first. **The count renders before the tickets** — a kitchen wants
+      to know how deep it is before it reads anything.
+    emptyFirstRun: '**No tickets. The kitchen is clear**, and that is worth saying plainly rather than
+      showing a blank rail — a screen that looks broken and a screen that means nothing to do are the
+      same picture otherwise.'
+    emptyNoResults: Nothing matches this station or course filter. **The rail is not empty** — the filter
+      is narrow, and on a kitchen screen that distinction is the difference between calm and panic.
+    emptyNoAccess: This display is not assigned to a station. **Assignment is a back-office act** —
+      a kitchen screen does not choose what it shows.
+    error: Could not reach the platform. **The rail is still live from cache** and every bump is queued.
+    offline: '**Amber, and it keeps working.** The kitchen still has to send food out — a display that
+      blanks mid-service is worse than one that says it is behind, and every bump journals locally and
+      syncs when the network returns.'
+  entryState:
+    params:
+    - name: venueId
+      from: session
+    - name: stationId
+      from: session
+    coldEntry: '**Cold is the only way in.** Nobody logs into a kitchen display — it is on when the
+      kitchen is open, and it resolves its station from the device assignment rather than from a person.'
+  layout:
+    template: board
+    regions:
+    - name: contentBody
+      components:
+      - kind: cardList
+        bindsTo: KitchenTicket[]
+        notes: '**One ticket per card, ordered by promise time not arrival.** A ticket due in two minutes
+          sits above one that arrived first, because a kitchen works to when food is wanted.'
+      - kind: metricTile
+        notes: Depth, oldest ticket age, station load. **Three numbers, glanceable** — anything a chef
+          has to read is a number they will not read.
+      - kind: primaryButton
+        label: Bump
+  navigation:
+    isEntryPoint: true
+    exitTo:
+    - KIT-002
+    - KIT-003
+    - KIT-004
+    - KIT-005
+    - KIT-006
+    - KIT-007
+    - KIT-008
+    - KIT-009
+    - KIT-010
+  implementation:
+    app: kitchen-display
+    route: /kitchen/kitchen-operations-command-center
+    component: apps/kitchen-display/src/routes/kitchen/KitchenOperationsCommandCenterBoard.tsx
+    status: notStarted
+  wireframe:
+    status: designed
+    board: wireframes/P15 Kitchen Display.dc.html#kit-001
+    source: Claude Design F&B pack, 20 August
+    note: '**Drawn as FNB-3A in the client pack.** The pack''s frame is the specification for this screen
+      — it carries operations, states, entry params and exits, and it is better specified than anything
+      derived from the screen file.'
+    derivedFrom: wireframes/FnB Board 3.dc.html#fnb-3a
+  provenance: client board, specified
+  notes: '**Built 20 August from board 3 of the client F&B design set.** **Board repointed 24 August.**
+    This screen pointed at `wireframes/FnB Board 3.dc.html#fnb-3a` — a frame in the client pack, which
+    is where the design came from and not where this screen is drawn. **`P15 Kitchen Display.dc.html`
+    and `P16 Venue Analytics.dc.html` carry one anchor per screen and nothing referenced either**, so
+    both shipped correctly anchored and unreachable. The pack frame is kept in `derivedFrom` because
+    provenance is worth more than the wrong pointer.'
+  requiresModule: fnb
+  boardFrames:
+  - FNB-3A
+- id: KIT-002
+  name: Kitchen Display System (KDS)
+  module: Kitchen
+  wave: 2
+  purpose: Kitchen Display System (KDS) — board 3 of the client F&B design set.
+  density: touchLarge
+  densityReason: '**Bumped by somebody with flour on their hands, read from two metres, in a room where
+    nobody is sitting down.** A kitchen display is not a back office at a different width.'
+  apis:
+  - operationId: listKitchenTickets
+    contract: fnb
+    purpose: Kitchen ticket queue
+    trigger: onLoad
+  - operationId: setKitchenTicketStatus
+    contract: fnb
+    purpose: Advance a kitchen ticket
+    trigger: onAction
+  - operationId: fireCourse
+    contract: fnb
+    purpose: Send a held course to the pass
+    trigger: onAction
+  - operationId: holdCourse
+    contract: fnb
+    purpose: Stop a course going out
+    trigger: onAction
+  - operationId: refireItem
+    contract: fnb
+    purpose: Make it again
+    trigger: onAction
+  - operationId: recallKitchenTicket
+    contract: fnb
+    purpose: Bring back a ticket that was bumped by mistake
+    trigger: onAction
+  - operationId: notifyServer
+    contract: fnb
+    purpose: The kitchen calls the server to the pass
+    trigger: onAction
+  states:
+    loading: The rail, oldest ticket first. **The count renders before the tickets** — a kitchen wants
+      to know how deep it is before it reads anything.
+    emptyFirstRun: '**No tickets. The kitchen is clear**, and that is worth saying plainly rather than
+      showing a blank rail — a screen that looks broken and a screen that means nothing to do are the
+      same picture otherwise.'
+    emptyNoResults: Nothing matches this station or course filter. **The rail is not empty** — the filter
+      is narrow, and on a kitchen screen that distinction is the difference between calm and panic.
+    emptyNoAccess: This display is not assigned to a station. **Assignment is a back-office act** —
+      a kitchen screen does not choose what it shows.
+    error: Could not reach the platform. **The rail is still live from cache** and every bump is queued.
+    offline: '**Amber, and it keeps working.** The kitchen still has to send food out — a display that
+      blanks mid-service is worse than one that says it is behind, and every bump journals locally and
+      syncs when the network returns.'
+  entryState:
+    params:
+    - name: venueId
+      from: session
+    - name: stationId
+      from: session
+    - name: ticketId
+      from: KIT-002
+    - name: visitId
+      from: deepLink
+      optional: true
+    coldEntry: '**Cold is the only way in.** Nobody logs into a kitchen display — it is on when the
+      kitchen is open, and it resolves its station from the device assignment rather than from a person.
+      The table the ticket belongs to.'
+  layout:
+    template: board
+    regions:
+    - name: contentBody
+      components:
+      - kind: cardList
+        bindsTo: KitchenTicket[]
+        notes: '**One ticket per card, ordered by promise time not arrival.** A ticket due in two minutes
+          sits above one that arrived first, because a kitchen works to when food is wanted.'
+      - kind: metricTile
+        notes: Depth, oldest ticket age, station load. **Three numbers, glanceable** — anything a chef
+          has to read is a number they will not read.
+      - kind: primaryButton
+        label: Bump
+  navigation:
+    entryFrom:
+    - KIT-001
+    exitTo: []
+  implementation:
+    app: kitchen-display
+    route: /kitchen/kitchen-display-system-kds
+    component: apps/kitchen-display/src/routes/kitchen/KitchenDisplaySystemKdsBoard.tsx
+    status: notStarted
+  wireframe:
+    status: designed
+    board: wireframes/P15 Kitchen Display.dc.html#kit-002
+    source: Claude Design F&B pack, 20 August
+    note: '**Drawn as FNB-3B in the client pack.** The pack''s frame is the specification for this screen
+      — it carries operations, states, entry params and exits, and it is better specified than anything
+      derived from the screen file.'
+    derivedFrom: wireframes/FnB Board 3.dc.html#fnb-3b
+  provenance: client board, specified
+  notes: '**Built 20 August from board 3 of the client F&B design set.** **The screen the platform exists
+    for.** Bumped, not tapped — a bump bar and a touch target sized for somebody wearing gloves. Nothing
+    on it is more than one action deep. **Operations from the 24 August F&B build wired here** — the
+    contract grew and the screens had not caught up, which is how 92 operations reached 49% of screens.
+    **Cross-platform navigation removed 24 August**: EMP-058. **A till does not navigate to a back office
+    and a guest app does not navigate to either** — those are device handovers, and a flow declares
+    them with `crossesDevice` rather than a screen pretending there is a link. **Board repointed 24
+    August.** This screen pointed at `wireframes/FnB Board 3.dc.html#fnb-3b` — a frame in the client
+    pack, which is where the design came from and not where this screen is drawn. **`P15 Kitchen Display.dc.html`
+    and `P16 Venue Analytics.dc.html` carry one anchor per screen and nothing referenced either**, so
+    both shipped correctly anchored and unreachable. The pack frame is kept in `derivedFrom` because
+    provenance is worth more than the wrong pointer.'
+  requiresModule: fnb
+  boardFrames:
+  - FNB-3B
+- id: KIT-003
+  name: Order Firing & Course Management
+  module: Kitchen
+  wave: 2
+  purpose: Order Firing & Course Management — board 3 of the client F&B design set.
+  density: touchLarge
+  densityReason: '**Bumped by somebody with flour on their hands, read from two metres, in a room where
+    nobody is sitting down.** A kitchen display is not a back office at a different width.'
+  apis:
+  - operationId: setKitchenTicketStatus
+    contract: fnb
+    purpose: Advance a kitchen ticket
+    trigger: onAction
+  - operationId: prioritiseKitchenTicket
+    contract: fnb
+    purpose: Move a ticket up the queue
+    trigger: onAction
+  - operationId: fireCourse
+    contract: fnb
+    purpose: Send a held course to the pass
+    trigger: onAction
+  - operationId: holdCourse
+    contract: fnb
+    purpose: Stop a course going out
+    trigger: onAction
+  - operationId: setCourseRules
+    contract: fnb
+    purpose: How this outlet courses by default
+    trigger: onAction
+  states:
+    loading: The rail, oldest ticket first. **The count renders before the tickets** — a kitchen wants
+      to know how deep it is before it reads anything.
+    emptyFirstRun: '**No tickets. The kitchen is clear**, and that is worth saying plainly rather than
+      showing a blank rail — a screen that looks broken and a screen that means nothing to do are the
+      same picture otherwise.'
+    emptyNoResults: Nothing matches this station or course filter. **The rail is not empty** — the filter
+      is narrow, and on a kitchen screen that distinction is the difference between calm and panic.
+    emptyNoAccess: This display is not assigned to a station. **Assignment is a back-office act** —
+      a kitchen screen does not choose what it shows.
+    error: Could not reach the platform. **The rail is still live from cache** and every bump is queued.
+    offline: '**Amber, and it keeps working.** The kitchen still has to send food out — a display that
+      blanks mid-service is worse than one that says it is behind, and every bump journals locally and
+      syncs when the network returns.'
+  entryState:
+    params:
+    - name: venueId
+      from: session
+    - name: stationId
+      from: session
+    - name: ticketId
+      from: KIT-002
+    - name: outletId
+      from: session
+    coldEntry: '**Cold is the only way in.** Nobody logs into a kitchen display — it is on when the
+      kitchen is open, and it resolves its station from the device assignment rather than from a person.
+      Resolves from the station assignment. A kitchen display belongs to one outlet.'
+  layout:
+    template: board
+    regions:
+    - name: contentBody
+      components:
+      - kind: cardList
+        bindsTo: KitchenTicket[]
+        notes: '**One ticket per card, ordered by promise time not arrival.** A ticket due in two minutes
+          sits above one that arrived first, because a kitchen works to when food is wanted.'
+      - kind: metricTile
+        notes: Depth, oldest ticket age, station load. **Three numbers, glanceable** — anything a chef
+          has to read is a number they will not read.
+      - kind: primaryButton
+        label: Bump
+  navigation:
+    entryFrom:
+    - KIT-001
+    exitTo: []
+  implementation:
+    app: kitchen-display
+    route: /kitchen/order-firing-course-management
+    component: apps/kitchen-display/src/routes/kitchen/OrderFiringCourseManagementBoard.tsx
+    status: notStarted
+  wireframe:
+    status: designed
+    board: wireframes/P15 Kitchen Display.dc.html#kit-003
+    source: Claude Design F&B pack, 20 August
+    note: '**Drawn as FNB-3C in the client pack.** The pack''s frame is the specification for this screen
+      — it carries operations, states, entry params and exits, and it is better specified than anything
+      derived from the screen file.'
+    derivedFrom: wireframes/FnB Board 3.dc.html#fnb-3c
+  provenance: client board, specified
+  notes: '**Built 20 August from board 3 of the client F&B design set.** **Starters before mains is
+    the entire job of a kitchen pass.** `KitchenTicket.coursing` carries `holdAndFire`, `phased` and
+    `timed`; without it a table gets dessert while eating its starter. **Operations from the 24 August
+    F&B build wired here** — the contract grew and the screens had not caught up, which is how 92 operations
+    reached 49% of screens. **Board repointed 24 August.** This screen pointed at `wireframes/FnB Board
+    3.dc.html#fnb-3c` — a frame in the client pack, which is where the design came from and not where
+    this screen is drawn. **`P15 Kitchen Display.dc.html` and `P16 Venue Analytics.dc.html` carry one
+    anchor per screen and nothing referenced either**, so both shipped correctly anchored and unreachable.
+    The pack frame is kept in `derivedFrom` because provenance is worth more than the wrong pointer.'
+  requiresModule: fnb
+  boardFrames:
+  - FNB-3C
+- id: KIT-004
+  name: Active Order Management & Fulfilment Journey
+  module: Kitchen
+  wave: 2
+  purpose: Active Order Management & Fulfilment Journey — board 3 of the client F&B design set.
+  density: touchLarge
+  densityReason: '**Bumped by somebody with flour on their hands, read from two metres, in a room where
+    nobody is sitting down.** A kitchen display is not a back office at a different width.'
+  apis:
+  - operationId: listKitchenTickets
+    contract: fnb
+    purpose: Kitchen ticket queue
+    trigger: onLoad
+  - operationId: getFnbOrder
+    contract: fnb
+    purpose: Read an F&B order
+    trigger: onLoad
+  states:
+    loading: The rail, oldest ticket first. **The count renders before the tickets** — a kitchen wants
+      to know how deep it is before it reads anything.
+    emptyFirstRun: '**No tickets. The kitchen is clear**, and that is worth saying plainly rather than
+      showing a blank rail — a screen that looks broken and a screen that means nothing to do are the
+      same picture otherwise.'
+    emptyNoResults: Nothing matches this station or course filter. **The rail is not empty** — the filter
+      is narrow, and on a kitchen screen that distinction is the difference between calm and panic.
+    emptyNoAccess: This display is not assigned to a station. **Assignment is a back-office act** —
+      a kitchen screen does not choose what it shows.
+    error: Could not reach the platform. **The rail is still live from cache** and every bump is queued.
+    offline: '**Amber, and it keeps working.** The kitchen still has to send food out — a display that
+      blanks mid-service is worse than one that says it is behind, and every bump journals locally and
+      syncs when the network returns.'
+  entryState:
+    params:
+    - name: venueId
+      from: session
+    - name: stationId
+      from: session
+    - name: orderId
+      from: KIT-002
+    coldEntry: '**Cold is the only way in.** Nobody logs into a kitchen display — it is on when the
+      kitchen is open, and it resolves its station from the device assignment rather than from a person.'
+  layout:
+    template: board
+    regions:
+    - name: contentBody
+      components:
+      - kind: cardList
+        bindsTo: KitchenTicket[]
+        notes: '**One ticket per card, ordered by promise time not arrival.** A ticket due in two minutes
+          sits above one that arrived first, because a kitchen works to when food is wanted.'
+      - kind: metricTile
+        notes: Depth, oldest ticket age, station load. **Three numbers, glanceable** — anything a chef
+          has to read is a number they will not read.
+      - kind: primaryButton
+        label: Bump
+  navigation:
+    entryFrom:
+    - KIT-001
+    exitTo: []
+  implementation:
+    app: kitchen-display
+    route: /kitchen/active-order-management-fulfilment-journey
+    component: apps/kitchen-display/src/routes/kitchen/ActiveOrderManagementFulfilmentJouBoard.tsx
+    status: notStarted
+  wireframe:
+    status: designed
+    board: wireframes/P15 Kitchen Display.dc.html#kit-004
+    source: Claude Design F&B pack, 20 August
+    note: '**Drawn as FNB-3D in the client pack.** The pack''s frame is the specification for this screen
+      — it carries operations, states, entry params and exits, and it is better specified than anything
+      derived from the screen file.'
+    derivedFrom: wireframes/FnB Board 3.dc.html#fnb-3d
+  provenance: client board, specified
+  notes: '**Built 20 August from board 3 of the client F&B design set.** **Board repointed 24 August.**
+    This screen pointed at `wireframes/FnB Board 3.dc.html#fnb-3d` — a frame in the client pack, which
+    is where the design came from and not where this screen is drawn. **`P15 Kitchen Display.dc.html`
+    and `P16 Venue Analytics.dc.html` carry one anchor per screen and nothing referenced either**, so
+    both shipped correctly anchored and unreachable. The pack frame is kept in `derivedFrom` because
+    provenance is worth more than the wrong pointer.'
+  requiresModule: fnb
+  boardFrames:
+  - FNB-3D
+- id: KIT-005
+  name: Kitchen Station Workload & Dynamic Routing
+  module: Kitchen
+  wave: 2
+  purpose: Kitchen Station Workload & Dynamic Routing — board 3 of the client F&B design set.
+  density: touchLarge
+  densityReason: '**Bumped by somebody with flour on their hands, read from two metres, in a room where
+    nobody is sitting down.** A kitchen display is not a back office at a different width.'
+  apis:
+  - operationId: listKitchenStations
+    contract: fnb
+    purpose: List preparation stations and their routing
+    trigger: onLoad
+  - operationId: setKitchenStations
+    contract: fnb
+    purpose: Configure stations and item routing
+    trigger: onAction
+  states:
+    loading: The rail, oldest ticket first. **The count renders before the tickets** — a kitchen wants
+      to know how deep it is before it reads anything.
+    emptyFirstRun: '**No tickets. The kitchen is clear**, and that is worth saying plainly rather than
+      showing a blank rail — a screen that looks broken and a screen that means nothing to do are the
+      same picture otherwise.'
+    emptyNoResults: Nothing matches this station or course filter. **The rail is not empty** — the filter
+      is narrow, and on a kitchen screen that distinction is the difference between calm and panic.
+    emptyNoAccess: This display is not assigned to a station. **Assignment is a back-office act** —
+      a kitchen screen does not choose what it shows.
+    error: Could not reach the platform. **The rail is still live from cache** and every bump is queued.
+    offline: '**Amber, and it keeps working.** The kitchen still has to send food out — a display that
+      blanks mid-service is worse than one that says it is behind, and every bump journals locally and
+      syncs when the network returns.'
+  entryState:
+    params:
+    - name: venueId
+      from: session
+    - name: stationId
+      from: session
+    coldEntry: '**Cold is the only way in.** Nobody logs into a kitchen display — it is on when the
+      kitchen is open, and it resolves its station from the device assignment rather than from a person.'
+  layout:
+    template: board
+    regions:
+    - name: contentBody
+      components:
+      - kind: cardList
+        bindsTo: KitchenTicket[]
+        notes: '**One ticket per card, ordered by promise time not arrival.** A ticket due in two minutes
+          sits above one that arrived first, because a kitchen works to when food is wanted.'
+      - kind: metricTile
+        notes: Depth, oldest ticket age, station load. **Three numbers, glanceable** — anything a chef
+          has to read is a number they will not read.
+      - kind: primaryButton
+        label: Bump
+  navigation:
+    entryFrom:
+    - KIT-001
+    exitTo: []
+  implementation:
+    app: kitchen-display
+    route: /kitchen/kitchen-station-workload-dynamic-routing
+    component: apps/kitchen-display/src/routes/kitchen/KitchenStationWorkloadDynamicRoutiBoard.tsx
+    status: notStarted
+  wireframe:
+    status: designed
+    board: wireframes/P15 Kitchen Display.dc.html#kit-005
+    source: Claude Design F&B pack, 20 August
+    note: '**Drawn as FNB-3E in the client pack.** The pack''s frame is the specification for this screen
+      — it carries operations, states, entry params and exits, and it is better specified than anything
+      derived from the screen file.'
+    derivedFrom: wireframes/FnB Board 3.dc.html#fnb-3e
+  provenance: client board, specified
+  notes: '**Built 20 August from board 3 of the client F&B design set.** **Board repointed 24 August.**
+    This screen pointed at `wireframes/FnB Board 3.dc.html#fnb-3e` — a frame in the client pack, which
+    is where the design came from and not where this screen is drawn. **`P15 Kitchen Display.dc.html`
+    and `P16 Venue Analytics.dc.html` carry one anchor per screen and nothing referenced either**, so
+    both shipped correctly anchored and unreachable. The pack frame is kept in `derivedFrom` because
+    provenance is worth more than the wrong pointer.'
+  requiresModule: fnb
+  boardFrames:
+  - FNB-3E
+- id: KIT-006
+  name: Expeditor & Order Assembly
+  module: Kitchen
+  wave: 2
+  purpose: Expeditor & Order Assembly — board 3 of the client F&B design set.
+  density: touchLarge
+  densityReason: '**Bumped by somebody with flour on their hands, read from two metres, in a room where
+    nobody is sitting down.** A kitchen display is not a back office at a different width.'
+  apis:
+  - operationId: listKitchenTickets
+    contract: fnb
+    purpose: Kitchen ticket queue
+    trigger: onLoad
+  - operationId: setKitchenTicketStatus
+    contract: fnb
+    purpose: Advance a kitchen ticket
+    trigger: onAction
+  - operationId: chaseStation
+    contract: fnb
+    purpose: The pass asks a station where an item is
+    trigger: onAction
+  - operationId: markOrderCollected
+    contract: fnb
+    purpose: The guest took it
+    trigger: onAction
+  - operationId: printOrderLabel
+    contract: fnb
+    purpose: A label for the bag
+    trigger: onAction
+  states:
+    loading: The rail, oldest ticket first. **The count renders before the tickets** — a kitchen wants
+      to know how deep it is before it reads anything.
+    emptyFirstRun: '**No tickets. The kitchen is clear**, and that is worth saying plainly rather than
+      showing a blank rail — a screen that looks broken and a screen that means nothing to do are the
+      same picture otherwise.'
+    emptyNoResults: Nothing matches this station or course filter. **The rail is not empty** — the filter
+      is narrow, and on a kitchen screen that distinction is the difference between calm and panic.
+    emptyNoAccess: This display is not assigned to a station. **Assignment is a back-office act** —
+      a kitchen screen does not choose what it shows.
+    error: Could not reach the platform. **The rail is still live from cache** and every bump is queued.
+    offline: '**Amber, and it keeps working.** The kitchen still has to send food out — a display that
+      blanks mid-service is worse than one that says it is behind, and every bump journals locally and
+      syncs when the network returns.'
+  entryState:
+    params:
+    - name: venueId
+      from: session
+    - name: stationId
+      from: session
+    - name: ticketId
+      from: KIT-002
+    - name: orderId
+      from: session
+    coldEntry: '**Cold is the only way in.** Nobody logs into a kitchen display — it is on when the
+      kitchen is open, and it resolves its station from the device assignment rather than from a person.
+      An order tapped on the rail.'
+  layout:
+    template: board
+    regions:
+    - name: contentBody
+      components:
+      - kind: cardList
+        bindsTo: KitchenTicket[]
+        notes: '**One ticket per card, ordered by promise time not arrival.** A ticket due in two minutes
+          sits above one that arrived first, because a kitchen works to when food is wanted.'
+      - kind: metricTile
+        notes: Depth, oldest ticket age, station load. **Three numbers, glanceable** — anything a chef
+          has to read is a number they will not read.
+      - kind: primaryButton
+        label: Bump
+  navigation:
+    entryFrom:
+    - KIT-001
+    exitTo: []
+  implementation:
+    app: kitchen-display
+    route: /kitchen/expeditor-order-assembly
+    component: apps/kitchen-display/src/routes/kitchen/ExpeditorOrderAssemblyBoard.tsx
+    status: notStarted
+  wireframe:
+    status: designed
+    board: wireframes/P15 Kitchen Display.dc.html#kit-006
+    source: Claude Design F&B pack, 20 August
+    note: '**Drawn as FNB-3F in the client pack.** The pack''s frame is the specification for this screen
+      — it carries operations, states, entry params and exits, and it is better specified than anything
+      derived from the screen file.'
+    derivedFrom: wireframes/FnB Board 3.dc.html#fnb-3f
+  provenance: client board, specified
+  notes: '**Built 20 August from board 3 of the client F&B design set.** **No expeditor role is modelled**
+    — this reads and sets ticket status like the KDS. Whether an expeditor needs their own state is
+    a kitchen question rather than a contract one. **Operations from the 24 August F&B build wired here**
+    — the contract grew and the screens had not caught up, which is how 92 operations reached 49% of
+    screens. **Retail board operations wired 24 August.** **Board repointed 24 August.** This screen
+    pointed at `wireframes/FnB Board 3.dc.html#fnb-3f` — a frame in the client pack, which is where
+    the design came from and not where this screen is drawn. **`P15 Kitchen Display.dc.html` and `P16
+    Venue Analytics.dc.html` carry one anchor per screen and nothing referenced either**, so both shipped
+    correctly anchored and unreachable. The pack frame is kept in `derivedFrom` because provenance is
+    worth more than the wrong pointer.'
+  requiresModule: fnb
+  boardFrames:
+  - FNB-3F
+- id: KIT-007
+  name: Guest Collection, Buzzer & Digital Notification
+  module: Kitchen
+  wave: 2
+  purpose: Guest Collection, Buzzer & Digital Notification — board 3 of the client F&B design set.
+  density: touchLarge
+  densityReason: '**Bumped by somebody with flour on their hands, read from two metres, in a room where
+    nobody is sitting down.** A kitchen display is not a back office at a different width.'
+  apis:
+  - operationId: listKitchenTickets
+    contract: fnb
+    purpose: Kitchen ticket queue
+    trigger: onLoad
+  - operationId: recordOrderHandover
+    contract: fnb
+    purpose: Record that an order reached the guest
+    trigger: onAction
+  states:
+    loading: The rail, oldest ticket first. **The count renders before the tickets** — a kitchen wants
+      to know how deep it is before it reads anything.
+    emptyFirstRun: '**No tickets. The kitchen is clear**, and that is worth saying plainly rather than
+      showing a blank rail — a screen that looks broken and a screen that means nothing to do are the
+      same picture otherwise.'
+    emptyNoResults: Nothing matches this station or course filter. **The rail is not empty** — the filter
+      is narrow, and on a kitchen screen that distinction is the difference between calm and panic.
+    emptyNoAccess: This display is not assigned to a station. **Assignment is a back-office act** —
+      a kitchen screen does not choose what it shows.
+    error: Could not reach the platform. **The rail is still live from cache** and every bump is queued.
+    offline: '**Amber, and it keeps working.** The kitchen still has to send food out — a display that
+      blanks mid-service is worse than one that says it is behind, and every bump journals locally and
+      syncs when the network returns.'
+  entryState:
+    params:
+    - name: venueId
+      from: session
+    - name: stationId
+      from: session
+    - name: orderId
+      from: KIT-002
+    coldEntry: '**Cold is the only way in.** Nobody logs into a kitchen display — it is on when the
+      kitchen is open, and it resolves its station from the device assignment rather than from a person.'
+  layout:
+    template: board
+    regions:
+    - name: contentBody
+      components:
+      - kind: cardList
+        bindsTo: KitchenTicket[]
+        notes: '**One ticket per card, ordered by promise time not arrival.** A ticket due in two minutes
+          sits above one that arrived first, because a kitchen works to when food is wanted.'
+      - kind: metricTile
+        notes: Depth, oldest ticket age, station load. **Three numbers, glanceable** — anything a chef
+          has to read is a number they will not read.
+      - kind: primaryButton
+        label: Bump
+  navigation:
+    entryFrom:
+    - KIT-001
+    exitTo: []
+  implementation:
+    app: kitchen-display
+    route: /kitchen/guest-collection-buzzer-digital-notification
+    component: apps/kitchen-display/src/routes/kitchen/GuestCollectionBuzzerDigitalNotifiBoard.tsx
+    status: notStarted
+  wireframe:
+    status: designed
+    board: wireframes/P15 Kitchen Display.dc.html#kit-007
+    source: Claude Design F&B pack, 20 August
+    note: '**Drawn as FNB-3G in the client pack.** The pack''s frame is the specification for this screen
+      — it carries operations, states, entry params and exits, and it is better specified than anything
+      derived from the screen file.'
+    derivedFrom: wireframes/FnB Board 3.dc.html#fnb-3g
+  provenance: client board, specified
+  notes: '**Built 20 August from board 3 of the client F&B design set.** **`buzzerCode` exists and nothing
+    dispatches to a physical pager.** The digital half works; the buzzer half assumes a device driver
+    the package does not model. **Board repointed 24 August.** This screen pointed at `wireframes/FnB
+    Board 3.dc.html#fnb-3g` — a frame in the client pack, which is where the design came from and not
+    where this screen is drawn. **`P15 Kitchen Display.dc.html` and `P16 Venue Analytics.dc.html` carry
+    one anchor per screen and nothing referenced either**, so both shipped correctly anchored and unreachable.
+    The pack frame is kept in `derivedFrom` because provenance is worth more than the wrong pointer.'
+  requiresModule: fnb
+  boardFrames:
+  - FNB-3G
+- id: KIT-008
+  name: Exceptions, Re-Fire & Unavailable Items
+  module: Kitchen
+  wave: 2
+  purpose: Exceptions, Re-Fire & Unavailable Items — board 3 of the client F&B design set.
+  density: touchLarge
+  densityReason: '**Bumped by somebody with flour on their hands, read from two metres, in a room where
+    nobody is sitting down.** A kitchen display is not a back office at a different width.'
+  apis:
+  - operationId: setItemAvailability
+    contract: fnb
+    purpose: Mark an item available or eighty-sixed
+    trigger: onAction
+  - operationId: setKitchenTicketStatus
+    contract: fnb
+    purpose: Advance a kitchen ticket
+    trigger: onAction
+  - operationId: getHaccpStatus
+    contract: fnb
+    purpose: getHaccpStatus
+    trigger: onLoad
+  - operationId: list86Events
+    contract: fnb
+    purpose: What came off the menu today, when, and for how long
+    trigger: onLoad
+  - operationId: logKitchenException
+    contract: fnb
+    purpose: Something went wrong that is not a refire
+    trigger: onAction
+  states:
+    loading: The rail, oldest ticket first. **The count renders before the tickets** — a kitchen wants
+      to know how deep it is before it reads anything.
+    emptyFirstRun: '**No tickets. The kitchen is clear**, and that is worth saying plainly rather than
+      showing a blank rail — a screen that looks broken and a screen that means nothing to do are the
+      same picture otherwise.'
+    emptyNoResults: Nothing matches this station or course filter. **The rail is not empty** — the filter
+      is narrow, and on a kitchen screen that distinction is the difference between calm and panic.
+    emptyNoAccess: This display is not assigned to a station. **Assignment is a back-office act** —
+      a kitchen screen does not choose what it shows.
+    error: Could not reach the platform. **The rail is still live from cache** and every bump is queued.
+    offline: '**Amber, and it keeps working.** The kitchen still has to send food out — a display that
+      blanks mid-service is worse than one that says it is behind, and every bump journals locally and
+      syncs when the network returns.'
+  entryState:
+    params:
+    - name: venueId
+      from: session
+    - name: stationId
+      from: session
+    - name: itemId
+      from: KIT-002
+    - name: ticketId
+      from: KIT-002
+    - name: outletId
+      from: session
+    coldEntry: '**Cold is the only way in.** Nobody logs into a kitchen display — it is on when the
+      kitchen is open, and it resolves its station from the device assignment rather than from a person.
+      Resolves from the station assignment. A kitchen display belongs to one outlet.'
+  layout:
+    template: board
+    regions:
+    - name: contentBody
+      components:
+      - kind: cardList
+        bindsTo: KitchenTicket[]
+        notes: '**One ticket per card, ordered by promise time not arrival.** A ticket due in two minutes
+          sits above one that arrived first, because a kitchen works to when food is wanted.'
+      - kind: metricTile
+        notes: Depth, oldest ticket age, station load. **Three numbers, glanceable** — anything a chef
+          has to read is a number they will not read.
+      - kind: primaryButton
+        label: Bump
+  navigation:
+    entryFrom:
+    - KIT-001
+    exitTo: []
+  implementation:
+    app: kitchen-display
+    route: /kitchen/exceptions-re-fire-unavailable-items
+    component: apps/kitchen-display/src/routes/kitchen/ExceptionsReFireUnavailableItemsBoard.tsx
+    status: notStarted
+  wireframe:
+    status: designed
+    board: wireframes/P15 Kitchen Display.dc.html#kit-008
+    source: Claude Design F&B pack, 20 August
+    note: '**Drawn as FNB-3H in the client pack.** The pack''s frame is the specification for this screen
+      — it carries operations, states, entry params and exits, and it is better specified than anything
+      derived from the screen file.'
+    derivedFrom: wireframes/FnB Board 3.dc.html#fnb-3h
+  provenance: client board, specified
+  notes: '**Built 20 August from board 3 of the client F&B design set.** **86 is a kitchen word and
+    a real state.** An item marked unavailable here stops selling at every till in the venue within
+    seconds, which is the only reason to put it on a kitchen screen. **Food-safety operations wired
+    20 August** — boards 5G and 5J of the client F&B pack, and **HACCP is a regulatory obligation nothing
+    in the package touched.** **Operations from the 24 August F&B build wired here** — the contract
+    grew and the screens had not caught up, which is how 92 operations reached 49% of screens. **Board
+    repointed 24 August.** This screen pointed at `wireframes/FnB Board 3.dc.html#fnb-3h` — a frame
+    in the client pack, which is where the design came from and not where this screen is drawn. **`P15
+    Kitchen Display.dc.html` and `P16 Venue Analytics.dc.html` carry one anchor per screen and nothing
+    referenced either**, so both shipped correctly anchored and unreachable. The pack frame is kept
+    in `derivedFrom` because provenance is worth more than the wrong pointer.'
+  requiresModule: fnb
+  boardFrames:
+  - FNB-3H
+- id: KIT-009
+  name: SLA, Priority & Service Rules
+  module: Kitchen
+  wave: 2
+  purpose: SLA, Priority & Service Rules — board 3 of the client F&B design set.
+  density: touchLarge
+  densityReason: '**Bumped by somebody with flour on their hands, read from two metres, in a room where
+    nobody is sitting down.** A kitchen display is not a back office at a different width.'
+  apis:
+  - operationId: prioritiseKitchenTicket
+    contract: fnb
+    purpose: Move a ticket up the queue
+    trigger: onAction
+  - operationId: setVenueSettings
+    contract: tenancy
+    purpose: Set support hours, quiet hours, segregated access and alerti
+    trigger: onAction
+  states:
+    loading: The rail, oldest ticket first. **The count renders before the tickets** — a kitchen wants
+      to know how deep it is before it reads anything.
+    emptyFirstRun: '**No tickets. The kitchen is clear**, and that is worth saying plainly rather than
+      showing a blank rail — a screen that looks broken and a screen that means nothing to do are the
+      same picture otherwise.'
+    emptyNoResults: Nothing matches this station or course filter. **The rail is not empty** — the filter
+      is narrow, and on a kitchen screen that distinction is the difference between calm and panic.
+    emptyNoAccess: This display is not assigned to a station. **Assignment is a back-office act** —
+      a kitchen screen does not choose what it shows.
+    error: Could not reach the platform. **The rail is still live from cache** and every bump is queued.
+    offline: '**Amber, and it keeps working.** The kitchen still has to send food out — a display that
+      blanks mid-service is worse than one that says it is behind, and every bump journals locally and
+      syncs when the network returns.'
+  entryState:
+    params:
+    - name: venueId
+      from: session
+    - name: stationId
+      from: session
+    - name: ticketId
+      from: KIT-002
+    coldEntry: '**Cold is the only way in.** Nobody logs into a kitchen display — it is on when the
+      kitchen is open, and it resolves its station from the device assignment rather than from a person.'
+  layout:
+    template: board
+    regions:
+    - name: contentBody
+      components:
+      - kind: cardList
+        bindsTo: KitchenTicket[]
+        notes: '**One ticket per card, ordered by promise time not arrival.** A ticket due in two minutes
+          sits above one that arrived first, because a kitchen works to when food is wanted.'
+      - kind: metricTile
+        notes: Depth, oldest ticket age, station load. **Three numbers, glanceable** — anything a chef
+          has to read is a number they will not read.
+      - kind: primaryButton
+        label: Bump
+  navigation:
+    entryFrom:
+    - KIT-001
+    exitTo: []
+  implementation:
+    app: kitchen-display
+    route: /kitchen/sla-priority-service-rules
+    component: apps/kitchen-display/src/routes/kitchen/SlaPriorityServiceRulesBoard.tsx
+    status: notStarted
+  wireframe:
+    status: designed
+    board: wireframes/P15 Kitchen Display.dc.html#kit-009
+    source: Claude Design F&B pack, 20 August
+    note: '**Drawn as FNB-3J in the client pack.** The pack''s frame is the specification for this screen
+      — it carries operations, states, entry params and exits, and it is better specified than anything
+      derived from the screen file.'
+    derivedFrom: wireframes/FnB Board 3.dc.html#fnb-3j
+  provenance: client board, specified
+  notes: '**Built 20 August from board 3 of the client F&B design set.** **Board repointed 24 August.**
+    This screen pointed at `wireframes/FnB Board 3.dc.html#fnb-3j` — a frame in the client pack, which
+    is where the design came from and not where this screen is drawn. **`P15 Kitchen Display.dc.html`
+    and `P16 Venue Analytics.dc.html` carry one anchor per screen and nothing referenced either**, so
+    both shipped correctly anchored and unreachable. The pack frame is kept in `derivedFrom` because
+    provenance is worth more than the wrong pointer.'
+  requiresModule: fnb
+  boardFrames:
+  - FNB-3J
+- id: KIT-010
+  name: Kitchen Performance, AI & Operational Optimization
+  module: Kitchen
+  wave: 2
+  purpose: Kitchen Performance, AI & Operational Optimization — board 3 of the client F&B design set.
+  density: touchLarge
+  densityReason: '**Bumped by somebody with flour on their hands, read from two metres, in a room where
+    nobody is sitting down.** A kitchen display is not a back office at a different width.'
+  apis:
+  - operationId: getDashboard
+    contract: reporting
+    purpose: Read a dashboard with tile data
+    trigger: onLoad
+  - operationId: askReportingQuestion
+    contract: reporting
+    purpose: Natural-language reporting query
+    trigger: onAction
+  states:
+    loading: The rail, oldest ticket first. **The count renders before the tickets** — a kitchen wants
+      to know how deep it is before it reads anything.
+    emptyFirstRun: '**No tickets. The kitchen is clear**, and that is worth saying plainly rather than
+      showing a blank rail — a screen that looks broken and a screen that means nothing to do are the
+      same picture otherwise.'
+    emptyNoResults: Nothing matches this station or course filter. **The rail is not empty** — the filter
+      is narrow, and on a kitchen screen that distinction is the difference between calm and panic.
+    emptyNoAccess: This display is not assigned to a station. **Assignment is a back-office act** —
+      a kitchen screen does not choose what it shows.
+    error: Could not reach the platform. **The rail is still live from cache** and every bump is queued.
+    offline: '**Amber, and it keeps working.** The kitchen still has to send food out — a display that
+      blanks mid-service is worse than one that says it is behind, and every bump journals locally and
+      syncs when the network returns.'
+  entryState:
+    params:
+    - name: venueId
+      from: session
+    - name: stationId
+      from: session
+    - name: dashboardId
+      from: KIT-002
+    coldEntry: '**Cold is the only way in.** Nobody logs into a kitchen display — it is on when the
+      kitchen is open, and it resolves its station from the device assignment rather than from a person.'
+  layout:
+    template: board
+    regions:
+    - name: contentBody
+      components:
+      - kind: cardList
+        bindsTo: KitchenTicket[]
+        notes: '**One ticket per card, ordered by promise time not arrival.** A ticket due in two minutes
+          sits above one that arrived first, because a kitchen works to when food is wanted.'
+      - kind: metricTile
+        notes: Depth, oldest ticket age, station load. **Three numbers, glanceable** — anything a chef
+          has to read is a number they will not read.
+      - kind: primaryButton
+        label: Bump
+  navigation:
+    entryFrom:
+    - KIT-001
+    exitTo: []
+  implementation:
+    app: kitchen-display
+    route: /kitchen/kitchen-performance-ai-operational-optimization
+    component: apps/kitchen-display/src/routes/kitchen/KitchenPerformanceAiOperationalOptBoard.tsx
+    status: notStarted
+  wireframe:
+    status: designed
+    board: wireframes/P15 Kitchen Display.dc.html#kit-010
+    source: Claude Design F&B pack, 20 August
+    note: '**Drawn as FNB-3K in the client pack.** The pack''s frame is the specification for this screen
+      — it carries operations, states, entry params and exits, and it is better specified than anything
+      derived from the screen file.'
+    derivedFrom: wireframes/FnB Board 3.dc.html#fnb-3k
+  provenance: client board, specified
+  notes: '**Built 20 August from board 3 of the client F&B design set.** **Board repointed 24 August.**
+    This screen pointed at `wireframes/FnB Board 3.dc.html#fnb-3k` — a frame in the client pack, which
+    is where the design came from and not where this screen is drawn. **`P15 Kitchen Display.dc.html`
+    and `P16 Venue Analytics.dc.html` carry one anchor per screen and nothing referenced either**, so
+    both shipped correctly anchored and unreachable. The pack frame is kept in `derivedFrom` because
+    provenance is worth more than the wrong pointer.'
+  requiresModule: fnb
+  boardFrames:
+  - FNB-3K

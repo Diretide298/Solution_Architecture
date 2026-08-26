@@ -1,0 +1,49 @@
+id: LLD-Restaurant waitlist entry
+title: Restaurant waitlist entry — 5 transitions
+generatedBy: tools/derive-diagrams.py
+index: diagrams/hld/04-lifecycles.yaml
+source: states/restaurant-waitlist.yaml
+entity: Restaurant waitlist entry
+contract: fnb
+enum: RestaurantWaitlist.status
+enumKind: inline
+enumSchema: RestaurantWaitlist
+enumProperty: status
+owner: fnb
+initial:
+- waiting
+terminal:
+- seated
+- walkedAway
+- noShow
+- cancelled
+transitions:
+- from: waiting
+  to: notified
+  operation: joinRestaurantWaitlist
+  trigger: operation
+  guard: Called. **`holdExpiresAt` starts here** — too short loses a guest returning from the bathroom,
+    too long leaves a table empty at peak
+- from: notified
+  to: seated
+  operation: joinRestaurantWaitlist
+  trigger: operation
+  guard: Sat down
+- from: notified
+  to: noShow
+  trigger: timer
+  guard: Called and did not come. **The table was held and lost**
+- from: waiting
+  to: walkedAway
+  operation: joinRestaurantWaitlist
+  trigger: operation
+  guard: '**Left before being called, which is the number a manager needs.** A guest who gave up on
+    the wait is feedback about the quote, not about the guest'
+- from: waiting
+  to: cancelled
+  operation: joinRestaurantWaitlist
+  trigger: operation
+  guard: Cancelled by the guest or the host
+notes: '**`walkedAway` and `noShow` are separated deliberately.** One left before being called — that
+  is feedback about the quoted wait. The other was called and did not come — that is a lost table. Collapsing
+  them makes the wait-time report useless.'

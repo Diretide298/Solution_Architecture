@@ -1,0 +1,37 @@
+id: LLD-API version
+title: API version — 4 transitions
+generatedBy: tools/derive-diagrams.py
+index: diagrams/hld/04-lifecycles.yaml
+source: states/api-version.yaml
+entity: API version
+contract: public-api
+enum: ApiVersion.status
+enumKind: inline
+enumSchema: ApiVersion
+enumProperty: status
+owner: public-api
+initial:
+- preview
+terminal:
+- sunset
+transitions:
+- from: preview
+  to: current
+  trigger: operation
+  guard: Generally available
+- from: current
+  to: deprecated
+  trigger: operation
+  guard: '**Announced with a sunset date and twelve months notice** (ADR-0026). Still fully functional
+    — deprecation is a warning, not a degradation'
+- from: deprecated
+  to: sunset
+  trigger: timer
+  guard: '**Stops answering.** The date was known for a year'
+- from: preview
+  to: sunset
+  trigger: operation
+  guard: A preview withdrawn before release. **No notice owed** — that is what preview means
+notes: '**Deprecated is fully functional.** A deprecated version that starts returning warnings in the
+  response body or throttling is one that broke its own promise — the promise was twelve months, not
+  twelve months of degradation.'

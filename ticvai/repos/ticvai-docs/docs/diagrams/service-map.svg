@@ -1,0 +1,111 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="620" viewBox="0 0 960 620">
+<style>
+  .bg{fill:#FFFFFF}
+  .band{fill:#F7F9FC;stroke:#E3E8F0;stroke-width:1}
+  .svc{fill:#FFFFFF;stroke:#5A6577;stroke-width:1.2}
+  .svc.found{fill:#0D6EFD;stroke:#0B1324;stroke-width:2}
+  .svc.comm{fill:#DDEBF7;stroke:#2E74B5;stroke-width:1.6}
+  .svc.ops{fill:#FFF7E6;stroke:#8A6D00;stroke-width:1.2}
+  .svc.eng{fill:#FCE4D6;stroke:#B05A2A;stroke-width:1.2}
+  .svc.plat{fill:#EDEDED;stroke:#6B7280;stroke-width:1.2}
+  .nm{fill:#0B1324;font-family:Arial,Helvetica,sans-serif;font-size:11.5px;font-weight:700}
+  .nm.on{fill:#FFFFFF}
+  .num{fill:#5A6577;font-family:'Courier New',monospace;font-size:9.5px}
+  .num.on{fill:#CFE4FF}
+  .grp{fill:#8494A8;font-family:'Courier New',monospace;font-size:10px;letter-spacing:1.3px}
+  .hd{fill:#0B1324;font-family:Arial,Helvetica,sans-serif;font-size:17px;font-weight:700}
+  .sub{fill:#5A6577;font-family:Arial,Helvetica,sans-serif;font-size:11.5px}
+  .w{stroke:#B05A2A;stroke-width:1.4;fill:none;marker-end:url(#a)}
+  .w.big{stroke-width:2.6}
+  .lbl{fill:#B05A2A;font-family:'Courier New',monospace;font-size:9px}
+  .key{fill:#5A6577;font-family:Arial,Helvetica,sans-serif;font-size:10px}
+</style>
+<defs><marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto">
+<path d="M1 1L9 5L1 9" fill="none" stroke="#B05A2A" stroke-width="1.6"/></marker></defs>
+<rect class="bg" x="0" y="0" width="960" height="620"/>
+
+<text class="hd" x="30" y="32">Sixteen services, five tiers — and the writes that cross between them</text>
+<text class="sub" x="30" y="54">Arrows are cross-service writes. The owner defines the row; a foreign writer may only append to it.</text>
+
+<rect class="band" x="30" y="76" width="900" height="76" rx="8"/>
+<text class="grp" x="44" y="94">FOUNDATION — READ BY EVERYTHING, DEPLOYS FIRST AND ALONE</text>
+<g><rect class="svc found" x="44" y="102" width="180" height="38" rx="7"/>
+<text class="nm on" x="134" y="118" text-anchor="middle">IdentityService</text>
+<text class="num on" x="134" y="132" text-anchor="middle">44 ops · 20 tables · 48%</text></g>
+<g><rect class="svc found" x="240" y="102" width="180" height="38" rx="7"/>
+<text class="nm on" x="330" y="118" text-anchor="middle">TenancyService</text>
+<text class="num on" x="330" y="132" text-anchor="middle">52 ops · 35 tables · 62%</text></g>
+<text class="key" x="440" y="118">platform.scope_node is reached by 289 of 379 tables.</text>
+<text class="key" x="440" y="134">A restart here is an outage everywhere.</text>
+
+<rect class="band" x="30" y="166" width="900" height="76" rx="8"/>
+<text class="grp" x="44" y="184">COMMERCE — THE SALE PATH</text>
+<g><rect class="svc comm" x="44" y="192" width="200" height="38" rx="7"/>
+<text class="nm" x="144" y="208" text-anchor="middle">CatalogueService</text>
+<text class="num" x="144" y="222" text-anchor="middle">132 ops · 40 tables · 43%</text></g>
+<g><rect class="svc comm" x="256" y="192" width="200" height="38" rx="7"/>
+<text class="nm" x="356" y="208" text-anchor="middle">OrderService</text>
+<text class="num" x="356" y="222" text-anchor="middle">96 ops · 34 tables · 55%</text></g>
+<g><rect class="svc comm" x="468" y="192" width="200" height="38" rx="7"/>
+<text class="nm" x="568" y="208" text-anchor="middle">AccessService</text>
+<text class="num" x="568" y="222" text-anchor="middle">30 ops · 8 tables · 57%</text></g>
+<g><rect class="svc comm" x="680" y="192" width="200" height="38" rx="7"/>
+<text class="nm" x="780" y="208" text-anchor="middle">LedgerService</text>
+<text class="num" x="780" y="222" text-anchor="middle">54 ops · 18 tables · 61%</text></g>
+
+<rect class="band" x="30" y="256" width="900" height="76" rx="8"/>
+<text class="grp" x="44" y="274">OPERATIONS — LICENSED PER MODULE</text>
+<g><rect class="svc ops" x="44" y="282" width="200" height="38" rx="7"/>
+<text class="nm" x="144" y="298" text-anchor="middle">InventoryService</text>
+<text class="num" x="144" y="312" text-anchor="middle">50 ops · 19 tables · 96%</text></g>
+<g><rect class="svc ops" x="256" y="282" width="200" height="38" rx="7"/>
+<text class="nm" x="356" y="298" text-anchor="middle">FnbService</text>
+<text class="num" x="356" y="312" text-anchor="middle">96 ops · 34 tables · 73%</text></g>
+<g><rect class="svc ops" x="468" y="282" width="200" height="38" rx="7"/>
+<text class="nm" x="568" y="298" text-anchor="middle">RetailService</text>
+<text class="num" x="568" y="312" text-anchor="middle">35 ops · 14 tables · 43%</text></g>
+<g><rect class="svc ops" x="680" y="282" width="200" height="38" rx="7"/>
+<text class="nm" x="780" y="298" text-anchor="middle">VenueOpsService</text>
+<text class="num" x="780" y="312" text-anchor="middle">102 ops · 32 tables · 47%</text></g>
+
+<rect class="band" x="30" y="346" width="440" height="76" rx="8"/>
+<text class="grp" x="44" y="364">ENGAGEMENT — NOTHING THAT TAKES MONEY DEPENDS ON THESE</text>
+<g><rect class="svc eng" x="44" y="372" width="200" height="38" rx="7"/>
+<text class="nm" x="144" y="388" text-anchor="middle">MarketingService</text>
+<text class="num" x="144" y="402" text-anchor="middle">93 ops · 37 tables · 41%</text></g>
+<g><rect class="svc eng" x="256" y="372" width="200" height="38" rx="7"/>
+<text class="nm" x="356" y="388" text-anchor="middle">AiService</text>
+<text class="num" x="356" y="402" text-anchor="middle">30 ops · 15 tables · 57%</text></g>
+
+<rect class="band" x="490" y="346" width="440" height="166" rx="8"/>
+<text class="grp" x="504" y="364">PLATFORM</text>
+<g><rect class="svc plat" x="504" y="372" width="196" height="38" rx="7"/>
+<text class="nm" x="602" y="388" text-anchor="middle">ControlService</text>
+<text class="num" x="602" y="402" text-anchor="middle">102 ops · 41 tables · 39%</text></g>
+<g><rect class="svc plat" x="712" y="372" width="196" height="38" rx="7"/>
+<text class="nm" x="810" y="388" text-anchor="middle">WhiteLabelService</text>
+<text class="num" x="810" y="402" text-anchor="middle">50 ops · 12 tables · 44%</text></g>
+<g><rect class="svc plat" x="504" y="424" width="196" height="38" rx="7"/>
+<text class="nm" x="602" y="440" text-anchor="middle">ReportingService</text>
+<text class="num" x="602" y="454" text-anchor="middle">29 ops · 13 tables · 62%</text></g>
+<g><rect class="svc plat" x="712" y="424" width="196" height="38" rx="7"/>
+<text class="nm" x="810" y="440" text-anchor="middle">CrossCellService</text>
+<text class="num" x="810" y="454" text-anchor="middle">16 ops · 1 table · 31%</text></g>
+<text class="key" x="504" y="486">CrossCell is the only service that reaches another region.</text>
+<text class="key" x="504" y="500">It writes 11 times into platform.* — the closest merge call.</text>
+
+<path class="w big" d="M356 192 L356 172 L322 172 L322 152"/>
+<text class="lbl" x="300" y="168">7</text>
+<path class="w" d="M400 230 L440 240 L520 240 L540 230"/>
+<text class="lbl" x="462" y="252">7 to Access</text>
+<path class="w" d="M420 230 L560 246 L720 246 L760 230"/>
+<text class="lbl" x="600" y="260">5 to Ledger</text>
+<path class="w" d="M256 210 L244 210"/>
+<text class="lbl" x="222" y="204">5</text>
+<path class="w" d="M300 282 L280 260 L280 242"/>
+<text class="lbl" x="286" y="266">3 F&amp;B to Order</text>
+
+<text class="sub" x="30" y="546">Percentages are flow coverage — how much of each service a journey has walked.</text>
+<text class="sub" x="30" y="566">InventoryService at 96% and CrossCellService at 31%: the difference is attention, not risk.</text>
+<text class="sub" x="30" y="592">shift moved from Tenancy to Order on 24 August. It removed 21 of Tenancy's 23 cross-service writes.</text>
+</svg>

@@ -1,0 +1,40 @@
+# DSAR request — state model
+# Contract: cross-cell.DsarRequest.status
+# Checked by tools/check-states.py.
+
+entity: DSAR request
+contract: cross-cell
+enum: DsarRequest.status
+enumKind: inline
+enumSchema: DsarRequest
+enumProperty: status
+owner: cross-cell
+initial:
+- pending
+terminal:
+- completed
+- partiallyFailed
+transitions:
+- from: pending
+  to: inProgress
+  operation: createDsarRequest
+  trigger: operation
+  guard: Fanned out to every cell holding this subject
+- from: inProgress
+  to: completed
+  trigger: job
+  guard: '**Every cell answered.** Only then is the request satisfied'
+- from: inProgress
+  to: partiallyFailed
+  trigger: job
+  guard: '**A cell did not answer, and this is reported rather than presented as done.** A partial erasure
+    described as complete is a regulatory statement that is false'
+- from: partiallyFailed
+  to: inProgress
+  operation: createDsarRequest
+  trigger: operation
+  guard: Retried against the cells that failed
+  isReversal: true
+notes: '`partiallyFailed` is not a synonym for completed and must never be shown as one. **Under PDPL
+  the answer to "have you erased my data" is yes or it is not**, and a cell that did not respond means
+  the honest answer is no.'

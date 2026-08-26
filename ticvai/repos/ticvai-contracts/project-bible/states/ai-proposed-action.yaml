@@ -1,0 +1,55 @@
+# AI proposed action — state model
+# Contract: ai.ProposedAction.status
+# Checked by tools/check-states.py.
+
+entity: AI proposed action
+contract: ai
+enum: ProposedAction.status
+enumKind: inline
+enumSchema: ProposedAction
+enumProperty: status
+owner: ai
+initial:
+- proposed
+terminal:
+- applied
+- rejected
+- expired
+transitions:
+- from: proposed
+  to: approved
+  operation: decideProposedAction
+  trigger: operation
+  guard: '**Authorised, not performed.** The owning contract executes afterwards under the approver’s
+    own permission — an approval endpoint that also executed would let someone authorise what they could
+    not do themselves'
+  requiresApproval: true
+- from: proposed
+  to: rejected
+  operation: decideProposedAction
+  trigger: operation
+  guard: Refused with a reason. **The only signal the assistant is proposing badly** — without it a
+    poor model degrades silently and nobody can measure it
+- from: approved
+  to: applied
+  trigger: cascade
+  guard: The owning contract performed it and reported back. **Approved and applied are separate because
+    the gap between them is where a failure hides** — an approval nobody acted on looks identical to
+    one nobody made
+- from: proposed
+  to: expired
+  trigger: timer
+  guard: Nobody decided. **A stale proposal is priced against a catalogue that has moved**, so applying
+    it later is applying yesterday’s reasoning to today’s data
+- from: approved
+  to: expired
+  trigger: timer
+  guard: Approved and never applied. **The more dangerous expiry** — someone believes they authorised
+    a change that never happened
+notes: '`approved` is not terminal and must not be treated as done. `rejectionRate` in the usage report
+  counts rejections against proposals, and it is the number that says whether the assistant is worth
+  having.
+
+
+  **No path back from `rejected`.** A refused proposal is evidence; asking again means a new conversation
+  and a new proposal, not reopening this one.'

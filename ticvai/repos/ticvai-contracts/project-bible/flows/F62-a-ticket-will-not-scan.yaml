@@ -1,0 +1,59 @@
+$schema: ./_schema.yaml
+id: F62
+name: A ticket will not scan
+actor: gateOperator
+capability: Admission exceptions
+wave: 1
+frequency: Routine.
+criticality: safety
+primaryContract: access
+contracts:
+- access
+- identity
+platforms:
+- P07
+trigger:
+  description: A guest presents something the scanner cannot read — a damaged code, a screenshot of
+    a screenshot, the wrong day.
+offlineBehaviour: '**Entirely offline-capable, and it must be.** The exception path is the one most
+  likely to be needed when the network is worst, because a busy gate and a strained network arrive together.'
+steps:
+- step: 1
+  screen: SCN-008
+  action: The steward types the reference by hand.
+  operations:
+  - lookupTicket
+  outcome: '**Typed, not guessed.** A lookup that fuzzy-matches will admit the wrong guest at a gate.'
+- step: 2
+  screen: SCN-009
+  action: The ticket is found and its history read.
+  operations:
+  - lookupTicket
+  - listScans
+  outcome: '**When and where it was used, if it was.** *Already scanned* with no detail is an argument;
+    *scanned at North Gate at 10:14* is an answer.'
+- step: 3
+  screen: SCN-003
+  action: It is valid. The guest is admitted.
+  operations:
+  - validateAccess
+  - listScans
+  outcome: Recorded as a manual admission. **The manual rate at a gate is a hardware signal** — one
+    lane doing forty a day has a broken reader.
+branches:
+- at: 3
+  condition: It is not valid and the guest disputes it.
+  behaviour: '`overrideAccess` with a name against it. **A steward at a gate needs a decision recorded,
+    not a rule that leaves them arguing.**'
+  severity: high
+  resolvedBy: overrideAccess
+exitStates:
+- state: admittedManually
+  description: Found and admitted by hand.
+- state: admittedOnOverride
+  description: '**Allowed against the rules, with a name.**'
+- state: refused
+  description: Refused with a stated reason.
+notes: '**Written 24 August.** `SCN-008`, `SCN-009` and `SCN-013` declared identical operation sets
+  — bulk-attach residue, and this flow is what distinguishes them.'
+openQuestions: null

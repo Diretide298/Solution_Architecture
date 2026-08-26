@@ -1,0 +1,1963 @@
+id: HLD-LIFECYCLES
+sourceFiles:
+  folder: states/
+  files: 114
+  drawn: 113
+  skipped:
+  - _schema.yaml
+  why: '**`_schema.yaml` is the shape, not a model.** Every state file validates against it; it has
+    no entity and no transitions.'
+title: 113 state models and 29 events
+generatedBy: tools/derive-diagrams.py
+index: diagrams/hld/00-platform.yaml
+about: '**What can happen to a thing, and in what order.** A state model is a lifecycle within one entity;
+  an event is a lifecycle crossing between two.
+
+
+  **223 of 1,014 operations are named by a transition** — a quarter of the API is a state change somewhere,
+  and the rule that a critical finding cannot be signed by whoever raised it lives here and nowhere
+  else.'
+naming: '**Called `domain` in the viewer, which names a methodology rather than a subject.** Every other
+  layer names a thing a reader recognises. `Lifecycles` covers both halves and says what question it
+  answers.'
+stateModels:
+- entity: AI index job
+  contract: ai
+  owner: ai
+  service: AiService
+  states: null
+  transitions: 8
+  initial:
+  - queued
+  terminal:
+  - complete
+  - failed
+  operations:
+  - reindexSource
+  guarded: 8
+  ref: diagrams/lld/lifecycles/ai-index-job.yaml
+- entity: AI knowledge document
+  contract: ai
+  owner: ai
+  service: AiService
+  states: null
+  transitions: 6
+  initial:
+  - processing
+  terminal:
+  - failed
+  - superseded
+  operations:
+  - ingestKnowledgeDocument
+  guarded: 6
+  ref: diagrams/lld/lifecycles/ai-knowledge-document.yaml
+- entity: AI layout draft
+  contract: ai
+  owner: ai
+  service: null
+  states: null
+  transitions: 2
+  initial:
+  - parsing
+  terminal:
+  - previewReady
+  - failed
+  operations: []
+  guarded: 2
+  ref: diagrams/lld/lifecycles/ai-layout-draft.yaml
+- entity: AI proposed action
+  contract: ai
+  owner: ai
+  service: AiService
+  states: null
+  transitions: 5
+  initial:
+  - proposed
+  terminal:
+  - applied
+  - rejected
+  - expired
+  operations:
+  - decideProposedAction
+  guarded: 5
+  ref: diagrams/lld/lifecycles/ai-proposed-action.yaml
+- entity: Operational alert
+  contract: reporting
+  owner: reporting
+  service: null
+  states: null
+  transitions: 5
+  initial:
+  - raised
+  terminal:
+  - resolved
+  - expired
+  operations: []
+  guarded: 5
+  ref: diagrams/lld/lifecycles/alert.yaml
+- entity: API client
+  contract: public-api
+  owner: public-api
+  service: ControlService
+  states: null
+  transitions: 4
+  initial:
+  - active
+  terminal:
+  - revoked
+  operations:
+  - revokeApiCredential
+  - rotateApiCredential
+  guarded: 4
+  ref: diagrams/lld/lifecycles/api-client.yaml
+- entity: API version
+  contract: public-api
+  owner: public-api
+  service: null
+  states: null
+  transitions: 4
+  initial:
+  - preview
+  terminal:
+  - sunset
+  operations: []
+  guarded: 4
+  ref: diagrams/lld/lifecycles/api-version.yaml
+- entity: Approval request
+  contract: approvals
+  owner: approvals
+  service: TenancyService
+  states: null
+  transitions: 13
+  initial:
+  - draft
+  - pending
+  terminal:
+  - approved
+  - rejected
+  - withdrawn
+  - expired
+  - cancelled
+  operations:
+  - createApprovalRequest
+  - decideApprovalRequest
+  - escalateApprovalRequest
+  - resubmitApprovalRequest
+  - withdrawApprovalRequest
+  guarded: 13
+  ref: diagrams/lld/lifecycles/approval-request.yaml
+- entity: Asset
+  contract: maintenance
+  owner: maintenance
+  service: VenueOpsService
+  states: null
+  transitions: 10
+  initial:
+  - inService
+  terminal:
+  - disposed
+  operations:
+  - updateAsset
+  - updateWorkOrder
+  - verifyWorkOrder
+  guarded: 10
+  ref: diagrams/lld/lifecycles/asset.yaml
+- entity: Campaign
+  contract: marketing-crm
+  owner: marketing
+  service: MarketingService
+  states: null
+  transitions: 8
+  initial:
+  - draft
+  terminal:
+  - completed
+  - stopped
+  - failed
+  operations:
+  - launchCampaign
+  - pauseCampaign
+  - stopCampaign
+  - unscheduleCampaign
+  guarded: 8
+  ref: diagrams/lld/lifecycles/campaign.yaml
+- entity: Cart
+  contract: orders
+  owner: orders
+  service: OrderService
+  states: null
+  transitions: 10
+  initial:
+  - active
+  terminal:
+  - expired
+  - abandoned
+  - checkedOut
+  operations:
+  - abandonCart
+  - addCartLine
+  - checkoutCart
+  - extendCart
+  guarded: 10
+  ref: diagrams/lld/lifecycles/cart.yaml
+- entity: Service case
+  contract: marketing-crm
+  owner: marketing
+  service: MarketingService
+  states: null
+  transitions: 9
+  initial:
+  - open
+  terminal:
+  - closed
+  operations:
+  - addCaseMessage
+  - escalateCase
+  - reopenCase
+  - updateCase
+  guarded: 9
+  ref: diagrams/lld/lifecycles/case.yaml
+- entity: Catalogue import job
+  contract: catalogue
+  owner: catalogue
+  service: CatalogueService
+  states: null
+  transitions: 6
+  initial:
+  - parsing
+  terminal:
+  - committed
+  - failed
+  operations:
+  - commitCatalogueImport
+  - importProductCatalogue
+  guarded: 6
+  ref: diagrams/lld/lifecycles/catalogue-import-job.yaml
+- entity: Cell cluster
+  contract: subscription
+  owner: subscription
+  service: ControlService
+  states: null
+  transitions: 4
+  initial:
+  - provisioning
+  terminal:
+  - retired
+  operations:
+  - launchCellCluster
+  guarded: 4
+  ref: diagrams/lld/lifecycles/cell-cluster.yaml
+- entity: Cell job
+  contract: subscription
+  owner: subscription
+  service: null
+  states: null
+  transitions: 5
+  initial:
+  - queued
+  terminal:
+  - completed
+  - failed
+  - rolledBack
+  operations: []
+  guarded: 5
+  ref: diagrams/lld/lifecycles/cell-job.yaml
+- entity: Cell
+  contract: subscription
+  owner: control
+  service: ControlService
+  states: null
+  transitions: 9
+  initial:
+  - provisioning
+  terminal:
+  - failed
+  operations:
+  - applyMigration
+  - cancelDecommission
+  - decommissionCell
+  - reactivateTenant
+  - suspendTenant
+  guarded: 9
+  ref: diagrams/lld/lifecycles/cell.yaml
+- entity: Challenge
+  contract: marketing-crm
+  owner: marketing-crm
+  service: null
+  states: null
+  transitions: 7
+  initial:
+  - draft
+  terminal:
+  - archived
+  operations: []
+  guarded: 7
+  ref: diagrams/lld/lifecycles/challenge.yaml
+- entity: Channel listing
+  contract: subscription
+  owner: subscription
+  service: null
+  states: null
+  transitions: 5
+  initial:
+  - draft
+  terminal:
+  - delisted
+  operations: []
+  guarded: 5
+  ref: diagrams/lld/lifecycles/channel-listing.yaml
+- entity: Chargeback
+  contract: orders
+  owner: orders
+  service: OrderService
+  states: null
+  transitions: 7
+  initial:
+  - received
+  terminal:
+  - won
+  - lost
+  - accepted
+  - expired
+  operations:
+  - listChargebacks
+  - respondToChargeback
+  guarded: 7
+  ref: diagrams/lld/lifecycles/chargeback.yaml
+- entity: Content block
+  contract: white-label
+  owner: white-label
+  service: null
+  states: null
+  transitions: 7
+  initial:
+  - draft
+  terminal:
+  - archived
+  operations: []
+  guarded: 7
+  ref: diagrams/lld/lifecycles/content-block.yaml
+- entity: White-label content
+  contract: white-label
+  owner: whitelabel
+  service: WhiteLabelService
+  states: null
+  transitions: 5
+  initial:
+  - draft
+  terminal:
+  - archived
+  operations:
+  - publishTenantConfig
+  - restoreConfigVersion
+  - updateContentPage
+  guarded: 5
+  ref: diagrams/lld/lifecycles/content.yaml
+- entity: Conversation
+  contract: marketing-crm
+  owner: marketing-crm
+  service: MarketingService
+  states: null
+  transitions: 13
+  initial:
+  - withAssistant
+  - queued
+  terminal:
+  - resolved
+  - abandoned
+  - timedOut
+  operations:
+  - claimConversation
+  - closeConversation
+  - escalateCase
+  - handoverToAgent
+  - sendConversationMessage
+  - transferConversation
+  guarded: 13
+  ref: diagrams/lld/lifecycles/conversation.yaml
+- entity: CorrectiveAction
+  contract: fnb
+  owner: FnbService
+  service: FnbService
+  states: 5
+  transitions: 6
+  initial:
+  - open
+  terminal:
+  - closed
+  operations:
+  - signCorrectiveAction
+  guarded: 5
+  ref: diagrams/lld/lifecycles/corrective-action.yaml
+- entity: Coupon code
+  contract: promotions
+  owner: promotions
+  service: CatalogueService
+  states: null
+  transitions: 8
+  initial:
+  - issued
+  terminal:
+  - redeemed
+  - expired
+  - voided
+  operations:
+  - assignCoupon
+  - createRefund
+  - evaluatePromotions
+  - voidCouponCode
+  guarded: 8
+  ref: diagrams/lld/lifecycles/coupon.yaml
+- entity: Deposit box
+  contract: shift
+  owner: shift
+  service: OrderService
+  states: null
+  transitions: 8
+  initial:
+  - allocated
+  terminal:
+  - reconciled
+  operations:
+  - acceptShiftVariance
+  - closeDepositBoxes
+  - openShift
+  - recountStockCount
+  - resumeShift
+  - suspendShift
+  guarded: 8
+  ref: diagrams/lld/lifecycles/deposit-box.yaml
+- entity: Deposit
+  contract: finance
+  owner: finance
+  service: LedgerService
+  states: null
+  transitions: 4
+  initial:
+  - held
+  terminal:
+  - convertedToRevenue
+  - returned
+  - forfeited
+  - partiallyForfeited
+  operations:
+  - settleDeposit
+  guarded: 4
+  ref: diagrams/lld/lifecycles/deposit.yaml
+- entity: Developer account
+  contract: public-api
+  owner: public-api
+  service: null
+  states: null
+  transitions: 6
+  initial:
+  - pending
+  terminal:
+  - closed
+  operations: []
+  guarded: 6
+  ref: diagrams/lld/lifecycles/developer-account.yaml
+- entity: DSAR request
+  contract: cross-cell
+  owner: cross-cell
+  service: CrossCellService
+  states: null
+  transitions: 4
+  initial:
+  - pending
+  terminal:
+  - completed
+  - partiallyFailed
+  operations:
+  - createDsarRequest
+  guarded: 4
+  ref: diagrams/lld/lifecycles/dsar-request.yaml
+- entity: Entitlement
+  contract: orders
+  owner: orders
+  service: CatalogueService
+  states: null
+  transitions: 10
+  initial:
+  - issued
+  terminal:
+  - fullyConsumed
+  - expired
+  - cancelled
+  - surrendered
+  operations:
+  - cancelPerformance
+  - createRefund
+  - suspendEntitlement
+  - transferOrderTickets
+  - validateAccess
+  guarded: 10
+  ref: diagrams/lld/lifecycles/entitlement-status.yaml
+- entity: F&B order
+  contract: fnb
+  owner: fnb
+  service: FnbService
+  states: null
+  transitions: 11
+  initial:
+  - ordered
+  terminal:
+  - served
+  - collected
+  - delivered
+  - cancelled
+  - refunded
+  operations:
+  - acceptFnbOrder
+  - cancelFnbOrder
+  - createRefund
+  - recordOrderHandover
+  - setKitchenTicketStatus
+  guarded: 11
+  ref: diagrams/lld/lifecycles/fnb-order.yaml
+- entity: Form definition
+  contract: marketing-crm
+  owner: marketing-crm
+  service: null
+  states: null
+  transitions: 5
+  initial:
+  - draft
+  terminal:
+  - retired
+  operations: []
+  guarded: 5
+  ref: diagrams/lld/lifecycles/form-definition.yaml
+- entity: Game card
+  contract: games
+  owner: games
+  service: VenueOpsService
+  states: null
+  transitions: 4
+  initial:
+  - active
+  terminal:
+  - expired
+  - transferred
+  operations:
+  - adjustGameCard
+  - transferGameCard
+  guarded: 4
+  ref: diagrams/lld/lifecycles/game-card.yaml
+- entity: Game
+  contract: games
+  owner: games
+  service: VenueOpsService
+  states: null
+  transitions: 7
+  initial:
+  - inService
+  terminal:
+  - retired
+  operations:
+  - completeWorkOrder
+  - updateGame
+  - verifyWorkOrder
+  guarded: 7
+  ref: diagrams/lld/lifecycles/game.yaml
+- entity: Gift card
+  contract: retail
+  owner: retail
+  service: RetailService
+  states: null
+  transitions: 9
+  initial:
+  - issued
+  terminal:
+  - redeemed
+  - expired
+  - blocked
+  operations:
+  - activateGiftCard
+  - blockGiftCard
+  - redeemGiftCard
+  guarded: 9
+  ref: diagrams/lld/lifecycles/gift-card.yaml
+- entity: Group booking
+  contract: orders
+  owner: orders
+  service: null
+  states: null
+  transitions: 6
+  initial:
+  - provisional
+  terminal:
+  - complete
+  - cancelled
+  operations: []
+  guarded: 6
+  ref: diagrams/lld/lifecycles/group-booking.yaml
+- entity: Guest device
+  contract: marketing-crm
+  owner: marketing-crm
+  service: MarketingService
+  states: null
+  transitions: 3
+  initial:
+  - active
+  terminal:
+  - revoked
+  - failed
+  operations:
+  - registerGuestDevice
+  - revokeGuestDevice
+  guarded: 3
+  ref: diagrams/lld/lifecycles/guest-device.yaml
+- entity: Guest membership
+  contract: catalogue
+  owner: catalogue
+  service: null
+  states: null
+  transitions: 6
+  initial:
+  - active
+  terminal:
+  - expired
+  - cancelled
+  operations: []
+  guarded: 6
+  ref: diagrams/lld/lifecycles/guest-membership-status.yaml
+- entity: Seat import job
+  contract: seating
+  owner: seating
+  service: CatalogueService
+  states: null
+  transitions: 6
+  initial:
+  - parsing
+  terminal:
+  - committed
+  - failed
+  operations:
+  - commitImportJob
+  guarded: 6
+  ref: diagrams/lld/lifecycles/import-job.yaml
+- entity: Incident
+  contract: maintenance
+  owner: maintenance
+  service: VenueOpsService
+  states: null
+  transitions: 6
+  initial:
+  - reported
+  terminal:
+  - closed
+  operations:
+  - updateIncident
+  guarded: 6
+  ref: diagrams/lld/lifecycles/incident.yaml
+- entity: Integration listing
+  contract: public-api
+  owner: public-api
+  service: ControlService
+  states: null
+  transitions: 8
+  initial:
+  - draft
+  terminal:
+  - delisted
+  operations:
+  - certifyIntegration
+  - submitIntegrationListing
+  guarded: 8
+  ref: diagrams/lld/lifecycles/integration-listing.yaml
+- entity: Inter-entity obligation
+  contract: finance
+  owner: finance
+  service: LedgerService
+  states: null
+  transitions: 4
+  initial:
+  - outstanding
+  terminal:
+  - settled
+  operations:
+  - disputeObligation
+  - recordSettlement
+  - resolveObligationDispute
+  guarded: 4
+  ref: diagrams/lld/lifecycles/inter-entity-obligation.yaml
+- entity: Invitation campaign
+  contract: marketing-crm
+  owner: marketing-crm
+  service: null
+  states: null
+  transitions: 4
+  initial:
+  - draft
+  terminal:
+  - closed
+  - cancelled
+  operations: []
+  guarded: 4
+  ref: diagrams/lld/lifecycles/invitation-campaign.yaml
+- entity: Invitation
+  contract: marketing-crm
+  owner: marketing-crm
+  service: null
+  states: null
+  transitions: 8
+  initial:
+  - issued
+  terminal:
+  - accepted
+  - declined
+  - expired
+  - revoked
+  operations: []
+  guarded: 8
+  ref: diagrams/lld/lifecycles/invitation.yaml
+- entity: Invoice
+  contract: subscription
+  owner: control
+  service: ControlService
+  states: null
+  transitions: 9
+  initial:
+  - draft
+  terminal:
+  - paid
+  - cancelled
+  operations:
+  - cancelInvoice
+  - disputeInvoice
+  - generateInvoice
+  - recordInvoicePayment
+  - resolveInvoiceDispute
+  guarded: 9
+  ref: diagrams/lld/lifecycles/invoice.yaml
+- entity: Journal entry
+  contract: finance
+  owner: ledger
+  service: LedgerService
+  states: null
+  transitions: 5
+  initial:
+  - draft
+  terminal:
+  - posted
+  - reversed
+  operations:
+  - approveJournalEntry
+  - createJournalEntry
+  - rejectJournal
+  - reverseJournalEntry
+  guarded: 5
+  ref: diagrams/lld/lifecycles/journal.yaml
+- entity: Marketing journey
+  contract: marketing-crm
+  owner: marketing-crm
+  service: MarketingService
+  states: null
+  transitions: 6
+  initial:
+  - draft
+  terminal:
+  - archived
+  operations:
+  - activateJourney
+  guarded: 6
+  ref: diagrams/lld/lifecycles/journey.yaml
+- entity: Kitchen ticket
+  contract: fnb
+  owner: fnb
+  service: FnbService
+  states: null
+  transitions: 7
+  initial:
+  - received
+  terminal:
+  - served
+  - cancelled
+  operations:
+  - cancelFnbOrder
+  - recordOrderHandover
+  - setKitchenTicketStatus
+  guarded: 7
+  ref: diagrams/lld/lifecycles/kitchen-ticket.yaml
+- entity: Inventory lease
+  contract: catalogue
+  owner: catalogue
+  service: CatalogueService
+  states: null
+  transitions: 3
+  initial:
+  - active
+  terminal:
+  - expired
+  - released
+  - forceReleased
+  operations:
+  - forceReleaseLease
+  - releaseLease
+  guarded: 3
+  ref: diagrams/lld/lifecycles/lease.yaml
+- entity: Lost item
+  contract: marketing-crm
+  owner: marketing-crm
+  service: null
+  states: null
+  transitions: 6
+  initial:
+  - open
+  terminal:
+  - claimed
+  - disposed
+  - returned
+  operations: []
+  guarded: 6
+  ref: diagrams/lld/lifecycles/lost-item.yaml
+- entity: Media asset
+  contract: assets
+  owner: assets
+  service: VenueOpsService
+  states: null
+  transitions: 6
+  initial:
+  - processing
+  terminal:
+  - ready
+  - quarantined
+  - failed
+  - archived
+  operations:
+  - updateMediaAsset
+  guarded: 6
+  ref: diagrams/lld/lifecycles/media.yaml
+- entity: Merchandise reservation
+  contract: retail
+  owner: retail
+  service: RetailService
+  states: null
+  transitions: 3
+  initial:
+  - reserved
+  terminal:
+  - collected
+  - expired
+  - cancelled
+  operations:
+  - cancelMerchandiseReservation
+  - collectMerchandiseReservation
+  guarded: 3
+  ref: diagrams/lld/lifecycles/merchandise-reservation.yaml
+- entity: Message dispatch
+  contract: marketing-crm
+  owner: marketing-crm
+  service: null
+  states: null
+  transitions: 9
+  initial:
+  - queued
+  terminal:
+  - clicked
+  - bounced
+  - failed
+  - suppressed
+  operations: []
+  guarded: 9
+  ref: diagrams/lld/lifecycles/message-dispatch.yaml
+- entity: Migration run
+  contract: platform-ops
+  owner: platform-ops
+  service: ControlService
+  states: null
+  transitions: 9
+  initial:
+  - queued
+  terminal:
+  - complete
+  - failed
+  - rolledBack
+  operations:
+  - applyMigration
+  - pauseRollout
+  - planMigration
+  - rollbackRollout
+  guarded: 9
+  ref: diagrams/lld/lifecycles/migration-run.yaml
+- entity: Onboarding application
+  contract: subscription
+  owner: subscription
+  service: ControlService
+  states: null
+  transitions: 7
+  initial:
+  - submitted
+  terminal:
+  - active
+  - rejected
+  - abandoned
+  operations:
+  - submitOnboardingApplication
+  guarded: 7
+  ref: diagrams/lld/lifecycles/onboarding-application.yaml
+- entity: Order
+  contract: orders
+  owner: orders
+  service: OrderService
+  states: null
+  transitions: 14
+  initial:
+  - pending
+  terminal:
+  - completed
+  - voided
+  - refunded
+  - failed
+  operations:
+  - createPayment
+  - createRefund
+  - holdOrder
+  - resumeOrder
+  - voidOrder
+  guarded: 14
+  ref: diagrams/lld/lifecycles/order.yaml
+- entity: Parking entitlement
+  contract: access
+  owner: access
+  service: AccessService
+  states: null
+  transitions: 11
+  initial:
+  - pending
+  terminal:
+  - used
+  - expired
+  - revoked
+  operations:
+  - createParkingEntitlement
+  - updateParkingEntitlement
+  guarded: 11
+  ref: diagrams/lld/lifecycles/parking-entitlement.yaml
+- entity: Partner agreement
+  contract: subscription
+  owner: subscription
+  service: TenancyService
+  states: null
+  transitions: 9
+  initial:
+  - pendingApproval
+  terminal:
+  - expired
+  - terminated
+  operations:
+  - decideApprovalRequest
+  - updatePartnerAgreement
+  guarded: 9
+  ref: diagrams/lld/lifecycles/partner-agreement.yaml
+- entity: Payment
+  contract: orders
+  owner: orders
+  service: OrderService
+  states: null
+  transitions: 9
+  initial:
+  - authorised
+  - pendingConfirmation
+  terminal:
+  - captured
+  - declined
+  - failed
+  - voided
+  - refunded
+  operations:
+  - capturePayment
+  - createRefund
+  - inquirePaymentStatus
+  - voidPayment
+  guarded: 9
+  ref: diagrams/lld/lifecycles/payment.yaml
+- entity: Performance
+  contract: catalogue
+  owner: catalogue
+  service: CatalogueService
+  states: null
+  transitions: 10
+  initial:
+  - scheduled
+  terminal:
+  - completed
+  - cancelled
+  operations:
+  - cancelPerformance
+  - updatePerformance
+  guarded: 10
+  ref: diagrams/lld/lifecycles/performance.yaml
+- entity: Fiscal period
+  contract: finance
+  owner: ledger
+  service: LedgerService
+  states: null
+  transitions: 4
+  initial:
+  - open
+  terminal:
+  - closed
+  operations:
+  - abandonPeriodClose
+  - closeFiscalPeriod
+  - reopenPeriod
+  guarded: 4
+  ref: diagrams/lld/lifecycles/period.yaml
+- entity: Privacy incident
+  contract: marketing-crm
+  owner: marketing-crm
+  service: null
+  states: null
+  transitions: 6
+  initial:
+  - open
+  terminal:
+  - closed
+  operations: []
+  guarded: 6
+  ref: diagrams/lld/lifecycles/privacy-incident.yaml
+- entity: Product
+  contract: catalogue
+  owner: catalogue
+  service: CatalogueService
+  states: null
+  transitions: 8
+  initial:
+  - draft
+  terminal:
+  - archived
+  operations:
+  - transitionProductLifecycle
+  guarded: 8
+  ref: diagrams/lld/lifecycles/product.yaml
+- entity: Production run
+  contract: fnb
+  owner: fnb
+  service: FnbService
+  states: null
+  transitions: 4
+  initial:
+  - planned
+  terminal:
+  - completed
+  - cancelled
+  operations:
+  - completeProductionRun
+  - planProductionRun
+  guarded: 4
+  ref: diagrams/lld/lifecycles/production-run.yaml
+- entity: Promotion
+  contract: promotions
+  owner: promotions
+  service: CatalogueService
+  states: null
+  transitions: 8
+  initial:
+  - draft
+  terminal:
+  - expired
+  - ended
+  operations:
+  - endPromotion
+  - pausePromotion
+  - publishPromotion
+  - unschedulePromotion
+  guarded: 8
+  ref: diagrams/lld/lifecycles/promotion.yaml
+- entity: Purchase order
+  contract: inventory
+  owner: inventory
+  service: InventoryService
+  states: null
+  transitions: 9
+  initial:
+  - raised
+  terminal:
+  - received
+  - closedShort
+  - cancelled
+  operations:
+  - acknowledgePurchaseOrder
+  - cancelPurchaseOrder
+  - closePurchaseOrderShort
+  - createGoodsReceipt
+  - sendPurchaseOrder
+  guarded: 9
+  ref: diagrams/lld/lifecycles/purchase-order.yaml
+- entity: Queue entry
+  contract: queue
+  owner: queue
+  service: VenueOpsService
+  states: null
+  transitions: 7
+  initial:
+  - waiting
+  terminal:
+  - redeemed
+  - expired
+  - noShow
+  - cancelled
+  - released
+  operations:
+  - callNextParties
+  - leaveQueue
+  - overrideQueueEntry
+  - redeemQueueEntry
+  - setQueueStatus
+  guarded: 7
+  ref: diagrams/lld/lifecycles/queue-entry.yaml
+- entity: Queue
+  contract: queue
+  owner: queue
+  service: VenueOpsService
+  states: null
+  transitions: 8
+  initial:
+  - closed
+  terminal: []
+  operations:
+  - completeWorkOrder
+  - setQueueStatus
+  guarded: 8
+  ref: diagrams/lld/lifecycles/queue.yaml
+- entity: Cross-cell redemption right
+  contract: cross-cell
+  owner: cross-cell
+  service: CrossCellService
+  states: null
+  transitions: 4
+  initial:
+  - active
+  terminal:
+  - exhausted
+  - revoked
+  - expired
+  operations:
+  - consumeRedemptionRight
+  - reconcileRedemptions
+  - revokeRedemptionRight
+  guarded: 4
+  ref: diagrams/lld/lifecycles/redemption-right.yaml
+- entity: Referral
+  contract: marketing-crm
+  owner: marketing-crm
+  service: null
+  states: null
+  transitions: 6
+  initial:
+  - issued
+  terminal:
+  - rewarded
+  - expired
+  - void
+  operations: []
+  guarded: 6
+  ref: diagrams/lld/lifecycles/referral.yaml
+- entity: Refund
+  contract: orders
+  owner: orders
+  service: OrderService
+  states: null
+  transitions: 5
+  initial:
+  - pendingApproval
+  - pendingGateway
+  terminal:
+  - completed
+  - declined
+  - failed
+  operations:
+  - createRefund
+  - decideApprovalRequest
+  guarded: 5
+  ref: diagrams/lld/lifecycles/refund.yaml
+- entity: Registered device
+  contract: tenancy
+  owner: tenancy
+  service: TenancyService
+  states: null
+  transitions: 10
+  initial:
+  - offline
+  terminal: []
+  operations:
+  - recordDeviceHeartbeat
+  guarded: 10
+  ref: diagrams/lld/lifecycles/registered-device.yaml
+- entity: Release
+  contract: platform-ops
+  owner: control
+  service: ControlService
+  states: null
+  transitions: 8
+  initial:
+  - draft
+  terminal:
+  - superseded
+  - withdrawn
+  operations:
+  - promoteRelease
+  - rejectRelease
+  - withdrawRelease
+  guarded: 8
+  ref: diagrams/lld/lifecycles/release.yaml
+- entity: Report execution
+  contract: reporting
+  owner: reporting
+  service: ReportingService
+  states: null
+  transitions: 6
+  initial:
+  - queued
+  terminal:
+  - completed
+  - failed
+  - cancelled
+  - expired
+  operations:
+  - cancelReportExecution
+  guarded: 6
+  ref: diagrams/lld/lifecycles/report-execution.yaml
+- entity: Report export
+  contract: reporting
+  owner: reporting
+  service: ReportingService
+  states: null
+  transitions: 5
+  initial:
+  - queued
+  terminal:
+  - ready
+  - failed
+  - expired
+  operations:
+  - exportReportResult
+  guarded: 5
+  ref: diagrams/lld/lifecycles/report-export.yaml
+- entity: Requisition
+  contract: inventory
+  owner: inventory
+  service: InventoryService
+  states: null
+  transitions: 10
+  initial:
+  - draft
+  terminal:
+  - closed
+  - cancelled
+  operations:
+  - approveRequisition
+  - cancelRequisition
+  - createPurchaseOrder
+  - createRequisition
+  - rejectRequisition
+  - returnRequisition
+  guarded: 10
+  ref: diagrams/lld/lifecycles/requisition.yaml
+- entity: Resale listing
+  contract: orders
+  owner: orders
+  service: OrderService
+  states: null
+  transitions: 5
+  initial:
+  - listed
+  terminal:
+  - sold
+  - withdrawn
+  - expired
+  operations:
+  - createResaleListing
+  guarded: 5
+  ref: diagrams/lld/lifecycles/resale-listing.yaml
+- entity: Reservation
+  contract: orders
+  owner: orders
+  service: OrderService
+  states: null
+  transitions: 3
+  initial:
+  - held
+  terminal:
+  - converted
+  - expired
+  - cancelled
+  operations:
+  - cancelReservation
+  - convertReservation
+  guarded: 3
+  ref: diagrams/lld/lifecycles/reservation.yaml
+- entity: Resource booking
+  contract: resources
+  owner: resources
+  service: VenueOpsService
+  states: null
+  transitions: 7
+  initial:
+  - reserved
+  terminal:
+  - returned
+  - cancelled
+  - noShow
+  operations:
+  - bookResource
+  - checkInResource
+  - checkOutResource
+  guarded: 7
+  ref: diagrams/lld/lifecycles/resource-booking.yaml
+- entity: Resource
+  contract: resources
+  owner: resources
+  service: VenueOpsService
+  states: null
+  transitions: 9
+  initial:
+  - available
+  terminal:
+  - retired
+  operations:
+  - bookResource
+  - checkInResource
+  - checkOutResource
+  - createResource
+  guarded: 9
+  ref: diagrams/lld/lifecycles/resource.yaml
+- entity: Restaurant waitlist entry
+  contract: fnb
+  owner: fnb
+  service: FnbService
+  states: null
+  transitions: 5
+  initial:
+  - waiting
+  terminal:
+  - seated
+  - walkedAway
+  - noShow
+  - cancelled
+  operations:
+  - joinRestaurantWaitlist
+  guarded: 5
+  ref: diagrams/lld/lifecycles/restaurant-waitlist.yaml
+- entity: Rollout to a cell
+  contract: platform-ops
+  owner: platform-ops
+  service: ControlService
+  states: null
+  transitions: 7
+  initial:
+  - pending
+  terminal:
+  - complete
+  - failed
+  - skipped
+  - rolledBack
+  operations:
+  - rollbackRollout
+  - skipRolloutCell
+  - startRollout
+  guarded: 7
+  ref: diagrams/lld/lifecycles/rollout-cell.yaml
+- entity: Rollout
+  contract: platform-ops
+  owner: control
+  service: ControlService
+  states: null
+  transitions: 8
+  initial:
+  - queued
+  terminal:
+  - complete
+  - failed
+  - rolledBack
+  operations:
+  - pauseRollout
+  - rollbackRollout
+  - startRollout
+  guarded: 8
+  ref: diagrams/lld/lifecycles/rollout.yaml
+- entity: Rota assignment
+  contract: workforce
+  owner: workforce
+  service: TenancyService
+  states: null
+  transitions: 10
+  initial:
+  - planned
+  terminal:
+  - cancelled
+  - completed
+  - noShow
+  operations:
+  - createRotaAssignment
+  - requestShiftSwap
+  - updateRotaAssignment
+  guarded: 10
+  ref: diagrams/lld/lifecycles/rota-assignment.yaml
+- entity: Sandbox
+  contract: public-api
+  owner: public-api
+  service: ControlService
+  states: null
+  transitions: 6
+  initial:
+  - provisioning
+  terminal:
+  - deleted
+  operations:
+  - createSandbox
+  - resetSandbox
+  guarded: 6
+  ref: diagrams/lld/lifecycles/sandbox.yaml
+- entity: Content schedule
+  contract: white-label
+  owner: whitelabel
+  service: WhiteLabelService
+  states: null
+  transitions: 5
+  initial:
+  - draft
+  terminal:
+  - expired
+  operations:
+  - updateBanner
+  guarded: 5
+  ref: diagrams/lld/lifecycles/schedule.yaml
+- entity: Seat hold
+  contract: seating
+  owner: seating
+  service: OrderService
+  states: null
+  transitions: 3
+  initial:
+  - held
+  terminal:
+  - converted
+  - released
+  - expired
+  operations:
+  - createOrder
+  - releaseSeatHold
+  guarded: 3
+  ref: diagrams/lld/lifecycles/seat-hold.yaml
+- entity: Seat map
+  contract: seating
+  owner: seating
+  service: CatalogueService
+  states: null
+  transitions: 6
+  initial:
+  - draft
+  terminal:
+  - archived
+  operations:
+  - publishSeatMap
+  - updateSeatMap
+  - validateSeatMap
+  guarded: 6
+  ref: diagrams/lld/lifecycles/seat-map.yaml
+- entity: Seat
+  contract: seating
+  owner: seating
+  service: CatalogueService
+  states: null
+  transitions: 12
+  initial:
+  - available
+  terminal:
+  - unavailable
+  operations:
+  - allocateBlockedSeats
+  - createPayment
+  - createRefund
+  - createSeatBlock
+  - createSeatHold
+  - releaseSeatBlock
+  - releaseSeatHold
+  - updateSeats
+  guarded: 12
+  ref: diagrams/lld/lifecycles/seat.yaml
+- entity: Settlement
+  contract: finance
+  owner: ledger
+  service: LedgerService
+  states: null
+  transitions: 7
+  initial:
+  - ingesting
+  terminal:
+  - resolved
+  - failed
+  operations:
+  - resolveSettlementException
+  guarded: 7
+  ref: diagrams/lld/lifecycles/settlement.yaml
+- entity: Shift swap
+  contract: workforce
+  owner: workforce
+  service: TenancyService
+  states: null
+  transitions: 6
+  initial:
+  - awaitingPeer
+  terminal:
+  - approved
+  - rejected
+  - withdrawn
+  operations:
+  - decideApprovalRequest
+  - revokeApprovalDelegation
+  guarded: 6
+  ref: diagrams/lld/lifecycles/shift-swap.yaml
+- entity: Shift
+  contract: shift
+  owner: shift
+  service: OrderService
+  states: null
+  transitions: 10
+  initial:
+  - pendingApproval
+  - open
+  terminal:
+  - closed
+  - autoClosed
+  operations:
+  - acceptShiftVariance
+  - approveShiftOpen
+  - closeShift
+  - reopenShift
+  - resumeShift
+  - suspendShift
+  guarded: 10
+  ref: diagrams/lld/lifecycles/shift.yaml
+- entity: Shop and drop
+  contract: retail
+  owner: retail
+  service: RetailService
+  states: null
+  transitions: 7
+  initial:
+  - awaitingCollection
+  terminal:
+  - collected
+  - uncollected
+  - disposed
+  operations:
+  - collectShopAndDrop
+  - disposeShopAndDrop
+  guarded: 7
+  ref: diagrams/lld/lifecycles/shop-and-drop.yaml
+- entity: Stock batch
+  contract: inventory
+  owner: inventory
+  service: null
+  states: null
+  transitions: 8
+  initial:
+  - available
+  terminal:
+  - consumed
+  - written-off
+  operations: []
+  guarded: 8
+  ref: diagrams/lld/lifecycles/stock-batch.yaml
+- entity: Stock count
+  contract: inventory
+  owner: inventory
+  service: InventoryService
+  states: null
+  transitions: 7
+  initial:
+  - open
+  terminal:
+  - posted
+  - cancelled
+  operations:
+  - cancelStockCount
+  - postStockCount
+  - recountStockCount
+  - startStockCount
+  guarded: 7
+  ref: diagrams/lld/lifecycles/stock-count.yaml
+- entity: Tenant subscription
+  contract: subscription
+  owner: subscription
+  service: ControlService
+  states: null
+  transitions: 7
+  initial:
+  - trial
+  - active
+  terminal:
+  - cancelled
+  - expired
+  operations:
+  - cancelSubscription
+  - setSubscription
+  guarded: 7
+  ref: diagrams/lld/lifecycles/subscription.yaml
+- entity: Table reservation
+  contract: fnb
+  owner: fnb
+  service: FnbService
+  states: null
+  transitions: 9
+  initial:
+  - booked
+  terminal:
+  - completed
+  - cancelled
+  - noShow
+  operations:
+  - seatTableReservation
+  - updateTableReservation
+  guarded: 9
+  ref: diagrams/lld/lifecycles/table-reservation.yaml
+- entity: Table visit
+  contract: fnb
+  owner: fnb
+  service: FnbService
+  states: null
+  transitions: 6
+  initial:
+  - open
+  terminal:
+  - settled
+  - merged
+  - cancelled
+  operations:
+  - clearTable
+  - closeTableVisit
+  - mergeTableVisits
+  - openTableVisit
+  - requestBill
+  guarded: 6
+  ref: diagrams/lld/lifecycles/table-visit.yaml
+- entity: Table
+  contract: fnb
+  owner: fnb
+  service: FnbService
+  states: null
+  transitions: 11
+  initial:
+  - free
+  terminal:
+  - outOfService
+  operations:
+  - claimTableSession
+  - clearTable
+  - createFnbOrder
+  - createPayment
+  - createReservation
+  - getGuestBill
+  guarded: 11
+  ref: diagrams/lld/lifecycles/table.yaml
+- entity: Tenant migration
+  contract: subscription
+  owner: control
+  service: ControlService
+  states: null
+  transitions: 8
+  initial:
+  - planned
+  terminal:
+  - complete
+  - failed
+  - rolledBack
+  operations:
+  - executeTenantMigration
+  - rollbackTenantMigration
+  guarded: 8
+  ref: diagrams/lld/lifecycles/tenant-migration.yaml
+- entity: Tenant
+  contract: subscription
+  owner: control
+  service: ControlService
+  states: null
+  transitions: 7
+  initial:
+  - onboarding
+  terminal:
+  - terminated
+  operations:
+  - reactivateTenant
+  - suspendTenant
+  - terminateTenant
+  - updateTenant
+  guarded: 7
+  ref: diagrams/lld/lifecycles/tenant.yaml
+- entity: Ticket transfer
+  contract: orders
+  owner: orders
+  service: OrderService
+  states: null
+  transitions: 3
+  initial:
+  - offered
+  terminal:
+  - claimed
+  - expired
+  - cancelled
+  operations:
+  - claimTicketTransfer
+  - transferOrderTickets
+  guarded: 3
+  ref: diagrams/lld/lifecycles/ticket-transfer.yaml
+- entity: Stock transfer
+  contract: inventory
+  owner: inventory
+  service: InventoryService
+  states: null
+  transitions: 6
+  initial:
+  - dispatched
+  terminal:
+  - received
+  - cancelled
+  operations:
+  - closeTransferShort
+  - createStockTransfer
+  - receiveStockTransfer
+  guarded: 6
+  ref: diagrams/lld/lifecycles/transfer.yaml
+- entity: Shift variance review
+  contract: finance
+  owner: ledger
+  service: OrderService
+  states: null
+  transitions: 2
+  initial:
+  - notRequired
+  terminal:
+  - reviewed
+  operations:
+  - acceptShiftVariance
+  guarded: 2
+  ref: diagrams/lld/lifecycles/variance-review.yaml
+- entity: Venue map import
+  contract: venue-map
+  owner: venue-map
+  service: VenueOpsService
+  states: null
+  transitions: 4
+  initial:
+  - parsing
+  terminal:
+  - committed
+  - failed
+  operations:
+  - acceptVenueLabelProposals
+  - importVenueGeometry
+  guarded: 4
+  ref: diagrams/lld/lifecycles/venue-map-import.yaml
+- entity: Venue map
+  contract: venue-map
+  owner: venue-map
+  service: VenueOpsService
+  states: null
+  transitions: 5
+  initial:
+  - draft
+  terminal:
+  - archived
+  operations:
+  - createVenueMap
+  - publishVenueMap
+  guarded: 5
+  ref: diagrams/lld/lifecycles/venue-map.yaml
+- entity: Voucher
+  contract: promotions
+  owner: promotions
+  service: CatalogueService
+  states: null
+  transitions: 7
+  initial:
+  - issued
+  terminal:
+  - redeemed
+  - expired
+  - voided
+  operations:
+  - redeemVoucher
+  - voidVoucher
+  guarded: 7
+  ref: diagrams/lld/lifecycles/voucher.yaml
+- entity: Waitlist entry
+  contract: catalogue
+  owner: catalogue
+  service: CatalogueService
+  states: null
+  transitions: 7
+  initial:
+  - waiting
+  terminal:
+  - converted
+  - expired
+  - left
+  operations:
+  - leaveWaitlist
+  - offerWaitlistCapacity
+  guarded: 7
+  ref: diagrams/lld/lifecycles/waitlist-entry.yaml
+- entity: Cross-cell wallet authorisation
+  contract: cross-cell
+  owner: cross-cell
+  service: CrossCellService
+  states: null
+  transitions: 7
+  initial:
+  - held
+  terminal:
+  - captured
+  - released
+  - expired
+  operations:
+  - captureWalletAuthorisation
+  - releaseWalletAuthorisation
+  guarded: 7
+  ref: diagrams/lld/lifecycles/wallet-authorisation.yaml
+- entity: Wallet pass
+  contract: orders
+  owner: orders
+  service: null
+  states: null
+  transitions: 6
+  initial:
+  - issued
+  terminal:
+  - voided
+  - expired
+  operations: []
+  guarded: 6
+  ref: diagrams/lld/lifecycles/wallet-pass.yaml
+- entity: Guest wallet
+  contract: retail
+  owner: retail
+  service: RetailService
+  states: null
+  transitions: 4
+  initial:
+  - active
+  terminal:
+  - closed
+  operations:
+  - closeWallet
+  - reinstateWallet
+  - suspendWallet
+  guarded: 4
+  ref: diagrams/lld/lifecycles/wallet.yaml
+- entity: Webhook delivery
+  contract: public-api
+  owner: public-api
+  service: null
+  states: null
+  transitions: 6
+  initial:
+  - pending
+  terminal:
+  - delivered
+  - abandoned
+  operations: []
+  guarded: 6
+  ref: diagrams/lld/lifecycles/webhook-delivery.yaml
+- entity: Webhook subscription
+  contract: public-api
+  owner: public-api
+  service: ControlService
+  states: null
+  transitions: 7
+  initial:
+  - pendingVerification
+  terminal:
+  - disabled
+  operations:
+  - createWebhookSubscription
+  guarded: 7
+  ref: diagrams/lld/lifecycles/webhook-subscription.yaml
+- entity: Work order
+  contract: maintenance
+  owner: maintenance
+  service: VenueOpsService
+  states: null
+  transitions: 16
+  initial:
+  - open
+  terminal:
+  - cancelled
+  - closed
+  - verified
+  operations:
+  - acceptWorkOrder
+  - cancelWorkOrder
+  - closeWorkOrder
+  - completeWorkOrder
+  - pauseWorkOrder
+  - rejectWorkOrder
+  - resumeWorkOrder
+  - startWorkOrder
+  - updateWorkOrder
+  - verifyWorkOrder
+  guarded: 16
+  ref: diagrams/lld/lifecycles/work-order.yaml
+events:
+- event: access-validated
+  description: An entitlement was presented and admitted.
+- event: ai-ceilingApproaching
+  description: AI spend has reached the configured warning threshold for a scope.
+- event: approval-granted
+  description: An approval request was granted at its final level.
+- event: approval-rejected
+  description: An approval request was refused.
+- event: assets-documentIndexed
+  description: Text was extracted from an uploaded document and is ready to embed.
+- event: cart-abandoned
+  description: A cart lapsed without checking out.
+- event: catalogue-productPublished
+  description: A product is on sale, or has returned to sale.
+- event: conversation-handedOver
+  description: An assistant conversation was passed to a human agent.
+- event: entitlement-issued
+  description: A right to admission, a meal, a locker or a rental now exists.
+- event: fnb-menuPublished
+  description: A menu is live at an outlet.
+- event: fnb-orderReady
+  description: Food is ready to hand over.
+- event: inventory-purchaseOrderReceived
+  description: A purchase order is fully received.
+- event: ledger-journalPosted
+  description: A journal entry has been posted and is now immutable.
+- event: ledger-periodClosed
+  description: A fiscal period is closed. Figures for it will not move again without a reopen.
+- event: maintenance-assetReturnedToService
+  description: An asset is verified and back in service.
+- event: maintenance-templatePublished
+  description: An inspection or procedure template is available for use.
+- event: maintenance-workOrderCompleted
+  description: Work on an asset is finished and awaiting verification.
+- event: marketing-caseClosed
+  description: A service case was resolved and closed.
+- event: order-completed
+  description: Everything an order promised has been delivered.
+- event: order-paid
+  description: An order has been paid in full. The moment revenue is recognisable and entitlements may
+    be issued.
+- event: order-refunded
+  description: Value has been returned to a guest, in whole or in part.
+- event: performance-cancelled
+  description: A performance was cancelled and everyone holding a ticket must be made whole.
+- event: reporting-definitionPublished
+  description: A report definition is available to run.
+- event: retail-merchandisePublished
+  description: Merchandise is on sale.
+- event: seat-sold
+  description: A specific seat is no longer available for a performance.
+- event: shift-closed
+  description: A till has been counted and closed.
+- event: stock-depleted
+  description: Stock left a location — sold, wasted, transferred or counted out.
+- event: tenant-suspended
+  description: A tenant has been suspended, in one of three modes.
+- event: whitelabel-contentPublished
+  description: A tenant published content to their guest surfaces — a page, a banner, an FAQ or a policy.

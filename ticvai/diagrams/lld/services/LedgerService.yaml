@@ -1,0 +1,639 @@
+id: LLD-LedgerService
+title: LedgerService — 54 operations, 18 tables
+generatedBy: tools/derive-diagrams.py
+tier: commerce
+index: diagrams/hld/02-services.yaml
+why: '**Money, and it is append-only.** 54 operations over 18 tables that are never updated and never
+  deleted — a different discipline from everything around it, and one that should not share a deploy
+  with anything that does mutate.'
+scale: Write-heavy, batch-tolerant, not latency-critical. Recognition and revaluation are jobs.
+ifDown: '**Correctness over availability.** A ledger that is briefly unavailable is recoverable; one
+  that is briefly wrong is not.'
+coverage:
+  operations: 54
+  inAFlow: 33
+  percent: 61%
+  note: '**Flow coverage is how much of this service a journey has walked.** A service under 40% is
+    unwalked rather than under-documented.'
+schemas:
+- schema: ledger
+  tables: 18
+  stores:
+  - postgres
+  largestTable: ledger.journal_entry
+operationsByContract:
+- contract: finance
+  count: 54
+  operations:
+  - operation: abandonPeriodClose
+    verb: POST
+    path: /fiscal-periods/{periodId}/abandon-close
+    scope: region
+    permission: LEDGER_APPROVE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: approveJournalEntry
+    verb: POST
+    path: /journal-entries/{entryId}/approve
+    scope: region
+    permission: LEDGER_APPROVE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: beginPeriodClose
+    verb: POST
+    path: /fiscal-periods/{periodId}/begin-close
+    scope: region
+    permission: LEDGER_APPROVE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: calculateTax
+    verb: POST
+    path: /tax/calculate
+    scope: venue
+    permission: LEDGER_VIEW
+    offline: true
+    reads: 3
+    writes: 1
+  - operation: closeFiscalPeriod
+    verb: POST
+    path: /fiscal-periods/{periodId}/close
+    scope: region
+    permission: LEDGER_APPROVE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: createAccount
+    verb: POST
+    path: /accounts
+    scope: region
+    permission: ACCOUNT_CONFIGURE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: createCostCenter
+    verb: POST
+    path: /cost-centers
+    scope: region
+    permission: ACCOUNT_CONFIGURE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: createJournalEntry
+    verb: POST
+    path: /journal-entries
+    scope: region
+    permission: LEDGER_POST
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: createLegalEntity
+    verb: POST
+    path: /legal-entities
+    scope: tenant
+    permission: ACCOUNT_CONFIGURE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: createRecognitionSchedule
+    verb: POST
+    path: /recognition-schedules
+    scope: region
+    permission: ACCOUNT_CONFIGURE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: createTaxCode
+    verb: POST
+    path: /tax-codes
+    scope: region
+    permission: TAX_CONFIGURE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: createTaxExemption
+    verb: POST
+    path: /tax-exemptions
+    scope: region
+    permission: TAX_CONFIGURE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: disputeObligation
+    verb: POST
+    path: /inter-entity-obligations/{obligationId}/dispute
+    scope: tenant
+    permission: LEDGER_POST
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: getAccount
+    verb: GET
+    path: /accounts/{accountId}
+    scope: region
+    permission: LEDGER_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: getDeferredRevenue
+    verb: GET
+    path: /deferred-revenue
+    scope: venue
+    permission: LEDGER_VIEW
+    offline: false
+    reads: 3
+    writes: 0
+  - operation: getFinancialReport
+    verb: GET
+    path: /reports/financial
+    scope: venue
+    permission: REPORT_VIEW_VENUE
+    offline: false
+    reads: 4
+    writes: 0
+  - operation: getForeignTenderReport
+    verb: GET
+    path: /fx/foreign-tender
+    scope: venue
+    permission: LEDGER_VIEW
+    offline: false
+    reads: 3
+    writes: 0
+  - operation: getJournalEntry
+    verb: GET
+    path: /journal-entries/{entryId}
+    scope: region
+    permission: LEDGER_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: getSettlement
+    verb: GET
+    path: /settlements/{settlementId}
+    scope: region
+    permission: SETTLEMENT_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: getTrialBalance
+    verb: GET
+    path: /ledger/trial-balance
+    scope: region
+    permission: LEDGER_VIEW
+    offline: false
+    reads: 4
+    writes: 0
+  - operation: getUnifiedReconciliation
+    verb: GET
+    path: /reconciliation/unified
+    scope: venue
+    permission: LEDGER_VIEW
+    offline: false
+    reads: 4
+    writes: 0
+  - operation: ingestSettlementFile
+    verb: POST
+    path: /settlements
+    scope: region
+    permission: SETTLEMENT_RECONCILE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: listAccountMappings
+    verb: GET
+    path: /account-mappings
+    scope: region
+    permission: LEDGER_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listAccounts
+    verb: GET
+    path: /accounts
+    scope: region
+    permission: LEDGER_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listCostCenters
+    verb: GET
+    path: /cost-centers
+    scope: region
+    permission: LEDGER_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listFiscalPeriods
+    verb: GET
+    path: /fiscal-periods
+    scope: region
+    permission: LEDGER_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listFxRates
+    verb: GET
+    path: /fx-rates
+    scope: region
+    permission: LEDGER_VIEW
+    offline: true
+    reads: 1
+    writes: 0
+  - operation: listInterEntityObligations
+    verb: GET
+    path: /fx/inter-entity
+    scope: tenant
+    permission: LEDGER_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listJournalEntries
+    verb: GET
+    path: /journal-entries
+    scope: region
+    permission: LEDGER_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listLedgerEntries
+    verb: GET
+    path: /ledger/entries
+    scope: venue
+    permission: LEDGER_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listLegalEntities
+    verb: GET
+    path: /legal-entities
+    scope: tenant
+    permission: LEDGER_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listPriceVariances
+    verb: GET
+    path: /price-variances
+    scope: venue
+    permission: LEDGER_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listRecognitionSchedules
+    verb: GET
+    path: /recognition-schedules
+    scope: region
+    permission: LEDGER_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listSettlementExceptions
+    verb: GET
+    path: /settlements/{settlementId}/exceptions
+    scope: region
+    permission: SETTLEMENT_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listSettlements
+    verb: GET
+    path: /settlements
+    scope: region
+    permission: SETTLEMENT_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listTaxCodes
+    verb: GET
+    path: /tax-codes
+    scope: region
+    permission: LEDGER_VIEW
+    offline: true
+    reads: 1
+    writes: 0
+  - operation: listTaxExemptions
+    verb: GET
+    path: /tax-exemptions
+    scope: region
+    permission: LEDGER_VIEW
+    offline: true
+    reads: 1
+    writes: 0
+  - operation: recordDeposit
+    verb: POST
+    path: /deposits
+    scope: venue
+    permission: LEDGER_POST
+    offline: false
+    reads: 3
+    writes: 3
+  - operation: recordSettlement
+    verb: POST
+    path: /inter-entity-obligations/{obligationId}/settle
+    scope: tenant
+    permission: LEDGER_POST
+    offline: false
+    reads: 3
+    writes: 3
+  - operation: recordWriteOff
+    verb: POST
+    path: /write-offs
+    scope: tenant
+    permission: LEDGER_POST
+    offline: false
+    reads: 3
+    writes: 2
+  - operation: rejectJournal
+    verb: POST
+    path: /journal-entries/{entryId}/reject
+    scope: region
+    permission: LEDGER_APPROVE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: reopenPeriod
+    verb: POST
+    path: /fiscal-periods/{periodId}/reopen
+    scope: region
+    permission: LEDGER_APPROVE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: resolveObligationDispute
+    verb: POST
+    path: /inter-entity-obligations/{obligationId}/resolve
+    scope: tenant
+    permission: LEDGER_POST
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: resolveSettlementException
+    verb: POST
+    path: /settlements/{settlementId}/exceptions
+    scope: region
+    permission: SETTLEMENT_RECONCILE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: reverseJournalEntry
+    verb: POST
+    path: /journal-entries/{entryId}/reverse
+    scope: region
+    permission: LEDGER_APPROVE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: reviewPriceVariance
+    verb: POST
+    path: /price-variances/{varianceId}/review
+    scope: venue
+    permission: LEDGER_APPROVE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: runFxRevaluation
+    verb: POST
+    path: /fx/revaluation
+    scope: region
+    permission: LEDGER_APPROVE
+    offline: false
+    reads: 4
+    writes: 3
+  - operation: runRecognition
+    verb: POST
+    path: /recognition/run
+    scope: region
+    permission: LEDGER_POST
+    offline: false
+    reads: 4
+    writes: 3
+  - operation: setAccountMappings
+    verb: PUT
+    path: /account-mappings
+    scope: region
+    permission: ACCOUNT_CONFIGURE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: setFxRate
+    verb: PUT
+    path: /fx-rates
+    scope: region
+    permission: LEDGER_APPROVE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: settleDeposit
+    verb: POST
+    path: /deposits/{depositId}/settle
+    scope: venue
+    permission: LEDGER_POST
+    offline: false
+    reads: 3
+    writes: 3
+  - operation: updateAccount
+    verb: PATCH
+    path: /accounts/{accountId}
+    scope: region
+    permission: ACCOUNT_CONFIGURE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: updateTaxCode
+    verb: PATCH
+    path: /tax-codes/{taxCodeId}
+    scope: region
+    permission: TAX_CONFIGURE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: validateRecognitionSchedules
+    verb: POST
+    path: /recognition-schedules/validate
+    scope: tenant
+    permission: LEDGER_VIEW
+    offline: false
+    reads: 2
+    writes: 0
+tables:
+- store: cache:idempotency
+  kind: cache
+  columns: 5
+  backing: redis
+  owned: false
+  why: '**Not a table and not owned by a service.** Derived from something already read, invalidated
+    by an event already consumed, losable without consequence — no migration, no backup, no owner.'
+- table: ledger.account
+  columns: 15
+  store: postgres
+  parent: null
+  writtenBy:
+  - finance
+  foreignWriters: null
+- table: ledger.account_mapping
+  columns: 4
+  store: postgres
+  parent: ledger.account
+  writtenBy:
+  - finance
+  foreignWriters: null
+- table: ledger.cost_center
+  columns: 6
+  store: postgres
+  parent: null
+  writtenBy:
+  - finance
+  foreignWriters: null
+- table: ledger.deposit
+  columns: 10
+  store: postgres
+  parent: null
+  writtenBy:
+  - finance
+  foreignWriters: null
+- table: ledger.entry
+  columns: 12
+  store: postgres
+  parent: null
+  writtenBy:
+  - finance
+  - orders
+  - shift
+  foreignWriters:
+  - orders
+  - shift
+- table: ledger.event_budget
+  columns: 8
+  store: postgres
+  parent: null
+  writtenBy: []
+  foreignWriters: null
+- table: ledger.fiscal_period
+  columns: 8
+  store: postgres
+  parent: null
+  writtenBy:
+  - finance
+  foreignWriters: null
+- table: ledger.fx_rate
+  columns: 10
+  store: postgres
+  parent: null
+  writtenBy:
+  - finance
+  foreignWriters: null
+- table: ledger.inter_entity_obligation
+  columns: 12
+  store: postgres
+  parent: null
+  writtenBy:
+  - finance
+  foreignWriters: null
+- table: ledger.journal_entry
+  columns: 16
+  store: postgres
+  parent: null
+  writtenBy:
+  - finance
+  - orders
+  - shift
+  foreignWriters:
+  - orders
+  - shift
+- table: ledger.journal_line
+  columns: 7
+  store: postgres
+  parent: ledger.journal_entry
+  writtenBy: []
+  foreignWriters: null
+- table: ledger.legal_entity
+  columns: 10
+  store: postgres
+  parent: null
+  writtenBy:
+  - finance
+  foreignWriters: null
+- table: ledger.price_variance
+  columns: 15
+  store: postgres
+  parent: null
+  writtenBy:
+  - finance
+  foreignWriters: null
+- table: ledger.recognition_schedule
+  columns: 15
+  store: postgres
+  parent: null
+  writtenBy:
+  - finance
+  foreignWriters: null
+- table: ledger.settlement
+  columns: 15
+  store: postgres
+  parent: null
+  writtenBy:
+  - finance
+  foreignWriters: null
+- table: ledger.settlement_exception
+  columns: 10
+  store: postgres
+  parent: ledger.settlement
+  writtenBy:
+  - finance
+  foreignWriters: null
+- table: ledger.tax_code
+  columns: 12
+  store: postgres
+  parent: null
+  writtenBy:
+  - finance
+  foreignWriters: null
+- table: ledger.tax_exemption
+  columns: 8
+  store: postgres
+  parent: null
+  writtenBy:
+  - finance
+  foreignWriters: null
+readsFrom:
+- service: OrderService
+  operations: 6
+- service: TenancyService
+  operations: 1
+- service: RetailService
+  operations: 1
+- service: ControlService
+  operations: 1
+- service: CatalogueService
+  operations: 1
+writesOutside: []
+screens:
+- P01:WEB-035 Multi-Currency & Pricing
+- P02:GST-044 Multi-Currency & Pricing
+- P04:POS-008 Reports
+- P08:BO-024 Payment Exceptions
+- P08:BO-025 Chargebacks & Disputes
+- P08:BO-029 Report Builder
+- P08:BO-043 Daily Reconciliation
+- P08:BO-058 Reporting Home
+- P08:BO-059 Sales Reports
+- P08:BO-060 Attendance & Footfall
+- P08:BO-061 Scheduled Reports
+- P08:BO-074 Chart of Accounts
+- P08:BO-075 Account Mapping
+- P08:BO-076 Revenue Recognition
+- P08:BO-077 FX Rates & Variances
+- P08:BO-089 Journal Entries
+- P08:BO-090 Period Close
+- P10:PTR-014 Settlement & Payment History
+- P10:PTR-018 Reports & Sales Performance
+- P12:SUP-008 Agent Performance & SLA View
+flows:
+- F13 Month end closes
+- F16 A venue opens for the first time
+- F32 A till opens, trades and settles
+- F82 A month is analysed from incrementality to a scheduled report
+- F98 A day is reconciled from takings to the ledger
+- F99 A chargeback arrives and is defended

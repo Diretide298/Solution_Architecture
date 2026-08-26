@@ -1,0 +1,40 @@
+id: LLD-Guest wallet
+title: Guest wallet — 4 transitions
+generatedBy: tools/derive-diagrams.py
+index: diagrams/hld/04-lifecycles.yaml
+source: states/wallet.yaml
+entity: Guest wallet
+contract: retail
+enum: Wallet.status
+enumKind: inline
+enumSchema: Wallet
+enumProperty: status
+owner: retail
+initial:
+- active
+terminal:
+- closed
+transitions:
+- from: active
+  to: suspended
+  operation: suspendWallet
+  trigger: operation
+  guard: Frozen — a dispute, or suspected fraud. **The balance is preserved**
+- from: suspended
+  to: active
+  operation: reinstateWallet
+  trigger: operation
+  guard: Released
+  isReversal: true
+- from: active
+  to: closed
+  operation: closeWallet
+  trigger: operation
+  guard: '**A closed wallet with a balance is money owed.** Closing must settle it or refuse'
+- from: suspended
+  to: closed
+  operation: closeWallet
+  trigger: operation
+  guard: Closed while suspended, after the dispute
+notes: '`closed` is terminal and a balance cannot be stranded there. **The guest’s money does not stop
+  being theirs because the account was closed.**'

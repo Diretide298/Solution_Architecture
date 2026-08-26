@@ -1,0 +1,70 @@
+$schema: ./_schema.yaml
+id: F93
+name: A recipe changes and its allergen claim is re-verified
+actor: venueManager
+capability: A recipe changes and its allergen claim is re-verified
+wave: 2
+frequency: As the venue needs it.
+criticality: safety
+primaryContract: fnb
+contracts:
+- fnb
+- catalogue
+platforms:
+- P08
+trigger:
+  description: An ingredient is substituted, or a recipe is edited. **The dish changed and the label
+    may not have.**
+offlineBehaviour: None of it offline. An allergen claim is a legal statement and it is not made on a
+  cached device.
+steps:
+- step: 1
+  screen: BO-111
+  action: Ingredient Substitution, Allergen & Nutrition.
+  operations:
+  - setRecipe
+  - setSubstitutionRules
+  outcome: '**Drawn by the client as FNB-2L.**'
+- step: 2
+  screen: BO-045
+  action: Menu Management.
+  operations:
+  - applyMenuActions
+  - createMenu
+  - getMenu
+  - listMenus
+  outcome: '**Drawn by the client as FNB-2E.**'
+  crossesDevice: true
+- step: 3
+  screen: BO-008
+  action: Product Detail & Variants.
+  operations:
+  - getProduct
+  - listProductVariants
+  - setProductAttributes
+  - updateProduct
+  outcome: '**Drawn by the client as FNB-2D.**'
+  crossesDevice: true
+- step: 4
+  screen: BO-007
+  action: Product Directory.
+  operations:
+  - setAlternativeCodes
+  - transitionProductLifecycle
+  outcome: '**Drawn by the client as FNB-2C.**'
+branches:
+- at: 1
+  condition: A step is not licensed for this tenant.
+  behaviour: '**The chain stops at the module boundary.** `requiresModule` decides — the journey is
+    shorter, not broken.'
+  severity: medium
+  resolvedBy: getModuleEnablement
+exitStates:
+- state: completed
+  description: The chain ran as the client drew it.
+- state: stoppedAtModule
+  description: '**A licence boundary, not a failure.**'
+notes: '**F&B board 2L, and it is the safety chain.** `verifyAllergens` was built 24 August because
+  **BL-127 built allergens and built substitution nowhere** — a dish declared nut-free after a swap
+  nobody checked is what this prevents. **Derived from the client''s declared `GOES TO` edges.**'
+openQuestions: null

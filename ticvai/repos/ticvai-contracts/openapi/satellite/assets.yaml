@@ -1,0 +1,654 @@
+openapi: 3.1.0
+info:
+  title: TICVAI Digital Media Library
+  version: 0.1.0
+  x-ticvai-screen-count: 0
+  x-ticvai-tier: satellite
+  x-ticvai-module: "21 — Digital Asset Management"
+  x-ticvai-requirements: 15
+  x-ticvai-capabilities: [C77]
+  x-ticvai-platforms:
+    - "P08 Venue Back Office"
+    - "P13 White-Label CMS"
+    - "P02 Guest App"
+    - "P01 Guest Web"
+  description: >
+    ## What this contract covers
+
+    **The single library every image, video and document is referenced from.**
+
+    | | |
+    |---|---|
+    | **Tier** | satellite |
+    | **Matrix domain** | 21 — Digital Asset Management |
+    | **Requirements** | ~15 |
+    | **Capabilities** | C77 |
+    | **Consumed by** | P08 Venue Back Office · P13 White-Label CMS · P02 Guest App · P01 Guest Web |
+
+    ## How to read this file
+
+    **This file is a contract.** It is hand-authored and it is the source of truth for one
+    bounded context: server code, client code and mock servers are generated from it, never
+    the other way round. If a field is not here, it does not exist.
+
+    **Contracts are split into two tiers.**
+
+    - **Spine** — the eight contexts everything else depends on: tenancy, identity,
+      catalogue, orders, shift, access, finance, cross-cell. Frozen first. A change here
+      requires a formal change request, because every satellite has pinned against it.
+    - **Satellite** — a domain that builds on the spine and can move independently.
+      Cheaper to change.
+
+    **`paths` are operations.** Each one declares four TICVAI extensions, and Redocly
+    rejects any that does not: `x-ticvai-permission`, `x-ticvai-scope-level`,
+    `x-ticvai-offline-capable`, `x-ticvai-conflict-policy`.
+
+    **`components.schemas` are API schemas — the shape of data on the wire.** They are not
+    database tables. Roughly 70% of the DDL derives from these; the rest — partitioning,
+    RLS, the PII split — is storage design that lives in the migration scripts.
+
+    ## This context
+
+    Every `assetRef` appearing anywhere else in the platform — banners, product images,
+    splash screens, work-order photographs, incident evidence — resolves here.
+
+    **Named media, not assets.** `maintenance` owns `asset` — a ride, a chiller, a vehicle.
+    In a venue "asset" means physical plant, and two contracts both claiming `/assets` with
+    the same operation ids is a codegen collision waiting to happen. This one is `/media`.
+
+    Positions this encodes:
+
+    - **Assets are referenced, never embedded.** A contract carries `assetRef`, and this
+      library resolves it to URLs. An image duplicated across three modules is three images
+      to update when the brand changes.
+    - **Deletion is refused while an asset is in use.** The reference count is maintained as
+      assets are attached, so a marketing manager cannot delete the image on a live
+      homepage.
+    - **Rights and licensing expiry are tracked.** A stock photograph licensed for one
+      season and still on a website two years later is a legal problem, not an oversight.
+    - **Derivatives are generated, not uploaded.** Thumbnails and responsive sizes come from
+      the original, so a new breakpoint is a re-render rather than a re-upload of everything.
+    - Uploads go direct to object storage through a signed URL. Large media never passes
+      through the API.
+
+servers:
+  - url: https://{cellHost}/api/v1
+    variables:
+      cellHost:
+        default: cell.ticvai.local
+
+security:
+  - bearerAuth: []
+
+tags:
+  - name: asset
+  - name: upload
+  - name: collection
+  - name: rights
+
+paths:
+  /media:
+    get:
+      operationId: searchMedia
+      x-ticvai-read-routing: replica
+      summary: Search the asset library
+      description: >
+        Filter by kind, tag, collection, venue or usage. `unusedOnly` surfaces assets nothing
+        references — the working set for a library clear-out.
+      tags: [asset]
+      x-ticvai-permission: ASSET_LIBRARY_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - name: kind
+          in: query
+          schema: { $ref: '#/components/schemas/MediaKind' }
+        - name: tag
+          in: query
+          schema: { type: string }
+        - name: collectionId
+          in: query
+          schema: { type: string, format: uuid }
+        - name: venueId
+          in: query
+          schema: { type: string, format: uuid }
+        - name: search
+          in: query
+          description: Matches filename, title, description and tags.
+          schema: { type: string }
+        - name: unusedOnly
+          in: query
+          schema: { type: boolean, default: false }
+        - name: rightsExpiringWithinDays
+          in: query
+          schema: { type: integer }
+        - $ref: '../shared/common.yaml#/components/parameters/PageSize'
+        - $ref: '../shared/common.yaml#/components/parameters/PageCursor'
+      responses:
+        '200':
+          description: Assets
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '../shared/common.yaml#/components/schemas/Page'
+                  - type: object
+                    properties:
+                      items:
+                        type: array
+                        items: { $ref: '#/components/schemas/MediaAsset' }
+        '403': { $ref: '../shared/common.yaml#/components/responses/Forbidden' }
+
+  /media/{mediaId}:
+    parameters:
+      - name: mediaId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    get:
+      operationId: getMediaAsset
+      x-ticvai-read-routing: replica
+      summary: Read an asset with derivatives and usage
+      description: >
+        Returns every generated size and every place the asset is referenced. Usage is what
+        makes deletion safe to refuse and impact visible before a replacement.
+      tags: [asset]
+      x-ticvai-permission: ASSET_LIBRARY_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '200':
+          description: Asset
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/MediaAssetDetail' }
+        '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
+
+    patch:
+      operationId: updateMediaAsset
+      summary: Amend metadata, tags or rights
+      tags: [asset]
+      x-ticvai-permission: ASSET_LIBRARY_MANAGE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              minProperties: 1
+              properties:
+                title: { $ref: '#/components/schemas/LocalisedText' }
+                description: { $ref: '#/components/schemas/LocalisedText' }
+                altText:
+                  allOf:
+                    - $ref: '#/components/schemas/LocalisedText'
+                  description: >
+                    Accessibility text. Required before an asset may be used in a
+                    guest-facing surface — WCAG 2.2 AA is a stated target.
+                tags:
+                  type: array
+                  items: { type: string }
+                collectionIds:
+                  type: array
+                  items: { type: string, format: uuid }
+                rights: { $ref: '#/components/schemas/MediaRights' }
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/MediaAsset' }
+
+    delete:
+      operationId: deleteMediaAsset
+      summary: Delete an asset
+      description: >
+        **Refused while the asset is referenced.** The response names every reference so the
+        holder can be cleared first — deleting the image on a live homepage should not be one
+        keystroke away.
+      tags: [asset]
+      x-ticvai-permission: ASSET_LIBRARY_MANAGE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '204': { description: Deleted }
+        '409':
+          description: Asset is in use. Every reference is listed
+          content:
+            application/problem+json:
+              schema: { $ref: '#/components/schemas/MediaInUseProblem' }
+
+  /media/{mediaId}/replace:
+    parameters:
+      - name: mediaId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    post:
+      operationId: replaceMediaAsset
+      summary: Replace the file behind an asset
+      description: >
+        The reference is stable, so every surface using it updates at once. This is how a
+        brand refresh happens without editing thirty screens.
+
+        Derivatives regenerate. The previous version is retained for rollback.
+      tags: [asset]
+      x-ticvai-permission: ASSET_LIBRARY_MANAGE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [uploadId]
+              properties:
+                uploadId: { type: string, format: uuid }
+                note: { type: string, maxLength: 500 }
+      responses:
+        '200':
+          description: Replaced, with affected surfaces reported
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/MediaReplaceResult' }
+        '409':
+          description: Replacement is a different kind — an image cannot replace a document
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /media/uploads:
+    post:
+      operationId: createUpload
+      summary: Request a signed upload URL
+      description: >
+        Uploads go **direct to object storage**, not through this API. Large media passing
+        through an application tier is latency, memory and a timeout waiting to happen.
+
+        Confirm with `POST /media/uploads/{id}/complete` once the transfer finishes.
+      tags: [upload]
+      x-ticvai-permission: ASSET_LIBRARY_MANAGE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [filename, contentType, sizeBytes]
+              properties:
+                filename: { type: string, maxLength: 256 }
+                contentType: { type: string }
+                sizeBytes: { type: integer, minimum: 1 }
+                venueId: { type: string, format: uuid }
+      responses:
+        '201':
+          description: Signed URL issued
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/UploadTicket' }
+        '400':
+          description: >
+            Content type not permitted, or size beyond the limit for that kind. Checked here
+            rather than after a guest has uploaded two hundred megabytes.
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /media/uploads/{uploadId}/complete:
+    parameters:
+      - name: uploadId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    post:
+      operationId: completeUpload
+      summary: Confirm an upload and create the asset
+      description: >
+        Verifies the transfer, reads dimensions and duration, generates derivatives, and
+        registers the asset.
+
+        Files are scanned before becoming available. An asset that fails scanning is quarantined,
+        not published — a tenant uploading a compromised file must not have it served to guests.
+      tags: [upload]
+      x-ticvai-permission: ASSET_LIBRARY_MANAGE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title: { $ref: '#/components/schemas/LocalisedText' }
+                altText: { $ref: '#/components/schemas/LocalisedText' }
+                tags:
+                  type: array
+                  items: { type: string }
+                collectionIds:
+                  type: array
+                  items: { type: string, format: uuid }
+                rights: { $ref: '#/components/schemas/MediaRights' }
+      responses:
+        '201':
+          description: Asset created. Derivatives may still be generating
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/MediaAsset' }
+        '409':
+          description: Upload incomplete, checksum mismatch, or the file failed scanning
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /media/collections:
+    get:
+      operationId: listCollections
+      x-ticvai-read-routing: replica
+      summary: List collections
+      description: >
+        Folders — by campaign, venue, season or product line. An asset may sit in several.
+      tags: [collection]
+      x-ticvai-permission: ASSET_LIBRARY_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '200':
+          description: Collections
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/Collection' }
+
+    post:
+      operationId: createCollection
+      summary: Create a collection
+      tags: [collection]
+      x-ticvai-permission: ASSET_LIBRARY_MANAGE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [name]
+              properties:
+                name: { type: string, maxLength: 200 }
+                description: { type: string, maxLength: 1000 }
+                venueId: { type: string, format: uuid }
+                parentCollectionId: { type: string, format: uuid }
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Collection' }
+
+  /media/rights-expiring:
+    get:
+      operationId: getExpiringRights
+      x-ticvai-read-routing: replica
+      summary: Assets whose licence is expiring or expired
+      description: >
+        A stock photograph licensed for one season and still on a website two years later is
+        a legal problem. Expired assets in active use sort first.
+      tags: [rights]
+      x-ticvai-permission: ASSET_LIBRARY_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - name: withinDays
+          in: query
+          schema: { type: integer, default: 60 }
+      responses:
+        '200':
+          description: Expiring assets
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/ExpiringMedia' }
+
+components:
+  schemas:
+    LocalisedText:
+      x-ticvai-persistence: "none — jsonb column"
+      type: object
+      additionalProperties: { type: string }
+
+    MediaKind:
+      type: string
+      enum: [image, video, audio, document, vector, font, archive]
+
+    MediaStatus:
+      type: string
+      enum: [processing, ready, quarantined, failed, archived]
+
+    MediaRights:
+      x-ticvai-persistence: "none — embedded in asset"
+      type: object
+      description: >
+        Licensing terms. Tracked because an expired licence on a live surface is a legal
+        exposure, not a housekeeping item.
+      properties:
+        licenceKind:
+          type: string
+          enum: [owned, royaltyFree, rightsManaged, creativeCommons, editorialOnly, unknown]
+        licensor: { type: string, nullable: true }
+        licenceReference: { type: string, nullable: true }
+        validFrom: { type: string, format: date, nullable: true }
+        validTo: { type: string, format: date, nullable: true }
+        permittedUses:
+          type: array
+          items:
+            type: string
+            enum: [web, print, socialMedia, inVenue, advertising, internal]
+        attributionRequired: { type: boolean, default: false }
+        attributionText: { type: string, nullable: true }
+
+    MediaAsset:
+      x-ticvai-persistence: "assets.media_asset"
+      type: object
+      required: [id, kind, status, filename, contentType, sizeBytes, referenceCount, createdAt]
+      properties:
+        id: { type: string, format: uuid }
+        kind: { $ref: '#/components/schemas/MediaKind' }
+        status: { $ref: '#/components/schemas/MediaStatus' }
+        filename: { type: string }
+        contentType: { type: string }
+        sizeBytes: { type: integer }
+        title: { $ref: '#/components/schemas/LocalisedText' }
+        altText:
+          allOf:
+            - $ref: '#/components/schemas/LocalisedText'
+          description: Required before use in a guest-facing surface. WCAG 2.2 AA.
+        width: { type: integer, nullable: true }
+        height: { type: integer, nullable: true }
+        durationSeconds: { type: number, nullable: true }
+        tags:
+          type: array
+          items: { type: string }
+        venueId: { type: string, format: uuid, nullable: true }
+        url:
+          type: string
+          description: Signed and expiring for private assets; stable CDN URL for public ones.
+        thumbnailUrl: { type: string, nullable: true }
+        referenceCount:
+          type: integer
+          description: >
+            How many surfaces reference this asset. Non-zero refuses deletion.
+        rights: { $ref: '#/components/schemas/MediaRights' }
+        isRightsExpired: { type: boolean }
+        version: { type: integer }
+        uploadedByPrincipalId: { type: string, format: uuid }
+        createdAt: { type: string, format: date-time }
+
+    MediaAssetDetail:
+      x-ticvai-persistence: "assets.media_asset"
+      allOf:
+        - $ref: '#/components/schemas/MediaAsset'
+        - type: object
+          properties:
+            derivatives:
+              type: array
+              description: >
+                Generated from the original, never uploaded separately. A new breakpoint is a
+                re-render rather than a re-upload of everything.
+              items:
+                type: object
+                properties:
+                  label: { type: string }
+                  width: { type: integer }
+                  height: { type: integer }
+                  sizeBytes: { type: integer }
+                  url: { type: string }
+            usage:
+              type: array
+              description: Every place this asset is referenced.
+              items: { $ref: '#/components/schemas/MediaUsage' }
+            collections:
+              type: array
+              items:
+                type: object
+                properties:
+                  id: { type: string, format: uuid }
+                  name: { type: string }
+            previousVersions:
+              type: array
+              items:
+                type: object
+                properties:
+                  version: { type: integer }
+                  replacedAt: { type: string, format: date-time }
+                  replacedByPrincipalId: { type: string, format: uuid }
+
+    MediaUsage:
+      x-ticvai-persistence: "assets.media_usage"
+      type: object
+      required: [surface, referenceId]
+      properties:
+        surface:
+          type: string
+          enum:
+            - tenantBranding
+            - homepageBanner
+            - promoBlock
+            - contentPage
+            - product
+            - event
+            - menuItem
+            - merchandise
+            - workOrder
+            - incident
+            - inspection
+            - campaign
+        referenceId: { type: string }
+        label: { type: string }
+        isLive:
+          type: boolean
+          description: True where the referencing surface is published to guests.
+
+    MediaInUseProblem:
+      x-ticvai-persistence: "none — error shape"
+      allOf:
+        - $ref: '../shared/common.yaml#/components/schemas/Problem'
+        - type: object
+          properties:
+            referenceCount: { type: integer }
+            usage:
+              type: array
+              items: { $ref: '#/components/schemas/MediaUsage' }
+
+    MediaReplaceResult:
+      x-ticvai-persistence: "none — computed"
+      type: object
+      required: [asset, affectedSurfaces]
+      properties:
+        asset: { $ref: '#/components/schemas/MediaAsset' }
+        affectedSurfaces:
+          type: integer
+          description: How many surfaces now show the new file.
+        liveSurfaces:
+          type: integer
+          description: Of those, how many are published to guests right now.
+        derivativesRegenerating: { type: boolean }
+
+    UploadTicket:
+      x-ticvai-persistence: "assets.media_upload"
+      type: object
+      required: [uploadId, uploadUrl, method, expiresAt]
+      properties:
+        uploadId: { type: string, format: uuid }
+        uploadUrl:
+          type: string
+          description: Signed. PUT the file here, then confirm with `/complete`.
+        method:
+          type: string
+          enum: [PUT, POST]
+        headers:
+          type: object
+          additionalProperties: { type: string }
+        maxSizeBytes: { type: integer }
+        expiresAt: { type: string, format: date-time }
+
+    Collection:
+      x-ticvai-persistence: "assets.media_collection"
+      type: object
+      required: [id, name, assetCount]
+      properties:
+        id: { type: string, format: uuid }
+        name: { type: string }
+        description: { type: string, nullable: true }
+        venueId: { type: string, format: uuid, nullable: true }
+        parentCollectionId: { type: string, format: uuid, nullable: true }
+        assetCount: { type: integer }
+        coverAssetId: { type: string, format: uuid, nullable: true }
+
+    ExpiringMedia:
+      x-ticvai-persistence: "none — computed"
+      type: object
+      required: [assetId, filename, validTo, isExpired, isInUse]
+      properties:
+        assetId: { type: string, format: uuid }
+        filename: { type: string }
+        thumbnailUrl: { type: string, nullable: true }
+        licensor: { type: string, nullable: true }
+        validTo: { type: string, format: date }
+        daysRemaining: { type: integer }
+        isExpired: { type: boolean }
+        isInUse: { type: boolean }
+        liveUsageCount:
+          type: integer
+          description: Expired and live is the combination that matters.
+
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

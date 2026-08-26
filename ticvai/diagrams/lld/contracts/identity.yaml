@@ -1,0 +1,668 @@
+id: LLD-identity
+title: identity — 44 operations
+generatedBy: tools/derive-diagrams.py
+index: diagrams/hld/03-contracts.yaml
+tier: spine
+service: IdentityService
+operations:
+- operation: completeSsoAuthorization
+  verb: POST
+  path: /auth/sso/{providerId}/callback
+  scope: tenant
+  permission: null
+  audience:
+  - anonymous
+  offline: false
+  reads:
+  - cache:idempotency
+  - identity.principal
+  - identity.sso_provider
+  writes:
+  - cache:idempotency
+  - identity.session
+- operation: createGrant
+  verb: POST
+  path: /grants
+  scope: venue
+  permission: PERMISSION_GRANT
+  audience:
+  - staff
+  - partner
+  offline: false
+  reads:
+  - cache:idempotency
+  - identity.grant
+  writes:
+  - cache:idempotency
+  - cache:resolution
+  - identity.grant
+- operation: createMfaChallenge
+  verb: POST
+  path: /auth/mfa/challenge
+  scope: tenant
+  permission: null
+  audience:
+  - staff
+  - partner
+  - guest
+  offline: false
+  reads:
+  - cache:idempotency
+  - identity.mfa_method
+  writes:
+  - cache:idempotency
+  - identity.mfa_challenge
+- operation: createPrincipal
+  verb: POST
+  path: /principals
+  scope: venue
+  permission: USER_MANAGE
+  audience:
+  - staff
+  - partner
+  offline: false
+  reads:
+  - cache:idempotency
+  - identity.principal
+  writes:
+  - cache:idempotency
+  - identity.principal
+- operation: createRole
+  verb: POST
+  path: /roles
+  scope: venue
+  permission: ROLE_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - identity.role
+  writes:
+  - cache:idempotency
+  - cache:resolution
+  - identity.role
+- operation: deleteGrant
+  verb: DELETE
+  path: /grants/{grantId}
+  scope: venue
+  permission: PERMISSION_GRANT
+  audience:
+  - staff
+  - partner
+  offline: false
+  reads:
+  - cache:idempotency
+  - identity.grant
+  writes:
+  - cache:idempotency
+  - cache:resolution
+  - identity.grant
+- operation: deleteGuestAccount
+  verb: DELETE
+  path: /auth/guest/account
+  scope: tenant
+  permission: null
+  audience:
+  - guest
+  offline: false
+  reads:
+  - cache:idempotency
+  - pii.subject
+  writes:
+  - cache:idempotency
+  - pii.subject
+  - platform.dsar_request
+- operation: enrolMfaMethod
+  verb: POST
+  path: /auth/mfa/methods
+  scope: tenant
+  permission: null
+  audience:
+  - staff
+  - partner
+  - guest
+  offline: false
+  reads:
+  - cache:idempotency
+  - identity.mfa_recovery_code
+  - identity.principal
+  writes:
+  - cache:idempotency
+  - identity.mfa_method
+  - identity.mfa_recovery_code
+- operation: exportSubjectData
+  verb: POST
+  path: /guests/{subjectId}/data-export
+  scope: tenant
+  permission: GUEST_VIEW_PII
+  audience:
+  - staff
+  - guest
+  offline: false
+  reads:
+  - access.entitlement
+  - cache:idempotency
+  - marketing.consent_record
+  - marketing.form_submission
+  - marketing.guest_document
+  - marketing.guest_profile
+  - orders.sales_order
+  - pii.subject
+  writes:
+  - cache:idempotency
+- operation: forceLogout
+  verb: POST
+  path: /auth/sessions/{sessionId}/force-logout
+  scope: venue
+  permission: SESSION_FORCE_LOGOUT
+  audience:
+  - staff
+  - partner
+  offline: false
+  reads:
+  - cache:idempotency
+  - identity.session
+  writes:
+  - cache:idempotency
+  - identity.session
+- operation: getCurrentSession
+  verb: GET
+  path: /auth/session
+  scope: workstation
+  permission: null
+  audience:
+  - staff
+  - partner
+  offline: true
+  reads:
+  - cache:resolution
+  - identity.grant
+  - identity.principal
+  - identity.role
+  - identity.session
+  writes:
+  - cache:resolution
+- operation: getGuestSession
+  verb: GET
+  path: /auth/guest/session
+  scope: tenant
+  permission: null
+  audience:
+  - guest
+  - partner
+  offline: true
+  reads:
+  - identity.guest_session
+  - pii.subject
+  writes: []
+- operation: getPrincipal
+  verb: GET
+  path: /principals/{principalId}
+  scope: venue
+  permission: USER_MANAGE
+  audience:
+  - staff
+  - partner
+  offline: false
+  reads:
+  - identity.principal
+  writes: []
+- operation: getSsoConfig
+  verb: GET
+  path: /tenants/sso-config
+  scope: tenant
+  permission: USER_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - identity.sso_group_mapping
+  - identity.sso_provider
+  writes: []
+- operation: grantDelegation
+  verb: POST
+  path: /guests/{subjectId}/delegations
+  scope: venue
+  permission: GUEST_MANAGE
+  audience:
+  - staff
+  - guest
+  offline: false
+  reads:
+  - cache:idempotency
+  - identity.grant
+  - pii.subject
+  writes:
+  - cache:idempotency
+  - identity.grant
+- operation: guestLogout
+  verb: DELETE
+  path: /auth/guest/session
+  scope: tenant
+  permission: null
+  audience:
+  - guest
+  offline: false
+  reads:
+  - identity.guest_session
+  writes:
+  - identity.guest_session
+- operation: guestSocialLogin
+  verb: POST
+  path: /auth/guest/social
+  scope: tenant
+  permission: null
+  audience:
+  - anonymous
+  offline: false
+  reads:
+  - cache:idempotency
+  - pii.subject_contact
+  writes:
+  - cache:idempotency
+  - identity.guest_session
+  - pii.subject
+- operation: guestUaePassLogin
+  verb: POST
+  path: /auth/guest/uae-pass
+  scope: tenant
+  permission: null
+  audience:
+  - anonymous
+  offline: false
+  reads:
+  - cache:idempotency
+  - pii.subject_contact
+  writes:
+  - cache:idempotency
+  - identity.guest_session
+  - pii.subject
+  - pii.subject_document
+- operation: linkGuestCheckout
+  verb: POST
+  path: /auth/guest/link-checkout
+  scope: venue
+  permission: null
+  audience:
+  - guest
+  offline: false
+  reads:
+  - cache:idempotency
+  - orders.sales_order
+  - pii.subject_contact
+  writes:
+  - cache:idempotency
+  - orders.sales_order
+  - pii.subject
+- operation: listActiveSessions
+  verb: GET
+  path: /auth/sessions
+  scope: venue
+  permission: SESSION_FORCE_LOGOUT
+  audience:
+  - staff
+  - partner
+  offline: false
+  reads:
+  - identity.principal
+  - identity.session
+  writes: []
+- operation: listDelegations
+  verb: GET
+  path: /guests/{subjectId}/delegations
+  scope: venue
+  permission: GUEST_VIEW
+  audience:
+  - staff
+  - guest
+  offline: false
+  reads:
+  - identity.grant
+  - marketing.guest_profile
+  - pii.subject
+  writes: []
+- operation: listGrants
+  verb: GET
+  path: /grants
+  scope: venue
+  permission: PERMISSION_VIEW
+  audience:
+  - staff
+  - partner
+  offline: false
+  reads:
+  - identity.grant
+  writes: []
+- operation: listMfaMethods
+  verb: GET
+  path: /auth/mfa/methods
+  scope: tenant
+  permission: null
+  audience:
+  - staff
+  - partner
+  - guest
+  offline: false
+  reads:
+  - identity.mfa_method
+  writes: []
+- operation: listPrincipals
+  verb: GET
+  path: /principals
+  scope: venue
+  permission: USER_MANAGE
+  audience:
+  - staff
+  - partner
+  offline: false
+  reads:
+  - identity.principal
+  writes: []
+- operation: listRoles
+  verb: GET
+  path: /roles
+  scope: venue
+  permission: ROLE_MANAGE
+  audience:
+  - staff
+  offline: true
+  reads:
+  - identity.role
+  writes: []
+- operation: listSsoProviders
+  verb: GET
+  path: /auth/sso/providers
+  scope: tenant
+  permission: null
+  audience:
+  - anonymous
+  - partner
+  offline: false
+  reads:
+  - identity.sso_provider
+  writes: []
+- operation: login
+  verb: POST
+  path: /auth/login
+  scope: tenant
+  permission: null
+  audience:
+  - anonymous
+  - partner
+  offline: false
+  reads:
+  - cache:idempotency
+  - identity.grant
+  - identity.principal
+  - identity.principal_credential
+  - identity.role
+  writes:
+  - cache:idempotency
+  - identity.session
+- operation: logout
+  verb: POST
+  path: /auth/logout
+  scope: workstation
+  permission: null
+  audience:
+  - staff
+  offline: true
+  reads:
+  - cache:idempotency
+  - identity.session
+  writes:
+  - cache:idempotency
+  - identity.session
+- operation: refreshToken
+  verb: POST
+  path: /auth/refresh
+  scope: tenant
+  permission: null
+  audience:
+  - staff
+  - partner
+  - guest
+  offline: false
+  reads:
+  - cache:idempotency
+  - identity.session
+  writes:
+  - cache:idempotency
+  - identity.session
+- operation: registerGuest
+  verb: POST
+  path: /auth/guest/register
+  scope: tenant
+  permission: null
+  audience:
+  - anonymous
+  offline: false
+  reads:
+  - cache:idempotency
+  - pii.subject
+  writes:
+  - cache:idempotency
+  - identity.guest_session
+  - pii.subject
+  - pii.subject_contact
+- operation: removeMfaMethod
+  verb: DELETE
+  path: /auth/mfa/methods/{methodId}
+  scope: tenant
+  permission: null
+  audience:
+  - staff
+  - partner
+  - guest
+  offline: false
+  reads:
+  - cache:idempotency
+  - identity.mfa_method
+  writes:
+  - cache:idempotency
+  - identity.mfa_method
+- operation: requestGuestOtp
+  verb: POST
+  path: /auth/guest/otp
+  scope: tenant
+  permission: null
+  audience:
+  - anonymous
+  offline: false
+  reads:
+  - cache:idempotency
+  - pii.subject_contact
+  writes:
+  - cache:idempotency
+  - identity.otp_challenge
+- operation: resolvePermissions
+  verb: POST
+  path: /permissions/resolve
+  scope: venue
+  permission: PERMISSION_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - cache:resolution
+  - identity.grant
+  - identity.principal
+  - identity.role
+  - identity.role_permission
+  - platform.scope_node
+  writes:
+  - cache:idempotency
+  - cache:resolution
+- operation: revokeAllSessions
+  verb: POST
+  path: /auth/sessions/revoke-all
+  scope: venue
+  permission: SESSION_FORCE_LOGOUT
+  audience:
+  - staff
+  - partner
+  offline: false
+  reads:
+  - cache:idempotency
+  - identity.session
+  writes:
+  - cache:idempotency
+  - identity.session
+- operation: selectRole
+  verb: POST
+  path: /auth/select-role
+  scope: tenant
+  permission: null
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - identity.grant
+  - identity.role
+  - identity.session
+  writes:
+  - cache:idempotency
+  - identity.session
+- operation: setPasswordPolicy
+  verb: PUT
+  path: /password-policy
+  scope: tenant
+  permission: TENANT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - identity.password_policy
+  writes:
+  - cache:idempotency
+  - identity.password_policy
+- operation: setSegregationRules
+  verb: PUT
+  path: /segregation-rules
+  scope: tenant
+  permission: ROLE_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - identity.grant
+  - identity.segregation_rule
+  writes:
+  - cache:idempotency
+  - identity.segregation_rule
+- operation: setSsoConfig
+  verb: PUT
+  path: /tenants/sso-config
+  scope: tenant
+  permission: USER_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - identity.sso_group_mapping
+  - identity.sso_provider
+  writes:
+  - cache:idempotency
+  - identity.sso_group_mapping
+  - identity.sso_provider
+- operation: startSsoAuthorization
+  verb: GET
+  path: /auth/sso/{providerId}/authorize
+  scope: tenant
+  permission: null
+  audience:
+  - anonymous
+  offline: false
+  reads:
+  - identity.sso_provider
+  writes: []
+- operation: updatePrincipal
+  verb: PATCH
+  path: /principals/{principalId}
+  scope: venue
+  permission: USER_MANAGE
+  audience:
+  - staff
+  - partner
+  offline: false
+  reads:
+  - cache:idempotency
+  - identity.principal
+  writes:
+  - cache:idempotency
+  - identity.principal
+- operation: verifyGuestEmail
+  verb: POST
+  path: /auth/guest/verify-email
+  scope: tenant
+  permission: GUEST_VIEW
+  audience:
+  - guest
+  - anonymous
+  offline: false
+  reads:
+  - cache:idempotency
+  - identity.otp_challenge
+  - pii.subject
+  writes:
+  - cache:idempotency
+  - identity.otp_challenge
+  - marketing.message_dispatch
+  - pii.subject
+- operation: verifyGuestOtp
+  verb: POST
+  path: /auth/guest/otp/verify
+  scope: tenant
+  permission: null
+  audience:
+  - anonymous
+  offline: false
+  reads:
+  - cache:idempotency
+  - identity.otp_challenge
+  - pii.subject_contact
+  writes:
+  - cache:idempotency
+  - identity.guest_session
+  - pii.subject_contact
+- operation: verifyMfaChallenge
+  verb: POST
+  path: /auth/mfa/challenge/{challengeId}/verify
+  scope: tenant
+  permission: null
+  audience:
+  - staff
+  - partner
+  - guest
+  offline: false
+  reads:
+  - cache:idempotency
+  - identity.mfa_challenge
+  - identity.mfa_recovery_code
+  writes:
+  - cache:idempotency
+  - identity.mfa_challenge
+  - identity.mfa_recovery_code
+  - identity.session
+- operation: verifyMfaEnrolment
+  verb: POST
+  path: /auth/mfa/methods/{methodId}
+  scope: tenant
+  permission: null
+  audience:
+  - staff
+  - partner
+  - guest
+  offline: false
+  reads:
+  - cache:idempotency
+  - identity.mfa_method
+  writes:
+  - cache:idempotency
+  - identity.mfa_method

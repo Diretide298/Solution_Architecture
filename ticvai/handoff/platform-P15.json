@@ -1,0 +1,331 @@
+{
+ "code": "P15",
+ "name": "Kitchen Display \u2014 Pass and Stations",
+ "shortName": "Kitchen Display",
+ "app": "kitchen-display",
+ "operator": "venue",
+ "audience": "staff",
+ "formFactor": "kiosk",
+ "offlineCapable": true,
+ "generated": "2026-08-26",
+ "note": "Derived by tools/derive-platform.py. **The gaps section is the point** \u2014 a page listing what exists is a directory; one listing what is missing is a worklist.",
+ "counts": {
+  "screens": 10,
+  "operations": 24,
+  "contracts": 3,
+  "modules": 1,
+  "undrawn": 0,
+  "operationsWithNoScreen": 31
+ },
+ "waves": {
+  "wave2": 10
+ },
+ "modules": [
+  {
+   "module": "Kitchen",
+   "screens": 10,
+   "waves": [
+    2
+   ]
+  }
+ ],
+ "contracts": [
+  {
+   "contract": "fnb",
+   "operations": 21
+  },
+  {
+   "contract": "reporting",
+   "operations": 2
+  },
+  {
+   "contract": "tenancy",
+   "operations": 1
+  }
+ ],
+ "screens": [
+  {
+   "id": "KIT-001",
+   "name": "Kitchen Operations Command Center",
+   "module": "Kitchen",
+   "wave": 2,
+   "route": "/kitchen/kitchen-operations-command-center",
+   "operations": 3,
+   "drawn": true
+  },
+  {
+   "id": "KIT-002",
+   "name": "Kitchen Display System (KDS)",
+   "module": "Kitchen",
+   "wave": 2,
+   "route": "/kitchen/kitchen-display-system-kds",
+   "operations": 7,
+   "drawn": true
+  },
+  {
+   "id": "KIT-003",
+   "name": "Order Firing & Course Management",
+   "module": "Kitchen",
+   "wave": 2,
+   "route": "/kitchen/order-firing-course-management",
+   "operations": 5,
+   "drawn": true
+  },
+  {
+   "id": "KIT-004",
+   "name": "Active Order Management & Fulfilment Journey",
+   "module": "Kitchen",
+   "wave": 2,
+   "route": "/kitchen/active-order-management-fulfilment-journey",
+   "operations": 2,
+   "drawn": true
+  },
+  {
+   "id": "KIT-005",
+   "name": "Kitchen Station Workload & Dynamic Routing",
+   "module": "Kitchen",
+   "wave": 2,
+   "route": "/kitchen/kitchen-station-workload-dynamic-routing",
+   "operations": 2,
+   "drawn": true
+  },
+  {
+   "id": "KIT-006",
+   "name": "Expeditor & Order Assembly",
+   "module": "Kitchen",
+   "wave": 2,
+   "route": "/kitchen/expeditor-order-assembly",
+   "operations": 5,
+   "drawn": true
+  },
+  {
+   "id": "KIT-007",
+   "name": "Guest Collection, Buzzer & Digital Notification",
+   "module": "Kitchen",
+   "wave": 2,
+   "route": "/kitchen/guest-collection-buzzer-digital-notification",
+   "operations": 2,
+   "drawn": true
+  },
+  {
+   "id": "KIT-008",
+   "name": "Exceptions, Re-Fire & Unavailable Items",
+   "module": "Kitchen",
+   "wave": 2,
+   "route": "/kitchen/exceptions-re-fire-unavailable-items",
+   "operations": 5,
+   "drawn": true
+  },
+  {
+   "id": "KIT-009",
+   "name": "SLA, Priority & Service Rules",
+   "module": "Kitchen",
+   "wave": 2,
+   "route": "/kitchen/sla-priority-service-rules",
+   "operations": 2,
+   "drawn": true
+  },
+  {
+   "id": "KIT-010",
+   "name": "Kitchen Performance, AI & Operational Optimization",
+   "module": "Kitchen",
+   "wave": 2,
+   "route": "/kitchen/kitchen-performance-ai-operational-optimization",
+   "operations": 2,
+   "drawn": true
+  }
+ ],
+ "gaps": {
+  "operationsWithNoScreen": [
+   {
+    "operation": "attachModifierGroup",
+    "contract": "fnb",
+    "verb": "PUT",
+    "summary": "Give an item its choices"
+   },
+   {
+    "operation": "clearTable",
+    "contract": "fnb",
+    "verb": "POST",
+    "summary": "Mark a table cleared and free"
+   },
+   {
+    "operation": "closeCorrectiveAction",
+    "contract": "fnb",
+    "verb": "POST",
+    "summary": "Close a signed finding"
+   },
+   {
+    "operation": "createCombo",
+    "contract": "fnb",
+    "verb": "POST",
+    "summary": "A meal deal, priced as one thing"
+   },
+   {
+    "operation": "createModifierGroup",
+    "contract": "fnb",
+    "verb": "POST",
+    "summary": "Create a modifier group"
+   },
+   {
+    "operation": "createTable",
+    "contract": "fnb",
+    "verb": "POST",
+    "summary": "A table as a thing, not an inference"
+   },
+   {
+    "operation": "escalateCorrectiveAction",
+    "contract": "fnb",
+    "verb": "POST",
+    "summary": "Escalate a finding"
+   },
+   {
+    "operation": "getTableVisit",
+    "contract": "fnb",
+    "verb": "GET",
+    "summary": "Read a visit with all its orders"
+   },
+   {
+    "operation": "rebalanceStationLoad",
+    "contract": "fnb",
+    "verb": "POST",
+    "summary": "Move work between stations mid-service"
+   },
+   {
+    "operation": "recordCorrectiveAction",
+    "contract": "fnb",
+    "verb": "POST",
+    "summary": "Record what was done about a finding"
+   },
+   {
+    "operation": "requestBill",
+    "contract": "fnb",
+    "verb": "POST",
+    "summary": "The party asked to pay"
+   },
+   {
+    "operation": "resolveBookingConflict",
+    "contract": "fnb",
+    "verb": "GET",
+    "summary": "Two bookings, one table \u2014 and what to do about it"
+   },
+   {
+    "operation": "sendBookingConfirmation",
+    "contract": "fnb",
+    "verb": "POST",
+    "summary": "Confirm a booking, and ask them to confirm back"
+   },
+   {
+    "operation": "sendOrderNotification",
+    "contract": "fnb",
+    "verb": "POST",
+    "summary": "Tell the guest where their order is"
+   },
+   {
+    "operation": "setComboSlots",
+    "contract": "fnb",
+    "verb": "PUT",
+    "summary": "What the guest chooses, and what it costs extra"
+   },
+   {
+    "operation": "setKitchenSla",
+    "contract": "fnb",
+    "verb": "PUT",
+    "summary": "How long a ticket may sit before it is late"
+   },
+   {
+    "operation": "setSectionLayout",
+    "contract": "fnb",
+    "verb": "PUT",
+    "summary": "Divide the floor into sections and give each a server"
+   },
+   {
+    "operation": "updateTable",
+    "contract": "fnb",
+    "verb": "PUT",
+    "summary": "Change what a table is"
+   },
+   {
+    "operation": "cancelReportExecution",
+    "contract": "reporting",
+    "verb": "DELETE",
+    "summary": "Cancel a running execution"
+   },
+   {
+    "operation": "deleteReportSchedule",
+    "contract": "reporting",
+    "verb": "DELETE",
+    "summary": "Delete a schedule"
+   },
+   {
+    "operation": "exportReportResult",
+    "contract": "reporting",
+    "verb": "POST",
+    "summary": "Export a completed result"
+   },
+   {
+    "operation": "getReportExecution",
+    "contract": "reporting",
+    "verb": "GET",
+    "summary": "Execution status and result"
+   },
+   {
+    "operation": "getReportExport",
+    "contract": "reporting",
+    "verb": "GET",
+    "summary": "Export status and download link"
+   },
+   {
+    "operation": "getReportResult",
+    "contract": "reporting",
+    "verb": "GET",
+    "summary": "Paged result rows"
+   },
+   {
+    "operation": "listAlertRules",
+    "contract": "reporting",
+    "verb": "GET",
+    "summary": "What raises an alert, and when"
+   },
+   {
+    "operation": "listReportFields",
+    "contract": "reporting",
+    "verb": "GET",
+    "summary": "Fields available for a data source"
+   },
+   {
+    "operation": "listReportSchedules",
+    "contract": "reporting",
+    "verb": "GET",
+    "summary": "List scheduled reports"
+   },
+   {
+    "operation": "listSeededReports",
+    "contract": "reporting",
+    "verb": "GET",
+    "summary": ""
+   },
+   {
+    "operation": "updateReportSchedule",
+    "contract": "reporting",
+    "verb": "PATCH",
+    "summary": "Amend, pause or resume a schedule"
+   },
+   {
+    "operation": "getRegionSettings",
+    "contract": "tenancy",
+    "verb": "GET",
+    "summary": "Read region settings"
+   },
+   {
+    "operation": "updateRegionSettings",
+    "contract": "tenancy",
+    "verb": "PUT",
+    "summary": "Update region settings"
+   }
+  ],
+  "modulesSplitAcrossWaves": [],
+  "screensNotDrawn": [],
+  "flowsNamingAMissingScreen": []
+ }
+}

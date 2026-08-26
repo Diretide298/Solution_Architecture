@@ -1,0 +1,1499 @@
+id: LLD-CatalogueService
+title: CatalogueService — 132 operations, 40 tables
+generatedBy: tools/derive-diagrams.py
+tier: commerce
+index: diagrams/hld.yaml
+why: '**What is sold, at what price, in which seat.** Promotions and seating are folded in because both
+  are pricing and availability against the same product — a promotion that cannot see a price list and
+  a seat that cannot see a product are two round trips on the hot path of every sale.'
+scale: Read-heavy, bundle-published to tills. **The catalogue bundle is this service's output** (ADR-0013).
+ifDown: A bad publish reaches every workstation. Versioned and rollback-able for that reason.
+coverage:
+  operations: 132
+  inAFlow: 57
+  percent: 43%
+  note: '**Flow coverage is how much of this service a journey has walked.** A service under 40% is
+    unwalked rather than under-documented.'
+schemas:
+- schema: catalogue
+  tables: 18
+  storage: ''
+- schema: promotions
+  tables: 11
+  storage: ''
+- schema: seating
+  tables: 11
+  storage: ''
+operationsByContract:
+- contract: catalogue
+  count: 66
+  operations:
+  - operation: acquireLease
+    verb: POST
+    path: /leases
+    scope: workstation
+    permission: ORDER_CREATE
+    offline: false
+    reads: 4
+    writes: 2
+  - operation: assessProductChange
+    verb: POST
+    path: /products/{productId}/change-impact
+    scope: venue
+    permission: PRODUCT_CONFIGURE
+    offline: false
+    reads: 4
+    writes: 0
+  - operation: bulkChangePrices
+    verb: POST
+    path: /products/bulk-price
+    scope: venue
+    permission: PRODUCT_CONFIGURE
+    offline: false
+    reads: 3
+    writes: 3
+  - operation: cancelPerformance
+    verb: POST
+    path: /performances/{performanceId}/cancel
+    scope: venue
+    permission: PERFORMANCE_CONFIGURE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: cloneProduct
+    verb: POST
+    path: /products/{productId}/clone
+    scope: venue
+    permission: PRODUCT_CONFIGURE
+    offline: false
+    reads: 2
+    writes: 3
+  - operation: commitCatalogueImport
+    verb: POST
+    path: /products/import/{jobId}/commit
+    scope: venue
+    permission: PRODUCT_CONFIGURE
+    offline: false
+    reads: 2
+    writes: 4
+  - operation: copyPriceList
+    verb: POST
+    path: /price-lists/{priceListId}/copy
+    scope: venue
+    permission: PRICE_CONFIGURE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: createDonationCampaign
+    verb: POST
+    path: /donation-campaigns
+    scope: venue
+    permission: PRODUCT_CONFIGURE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: createEntitlementTemplate
+    verb: POST
+    path: /entitlement-templates
+    scope: venue
+    permission: PRODUCT_CONFIGURE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: createEnvelope
+    verb: POST
+    path: /envelopes
+    scope: venue
+    permission: CAPACITY_CONFIGURE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: createEvent
+    verb: POST
+    path: /events
+    scope: venue
+    permission: EVENT_CONFIGURE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: createPerformances
+    verb: POST
+    path: /events/{eventId}/performances
+    scope: venue
+    permission: PERFORMANCE_CONFIGURE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: createPriceList
+    verb: POST
+    path: /price-lists
+    scope: venue
+    permission: PRICE_CONFIGURE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: createProduct
+    verb: POST
+    path: /products
+    scope: venue
+    permission: PRODUCT_CONFIGURE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: forceReleaseLease
+    verb: POST
+    path: /leases/{leaseId}/force-release
+    scope: venue
+    permission: CAPACITY_CONFIGURE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: freezeEntitlement
+    verb: POST
+    path: /entitlements/{entitlementId}/freeze
+    scope: venue
+    permission: PRODUCT_CONFIGURE
+    offline: false
+    reads: 1
+    writes: 2
+  - operation: getAvailability
+    verb: GET
+    path: /availability
+    scope: venue
+    permission: PRODUCT_VIEW
+    offline: false
+    reads: 3
+    writes: 0
+  - operation: getChannelAllocations
+    verb: GET
+    path: /envelopes/{envelopeId}/channel-allocations
+    scope: venue
+    permission: PRODUCT_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: getEvent
+    verb: GET
+    path: /events/{eventId}
+    scope: venue
+    permission: PRODUCT_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: getLatestBundle
+    verb: GET
+    path: /catalogue/bundles/latest
+    scope: workstation
+    permission: PRODUCT_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: getMyMemberships
+    verb: GET
+    path: /guests/me/memberships
+    scope: venue
+    permission: PRODUCT_VIEW
+    offline: false
+    reads: 3
+    writes: 0
+  - operation: getPerformance
+    verb: GET
+    path: /performances/{performanceId}
+    scope: venue
+    permission: PRODUCT_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: getPriceList
+    verb: GET
+    path: /price-lists/{priceListId}
+    scope: venue
+    permission: PRICE_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: getProduct
+    verb: GET
+    path: /products/{productId}
+    scope: venue
+    permission: PRODUCT_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: importProductCatalogue
+    verb: POST
+    path: /products/import
+    scope: venue
+    permission: PRODUCT_CONFIGURE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: joinWaitlist
+    verb: POST
+    path: /waitlist-entries
+    scope: venue
+    permission: null
+    offline: false
+    reads: 3
+    writes: 2
+  - operation: leaveWaitlist
+    verb: DELETE
+    path: /waitlist-entries/{entryId}
+    scope: venue
+    permission: null
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: listAlternativeCodes
+    verb: GET
+    path: /products/{productId}/alternative-codes
+    scope: venue
+    permission: PRODUCT_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listCatalogueBundles
+    verb: GET
+    path: /catalogue/bundles
+    scope: venue
+    permission: PRODUCT_VIEW
+    offline: false
+    reads: 2
+    writes: 0
+  - operation: listDonationCampaigns
+    verb: GET
+    path: /donation-campaigns
+    scope: venue
+    permission: PRODUCT_VIEW
+    offline: true
+    reads: 1
+    writes: 0
+  - operation: listEntitlementTemplates
+    verb: GET
+    path: /entitlement-templates
+    scope: venue
+    permission: PRODUCT_VIEW
+    offline: true
+    reads: 1
+    writes: 0
+  - operation: listEnvelopes
+    verb: GET
+    path: /envelopes
+    scope: venue
+    permission: PRODUCT_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listEvents
+    verb: GET
+    path: /events
+    scope: venue
+    permission: PRODUCT_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listGuestMemberships
+    verb: GET
+    path: /guest/memberships
+    scope: venue
+    permission: PRODUCT_VIEW
+    offline: false
+    reads: 3
+    writes: 0
+  - operation: listLeases
+    verb: GET
+    path: /leases
+    scope: venue
+    permission: PRODUCT_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listPerformances
+    verb: GET
+    path: /events/{eventId}/performances
+    scope: venue
+    permission: PRODUCT_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listPriceLists
+    verb: GET
+    path: /price-lists
+    scope: venue
+    permission: PRICE_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listPrices
+    verb: GET
+    path: /price-lists/{priceListId}/prices
+    scope: venue
+    permission: PRICE_VIEW
+    offline: false
+    reads: 2
+    writes: 1
+  - operation: listProductCategories
+    verb: GET
+    path: /product-categories
+    scope: venue
+    permission: PRODUCT_VIEW
+    offline: true
+    reads: 2
+    writes: 0
+  - operation: listProductVariants
+    verb: GET
+    path: /products/{productId}/variants
+    scope: venue
+    permission: PRODUCT_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listProductVersions
+    verb: GET
+    path: /products/{productId}/versions
+    scope: venue
+    permission: PRODUCT_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listProducts
+    verb: GET
+    path: /products
+    scope: venue
+    permission: PRODUCT_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listWaitlistEntries
+    verb: GET
+    path: /waitlist-entries
+    scope: venue
+    permission: PRODUCT_VIEW
+    offline: false
+    reads: 2
+    writes: 0
+  - operation: offerWaitlistCapacity
+    verb: POST
+    path: /waitlist-entries/{entryId}/offer
+    scope: venue
+    permission: PRODUCT_CONFIGURE
+    offline: false
+    reads: 3
+    writes: 3
+  - operation: publishBundle
+    verb: POST
+    path: /catalogue/bundles
+    scope: venue
+    permission: PRODUCT_CONFIGURE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: reinstateEntitlement
+    verb: POST
+    path: /entitlements/{entitlementId}/reinstate
+    scope: venue
+    permission: PRODUCT_CONFIGURE
+    offline: false
+    reads: 1
+    writes: 2
+  - operation: releaseChannelAllocation
+    verb: POST
+    path: /envelopes/{envelopeId}/channel-allocations/release
+    scope: venue
+    permission: CAPACITY_CONFIGURE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: releaseLease
+    verb: DELETE
+    path: /leases/{leaseId}
+    scope: workstation
+    permission: ORDER_CREATE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: renewLease
+    verb: POST
+    path: /leases/{leaseId}/renew
+    scope: workstation
+    permission: ORDER_CREATE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: reportBundleApplied
+    verb: POST
+    path: /catalogue/bundles/{version}/applied
+    scope: workstation
+    permission: PRODUCT_VIEW
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: resolveProductByCode
+    verb: GET
+    path: /products/resolve
+    scope: venue
+    permission: PRODUCT_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: restoreProductVersion
+    verb: POST
+    path: /products/{productId}/versions/{version}/restore
+    scope: venue
+    permission: PRODUCT_CONFIGURE
+    offline: false
+    reads: 3
+    writes: 3
+  - operation: searchCatalogue
+    verb: GET
+    path: /search
+    scope: venue
+    permission: null
+    offline: true
+    reads: 3
+    writes: 0
+  - operation: setAlternativeCodes
+    verb: PUT
+    path: /products/{productId}/alternative-codes
+    scope: venue
+    permission: PRODUCT_CONFIGURE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: setChannelAllocations
+    verb: PUT
+    path: /envelopes/{envelopeId}/channel-allocations
+    scope: venue
+    permission: CAPACITY_CONFIGURE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: setPrices
+    verb: PUT
+    path: /price-lists/{priceListId}/prices
+    scope: venue
+    permission: PRICE_CONFIGURE
+    offline: false
+    reads: 2
+    writes: 3
+  - operation: setProductAttributes
+    verb: PUT
+    path: /products/{productId}/attributes
+    scope: venue
+    permission: PRODUCT_CONFIGURE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: setProductCategories
+    verb: PUT
+    path: /product-categories
+    scope: venue
+    permission: PRODUCT_CONFIGURE
+    offline: false
+    reads: 2
+    writes: 3
+  - operation: suspendEntitlement
+    verb: POST
+    path: /entitlements/{entitlementId}/suspend
+    scope: venue
+    permission: ORDER_MODIFY
+    offline: false
+    reads: 3
+    writes: 2
+  - operation: transitionProductLifecycle
+    verb: POST
+    path: /products/{productId}/lifecycle
+    scope: venue
+    permission: PRODUCT_CONFIGURE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: updateDonationCampaign
+    verb: PATCH
+    path: /donation-campaigns/{campaignId}
+    scope: venue
+    permission: PRODUCT_CONFIGURE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: updateEnvelope
+    verb: PATCH
+    path: /envelopes/{envelopeId}
+    scope: venue
+    permission: CAPACITY_CONFIGURE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: updateEvent
+    verb: PATCH
+    path: /events/{eventId}
+    scope: venue
+    permission: EVENT_CONFIGURE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: updatePerformance
+    verb: PATCH
+    path: /performances/{performanceId}
+    scope: venue
+    permission: PERFORMANCE_CONFIGURE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: updatePriceList
+    verb: PATCH
+    path: /price-lists/{priceListId}
+    scope: venue
+    permission: PRICE_CONFIGURE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: updateProduct
+    verb: PATCH
+    path: /products/{productId}
+    scope: venue
+    permission: PRODUCT_CONFIGURE
+    offline: false
+    reads: 2
+    writes: 2
+- contract: promotions
+  count: 35
+  operations:
+  - operation: analysePromotionConflicts
+    verb: GET
+    path: /promotions/{promotionId}/conflicts
+    scope: venue
+    permission: PRICE_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: assignCoupon
+    verb: POST
+    path: /coupon-codes/{code}/assign
+    scope: venue
+    permission: PRICE_CONFIGURE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: createBundle
+    verb: POST
+    path: /bundles
+    scope: venue
+    permission: PRODUCT_CONFIGURE
+    offline: false
+    reads: 4
+    writes: 4
+  - operation: createCouponCampaign
+    verb: POST
+    path: /coupon-campaigns
+    scope: venue
+    permission: PRICE_CONFIGURE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: createPromotion
+    verb: POST
+    path: /promotions
+    scope: venue
+    permission: PRICE_CONFIGURE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: createUpsellRule
+    verb: POST
+    path: /upsell-rules
+    scope: region
+    permission: PRODUCT_CONFIGURE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: createVoucherBatch
+    verb: POST
+    path: /voucher-batches
+    scope: venue
+    permission: PRICE_CONFIGURE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: deleteUpsellRule
+    verb: DELETE
+    path: /upsell-rules/{ruleId}
+    scope: venue
+    permission: PRODUCT_CONFIGURE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: endPromotion
+    verb: POST
+    path: /promotions/{promotionId}/end
+    scope: venue
+    permission: PRICE_CONFIGURE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: evaluatePromotions
+    verb: POST
+    path: /promotions/evaluate
+    scope: venue
+    permission: PRICE_VIEW
+    offline: true
+    reads: 3
+    writes: 1
+  - operation: generateCouponCodes
+    verb: POST
+    path: /coupon-campaigns/{campaignId}/codes
+    scope: venue
+    permission: PRICE_CONFIGURE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: getBundle
+    verb: GET
+    path: /bundles/{bundleId}
+    scope: venue
+    permission: PRODUCT_VIEW
+    offline: false
+    reads: 3
+    writes: 0
+  - operation: getCouponCode
+    verb: GET
+    path: /coupon-codes/{code}
+    scope: venue
+    permission: PRICE_VIEW
+    offline: true
+    reads: 1
+    writes: 0
+  - operation: getPromotion
+    verb: GET
+    path: /promotions/{promotionId}
+    scope: venue
+    permission: PRICE_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: getPromotionUsage
+    verb: GET
+    path: /promotions/{promotionId}/usage
+    scope: venue
+    permission: PRICE_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: getRecommendations
+    verb: POST
+    path: /recommendations
+    scope: venue
+    permission: PRODUCT_VIEW
+    offline: false
+    reads: 5
+    writes: 0
+  - operation: getUpsellSuggestions
+    verb: POST
+    path: /upsell-suggestions
+    scope: venue
+    permission: PRODUCT_VIEW
+    offline: true
+    reads: 3
+    writes: 1
+  - operation: listAllocationSplits
+    verb: GET
+    path: /allocation-splits
+    scope: venue
+    permission: LEDGER_VIEW
+    offline: false
+    reads: 2
+    writes: 0
+  - operation: listBundles
+    verb: GET
+    path: /bundles
+    scope: venue
+    permission: PRODUCT_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listCouponCampaigns
+    verb: GET
+    path: /coupon-campaigns
+    scope: venue
+    permission: PRICE_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listCouponCodes
+    verb: GET
+    path: /coupon-campaigns/{campaignId}/codes
+    scope: venue
+    permission: PRICE_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listPromotions
+    verb: GET
+    path: /promotions
+    scope: venue
+    permission: PRICE_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listUpsellRules
+    verb: GET
+    path: /upsell-rules
+    scope: venue
+    permission: PRODUCT_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listVoucherBatches
+    verb: GET
+    path: /voucher-batches
+    scope: venue
+    permission: PRICE_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: pausePromotion
+    verb: POST
+    path: /promotions/{promotionId}/pause
+    scope: venue
+    permission: PRICE_CONFIGURE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: previewAllocationSplit
+    verb: POST
+    path: /allocation-splits/preview
+    scope: venue
+    permission: LEDGER_VIEW
+    offline: false
+    reads: 3
+    writes: 1
+  - operation: publishPromotion
+    verb: POST
+    path: /promotions/{promotionId}/publish
+    scope: venue
+    permission: PRICE_CONFIGURE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: redeemVoucher
+    verb: POST
+    path: /vouchers/{voucherCode}/redeem
+    scope: venue
+    permission: ORDER_CREATE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: setPromotionVariants
+    verb: PUT
+    path: /promotions/{promotionId}/variants
+    scope: venue
+    permission: PRICE_CONFIGURE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: simulatePromotion
+    verb: POST
+    path: /promotions/{promotionId}/simulate
+    scope: venue
+    permission: PRICE_VIEW
+    offline: false
+    reads: 4
+    writes: 0
+  - operation: unschedulePromotion
+    verb: POST
+    path: /promotions/{promotionId}/unschedule
+    scope: venue
+    permission: PRICE_CONFIGURE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: updateBundle
+    verb: PATCH
+    path: /bundles/{bundleId}
+    scope: venue
+    permission: PRODUCT_CONFIGURE
+    offline: false
+    reads: 4
+    writes: 4
+  - operation: updatePromotion
+    verb: PATCH
+    path: /promotions/{promotionId}
+    scope: venue
+    permission: PRICE_CONFIGURE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: voidCouponCode
+    verb: POST
+    path: /coupon-codes/{code}/void
+    scope: venue
+    permission: PRICE_CONFIGURE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: voidVoucher
+    verb: POST
+    path: /vouchers/{voucherId}/void
+    scope: venue
+    permission: PRICE_CONFIGURE
+    offline: false
+    reads: 2
+    writes: 2
+- contract: seating
+  count: 31
+  operations:
+  - operation: allocateBlockedSeats
+    verb: POST
+    path: /seat-blocks/{blockId}/allocate
+    scope: venue
+    permission: ORDER_CREATE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: assignSeats
+    verb: POST
+    path: /performances/{performanceId}/assign-seats
+    scope: venue
+    permission: ORDER_CREATE
+    offline: false
+    reads: 5
+    writes: 3
+  - operation: cloneSeatMap
+    verb: POST
+    path: /seat-maps/{seatMapId}/clone
+    scope: venue
+    permission: CAPACITY_CONFIGURE
+    offline: false
+    reads: 3
+    writes: 3
+  - operation: commitImportJob
+    verb: POST
+    path: /seat-maps/{seatMapId}/import/{jobId}
+    scope: venue
+    permission: CAPACITY_CONFIGURE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: createSeatBlock
+    verb: POST
+    path: /seat-blocks
+    scope: venue
+    permission: CAPACITY_CONFIGURE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: createSeatCategory
+    verb: POST
+    path: /seat-categories
+    scope: venue
+    permission: CAPACITY_CONFIGURE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: createSeatHold
+    verb: POST
+    path: /seat-holds
+    scope: venue
+    permission: ORDER_CREATE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: createSeatMap
+    verb: POST
+    path: /seat-maps
+    scope: venue
+    permission: CAPACITY_CONFIGURE
+    offline: false
+    reads: 3
+    writes: 3
+  - operation: createSeatMapTemplate
+    verb: POST
+    path: /seat-map-templates
+    scope: region
+    permission: CAPACITY_CONFIGURE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: extendSeatHold
+    verb: POST
+    path: /seat-holds/{holdId}/extend
+    scope: venue
+    permission: ORDER_CREATE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: getImportJob
+    verb: GET
+    path: /seat-maps/{seatMapId}/import/{jobId}
+    scope: venue
+    permission: PRODUCT_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: getSeatAvailability
+    verb: GET
+    path: /performances/{performanceId}/seat-availability
+    scope: venue
+    permission: PRODUCT_VIEW
+    offline: false
+    reads: 3
+    writes: 0
+  - operation: getSeatHold
+    verb: GET
+    path: /seat-holds/{holdId}
+    scope: venue
+    permission: ORDER_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: getSeatMap
+    verb: GET
+    path: /seat-maps/{seatMapId}
+    scope: venue
+    permission: PRODUCT_VIEW
+    offline: false
+    reads: 2
+    writes: 0
+  - operation: getSeatingRules
+    verb: GET
+    path: /seat-maps/{seatMapId}/rules
+    scope: venue
+    permission: PRODUCT_VIEW
+    offline: true
+    reads: 1
+    writes: 0
+  - operation: importSeatGeometry
+    verb: POST
+    path: /seat-maps/{seatMapId}/import/geometry
+    scope: venue
+    permission: CAPACITY_CONFIGURE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: importSeatManifest
+    verb: POST
+    path: /seat-maps/{seatMapId}/import/manifest
+    scope: venue
+    permission: CAPACITY_CONFIGURE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: listSeatBlocks
+    verb: GET
+    path: /seat-blocks
+    scope: venue
+    permission: PRODUCT_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listSeatCategories
+    verb: GET
+    path: /seat-categories
+    scope: venue
+    permission: PRODUCT_VIEW
+    offline: true
+    reads: 1
+    writes: 0
+  - operation: listSeatMapTemplates
+    verb: GET
+    path: /seat-map-templates
+    scope: region
+    permission: PRODUCT_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listSeatMaps
+    verb: GET
+    path: /seat-maps
+    scope: venue
+    permission: PRODUCT_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listSeats
+    verb: GET
+    path: /seat-maps/{seatMapId}/seats
+    scope: venue
+    permission: PRODUCT_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: publishSeatMap
+    verb: POST
+    path: /seat-maps/{seatMapId}/publish
+    scope: venue
+    permission: CAPACITY_CONFIGURE
+    offline: false
+    reads: 3
+    writes: 3
+  - operation: recommendSeats
+    verb: POST
+    path: /performances/{performanceId}/seat-recommendations
+    scope: venue
+    permission: PRODUCT_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: releaseSeatBlock
+    verb: DELETE
+    path: /seat-blocks/{blockId}
+    scope: venue
+    permission: CAPACITY_CONFIGURE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: releaseSeatHold
+    verb: DELETE
+    path: /seat-holds/{holdId}
+    scope: venue
+    permission: ORDER_CREATE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: setMapZones
+    verb: PUT
+    path: /seat-maps/{seatMapId}/zones
+    scope: venue
+    permission: CAPACITY_CONFIGURE
+    offline: false
+    reads: 3
+    writes: 2
+  - operation: setSeatingRules
+    verb: PUT
+    path: /seat-maps/{seatMapId}/rules
+    scope: venue
+    permission: CAPACITY_CONFIGURE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: updateSeatMap
+    verb: PATCH
+    path: /seat-maps/{seatMapId}
+    scope: venue
+    permission: CAPACITY_CONFIGURE
+    offline: false
+    reads: 3
+    writes: 3
+  - operation: updateSeats
+    verb: PATCH
+    path: /seat-maps/{seatMapId}/seats
+    scope: venue
+    permission: CAPACITY_CONFIGURE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: validateSeatMap
+    verb: POST
+    path: /seat-maps/{seatMapId}/validate
+    scope: venue
+    permission: PRODUCT_VIEW
+    offline: false
+    reads: 2
+    writes: 2
+tables:
+- table: catalogue.alternative_code
+  columns: 6
+  store: postgres
+  parent: null
+  writtenBy:
+  - catalogue
+  foreignWriters: null
+- table: catalogue.attribute_axis
+  columns: 4
+  store: postgres
+  parent: null
+  writtenBy:
+  - catalogue
+  foreignWriters: null
+- table: catalogue.channel_allocation
+  columns: 8
+  store: postgres
+  parent: null
+  writtenBy:
+  - catalogue
+  foreignWriters: null
+- table: catalogue.donation_campaign
+  columns: 14
+  store: postgres
+  parent: null
+  writtenBy:
+  - catalogue
+  foreignWriters: null
+- table: catalogue.entitlement_template
+  columns: 32
+  store: postgres
+  parent: access.entitlement
+  writtenBy:
+  - catalogue
+  foreignWriters: null
+- table: catalogue.envelope
+  columns: 12
+  store: postgres
+  parent: null
+  writtenBy:
+  - catalogue
+  foreignWriters: null
+- table: catalogue.event
+  columns: 8
+  store: postgres
+  parent: null
+  writtenBy:
+  - catalogue
+  foreignWriters: null
+- table: catalogue.import_job
+  columns: 6
+  store: postgres
+  parent: null
+  writtenBy:
+  - catalogue
+  foreignWriters: null
+- table: catalogue.inventory_lease
+  columns: 14
+  store: postgres
+  parent: null
+  writtenBy:
+  - catalogue
+  - orders
+  foreignWriters:
+  - orders
+- table: catalogue.performance
+  columns: 9
+  store: postgres
+  parent: null
+  writtenBy:
+  - catalogue
+  foreignWriters: null
+- table: catalogue.price
+  columns: 5
+  store: postgres
+  parent: null
+  writtenBy:
+  - fnb
+  - inventory
+  foreignWriters:
+  - fnb
+  - inventory
+- table: catalogue.price_list
+  columns: 10
+  store: postgres
+  parent: null
+  writtenBy:
+  - catalogue
+  foreignWriters: null
+- table: catalogue.product
+  columns: 21
+  store: postgres
+  parent: null
+  writtenBy:
+  - catalogue
+  - inventory
+  foreignWriters:
+  - inventory
+- table: catalogue.product_category
+  columns: 9
+  store: postgres
+  parent: null
+  writtenBy:
+  - catalogue
+  foreignWriters: null
+- table: catalogue.product_version
+  columns: 8
+  store: postgres
+  parent: catalogue.product
+  writtenBy:
+  - catalogue
+  - fnb
+  foreignWriters:
+  - fnb
+- table: catalogue.published_bundle
+  columns: 9
+  store: postgres
+  parent: null
+  writtenBy:
+  - catalogue
+  foreignWriters: null
+- table: catalogue.variant
+  columns: 5
+  store: postgres
+  parent: null
+  writtenBy:
+  - catalogue
+  foreignWriters: null
+- table: catalogue.waitlist_entry
+  columns: 11
+  store: postgres
+  parent: null
+  writtenBy:
+  - catalogue
+  foreignWriters: null
+- table: promotions.allocation_component
+  columns: 9
+  store: postgres
+  parent: promotions.allocation_split
+  writtenBy:
+  - promotions
+  foreignWriters: null
+- table: promotions.allocation_split
+  columns: 5
+  store: postgres
+  parent: null
+  writtenBy: []
+  foreignWriters: null
+- table: promotions.bundle
+  columns: 15
+  store: postgres
+  parent: null
+  writtenBy:
+  - promotions
+  foreignWriters: null
+- table: promotions.bundle_choice_group
+  columns: 6
+  store: postgres
+  parent: promotions.bundle
+  writtenBy: []
+  foreignWriters: null
+- table: promotions.bundle_component
+  columns: 6
+  store: postgres
+  parent: null
+  writtenBy:
+  - promotions
+  foreignWriters: null
+- table: promotions.coupon_campaign
+  columns: 13
+  store: postgres
+  parent: null
+  writtenBy:
+  - promotions
+  foreignWriters: null
+- table: promotions.coupon_code
+  columns: 12
+  store: postgres
+  parent: null
+  writtenBy:
+  - promotions
+  foreignWriters: null
+- table: promotions.promotion
+  columns: 20
+  store: postgres
+  parent: null
+  writtenBy:
+  - promotions
+  foreignWriters: null
+- table: promotions.upsell_rule
+  columns: 11
+  store: postgres
+  parent: null
+  writtenBy:
+  - promotions
+  foreignWriters: null
+- table: promotions.voucher
+  columns: 6
+  store: postgres
+  parent: null
+  writtenBy:
+  - promotions
+  foreignWriters: null
+- table: promotions.voucher_batch
+  columns: 12
+  store: postgres
+  parent: null
+  writtenBy:
+  - promotions
+  foreignWriters: null
+- table: seating.import_job
+  columns: 11
+  store: postgres
+  parent: null
+  writtenBy:
+  - seating
+  foreignWriters: null
+- table: seating.seat
+  columns: 11
+  store: postgres
+  parent: null
+  writtenBy:
+  - seating
+  foreignWriters: null
+- table: seating.seat_block
+  columns: 9
+  store: postgres
+  parent: null
+  writtenBy:
+  - seating
+  foreignWriters: null
+- table: seating.seat_category
+  columns: 7
+  store: postgres
+  parent: null
+  writtenBy:
+  - seating
+  foreignWriters: null
+- table: seating.seat_hold
+  columns: 12
+  store: postgres
+  parent: null
+  writtenBy:
+  - seating
+  foreignWriters: null
+- table: seating.seat_map
+  columns: 8
+  store: postgres
+  parent: null
+  writtenBy:
+  - seating
+  foreignWriters: null
+- table: seating.seat_map_template
+  columns: 8
+  store: postgres
+  parent: null
+  writtenBy:
+  - seating
+  foreignWriters: null
+- table: seating.seating_rules
+  columns: 9
+  store: postgres
+  parent: null
+  writtenBy:
+  - seating
+  foreignWriters: null
+- table: seating.section
+  columns: 5
+  store: postgres
+  parent: null
+  writtenBy:
+  - seating
+  foreignWriters: null
+- table: seating.section_row
+  columns: 4
+  store: postgres
+  parent: seating.section
+  writtenBy: []
+  foreignWriters: null
+- table: seating.zone
+  columns: 9
+  store: postgres
+  parent: null
+  writtenBy:
+  - seating
+  foreignWriters: null
+readsFrom:
+- service: OrderService
+  operations: 6
+- service: AccessService
+  operations: 5
+- service: MarketingService
+  operations: 2
+- service: TenancyService
+  operations: 1
+- service: LedgerService
+  operations: 1
+writesOutside:
+- service: AccessService
+  operations: 3
+  why: '**The owner defines the row; this service may only append to it.**'
+screens:
+- P01:WEB-001 Home / Landing
+- P01:WEB-002 Event & Attraction Listing
+- P01:WEB-003 Search Results
+- P01:WEB-004 Event / Attraction Detail
+- P01:WEB-005 Ticket Type Selection
+- P01:WEB-006 Date & Session Selection
+- P01:WEB-007 Seat Map Selection
+- P01:WEB-008 Add-ons & Upsell
+- P01:WEB-010 Shopping Cart
+- P01:WEB-022 Membership Plans
+- P01:WEB-032 Offers & Promotions
+- P01:WEB-035 Multi-Currency & Pricing
+- P02:GST-001 Home – Default
+- P02:GST-002 Explore Categories
+- P02:GST-003 Attractions List
+- P02:GST-004 Attraction Details
+- P02:GST-005 What's On
+- P02:GST-006 Event / Exhibition Details
+- P02:GST-007 Select Date & Time
+- P02:GST-015 Memberships
+- P02:GST-021 Interactive Map
+- P02:GST-037 Offers & Promotions
+- P02:GST-038 Digital Companion Mode
+- P02:GST-044 Multi-Currency & Pricing
+- P02:GST-048 Upsell / Cross-Sell
+- P02:GST-049 Interactive Seat Selection
+- P02:GST-050 Resource Booking – Cabana
+- P02:GST-051 Plan Your Adventure – Start
+- P02:GST-052 Suggested Itineraries
+- P02:GST-053 Build Your Own Itinerary
+- P02:GST-054 AI Optimized Itinerary
+- P02:GST-056 Bundle Package
+- P02:GST-058 Resource Availability (Cabana)
+- P02:GST-059 Plan My Day – In Progress
+- P02:GST-063 Search
+- P04:POS-002 Sell — Ticket Catalogue
+- P04:POS-003 Sell — Timed Entry
+- P04:POS-004 Sell — Seat Map
+- P05:KSK-003 What are you buying
+- P05:KSK-004 Choose tickets
+- P05:KSK-005 Choose a session
+- P05:KSK-006 Review
+- P05:KSK-015 Assistant
+- P06:EMP-018 Offline package
+- P06:EMP-033 Capacity view
+- P06:EMP-034 Walk-up sale
+- P08:BO-001 Queue Directory
+- P08:BO-002 Queue Configuration
+- P08:BO-007 Product Directory
+- P08:BO-008 Product Detail & Variants
+- P08:BO-009 Pricing Rules
+- P08:BO-010 Promotions & Coupons
+- P08:BO-011 Packages & Bundles
+- P08:BO-012 Membership Products
+- P08:BO-013 Channel & Distribution
+- P08:BO-014 Catalogue Publishing
+- P08:BO-015 Session Calendar
+- P08:BO-016 Session Template
+- P08:BO-017 Capacity Management
+- P08:BO-018 Allocation & Holds
+- P08:BO-019 Closures & Blackouts
+- P08:BO-037 Offline Package Status
+- P08:BO-063 Opening Hours & Calendar
+- P08:BO-115 Category, Brand & Merchandise Hierarchy
+- P08:BO-117 Product Import, Governance & AI Configuration Assistant
+- P08:BO-119 Cross-Sell, Upsell & Recommendation Rules
+- P08:BO-125 Product & Category Button Configuration
+- P10:PTR-005 Inventory & Allocation View
+- P10:PTR-006 Product Catalog (B2B Pricing)
+- P10:PTR-007 Availability Search
+- P10:PTR-009 Group / Bulk Booking
+- P10:PTR-010 Cart & Quote
+- P16:ANL-004 Product Performance
+flows:
+- F01 Guest buys a ticket online
+- F02 Guest buys seated tickets
+- F03 Partner books on credit
+- F07 Guest buys at a kiosk
+- F09 Event is cancelled and refunded
+- F14 A discount needs a manager
+- F19 A membership works in another country
+- F21 A ride queue fills and a guest is redirected
+- F31 A menu is drafted, scheduled and rolled back
+- F32 A till opens, trades and settles
+- F33 A till goes offline and comes back
+- F34 A retail sale, from scan to return
+- F49 A guest plans a day and follows it
+- F52 A guest books a cabana and uses it
+- F53 A guest earns, sees and spends loyalty
+- F55 A guest buys on the web and transfers to a friend
+- F58 A ticket is sold at a till, added to, and refunded
+- F59 A seat is picked, held and sold at a window
+- F66 A walk-up sale is taken on a handheld
+- F67 A queue is monitored and capacity is held
+- F71 A device is prepared, used and handed over
+- F75 A kiosk serves itself and calls for help
+- F77 A promotion is built, bundled, published and measured
+- F78 A supplier is set up and a catalogue is priced and published
+- F82 A month is analysed from incrementality to a scheduled report
+- F85 Production is planned, costed and released
+- F86 A POS layout is designed, previewed and deployed
+- F90 An audience is built, offered to, and the result is judged
+- F93 A recipe changes and its allergen claim is re-verified
+- F95 A fleet is watched, a fault is found, and a station is fixed

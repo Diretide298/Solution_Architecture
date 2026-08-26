@@ -1,0 +1,5 @@
+T:System.DateTime; Use DateTimeOffset. Venues span time zones within one tenant (Abu Dhabi, Dubai, Oman); server-local time is meaningless.
+P:System.DateTime.Now; Use DateTimeOffset.UtcNow and convert at the edge using the region's time zone.
+P:System.DateTime.Today; Use DateTimeOffset.UtcNow and the venue's operating calendar.
+M:System.Guid.NewGuid; Use UlidGenerator.NewUlid for entity ids — offline clients must generate ids locally and a shared sequence is a contention point on partitioned tables.
+T:System.Decimal; Use Ticvai.Shared.Kernel.Primitives.Money for monetary values. Raw decimal loses the per-region currency scale (OMR is 3dp, AED is 2dp).

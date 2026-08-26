@@ -1,0 +1,61 @@
+# backoffice — staff · web
+# Screen and route manifest. Derived from screens/*.yaml. Do not hand-edit.
+
+app: backoffice
+audience: staff
+formFactor: web
+status: scaffolded
+runtime: reactWeb
+offlineCapable: false
+directions:
+- ltr
+- rtl
+platforms:
+- P08 Staff Web — Venue Back Office
+packages:
+- design-tokens
+- ui
+- api-client
+contracts:
+- queue
+screenCount: 6
+byWave:
+  wave1: 4
+  wave2: 2
+screens:
+- id: BO-001
+  name: Queue Directory
+  route: /queue-management/queue-directory
+  component: apps/backoffice/src/routes/queue-management/QueueDirectoryList.tsx
+  wave: 1
+  status: notStarted
+- id: BO-002
+  name: Queue Configuration
+  route: /queue-management/queue-configuration
+  component: apps/backoffice/src/routes/queue-management/QueueConfigurationForm.tsx
+  wave: 1
+  status: notStarted
+- id: BO-003
+  name: Queue Integration Setup
+  route: /queue-management/queue-integration-setup
+  component: apps/backoffice/src/routes/queue-management/QueueIntegrationSetupForm.tsx
+  wave: 1
+  status: notStarted
+- id: BO-004
+  name: Manual Wait Time Entry
+  route: /queue-management/manual-wait-time-entry
+  component: apps/backoffice/src/routes/queue-management/ManualWaitTimeEntryForm.tsx
+  wave: 1
+  status: notStarted
+- id: BO-005
+  name: Queue Monitor
+  route: /queue-management/queue-monitor
+  component: apps/backoffice/src/routes/queue-management/QueueMonitorDashboard.tsx
+  wave: 2
+  status: notStarted
+- id: BO-006
+  name: Parking Configuration
+  route: /parking/parking-configuration
+  component: apps/backoffice/src/routes/parking/ParkingConfigurationForm.tsx
+  wave: 2
+  status: notStarted

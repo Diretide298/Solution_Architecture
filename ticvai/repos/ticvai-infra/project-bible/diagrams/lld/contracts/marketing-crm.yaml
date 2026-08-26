@@ -1,0 +1,1278 @@
+id: LLD-marketing-crm
+title: marketing-crm — 96 operations
+generatedBy: tools/derive-diagrams.py
+index: diagrams/hld/03-contracts.yaml
+tier: satellite
+service: MarketingService
+operations:
+- operation: accrueLoyaltyPoints
+  verb: POST
+  path: /loyalty/accruals
+  scope: venue
+  permission: LOYALTY_ACCRUE
+  audience:
+  - service
+  offline: false
+  reads:
+  - cache:idempotency
+  - marketing.loyalty_position
+  - marketing.loyalty_programme
+  - orders.sales_order
+  writes:
+  - cache:idempotency
+  - marketing.loyalty_position
+- operation: activateJourney
+  verb: POST
+  path: /journeys/{journeyId}/activate
+  scope: venue
+  permission: MARKETING_SEND
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - marketing.journey
+  writes:
+  - cache:idempotency
+  - marketing.journey
+- operation: addCaseMessage
+  verb: POST
+  path: /cases/{caseId}/messages
+  scope: venue
+  permission: CASE_MANAGE
+  audience: null
+  offline: true
+  reads:
+  - cache:idempotency
+  - marketing.case_message
+  writes:
+  - cache:idempotency
+  - marketing.case_message
+- operation: addGuestNote
+  verb: POST
+  path: /guests/{subjectId}/notes
+  scope: venue
+  permission: GUEST_MANAGE
+  audience:
+  - staff
+  offline: true
+  reads:
+  - cache:idempotency
+  - marketing.guest_profile
+  writes:
+  - cache:idempotency
+- operation: addSuppression
+  verb: POST
+  path: /consent/suppression-list
+  scope: tenant
+  permission: GUEST_MANAGE
+  audience: null
+  offline: false
+  reads:
+  - cache:idempotency
+  - marketing.suppression
+  writes:
+  - cache:idempotency
+  - marketing.suppression
+- operation: addToWishlist
+  verb: POST
+  path: /guests/{subjectId}/wishlist
+  scope: venue
+  permission: null
+  audience: null
+  offline: false
+  reads:
+  - cache:idempotency
+  - marketing.wishlist_item
+  writes:
+  - cache:idempotency
+  - marketing.wishlist_item
+- operation: adjustLoyaltyPoints
+  verb: POST
+  path: /guests/{subjectId}/loyalty/adjust
+  scope: venue
+  permission: LEDGER_POST
+  audience: null
+  offline: false
+  reads:
+  - cache:idempotency
+  - marketing.loyalty_position
+  writes:
+  - cache:idempotency
+  - marketing.loyalty_position
+- operation: claimConversation
+  verb: POST
+  path: /conversations/{conversationId}/claim
+  scope: tenant
+  permission: CASE_MANAGE
+  audience: null
+  offline: false
+  reads:
+  - cache:idempotency
+  - marketing.agent_availability
+  - marketing.conversation
+  writes:
+  - cache:idempotency
+  - marketing.conversation
+- operation: closeConversation
+  verb: POST
+  path: /conversations/{conversationId}/close
+  scope: tenant
+  permission: CASE_MANAGE
+  audience: null
+  offline: false
+  reads:
+  - cache:idempotency
+  - marketing.conversation
+  writes:
+  - cache:idempotency
+  - marketing.case
+  - marketing.conversation
+- operation: createCampaign
+  verb: POST
+  path: /campaigns
+  scope: venue
+  permission: MARKETING_MANAGE
+  audience: null
+  offline: false
+  reads:
+  - cache:idempotency
+  - marketing.campaign
+  - marketing.segment_criterion
+  writes:
+  - cache:idempotency
+  - marketing.campaign
+  - marketing.segment_criterion
+- operation: createCase
+  verb: POST
+  path: /cases
+  scope: venue
+  permission: CASE_MANAGE
+  audience: null
+  offline: true
+  reads:
+  - cache:idempotency
+  - marketing.case
+  writes:
+  - cache:idempotency
+  - marketing.case
+- operation: createChallenge
+  verb: POST
+  path: /challenges
+  scope: venue
+  permission: MARKETING_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - catalogue.event
+  - marketing.loyalty_programme
+  writes:
+  - cache:idempotency
+  - marketing.challenge
+- operation: createForm
+  verb: POST
+  path: /forms
+  scope: venue
+  permission: MARKETING_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - catalogue.product
+  - marketing.form_definition
+  writes:
+  - cache:idempotency
+  - marketing.form_definition
+- operation: createInvitationCampaign
+  verb: POST
+  path: /invitation-campaigns
+  scope: venue
+  permission: MARKETING_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - catalogue.event
+  - catalogue.product
+  writes:
+  - cache:idempotency
+  - marketing.invitation_campaign
+- operation: createJourney
+  verb: POST
+  path: /journeys
+  scope: venue
+  permission: MARKETING_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - marketing.journey
+  - marketing.message_template
+  writes:
+  - cache:idempotency
+  - marketing.journey
+- operation: createLoyaltyProgramme
+  verb: POST
+  path: /loyalty/programmes
+  scope: tenant
+  permission: MARKETING_MANAGE
+  audience: null
+  offline: false
+  reads:
+  - cache:idempotency
+  - marketing.loyalty_programme
+  writes:
+  - cache:idempotency
+  - marketing.loyalty_programme
+- operation: createMessageTemplate
+  verb: POST
+  path: /message-templates
+  scope: tenant
+  permission: MARKETING_MANAGE
+  audience: null
+  offline: false
+  reads:
+  - cache:idempotency
+  - marketing.message_template
+  writes:
+  - cache:idempotency
+  - marketing.message_template
+- operation: createReferral
+  verb: POST
+  path: /referrals
+  scope: venue
+  permission: MARKETING_MANAGE
+  audience:
+  - staff
+  - guest
+  offline: false
+  reads:
+  - cache:idempotency
+  - marketing.guest_profile
+  - promotions.promotion
+  writes:
+  - cache:idempotency
+  - marketing.referral
+- operation: createSegment
+  verb: POST
+  path: /segments
+  scope: venue
+  permission: MARKETING_MANAGE
+  audience: null
+  offline: false
+  reads:
+  - cache:idempotency
+  - marketing.segment
+  - marketing.segment_criterion
+  writes:
+  - cache:idempotency
+  - marketing.segment
+  - marketing.segment_criterion
+- operation: createUrlRedirect
+  verb: POST
+  path: /seo-redirects
+  scope: tenant
+  permission: MARKETING_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - control.url_redirect
+  writes:
+  - cache:idempotency
+  - cache:resolution
+  - control.url_redirect
+- operation: endKioskAssist
+  verb: POST
+  path: /kiosk-assists/{sessionId}/end
+  scope: venue
+  permission: null
+  audience: null
+  offline: false
+  reads:
+  - cache:idempotency
+  - marketing.kiosk_assist_session
+  writes:
+  - cache:idempotency
+  - marketing.kiosk_assist_session
+- operation: escalateCase
+  verb: POST
+  path: /cases/{caseId}/escalate
+  scope: venue
+  permission: CASE_MANAGE
+  audience: null
+  offline: false
+  reads:
+  - cache:idempotency
+  - marketing.case
+  writes:
+  - cache:idempotency
+  - marketing.case
+- operation: getCampaign
+  verb: GET
+  path: /campaigns/{campaignId}
+  scope: venue
+  permission: MARKETING_VIEW
+  audience: null
+  offline: false
+  reads:
+  - marketing.campaign
+  writes: []
+- operation: getCampaignPerformance
+  verb: GET
+  path: /campaigns/{campaignId}/performance
+  scope: venue
+  permission: MARKETING_VIEW
+  audience: null
+  offline: false
+  reads:
+  - marketing.attribution_touch
+  - marketing.campaign
+  - marketing.message_delivery
+  writes: []
+- operation: getCase
+  verb: GET
+  path: /cases/{caseId}
+  scope: venue
+  permission: CASE_VIEW
+  audience: null
+  offline: false
+  reads:
+  - marketing.case
+  - marketing.case_message
+  writes: []
+- operation: getConsentHistory
+  verb: GET
+  path: /guests/{subjectId}/consents/history
+  scope: venue
+  permission: GUEST_VIEW
+  audience: null
+  offline: false
+  reads:
+  - marketing.consent_record
+  writes: []
+- operation: getConversation
+  verb: GET
+  path: /conversations/{conversationId}
+  scope: tenant
+  permission: CASE_VIEW
+  audience: null
+  offline: false
+  reads:
+  - marketing.conversation
+  - marketing.conversation_message
+  - pii.subject
+  writes: []
+- operation: getGuestConsents
+  verb: GET
+  path: /guests/{subjectId}/consents
+  scope: venue
+  permission: GUEST_VIEW
+  audience: null
+  offline: false
+  reads:
+  - marketing.consent_purpose
+  - marketing.consent_record
+  - pii.subject
+  writes: []
+- operation: getGuestLoyalty
+  verb: GET
+  path: /guests/{subjectId}/loyalty
+  scope: venue
+  permission: GUEST_VIEW
+  audience: null
+  offline: false
+  reads:
+  - marketing.loyalty_position
+  writes: []
+- operation: getGuestProfile
+  verb: GET
+  path: /guests/{subjectId}
+  scope: venue
+  permission: GUEST_VIEW
+  audience: null
+  offline: false
+  reads:
+  - marketing.consent_record
+  - marketing.guest_profile
+  - marketing.loyalty_position
+  - pii.subject
+  - pii.subject_contact
+  writes: []
+- operation: getJourneyPerformance
+  verb: GET
+  path: /journeys/{journeyId}/performance
+  scope: venue
+  permission: MARKETING_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - marketing.attribution_touch
+  - marketing.journey
+  - marketing.journey_entrant
+  - marketing.message_dispatch
+  writes: []
+- operation: getLostItemMatches
+  verb: GET
+  path: /lost-items/{itemId}/matches
+  scope: venue
+  permission: CASE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - marketing.lost_item
+  writes: []
+- operation: getLoyaltyPosition
+  verb: GET
+  path: /loyalty/position
+  scope: tenant
+  permission: null
+  audience: null
+  offline: false
+  reads:
+  - marketing.loyalty_programme
+  writes: []
+- operation: getMessageStatus
+  verb: GET
+  path: /messages/{messageId}
+  scope: venue
+  permission: GUEST_VIEW
+  audience: null
+  offline: false
+  reads:
+  - marketing.message_dispatch
+  writes: []
+- operation: getMyChallenges
+  verb: GET
+  path: /guests/me/challenges
+  scope: venue
+  permission: MARKETING_VIEW
+  audience:
+  - staff
+  - guest
+  offline: false
+  reads:
+  - marketing.challenge
+  - marketing.challenge_progress
+  writes: []
+- operation: getSuppressionList
+  verb: GET
+  path: /consent/suppression-list
+  scope: tenant
+  permission: GUEST_VIEW
+  audience: null
+  offline: false
+  reads:
+  - marketing.suppression
+  writes: []
+- operation: getWaiverStatus
+  verb: GET
+  path: /guests/{subjectId}/waiver-status
+  scope: venue
+  permission: GUEST_VIEW
+  audience:
+  - staff
+  - guest
+  - device
+  offline: true
+  reads:
+  - access.entitlement
+  - catalogue.product
+  - marketing.form_definition
+  - marketing.form_submission
+  writes: []
+- operation: getWishlist
+  verb: GET
+  path: /guests/{subjectId}/wishlist
+  scope: venue
+  permission: null
+  audience: null
+  offline: false
+  reads:
+  - marketing.wishlist_item
+  writes: []
+- operation: handoverToAgent
+  verb: POST
+  path: /conversations/{conversationId}/handover
+  scope: tenant
+  permission: null
+  audience: null
+  offline: false
+  reads:
+  - cache:idempotency
+  - marketing.agent_availability
+  - marketing.conversation
+  writes:
+  - cache:idempotency
+  - marketing.conversation
+- operation: identifyGuest
+  verb: POST
+  path: /guests/identify
+  scope: venue
+  permission: GUEST_VIEW
+  audience:
+  - staff
+  - device
+  offline: false
+  reads:
+  - access.blacklist
+  - access.entitlement
+  - marketing.guest_profile
+  - marketing.loyalty_position
+  - pii.subject
+  writes: []
+- operation: launchCampaign
+  verb: POST
+  path: /campaigns/{campaignId}/launch
+  scope: venue
+  permission: MARKETING_SEND
+  audience: null
+  offline: false
+  reads:
+  - cache:idempotency
+  - marketing.campaign
+  writes:
+  - cache:idempotency
+  - marketing.campaign
+- operation: listCampaigns
+  verb: GET
+  path: /campaigns
+  scope: venue
+  permission: MARKETING_VIEW
+  audience: null
+  offline: false
+  reads:
+  - marketing.campaign
+  writes: []
+- operation: listCases
+  verb: GET
+  path: /cases
+  scope: venue
+  permission: CASE_VIEW
+  audience: null
+  offline: false
+  reads:
+  - marketing.case
+  writes: []
+- operation: listConsentPurposes
+  verb: GET
+  path: /consent-purposes
+  scope: tenant
+  permission: GUEST_VIEW
+  audience: null
+  offline: true
+  reads:
+  - cache:resolution
+  - marketing.consent_purpose
+  writes:
+  - cache:resolution
+- operation: listConversations
+  verb: GET
+  path: /conversations
+  scope: tenant
+  permission: CASE_VIEW
+  audience: null
+  offline: false
+  reads:
+  - identity.principal
+  - marketing.conversation
+  writes: []
+- operation: listGuestDevices
+  verb: GET
+  path: /guests/{subjectId}/devices
+  scope: tenant
+  permission: null
+  audience: null
+  offline: false
+  reads:
+  - marketing.guest_device
+  writes: []
+- operation: listJourneys
+  verb: GET
+  path: /journeys
+  scope: venue
+  permission: MARKETING_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - marketing.journey
+  writes: []
+- operation: listLostItems
+  verb: GET
+  path: /lost-items
+  scope: venue
+  permission: CASE_VIEW
+  audience:
+  - staff
+  - guest
+  offline: false
+  reads:
+  - marketing.lost_item
+  - venuemap.point
+  writes: []
+- operation: listLoyaltyProgrammes
+  verb: GET
+  path: /loyalty/programmes
+  scope: venue
+  permission: MARKETING_VIEW
+  audience: null
+  offline: true
+  reads:
+  - marketing.loyalty_programme
+  writes: []
+- operation: listMessageTemplates
+  verb: GET
+  path: /message-templates
+  scope: venue
+  permission: MARKETING_VIEW
+  audience: null
+  offline: false
+  reads:
+  - marketing.message_template
+  writes: []
+- operation: listMessageTriggers
+  verb: GET
+  path: /message-triggers
+  scope: venue
+  permission: MARKETING_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - marketing.message_trigger
+  writes: []
+- operation: listMyCases
+  verb: GET
+  path: /my/cases
+  scope: tenant
+  permission: null
+  audience:
+  - guest
+  offline: false
+  reads:
+  - marketing.case
+  - pii.subject
+  writes: []
+- operation: listReviews
+  verb: GET
+  path: /reviews
+  scope: venue
+  permission: MARKETING_VIEW
+  audience: null
+  offline: false
+  reads:
+  - marketing.review
+  writes: []
+- operation: listSegmentMembers
+  verb: GET
+  path: /segments/{segmentId}/members
+  scope: venue
+  permission: MARKETING_VIEW
+  audience: null
+  offline: false
+  reads:
+  - marketing.guest_profile
+  writes: []
+- operation: listSegments
+  verb: GET
+  path: /segments
+  scope: venue
+  permission: MARKETING_VIEW
+  audience: null
+  offline: false
+  reads:
+  - marketing.segment
+  writes: []
+- operation: matchGuest
+  verb: POST
+  path: /guests/match
+  scope: venue
+  permission: GUEST_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - marketing.guest_profile
+  - pii.subject
+  writes: []
+- operation: matchLostItem
+  verb: POST
+  path: /lost-items/{itemId}/match
+  scope: venue
+  permission: CASE_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - marketing.lost_item
+  writes:
+  - cache:idempotency
+  - marketing.case
+  - marketing.lost_item
+- operation: mergeGuestProfiles
+  verb: POST
+  path: /guests/{subjectId}/merge
+  scope: venue
+  permission: GUEST_MANAGE
+  audience: null
+  offline: false
+  reads:
+  - cache:idempotency
+  - marketing.guest_profile
+  writes:
+  - cache:idempotency
+  - marketing.guest_profile
+- operation: mergeGuests
+  verb: POST
+  path: /guests/merge
+  scope: tenant
+  permission: GUEST_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - marketing.consent_record
+  - marketing.guest_profile
+  - pii.subject
+  writes:
+  - cache:idempotency
+  - marketing.guest_profile
+  - pii.subject
+- operation: pauseCampaign
+  verb: POST
+  path: /campaigns/{campaignId}/pause
+  scope: venue
+  permission: MARKETING_MANAGE
+  audience: null
+  offline: false
+  reads:
+  - cache:idempotency
+  - marketing.campaign
+  writes:
+  - cache:idempotency
+  - marketing.campaign
+- operation: previewSegment
+  verb: POST
+  path: /segments/{segmentId}/preview
+  scope: venue
+  permission: MARKETING_VIEW
+  audience: null
+  offline: false
+  reads:
+  - cache:idempotency
+  - marketing.segment
+  writes:
+  - cache:idempotency
+  - marketing.segment
+- operation: raiseMyCase
+  verb: POST
+  path: /my/cases
+  scope: tenant
+  permission: null
+  audience:
+  - guest
+  offline: true
+  reads:
+  - cache:idempotency
+  - marketing.case
+  writes:
+  - cache:idempotency
+  - marketing.case
+- operation: recordConsent
+  verb: POST
+  path: /guests/{subjectId}/consents
+  scope: venue
+  permission: null
+  audience: null
+  offline: false
+  reads:
+  - cache:idempotency
+  - marketing.guest_profile
+  writes:
+  - cache:idempotency
+  - marketing.guest_profile
+- operation: recordLostItem
+  verb: POST
+  path: /lost-items
+  scope: venue
+  permission: CASE_MANAGE
+  audience:
+  - staff
+  - guest
+  offline: true
+  reads:
+  - cache:idempotency
+  - marketing.lost_item
+  - pii.subject
+  - venuemap.point
+  writes:
+  - cache:idempotency
+  - marketing.lost_item
+- operation: recordPrivacyIncident
+  verb: POST
+  path: /privacy-incidents
+  scope: tenant
+  permission: GUEST_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - pii.subject
+  writes:
+  - cache:idempotency
+  - marketing.privacy_incident
+- operation: recordTouchPoint
+  verb: POST
+  path: /attribution/touches
+  scope: venue
+  permission: MARKETING_MANAGE
+  audience:
+  - service
+  offline: false
+  reads:
+  - cache:idempotency
+  - marketing.campaign
+  - marketing.journey
+  writes:
+  - cache:idempotency
+  - marketing.touch_point
+- operation: redeemLoyaltyPoints
+  verb: POST
+  path: /loyalty/redemptions
+  scope: venue
+  permission: LOYALTY_REDEEM
+  audience:
+  - staff
+  - guest
+  offline: false
+  reads:
+  - cache:idempotency
+  - marketing.loyalty_position
+  - marketing.loyalty_programme
+  writes:
+  - cache:idempotency
+  - marketing.loyalty_position
+  - orders.stored_value_authorisation
+- operation: registerGuestDevice
+  verb: POST
+  path: /guests/{subjectId}/devices
+  scope: tenant
+  permission: null
+  audience: null
+  offline: false
+  reads:
+  - cache:idempotency
+  - marketing.guest_device
+  writes:
+  - cache:idempotency
+  - marketing.guest_device
+- operation: removeFromWishlist
+  verb: DELETE
+  path: /guests/{subjectId}/wishlist/{itemId}
+  scope: venue
+  permission: null
+  audience: null
+  offline: false
+  reads:
+  - cache:idempotency
+  - marketing.guest_profile
+  writes:
+  - cache:idempotency
+  - marketing.guest_profile
+- operation: reopenCase
+  verb: POST
+  path: /cases/{caseId}/reopen
+  scope: venue
+  permission: CASE_MANAGE
+  audience: null
+  offline: false
+  reads:
+  - cache:idempotency
+  - marketing.case
+  writes:
+  - cache:idempotency
+  - marketing.case
+- operation: replyToMyCase
+  verb: POST
+  path: /my/cases/{caseId}/messages
+  scope: tenant
+  permission: null
+  audience:
+  - guest
+  offline: false
+  reads:
+  - cache:idempotency
+  - marketing.case
+  writes:
+  - cache:idempotency
+  - marketing.case_message
+- operation: respondToInvitation
+  verb: POST
+  path: /invitations/{token}/respond
+  scope: venue
+  permission: GUEST_VIEW
+  audience:
+  - guest
+  - public
+  offline: false
+  reads:
+  - cache:idempotency
+  - marketing.invitation
+  - marketing.invitation_campaign
+  writes:
+  - cache:idempotency
+  - marketing.invitation
+- operation: respondToReview
+  verb: POST
+  path: /reviews/{reviewId}/respond
+  scope: venue
+  permission: MARKETING_MANAGE
+  audience: null
+  offline: false
+  reads:
+  - cache:idempotency
+  - marketing.review
+  writes:
+  - cache:idempotency
+  - marketing.review
+- operation: retryMessageDispatch
+  verb: POST
+  path: /message-dispatches/{dispatchId}/retry
+  scope: venue
+  permission: MARKETING_SEND
+  audience:
+  - staff
+  - service
+  offline: false
+  reads:
+  - cache:idempotency
+  - marketing.guest_profile
+  - marketing.message_dispatch
+  - marketing.suppression
+  writes:
+  - cache:idempotency
+  - marketing.message_dispatch
+- operation: revokeGuestDevice
+  verb: DELETE
+  path: /guests/{subjectId}/devices/{deviceId}
+  scope: tenant
+  permission: null
+  audience: null
+  offline: false
+  reads:
+  - cache:idempotency
+  - marketing.guest_profile
+  writes:
+  - cache:idempotency
+  - marketing.guest_profile
+- operation: searchGuests
+  verb: GET
+  path: /guests
+  scope: venue
+  permission: GUEST_VIEW
+  audience: null
+  offline: false
+  reads:
+  - marketing.guest_profile
+  writes: []
+- operation: sendConversationMessage
+  verb: POST
+  path: /conversations/{conversationId}/messages
+  scope: tenant
+  permission: CASE_MANAGE
+  audience: null
+  offline: false
+  reads:
+  - cache:idempotency
+  - marketing.conversation
+  writes:
+  - cache:idempotency
+  - marketing.conversation
+  - marketing.conversation_message
+- operation: sendTransactionalMessage
+  verb: POST
+  path: /messages
+  scope: venue
+  permission: null
+  audience: null
+  offline: false
+  reads:
+  - cache:idempotency
+  - marketing.message_dispatch
+  writes:
+  - cache:idempotency
+  - marketing.message_dispatch
+- operation: setAgentAvailability
+  verb: PUT
+  path: /agent-availability
+  scope: tenant
+  permission: CASE_MANAGE
+  audience: null
+  offline: false
+  reads:
+  - cache:idempotency
+  - identity.principal
+  writes:
+  - cache:idempotency
+  - marketing.agent_availability
+- operation: setCallDisposition
+  verb: POST
+  path: /conversations/{conversationId}/disposition
+  scope: venue
+  permission: CASE_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - marketing.case
+  - marketing.conversation
+  writes:
+  - cache:idempotency
+  - marketing.case
+  - marketing.conversation
+- operation: setConsentPurposes
+  verb: PUT
+  path: /consent-purposes
+  scope: tenant
+  permission: GUEST_MANAGE
+  audience: null
+  offline: false
+  reads:
+  - cache:idempotency
+  - marketing.consent_purpose
+  writes:
+  - cache:idempotency
+  - cache:resolution
+  - marketing.consent_purpose
+- operation: setMessageTrigger
+  verb: POST
+  path: /message-triggers
+  scope: venue
+  permission: MARKETING_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - marketing.message_template
+  - marketing.message_trigger
+  writes:
+  - cache:idempotency
+  - marketing.message_trigger
+- operation: setSeoMetadata
+  verb: PUT
+  path: /seo-metadata
+  scope: tenant
+  permission: MARKETING_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - catalogue.product
+  writes:
+  - cache:idempotency
+  - cache:resolution
+  - control.seo_metadata
+- operation: startKioskAssist
+  verb: POST
+  path: /kiosk-assists
+  scope: venue
+  permission: CASE_MANAGE
+  audience: null
+  offline: false
+  reads:
+  - cache:idempotency
+  - orders.cart
+  - platform.device
+  writes:
+  - cache:idempotency
+  - marketing.kiosk_assist_session
+- operation: stopCampaign
+  verb: POST
+  path: /campaigns/{campaignId}/stop
+  scope: venue
+  permission: MARKETING_SEND
+  audience: null
+  offline: false
+  reads:
+  - cache:idempotency
+  - marketing.campaign
+  - marketing.segment_criterion
+  writes:
+  - cache:idempotency
+  - marketing.campaign
+  - marketing.segment_criterion
+- operation: submitForm
+  verb: POST
+  path: /form-submissions
+  scope: venue
+  permission: GUEST_VIEW
+  audience:
+  - staff
+  - guest
+  offline: true
+  reads:
+  - cache:idempotency
+  - marketing.consent_record
+  - marketing.form_definition
+  - pii.subject
+  writes:
+  - cache:idempotency
+  - marketing.consent_record
+  - marketing.form_submission
+- operation: submitReview
+  verb: POST
+  path: /reviews
+  scope: venue
+  permission: null
+  audience: null
+  offline: false
+  reads:
+  - cache:idempotency
+  - marketing.review
+  writes:
+  - cache:idempotency
+  - marketing.review
+- operation: testSendCampaign
+  verb: POST
+  path: /campaigns/{campaignId}/test-send
+  scope: venue
+  permission: MARKETING_MANAGE
+  audience: null
+  offline: false
+  reads:
+  - cache:idempotency
+  - marketing.campaign
+  writes:
+  - cache:idempotency
+  - marketing.campaign
+- operation: transferConversation
+  verb: POST
+  path: /conversations/{conversationId}/transfer
+  scope: tenant
+  permission: CASE_MANAGE
+  audience: null
+  offline: false
+  reads:
+  - cache:idempotency
+  - identity.principal
+  - marketing.conversation
+  writes:
+  - cache:idempotency
+  - marketing.conversation
+- operation: unscheduleCampaign
+  verb: POST
+  path: /campaigns/{campaignId}/unschedule
+  scope: venue
+  permission: MARKETING_MANAGE
+  audience: null
+  offline: false
+  reads:
+  - cache:idempotency
+  - marketing.campaign
+  writes:
+  - cache:idempotency
+  - marketing.campaign
+- operation: updateCampaign
+  verb: PATCH
+  path: /campaigns/{campaignId}
+  scope: venue
+  permission: MARKETING_MANAGE
+  audience: null
+  offline: false
+  reads:
+  - cache:idempotency
+  - marketing.campaign
+  - marketing.segment_criterion
+  writes:
+  - cache:idempotency
+  - marketing.campaign
+  - marketing.segment_criterion
+- operation: updateCase
+  verb: PATCH
+  path: /cases/{caseId}
+  scope: venue
+  permission: CASE_MANAGE
+  audience: null
+  offline: false
+  reads:
+  - cache:idempotency
+  - marketing.case
+  writes:
+  - cache:idempotency
+  - marketing.case
+- operation: updateGuestPreferences
+  verb: PUT
+  path: /guests/{subjectId}/preferences
+  scope: tenant
+  permission: GUEST_MANAGE
+  audience:
+  - staff
+  - guest
+  offline: false
+  reads:
+  - cache:idempotency
+  - marketing.guest_profile
+  writes:
+  - cache:idempotency
+  - marketing.guest_profile
+- operation: updateGuestProfile
+  verb: PATCH
+  path: /guests/{subjectId}
+  scope: venue
+  permission: GUEST_MANAGE
+  audience: null
+  offline: false
+  reads:
+  - cache:idempotency
+  - marketing.guest_profile
+  - marketing.loyalty_position
+  writes:
+  - cache:idempotency
+  - marketing.guest_profile
+  - marketing.loyalty_position
+- operation: updateMyProfile
+  verb: PATCH
+  path: /guests/me/profile
+  scope: venue
+  permission: GUEST_VIEW
+  audience:
+  - guest
+  offline: false
+  reads:
+  - cache:idempotency
+  - marketing.guest_profile
+  writes:
+  - cache:idempotency
+  - marketing.guest_profile
+  - pii.subject
+- operation: uploadGuestDocument
+  verb: POST
+  path: /guest-documents
+  scope: venue
+  permission: GUEST_VIEW_PII
+  audience:
+  - staff
+  - guest
+  offline: false
+  reads:
+  - cache:idempotency
+  - marketing.consent_record
+  - pii.subject
+  writes:
+  - cache:idempotency
+  - marketing.guest_document

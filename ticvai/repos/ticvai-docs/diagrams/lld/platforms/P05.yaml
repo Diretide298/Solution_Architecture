@@ -1,0 +1,479 @@
+id: LLD-P05
+title: P05 Guest Kiosk — Self-Service — 17 screens
+generatedBy: tools/derive-diagrams.py
+index: diagrams/hld/00-platform.yaml
+audience: guest
+operator: guest
+app: guest-app
+formFactor: kiosk
+runtime: reactWeb
+offlineCapable: false
+deployment:
+  target: kiosk hardware, kiosk-mode shell
+  distribution: device management push
+  bundleUpdate: on deploy
+  hosting: in-cell
+  storeReview: false
+  deviceOwnership: venue-owned, unattended
+  networkAssumption: venue LAN, generally reliable
+  releaseCadence: monthly, out of hours
+why: null
+modulesUsed:
+- module: ticketing
+  screens: 10
+- module: core
+  screens: 3
+- module: retail
+  screens: 2
+- module: marketing
+  screens: 1
+- module: fnb
+  screens: 1
+servicesCalled:
+- service: OrderService
+  operationCalls: 10
+- service: CatalogueService
+  operationCalls: 8
+- service: RetailService
+  operationCalls: 3
+- service: WhiteLabelService
+  operationCalls: 2
+- service: MarketingService
+  operationCalls: 2
+- service: FnbService
+  operationCalls: 2
+- service: AiService
+  operationCalls: 1
+coverage:
+  screens: 17
+  inAFlow: 13
+  drawn: 17
+  note: '**A screen in no flow has been specified and never walked.** Every flow written in this package
+    has found a defect.'
+screens:
+- screen: KSK-001
+  name: Attract Loop
+  module: Sell
+  requiresModule: core
+  wave: 2
+  density: touchLarge
+  operations: []
+  states:
+  - emptyFirstRun
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams: []
+  goesTo:
+  - KSK-002
+  - KSK-003
+  - KSK-004
+  boardFrames: null
+  wireframe: wireframes/P05 Guest Kiosk.dc.html#ksk-001
+  inFlows:
+  - F07 Guest buys at a kiosk
+  - F75 A kiosk serves itself and calls for help
+- screen: KSK-002
+  name: Language Select
+  module: Sell
+  requiresModule: core
+  wave: 2
+  density: touchLarge
+  operations:
+  - getTenantAppStatus
+  - getTenantConfig
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams: []
+  goesTo:
+  - KSK-001
+  - KSK-003
+  - KSK-004
+  boardFrames: null
+  wireframe: wireframes/P05 Guest Kiosk.dc.html#ksk-002
+  inFlows:
+  - F07 Guest buys at a kiosk
+  - F75 A kiosk serves itself and calls for help
+- screen: KSK-003
+  name: What are you buying
+  module: Sell
+  requiresModule: ticketing
+  wave: 2
+  density: touchLarge
+  operations:
+  - listProducts
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams: []
+  goesTo:
+  - KSK-001
+  - KSK-002
+  - KSK-004
+  boardFrames: null
+  wireframe: wireframes/P05 Guest Kiosk.dc.html#ksk-003
+  inFlows:
+  - F07 Guest buys at a kiosk
+  - F75 A kiosk serves itself and calls for help
+- screen: KSK-004
+  name: Choose tickets
+  module: Sell
+  requiresModule: ticketing
+  wave: 2
+  density: touchLarge
+  operations:
+  - getAvailability
+  - listProductVariants
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams:
+  - productId<-deepLink
+  goesTo:
+  - KSK-001
+  - KSK-002
+  - KSK-003
+  - KSK-005
+  boardFrames: null
+  wireframe: wireframes/P05 Guest Kiosk.dc.html#ksk-004
+  inFlows:
+  - F07 Guest buys at a kiosk
+- screen: KSK-005
+  name: Choose a session
+  module: Sell
+  requiresModule: ticketing
+  wave: 2
+  density: touchLarge
+  operations:
+  - acquireLease
+  - getAvailability
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams: []
+  goesTo:
+  - KSK-001
+  - KSK-002
+  - KSK-003
+  - KSK-006
+  boardFrames: null
+  wireframe: wireframes/P05 Guest Kiosk.dc.html#ksk-005
+  inFlows:
+  - F07 Guest buys at a kiosk
+- screen: KSK-006
+  name: Review
+  module: Sell
+  requiresModule: ticketing
+  wave: 2
+  density: touchLarge
+  operations:
+  - addCartLine
+  - checkoutCart
+  - evaluatePromotions
+  - getCart
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams:
+  - cartId<-session
+  goesTo:
+  - KSK-001
+  - KSK-002
+  - KSK-003
+  - KSK-007
+  boardFrames: null
+  wireframe: wireframes/P05 Guest Kiosk.dc.html#ksk-006
+  inFlows:
+  - F07 Guest buys at a kiosk
+  - F57 A guest uses a kiosk and it fails
+  - F75 A kiosk serves itself and calls for help
+- screen: KSK-007
+  name: Payment
+  module: Sell
+  requiresModule: ticketing
+  wave: 2
+  density: touchLarge
+  operations:
+  - createPayment
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams: []
+  goesTo:
+  - KSK-001
+  - KSK-002
+  - KSK-003
+  - KSK-009
+  boardFrames: null
+  wireframe: wireframes/P05 Guest Kiosk.dc.html#ksk-007
+  inFlows:
+  - F07 Guest buys at a kiosk
+  - F75 A kiosk serves itself and calls for help
+- screen: KSK-008
+  name: Payment unresolved
+  module: Sell
+  requiresModule: ticketing
+  wave: 2
+  density: touchLarge
+  operations:
+  - inquirePaymentStatus
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams:
+  - paymentId<-deepLink
+  goesTo:
+  - KSK-001
+  - KSK-002
+  - KSK-003
+  boardFrames: null
+  wireframe: wireframes/P05 Guest Kiosk.dc.html#ksk-008
+  inFlows:
+  - F57 A guest uses a kiosk and it fails
+- screen: KSK-009
+  name: Ticket issued
+  module: Sell
+  requiresModule: ticketing
+  wave: 2
+  density: touchLarge
+  operations:
+  - getOrder
+  - transferOrderTickets
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams:
+  - orderId<-deepLink
+  goesTo:
+  - KSK-001
+  - KSK-002
+  - KSK-003
+  boardFrames: null
+  wireframe: wireframes/P05 Guest Kiosk.dc.html#ksk-009
+  inFlows:
+  - F07 Guest buys at a kiosk
+  - F75 A kiosk serves itself and calls for help
+- screen: KSK-010
+  name: Print failure
+  module: Sell
+  requiresModule: ticketing
+  wave: 2
+  density: touchLarge
+  operations:
+  - transferOrderTickets
+  states:
+  - emptyFirstRun
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams:
+  - orderId<-deepLink
+  goesTo:
+  - KSK-001
+  - KSK-002
+  - KSK-003
+  - KSK-013
+  boardFrames: null
+  wireframe: wireframes/P05 Guest Kiosk.dc.html#ksk-010
+  inFlows:
+  - F57 A guest uses a kiosk and it fails
+- screen: KSK-011
+  name: Collect a booking
+  module: Sell
+  requiresModule: retail
+  wave: 2
+  density: touchLarge
+  operations:
+  - getOrder
+  - lookupShopAndDrop
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams:
+  - orderId<-deepLink
+  goesTo:
+  - KSK-001
+  - KSK-002
+  - KSK-003
+  boardFrames: null
+  wireframe: wireframes/P05 Guest Kiosk.dc.html#ksk-011
+  inFlows: null
+- screen: KSK-012
+  name: Booking found
+  module: Sell
+  requiresModule: ticketing
+  wave: 2
+  density: touchLarge
+  operations:
+  - transferOrderTickets
+  states:
+  - emptyFirstRun
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams:
+  - orderId<-deepLink
+  goesTo:
+  - KSK-001
+  - KSK-002
+  - KSK-003
+  boardFrames: null
+  wireframe: wireframes/P05 Guest Kiosk.dc.html#ksk-012
+  inFlows: null
+- screen: KSK-013
+  name: Call staff
+  module: Sell
+  requiresModule: marketing
+  wave: 2
+  density: touchLarge
+  operations:
+  - endKioskAssist
+  states:
+  - emptyFirstRun
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams:
+  - sessionId<-session
+  goesTo:
+  - KSK-001
+  - KSK-002
+  - KSK-003
+  boardFrames: null
+  wireframe: wireframes/P05 Guest Kiosk.dc.html#ksk-013
+  inFlows:
+  - F57 A guest uses a kiosk and it fails
+  - F75 A kiosk serves itself and calls for help
+- screen: KSK-014
+  name: Out of service
+  module: Sell
+  requiresModule: core
+  wave: 2
+  density: touchLarge
+  operations: []
+  states:
+  - emptyFirstRun
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams: []
+  goesTo:
+  - KSK-001
+  - KSK-002
+  - KSK-003
+  boardFrames: null
+  wireframe: wireframes/P05 Guest Kiosk.dc.html#ksk-014
+  inFlows: null
+- screen: KSK-015
+  name: Assistant
+  module: AI
+  requiresModule: ticketing
+  wave: 2
+  density: touchLarge
+  operations:
+  - getAvailability
+  - handoverToAgent
+  - listProducts
+  - sendAiMessage
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - conversationId<-deepLink
+  goesTo:
+  - KSK-001
+  boardFrames: null
+  wireframe: wireframes/P05 Guest Kiosk.dc.html#ksk-015
+  inFlows:
+  - F24 A guest asks the assistant and ends up with a person
+- screen: KSK-016
+  name: Order Food
+  module: Sell
+  requiresModule: fnb
+  wave: 2
+  density: touchLarge
+  operations:
+  - createGuestFnbOrder
+  - getGuestMenu
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - outletId<-deepLink
+  goesTo:
+  - KSK-017
+  boardFrames: null
+  wireframe: wireframes/P05 Guest Kiosk.dc.html#ksk-016
+  inFlows: null
+- screen: KSK-017
+  name: Shop
+  module: Sell
+  requiresModule: retail
+  wave: 2
+  density: touchLarge
+  operations:
+  - listMerchandise
+  - reserveMerchandise
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - outletId<-KSK-016
+  goesTo: []
+  boardFrames: null
+  wireframe: wireframes/P05 Guest Kiosk.dc.html#ksk-017
+  inFlows:
+  - F51 A guest shops in the venue and collects on the way out

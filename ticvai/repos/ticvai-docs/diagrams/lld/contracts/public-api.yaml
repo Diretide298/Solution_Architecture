@@ -1,0 +1,316 @@
+id: LLD-public-api
+title: public-api — 22 operations
+generatedBy: tools/derive-diagrams.py
+index: diagrams/hld/03-contracts.yaml
+tier: satellite
+service: ControlService
+operations:
+- operation: certifyIntegration
+  verb: POST
+  path: /listings/{listingId}/certify
+  scope: tenant
+  permission: DEVELOPER_ADMIN
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - control.api_version
+  - control.integration_listing
+  writes:
+  - cache:idempotency
+  - control.integration_listing
+- operation: createApiClient
+  verb: POST
+  path: /api-clients
+  scope: tenant
+  permission: DEVELOPER_MANAGE
+  audience:
+  - staff
+  - partner
+  offline: false
+  reads:
+  - cache:idempotency
+  - control.api_licence
+  - control.developer_account
+  writes:
+  - cache:idempotency
+  - control.api_client
+- operation: createSandbox
+  verb: POST
+  path: /sandboxes
+  scope: tenant
+  permission: DEVELOPER_MANAGE
+  audience:
+  - staff
+  - partner
+  offline: false
+  reads:
+  - cache:idempotency
+  - control.developer_account
+  writes:
+  - cache:idempotency
+  - control.sandbox
+- operation: createWebhookSubscription
+  verb: POST
+  path: /webhook-subscriptions
+  scope: tenant
+  permission: DEVELOPER_MANAGE
+  audience:
+  - staff
+  - partner
+  offline: false
+  reads:
+  - cache:idempotency
+  - control.api_client
+  writes:
+  - cache:idempotency
+  - control.webhook_subscription
+- operation: deprecateApiVersion
+  verb: POST
+  path: /api-versions/{version}/deprecate
+  scope: tenant
+  permission: DEVELOPER_ADMIN
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - control.api_client
+  - control.api_version
+  writes:
+  - cache:idempotency
+  - control.api_version
+  - marketing.message_dispatch
+- operation: getApiUsage
+  verb: GET
+  path: /api-usage
+  scope: tenant
+  permission: DEVELOPER_VIEW
+  audience:
+  - staff
+  - partner
+  offline: false
+  reads:
+  - control.api_client
+  writes: []
+- operation: issueApiToken
+  verb: POST
+  path: /oauth/token
+  scope: tenant
+  permission: DEVELOPER_VIEW
+  audience:
+  - partner
+  - service
+  offline: false
+  reads:
+  - control.api_client
+  - control.api_licence
+  writes: []
+- operation: listApiClients
+  verb: GET
+  path: /api-clients
+  scope: tenant
+  permission: DEVELOPER_VIEW
+  audience:
+  - staff
+  - partner
+  offline: false
+  reads:
+  - control.api_client
+  writes: []
+- operation: listApiVersions
+  verb: GET
+  path: /api-versions
+  scope: tenant
+  permission: DEVELOPER_VIEW
+  audience:
+  - public
+  - partner
+  offline: false
+  reads:
+  - control.api_version
+  writes: []
+- operation: listIntegrationListings
+  verb: GET
+  path: /listings
+  scope: tenant
+  permission: DEVELOPER_VIEW
+  audience:
+  - public
+  - staff
+  - partner
+  offline: false
+  reads:
+  - control.integration_listing
+  writes: []
+- operation: listSandboxes
+  verb: GET
+  path: /sandboxes
+  scope: tenant
+  permission: DEVELOPER_VIEW
+  audience:
+  - staff
+  - partner
+  offline: false
+  reads:
+  - control.sandbox
+  writes: []
+- operation: listWebhookDeliveries
+  verb: GET
+  path: /webhook-subscriptions/{subscriptionId}/deliveries
+  scope: tenant
+  permission: DEVELOPER_VIEW
+  audience:
+  - staff
+  - partner
+  offline: false
+  reads:
+  - control.webhook_delivery
+  writes: []
+- operation: listWebhookSubscriptions
+  verb: GET
+  path: /webhook-subscriptions
+  scope: tenant
+  permission: DEVELOPER_VIEW
+  audience:
+  - staff
+  - partner
+  offline: false
+  reads:
+  - control.webhook_subscription
+  writes: []
+- operation: registerDeveloper
+  verb: POST
+  path: /developers
+  scope: tenant
+  permission: DEVELOPER_VIEW
+  audience:
+  - public
+  offline: false
+  reads:
+  - cache:idempotency
+  - control.developer_account
+  writes:
+  - cache:idempotency
+  - control.developer_account
+- operation: replayEvents
+  verb: POST
+  path: /webhook-subscriptions/{subscriptionId}/replay
+  scope: tenant
+  permission: DEVELOPER_MANAGE
+  audience:
+  - staff
+  - partner
+  offline: false
+  reads:
+  - cache:idempotency
+  - control.webhook_subscription
+  - platform.outbox
+  writes:
+  - cache:idempotency
+  - control.webhook_delivery
+- operation: resetSandbox
+  verb: POST
+  path: /sandboxes/{sandboxId}/reset
+  scope: tenant
+  permission: DEVELOPER_MANAGE
+  audience:
+  - staff
+  - partner
+  offline: false
+  reads:
+  - cache:idempotency
+  - control.sandbox
+  writes:
+  - cache:idempotency
+  - control.sandbox
+- operation: revokeApiCredential
+  verb: DELETE
+  path: /api-clients/{clientId}/credentials
+  scope: tenant
+  permission: DEVELOPER_MANAGE
+  audience:
+  - staff
+  - partner
+  offline: false
+  reads:
+  - cache:idempotency
+  - control.api_client
+  writes:
+  - control.api_client
+- operation: rotateApiCredential
+  verb: POST
+  path: /api-clients/{clientId}/credentials
+  scope: tenant
+  permission: DEVELOPER_MANAGE
+  audience:
+  - staff
+  - partner
+  offline: false
+  reads:
+  - cache:idempotency
+  - control.api_client
+  writes:
+  - cache:idempotency
+  - control.api_client
+- operation: setApiLicensing
+  verb: PUT
+  path: /api-licensing
+  scope: tenant
+  permission: DEVELOPER_ADMIN
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - control.api_licence
+  writes:
+  - cache:idempotency
+  - cache:resolution
+  - control.api_licence
+- operation: setApiQuota
+  verb: PUT
+  path: /api-quotas
+  scope: tenant
+  permission: DEVELOPER_ADMIN
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - control.api_client
+  writes:
+  - cache:idempotency
+  - cache:resolution
+  - control.api_quota
+- operation: setDeveloperMembers
+  verb: PUT
+  path: /developers/{developerId}/members
+  scope: tenant
+  permission: DEVELOPER_MANAGE
+  audience:
+  - partner
+  offline: false
+  reads:
+  - cache:idempotency
+  - control.developer_account
+  - identity.principal
+  writes:
+  - cache:idempotency
+  - control.developer_account
+  - identity.grant
+- operation: submitIntegrationListing
+  verb: POST
+  path: /listings
+  scope: tenant
+  permission: DEVELOPER_MANAGE
+  audience:
+  - partner
+  offline: false
+  reads:
+  - cache:idempotency
+  - control.developer_account
+  writes:
+  - cache:idempotency
+  - control.integration_listing

@@ -1,0 +1,56 @@
+id: LLD-Marketing journey
+title: Marketing journey — 6 transitions
+generatedBy: tools/derive-diagrams.py
+index: diagrams/hld/04-lifecycles.yaml
+source: states/journey.yaml
+entity: Marketing journey
+contract: marketing-crm
+enum: Journey.status
+enumKind: inline
+enumSchema: Journey
+enumProperty: status
+owner: marketing-crm
+initial:
+- draft
+terminal:
+- archived
+transitions:
+- from: draft
+  to: active
+  operation: activateJourney
+  trigger: operation
+  guard: '**Refused where the graph does not terminate or a step points at nothing** — a half-drawn
+    journey that starts sending is worse than one that never starts'
+- from: active
+  to: paused
+  operation: activateJourney
+  trigger: operation
+  guard: '**Guests inside stay where they are.** A half-finished recovery sequence that restarts from
+    the top sends the first message twice'
+- from: paused
+  to: active
+  operation: activateJourney
+  trigger: operation
+  guard: Resumed, and entrants continue from their step
+  isReversal: true
+- from: active
+  to: archived
+  operation: activateJourney
+  trigger: operation
+  guard: Ended. Entrants exit wherever they are
+- from: paused
+  to: archived
+  operation: activateJourney
+  trigger: operation
+  guard: Ended while paused
+- from: draft
+  to: archived
+  operation: activateJourney
+  trigger: operation
+  guard: Abandoned before activation
+notes: '**Pausing does not evict entrants**, which is the difference between a pause and an archive
+  — a guest three steps into a renewal sequence resumes at step four.
+
+
+  **`maxDurationDays` exits entrants regardless of status**: a journey with no end is a guest who never
+  leaves it.'

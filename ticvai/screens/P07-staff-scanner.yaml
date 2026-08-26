@@ -1,0 +1,964 @@
+# P07 — Staff Scanner — Access Control
+#
+# Derived from the wireframe board on 14 August. **Purposes and navigation are real;
+# components, states and operations are not yet written.** Every screen carries
+# wireframe.status drafted so the gap is visible rather than implied.
+
+platform:
+  code: P07
+  audience: staff
+  formFactor: handheld
+  shortName: Venue Scanner
+  name: Venue Scanner — Access Control
+  surface: staffFacing
+  runtime: reactNative
+  app: venue-scanner
+  appStatus: scaffolded
+  offlineCapable: true
+  packages:
+  - design-tokens
+  - ui
+  - api-client
+  - offline-core
+  deployment:
+    target: rugged handheld — Android
+    distribution: MDM
+    bundleUpdate: at shift start
+    hosting: local, offline-first (ADR-0013)
+    storeReview: false
+    deviceOwnership: venue-owned, issued per shift
+    networkAssumption: must function with none
+    releaseCadence: monthly, never on an event day
+  screenCount: 11
+  designReferences:
+  - path: sources/designs/TICVAI_Employee_App_UI_Reference_1.pdf
+    note: Employee app reference. The scanner shares its visual language and its offline strip.
+  operator: venue
+  directions:
+  - ltr
+  - rtl
+  densityNote: '**A gate device held in one hand while the other takes a ticket.** `compact` was assigned
+    by platform code on 18 August and it was wrong — a scanner is not a desktop.'
+  wireframeBoard: wireframes/P07 Venue Scanner.dc.html
+  wireframeBoardNote: '**The generated board for the whole platform.** Individual screens keep the client-pack
+    anchor where one exists — a screen the client drew should open the client''s frame — and this renders
+    every screen on the platform including the ones no pack covers.
+
+
+    **Declared 24 August.** The file was written from the first generation and nothing pointed at it:
+    `check-wireframes` has no unmatched-board concept, so the Python suite passed while the viewer flagged
+    an orphan. **A board nobody references is a board nobody reviews.**'
+screens:
+- id: SCN-001
+  name: Sign in
+  module: Access
+  purpose: PIN or badge. Session carries the workstation.
+  capability: C00
+  wave: 1
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+        notes: Structure from the wireframe board. Components not yet enumerated.
+  states:
+    loading: Session check against the local store, then the server if reachable
+    emptyFirstRun: Not applicable
+    emptyNoAccess: '**Says which permission is missing, and never renders as an empty list.** This screen
+      needs `PERMISSION_VIEW`, `SHIFT_OPEN` to read permissions; a person without it sees the reason
+      and who to ask, because an empty table reads as *there is no data* and sends somebody to support
+      with the wrong question.
+
+
+      **Authority is carried by the person, not the device** (ADR-0002) — so signing in again on the
+      same terminal is the way through.'
+    error: Sign-in failed. The reason is shown — wrong PIN reads differently from no network
+    offline: '**Signs in against the cached principal list from the last bundle.** A steward locked
+      out at 08:00 because the venue wifi is down is a gate that does not open'
+  navigation:
+    exitTo:
+    - SCN-002
+    - SCN-003
+    inferred: true
+    fromFlows: true
+    isEntryPoint: true
+  wireframe:
+    status: generated
+    board: wireframes/P07 Venue Scanner.dc.html#scn-001
+  notes: 'Definition derived from the wireframe board on 14 August. Components, states and operations
+    still to be written. **createCashMovement removed 18 August** — attached by module resemblance,
+    not by what this screen does. A screen that does not handle money should not be able to move it
+    (CF-87''s class). **Sign in.** The session carries the workstation, so the device cannot scan before
+    it knows who is holding it. **Declared 20 August** — `isEntryPoint` existed in the schema and five
+    platforms used none, so every screen in them read as unreachable. **`selectRole` and `resolvePermissions`
+    wired 24 August.** ADR-0002 makes authorisation user-driven and **a sign-in screen that does not
+    resolve a role is a sign-in that grants nothing** — found by walking F61. **Removed 24 August**:
+    acceptShiftVariance, approveShiftOpen, closeShift, forceLogout, getShift, listActiveSessions, listCashMovements,
+    listShifts, openShift, recordNoSale, reopenShift, resumeShift, revokeAllSessions, suspendShift.
+    **Bulk-attach residue** — the 18 August defect that put identical operation sets on unrelated screens.
+    A till does not cancel a performance, a staff app does not create roles, and **a scanner does not
+    run a cash shift.**'
+  implementation:
+    app: venue-scanner
+    route: /access/sign-in
+    component: apps/venue-scanner/src/routes/access/SignInDetail.tsx
+    status: notStarted
+  apis:
+  - operationId: login
+    contract: identity
+    purpose: From the flow it appears in
+    trigger: onLoad
+  - operationId: getCurrentShift
+    contract: shift
+    purpose: From the flow it appears in
+    trigger: onLoad
+  - operationId: getCurrentSession
+    contract: identity
+    purpose: Current session and effective permissions
+    trigger: onLoad
+  - operationId: getGuestSession
+    contract: identity
+    purpose: Read the current guest session
+    trigger: onLoad
+  - operationId: listMfaMethods
+    contract: identity
+    purpose: Enrolled MFA methods
+    trigger: onLoad
+  - operationId: listSsoProviders
+    contract: identity
+    purpose: Identity providers configured for this tenant
+    trigger: onLoad
+  - operationId: selectRole
+    contract: identity
+    purpose: Choose a role for a multi-role session
+    trigger: onAction
+  - operationId: resolvePermissions
+    contract: identity
+    purpose: Simulate a principal's effective permissions
+    trigger: onAction
+  density: comfortable
+  entryState:
+    params:
+    - name: sessionId
+      from: session
+    - name: shiftId
+      from: session
+    coldEntry: Resolves from the session; a cold arrival is the ordinary case.
+  requiresModule: core
+  statesDerived: true
+- id: SCN-002
+  name: Access point & direction
+  module: Access
+  purpose: Confirm what this device is doing before it does it.
+  capability: C00
+  wave: 1
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+        notes: Structure from the wireframe board. Components not yet enumerated.
+  states:
+    loading: Access points from the bundle
+    emptyFirstRun: No access points configured for this venue — a configuration error, shown as one
+    emptyNoAccess: '**Says which permission is missing, and never renders as an empty list.** This screen
+      needs `SCOPE_VIEW`, `TURNSTILE_MODE_SET` to read scopes; a person without it sees the reason and
+      who to ask, because an empty table reads as *there is no data* and sends somebody to support with
+      the wrong question.
+
+
+      **Authority is carried by the person, not the device** (ADR-0002) — so signing in again on the
+      same terminal is the way through.
+
+
+      **Also reached when `access` is not licensed.** The tenant has not bought this module, which is
+      a commercial answer and not a permission one — say which, because the person to ask is different.'
+    error: Cannot load. The last selection is offered
+    offline: Fully offline. The access point list is in the bundle
+  navigation:
+    exitTo:
+    - SCN-001
+    - SCN-003
+    - SCN-015
+    inferred: true
+    fromFlows: true
+  wireframe:
+    status: generated
+    board: wireframes/P07 Venue Scanner.dc.html#scn-002
+  notes: 'Definition derived from the wireframe board on 14 August. Components, states and operations
+    still to be written. **Authoring operations removed 24 August**: createAccessPoint, setAccessPointGeofence,
+    updateAccessPoint. **A scanner reads the gate configuration; it does not write it.** An access point
+    is created in the back office and a geofence is a venue decision — a handheld at a lane that can
+    redefine the lane is a handheld that can admit anywhere.'
+  implementation:
+    app: venue-scanner
+    route: /access/access-point-direction
+    component: apps/venue-scanner/src/routes/access/AccessPointDirectionDetail.tsx
+    status: notStarted
+  apis:
+  - operationId: listAccessPoints
+    contract: access
+    purpose: From the flow it appears in
+    trigger: onLoad
+  - operationId: setTurnstileMode
+    contract: access
+    purpose: From the flow it appears in
+    trigger: onLoad
+  - operationId: getAccessPoint
+    contract: access
+    purpose: Read an access point
+    trigger: onLoad
+  density: comfortable
+  entryState:
+    params:
+    - name: accessPointId
+      from: deepLink
+    coldEntry: '**A staff link opened cold resolves the thing or says plainly that it is gone.** No
+      silent redirect — a supervisor following a link from an alert needs to know whether the record
+      moved, closed or never existed, because those are three different next actions. **The scope is
+      resolved from the session, never from the link**: a link cannot move somebody to a venue they
+      do not hold. Arrives with `accessPointId`.'
+  requiresModule: access
+  statesDerived: true
+- id: SCN-003
+  name: Ready to scan
+  module: Access
+  purpose: The screen the device sits on all day.
+  capability: C00
+  wave: 1
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+        notes: Structure from the wireframe board. Components not yet enumerated.
+  states:
+    loading: Instant. This screen must never wait
+    emptyFirstRun: Not applicable
+    emptyNoAccess: '**Says which permission is missing, and never renders as an empty list.** This screen
+      needs `ACCESS_OVERRIDE`, `ACCESS_VALIDATE`, `REPORT_VIEW_VENUE` and 2 more to use accesses; a
+      person without it sees the reason and who to ask, because an empty table reads as *there is no
+      data* and sends somebody to support with the wrong question.
+
+
+      **Authority is carried by the person, not the device** (ADR-0002) — so signing in again on the
+      same terminal is the way through.
+
+
+      **Also reached when `access` is not licensed.** The tenant has not bought this module, which is
+      a commercial answer and not a permission one — say which, because the person to ask is different.'
+    error: Camera or scanner hardware failed — distinct from a bad scan, and it needs a different response
+    offline: '**Same loop, different truth. Amber says so.** Was a separate screen until 18 August,
+      and the screen already had an `offline` state — two places describing one condition is two places
+      to disagree.'
+    outcomeAdmitted: '**Admitted.** Readable at arm''s length and gone in 1.5 seconds. Was a screen
+      at `/access/admitted` until 18 August — **a route you navigate to is not a thing that disappears
+      in 1.5 seconds**, and a scanner that pushes a page per scan is a scanner that cannot do 40 guests
+      a minute.'
+    outcomeDenied: '**Denied, with a reason and a next action — never a boolean.** The reason is what
+      the operator reads aloud, and it decides whether the next step is an override, a lookup or an
+      apology.'
+    outcomeBlacklisted: '**Blacklisted — denies outright regardless of entitlement.** Separated from
+      `outcomeDenied` because the operator response differs: a denied guest may be helped, a blacklisted
+      one is a security matter and the screen must not suggest an override.'
+    overrideDialog: '**Override — a confirm dialog on `outcomeDenied`, not a screen.** The operation
+      most likely to be examined after an incident, so it captures a reason and a principal. **A modal,
+      because an override is a decision taken while looking at the denial**, not a page you navigate
+      to afterwards.'
+  navigation:
+    exitTo:
+    - SCN-001
+    - SCN-002
+    - SCN-003
+    inferred: true
+    fromFlows: true
+  wireframe:
+    status: generated
+    board: wireframes/P07 Venue Scanner.dc.html#scn-003
+  notes: 'Definition derived from the wireframe board on 14 August. Components, states and operations
+    still to be written. **Absorbed SCN-004, SCN-005, SCN-006, SCN-010, SCN-012 on 18 August.** A scanner
+    is one screen the device sits on all day, and an outcome is a state of it — **routing to `/access/admitted`
+    for something gone in 1.5 seconds is a page load per guest**, and at a gate doing 40 a minute that
+    is the whole problem. Every absorbed screen kept its copy as a named state. **Authoring operations
+    removed 24 August**: addBlacklistEntry, removeBlacklistEntry. **A scanner reads the gate configuration;
+    it does not write it.** An access point is created in the back office and a geofence is a venue
+    decision — a handheld at a lane that can redefine the lane is a handheld that can admit anywhere.'
+  implementation:
+    app: venue-scanner
+    route: /access/ready-to-scan
+    component: apps/venue-scanner/src/routes/access/ReadyToScanDetail.tsx
+    status: notStarted
+  apis:
+  - operationId: listScans
+    contract: access
+    purpose: List scan events
+    trigger: onLoad
+  - operationId: syncScans
+    contract: access
+    purpose: Replay scans recorded offline
+    trigger: onAction
+  - operationId: getOfflinePackage
+    contract: access
+    purpose: Entitlement and rule set for offline validation
+    trigger: onLoad
+  - operationId: lookupTicket
+    contract: access
+    purpose: Read-only validity check without admitting
+    trigger: onLoad
+  - operationId: overrideAccess
+    contract: access
+    purpose: Admit against a failed validation
+    trigger: onAction
+  - operationId: validateAccess
+    contract: access
+    purpose: Validate media at an access point and admit or deny
+    trigger: onAction
+  - operationId: validateGroupAccess
+    contract: access
+    purpose: Admit a group on one read
+    trigger: onAction
+  - operationId: consumeRedemptionRight
+    contract: cross-cell
+    purpose: Consume entries against a right, locally authoritative
+    trigger: onAction
+  - operationId: listBlacklist
+    contract: access
+    purpose: From the flow it appears in
+    trigger: onLoad
+  density: comfortable
+  entryState:
+    params:
+    - name: mediaCode
+      from: deepLink
+    - name: rightId
+      from: deepLink
+    coldEntry: '**A staff link opened cold resolves the thing or says plainly that it is gone.** No
+      silent redirect — a supervisor following a link from an alert needs to know whether the record
+      moved, closed or never existed, because those are three different next actions. **The scope is
+      resolved from the session, never from the link**: a link cannot move somebody to a venue they
+      do not hold. Arrives with `mediaCode`, `rightId`.'
+  requiresModule: access
+  statesDerived: true
+- id: SCN-007
+  name: Group admission
+  module: Access
+  purpose: Partial admission is the normal case, not the error.
+  capability: C00
+  wave: 1
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+        notes: Structure from the wireframe board. Components not yet enumerated.
+  states:
+    loading: Party resolution from the bundle
+    emptyFirstRun: Party of one — falls through to a normal scan
+    emptyNoAccess: '**Says which permission is missing, and never renders as an empty list.** This screen
+      needs `ACCESS_OVERRIDE`, `ACCESS_VALIDATE`, `REPORT_VIEW_VENUE` and 1 more to use accesses; a
+      person without it sees the reason and who to ask, because an empty table reads as *there is no
+      data* and sends somebody to support with the wrong question.
+
+
+      **Authority is carried by the person, not the device** (ADR-0002) — so signing in again on the
+      same terminal is the way through.
+
+
+      **Also reached when `access` is not licensed.** The tenant has not bought this module, which is
+      a commercial answer and not a permission one — say which, because the person to ask is different.'
+    error: Group could not be resolved
+    offline: Fully offline. Admits what is valid and states the shortfall
+  navigation:
+    exitTo:
+    - SCN-001
+    - SCN-002
+    - SCN-003
+    inferred: true
+  wireframe:
+    status: generated
+    board: wireframes/P07 Venue Scanner.dc.html#scn-007
+  notes: Definition derived from the wireframe board on 14 August. Components, states and operations
+    still to be written.
+  implementation:
+    app: venue-scanner
+    route: /access/group-admission
+    component: apps/venue-scanner/src/routes/access/GroupAdmissionDetail.tsx
+    status: notStarted
+  apis:
+  - operationId: validateGroupAccess
+    contract: access
+    purpose: From the flow it appears in
+    trigger: onLoad
+  - operationId: getOfflinePackage
+    contract: access
+    purpose: Entitlement and rule set for offline validation
+    trigger: onLoad
+  - operationId: listScans
+    contract: access
+    purpose: List scan events
+    trigger: onLoad
+  - operationId: lookupTicket
+    contract: access
+    purpose: Read-only validity check without admitting
+    trigger: onLoad
+  - operationId: overrideAccess
+    contract: access
+    purpose: Admit against a failed validation
+    trigger: onAction
+  - operationId: syncScans
+    contract: access
+    purpose: Replay scans recorded offline
+    trigger: onAction
+  - operationId: validateAccess
+    contract: access
+    purpose: Validate media at an access point and admit or deny
+    trigger: onAction
+  density: comfortable
+  requiresModule: access
+  statesDerived: true
+- id: SCN-008
+  name: Manual entry
+  module: Access
+  purpose: Damaged media, dead phone battery, printed slip.
+  capability: C00
+  wave: 1
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+        notes: Structure from the wireframe board. Components not yet enumerated.
+  states:
+    loading: Reference lookup, local first
+    emptyFirstRun: No match for that reference
+    emptyNoAccess: '**Says which permission is missing, and never renders as an empty list.** This screen
+      needs `ACCESS_OVERRIDE`, `ACCESS_VALIDATE`, `REPORT_VIEW_VENUE` and 1 more to use accesses; a
+      person without it sees the reason and who to ask, because an empty table reads as *there is no
+      data* and sends somebody to support with the wrong question.
+
+
+      **Authority is carried by the person, not the device** (ADR-0002) — so signing in again on the
+      same terminal is the way through.
+
+
+      **Also reached when `access` is not licensed.** The tenant has not bought this module, which is
+      a commercial answer and not a permission one — say which, because the person to ask is different.'
+    error: Not found. Offers SCN-009 by name instead
+    offline: Searches the bundle only. A reference issued after the last sync will not be found, and
+      the screen says so rather than denying
+  navigation:
+    exitTo:
+    - SCN-001
+    - SCN-002
+    - SCN-003
+    inferred: true
+  wireframe:
+    status: generated
+    board: wireframes/P07 Venue Scanner.dc.html#scn-008
+  notes: Definition derived from the wireframe board on 14 August. Components, states and operations
+    still to be written.
+  implementation:
+    app: venue-scanner
+    route: /access/manual-entry
+    component: apps/venue-scanner/src/routes/access/ManualEntryDetail.tsx
+    status: notStarted
+  apis:
+  - operationId: lookupTicket
+    contract: access
+    purpose: From the flow it appears in
+    trigger: onLoad
+  - operationId: getOfflinePackage
+    contract: access
+    purpose: Entitlement and rule set for offline validation
+    trigger: onLoad
+  - operationId: listScans
+    contract: access
+    purpose: List scan events
+    trigger: onLoad
+  - operationId: overrideAccess
+    contract: access
+    purpose: Admit against a failed validation
+    trigger: onAction
+  - operationId: syncScans
+    contract: access
+    purpose: Replay scans recorded offline
+    trigger: onAction
+  - operationId: validateAccess
+    contract: access
+    purpose: Validate media at an access point and admit or deny
+    trigger: onAction
+  - operationId: validateGroupAccess
+    contract: access
+    purpose: Admit a group on one read
+    trigger: onAction
+  density: comfortable
+  requiresModule: access
+  statesDerived: true
+- id: SCN-009
+  name: Ticket lookup
+  module: Access
+  purpose: Reads. Does not admit, does not decrement.
+  capability: C00
+  wave: 1
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+        notes: Structure from the wireframe board. Components not yet enumerated.
+  states:
+    loading: Name search across the bundle
+    emptyFirstRun: No match
+    emptyNoAccess: '**Says which permission is missing, and never renders as an empty list.** This screen
+      needs `ACCESS_OVERRIDE`, `ACCESS_VALIDATE`, `REPORT_VIEW_VENUE` and 1 more to use accesses; a
+      person without it sees the reason and who to ask, because an empty table reads as *there is no
+      data* and sends somebody to support with the wrong question.
+
+
+      **Authority is carried by the person, not the device** (ADR-0002) — so signing in again on the
+      same terminal is the way through.
+
+
+      **Also reached when `access` is not licensed.** The tenant has not bought this module, which is
+      a commercial answer and not a permission one — say which, because the person to ask is different.'
+    error: Search unavailable
+    offline: Bundle only, and the bundle age is shown beside the results
+  navigation:
+    exitTo:
+    - SCN-001
+    - SCN-002
+    - SCN-003
+    inferred: true
+  wireframe:
+    status: generated
+    board: wireframes/P07 Venue Scanner.dc.html#scn-009
+  notes: Definition derived from the wireframe board on 14 August. Components, states and operations
+    still to be written.
+  implementation:
+    app: venue-scanner
+    route: /access/ticket-lookup
+    component: apps/venue-scanner/src/routes/access/TicketLookupDetail.tsx
+    status: notStarted
+  apis:
+  - operationId: lookupTicket
+    contract: access
+    purpose: From the flow it appears in
+    trigger: onLoad
+  - operationId: getOfflinePackage
+    contract: access
+    purpose: Entitlement and rule set for offline validation
+    trigger: onLoad
+  - operationId: listScans
+    contract: access
+    purpose: List scan events
+    trigger: onLoad
+  - operationId: overrideAccess
+    contract: access
+    purpose: Admit against a failed validation
+    trigger: onAction
+  - operationId: syncScans
+    contract: access
+    purpose: Replay scans recorded offline
+    trigger: onAction
+  - operationId: validateAccess
+    contract: access
+    purpose: Validate media at an access point and admit or deny
+    trigger: onAction
+  - operationId: validateGroupAccess
+    contract: access
+    purpose: Admit a group on one read
+    trigger: onAction
+  density: comfortable
+  requiresModule: access
+  statesDerived: true
+- id: SCN-011
+  name: Delegated right
+  module: Access
+  purpose: A ticket issued in another cell, redeemed here.
+  capability: C00
+  wave: 1
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+        notes: Structure from the wireframe board. Components not yet enumerated.
+  states:
+    loading: Right resolution, which may cross cells
+    emptyFirstRun: No delegated right on this media
+    emptyNoAccess: '**Says which permission is missing, and never renders as an empty list.** This screen
+      needs `ACCESS_VALIDATE`, `TICKET_LOOKUP` to use accesses; a person without it sees the reason
+      and who to ask, because an empty table reads as *there is no data* and sends somebody to support
+      with the wrong question.
+
+
+      **Authority is carried by the person, not the device** (ADR-0002) — so signing in again on the
+      same terminal is the way through.'
+    error: Cross-cell lookup failed
+    offline: '**Not available offline.** A delegated right issued in another region cannot be verified
+      from a local bundle, and admitting on trust is how a pass gets used twice in two countries'
+  navigation:
+    exitTo:
+    - SCN-001
+    - SCN-002
+    - SCN-003
+    inferred: true
+  wireframe:
+    status: generated
+    board: wireframes/P07 Venue Scanner.dc.html#scn-011
+  notes: Definition derived from the wireframe board on 14 August. Components, states and operations
+    still to be written.
+  implementation:
+    app: venue-scanner
+    route: /access/delegated-right
+    component: apps/venue-scanner/src/routes/access/DelegatedRightDetail.tsx
+    status: notStarted
+  apis:
+  - operationId: getRedemptionRight
+    contract: cross-cell
+    purpose: From the flow it appears in
+    trigger: onLoad
+  - operationId: consumeRedemptionRight
+    contract: cross-cell
+    purpose: Consume entries against a right, locally authoritative
+    trigger: onAction
+  density: comfortable
+  entryState:
+    params:
+    - name: rightId
+      from: deepLink
+    coldEntry: '**A staff link opened cold resolves the thing or says plainly that it is gone.** No
+      silent redirect — a supervisor following a link from an alert needs to know whether the record
+      moved, closed or never existed, because those are three different next actions. **The scope is
+      resolved from the session, never from the link**: a link cannot move somebody to a venue they
+      do not hold. Arrives with `rightId`.'
+  requiresModule: core
+  statesDerived: true
+- id: SCN-013
+  name: Offline journal
+  module: Access
+  purpose: What the device decided, before anyone confirmed it.
+  capability: C00
+  wave: 1
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+        notes: Structure from the wireframe board. Components not yet enumerated.
+  states:
+    loading: Journal loads locally
+    emptyFirstRun: Nothing journalled
+    emptyNoAccess: '**Says which permission is missing, and never renders as an empty list.** This screen
+      needs `ACCESS_OVERRIDE`, `ACCESS_VALIDATE`, `REPORT_VIEW_VENUE` and 1 more to use accesses; a
+      person without it sees the reason and who to ask, because an empty table reads as *there is no
+      data* and sends somebody to support with the wrong question.
+
+
+      **Authority is carried by the person, not the device** (ADR-0002) — so signing in again on the
+      same terminal is the way through.
+
+
+      **Also reached when `access` is not licensed.** The tenant has not bought this module, which is
+      a commercial answer and not a permission one — say which, because the person to ask is different.'
+    error: Journal unreadable — the most serious failure on the device
+    offline: The journal is the offline record. It is why an offline admit is recoverable
+  navigation:
+    exitTo:
+    - SCN-001
+    - SCN-002
+    - SCN-003
+    inferred: true
+  wireframe:
+    status: generated
+    board: wireframes/P07 Venue Scanner.dc.html#scn-013
+  notes: Definition derived from the wireframe board on 14 August. Components, states and operations
+    still to be written.
+  implementation:
+    app: venue-scanner
+    route: /access/offline-journal
+    component: apps/venue-scanner/src/routes/access/OfflineJournalDetail.tsx
+    status: notStarted
+  apis:
+  - operationId: listScans
+    contract: access
+    purpose: From the flow it appears in
+    trigger: onLoad
+  - operationId: getOfflinePackage
+    contract: access
+    purpose: Entitlement and rule set for offline validation
+    trigger: onLoad
+  - operationId: lookupTicket
+    contract: access
+    purpose: Read-only validity check without admitting
+    trigger: onLoad
+  - operationId: overrideAccess
+    contract: access
+    purpose: Admit against a failed validation
+    trigger: onAction
+  - operationId: syncScans
+    contract: access
+    purpose: Replay scans recorded offline
+    trigger: onAction
+  - operationId: validateAccess
+    contract: access
+    purpose: Validate media at an access point and admit or deny
+    trigger: onAction
+  - operationId: validateGroupAccess
+    contract: access
+    purpose: Admit a group on one read
+    trigger: onAction
+  density: comfortable
+  requiresModule: access
+  statesDerived: true
+- id: SCN-014
+  name: Sync & reconciliation
+  module: Access
+  purpose: The screen nobody designs and everybody needs.
+  capability: C00
+  wave: 1
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+        notes: Structure from the wireframe board. Components not yet enumerated.
+  states:
+    loading: Sync in progress, with a count
+    emptyFirstRun: Nothing to sync
+    emptyNoAccess: '**Says which permission is missing, and never renders as an empty list.** This screen
+      needs `ACCESS_OVERRIDE`, `ACCESS_VALIDATE`, `ORDER_CREATE` and 3 more to use accesses; a person
+      without it sees the reason and who to ask, because an empty table reads as *there is no data*
+      and sends somebody to support with the wrong question.
+
+
+      **Authority is carried by the person, not the device** (ADR-0002) — so signing in again on the
+      same terminal is the way through.
+
+
+      **Also reached when `access` is not licensed.** The tenant has not bought this module, which is
+      a commercial answer and not a permission one — say which, because the person to ask is different.'
+    error: Sync failed. **The journal is kept** — a failed sync must never discard what it was carrying
+    offline: Not applicable. This screen exists to end the offline period
+  navigation:
+    exitTo:
+    - SCN-001
+    - SCN-002
+    - SCN-003
+    inferred: true
+    fromFlows: true
+  wireframe:
+    status: generated
+    board: wireframes/P07 Venue Scanner.dc.html#scn-014
+  notes: 'Definition derived from the wireframe board on 14 August. Components, states and operations
+    still to be written. **Cross-platform navigation removed 24 August**: ADM-003. **A till does not
+    navigate to a back office and a guest app does not navigate to either** — those are device handovers,
+    and a flow declares them with `crossesDevice` rather than a screen pretending there is a link.'
+  implementation:
+    app: venue-scanner
+    route: /access/sync-reconciliation
+    component: apps/venue-scanner/src/routes/access/SyncReconciliationDetail.tsx
+    status: notStarted
+  apis:
+  - operationId: syncScans
+    contract: access
+    purpose: From the flow it appears in
+    trigger: onLoad
+  - operationId: listSyncRejections
+    contract: orders
+    purpose: From the flow it appears in
+    trigger: onLoad
+  - operationId: getOfflinePackage
+    contract: access
+    purpose: Entitlement and rule set for offline validation
+    trigger: onLoad
+  - operationId: listScans
+    contract: access
+    purpose: List scan events
+    trigger: onLoad
+  - operationId: lookupTicket
+    contract: access
+    purpose: Read-only validity check without admitting
+    trigger: onLoad
+  - operationId: overrideAccess
+    contract: access
+    purpose: Admit against a failed validation
+    trigger: onAction
+  - operationId: syncOrders
+    contract: orders
+    purpose: Replay orders recorded offline
+    trigger: onAction
+  - operationId: validateAccess
+    contract: access
+    purpose: Validate media at an access point and admit or deny
+    trigger: onAction
+  - operationId: validateGroupAccess
+    contract: access
+    purpose: Admit a group on one read
+    trigger: onAction
+  density: comfortable
+  requiresModule: access
+  statesDerived: true
+- id: SCN-015
+  name: Offline package
+  module: Access
+  purpose: Rule changes land here, not instantly.
+  capability: C00
+  wave: 1
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+        notes: Structure from the wireframe board. Components not yet enumerated.
+  states:
+    loading: Downloading. Size and progress shown
+    emptyFirstRun: Not applicable
+    emptyNoAccess: '**Says which permission is missing, and never renders as an empty list.** This screen
+      needs `ACCESS_OVERRIDE`, `ACCESS_VALIDATE`, `REPORT_VIEW_VENUE` and 1 more to use accesses; a
+      person without it sees the reason and who to ask, because an empty table reads as *there is no
+      data* and sends somebody to support with the wrong question.
+
+
+      **Authority is carried by the person, not the device** (ADR-0002) — so signing in again on the
+      same terminal is the way through.
+
+
+      **Also reached when `access` is not licensed.** The tenant has not bought this module, which is
+      a commercial answer and not a permission one — say which, because the person to ask is different.'
+    error: Download failed. The previous bundle stays in place
+    offline: Cannot refresh. The existing bundle continues to be used and its age is shown
+  navigation:
+    exitTo:
+    - SCN-001
+    - SCN-002
+    - SCN-003
+    inferred: true
+    fromFlows: true
+  wireframe:
+    status: generated
+    board: wireframes/P07 Venue Scanner.dc.html#scn-015
+  notes: Definition derived from the wireframe board on 14 August. Components, states and operations
+    still to be written.
+  implementation:
+    app: venue-scanner
+    route: /access/offline-package
+    component: apps/venue-scanner/src/routes/access/OfflinePackageDetail.tsx
+    status: notStarted
+  apis:
+  - operationId: getOfflinePackage
+    contract: access
+    purpose: From the flow it appears in
+    trigger: onLoad
+  - operationId: listScans
+    contract: access
+    purpose: List scan events
+    trigger: onLoad
+  - operationId: lookupTicket
+    contract: access
+    purpose: Read-only validity check without admitting
+    trigger: onLoad
+  - operationId: overrideAccess
+    contract: access
+    purpose: Admit against a failed validation
+    trigger: onAction
+  - operationId: syncScans
+    contract: access
+    purpose: Replay scans recorded offline
+    trigger: onAction
+  - operationId: validateAccess
+    contract: access
+    purpose: Validate media at an access point and admit or deny
+    trigger: onAction
+  - operationId: validateGroupAccess
+    contract: access
+    purpose: Admit a group on one read
+    trigger: onAction
+  density: comfortable
+  requiresModule: access
+  statesDerived: true
+- id: SCN-016
+  name: Gate mode
+  module: Access
+  purpose: Podium operation. Changes what the gate does.
+  capability: C00
+  wave: 1
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+        notes: Structure from the wireframe board. Components not yet enumerated.
+  states:
+    loading: Current mode from the device
+    emptyFirstRun: Not applicable
+    emptyNoAccess: '**Says which permission is missing, and never renders as an empty list.** This screen
+      needs `SCOPE_VIEW`, `TURNSTILE_MODE_SET` to read scopes; a person without it sees the reason and
+      who to ask, because an empty table reads as *there is no data* and sends somebody to support with
+      the wrong question.
+
+
+      **Authority is carried by the person, not the device** (ADR-0002) — so signing in again on the
+      same terminal is the way through.
+
+
+      **Also reached when `access` is not licensed.** The tenant has not bought this module, which is
+      a commercial answer and not a permission one — say which, because the person to ask is different.'
+    error: Turnstile unreachable — the mode is a request, not a confirmed hardware state
+    offline: '**Requests only.** Hardware control is out of contract and the vendor SDK is outstanding
+      (CF-33)'
+  navigation:
+    exitTo:
+    - SCN-001
+    - SCN-002
+    - SCN-003
+    inferred: true
+  wireframe:
+    status: generated
+    board: wireframes/P07 Venue Scanner.dc.html#scn-016
+  notes: 'Definition derived from the wireframe board on 14 August. Components, states and operations
+    still to be written. **Authoring operations removed 24 August**: createAccessPoint, setAccessPointGeofence,
+    updateAccessPoint. **A scanner reads the gate configuration; it does not write it.** An access point
+    is created in the back office and a geofence is a venue decision — a handheld at a lane that can
+    redefine the lane is a handheld that can admit anywhere.'
+  implementation:
+    app: venue-scanner
+    route: /access/gate-mode
+    component: apps/venue-scanner/src/routes/access/GateModeDetail.tsx
+    status: notStarted
+  apis:
+  - operationId: setTurnstileMode
+    contract: access
+    purpose: From the flow it appears in
+    trigger: onLoad
+  - operationId: getAccessPoint
+    contract: access
+    purpose: Read an access point
+    trigger: onLoad
+  - operationId: listAccessPoints
+    contract: access
+    purpose: List access points
+    trigger: onLoad
+  density: comfortable
+  entryState:
+    params:
+    - name: accessPointId
+      from: deepLink
+    coldEntry: '**A staff link opened cold resolves the thing or says plainly that it is gone.** No
+      silent redirect — a supervisor following a link from an alert needs to know whether the record
+      moved, closed or never existed, because those are three different next actions. **The scope is
+      resolved from the session, never from the link**: a link cannot move somebody to a venue they
+      do not hold. Arrives with `accessPointId`.'
+  requiresModule: access
+  statesDerived: true

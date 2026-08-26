@@ -1,0 +1,66 @@
+id: LLD-Cell
+title: Cell — 9 transitions
+generatedBy: tools/derive-diagrams.py
+index: diagrams/hld/04-lifecycles.yaml
+source: states/cell.yaml
+entity: Cell
+contract: subscription
+enum: CellStatus
+enumKind: named
+enumSchema: CellStatus
+owner: control
+initial:
+- provisioning
+terminal:
+- failed
+transitions:
+- from: provisioning
+  to: active
+  trigger: job
+  guard: Provisioned, migrated to the current schema and health-checked
+- from: provisioning
+  to: failed
+  trigger: job
+  guard: Provisioning failed
+- from: active
+  to: migrating
+  operation: applyMigration
+  trigger: operation
+  guard: Schema migration in flight
+- from: migrating
+  to: active
+  trigger: job
+  guard: Migration complete and verified
+- from: migrating
+  to: failed
+  trigger: job
+  guard: Migration failed and rollback did not restore it
+- from: active
+  to: suspended
+  operation: suspendTenant
+  trigger: cascade
+  guard: Every tenant on the cell suspended
+- from: suspended
+  to: active
+  operation: reactivateTenant
+  trigger: cascade
+  guard: Reinstated
+  isReversal: true
+- from: active
+  to: decommissioning
+  operation: decommissionCell
+  trigger: operation
+  guard: Tenants migrated off. **Refused while any tenant remains**
+  requiresApproval: true
+- from: decommissioning
+  to: active
+  operation: cancelDecommission
+  trigger: operation
+  guard: Halted
+  isReversal: true
+  requiresApproval: true
+notes: No transition from `decommissioning` to a terminal state. A cell is retired by record, not deleted
+  — the audit of what ran where outlives the infrastructure.
+openQuestions:
+- '`decommissioning` has no exit. Either a `retired` state is missing from the enum, or decommissioning
+  is where a cell record ends and the enum should say so.'

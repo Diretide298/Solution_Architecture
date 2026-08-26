@@ -1,0 +1,190 @@
+id: LLD-CrossCellService
+title: CrossCellService — 16 operations, 1 tables
+generatedBy: tools/derive-diagrams.py
+tier: platform
+index: diagrams/hld/02-services.yaml
+why: '**The only service that reaches another region** (ADR-0010, ADR-0014). Separate because it is
+  the one place where data crosses a jurisdiction, and **a boundary that matters legally should be a
+  boundary that exists physically.**
+
+
+  It moves a pseudonymous guest link rather than a guest, which is the whole design.'
+scale: Low volume, high scrutiny.
+ifDown: Down blocks cross-region entitlements. Each region continues alone.
+coverage:
+  operations: 16
+  inAFlow: 5
+  percent: 31%
+  note: '**Flow coverage is how much of this service a journey has walked.** A service under 40% is
+    unwalked rather than under-documented.'
+schemas:
+- schema: sync
+  tables: 1
+  stores:
+  - postgres
+  largestTable: sync.rejection
+operationsByContract:
+- contract: cross-cell
+  count: 16
+  operations:
+  - operation: authoriseWalletSpend
+    verb: POST
+    path: /wallet-authorisations
+    scope: workstation
+    permission: ORDER_CREATE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: captureWalletAuthorisation
+    verb: POST
+    path: /wallet-authorisations/{authorisationId}/capture
+    scope: workstation
+    permission: ORDER_CREATE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: consumeRedemptionRight
+    verb: POST
+    path: /redemption-rights/{rightId}/consume
+    scope: workstation
+    permission: ACCESS_VALIDATE
+    offline: true
+    reads: 2
+    writes: 2
+  - operation: createDsarRequest
+    verb: POST
+    path: /dsar/requests
+    scope: tenant
+    permission: null
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: createGuestLink
+    verb: POST
+    path: /guest-links
+    scope: tenant
+    permission: null
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: getDsarRequest
+    verb: GET
+    path: /dsar/requests/{requestId}
+    scope: tenant
+    permission: null
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: getGuestLink
+    verb: GET
+    path: /guest-links/{guestLinkId}
+    scope: tenant
+    permission: null
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: getRedemptionRight
+    verb: GET
+    path: /redemption-rights/{rightId}
+    scope: venue
+    permission: TICKET_LOOKUP
+    offline: true
+    reads: 1
+    writes: 0
+  - operation: getWalletAllocation
+    verb: GET
+    path: /wallet-allocations
+    scope: venue
+    permission: ORDER_VIEW
+    offline: true
+    reads: 1
+    writes: 0
+  - operation: propagateRedemptionRight
+    verb: POST
+    path: /redemption-rights
+    scope: tenant
+    permission: null
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: reconcileRedemptions
+    verb: POST
+    path: /redemption-rights/reconcile
+    scope: tenant
+    permission: null
+    offline: false
+    reads: 3
+    writes: 2
+  - operation: releaseWalletAuthorisation
+    verb: POST
+    path: /wallet-authorisations/{authorisationId}/release
+    scope: workstation
+    permission: ORDER_CREATE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: resolveGuestLink
+    verb: GET
+    path: /guest-links/resolve
+    scope: tenant
+    permission: null
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: revokeGuestLink
+    verb: DELETE
+    path: /guest-links/{guestLinkId}
+    scope: tenant
+    permission: null
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: revokeRedemptionRight
+    verb: DELETE
+    path: /redemption-rights/{rightId}
+    scope: tenant
+    permission: null
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: setWalletAllocationPolicy
+    verb: PUT
+    path: /wallet-allocations
+    scope: region
+    permission: REGION_CONFIGURE
+    offline: false
+    reads: 2
+    writes: 2
+tables:
+- store: cache:idempotency
+  kind: cache
+  columns: 5
+  backing: redis
+  owned: false
+  why: '**Not a table and not owned by a service.** Derived from something already read, invalidated
+    by an event already consumed, losable without consequence — no migration, no backup, no owner.'
+- table: sync.rejection
+  columns: 9
+  store: postgres
+  parent: null
+  writtenBy:
+  - access
+  - games
+  foreignWriters:
+  - access
+  - games
+readsFrom:
+- service: TenancyService
+  operations: 16
+- service: AccessService
+  operations: 1
+writesOutside:
+- service: TenancyService
+  operations: 11
+  why: '**The owner defines the row; this service may only append to it.**'
+screens:
+- P07:SCN-003 Ready to scan
+- P07:SCN-011 Delegated right
+- P09:ADM-003 Cross-Tenant Health Dashboard
+flows:
+- F19 A membership works in another country

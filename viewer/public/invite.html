@@ -1,0 +1,276 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Atlas — accept your invite</title>
+    <script>
+      // Night by default here, whatever the app is set to. Both auth pages are
+      // designed night-first — the lattice, the scrim and the translucent card
+      // are built for a dark stage — and an explicit preference still wins.
+      // Inline and above the stylesheets on purpose: a module would paint the
+      // day palette first and flash.
+      try {
+        if ((localStorage.getItem('ticvai-theme') ?? 'dark') === 'dark') {
+          document.documentElement.dataset.theme = 'dark';
+        }
+      } catch { document.documentElement.dataset.theme = 'dark'; }
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+    href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap"
+    rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/styles.css" />
+    <link rel="stylesheet" href="/layers.css" />
+    <link rel="stylesheet" href="/auth.css" />
+    <link rel="stylesheet" href="/invite.css" />
+    <link rel="icon" href="/brand/atlas-mark.png" />
+  </head>
+  <body class="invite-page">
+    <!-- Three stacked layers: the lattice, a radial wash that sinks it behind
+         the card without hiding it, and the card. Neither of the first two
+         listens for anything — see auth-bg.js. -->
+    <canvas class="auth-field" id="invite-field" aria-hidden="true"></canvas>
+    <div class="auth-scrim" aria-hidden="true"></div>
+
+    <main class="invite-card">
+      <!-- Two cuts of the lockup: the card is translucent over a dark stage by
+           night and a pale one by day, and each wordmark disappears on the
+           other. The handoff composed the day one from a mark plus typeset
+           Montserrat because no dark-wordmark file existed then; one does now,
+           so this is the swap it asked for. -->
+      <div class="invite-brand">
+        <img
+          class="auth-lockup auth-lockup-day"
+          src="/brand/atlast_blackfont.png"
+          alt="Atlas — the context layer for AI-assisted development"
+        />
+        <img
+          class="auth-lockup auth-lockup-night"
+          src="/brand/atlas-lockup.png"
+          alt=""
+          aria-hidden="true"
+        />
+      </div>
+
+      <!-- Three states, one at a time: checking the link, the form, and the
+           refusal. Never a form over an invalid link — choosing a password and
+           only then being told the link is dead is a small cruelty. -->
+      <section id="checking" class="auth-state">
+        <p class="auth-note">Checking your invite…</p>
+      </section>
+
+      <section id="refused" class="auth-state" hidden>
+        <h1 class="auth-title">That link does not work</h1>
+        <p class="auth-note" id="refused-why"></p>
+        <p class="auth-note">
+          Ask whoever invited you for another. An invite works once, and expires
+          after seven days.
+        </p>
+      </section>
+
+      <section id="form" class="auth-state" hidden>
+        <h1 class="auth-title">Set up your account</h1>
+        <p class="auth-note">
+          This invite is for <b id="invite-email"></b>, as
+          <span id="invite-role"></span>. The address is fixed by whoever
+          invited you and cannot be changed here.
+        </p>
+
+        <div class="auth-field-row">
+          <label class="auth-label" for="name">Your name</label>
+          <input id="name" class="auth-input" type="text" autocomplete="name"
+                 placeholder="How your verdicts will be signed" />
+        </div>
+
+        <div class="auth-field-row">
+          <label class="auth-label" for="password">Password</label>
+          <input id="password" class="auth-input" type="password"
+                 autocomplete="new-password" placeholder="At least 12 characters" />
+        </div>
+
+        <div class="auth-field-row">
+          <label class="auth-label" for="confirm">Password again</label>
+          <input id="confirm" class="auth-input" type="password" autocomplete="new-password" />
+        </div>
+
+        <p class="auth-error" id="error" hidden></p>
+
+        <button id="submit" class="auth-button" type="button">Create my account</button>
+        <p class="auth-note auth-fine">
+          Long beats complicated. Three or four unrelated words are easier to
+          remember and harder to guess than <code>Passw0rd!</code>
+        </p>
+      </section>
+
+      <!-- The same link shape, opened by somebody who already has an account
+           and has lost the way into it. No name field: they chose that when
+           the account was made, and a reset is not a second chance to become
+           somebody else. -->
+      <section id="reset-form" class="auth-state" hidden>
+        <h1 class="auth-title">Set a new password</h1>
+        <p class="auth-note">
+          For <b id="reset-email"></b>. Choosing one here replaces the old
+          password and signs you out of every other browser you were still
+          signed in on.
+        </p>
+
+        <div class="auth-field-row">
+          <label class="auth-label" for="reset-password">New password</label>
+          <input id="reset-password" class="auth-input" type="password"
+                 autocomplete="new-password" placeholder="At least 12 characters" />
+        </div>
+
+        <div class="auth-field-row">
+          <label class="auth-label" for="reset-confirm">Password again</label>
+          <input id="reset-confirm" class="auth-input" type="password" autocomplete="new-password" />
+        </div>
+
+        <p class="auth-error" id="reset-error" hidden></p>
+
+        <button id="reset-submit" class="auth-button" type="button">Set my password</button>
+        <p class="auth-note auth-fine">
+          Nobody else sees this, now or later — only a hash of it is kept, and
+          whoever made you this link never learns what you chose. Long beats
+          complicated: three or four unrelated words are easier to remember and
+          harder to guess than <code>Passw0rd!</code>
+        </p>
+      </section>
+
+      <section id="done" class="auth-state" hidden>
+        <h1 class="auth-title">You are in</h1>
+        <p class="auth-note">
+          Signed in as <b id="done-email"></b>. You can record verdicts on
+          operations, tables, screens and boards.
+        </p>
+        <a class="auth-button" href="/">Open the viewer</a>
+      </section>
+
+      <!-- Who built it and who it is for. Outside the states, because it is
+           true of the page rather than of any one of them. -->
+      <div class="auth-foot">
+        <span class="auth-rings" aria-hidden="true">
+          <span class="auth-ring"></span><span class="auth-ring"></span>
+        </span>
+        <span class="auth-by">
+          <span class="auth-by-label">Powered by</span>
+          <span class="auth-by-name">Ainfinite<b>Core</b></span>
+        </span>
+        <img class="auth-partner" src="/brand/softlabs-logo.webp" alt="Softlabs Group" />
+      </div>
+    </main>
+
+    <script type="module">
+      import { startAuthBackground } from '/auth-bg.js';
+      startAuthBackground(document.getElementById('invite-field'));
+
+      import { checkInvite, redeemInvite, checkReset, useReset } from '/validation.js';
+
+      const $ = (id) => document.getElementById(id);
+      const show = (which) => {
+        for (const id of ['checking', 'refused', 'form', 'reset-form', 'done']) {
+          $(id).hidden = id !== which;
+        }
+      };
+
+      // The token rides in the fragment, not the query, so it is never sent to
+      // the server in a request line and never lands in an access log.
+      // One page, two links. A reset says so in the fragment; anything else is
+      // an invite, which is the shape this page had before resets existed and
+      // the shape every link already sent out still has.
+      const raw = location.hash.slice(1);
+      const isReset = raw.startsWith('reset=');
+      const token = decodeURIComponent(isReset ? raw.slice('reset='.length) : raw);
+
+      if (!token) {
+        $('refused-why').textContent = 'This link has no invite in it.';
+        show('refused');
+      } else if (isReset) {
+        try {
+          const who = await checkReset(token);
+          $('reset-email').textContent = who.email;
+          show('reset-form');
+          $('reset-password').focus();
+        } catch (error) {
+          $('refused-why').textContent = error.message;
+          show('refused');
+        }
+      } else {
+        try {
+          const invite = await checkInvite(token);
+          $('invite-email').textContent = invite.email;
+          $('invite-role').textContent = invite.role;
+          show('form');
+          $('name').focus();
+        } catch (error) {
+          $('refused-why').textContent = error.message;
+          show('refused');
+        }
+      }
+
+      const fail = (message) => {
+        $('error').textContent = message;
+        $('error').hidden = false;
+      };
+
+      const submit = async () => {
+        $('error').hidden = true;
+        const password = $('password').value;
+        if (password !== $('confirm').value) return fail('Those two passwords are not the same.');
+        if (password.length < 12) return fail('A password needs at least 12 characters.');
+
+        $('submit').disabled = true;
+        $('submit').textContent = 'Creating…';
+        try {
+          const result = await redeemInvite(token, $('name').value, password);
+          $('done-email').textContent = result.email;
+          show('done');
+        } catch (error) {
+          fail(error.message);
+          $('submit').disabled = false;
+          $('submit').textContent = 'Create my account';
+        }
+      };
+
+      $('submit').onclick = submit;
+      for (const id of ['name', 'password', 'confirm']) {
+        $(id).addEventListener('keydown', (e) => { if (e.key === 'Enter') submit(); });
+      }
+
+      const resetFail = (message) => {
+        $('reset-error').textContent = message;
+        $('reset-error').hidden = false;
+      };
+
+      const submitReset = async () => {
+        $('reset-error').hidden = true;
+        const password = $('reset-password').value;
+        if (password !== $('reset-confirm').value) {
+          return resetFail('Those two passwords are not the same.');
+        }
+        if (password.length < 12) {
+          return resetFail('A password needs at least 12 characters.');
+        }
+
+        $('reset-submit').disabled = true;
+        $('reset-submit').textContent = 'Setting…';
+        try {
+          const result = await useReset(token, password);
+          $('done-email').textContent = result.email;
+          show('done');
+        } catch (error) {
+          resetFail(error.message);
+          $('reset-submit').disabled = false;
+          $('reset-submit').textContent = 'Set my password';
+        }
+      };
+
+      $('reset-submit').onclick = submitReset;
+      for (const id of ['reset-password', 'reset-confirm']) {
+        $(id).addEventListener('keydown', (e) => { if (e.key === 'Enter') submitReset(); });
+      }
+    </script>
+  </body>
+</html>

@@ -1,0 +1,81 @@
+$schema: ./_schema.yaml
+id: F69
+name: An incident is reported, escalated and closed
+actor: supervisor
+capability: Incident management
+wave: 2
+frequency: Routine.
+criticality: safety
+primaryContract: workforce
+contracts:
+- workforce
+- approvals
+- marketing-crm
+platforms:
+- P06
+trigger:
+  description: Something happened — an injury, an evacuation, a theft. **The first minutes matter and
+    the record matters later.**
+offlineBehaviour: '**Reporting works offline and must.** An incident happens where it happens, and a
+  steward who has to walk to a signal is a steward not dealing with it.'
+steps:
+- step: 1
+  screen: EMP-026
+  action: A steward reports it from where it happened.
+  operations:
+  - reportIncident
+  outcome: '**Kind, location, people involved, time.** Typed in under a minute or it is typed later
+    and wrongly.'
+- step: 2
+  screen: EMP-027
+  action: A supervisor reads it and adds detail.
+  operations:
+  - getIncident
+  - updateIncident
+  outcome: '**Appended, never overwritten.** An incident record edited after the fact is a record that
+    cannot be relied on.'
+  crossesDevice: true
+- step: 3
+  screen: EMP-050
+  action: Where required, the authorities are notified.
+  operations:
+  - recordAuthorityNotification
+  - listIncidents
+  outcome: '**The notification is itself a record.** *We told the police* with no time and no name is
+    not evidence.'
+  crossesDevice: true
+- step: 4
+  screen: EMP-047
+  action: If it is a venue-wide event, an announcement goes out.
+  operations:
+  - publishAnnouncement
+  - acknowledgeAnnouncement
+  - getAnnouncementReach
+  outcome: '**Reach is measured.** An evacuation announcement nobody acknowledged is an evacuation nobody
+    heard.'
+  crossesDevice: true
+branches:
+- at: 2
+  condition: It involves a guest and becomes a case.
+  behaviour: '`createCase` links the incident to the guest record. **An incident is what happened; a
+    case is the conversation afterwards**, and conflating them puts operational detail in a guest-facing
+    thread.'
+  severity: high
+  resolvedBy: createCase
+- at: 4
+  condition: Staff do not acknowledge the announcement.
+  behaviour: '**Escalated by name, not re-broadcast.** A second identical message to everybody is a
+    message everybody ignores.'
+  severity: high
+  resolvedBy: getAnnouncementReach
+exitStates:
+- state: closed
+  description: Reported, actioned, recorded.
+- state: escalatedToAuthorities
+  description: '**With time and name.**'
+- state: linkedToCase
+  description: A guest is involved and the conversation continues elsewhere.
+notes: '**Written 24 August.** `EMP-027` could report a new incident from a detail screen — removed.
+  And **`getAnnouncementReach` had never been in a flow**: the platform could broadcast and never ask
+  who heard.'
+openQuestions: null

@@ -1,0 +1,94 @@
+$id: "ticvai/states/_schema.yaml"
+title: TICVAI state model
+
+description: >
+  ## What this is
+
+  **The legal transitions for every status enum in the contracts.**
+
+  Thirty-eight enums declare what states exist. None of them declares which moves between
+  those states are allowed, so nothing catches an order going from `held` to `refunded`
+  without ever being paid. The enum permits it; the business does not; no artefact says so.
+
+  ## Why this is a file and not prose
+
+  Written down as English, a state model is read once and then diverges. Written like this it
+  is checked: `tools/check-states.py` verifies that every state in a contract enum appears
+  here, that every state is reachable from an initial one, that every state can reach a
+  terminal one, and that no operation claims to produce a transition the model forbids.
+
+  ## Vocabulary
+
+  **initial** — a state an entity may be created in. Usually one; occasionally several, where
+  a record can be created already advanced.
+
+  **terminal** — a state nothing leaves. An entity in a terminal state is finished, and the
+  check that every state reaches one is what catches a state that traps records.
+
+  **transition** — `from` → `to`, with the operation that causes it and the guard that must
+  hold. The guard is prose; the point is that it is stated somewhere rather than living in
+  whoever wrote the handler.
+
+  **reversal** — a transition that undoes an earlier one. Marked because reversals are where
+  money and entitlements move backwards, and they carry different approval requirements.
+
+type: object
+required: [entity, contract, enum, initial, terminal, transitions]
+properties:
+  entity:
+    type: string
+    description: The business concept, in the language people use for it.
+  contract:
+    type: string
+    description: Which OpenAPI file holds the enum.
+  enum:
+    type: string
+    description: The schema name. Must exist in that contract, and its values must match.
+  owner:
+    type: string
+    description: >
+      The bounded context whose operations legitimately move this state. Others read it. This
+      is the ownership matrix, recorded where it is enforceable rather than in a table nobody
+      opens.
+  initial:
+    type: array
+    items: { type: string }
+  terminal:
+    type: array
+    items: { type: string }
+  offlineReachable:
+    type: array
+    description: >
+      States a terminal may enter while disconnected. Everything else requires the server. On
+      an offline-capable surface this is the difference between a sale that completes and one
+      that cannot.
+    items: { type: string }
+  transitions:
+    type: array
+    items:
+      type: object
+      required: [from, to]
+      properties:
+        from: { type: string }
+        to: { type: string }
+        operation:
+          type: string
+          description: operationId that causes it. Absent where a job or timer does.
+        trigger:
+          type: string
+          enum: [operation, timer, job, externalEvent, cascade]
+        guard:
+          type: string
+          description: What must be true. Stated here so it is not only in a handler.
+        isReversal:
+          type: boolean
+          default: false
+        requiresApproval: { type: boolean, default: false }
+        emits:
+          type: array
+          description: Domain events this transition publishes. Cross-checked against events/.
+          items: { type: string }
+  notes: { type: string }
+  openQuestions:
+    type: array
+    items: { type: string }

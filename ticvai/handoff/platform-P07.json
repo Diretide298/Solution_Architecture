@@ -1,0 +1,402 @@
+{
+ "code": "P07",
+ "name": "Venue Scanner \u2014 Access Control",
+ "shortName": "Venue Scanner",
+ "app": "venue-scanner",
+ "operator": "venue",
+ "audience": "staff",
+ "formFactor": "handheld",
+ "offlineCapable": true,
+ "generated": "2026-08-26",
+ "note": "Derived by tools/derive-platform.py. **The gaps section is the point** \u2014 a page listing what exists is a directory; one listing what is missing is a worklist.",
+ "counts": {
+  "screens": 11,
+  "operations": 23,
+  "contracts": 5,
+  "modules": 1,
+  "undrawn": 0,
+  "operationsWithNoScreen": 40
+ },
+ "waves": {
+  "wave1": 11
+ },
+ "modules": [
+  {
+   "module": "Access",
+   "screens": 11,
+   "waves": [
+    1
+   ]
+  }
+ ],
+ "contracts": [
+  {
+   "contract": "access",
+   "operations": 11
+  },
+  {
+   "contract": "identity",
+   "operations": 7
+  },
+  {
+   "contract": "orders",
+   "operations": 2
+  },
+  {
+   "contract": "cross-cell",
+   "operations": 2
+  },
+  {
+   "contract": "shift",
+   "operations": 1
+  }
+ ],
+ "screens": [
+  {
+   "id": "SCN-001",
+   "name": "Sign in",
+   "module": "Access",
+   "wave": 1,
+   "route": "/access/sign-in",
+   "operations": 8,
+   "drawn": true
+  },
+  {
+   "id": "SCN-002",
+   "name": "Access point & direction",
+   "module": "Access",
+   "wave": 1,
+   "route": "/access/access-point-direction",
+   "operations": 3,
+   "drawn": true
+  },
+  {
+   "id": "SCN-003",
+   "name": "Ready to scan",
+   "module": "Access",
+   "wave": 1,
+   "route": "/access/ready-to-scan",
+   "operations": 9,
+   "drawn": true
+  },
+  {
+   "id": "SCN-007",
+   "name": "Group admission",
+   "module": "Access",
+   "wave": 1,
+   "route": "/access/group-admission",
+   "operations": 7,
+   "drawn": true
+  },
+  {
+   "id": "SCN-008",
+   "name": "Manual entry",
+   "module": "Access",
+   "wave": 1,
+   "route": "/access/manual-entry",
+   "operations": 7,
+   "drawn": true
+  },
+  {
+   "id": "SCN-009",
+   "name": "Ticket lookup",
+   "module": "Access",
+   "wave": 1,
+   "route": "/access/ticket-lookup",
+   "operations": 7,
+   "drawn": true
+  },
+  {
+   "id": "SCN-011",
+   "name": "Delegated right",
+   "module": "Access",
+   "wave": 1,
+   "route": "/access/delegated-right",
+   "operations": 2,
+   "drawn": true
+  },
+  {
+   "id": "SCN-013",
+   "name": "Offline journal",
+   "module": "Access",
+   "wave": 1,
+   "route": "/access/offline-journal",
+   "operations": 7,
+   "drawn": true
+  },
+  {
+   "id": "SCN-014",
+   "name": "Sync & reconciliation",
+   "module": "Access",
+   "wave": 1,
+   "route": "/access/sync-reconciliation",
+   "operations": 9,
+   "drawn": true
+  },
+  {
+   "id": "SCN-015",
+   "name": "Offline package",
+   "module": "Access",
+   "wave": 1,
+   "route": "/access/offline-package",
+   "operations": 7,
+   "drawn": true
+  },
+  {
+   "id": "SCN-016",
+   "name": "Gate mode",
+   "module": "Access",
+   "wave": 1,
+   "route": "/access/gate-mode",
+   "operations": 3,
+   "drawn": true
+  }
+ ],
+ "gaps": {
+  "operationsWithNoScreen": [
+   {
+    "operation": "enrolFacePass",
+    "contract": "access",
+    "verb": "POST",
+    "summary": "Register a facial profile against an entitlement"
+   },
+   {
+    "operation": "getFacePassEnrolment",
+    "contract": "access",
+    "verb": "GET",
+    "summary": "Whether a pass has a face registered, and when"
+   },
+   {
+    "operation": "revokeFacePass",
+    "contract": "access",
+    "verb": "DELETE",
+    "summary": "Remove a facial profile"
+   },
+   {
+    "operation": "authoriseWalletSpend",
+    "contract": "cross-cell",
+    "verb": "POST",
+    "summary": "Hold funds against the guest's home-cell balance"
+   },
+   {
+    "operation": "captureWalletAuthorisation",
+    "contract": "cross-cell",
+    "verb": "POST",
+    "summary": "Capture a held amount"
+   },
+   {
+    "operation": "getWalletAllocation",
+    "contract": "cross-cell",
+    "verb": "GET",
+    "summary": "The consuming cell's bounded offline allocation"
+   },
+   {
+    "operation": "releaseWalletAuthorisation",
+    "contract": "cross-cell",
+    "verb": "POST",
+    "summary": "Release a hold without capturing"
+   },
+   {
+    "operation": "setWalletAllocationPolicy",
+    "contract": "cross-cell",
+    "verb": "PUT",
+    "summary": "Set the allocation cap policy"
+   },
+   {
+    "operation": "createMfaChallenge",
+    "contract": "identity",
+    "verb": "POST",
+    "summary": "Step-up authentication for a sensitive action"
+   },
+   {
+    "operation": "exportSubjectData",
+    "contract": "identity",
+    "verb": "POST",
+    "summary": "Everything the platform holds about one guest"
+   },
+   {
+    "operation": "setPasswordPolicy",
+    "contract": "identity",
+    "verb": "PUT",
+    "summary": "Length, breach check, lockout and step-up"
+   },
+   {
+    "operation": "setSegregationRules",
+    "contract": "identity",
+    "verb": "PUT",
+    "summary": "Which permissions may not be held together"
+   },
+   {
+    "operation": "captureStoredValue",
+    "contract": "orders",
+    "verb": "POST",
+    "summary": "Take some or all of a held balance"
+   },
+   {
+    "operation": "convertReservation",
+    "contract": "orders",
+    "verb": "POST",
+    "summary": "Convert a reservation into an order"
+   },
+   {
+    "operation": "convertToTermProduct",
+    "contract": "orders",
+    "verb": "POST",
+    "summary": "Turn a visit into a membership or season pass"
+   },
+   {
+    "operation": "createPaymentLink",
+    "contract": "orders",
+    "verb": "POST",
+    "summary": "Send a guest a link to pay later"
+   },
+   {
+    "operation": "createResaleListing",
+    "contract": "orders",
+    "verb": "POST",
+    "summary": "List an entitlement for resale"
+   },
+   {
+    "operation": "createReservation",
+    "contract": "orders",
+    "verb": "POST",
+    "summary": "Hold without payment"
+   },
+   {
+    "operation": "extendReservation",
+    "contract": "orders",
+    "verb": "POST",
+    "summary": "Extend a reservation"
+   },
+   {
+    "operation": "getGroupBooking",
+    "contract": "orders",
+    "verb": "GET",
+    "summary": ""
+   },
+   {
+    "operation": "issueInvitation",
+    "contract": "orders",
+    "verb": "POST",
+    "summary": "Issue a complimentary entitlement, with no payment expected"
+   },
+   {
+    "operation": "listAbandonedCarts",
+    "contract": "orders",
+    "verb": "GET",
+    "summary": "Carts that lapsed without checking out"
+   },
+   {
+    "operation": "listChargebacks",
+    "contract": "orders",
+    "verb": "GET",
+    "summary": "Open disputes, by deadline"
+   },
+   {
+    "operation": "listFraudRules",
+    "contract": "orders",
+    "verb": "GET",
+    "summary": ""
+   },
+   {
+    "operation": "listInvitationAllowances",
+    "contract": "orders",
+    "verb": "GET",
+    "summary": "Who may issue comps, and how many are left"
+   },
+   {
+    "operation": "listPaymentProviders",
+    "contract": "orders",
+    "verb": "GET",
+    "summary": "Gateways configured for this scope"
+   },
+   {
+    "operation": "listPaymentTokens",
+    "contract": "orders",
+    "verb": "GET",
+    "summary": "A guest's saved payment methods"
+   },
+   {
+    "operation": "openGuestCreditAccount",
+    "contract": "orders",
+    "verb": "POST",
+    "summary": "A credit limit for an individual booking ahead"
+   },
+   {
+    "operation": "printTicketProof",
+    "contract": "orders",
+    "verb": "POST",
+    "summary": "Print a sample without selling anything"
+   },
+   {
+    "operation": "pushWalletPassUpdate",
+    "contract": "orders",
+    "verb": "POST",
+    "summary": "Push a change to every device holding it"
+   },
+   {
+    "operation": "quoteUpgrade",
+    "contract": "orders",
+    "verb": "POST",
+    "summary": "What an upgrade costs, pro-rata"
+   },
+   {
+    "operation": "reissueEntitlement",
+    "contract": "orders",
+    "verb": "POST",
+    "summary": "Zero-value reissue of an expired entitlement for a later date"
+   },
+   {
+    "operation": "resendPaymentLink",
+    "contract": "orders",
+    "verb": "POST",
+    "summary": ""
+   },
+   {
+    "operation": "respondToChargeback",
+    "contract": "orders",
+    "verb": "POST",
+    "summary": "Submit evidence, or accept the loss"
+   },
+   {
+    "operation": "setFraudRules",
+    "contract": "orders",
+    "verb": "PUT",
+    "summary": ""
+   },
+   {
+    "operation": "setPaymentProvider",
+    "contract": "orders",
+    "verb": "PUT",
+    "summary": "Configure a gateway and its routing"
+   },
+   {
+    "operation": "shareEntitlement",
+    "contract": "orders",
+    "verb": "POST",
+    "summary": "Let somebody else use this, without giving it away"
+   },
+   {
+    "operation": "splitOrder",
+    "contract": "orders",
+    "verb": "POST",
+    "summary": "Break one order into independent orders"
+   },
+   {
+    "operation": "storePaymentToken",
+    "contract": "orders",
+    "verb": "POST",
+    "summary": "Save a payment method for future use"
+   },
+   {
+    "operation": "voidPayment",
+    "contract": "orders",
+    "verb": "POST",
+    "summary": "Release an authorisation before it is captured"
+   }
+  ],
+  "modulesSplitAcrossWaves": [],
+  "screensNotDrawn": [],
+  "flowsNamingAMissingScreen": []
+ }
+}

@@ -1,0 +1,86 @@
+$schema: ./_schema.yaml
+id: F56
+name: A guest registers, verifies and sets preferences
+actor: guest
+capability: Guest identity
+wave: 3
+frequency: Routine.
+criticality: safety
+primaryContract: identity
+contracts:
+- identity
+- marketing-crm
+platforms:
+- P02
+- P01
+trigger:
+  description: '**The front door of the platform.** `GST-042` declares 21 operations and 19 were in
+    no flow; `WEB-016` declares 22 with 20 uncovered.'
+offlineBehaviour: '**None of it works offline and none of it should.** A credential minted on a device
+  nobody verified is a credential.'
+steps:
+- step: 1
+  screen: GST-042
+  action: They register — social, UAE Pass, or an email.
+  operations:
+  - guestSocialLogin
+  - guestUaePassLogin
+  - completeSsoAuthorization
+  outcome: '**Three doors, one subject.** UAE Pass is the one that matters locally, and it arrives verified
+    in a way an email never is.'
+- step: 2
+  screen: GST-042
+  action: An OTP or MFA is enrolled where the venue needs it.
+  operations:
+  - enrolMfaMethod
+  - listMfaMethods
+  outcome: '**Enrolled at registration, not at first sensitive act.** A guest asked for MFA halfway
+    through a purchase abandons the purchase.'
+- step: 3
+  screen: WEB-016
+  action: A guest who checked out anonymously links their order.
+  operations:
+  - linkGuestCheckout
+  - claimCart
+  outcome: '**This is the operation that stops duplicates.** A guest who bought without an account and
+    registers afterwards is one person — and without this they are two, which is what `mergeGuests`
+    then has to fix.'
+  crossesDevice: true
+- step: 4
+  screen: GST-039
+  action: They set a profile.
+  operations: []
+  outcome: Name, language, accessibility needs.
+  crossesDevice: true
+- step: 5
+  screen: GST-065
+  action: And their marketing preferences.
+  operations:
+  - recordConsent
+  outcome: '**Consent is separate from preference and is never inherited.** CF-160 made a merge take
+    the narrower of two consents for exactly this reason.'
+  crossesDevice: true
+exitStates:
+- state: registered
+  description: Verified, profiled, consented.
+- state: registeredUnverified
+  description: '**Cannot receive transferred tickets** — `verifyGuestEmail` exists because an unverified
+    account could receive someone else’s.'
+- state: linkedExisting
+  description: Recognised as an existing guest.
+branches:
+- at: 1
+  condition: The email already exists.
+  behaviour: '**Offered a login, not refused.** A guest told *that email is taken* about their own email
+    is a guest who makes a second account.'
+  severity: high
+  resolvedBy: guestSocialLogin
+- at: 3
+  condition: The anonymous order cannot be matched.
+  behaviour: '**Left unlinked rather than guessed.** Linking the wrong order gives a stranger somebody
+    else’s ticket.'
+  severity: high
+  resolvedBy: linkGuestCheckout
+notes: '**Written 24 August. The largest single gap in the package** — the front door, entirely unwalked.
+  Step 3 is the one that prevents the duplicate `mergeGuests` was built to clean up.'
+openQuestions: null

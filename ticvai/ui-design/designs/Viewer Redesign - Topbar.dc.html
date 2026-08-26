@@ -1,0 +1,1016 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  html, body { margin: 0; padding: 0; background: #F5F5F5; overflow-x: auto; }
+  body { font-family: 'Plus Jakarta Sans', system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+  a { color: #1C7E80; text-decoration: none; }
+  a:hover { color: #186B6D; }
+  @keyframes atlasFlow { to { stroke-dashoffset: -100; } }
+  @keyframes atlasComet { to { stroke-dashoffset: -104; } }
+  @keyframes atlasOrbit { to { stroke-dashoffset: -60; } }
+  @keyframes atlasSonar { 0% { transform: scale(.72); opacity: .5; } 65% { opacity: 0; } 100% { transform: scale(2.5); opacity: 0; } }
+  @keyframes atlasBob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-2.5px); } }
+  @keyframes atlasTwinkle { 0%, 100% { opacity: .08; } 50% { opacity: .5; } }
+  @keyframes atlasBreathe { 0%, 100% { filter: brightness(1); } 50% { filter: brightness(1.22); } }
+  *, *::before, *::after { box-sizing: border-box; }
+  ::-webkit-scrollbar { width: 10px; height: 10px; }
+  ::-webkit-scrollbar-thumb { background: #CFCFCF; border-radius: 99px; border: 3px solid transparent; background-clip: content-box; }
+  ::-webkit-scrollbar-track { background: transparent; }
+</style>
+</helmet>
+<div style="display:flex;flex-direction:column;height:100vh;min-width:1180px;background:#F5F5F5;color:#2E2E2E;font-size:14px">
+
+  <header style="background:#333333;display:flex;align-items:center;gap:20px;padding:0 22px;height:64px;flex:none">
+    <img src="brand/atlas-lockup-day.png" alt="Atlas — the context layer for AI-assisted development" style="height:46px;width:auto;display:block;flex:none" />
+    <span style="width:1px;height:26px;background:rgba(255,255,255,.13);flex:none"></span>
+    <nav style="display:flex;align-items:center;gap:3px;background:#292929;border-radius:11px;padding:4px;flex:none">
+      <sc-for list="{{ layers }}" as="l" hint-placeholder-count="5">
+        <a href="#" onClick="{{ l.pick }}" style="display:flex;align-items:center;gap:8px;padding:8px 14px;border-radius:8px;font-size:13px;font-weight:600;white-space:nowrap;background:{{ l.bg }};color:{{ l.fg }};box-shadow:{{ l.shadow }}" style-hover="color:#fff">
+          {{ l.name }}
+          <span style="font-family:'JetBrains Mono',monospace;font-size:10.5px;font-weight:500;opacity:.7">{{ l.count }}</span>
+        </a>
+      </sc-for>
+    </nav>
+    <span style="flex:1"></span>
+    <label style="display:flex;align-items:center;gap:10px;flex:0 1 210px;padding:9px 13px;border-radius:11px;background:#4A4A4A;border:1px solid #565656">
+      <span style="width:13px;height:13px;border:1.6px solid #9A9A9A;border-radius:50%;display:block;flex:none"></span>
+      <input type="search" placeholder="Search operations, schemas…" style="border:0;background:transparent;outline:none;font:inherit;font-size:13px;width:100%;color:#F7F7F7" />
+      <kbd style="font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:500;color:#B5B5B5;background-color:#525252;border-radius:5px;padding:3px 6px;flex:none">⌘K</kbd>
+    </label>
+    <span style="display:flex;align-items:center;gap:10px;flex:none">
+      <span style="width:7px;height:7px;border-radius:50%;background:#48CFCB;box-shadow:0 0 0 4px rgba(72,207,203,.2);display:block" title="Watching for changes"></span>
+      <span style="display:flex;flex-direction:column;text-align:right">
+        <span style="font-size:12.5px;font-weight:700;color:#F7F7F7">hamza</span>
+        <span style="font-size:9.5px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:#ADADAD">reviewer</span>
+      </span>
+      <span style="width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#229799,#48CFCB);color:#fff;font-size:11.5px;font-weight:700;display:flex;align-items:center;justify-content:center">HA</span>
+    </span>
+  </header>
+
+  <div style="background:#3A3A3A;border-bottom:1px solid #4A4A4A;display:flex;align-items:center;gap:20px;padding:0 22px;height:52px;flex:none">
+    <nav style="display:flex;align-items:stretch;gap:2px;height:100%">
+      <sc-for list="{{ views }}" as="v" hint-placeholder-count="5">
+        <a href="#" onClick="{{ v.pick }}" style="display:flex;align-items:center;gap:8px;padding:0 14px;font-size:13.5px;font-weight:600;white-space:nowrap;border-bottom:2.5px solid {{ v.line }};color:{{ v.fg }}" style-hover="color:#fff">
+          {{ v.name }}
+          <kbd style="font-family:'JetBrains Mono',monospace;font-size:10px;padding:2px 5px;border-radius:5px;background:#4E4E4E;color:#B5B5B5">{{ v.key }}</kbd>
+        </a>
+      </sc-for>
+    </nav>
+    <span style="flex:1"></span>
+    <span style="font-size:11.5px;font-weight:600;color:#ADADAD;white-space:nowrap">{{ summary }}</span>
+    <span style="width:1px;height:22px;background:#4E4E4E"></span>
+    <div style="display:flex;align-items:center;gap:8px">
+      <sc-for list="{{ toggles }}" as="t" hint-placeholder-count="2">
+        <button onClick="{{ t.pick }}" style="border:1px solid {{ t.border }};border-radius:9px;padding:7px 12px;font:inherit;font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;background:{{ t.bg }};color:{{ t.fg }}" style-hover="border-color:#6E6E6E">{{ t.name }}</button>
+      </sc-for>
+    </div>
+  </div>
+
+  <div style="flex:1;display:grid;grid-template-columns:272px minmax(440px,1fr) 296px;min-height:0">
+
+    <aside style="background:#FFFFFF;border-right:1px solid #DEDEDE;display:flex;flex-direction:column;overflow:hidden">
+      <div style="padding:15px 15px 12px;display:flex;flex-direction:column;gap:11px;border-bottom:1px solid #F5F5F5">
+        <div style="display:flex;background:#F5F5F5;border-radius:10px;padding:3px;gap:2px">
+          <sc-for list="{{ groupings }}" as="g" hint-placeholder-count="3">
+            <button onClick="{{ g.pick }}" style="flex:1;border:0;padding:7px 0;border-radius:8px;font:inherit;font-size:12px;font-weight:600;cursor:pointer;background:{{ g.bg }};color:{{ g.fg }};box-shadow:{{ g.shadow }}" style-hover="color:#2E2E2E">{{ g.name }}</button>
+          </sc-for>
+        </div>
+        <label style="display:flex;align-items:center;gap:9px;padding:9px 12px;border-radius:10px;background:#fff;border:1px solid #E4E4E4">
+          <span style="width:13px;height:13px;border:1.6px solid #9A9A9A;border-radius:50%;display:block;flex:none"></span>
+          <input type="search" placeholder="{{ filterHint }}" style="border:0;background:transparent;outline:none;font:inherit;font-size:13px;width:100%;color:#F7F7F7" />
+        </label>
+      </div>
+
+      <div style="margin:13px 13px 2px;padding:11px 13px;border-radius:11px;background:#EEF1F0;border:1px solid #D8DFDC;font-size:11.5px;line-height:1.55;color:#4F5E5A">{{ note }}</div>
+
+      <div style="flex:1;overflow:auto;padding:8px 9px 14px;min-height:0;display:flex;flex-direction:column;gap:13px">
+        <sc-for list="{{ groups }}" as="grp" hint-placeholder-count="2">
+          <div style="display:flex;flex-direction:column;gap:1px">
+            <div style="display:flex;align-items:center;gap:8px;padding:4px 11px 7px">
+              <span style="width:7px;height:7px;border-radius:2px;background:{{ grp.tone }};display:block;flex:none"></span>
+              <span style="font-size:9.5px;font-weight:700;letter-spacing:0.13em;text-transform:uppercase;color:#8A8A8A">{{ grp.title }}</span>
+              <span style="flex:1"></span>
+              <span style="font-family:'JetBrains Mono',monospace;font-size:10.5px;color:#8A8A8A">{{ grp.count }}</span>
+            </div>
+            <sc-for list="{{ grp.items }}" as="s" hint-placeholder-count="9">
+              <a href="#" onClick="{{ s.pick }}" style="display:flex;align-items:center;gap:10px;padding:8px 11px;border-radius:9px;background:{{ s.bg }};color:{{ s.fg }};font-weight:{{ s.weight }}" style-hover="background:#F4F4F4">
+                <span style="font-family:'JetBrains Mono',monospace;font-size:10.5px;font-weight:500;color:#8A8A8A;flex:none;width:{{ s.idw }}">{{ s.id }}</span>
+                <span style="font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ s.name }}</span>
+                <span style="flex:1"></span>
+                <span style="font-family:'JetBrains Mono',monospace;font-size:10.5px;color:#8A8A8A">{{ s.meta }}</span>
+              </a>
+            </sc-for>
+          </div>
+        </sc-for>
+      </div>
+
+      <div style="padding:13px 16px;display:flex;align-items:center;gap:10px;flex:none;background:#333333">
+        <span style="display:flex;align-items:center;flex:none">
+          <span style="width:14px;height:14px;border-radius:50%;border:2.2px solid #48CFCB;display:block"></span>
+          <span style="width:14px;height:14px;border-radius:50%;border:2.2px solid #229799;display:block;margin-left:-5px"></span>
+        </span>
+        <span style="display:flex;flex-direction:column;line-height:1.25">
+          <span style="font-size:8.5px;font-weight:700;letter-spacing:0.16em;text-transform:uppercase;color:#ADADAD">Powered by</span>
+          <span style="font-size:12.5px;font-weight:700;letter-spacing:-0.01em;color:#F7F7F7">Ainfinite<span style="color:#48CFCB">Core</span></span>
+        </span>
+        <span style="flex:1"></span>
+        <span style="width:1px;height:22px;background:rgba(255,255,255,.14);flex:none"></span>
+        <img src="softlabs-logo.webp" alt="Softlabs Group" style="width:78px;height:auto;display:block;flex:none;filter:brightness(0) invert(1);opacity:.66" />
+      </div>
+    </aside>
+
+    <main style="display:flex;flex-direction:column;overflow:hidden;min-height:0;background:#F5F5F5">
+      <div style="background:#FAFAFA;border-bottom:1px solid #DEDEDE;padding:14px 24px;display:flex;flex-wrap:wrap;align-items:center;gap:11px 18px;flex:none">
+        <div style="flex:1 1 250px;min-width:0">
+          <h1 style="margin:0;font-size:20px;font-weight:800;letter-spacing:-0.02em;color:#2E2E2E">{{ title }}</h1>
+          <div style="margin-top:3px;font-size:12.5px;font-weight:500;color:#6E6E6E">{{ sub }}</div>
+        </div>
+        <div style="display:flex;flex-wrap:wrap;gap:7px;align-items:center">
+          <sc-for list="{{ chips }}" as="c" hint-placeholder-count="4">
+            <span style="display:inline-flex;align-items:center;gap:7px;padding:6px 11px;border-radius:9px;background:#fff;border:1px solid #E4E4E4;font-size:11.5px;font-weight:600;color:#2E2E2E;white-space:nowrap">
+              <span style="font-size:9.5px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#8A8A8A">{{ c.k }}</span>{{ c.v }}
+            </span>
+          </sc-for>
+        </div>
+      </div>
+
+      <div style="flex:1;overflow:auto;padding:18px 24px 36px;display:flex;flex-direction:column;gap:16px;min-height:0">
+
+        <sc-if value="{{ isScreen }}" hint-placeholder-val="{{ true }}">
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(350px,1fr));gap:16px;align-items:start">
+            <section style="background:#fff;border:1px solid #E4E4E4;border-radius:15px;box-shadow:0 1px 2px rgba(66,66,66,.06);overflow:hidden">
+              <div style="padding:16px 19px 13px;display:flex;flex-wrap:wrap;align-items:center;gap:10px;background:#FFFFFF;border-bottom:1px solid #F5F5F5">
+                <h2 style="margin:0;font-size:15px;font-weight:700;letter-spacing:-0.01em">Layout</h2>
+                <span style="font-size:11px;font-weight:600;color:#6E6E6E">contentBody · 4 components</span>
+                <span style="flex:1"></span>
+                <span style="font-size:11px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#1C7E80;background:#E5F7F6;border-radius:7px;padding:4px 9px">region</span>
+              </div>
+              <div style="padding:5px 19px 18px;display:flex;flex-direction:column">
+                <sc-for list="{{ components }}" as="c" hint-placeholder-count="4">
+                  <div style="padding:13px 0;border-bottom:1px dashed #F5F5F5;display:flex;flex-direction:column;gap:5px">
+                    <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+                      <span style="font-family:'JetBrains Mono',monospace;font-size:12.5px;font-weight:500;color:#229799">{{ c.kind }}</span>
+                      <span style="font-size:13.5px;font-weight:600;color:#2E2E2E">{{ c.label }}</span>
+                      <span style="flex:1"></span>
+                      <span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#1C7E80;background:#E5F7F6;border-radius:6px;padding:3px 8px">{{ c.binds }}</span>
+                    </div>
+                    <div style="font-size:12.5px;line-height:1.5;color:#6E6E6E;max-width:52ch">{{ c.note }}</div>
+                  </div>
+                </sc-for>
+              </div>
+            </section>
+
+            <div style="display:flex;flex-direction:column;gap:16px">
+              <section style="background:#fff;border:1px solid #E4E4E4;border-radius:15px;box-shadow:0 1px 2px rgba(66,66,66,.06);padding:16px 19px 18px">
+                <div style="display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-bottom:13px">
+                  <h2 style="margin:0;font-size:15px;font-weight:700;letter-spacing:-0.01em">States</h2>
+                  <span style="font-size:11px;font-weight:600;color:#6E6E6E">3 of 4 declared</span>
+                </div>
+                <div style="display:flex;flex-direction:column;gap:9px">
+                  <sc-for list="{{ screenStates }}" as="s" hint-placeholder-count="4">
+                    <div style="display:grid;grid-template-columns:7px minmax(0,1fr);gap:13px;padding:12px 14px;border-radius:11px;background:#FAFAFA;border:1px solid #F5F5F5">
+                      <span style="border-radius:99px;background:{{ s.tone }};display:block"></span>
+                      <span style="display:flex;flex-direction:column;gap:4px">
+                        <span style="display:flex;align-items:center;gap:9px;flex-wrap:wrap">
+                          <b style="font-size:13px;font-weight:700">{{ s.name }}</b>
+                          <span style="font-size:11.5px;color:#6E6E6E">{{ s.when }}</span>
+                        </span>
+                        <span style="font-size:12.5px;line-height:1.5;color:#5C5C5C">{{ s.body }}</span>
+                      </span>
+                    </div>
+                  </sc-for>
+                </div>
+              </section>
+
+              <section style="background:#fff;border:1px solid #E4E4E4;border-radius:15px;box-shadow:0 1px 2px rgba(66,66,66,.06);padding:16px 19px 18px">
+                <div style="display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-bottom:6px">
+                  <h2 style="margin:0;font-size:15px;font-weight:700;letter-spacing:-0.01em">Reaches</h2>
+                  <span style="font-size:10px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#7A6534;background:#F1EDE3;border-radius:7px;padding:4px 9px">finding</span>
+                </div>
+                <p style="margin:0;font-size:12.5px;line-height:1.6;color:#5C5C5C">This screen names no operation, so it reaches nothing. It can be drawn and it cannot be built — and 192 of the 347 screens are in the same position.</p>
+              </section>
+            </div>
+          </div>
+
+          <section style="background:#fff;border:1px solid #E4E4E4;border-radius:15px;box-shadow:0 1px 2px rgba(66,66,66,.06);padding:16px 19px 20px">
+            <div style="display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-bottom:14px">
+              <h2 style="margin:0;font-size:15px;font-weight:700;letter-spacing:-0.01em">Deployment</h2>
+              <span style="font-size:11px;font-weight:600;color:#6E6E6E">whole platform · P01 Guest Web — Storefront</span>
+            </div>
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(148px,1fr));gap:11px">
+              <sc-for list="{{ deployment }}" as="d" hint-placeholder-count="8">
+                <div style="padding:13px 14px;border-radius:11px;background:#FAFAFA;border:1px solid #F5F5F5;display:flex;flex-direction:column;gap:5px">
+                  <span style="font-size:9.5px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:#8A8A8A">{{ d.k }}</span>
+                  <span style="font-size:13px;font-weight:600;color:#3A3A3A;line-height:1.4">{{ d.v }}</span>
+                </div>
+              </sc-for>
+            </div>
+          </section>
+        </sc-if>
+
+        <sc-if value="{{ isGraph }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;flex-direction:column;gap:14px">
+            <div style="display:flex;flex-wrap:wrap;align-items:center;gap:8px">
+              <div style="display:flex;background:#F0F0F0;border-radius:10px;padding:3px;gap:2px">
+                <sc-for list="{{ graphTabs }}" as="g" hint-placeholder-count="5">
+                  <button onClick="{{ g.pick }}" style="border:0;padding:7px 14px;border-radius:8px;font:inherit;font-size:12px;font-weight:600;cursor:pointer;background:{{ g.bg }};color:{{ g.fg }};box-shadow:{{ g.shadow }}" style-hover="color:#2E2E2E">{{ g.name }}</button>
+                </sc-for>
+              </div>
+              <span style="font-size:11.5px;font-weight:600;color:#6E6E6E">24 contracts · 32 event links between them · 21 critical consumers</span>
+              <div style="display:flex;background:#F0F0F0;border-radius:10px;padding:3px;gap:2px">
+                <sc-for list="{{ dimTabs }}" as="d" hint-placeholder-count="2">
+                  <button onClick="{{ d.pick }}" style="border:0;padding:6px 12px;border-radius:8px;font-family:'JetBrains Mono',monospace;font-size:11.5px;font-weight:500;cursor:pointer;background:{{ d.bg }};color:{{ d.fg }};box-shadow:{{ d.shadow }}">{{ d.name }}</button>
+                </sc-for>
+              </div>
+              <span style="flex:1"></span>
+              <button style="border:1px solid #E4E4E4;background:#fff;border-radius:9px;padding:7px 14px;font:inherit;font-size:12px;font-weight:600;color:#525252;cursor:pointer" style-hover="border-color:#C9C9C9">Fit</button>
+            </div>
+
+            <div style="position:relative;background:radial-gradient(120% 92% at 50% 46%,#16262C 0%,#111A1F 38%,#0D1113 72%,#0A0C0E 100%);border:1px solid #D8D8D8;border-radius:15px;box-shadow:0 1px 2px rgba(66,66,66,.06);height:520px;overflow:hidden">
+              <canvas ref="{{ bindGalaxy }}" style="position:absolute;inset:0;width:100%;height:100%;display:block"></canvas>
+              <div style="position:absolute;inset:0;pointer-events:none;background:radial-gradient(126% 98% at 50% 46%,transparent 46%,rgba(5,8,10,.66) 100%)"></div>
+              <div style="position:absolute;left:0;right:0;bottom:0;z-index:90;display:flex;flex-wrap:wrap;align-items:center;gap:7px 20px;padding:14px 18px;background:linear-gradient(to top,rgba(7,11,13,.94) 0%,rgba(7,11,13,.72) 62%,transparent 100%)">
+                <sc-for list="{{ graphLegend }}" as="l" hint-placeholder-count="5">
+                  <span style="display:flex;align-items:center;gap:8px;font-size:11.5px;color:#A0B4B3;white-space:nowrap">
+                    <span style="width:8px;height:8px;border-radius:50%;background:{{ l.color }};display:block;flex:none"></span>{{ l.text }}
+                  </span>
+                </sc-for>
+                <span style="flex:1"></span>
+                <span style="font-size:11px;color:#7C8E8D;white-space:nowrap">dot size is the operation count · the sphere turns on its own</span>
+              </div>
+            </div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ isER }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;flex-direction:column;gap:14px">
+            <div style="display:flex;flex-wrap:wrap;align-items:center;gap:10px">
+              <span style="display:inline-flex;align-items:center;gap:9px;padding:8px 13px;border-radius:10px;background:#fff;border:1px solid #E4E4E4;font-size:12.5px;font-weight:600;color:#2E2E2E">satellite / fnb <span style="color:#8A8A8A">▾</span></span>
+              <span style="font-size:11.5px;font-weight:600;color:#6E6E6E">37 entities · 1 referenced from other contracts · 29 relationships</span>
+              <span style="flex:1"></span>
+              <button style="border:1px solid #E4E4E4;background:#fff;border-radius:9px;padding:7px 14px;font:inherit;font-size:12px;font-weight:600;color:#525252;cursor:pointer" style-hover="border-color:#C9C9C9">Fit</button>
+            </div>
+
+            <div style="position:relative;background:#FFFFFF;border:1px solid #E4E4E4;border-radius:15px;box-shadow:0 1px 2px rgba(66,66,66,.06);padding:20px;overflow:auto">
+              <div style="position:absolute;inset:0;background-image:radial-gradient(#E4E4E4 1px,transparent 1px);background-size:22px 22px;opacity:.9"></div>
+              <div style="position:relative;display:grid;grid-template-columns:repeat(auto-fill,minmax(268px,1fr));gap:20px">
+                <sc-for list="{{ entities }}" as="e" hint-placeholder-count="8">
+                  <div style="background:#fff;border:1.5px solid {{ e.border }};border-radius:12px;overflow:hidden;box-shadow:0 2px 8px rgba(66,66,66,.10)">
+                    <div style="padding:11px 14px;background:{{ e.head }};display:flex;align-items:center;gap:9px">
+                      <span style="width:8px;height:8px;border-radius:50%;background:{{ e.dot }};display:block;flex:none"></span>
+                      <span style="font-size:14.5px;font-weight:700;letter-spacing:-0.01em;color:{{ e.headFg }}">{{ e.name }}</span>
+                      <span style="flex:1"></span>
+                      <span style="font-family:'JetBrains Mono',monospace;font-size:11.5px;font-weight:500;color:{{ e.countFg }}">{{ e.count }}</span>
+                    </div>
+                    <div style="padding:8px 0 10px;display:flex;flex-direction:column">
+                      <sc-for list="{{ e.fields }}" as="f" hint-placeholder-count="5">
+                        <span style="display:flex;align-items:baseline;gap:12px;padding:6px 14px">
+                          <span style="font-family:'JetBrains Mono',monospace;font-size:12.5px;color:{{ f.nameFg }};font-weight:{{ f.weight }}">{{ f.n }}</span>
+                          <span style="flex:1;border-bottom:1px dotted #F5F5F5;min-width:8px"></span>
+                          <span style="font-family:'JetBrains Mono',monospace;font-size:11.5px;color:#8A8A8A;white-space:nowrap">{{ f.t }}</span>
+                        </span>
+                      </sc-for>
+                    </div>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+
+            <div style="display:flex;flex-wrap:wrap;gap:16px;padding:13px 16px;background:#fff;border:1px solid #E4E4E4;border-radius:12px">
+              <sc-for list="{{ erLegend }}" as="l" hint-placeholder-count="3">
+                <span style="display:flex;align-items:center;gap:9px;font-size:11.5px;color:#5C5C5C">
+                  <span style="width:9px;height:9px;border-radius:50%;background:{{ l.color }};display:block;flex:none"></span>{{ l.text }}
+                </span>
+              </sc-for>
+              <span style="flex:1"></span>
+              <span style="font-size:11px;color:#8A8A8A">click a field to follow its $ref · drag a box to pin it</span>
+            </div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ isStates }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;flex-direction:column;gap:14px">
+            <div style="display:flex;flex-wrap:wrap;align-items:center;gap:10px">
+              <span style="display:inline-flex;align-items:center;gap:9px;padding:8px 13px;border-radius:10px;background:#fff;border:1px solid #E4E4E4;font-size:12.5px;font-weight:600;color:#2E2E2E">Order — 9 states <span style="color:#8A8A8A">▾</span></span>
+              <span style="font-size:11.5px;font-weight:600;color:#6E6E6E">9 states · 14 transitions · 5 reversals · checked against orders.OrderStatus</span>
+              <span style="flex:1"></span>
+              <button style="border:1px solid #E4E4E4;background:#fff;border-radius:9px;padding:7px 14px;font:inherit;font-size:12px;font-weight:600;color:#525252;cursor:pointer" style-hover="border-color:#C9C9C9">Fit</button>
+            </div>
+
+            <div style="position:relative;background:#FFFFFF;border:1px solid #E4E4E4;border-radius:15px;box-shadow:0 1px 2px rgba(66,66,66,.06);height:480px;overflow:hidden">
+              <div style="position:absolute;inset:0;background-image:radial-gradient(#E4E4E4 1px,transparent 1px);background-size:22px 22px;opacity:.9"></div>
+              <span style="position:absolute;inset:0">{{ transitionSvg }}</span>
+              <sc-for list="{{ transLabels }}" as="l" hint-placeholder-count="5">
+                <span style="position:absolute;left:{{ l.left }};top:{{ l.top }};transform:translate(-50%,-50%);font-size:11px;font-weight:600;color:{{ l.color }};background:rgba(247,249,252,.92);padding:1px 5px;border-radius:4px;white-space:nowrap">{{ l.text }}</span>
+              </sc-for>
+              <sc-for list="{{ stateNodes }}" as="s" hint-placeholder-count="9">
+                <span style="position:absolute;left:{{ s.left }};top:{{ s.top }};transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;gap:1px;padding:9px 16px;border-radius:10px;background:#fff;border:1.6px solid {{ s.border }};box-shadow:0 2px 6px rgba(66,66,66,.09)">
+                  <span style="font-size:13px;font-weight:700;letter-spacing:-0.01em;color:#2E2E2E;white-space:nowrap">{{ s.name }}</span>
+                  <sc-if value="{{ s.offline }}" hint-placeholder-val="{{ false }}">
+                    <span style="font-size:9px;font-weight:600;letter-spacing:0.09em;text-transform:uppercase;color:#8A8A8A">offline</span>
+                  </sc-if>
+                </span>
+              </sc-for>
+              <div style="position:absolute;left:16px;bottom:16px;background:rgba(255,255,255,.94);border:1px solid #E4E4E4;border-radius:12px;padding:13px 15px;display:flex;flex-direction:column;gap:7px">
+                <sc-for list="{{ stateLegend }}" as="l" hint-placeholder-count="5">
+                  <span style="display:flex;align-items:center;gap:9px;font-size:11.5px;color:#5C5C5C">
+                    <span style="width:9px;height:9px;border-radius:50%;background:{{ l.color }};display:block;flex:none"></span>{{ l.text }}
+                  </span>
+                </sc-for>
+                <span style="font-size:11px;color:#8A8A8A;margin-top:2px">drag a state to move it · hover a transition for its guard</span>
+              </div>
+            </div>
+
+            <section style="background:#fff;border:1px solid #E4E4E4;border-radius:15px;box-shadow:0 1px 2px rgba(66,66,66,.06);padding:16px 19px 18px">
+              <div style="display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-bottom:8px">
+                <h2 style="margin:0;font-size:15px;font-weight:700;letter-spacing:-0.01em">Note</h2>
+                <span style="font-size:10px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#7A6534;background:#F1EDE3;border-radius:7px;padding:4px 9px">defect</span>
+              </div>
+              <p style="margin:0;font-size:12.5px;line-height:1.6;color:#5C5C5C;max-width:88ch"><b style="color:#2E2E2E">held → refunded is not a transition.</b> A parked sale was never paid, so there is nothing to return. The enum permits it and the business does not, which is the defect this file exists to catch.</p>
+            </section>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ isJourney }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;flex-direction:column;gap:14px">
+            <section style="background:#fff;border:1px solid #E4E4E4;border-radius:15px;box-shadow:0 1px 2px rgba(66,66,66,.06);padding:16px 19px 18px;display:flex;flex-direction:column;gap:12px">
+              <div style="display:flex;flex-direction:column;gap:7px">
+                <span style="font-size:9.5px;font-weight:700;letter-spacing:0.13em;text-transform:uppercase;color:#8A8A8A">Trigger</span>
+                <p style="margin:0;font-size:13px;line-height:1.6;color:#424242;max-width:88ch">A guest arrives wanting to visit. Most arrive on a product page from a search engine or a campaign link rather than the homepage, so the flow must work from any entry point.</p>
+              </div>
+              <div style="height:1px;background:#F5F5F5"></div>
+              <div style="display:flex;flex-direction:column;gap:7px">
+                <span style="font-size:9.5px;font-weight:700;letter-spacing:0.13em;text-transform:uppercase;color:#7A6534">Offline — cannot start</span>
+                <p style="margin:0;font-size:13px;line-height:1.6;color:#424242;max-width:88ch">The storefront is a web surface with no local bundle. Availability and pricing are read live, and selling from a cached catalogue to an anonymous browser would oversell within minutes. This is the deliberate opposite of the POS position (ADR-0013): a POS has a known workstation, a shift and a lease; a browser has none of those.</p>
+              </div>
+            </section>
+
+            <div style="display:flex;align-items:stretch;overflow-x:auto;padding-bottom:6px">
+              <sc-for list="{{ journeySteps }}" as="s" hint-placeholder-count="4">
+                <div style="display:flex;align-items:center;flex:none">
+                  <div style="width:258px;background:#fff;border:1px solid #E4E4E4;border-radius:13px;box-shadow:0 1px 2px rgba(66,66,66,.06);padding:14px 15px 15px;display:flex;flex-direction:column;gap:9px">
+                    <div style="display:flex;align-items:center;gap:9px">
+                      <span style="width:21px;height:21px;border-radius:7px;background:#E5F7F6;color:#186B6D;font-size:11.5px;font-weight:700;display:flex;align-items:center;justify-content:center">{{ s.n }}</span>
+                      <span style="font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:500;color:#6E6E6E">{{ s.id }}</span>
+                      <span style="flex:1"></span>
+                      <span style="font-family:'JetBrains Mono',monospace;font-size:10px;color:#8A8A8A">{{ s.platform }}</span>
+                    </div>
+                    <div style="display:flex;flex-direction:column;gap:3px">
+                      <span style="font-size:14px;font-weight:700;letter-spacing:-0.01em;color:#2E2E2E">{{ s.name }}</span>
+                      <span style="font-size:12.5px;color:#6E6E6E">{{ s.does }}</span>
+                    </div>
+                    <div style="display:flex;flex-direction:column;gap:5px">
+                      <sc-for list="{{ s.ops }}" as="o" hint-placeholder-count="2">
+                        <span style="display:flex;align-items:center;gap:8px;padding:6px 10px;border-radius:8px;background:#FAFAFA;border:1px solid #F5F5F5;font-family:'JetBrains Mono',monospace;font-size:11.5px;color:#3A3A3A">
+                          <span style="width:5px;height:5px;border-radius:50%;background:#229799;display:block;flex:none"></span>{{ o }}
+                        </span>
+                      </sc-for>
+                    </div>
+                    <span style="font-size:12px;line-height:1.5;color:#6E6E6E">→ {{ s.outcome }}</span>
+                  </div>
+                  <sc-if value="{{ s.arrow }}" hint-placeholder-val="{{ true }}">
+                    <span style="width:32px;text-align:center;font-size:15px;color:#B5B5B5;flex:none">→</span>
+                  </sc-if>
+                </div>
+              </sc-for>
+            </div>
+
+            <section style="background:#fff;border:1px solid #E4E4E4;border-radius:15px;box-shadow:0 1px 2px rgba(66,66,66,.06);padding:16px 19px 18px">
+              <div style="display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-bottom:13px">
+                <h2 style="margin:0;font-size:15px;font-weight:700;letter-spacing:-0.01em">Branches</h2>
+                <span style="font-size:11px;font-weight:600;color:#6E6E6E">7 across the flow · 2 on this step</span>
+              </div>
+              <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:11px">
+                <sc-for list="{{ branches }}" as="b" hint-placeholder-count="2">
+                  <div style="display:grid;grid-template-columns:4px minmax(0,1fr);gap:13px;padding:13px 15px;border-radius:11px;background:#FAFAFA;border:1px solid #F5F5F5">
+                    <span style="border-radius:99px;background:#229799;display:block"></span>
+                    <span style="display:flex;flex-direction:column;gap:6px">
+                      <b style="font-size:13px;font-weight:700;line-height:1.45;color:#2E2E2E">{{ b.title }}</b>
+                      <span style="font-size:12.5px;line-height:1.55;color:#5C5C5C">{{ b.body }}</span>
+                      <span style="display:flex;align-items:center;gap:8px;margin-top:1px">
+                        <span style="font-size:9.5px;font-weight:700;letter-spacing:0.11em;text-transform:uppercase;color:#186B6D;background:#E5F7F6;border-radius:6px;padding:3px 8px">{{ b.tag }}</span>
+                        <span style="font-family:'JetBrains Mono',monospace;font-size:10.5px;color:#8A8A8A">{{ b.res }}</span>
+                      </span>
+                    </span>
+                  </div>
+                </sc-for>
+              </div>
+            </section>
+          </div>
+        </sc-if>
+      </div>
+    </main>
+
+    <aside style="background:#FFFFFF;border-left:1px solid #DEDEDE;display:flex;flex-direction:column;overflow:hidden">
+      <div style="padding:18px 19px 14px;border-bottom:1px solid #F5F5F5;display:flex;align-items:center;gap:9px">
+        <h2 style="margin:0;font-size:12px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:#2E2E2E">Links</h2>
+        <span style="flex:1"></span>
+        <span style="font-size:11px;font-weight:600;color:#6E6E6E">what points here</span>
+      </div>
+      <div style="flex:1;overflow:auto;padding:17px 19px 24px;display:flex;flex-direction:column;gap:21px;min-height:0">
+        <sc-for list="{{ linkGroups }}" as="g" hint-placeholder-count="3">
+          <div style="display:flex;flex-direction:column;gap:9px">
+            <div style="display:flex;align-items:center;gap:8px">
+              <span style="font-size:10px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:#8A8A8A">{{ g.title }}</span>
+              <span style="flex:1"></span>
+              <span style="font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:500;color:#2E2E2E;background:#F5F5F5;border-radius:6px;padding:2px 7px">{{ g.count }}</span>
+            </div>
+            <sc-if value="{{ g.empty }}" hint-placeholder-val="{{ false }}">
+              <p style="margin:0;font-size:12.5px;line-height:1.55;color:#8A8A8A">{{ g.emptyNote }}</p>
+            </sc-if>
+            <sc-for list="{{ g.items }}" as="i" hint-placeholder-count="2">
+              <a href="#" onClick="{{ noop }}" style="display:flex;align-items:center;gap:9px;padding:9px 11px;border-radius:10px;background:#fff;border:1px solid #F5F5F5;color:#3A3A3A" style-hover="border-color:#48CFCB;background:#F0FCFB">
+                <span style="font-family:'JetBrains Mono',monospace;font-size:10.5px;color:#8A8A8A;flex:none">{{ i.id }}</span>
+                <span style="font-size:12.5px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ i.name }}</span>
+                <span style="flex:1"></span>
+                <span style="font-size:10px;font-weight:700;letter-spacing:0.08em;color:#8A8A8A">{{ i.tag }}</span>
+              </a>
+            </sc-for>
+          </div>
+        </sc-for>
+      </div>
+    </aside>
+  </div>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1500,&quot;height&quot;:950}}">
+class Component extends DCLogic {
+  // the 24 contracts, their operation counts and their tier — the labelled nodes on the sphere
+  CONTRACTS = [
+    ['catalogue', 73, 'spine'], ['orders', 68, 'spine'], ['finance', 54, 'spine'],
+    ['identity', 47, 'spine'], ['access', 35, 'spine'], ['tenancy', 31, 'spine'],
+    ['shift', 26, 'spine'], ['cross-cell', 24, 'spine'],
+    ['inventory', 44, 'sat'], ['reporting', 38, 'sat'], ['fnb', 33, 'sat'],
+    ['subscription', 31, 'sat'], ['seating', 29, 'sat'], ['marketing-crm', 42, 'sat'],
+    ['promotions', 30, 'sat'], ['platform-ops', 28, 'sat'], ['assets', 22, 'sat'],
+    ['retail', 27, 'sat'], ['white-label', 36, 'sat'], ['games', 21, 'sat'],
+    ['queue', 25, 'sat'], ['maintenance', 40, 'sat'],
+    ['common', 18, 'core'], ['permissions', 16, 'core'],
+  ];
+  EVENT_LINKS = [
+    ['catalogue','orders',1], ['catalogue','finance',1], ['catalogue','white-label',1],
+    ['catalogue','inventory',1], ['catalogue','seating',1], ['catalogue','subscription',1],
+    ['orders','finance',1], ['orders','reporting',0], ['orders','marketing-crm',0],
+    ['orders','fnb',0], ['maintenance','queue',1], ['maintenance','games',1],
+    ['maintenance','catalogue',0], ['finance','inventory',1], ['finance','reporting',1],
+    ['access','inventory',0], ['identity','cross-cell',0], ['tenancy','catalogue',0],
+    ['shift','catalogue',0], ['inventory','reporting',0], ['marketing-crm','identity',0],
+    ['seating','orders',0],
+  ];
+
+  bindGalaxy = (el) => {
+    if (!el || el === this._cv) return;
+    this._cv = el;
+    if (this._raf) cancelAnimationFrame(this._raf);
+    if (!this._model) this._model = this.buildGalaxy();
+    this._raf = requestAnimationFrame(this.drawGalaxy);
+  };
+
+  // deep link: the landing page sends #layer=Contracts
+  FIRST_VIEW = { Frontend: 'Screen', Contracts: 'Graph', Domain: 'States', Backend: 'Services', Decisions: 'Register' };
+  readLayerFromHash = () => {
+    const m = /layer=([A-Za-z]+)/.exec(window.location.hash || '');
+    if (!m) return;
+    const want = Object.keys(this.FIRST_VIEW).find(k => k.toLowerCase() === m[1].toLowerCase());
+    if (want) this.setState({ layer: want, view: this.FIRST_VIEW[want] });
+  };
+  componentDidMount() {
+    this.readLayerFromHash();
+    window.addEventListener('hashchange', this.readLayerFromHash);
+  }
+  componentWillUnmount() {
+    if (this._raf) cancelAnimationFrame(this._raf);
+    window.removeEventListener('hashchange', this.readLayerFromHash);
+  }
+
+  buildGalaxy() {
+    let sd = 20260821;
+    const rnd = () => (sd = (sd * 1103515245 + 12345) % 2147483648) / 2147483648;
+    const GOLD = Math.PI * (3 - Math.sqrt(5));
+    const onSphere = (i, n, r) => {
+      const y = 1 - (i / Math.max(1, n - 1)) * 2, rad = Math.sqrt(Math.max(0, 1 - y * y));
+      const th = GOLD * i;
+      return { x: Math.cos(th) * rad * r, y: y * r, z: Math.sin(th) * rad * r };
+    };
+    const hubs = this.CONTRACTS.map(([name, ops, tier], i) => {
+      const p = onSphere(i + 0.5, this.CONTRACTS.length, tier === 'core' ? 0.34 : 1);
+      return { ...p, name, ops, tier, r: 1.5 + Math.pow(ops, 0.55) * 0.3 };
+    });
+    // 2D fallback: the same contracts as two concentric rings on a plane
+    const rings = { spine: 0.56, sat: 1, core: 0.17 };
+    const seen = { spine: 0, sat: 0, core: 0 };
+    const per = { spine: 8, sat: 14, core: 2 };
+    hubs.forEach(h => {
+      const i = seen[h.tier]++;
+      const a = (i / per[h.tier]) * Math.PI * 2 - Math.PI / 2 + (h.tier === 'sat' ? 0.22 : 0);
+      h.fx = Math.cos(a) * rings[h.tier];
+      h.fy = Math.sin(a) * rings[h.tier];
+    });
+    const byName = {}; hubs.forEach(h => { byName[h.name] = h; });
+    const links = this.EVENT_LINKS.map(([a, b, crit]) => ({ a: byName[a], b: byName[b], crit }));
+    // the dust: every operation, schema and permission the contracts carry
+    const dust = [];
+    for (let i = 0; i < 900; i++) {
+      const u = rnd() * 2 - 1, th = rnd() * Math.PI * 2, rad = Math.sqrt(1 - u * u);
+      const shell = rnd() > 0.22;
+      const rr = shell ? 0.9 + (rnd() - 0.5) * 0.15 : 0.3 + rnd() * 0.52;
+      dust.push({ x: Math.cos(th) * rad * rr, y: u * rr, z: Math.sin(th) * rad * rr,
+        r: 0.35 + rnd() * 0.95, tw: rnd() * 6.283, hot: rnd() > 0.9 });
+    }
+    // filaments — each mote tied to its two nearest neighbours, computed once
+    const web = [];
+    for (let i = 0; i < dust.length; i++) {
+      const a = dust[i]; const near = [];
+      for (let j = 0; j < dust.length; j++) {
+        if (i === j) continue;
+        const b = dust[j];
+        const d2 = (a.x - b.x) ** 2 + (a.y - b.y) ** 2 + (a.z - b.z) ** 2;
+        if (d2 < 0.011) near.push([d2, j]);
+      }
+      near.sort((p, q) => p[0] - q[0]);
+      near.slice(0, 3).forEach(([, j]) => { if (j > i) web.push([i, j]); });
+    }
+    return { hubs, links, dust, web };
+  }
+
+  drawGalaxy = () => {
+    const cv = this._cv, m = this._model;
+    if (!cv || !m) return;
+    const box = cv.getBoundingClientRect();
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    if (cv.width !== Math.round(box.width * dpr) || cv.height !== Math.round(box.height * dpr)) {
+      cv.width = Math.round(box.width * dpr); cv.height = Math.round(box.height * dpr);
+    }
+    const g = cv.getContext('2d');
+    const W = box.width, H = box.height;
+    g.setTransform(dpr, 0, 0, dpr, 0, 0);
+    g.clearRect(0, 0, W, H);
+    const t = performance.now() / 1000;
+    const flat = this.state.graphMode === '2D';
+    const yaw = t * 0.11, pitch = -0.34 + Math.sin(t * 0.07) * 0.06;
+    const R = Math.min(W * 0.3, H * 0.37), cx = W / 2, cy = H * 0.43, FOV = 3.1;
+    const cy_ = Math.cos(yaw), sy_ = Math.sin(yaw), cp = Math.cos(pitch), sp = Math.sin(pitch);
+    const proj = (p) => {
+      const x1 = p.x * cy_ + p.z * sy_, z1 = -p.x * sy_ + p.z * cy_;
+      const y2 = p.y * cp - z1 * sp, z2 = p.y * sp + z1 * cp;
+      const k = FOV / (FOV + z2 * 1.35);
+      return { sx: cx + x1 * R * k, sy: cy + y2 * R * k, k, z: z2 };
+    };
+
+    g.globalCompositeOperation = 'lighter';
+    const FR = Math.min(W * 0.34, H * 0.36);
+    const flatPos = (h) => ({ sx: cx + h.fx * FR, sy: cy + h.fy * FR, k: 1, z: 0 });
+    if (flat) {
+      // the two rings, drawn as guides rather than left implicit
+      g.strokeStyle = 'rgba(143,207,204,.16)';
+      g.lineWidth = 1; g.setLineDash([1.5, 7]);
+      [0.56, 1].forEach(r => { g.beginPath(); g.arc(cx, cy, FR * r, 0, 6.284); g.stroke(); });
+      g.setLineDash([]);
+    }
+    const dp = flat ? [] : m.dust.map(proj);
+    if (!flat) {
+    m.web.forEach(([i, j]) => {
+      const a = dp[i], b = dp[j];
+      if (!a || !b) return;
+      const dep = (a.z + b.z) / 2;
+      g.strokeStyle = 'rgba(120,214,210,' + (0.15 - dep * 0.08).toFixed(3) + ')';
+      g.lineWidth = 0.5;
+      g.beginPath(); g.moveTo(a.sx, a.sy); g.lineTo(b.sx, b.sy); g.stroke();
+    });
+    m.dust.forEach((d, i) => {
+      const p = dp[i];
+      const tw = 0.55 + Math.sin(t * 1.4 + d.tw) * 0.3;
+      const a = Math.max(0, (0.5 - p.z * 0.3)) * tw * (d.hot ? 2 : 1);
+      const rad = Math.max(0.4, d.r * p.k);
+      const grd = g.createRadialGradient(p.sx, p.sy, 0, p.sx, p.sy, rad * 2.4);
+      grd.addColorStop(0, 'rgba(' + (d.hot ? '224,250,248' : '150,232,228') + ',' + a.toFixed(3) + ')');
+      grd.addColorStop(0.5, 'rgba(96,214,210,' + (a * 0.45).toFixed(3) + ')');
+      grd.addColorStop(1, 'rgba(72,207,203,0)');
+      g.fillStyle = grd;
+      g.beginPath(); g.arc(p.sx, p.sy, rad * 2.4, 0, 6.284); g.fill();
+    });
+    }
+
+    const hp = m.hubs.map(h => flat ? flatPos(h) : proj(h));
+    const idx = new Map(); m.hubs.forEach((h, i) => idx.set(h, i));
+    m.links.forEach((l, i) => {
+      const a = hp[idx.get(l.a)], b = hp[idx.get(l.b)];
+      const dep = (a.z + b.z) / 2;
+      const base = Math.max(0.04, 0.34 - dep * 0.22);
+      g.strokeStyle = l.crit ? 'rgba(224,174,82,' + base.toFixed(3) + ')'
+        : 'rgba(120,214,210,' + (base * 0.8).toFixed(3) + ')';
+      g.lineWidth = l.crit ? 1.15 : 0.85;
+      g.setLineDash([2.4, 7]);
+      g.lineDashOffset = -((t * (l.crit ? 26 : 17) + i * 3) % 1000);
+      g.beginPath(); g.moveTo(a.sx, a.sy); g.lineTo(b.sx, b.sy); g.stroke();
+      // the packet, running publisher → consumer
+      const ph = ((t * (l.crit ? 0.34 : 0.22) + i * 0.13) % 1);
+      const px = a.sx + (b.sx - a.sx) * ph, py = a.sy + (b.sy - a.sy) * ph;
+      const pr = (l.crit ? 2.6 : 1.9) * ((a.k + b.k) / 2);
+      const pg = g.createRadialGradient(px, py, 0, px, py, pr * 3);
+      pg.addColorStop(0, l.crit ? 'rgba(255,224,166,.95)' : 'rgba(207,247,245,.75)');
+      pg.addColorStop(1, 'rgba(72,207,203,0)');
+      g.fillStyle = pg; g.beginPath(); g.arc(px, py, pr * 3, 0, 6.284); g.fill();
+      g.setLineDash([]);
+    });
+
+    m.hubs.forEach((h, i) => {
+      const p = hp[i];
+      const pulse = 1 + Math.sin(t * 1.6 + i) * (h.tier === 'sat' ? 0.04 : 0.09);
+      const rad = h.r * p.k * pulse * (flat ? 1.5 : 1);
+      const front = Math.max(0.24, 0.9 - p.z * 0.55);
+      const core = h.tier === 'core' ? '252,230,184' : h.tier === 'spine' ? '214,248,246' : '175,235,232';
+      const mid = h.tier === 'core' ? '224,174,82' : h.tier === 'spine' ? '72,207,203' : '43,179,176';
+      const grd = g.createRadialGradient(p.sx, p.sy, 0, p.sx, p.sy, rad * 2.8);
+      grd.addColorStop(0, 'rgba(' + core + ',' + (front * 0.8).toFixed(2) + ')');
+      grd.addColorStop(0.3, 'rgba(' + mid + ',' + (front * 0.42).toFixed(2) + ')');
+      grd.addColorStop(1, 'rgba(' + mid + ',0)');
+      g.fillStyle = grd; g.beginPath(); g.arc(p.sx, p.sy, rad * 2.8, 0, 6.284); g.fill();
+      g.fillStyle = 'rgba(' + core + ',' + front.toFixed(2) + ')';
+      g.beginPath(); g.arc(p.sx, p.sy, rad * 0.8, 0, 6.284); g.fill();
+    });
+
+    g.globalCompositeOperation = 'source-over';
+    g.font = '600 10.5px "Plus Jakarta Sans", system-ui, sans-serif';
+    g.textAlign = 'center';
+    m.hubs.forEach((h, i) => {
+      const p = hp[i];
+      if (p.z > 0.1) return;
+      g.fillStyle = 'rgba(226,242,241,' + Math.max(0.22, 0.92 - (p.z + 1) * 0.36).toFixed(2) + ')';
+      g.fillText(h.name, p.sx, p.sy + h.r * p.k * 2.2 + 12);
+    });
+    this._raf = requestAnimationFrame(this.drawGalaxy);
+  };
+
+  state = { layer: 'Frontend', view: 'Screen', grouping: 'Platforms', screen: 'WEB-002',
+    graphTab: 'Spine', graphMode: '3D', toggles: { Labels: true, 'Shared $refs': false } };
+
+  renderVals() {
+    const noop = (e) => { if (e && e.preventDefault) e.preventDefault(); };
+    const set = (k, v) => (e) => { noop(e); this.setState({ [k]: v }); };
+    const L = this.state.layer, V = this.state.view;
+
+    const layers = [
+      { name: 'Frontend', count: '364' }, { name: 'Contracts', count: '24' },
+      { name: 'Domain', count: '38' }, { name: 'Backend', count: '224' },
+      { name: 'Decisions', count: '18' },
+    ].map(o => {
+      const on = o.name === L;
+      return { ...o, pick: (e) => { noop(e);
+          const first = { Frontend: 'Screen', Contracts: 'Graph', Domain: 'States', Backend: 'Services', Decisions: 'Register' }[o.name];
+          this.setState({ layer: o.name, view: first }); },
+        bg: on ? 'linear-gradient(135deg,#229799,#48CFCB)' : 'transparent',
+        fg: on ? '#ffffff' : '#B5B5B5', shadow: on ? '0 4px 12px rgba(34,151,153,.35)' : 'none' };
+    });
+
+    const viewSets = {
+      Frontend: [['Screen','W'],['Journey','J'],['Apps','P'],['Waves','V'],['Audit','A']],
+      Contracts: [['Graph','G'],['Structure','S'],['ER','E'],['Lineage','L'],['Reader','R'],['Audit','A']],
+      Domain: [['States','T'],['Events','E'],['Audit','A']],
+      Backend: [['Services','S'],['Data','D'],['Migrations','M'],['Routing','R'],['Audit','A']],
+      Decisions: [['Register','R'],['Audit','A']],
+    };
+    const views = (viewSets[L] || viewSets.Frontend).map(([name, key]) => {
+      const on = name === V;
+      return { name, key, pick: set('view', name),
+        line: on ? '#48CFCB' : 'transparent', fg: on ? '#ffffff' : '#ADADAD' };
+    });
+
+    const groupSets = {
+      Frontend: ['Platforms', 'Modules', 'Waves'],
+      Contracts: ['Contracts', 'Modules', 'Platforms'],
+      Domain: ['Entities', 'Contexts', 'Events'],
+      Backend: ['Services', 'Tables', 'Waves'],
+      Decisions: ['Register', 'Themes', 'Waves'],
+    };
+    const gs = groupSets[L] || groupSets.Frontend;
+    const activeGrouping = gs.includes(this.state.grouping) ? this.state.grouping : gs[0];
+    const groupings = gs.map(name => {
+      const on = name === activeGrouping;
+      return { name, pick: set('grouping', name), bg: on ? '#ffffff' : 'transparent',
+        fg: on ? '#2E2E2E' : '#6E6E6E', shadow: on ? '0 1px 3px rgba(66,66,66,.14)' : 'none' };
+    });
+
+    const row = (id, name, meta, idw) => {
+      const on = id === this.state.screen;
+      return { id, name, meta, idw: idw || '54px', pick: set('screen', id),
+        bg: on ? '#E5F7F6' : 'transparent', fg: on ? '#186B6D' : '#424242', weight: on ? 700 : 500 };
+    };
+
+    const groupsByLayer = {
+      Frontend: [
+        { title: 'Guest Web — Storefront', count: 'P01 · 29', tone: '#229799', items: [
+          row('WEB-001','Home / Landing','3'), row('WEB-002','Event & Attraction Listing','2'),
+          row('WEB-003','Search Results','0'), row('WEB-004','Event / Attraction Detail','2'),
+          row('WEB-005','Ticket Type Selection','2'), row('WEB-006','Date & Session Selection','1'),
+          row('WEB-007','Seat Map Selection','3'), row('WEB-008','Add-ons & Upsell','1'),
+          row('WEB-009','Wishlist','3'), row('WEB-010','Shopping Cart','2'),
+          row('WEB-011','Guest Details & Attendees','2'), row('WEB-012','Checkout — Payment','3'),
+          row('WEB-013','Order Confirmation','2'), row('WEB-014','Payment Link Landing','1'),
+        ]},
+        { title: 'Guest Mobile App', count: 'P02 · 24', tone: '#48CFCB', items: [
+          row('APP-001','Splash & Onboarding','2'), row('APP-002','Home Feed','4'),
+          row('APP-003','My Tickets — Wallet','3'), row('APP-004','Scan & Enter','2'),
+        ]},
+      ],
+      Contracts: [
+        { title: 'Spine', count: '8', tone: '#229799', items: [
+          row('','access','35','0'), row('','catalogue','73','0'), row('','cross-cell','24','0'),
+          row('','finance','83','0'), row('','identity','59','0'), row('','orders','71','0'),
+          row('','shift','24','0'), row('','tenancy','34','0'),
+        ]},
+        { title: 'Satellite', count: '14', tone: '#48CFCB', items: [
+          row('','assets','22','0'), row('','fnb','78','0'), row('','games','22','0'),
+          row('','inventory','73','0'), row('','maintenance','58','0'), row('','marketing-crm','88','0'),
+          row('','platform-ops','44','0'), row('','promotions','61','0'), row('','queue','40','0'),
+          row('','reporting','48','0'), row('','retail','49','0'), row('','seating','62','0'),
+          row('','subscription','77','0'), row('','white-label','75','0'),
+        ]},
+        { title: 'Shared', count: '2', tone: '#C08A2E', items: [
+          row('','common','5','0'), row('','permissions','3','0'),
+        ]},
+      ],
+      Domain: [
+        { title: 'Entities', count: '39 models', tone: '#229799', items: [
+          row('','Order','9/9','0'), row('','Payment','7/7','0'), row('','Ticket','6/6','0'),
+          row('','Report execution','6/6','0'), row('','Seat map','4/6','0'),
+          row('','Stock transfer','5/6','0'), row('','White-label content','3/5','0'),
+          row('','Journal entry','4/5','0'), row('','Content schedule','4/5','0'),
+          row('','Fiscal period','3/4','0'), row('','Inventory lease','4/3','0'),
+          row('','Shift variance review','3/2','0'),
+        ]},
+        { title: 'Events', count: '16', tone: '#C08A2E', items: [
+          row('','order.paid','5','0'), row('','order.refunded','5','0'),
+          row('','access.validated','3','0'), row('','catalogue.productPublished','3','0'),
+          row('','entitlement.issued','3','0'), row('','stock.depleted','3','0'),
+          row('','tenant.suspended','3','0'), row('','fnb.orderReady','2','0'),
+        ]},
+      ],
+      Backend: [
+        { title: 'Services', count: '18', tone: '#229799', items: [
+          row('','order-service','24','0'), row('','payment-service','19','0'),
+          row('','catalogue-service','31','0'), row('','access-service','14','0'),
+          row('','inventory-service','22','0'), row('','reporting-service','17','0'),
+        ]},
+        { title: 'Tables', count: '224', tone: '#229799', items: [
+          row('','orders','18 cols','0'), row('','order_lines','14 cols','0'),
+          row('','payments','16 cols','0'), row('','tickets','12 cols','0'),
+          row('','seat_holds','9 cols','0'),
+        ]},
+      ],
+      Decisions: [
+        { title: 'Register', count: '18', tone: '#C08A2E', items: [
+          row('ADR-0013','Offline selling is POS-only','wave 1'),
+          row('ADR-0014','One catalogue per tenant','wave 1'),
+          row('ADR-0018','Events carry no payloads','wave 2'),
+          row('ADR-0021','Refunds never reverse a hold','wave 2'),
+        ]},
+      ],
+    };
+
+    const toggleSets = {
+      Screen: ['Notes', 'Wireframe'], Journey: ['Branches', 'Operations'],
+      Graph: ['Labels', 'Shared $refs'], ER: ['Fields', 'Enums'],
+      States: ['Guards', 'Reversals'], Structure: ['Depth', 'Types'],
+    };
+    const ts = toggleSets[V] || ['Notes', 'Details'];
+    const toggles = ts.map(name => {
+      const on = !!this.state.toggles[name];
+      return { name,
+        pick: (e) => { noop(e); this.setState(s => ({ toggles: { ...s.toggles, [name]: !s.toggles[name] } })); },
+        bg: on ? '#1F5F60' : '#4A4A4A', fg: on ? '#8FE5E2' : '#D2D2D2',
+        border: on ? '#2C7C7D' : '#565656' };
+    });
+
+    const dimTabs = ['3D', '2D'].map(name => {
+      const on = name === this.state.graphMode;
+      return { name, pick: set('graphMode', name), bg: on ? '#ffffff' : 'transparent',
+        fg: on ? '#2E2E2E' : '#6E6E6E', shadow: on ? '0 1px 3px rgba(66,66,66,.14)' : 'none' };
+    });
+
+    const graphTabs = ['Spine', 'Files', 'Schemas', 'Permissions', 'Local'].map(name => {
+      const on = name === this.state.graphTab;
+      return { name, pick: set('graphTab', name), bg: on ? '#ffffff' : 'transparent',
+        fg: on ? '#2E2E2E' : '#6E6E6E', shadow: on ? '0 1px 3px rgba(66,66,66,.14)' : 'none' };
+    });
+
+    const svgLayer = (lines) => React.createElement('svg', {
+      viewBox: '0 0 100 100', preserveAspectRatio: 'none',
+      style: { position: 'absolute', inset: 0, width: '100%', height: '100%', overflow: 'visible' },
+    }, lines.map((l, i) => React.createElement('line', {
+      key: i, x1: l.x1, y1: l.y1, x2: l.x2, y2: l.y2,
+      stroke: l.color, strokeWidth: l.width || 1.6, strokeOpacity: l.op == null ? 1 : l.op,
+      strokeDasharray: l.dash || undefined, strokeLinecap: 'round',
+      vectorEffect: 'non-scaling-stroke',
+    })));
+
+    const F = (n, t, key) => ({ n, t, nameFg: key ? '#186B6D' : '#424242', weight: key ? 700 : 400 });
+    const ent = (name, count, kind, fields) => ({
+      name, count, fields,
+      border: kind === 'enum' ? '#D6CBE8' : kind === 'ext' ? '#E4D6BC' : '#CBE4E3',
+      head: kind === 'enum' ? '#F3EFFA' : kind === 'ext' ? '#FAF3E6' : '#EAF7F6',
+      headFg: kind === 'enum' ? '#4C3B70' : kind === 'ext' ? '#6E5423' : '#175E60',
+      countFg: kind === 'enum' ? '#8B7BB0' : kind === 'ext' ? '#A08A5C' : '#5E9C9B',
+      dot: kind === 'enum' ? '#7C5FC0' : kind === 'ext' ? '#C08A2E' : '#229799',
+    });
+
+    const entities = [
+      ent('FnbOrder', '12', 'own', [F('id','string',1), F('outletId','string (uuid)',1),
+        F('status','FnbOrderStatus'), F('serviceMode','ServiceMode'), F('lines','CreateFnbOr…'),
+        F('grossAmount','Money'), F('taxAmount','Money'), F('kitchenTicketId','string')]),
+      ent('KitchenTicket', '10', 'own', [F('id','string',1), F('orderId','string',1),
+        F('outletId','string'), F('status','KitchenTick…'), F('priority','integer'),
+        F('prioritisedAt','string (dat…')]),
+      ent('TableVisit', '13', 'own', [F('id','string',1), F('tableId','string (uuid)',1),
+        F('outletId','string (uuid)'), F('covers','integer'), F('status','string'),
+        F('orders','FnbOrder[]')]),
+      ent('Menu', '7', 'own', [F('id','string',1), F('code','string'), F('name','string'),
+        F('outletId','string (uui…'), F('sections','MenuSection…'), F('isActive','boolean')]),
+      ent('MenuItem', '14', 'own', [F('id','string',1), F('productVariantId','string (uui…',1),
+        F('name','string'), F('price','Money'), F('isStockTracked','boolean'),
+        F('isAvailable','boolean')]),
+      ent('Bill', '8', 'own', [F('visitId','string',1), F('covers','integer'),
+        F('lines','object[]'), F('subtotal','Money'), F('taxAmount','Money'), F('total','Money')]),
+      ent('KitchenTicketStatus', '6', 'enum', [F('received',''), F('preparing',''), F('ready',''),
+        F('served',''), F('recalled',''), F('cancelled','')]),
+      ent('ServiceMode', '5', 'enum', [F('quickService',''), F('tableService',''),
+        F('roomService',''), F('collection',''), F('delivery','')]),
+      ent('Money', '2', 'ext', [F('currency','string'), F('scale','integer')]),
+      ent('Page', '3', 'ext', [F('cursor','string'), F('size','integer'), F('total','integer')]),
+    ];
+
+    // state machine layout
+    const sn = (name, x, y, kind, offline) => ({ name, left: x + '%', top: y + '%',
+      border: kind === 'initial' ? '#229799' : kind === 'terminal' ? '#7C5FC0' : '#C9C9C9',
+      offline: offline ? true : false });
+    const stateNodes = [
+      sn('pending', 13, 52, 'initial', 1), sn('held', 34, 30, 'mid', 1),
+      sn('partiallyPaid', 34, 52, 'mid'), sn('paid', 34, 74, 'mid', 1),
+      sn('refunded', 68, 14, 'terminal'), sn('partiallyRefunded', 68, 32, 'terminal'),
+      sn('voided', 68, 52, 'terminal'), sn('failed', 68, 70, 'terminal'),
+      sn('completed', 68, 88, 'terminal'),
+    ];
+    const tr = (x1, y1, x2, y2, kind) => ({
+      x1, y1, x2, y2,
+      color: kind === 'reversal' ? '#C08A2E' : kind === 'job' ? '#229799' : '#A8A8A8',
+      dash: kind === 'job' ? '5 4' : undefined, width: 1.8,
+    });
+    const transitionSvg = svgLayer([
+      tr(13,52,34,30), tr(13,52,34,52), tr(13,52,34,74),
+      tr(34,30,34,52), tr(34,52,34,74),
+      tr(34,74,68,88,'job'), tr(34,74,68,52), tr(34,30,68,52),
+      tr(68,52,68,70), tr(68,88,68,14,'reversal'), tr(68,32,68,14,'reversal'),
+      tr(34,52,68,32,'reversal'),
+    ]);
+    const mid = (text, a, b, color) => ({ text, color,
+      left: ((a[0] + b[0]) / 2) + '%', top: ((a[1] + b[1]) / 2) + '%' });
+    const transLabels = [
+      mid('holdOrder', [13,52], [34,30], '#6E6E6E'),
+      mid('createPayment', [13,52], [34,52], '#6E6E6E'),
+      mid('resumeOrder', [13,52], [34,74], '#6E6E6E'),
+      mid('job', [34,74], [68,88], '#186B6D'),
+      mid('✓ createRefund', [34,52], [68,32], '#8A6420'),
+      mid('✓ createRefund', [68,88], [68,14], '#8A6420'),
+    ];
+
+    const summaries = {
+      Frontend: '347 screens · 12 platforms · 2 boards',
+      Contracts: '24 contracts · 3 tiers · 1043 operations',
+      Domain: '39 state models · 225 states · 16 events',
+      Backend: '18 services · 224 tables · 41 migrations',
+      Decisions: '18 decisions · 4 themes',
+    };
+    const filterHints = { Frontend: 'Filter screens…', Contracts: 'Filter contracts…',
+      Domain: 'Filter entities…', Backend: 'Filter services…', Decisions: 'Filter decisions…' };
+    const notes = {
+      Frontend: 'One platform — P03 — has no screen files yet. A gap in the definitions, not in the product.',
+      Contracts: 'Two contracts are shared and referenced by all 22 others. Changing them is never local.',
+      Domain: '39 state models cover 225 states and 299 transitions. The contracts declare 38 status enums, and every one of them has a model.',
+      Backend: '224 tables across 18 services. 6 tables are written by more than one service.',
+      Decisions: '18 decisions recorded. 4 are superseded and kept for the trail.',
+    };
+
+    const titles = {
+      Screen: ['Event & Attraction Listing', 'Screen schematic · the structure a wireframe implements'],
+      Journey: ['F01 — Guest buys a ticket online', '8 steps · 7 branches · 12 flows and 347 screens in all'],
+      Graph: ['Contract graph', 'What each contract publishes, and who consumes it'],
+      ER: ['satellite / fnb', 'Entities and relationships declared by this contract'],
+      States: ['Order — 9 states', 'The state model, checked against the status enum'],
+      Structure: ['Contract structure', 'Operations, schemas and parameters by file'],
+      Events: ['Event catalogue', '16 events · 47 declared consumers'],
+      Services: ['Service map', '18 services · what each one owns'],
+      Data: ['Data model', '224 tables · ownership and lineage'],
+      Register: ['Decision register', '18 decisions · 4 themes'],
+      Audit: ['Audit', 'What the definitions contradict'],
+      Apps: ['Platforms', '12 platforms · 347 screens'],
+      Waves: ['Delivery waves', '3 waves · 12 platforms'],
+    };
+    const t = titles[V] || ['—', ''];
+
+    const chipSets = {
+      Screen: [{ k: 'platform', v: 'P01 Guest Web' }, { k: 'module', v: 'Discovery & Browse' },
+        { k: 'template', v: 'list' }, { k: 'wave', v: '1' }, { k: 'capability', v: 'C79' }],
+      Journey: [{ k: 'actor', v: 'guest' }, { k: 'criticality', v: 'revenue' },
+        { k: 'frequency', v: 'constant' }, { k: 'wave', v: '1' }, { k: 'capability', v: 'C02' }],
+      Graph: [{ k: 'tier', v: 'spine + satellite' }, { k: 'links', v: '32 events' },
+        { k: 'critical', v: '21 consumers' }],
+      ER: [{ k: 'tier', v: 'satellite' }, { k: 'entities', v: '37' },
+        { k: 'relationships', v: '29' }, { k: 'external', v: '1' }],
+      States: [{ k: 'owner', v: 'orders' }, { k: 'initial', v: 'pending' },
+        { k: 'terminal', v: '4 states' }, { k: 'offline', v: 'pending, held, paid' }],
+    };
+
+    return {
+      noop, layers, views, groupings, toggles, graphTabs, dimTabs, entities, bindGalaxy: this.bindGalaxy,
+      stateNodes, transLabels, transitionSvg,
+      groups: groupsByLayer[L] || groupsByLayer.Frontend,
+      summary: summaries[L], filterHint: filterHints[L], note: notes[L],
+      title: t[0], sub: t[1], chips: chipSets[V] || [],
+      isScreen: V === 'Screen', isJourney: V === 'Journey', isGraph: V === 'Graph',
+      isER: V === 'ER', isStates: V === 'States',
+      components: [
+        { kind: 'searchField', label: 'Search events and attractions', binds: 'query', note: 'Debounced; the term stays in the URL so a result set can be shared.' },
+        { kind: 'multiSelect', label: 'Category', binds: 'Category[]', note: 'Facet counts come from the same response as the list.' },
+        { kind: 'datePicker', label: 'Date', binds: 'dateRange', note: 'Format from region settings, not a locale guess.' },
+        { kind: 'cardList', label: 'Results', binds: 'Product[]', note: 'Cursor pagination. Infinite scroll with an explicit load-more fallback.' },
+      ],
+      screenStates: [
+        { name: 'loading', when: 'while the data is on its way', tone: '#48CFCB', body: 'Card skeletons at the current page size.' },
+        { name: 'empty', when: 'when there is nothing to show', tone: '#C08A2E', body: 'No products match. Names the most restrictive filter and offers to clear it — an empty state with no action is a dead end.' },
+        { name: 'error', when: 'when the call fails', tone: '#C0564F', body: 'Retry with filters preserved. Filters are never silently reset.' },
+        { name: 'offline', when: 'not required here', tone: '#D2D2D2', body: 'The platform is not offline-capable, so the rule does not apply.' },
+      ],
+      deployment: [
+        { k: 'runs on', v: 'browser' }, { k: 'ships by', v: 'CDN + edge' },
+        { k: 'hosted', v: 'static build served from the cell region' },
+        { k: 'updates', v: 'immediate on deploy' }, { k: 'cadence', v: 'continuous' },
+        { k: 'network', v: 'public internet, unmanaged' }, { k: 'device', v: 'guest device' },
+        { k: 'store review', v: 'false' },
+      ],
+      journeySteps: [
+        { n: '1', id: 'WEB-001', platform: 'P01', name: 'Home / Landing', does: 'Lands and orients',
+          ops: ['getTenantConfig', 'getTenantAppStatus', 'listProducts'],
+          outcome: "Sees what is on, in the tenant's branding", arrow: true },
+        { n: '2', id: 'WEB-004', platform: 'P01', name: 'Event / Attraction Detail', does: 'Opens a product and decides',
+          ops: ['getProduct', 'listPerformances'],
+          outcome: 'Understands what is included and roughly when it is available', arrow: true },
+        { n: '3', id: 'WEB-005', platform: 'P01', name: 'Ticket Type Selection', does: 'Chooses ticket types and quantities',
+          ops: ['listProductVariants', 'evaluatePromotions'],
+          outcome: 'Sees a running total that already reflects any applicable promotion', arrow: true },
+        { n: '4', id: 'WEB-006', platform: 'P01', name: 'Date & Session Selection', does: 'Picks a date and session',
+          ops: ['getAvailability'],
+          outcome: 'Holds nothing yet. Availability is never cached', arrow: false },
+      ],
+      branches: [
+        { title: 'The session sells out between loading the page and selecting it',
+          body: 'Selection is refused with the next available session offered. Availability is read live, so this is caught here rather than at checkout.',
+          tag: 'recoverable', res: 'resolved by WEB-006' },
+        { title: 'The session shows sold out while a counter allocation remains',
+          body: 'Correct behaviour, not a defect: allocations are held per channel, and the web channel has exhausted its share.',
+          tag: 'recoverable', res: 'resolved by WEB-006' },
+      ],
+      graphLegend: [
+        { color: '#48CFCB', text: 'spine — the bright cluster' },
+        { color: '#2BB3B0', text: 'satellite — the outer shell' },
+        { color: '#C08A2E', text: 'shared — the core, refd by all 22' },
+        { color: '#C08A2E', text: 'an event with a critical consumer' },
+        { color: '#A8A8A8', text: 'an event — the packet runs publisher → consumer' },
+      ],
+      erLegend: [
+        { color: '#229799', text: 'entity in this contract' },
+        { color: '#7C5FC0', text: 'enum' },
+        { color: '#C08A2E', text: 'entity from another contract' },
+      ],
+      stateLegend: [
+        { color: '#229799', text: 'initial' }, { color: '#7C5FC0', text: 'terminal' },
+        { color: '#A8A8A8', text: 'operation moves it' },
+        { color: '#229799', text: 'timer or job — dashed, because no operation causes it' },
+        { color: '#C08A2E', text: 'reversal — value moving backwards' },
+      ],
+      linkGroups: [
+        { title: 'Flows through here', count: '1', empty: false, items: [
+          { id: 'F01', name: 'Guest buys a ticket online', tag: 'step 1' } ] },
+        { title: 'Reached from', count: '2', empty: false, items: [
+          { id: 'WEB-001', name: 'Home / Landing', tag: 'P01' },
+          { id: 'WEB-003', name: 'Search Results', tag: 'P01' } ] },
+        { title: 'Operations', count: '0', empty: true, emptyNote: 'Nothing declared, so nothing to trace into the contracts.', items: [] },
+      ],
+    };
+  }
+}
+
+</script>
+</body>
+</html>

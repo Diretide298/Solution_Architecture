@@ -1,0 +1,937 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script>
+      // The saved day/night choice, before the stylesheets resolve. `theme.js`
+      // owns this key; this is only here because a module cannot run early
+      // enough to beat the first paint — and the curtain below paints a
+      // full-screen background, so getting this wrong is a full-screen flash.
+      try {
+        if ((localStorage.getItem('ticvai-theme') ?? 'dark') === 'dark') {
+          document.documentElement.dataset.theme = 'dark';
+        }
+      } catch { /* storage can be denied outright; day is a fine fallback */ }
+    </script>
+    <title>Atlas — TICVAI delivery package</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/styles.css" />
+    <link rel="stylesheet" href="/layers.css" />
+    <link rel="icon" href="/brand/atlas-mark.png" />
+    <script>
+      // A new browser session starts at the door.
+      //
+      // `sessionStorage` is cleared when the browser closes and survives every
+      // reload in between, which is exactly the line between "a refresh" and
+      // "a new session" — see door.py for why nothing else draws it correctly.
+      //
+      // Skipped whenever the address says where to be: a query, which only the
+      // door writes, or a hash, which is a link somebody was sent. Redirecting
+      // those would lose the thing the visitor came for.
+      //
+      // `replace`, so Back does not bounce between here and the landing page.
+      try {
+        var seen = sessionStorage.getItem('ticvai-session');
+        sessionStorage.setItem('ticvai-session', '1');
+        var asked = location.search.length > 1 || location.hash.length > 1;
+        if (!seen && !asked) {
+          location.replace('/home.html');
+        }
+      } catch { /* storage can be denied outright; then the viewer just opens */ }
+
+      // Where the reader came from, decided before anything paints.
+      //
+      // A layer or a view on the address means the door sent them, and the door
+      // has just flown them into a body. There is no wait to cover in that case
+      // — they know something is coming — so the curtain is suppressed
+      // entirely and the field takes the whole screen instead. See noloader.py.
+      //
+      // On <html>: <body> does not exist yet, and the curtain is inline in it,
+      // so a decision made any later than this shows as a frame of loading
+      // screen before it is taken away again.
+      try {
+        if (/[?&](layer|mode)=/.test(location.search)) {
+          document.documentElement.dataset.entry = 'door';
+        }
+      } catch { /* nothing here is worth failing a page load over */ }
+
+      // The curtain's dead man's switch. A wrong loading screen is a bad page;
+      // one that never lifts is no page, so this fires whatever else breaks.
+      // `loader.js` sets `claimed` on import, which is how a page with a script
+      // of its own says it will lower the curtain at the right moment instead.
+      window.__atlasLoader = { claimed: false };
+      (function () {
+        var down = function () {
+          var box = document.getElementById('atlas-loader');
+          if (box) { box.classList.add('is-done'); setTimeout(function () { box.remove(); }, 700); }
+        };
+        window.__atlasLoader.timer = setTimeout(down, 12000);
+        window.addEventListener('load', function () {
+          // A page with no script of its own has nothing to say when it is
+          // ready, so `load` is as good as it gets. One that imported loader.js
+          // is left alone: on the viewer, `load` fires long before the index
+          // has been read.
+          setTimeout(function () { if (!window.__atlasLoader.claimed) down(); }, 300);
+        });
+      })();
+    </script>
+  </head>
+  <body>
+    <!-- The loading curtain. Inline, and first in the body, so it is
+         painted by the first frame — a loader that arrives with the
+         JavaScript misses the module fetch, which is the part of the
+         wait it exists to cover. `loader.js` takes it down; the guard in
+         the head above is what happens if nothing ever does. -->
+    <div class="atlas-loader" id="atlas-loader" role="status" aria-live="polite">
+      <svg class="al-mark" viewBox="0 0 210 210" aria-hidden="true" focusable="false"><g class="al-links"><line class="al-link" style="--i:1" x1="105.0" y1="18.5" x2="148.9" y2="28.9"/><line class="al-link" style="--i:3" x1="148.9" y1="28.9" x2="177.6" y2="63.1"/><line class="al-link" style="--i:5" x1="177.6" y1="63.1" x2="192.9" y2="105.0"/><line class="al-link" style="--i:7" x1="192.9" y1="105.0" x2="180.1" y2="148.4"/><line class="al-link" style="--i:9" x1="180.1" y1="148.4" x2="148.6" y2="180.5"/><line class="al-link" style="--i:11" x1="148.6" y1="180.5" x2="105.0" y2="192.3"/><line class="al-link" style="--i:13" x1="105.0" y1="192.3" x2="62.1" y2="179.3"/><line class="al-link" style="--i:15" x1="62.1" y1="179.3" x2="32.5" y2="146.8"/><line class="al-link" style="--i:17" x1="32.5" y1="146.8" x2="18.1" y2="105.0"/><line class="al-link" style="--i:19" x1="18.1" y1="105.0" x2="32.9" y2="63.4"/><line class="al-link" style="--i:21" x1="32.9" y1="63.4" x2="62.9" y2="32.1"/><line class="al-link" style="--i:23" x1="62.9" y1="32.1" x2="105.0" y2="18.5"/><line class="al-link" style="--i:1" x1="105.0" y1="18.5" x2="143.0" y2="75.0"/><line class="al-link" style="--i:3" x1="148.9" y1="28.9" x2="143.0" y2="75.0"/><line class="al-link" style="--i:4" x1="177.6" y1="63.1" x2="143.0" y2="75.0"/><line class="al-link" style="--i:7" x1="192.9" y1="105.0" x2="149.0" y2="139.0"/><line class="al-link" style="--i:8" x1="180.1" y1="148.4" x2="149.0" y2="139.0"/><line class="al-link" style="--i:11" x1="148.6" y1="180.5" x2="107.0" y2="161.0"/><line class="al-link" style="--i:12" x1="105.0" y1="192.3" x2="107.0" y2="161.0"/><line class="al-link" style="--i:15" x1="62.1" y1="179.3" x2="59.0" y2="135.0"/><line class="al-link" style="--i:16" x1="32.5" y1="146.8" x2="59.0" y2="135.0"/><line class="al-link" style="--i:19" x1="18.1" y1="105.0" x2="71.0" y2="79.0"/><line class="al-link" style="--i:20" x1="32.9" y1="63.4" x2="71.0" y2="79.0"/><line class="al-link" style="--i:21" x1="62.9" y1="32.1" x2="71.0" y2="79.0"/><line class="al-link" style="--i:19" x1="71.0" y1="79.0" x2="89.0" y2="123.0"/><line class="al-link" style="--i:5" x1="143.0" y1="75.0" x2="127.0" y2="115.0"/><line class="al-link" style="--i:14" x1="59.0" y1="135.0" x2="107.0" y2="161.0"/><line class="al-link" style="--i:8" x1="149.0" y1="139.0" x2="127.0" y2="115.0"/><line class="al-link" style="--i:13" x1="89.0" y1="123.0" x2="107.0" y2="161.0"/></g><path class="al-glyph" d="M105,28 C110,64 124,116 151,161 C134,150 119,136 105,127 C91,136 76,150 59,161 C86,116 100,64 105,28 Z"/><path class="al-stand" d="M105,128 L105,176 M105,158 L90,171 M105,158 L120,171"/><g class="al-nodes"><circle class="al-node" style="--i:0" cx="105.0" cy="18.5" r="6.6"/><circle class="al-node" style="--i:2" cx="148.9" cy="28.9" r="6.1"/><circle class="al-node" style="--i:4" cx="177.6" cy="63.1" r="5.5"/><circle class="al-node" style="--i:6" cx="192.9" cy="105.0" r="6.5"/><circle class="al-node" style="--i:8" cx="180.1" cy="148.4" r="5.4"/><circle class="al-node" style="--i:10" cx="148.6" cy="180.5" r="5.6"/><circle class="al-node" style="--i:12" cx="105.0" cy="192.3" r="6.3"/><circle class="al-node" style="--i:14" cx="62.1" cy="179.3" r="5.3"/><circle class="al-node" style="--i:16" cx="32.5" cy="146.8" r="6.6"/><circle class="al-node" style="--i:18" cx="18.1" cy="105.0" r="6.7"/><circle class="al-node" style="--i:20" cx="32.9" cy="63.4" r="5.2"/><circle class="al-node" style="--i:22" cx="62.9" cy="32.1" r="5.4"/><circle class="al-node" style="--i:20" cx="71.0" cy="79.0" r="4.6"/><circle class="al-node" style="--i:3" cx="143.0" cy="75.0" r="5.2"/><circle class="al-node" style="--i:16" cx="59.0" cy="135.0" r="4.4"/><circle class="al-node" style="--i:9" cx="149.0" cy="139.0" r="4.8"/><circle class="al-node" style="--i:12" cx="107.0" cy="161.0" r="4.2"/><circle class="al-node" style="--i:15" cx="89.0" cy="123.0" r="3.6"/><circle class="al-node" style="--i:8" cx="127.0" cy="115.0" r="3.4"/></g></svg>
+      <p class="al-text">Reading the delivery package…</p>
+    </div>
+    <div id="app" class="app">
+      <!-- ── chrome ──────────────────────────────────────────────
+           Two rows, dark in both themes. Row one is who and where — the brand,
+           which layer of the system is open, and you. Row two is what you are
+           looking at within that layer. They are separate rows because they
+           answer different questions and a single bar made the layer switch and
+           the view tabs read as one list of nine things. -->
+      <header class="chrome">
+        <div class="chrome-row chrome-row-1">
+          <!-- Both rails become off-canvas drawers on a phone, so each needs a
+               way back. Rendered at every width and hidden by CSS above the
+               phone breakpoint, so nothing has to build them conditionally. -->
+          <button
+            id="drawer-left-toggle"
+            class="drawer-toggle"
+            type="button"
+            aria-label="Show the file tree"
+            aria-expanded="false"
+            aria-controls="sidebar-left"
+          >
+            <span class="icon-menu" aria-hidden="true"></span>
+          </button>
+
+          <!-- One image, not a typeset wordmark: the lockup carries the name and
+               the tagline rides in the alt.
+
+               One file for both themes, too. The chrome is dark whichever theme
+               is on, so the white-ink cut is right in both — a day/night pair
+               here would be two names for the same picture. -->
+          <!-- Back to the door. It used to point at "/", which is this page, so
+               the lockup was a reload button dressed as a link. -->
+          <a class="brand" href="/home.html" aria-label="Atlas — the six layers">
+            <img
+              class="brand-lockup"
+              src="/brand/atlas-lockup.png"
+              alt="Atlas — the context layer for AI-assisted development"
+            />
+          </a>
+
+          <span class="chrome-divider" aria-hidden="true"></span>
+
+          <!-- which layer of the system is on screen. Contracts are the middle
+               one deliberately: the API is the join between the other two. -->
+          <div class="layer-tray" id="layers" role="tablist" aria-label="Layer"></div>
+
+          <div class="chrome-spacer"></div>
+
+          <button id="search-trigger" class="search-trigger" type="button" aria-label="Search">
+            <span class="icon-search" aria-hidden="true"></span>
+            <span class="search-trigger-text">Search operations…</span>
+            <kbd>Ctrl K</kbd>
+          </button>
+
+          <div class="chrome-right">
+            <span id="live-dot" class="live-dot" title="Watching contracts for changes"></span>
+            <!-- hidden until the links pane actually holds something: on the
+                 Decisions layer, and before anything is selected, it never does -->
+            <button
+              id="drawer-right-toggle"
+              class="drawer-toggle"
+              type="button"
+              aria-label="Show links to the selection"
+              aria-expanded="false"
+              aria-controls="sidebar-right"
+              hidden
+            >
+              <span class="icon-links" aria-hidden="true"></span>
+            </button>
+          <!-- Notes that named you. Its own control rather than a mark on the
+               account button: being mentioned is a thing that happened to you,
+               not a fact about who you are signed in as, and the two want
+               different actions. Hidden until there is an account to address. -->
+          <button id="bell-toggle" class="icon-btn bell-toggle" type="button"
+                  title="Where you were named" aria-haspopup="dialog"
+                  aria-expanded="false" aria-controls="bell-panel" hidden>
+            <!-- Drawn rather than a glyph: every other icon here is shape and
+                 currentColor, and a font character sits on a different baseline
+                 and changes size with the text scale. -->
+            <svg class="icon-bell" viewBox="0 0 16 16" aria-hidden="true"
+                 fill="none" stroke="currentColor" stroke-width="1.4"
+                 stroke-linecap="round" stroke-linejoin="round">
+              <path d="M4 6.5a4 4 0 0 1 8 0c0 2.4.6 3.6 1.2 4.2a.5.5 0 0 1-.35.85H3.15a.5.5 0 0 1-.35-.85C3.4 10.1 4 8.9 4 6.5Z" />
+              <path d="M6.6 13.4a1.6 1.6 0 0 0 2.8 0" />
+            </svg>
+            <span id="bell-count" class="bell-count" hidden></span>
+          </button>
+
+          <!-- Back to the door. The lockup on the left goes there too, but a
+               lockup reads as decoration — for years it went to "/", which is
+               this page, so nobody had any reason to learn it was a link. This
+               one is a button among buttons and says where it goes. -->
+          <a id="home-link" class="icon-btn" href="/home.html"
+             title="The six layers" aria-label="The six layers">
+            <svg class="icon-home" viewBox="0 0 16 16" aria-hidden="true">
+              <circle cx="8" cy="8" r="2.1" fill="currentColor" />
+              <circle cx="3" cy="3.6" r="1.5" fill="currentColor" opacity=".72" />
+              <circle cx="13" cy="3.6" r="1.5" fill="currentColor" opacity=".72" />
+              <circle cx="3" cy="12.4" r="1.5" fill="currentColor" opacity=".72" />
+              <circle cx="13" cy="12.4" r="1.5" fill="currentColor" opacity=".72" />
+              <path d="M8 8 3 3.6M8 8l5-4.4M8 8l-5 4.4M8 8l5 4.4" fill="none"
+                    stroke="currentColor" stroke-width="1" opacity=".5" />
+            </svg>
+          </a>
+
+          <!-- Who you are signed in as, and the way out. -->
+          <button id="account-toggle" class="icon-btn account-toggle" type="button"
+                  title="Your account" aria-haspopup="dialog">
+            <span id="account-initials" class="account-initials">·</span>
+          </button>
+          <!-- Drawn, not typed. This was U+25D0, which is an icon only where a
+               font ships it — and on a box with a minimal font set it is a
+               tofu box sitting next to the bell, which made the bell look
+               broken too. -->
+          <button id="theme-toggle" class="icon-btn" title="Toggle theme" type="button">
+            <svg class="icon-theme" viewBox="0 0 16 16" aria-hidden="true">
+              <circle cx="8" cy="8" r="6" fill="none" stroke="currentColor" stroke-width="1.4" />
+              <path d="M8 2a6 6 0 0 0 0 12Z" fill="currentColor" />
+            </svg>
+          </button>
+          </div>
+        </div>
+
+        <div class="chrome-row chrome-row-2">
+          <nav class="view-tabs" id="modes" aria-label="View"></nav>
+          <div class="chrome-spacer"></div>
+          <!-- What this layer holds, in one line. The same count the left
+               column's note spells out, said once at the top so it is answered
+               before anybody goes looking. -->
+          <span class="layer-summary" id="layer-summary"></span>
+          <span class="chrome-divider chrome-divider-sm" aria-hidden="true"></span>
+          <div class="view-toggles" id="view-toggles"></div>
+        </div>
+      </header>
+
+      <!-- ── left sidebar ────────────────────────────────────────── -->
+      <aside class="sidebar-left" id="sidebar-left" aria-label="File tree">
+        <!-- the grouping options are rebuilt per layer, so this is empty here -->
+        <div class="pane-head"><div class="seg seg-sm" id="group-by"></div></div>
+        <div class="side-filter-row">
+          <input
+            id="side-filter"
+            class="struct-filter side-filter"
+            type="search"
+            placeholder="Filter…"
+            autocomplete="off"
+          />
+          <span class="pane-count" id="file-count"></span>
+        </div>
+        <div class="filter-row" id="type-filters"></div>
+        <div class="filter-row lens-filters" id="lens-filters" hidden></div>
+        <div class="side-note" id="side-note" hidden></div>
+        <div class="tree" id="tree"></div>
+        <div class="powered">
+          <span class="powered-mark" aria-hidden="true">
+            <span class="powered-ring"></span><span class="powered-ring"></span>
+          </span>
+          <span class="powered-text">
+            <span class="powered-label">Powered by</span>
+            <span class="powered-name">Ainfinite<b>Core</b></span>
+          </span>
+          <img class="powered-partner" src="/brand/softlabs-logo.webp" alt="Softlabs Group" />
+        </div>
+      </aside>
+
+      <!-- ── main ────────────────────────────────────────────────── -->
+      <main class="main" id="main">
+        <section class="view" id="view-graph" hidden>
+          <div class="graph-toolbar">
+            <div class="seg" id="graph-scope">
+              <button data-scope="spine" data-tip-title="Spine" data-tip="The architecture picture. shared/ at the centre, spine contracts in the inner ring, satellites outside — joined by the **events** between them, because no contract $refs another. Sized by operation count.">Spine</button>
+              <button data-scope="files" data-tip-title="Files" data-tip="The contracts and the $refs between them. Every one of the 44 links points at shared/, so this says everything uses common and little else — which is why Spine exists.">Files</button>
+              <button data-scope="schemas" data-tip-title="Schemas" data-tip="Every component in every contract and the $refs between them. The real reference graph, not a text search.">Schemas</button>
+              <button data-scope="permissions" data-tip-title="Permissions" data-tip="Which contracts use which permissions, aggregated per contract. The vocabulary comes from the single enum in shared/permissions.yaml.">Permissions</button>
+              <button data-scope="local" data-tip-title="Local" data-tip="The neighbourhood of whatever is selected — two hops from a component, one from a whole contract, since a contract is already dozens of nodes.">Local</button>
+            </div>
+            <div class="seg" id="graph-mode" hidden>
+              <button data-mode="3d" data-tip-title="3D" data-tip="The sphere. Says how much is here, and which contracts everything else points at.">3D</button>
+              <button data-mode="2d" data-tip-title="2D" data-tip="The same model with the projection switched off. The one that reads at a glance and prints.">2D</button>
+            </div>
+            <label class="toggle" id="graph-labels-wrap">
+              <input type="checkbox" id="graph-labels" checked />
+              <span data-tip-title="Labels" data-tip="Node names. Turned off, the shape of the graph is easier to read at a distance.">Labels</span>
+            </label>
+            <!-- every contract $refs shared/common and shared/permissions and
+                 nothing else, so those 44 edges are true of everything and say
+                 nothing about any one contract. Off by default, as with the
+                 ambient keys in the data view. -->
+            <label
+              class="toggle spine-only"
+              title="Every contract $refs shared/common and shared/permissions. True of all of them, so it distinguishes none of them."
+            >
+              <input type="checkbox" id="graph-shared" />
+              <span>Shared $refs</span>
+            </label>
+            <div class="graph-hint" id="graph-hint"></div>
+            <div class="spacer"></div>
+            <button class="ghost-btn" id="graph-recenter" type="button">Recenter</button>
+          </div>
+          <canvas id="graph-canvas"></canvas>
+          <canvas class="galaxy-field" id="graph-galaxy" hidden></canvas>
+          <div class="graph-legend" id="graph-legend"></div>
+          <div class="graph-tooltip" id="graph-tooltip" hidden></div>
+        </section>
+
+        <section class="view" id="view-structure" hidden>
+          <div class="graph-toolbar">
+            <div class="seg" id="struct-layout">
+              <button data-layout="tree">Tree</button>
+              <button data-layout="nested">Nested</button>
+            </div>
+            <div class="struct-file" id="struct-file">No file selected</div>
+            <input
+              id="struct-filter"
+              class="struct-filter"
+              type="search"
+              placeholder="Filter keys and values…"
+              autocomplete="off"
+            />
+            <label class="toggle">
+              <input type="checkbox" id="struct-fields" checked />
+              <span data-tip-title="Fields" data-tip="Scalar leaves shown as rows inside their parent block. Off gives the bare skeleton of the document.">Fields</span>
+            </label>
+            <label class="toggle">
+              <input type="checkbox" id="struct-links" checked />
+              <span data-tip-title="$ref links" data-tip="Draw a line from each $ref to what it resolves to, including across files.">$ref links</span>
+            </label>
+            <button class="ghost-btn" id="struct-expand" type="button">Expand all</button>
+            <button class="ghost-btn" id="struct-collapse" type="button">Collapse</button>
+            <button class="ghost-btn" id="struct-fit" type="button">Fit</button>
+            <div class="spacer"></div>
+            <div class="graph-hint" id="struct-hint"></div>
+          </div>
+          <canvas id="struct-canvas"></canvas>
+          <div class="graph-legend" id="struct-legend"></div>
+        </section>
+
+        <section class="view" id="view-er" hidden>
+          <div class="graph-toolbar">
+            <select class="scope-select" id="er-scope"></select>
+            <label class="toggle">
+              <input type="checkbox" id="er-rows" checked />
+              <span data-tip-title="Fields" data-tip="Every property of every schema, with its type. Off leaves just the entities and the refs between them.">Fields</span>
+            </label>
+            <button class="ghost-btn" id="er-fit" type="button">Fit</button>
+            <div class="graph-hint" id="er-hint"></div>
+          </div>
+          <canvas id="er-canvas"></canvas>
+          <div class="graph-legend" id="er-legend"></div>
+        </section>
+
+        <!-- The join the viewer could not make for itself: which tables an
+             operation touches. Not derivable from the contracts, so it arrives
+             as data — and 318 of the 654 rows admit nobody has worked it out. -->
+        <section class="view sheet" id="view-lineage" hidden>
+          <div class="graph-toolbar">
+            <!-- The three sheets answer "which tables does this touch", one row
+                 at a time. The map answers the question none of them can be
+                 sorted into: which tables more than one service writes. -->
+            <div class="seg" id="lineage-layout">
+              <button data-layout="list" data-tip-title="List" data-tip="The lineage as rows — every operation, its service, its stored procedure and the tables it reads and writes.">List</button>
+              <button data-layout="map" data-tip-title="Map" data-tip="Services on the inner shell, the tables they touch on the outer. **A table written by two services is a boundary worth questioning** — those are the amber ones.">Map</button>
+            </div>
+            <div class="seg" id="lineage-mode" hidden>
+              <button data-mode="3d" data-tip-title="3D" data-tip="Two shells — the services inside, the tables they share outside. A shell seats every name with room around it, which a ring of the same radius cannot.">3D</button>
+              <button data-mode="2d" data-tip-title="2D" data-tip="The same model with the projection switched off — services on the inner ring, tables on the outer. The one to screenshot into a document.">2D</button>
+            </div>
+            <div class="seg" id="lineage-scope">
+              <button data-scope="operations" data-tip-title="By operation" data-tip="Every operation against the tables it reads and writes, its service, and where the read is routed. Grouped by contract.">Operations</button>
+              <button data-scope="tables" data-tip-title="By table" data-tip="The other direction — each table with every operation that touches it. The busiest tables are the ones a schema change costs most to make.">Tables</button>
+              <button data-scope="services" data-tip-title="By service" data-tip="The 22 services the operations divide into, and the tables each one owns. A table written by two services is a boundary worth questioning.">Services</button>
+            </div>
+            <label class="toggle">
+              <input type="checkbox" id="lineage-unresolved" checked />
+              <span data-tip-title="Resolves to no table" data-tip="318 of the 654, marked `unresolved` by the file itself. Not a defect list: most return a computed projection, which has no persistence marker because there is nothing to mark. Shown by default, because hiding them would make the other 336 read as the whole set.">No table</span>
+            </label>
+            <input id="lineage-filter" class="struct-filter" type="search" placeholder="Filter…" autocomplete="off" />
+            <div class="spacer"></div>
+            <div class="graph-hint" id="lineage-hint"></div>
+          </div>
+          <div class="sheet-body" id="lineage-body"></div>
+          <canvas class="galaxy-field" id="lineage-galaxy" hidden></canvas>
+          <div class="graph-legend galaxy-legend" id="lineage-legend" hidden></div>
+        </section>
+
+        <section class="view journey" id="view-journey" hidden>
+          <div class="graph-toolbar">
+            <select class="scope-select" id="journey-scope"></select>
+            <label class="toggle">
+              <input type="checkbox" id="journey-branches" checked />
+              <span data-tip-title="Branches" data-tip="Where the flow can go wrong or fork. A flow with only a happy path describes a demo, so a flow declaring none is reported.">Branches</span>
+            </label>
+            <label class="toggle">
+              <input type="checkbox" id="journey-ops" checked />
+              <span data-tip-title="Operations" data-tip="The API calls each step makes. A step calling an operation its own screen never declares is a finding, and is marked.">Operations</span>
+            </label>
+            <div class="spacer"></div>
+            <div class="graph-hint" id="journey-hint"></div>
+          </div>
+          <div class="journey-body" id="journey-body"></div>
+        </section>
+
+        <!-- ── frontend layer ─────────────────────────────────────── -->
+        <section class="view sheet" id="view-screen" hidden>
+          <div class="graph-toolbar">
+            <select class="scope-select" id="screen-scope"></select>
+            <label class="toggle">
+              <input type="checkbox" id="screen-notes" checked />
+              <span data-tip-title="Notes" data-tip="The per-component notes from the screen definition — usually the reason a control is the way it is.">Notes</span>
+            </label>
+            <div class="spacer"></div>
+            <div class="graph-hint" id="screen-hint"></div>
+          </div>
+          <div class="sheet-body" id="screen-body"></div>
+        </section>
+
+        <section class="view sheet" id="view-apps" hidden>
+          <div class="graph-toolbar">
+            <!-- The cards say what each app is. The map says what each app
+                 rests on, which the cards cannot show at all. -->
+            <div class="seg" id="apps-layout">
+              <button data-layout="cards" data-tip-title="Cards" data-tip="Every app manifest — runtime, platforms, packages and the screens it builds, by wave.">Cards</button>
+              <button data-layout="galaxy" data-tip-title="Map" data-tip="The apps and the contracts they call, resolved through their screens. **An app that reaches nine contracts cannot ship before all nine do** — which is the dependency the manifests never state.">Map</button>
+            </div>
+            <div class="seg" id="apps-mode" hidden>
+              <button data-mode="3d" data-tip-title="3D" data-tip="Two shells — the apps inside, the contracts they reach outside. Says how much each app carries and how far its reach goes.">3D</button>
+              <button data-mode="2d" data-tip-title="2D" data-tip="The same model with the projection switched off — apps on the inner ring, contracts on the outer. The one to screenshot into a document.">2D</button>
+            </div>
+            <div class="spacer"></div>
+            <div class="graph-hint" id="apps-hint"></div>
+          </div>
+          <div class="sheet-body" id="apps-body"></div>
+          <canvas class="galaxy-field" id="apps-galaxy" hidden></canvas>
+          <div class="graph-legend galaxy-legend" id="apps-legend" hidden></div>
+        </section>
+
+        <!-- Delivery sequencing — the one dimension nothing else here shows.
+             Every screen carries a wave, and a wave is a commitment. -->
+        <section class="view sheet" id="view-waves" hidden>
+          <div class="graph-toolbar">
+            <label class="toggle">
+              <input type="checkbox" id="waves-unbuilt" checked />
+              <span data-tip-title="Unbuildable" data-tip="Screens that name no operation. Somebody can draw them and nobody can build them — and 192 of 347 are in this state.">Mark unbuildable</span>
+            </label>
+            <label class="toggle">
+              <input type="checkbox" id="waves-offline" />
+              <span data-tip-title="Offline only" data-tip="Only the screens on an offline-capable surface. These are the ones that must work with no network at all.">Offline only</span>
+            </label>
+            <div class="spacer"></div>
+            <div class="graph-hint" id="waves-hint"></div>
+          </div>
+          <div class="sheet-body" id="waves-body"></div>
+        </section>
+
+        <!-- ── decisions layer ────────────────────────────────────── -->
+        <!-- Prose, which is where the reasons live. Plus the one spec in the
+             package that can be executed rather than read. -->
+        <section class="view sheet" id="view-decisions" hidden>
+          <div class="graph-toolbar">
+            <div class="seg" id="decisions-scope">
+              <button data-scope="adrs" data-tip-title="Decisions" data-tip="The 18 ADRs — what was decided, when, what it closes and what it constrains. An ADR that is Accepted and partly superseded is marked, because it reads as current in a list and is not.">Decisions</button>
+              <button data-scope="permissions" data-tip-title="Permission vectors" data-tip="The normative authorisation spec, executed. Each vector is a set of grants, a query and the verdict the platform must reach — and the viewer resolves each one rather than listing it.">Permissions</button>
+              <button data-scope="gaps" data-tip-title="Artefact audit" data-tip="The delivery's own count of what the requirements demand and the package does not have. The only register here that measures absence.">Gaps</button>
+              <button data-scope="registers" data-tip-title="Registers" data-tip="The reference data — capabilities, actors, AI applications, conflicts, external dependencies — and the handoff narratives.">Registers</button>
+            </div>
+            <input id="decisions-filter" class="struct-filter" type="search" placeholder="Filter…" autocomplete="off" />
+            <div class="spacer"></div>
+            <div class="graph-hint" id="decisions-hint"></div>
+          </div>
+          <div class="sheet-body" id="decisions-body"></div>
+        </section>
+
+        <!-- The sequence is the argument. ADR-0018 makes sense only after
+             ADR-0011, and a register sorted by number hides that. -->
+        <section class="view sheet" id="view-timeline" hidden>
+          <div class="graph-toolbar">
+            <div class="seg" id="timeline-scope">
+              <button data-scope="all">Everything</button>
+              <button data-scope="adrs">Decisions</button>
+              <button data-scope="conflicts">Conflicts</button>
+            </div>
+            <input id="timeline-filter" class="struct-filter" type="search" placeholder="Filter…" autocomplete="off" />
+            <div class="spacer"></div>
+            <div class="graph-hint" id="timeline-hint"></div>
+          </div>
+          <div class="sheet-body" id="timeline-body"></div>
+        </section>
+
+        <!-- Which decision replaced which. check-package already enforces
+             this and it was invisible here. -->
+        <section class="view sheet" id="view-supersession" hidden>
+          <div class="graph-toolbar">
+            <label class="toggle"><input type="checkbox" id="supersession-all" /> <span>Show every decision, not only the ones involved</span></label>
+            <div class="spacer"></div>
+            <div class="graph-hint" id="supersession-hint"></div>
+          </div>
+          <div class="sheet-body" id="supersession-body"></div>
+        </section>
+
+        <!-- A dataset, so a table rather than a file tree. -->
+        <section class="view sheet" id="view-register" hidden>
+          <div class="graph-toolbar">
+            <select class="scope-select" id="register-pick"></select>
+            <div class="seg" id="register-state"></div>
+            <input id="register-filter" class="struct-filter" type="search" placeholder="Filter…" autocomplete="off" />
+            <div class="spacer"></div>
+            <div class="graph-hint" id="register-hint"></div>
+          </div>
+          <div class="sheet-body" id="register-body"></div>
+        </section>
+
+        <!-- One decision as prose, with what cites it resolved as links.
+             The body used to be a tooltip. -->
+        <section class="view sheet" id="view-decision" hidden>
+          <div class="graph-toolbar">
+            <select class="scope-select" id="decision-pick"></select>
+            <div class="spacer"></div>
+            <div class="graph-hint" id="decision-hint"></div>
+          </div>
+          <div class="sheet-body" id="decision-body"></div>
+        </section>
+
+        <!-- ── domain layer ───────────────────────────────────────── -->
+        <!-- states/ and events/. The contracts declare 38 status enums and not
+             one of them says which moves are legal; these two files do, and
+             they check each other. -->
+        <section class="view" id="view-states" hidden>
+          <div class="graph-toolbar">
+            <select class="scope-select" id="states-scope"></select>
+            <label class="toggle">
+              <input type="checkbox" id="states-guards" checked />
+              <span data-tip-title="Guards" data-tip="Show the condition that must hold, on whichever transition the pointer is over. The guard is the reason the move is allowed, and the reason the state model is written down at all.">Guards</span>
+            </label>
+            <button class="ghost-btn" id="states-fit" type="button">Fit</button>
+            <div class="spacer"></div>
+            <div class="graph-hint" id="states-hint"></div>
+          </div>
+          <canvas id="states-canvas"></canvas>
+          <div class="graph-legend" id="states-legend"></div>
+        </section>
+
+        <section class="view sheet" id="view-events" hidden>
+          <div class="graph-toolbar">
+            <!-- Two readings of the same catalogue. The list answers "what is
+                 declared"; the flow answers "what does publishing this set
+                 off", which is the question the list cannot be arranged to
+                 answer at all. -->
+            <div class="seg" id="events-layout">
+              <button data-layout="list" data-tip-title="Catalogue" data-tip="Every event, its publisher, its consumers and its payload — read one at a time.">Catalogue</button>
+              <button data-layout="galaxy" data-tip-title="Flow" data-tip="The 24 bounded contexts and the events that pass between them. **No contract $refs another** — every file-level link points at shared/ — so all the real coupling in the platform runs through `platform.outbox`, and this is the picture of it.">Flow</button>
+            </div>
+            <select class="scope-select" id="events-scope"></select>
+            <div class="seg" id="events-mode" hidden>
+              <button data-mode="3d" data-tip-title="3D" data-tip="The sphere. Says how big the traffic is, and which contexts sit at the middle of it.">3D</button>
+              <button data-mode="2d" data-tip-title="2D" data-tip="The same model with the projection switched off — sources on the inner ring, sinks on the outer. The one to screenshot into a document.">2D</button>
+            </div>
+            <label class="toggle" id="events-critical-wrap" hidden>
+              <input type="checkbox" id="events-critical" />
+              <span data-tip-title="Critical only" data-tip="Only the deliveries marked `isCritical` — the ones where a missed message is an incident rather than a delay.">Critical only</span>
+            </label>
+            <div class="spacer"></div>
+            <div class="graph-hint" id="events-hint"></div>
+          </div>
+          <div class="sheet-body" id="events-body"></div>
+          <canvas class="galaxy-field" id="events-canvas" hidden></canvas>
+          <div class="graph-legend galaxy-legend" id="events-legend" hidden></div>
+        </section>
+
+        <!-- ── backend layer ──────────────────────────────────────── -->
+        <section class="view" id="view-data" hidden>
+          <div class="graph-toolbar">
+            <!-- ER is the reading view — every column, every type, right for
+                 one schema at a time. The galaxy drops the columns into the
+                 field behind the schemas, which is the only way the whole
+                 database is one picture: 359 tables is 359 boxes and about
+                 three and a half thousand rows.
+
+                 The id stays `boxes`: it is what the state, the galaxy's drill
+                 and the segmented control agree on, and no reader sees it.
+                 Same rule as `backend` keeping its key while the tab became
+                 DB — only the label was wrong. `Boxes` named the shape drawn
+                 rather than the thing drawn, and tables with their columns and
+                 the keys between them is an ER diagram, which is what the
+                 Contracts layer beside it already calls the same picture. -->
+            <div class="seg" id="data-layout">
+              <button data-layout="boxes" data-tip-title="ER" data-tip="Every table in this schema as an entity, with its columns, their types and the keys between them. The reading view.">ER</button>
+              <button data-layout="galaxy" data-tip-title="Galaxy" data-tip="The schemas as bodies and their tables as the mass behind them, with every relationship between schemas as a lane. Position is structural: what everything keys to sits inside, what nothing depends on sits outside.">Galaxy</button>
+            </div>
+            <div class="seg" id="data-mode" hidden>
+              <button data-mode="3d">3D</button>
+              <button data-mode="2d">2D</button>
+            </div>
+            <select class="scope-select" id="data-scope"></select>
+            <label class="toggle">
+              <input type="checkbox" id="data-rows" checked />
+              <span data-tip-title="Columns" data-tip="Every column with its type, and • on the required ones. Off leaves the tables and their relationships.">Columns</span>
+            </label>
+            <label class="toggle" title="Relationships read from *_id column names rather than declared anywhere">
+              <input type="checkbox" id="data-inferred" checked />
+              <span data-tip-title="Inferred keys" data-tip="Relationships the viewer worked out from *_id column names, because nothing declares them. Drawn dashed and counted separately, so a guess is never mistaken for a fact. Dropped entirely for any table the DDL covers.">Inferred keys</span>
+            </label>
+            <!-- An anchor is where a table's own outbound keys stop. Asking
+                 "everything anchored only on scope_node" is asking "everything
+                 purely tenancy-scoped" — a question that crosses every schema,
+                 so this replaces the scope rather than narrowing it. -->
+            <select class="scope-select" id="data-anchor"></select>
+            <label class="toggle" id="data-anchor-only-wrap" hidden
+                   title="Anchored on this and nothing else — the tables that answer to one spine only.">
+              <input type="checkbox" id="data-anchor-only" />
+              <span>Only this</span>
+            </label>
+            <!-- venue_id, principal, subject, tenant: true of nearly every table,
+                 so they say nothing about this one. Off by default. -->
+            <label class="toggle" title="Keys to the hub tables — venue, principal, subject, tenant. True of nearly every table, so they say nothing about this one.">
+              <input type="checkbox" id="data-ambient" />
+              <span data-tip-title="Ambient keys" data-tip="Keys to the four hub tables — venue, principal, subject, tenant. platform.scope_node is referenced by 64 tables and identity.principal by 69, so these edges are true of nearly every table and say nothing about this one. Off by default.">Ambient keys</span>
+            </label>
+            <button class="ghost-btn" id="data-fit" type="button">Fit</button>
+            <div class="spacer"></div>
+            <div class="graph-hint" id="data-hint"></div>
+          </div>
+          <canvas id="data-canvas"></canvas>
+          <canvas class="galaxy-field" id="data-galaxy" hidden></canvas>
+          <div class="graph-legend" id="data-legend"></div>
+        </section>
+
+        <section class="view sheet" id="view-migrations" hidden>
+          <div class="graph-toolbar">
+            <div class="spacer"></div>
+            <div class="graph-hint" id="migrations-hint"></div>
+          </div>
+          <div class="sheet-body" id="migrations-body"></div>
+        </section>
+
+        <section class="view sheet" id="view-routing" hidden>
+          <div class="graph-toolbar">
+            <div class="spacer"></div>
+            <div class="graph-hint" id="routing-hint"></div>
+          </div>
+          <div class="sheet-body" id="routing-body"></div>
+        </section>
+
+        <section class="view" id="view-services-graph" hidden>
+          <div class="graph-toolbar">
+            <div class="seg" id="services-graph-mode">
+              <button data-mode="3d" data-tip-title="3D" data-tip="The sphere. Says how much is here, and which services everything else writes into.">3D</button>
+              <button data-mode="2d" data-tip-title="2D" data-tip="The same model with the projection switched off. The one that reads at a glance and prints.">2D</button>
+            </div>
+            <button class="ghost-btn" id="services-graph-reset" type="button">Reset</button>
+            <div class="spacer"></div>
+            <div class="graph-hint" id="services-graph-hint"></div>
+          </div>
+          <canvas class="galaxy-field" id="services-galaxy"></canvas>
+          <div class="graph-legend galaxy-legend" id="services-graph-legend"></div>
+        </section>
+
+        <section class="view" id="view-er-services" hidden>
+          <div class="graph-toolbar">
+            <div class="seg" id="er-services-scope"></div>
+            <label class="toggle">
+              <input type="checkbox" id="er-services-reads" />
+              <span data-tip-title="Reads" data-tip="A service reading another's data is a dependency too — it just cannot corrupt it. On, sixteen services depend on so nearly all of each other that the layout has nothing to arrange; off leaves the writes, which are the boundaries somebody had to justify.">Reads</span>
+            </label>
+            <button class="ghost-btn" id="er-services-fit" type="button">Fit</button>
+            <div class="spacer"></div>
+            <div class="graph-hint" id="er-services-hint"></div>
+          </div>
+          <canvas id="er-services-canvas"></canvas>
+          <div class="graph-legend" id="er-services-legend"></div>
+        </section>
+
+        <section class="view sheet" id="view-platform-lld" hidden>
+          <div class="graph-toolbar">
+            <select class="scope-select" id="platform-pick"></select>
+            <div class="spacer"></div>
+            <div class="graph-hint" id="platform-lld-hint"></div>
+          </div>
+          <div class="sheet-body" id="platform-lld-body"></div>
+        </section>
+
+        <section class="view sheet" id="view-contracts-hld" hidden>
+          <div class="graph-toolbar">
+            <!-- common and permissions are referenced by 28 contracts each, so
+                 those edges are true of nearly every box and say nothing about
+                 any one of them. Off by default, same as ambient keys in the
+                 data view, and the note under the diagram says how many are
+                 being withheld. -->
+            <label class="toggle" title="Edges into common and permissions — referenced by nearly every contract, so they say nothing about any one of them.">
+              <input type="checkbox" id="contracts-shared" checked />
+              <span data-tip-title="Shared vocabulary" data-tip="Edges into the two shared contracts. common and permissions are each referenced by 28 of the 30, so these lines are true of nearly every box and say nothing about this one. Drawn quietly, because 28 of the 30 have them and the fan is the finding. Turn them off for a diagram of the couplings that are not shared — there is one.">Shared vocabulary</span>
+            </label>
+            <div class="spacer"></div>
+            <div class="graph-hint" id="contracts-hld-hint"></div>
+          </div>
+          <div class="sheet-body" id="contracts-hld-body"></div>
+        </section>
+
+        <section class="view sheet" id="view-lifecycles-hld" hidden>
+          <div class="graph-toolbar">
+            <div class="spacer"></div>
+            <div class="graph-hint" id="lifecycles-hld-hint"></div>
+          </div>
+          <div class="sheet-body" id="lifecycles-hld-body"></div>
+        </section>
+
+        <section class="view sheet" id="view-overview" hidden>
+          <div class="graph-toolbar">
+            <div class="spacer"></div>
+            <div class="graph-hint" id="overview-hint"></div>
+          </div>
+          <div class="sheet-body" id="overview-body"></div>
+        </section>
+
+        <section class="view sheet" id="view-hierarchy" hidden>
+          <div class="graph-toolbar">
+            <div class="spacer"></div>
+            <div class="graph-hint" id="hierarchy-hint"></div>
+          </div>
+          <div class="sheet-body" id="hierarchy-body"></div>
+        </section>
+
+        <section class="view sheet" id="view-hld" hidden>
+          <div class="graph-toolbar">
+            <div class="spacer"></div>
+            <div class="graph-hint" id="hld-hint"></div>
+          </div>
+          <div class="sheet-body" id="hld-body"></div>
+        </section>
+
+        <section class="view sheet" id="view-service" hidden>
+          <div class="graph-toolbar">
+            <div class="spacer"></div>
+            <div class="graph-hint" id="service-hint"></div>
+          </div>
+          <div class="sheet-body" id="service-body"></div>
+        </section>
+
+        <section class="view sheet" id="view-context" hidden>
+          <div class="graph-toolbar">
+            <div class="spacer"></div>
+            <div class="graph-hint" id="context-hint"></div>
+          </div>
+          <div class="sheet-body" id="context-body"></div>
+        </section>
+
+        <section class="view sheet" id="view-deploy" hidden>
+          <div class="graph-toolbar">
+            <div class="spacer"></div>
+            <div class="graph-hint" id="deploy-hint"></div>
+          </div>
+          <div class="sheet-body" id="deploy-body"></div>
+        </section>
+
+        <section class="view reader" id="view-reader" hidden>
+          <div class="reader-empty" id="reader-empty">
+            <div class="reader-empty-inner">
+              <h2>Nothing selected</h2>
+              <p>
+                Pick a contract on the left, click a node in the graph, or press
+                <kbd>Ctrl</kbd>+<kbd>K</kbd> to search.
+              </p>
+            </div>
+          </div>
+          <article class="reader-body" id="reader-body" hidden>
+            <div class="reader-head" id="reader-head"></div>
+            <div class="reader-meta" id="reader-meta"></div>
+            <!-- where this contract lands in the database, and what reaches it -->
+            <div class="reader-trace" id="reader-trace"></div>
+            <!-- an operation is one of the four things a person signs off -->
+            <div class="reader-validation" id="reader-validation"></div>
+            <div class="reader-source" id="reader-source"></div>
+          </article>
+        </section>
+
+        <section class="view audit" id="view-audit" hidden>
+          <div class="audit-head">
+            <h2>Contract audit</h2>
+            <p id="audit-summary" class="audit-summary"></p>
+          </div>
+          <div class="audit-filters" id="audit-filters"></div>
+          <div class="audit-list" id="audit-list"></div>
+        </section>
+      </main>
+
+      <!-- ── right sidebar ───────────────────────────────────────── -->
+      <aside class="sidebar-right" id="sidebar-right" aria-label="Links to the selection">
+        <div class="pane-head"><span>Links</span></div>
+        <div class="links-pane" id="links-pane">
+          <p class="pane-empty">Select a node to see what links to it.</p>
+        </div>
+      </aside>
+    </div>
+
+    <!-- Dims the content behind an open drawer. Outside .app so it stacks
+         against the palette by z-index alone, and stops below the topbar so
+         the toggle that opened the drawer can still close it. -->
+    <div class="drawer-backdrop" id="drawer-backdrop"></div>
+
+    <!-- ── account ───────────────────────────────────────────────────
+         Signing in, and — for an admin — inviting the people who will be
+         recording verdicts alongside you. -->
+    <!-- ── where you were named ────────────────────────────────────
+         The notes that named you, read here rather than only on the review
+         page. It carries the note itself: a panel that says "3 notifications"
+         and makes you go somewhere else to find out what for is one people
+         stop opening. -->
+    <div class="palette-backdrop" id="bell-panel" hidden>
+      <div class="account-dialog bell-dialog" role="dialog" aria-modal="true"
+           aria-labelledby="bell-title">
+        <h2 class="account-title" id="bell-title">Where you were named</h2>
+        <p class="auth-note auth-fine" id="bell-note"></p>
+        <div id="bell-list" class="bell-list"></div>
+        <button class="auth-button auth-button-quiet" id="bell-seen" type="button" hidden>
+          Mark all read
+        </button>
+        <a class="auth-button auth-button-quiet" href="/reviews.html">
+          All review activity
+        </a>
+      </div>
+    </div>
+
+    <div class="palette-backdrop" id="account-panel" hidden>
+      <div class="account-dialog" role="dialog" aria-modal="true" aria-labelledby="account-title">
+        <h2 class="account-title" id="account-title">Sign in</h2>
+
+        <!-- signed out -->
+        <div id="account-signin">
+          <p class="auth-note">
+            Your session has ended. Sign in again to carry on — nothing you were
+            looking at has moved.
+          </p>
+          <label class="auth-label" for="signin-email">Email</label>
+          <input id="signin-email" class="auth-input" type="email"
+                 autocomplete="username" placeholder="you@softlabsgroup.com" />
+          <label class="auth-label" for="signin-password">Password</label>
+          <input id="signin-password" class="auth-input" type="password"
+                 autocomplete="current-password" />
+          <p class="auth-error" id="signin-error" hidden></p>
+          <button id="signin-submit" class="auth-button" type="button">Sign in</button>
+          <p class="auth-note auth-fine">
+            No account? Ask an admin for an invite link — accounts are made from
+            invites, not from a signup page.
+          </p>
+        </div>
+
+        <!-- signed in -->
+        <div id="account-signed" hidden>
+          <p class="auth-note">
+            Signed in as <b id="account-email"></b><span id="account-role-note"></span>.
+          </p>
+
+          <!-- Anyone signed in can see where the sign-off stands. It is the
+               one question a verdict block on a single artefact cannot answer,
+               and it is the reviewer's question rather than the admin's. -->
+          <p class="auth-note auth-fine">
+            A verdict block says what was decided about one thing. This says
+            what is left.
+          </p>
+          <a class="auth-button" href="/validation.html">What has been signed off</a>
+          <a class="auth-button auth-button-quiet" id="mentions-link" href="/reviews.html">Review activity</a>
+          <!-- The rollups. Neither is a view of one layer, which is why neither
+               is a tab: a module and a domain both cut across all five. -->
+          <a class="auth-button auth-button-quiet" href="/domains.html">Domain lenses</a>
+
+          <!-- admin only: the door to everything about accounts -->
+          <div id="account-admin" hidden>
+            <p class="auth-note auth-fine">
+              Inviting people, enabling and disabling accounts, and changing
+              your own password all live on one page.
+            </p>
+            <a class="auth-button" href="/admin.html">Manage accounts and invites</a>
+          </div>
+
+          <button id="signout" class="auth-button auth-button-quiet" type="button">Sign out</button>
+
+          <!-- Beside Sign out rather than hidden on the accounts page, because
+               the person who needs it is whoever just remembered where they
+               left a laptop, and they are not an admin by default. What it
+               costs is spelled out before it is armed: the label alone reads
+               like a tidier Sign out, and the part that surprises people is
+               that "everywhere" includes the browser they are reading it in. -->
+          <button id="signout-all" class="auth-button auth-button-quiet" type="button">
+            Sign out everywhere
+          </button>
+          <div id="signout-all-confirm" hidden>
+            <p class="auth-note auth-fine">
+              This ends every session on your account — every browser, every
+              device, <b>including this one</b>. You will be signed out here and
+              sent back to the door. Nothing else changes: your account stays
+              enabled, you can sign straight back in, and every verdict you have
+              recorded keeps your name on it.
+            </p>
+            <button id="signout-all-go" class="auth-button" type="button">
+              Yes, end every session
+            </button>
+            <button id="signout-all-cancel" class="auth-button auth-button-quiet" type="button">
+              Cancel
+            </button>
+          </div>
+          <p class="auth-error" id="signout-all-error" hidden></p>
+        </div>
+
+        <p class="auth-note auth-fine" id="account-offline" hidden>
+          The validation service is not running, so there is nothing to sign in
+          to. Start it with:
+          <code>python -m uvicorn api.main:app --port 8787</code>
+        </p>
+      </div>
+    </div>
+
+    <!-- ── command palette ───────────────────────────────────────── -->
+    <div class="palette-backdrop" id="palette" hidden>
+      <div class="palette">
+        <input
+          id="palette-input"
+          class="palette-input"
+          type="text"
+          placeholder="Search operations, schemas, permissions, paths…"
+          autocomplete="off"
+          spellcheck="false"
+        />
+        <div class="palette-results" id="palette-results"></div>
+        <div class="palette-foot">
+          <span>
+            <kbd><svg class="icon-arrow" viewBox="0 0 10 10" aria-label="up"><path d="M5 8.5V2M5 2 2 5M5 2l3 3" /></svg></kbd
+            ><kbd><svg class="icon-arrow" viewBox="0 0 10 10" aria-label="down"><path d="M5 1.5V8M5 8l3-3M5 8 2 5" /></svg></kbd>
+            navigate
+          </span>
+          <span>
+            <kbd><svg class="icon-arrow" viewBox="0 0 10 10" aria-label="enter"><path d="M8.5 2v3.5h-6M2.5 5.5 5 3M2.5 5.5 5 8" /></svg></kbd>
+            open
+          </span>
+          <span><kbd>esc</kbd> close</span>
+          <span class="spacer"></span>
+          <span id="palette-count"></span>
+        </div>
+      </div>
+    </div>
+
+    <div class="toast" id="toast" hidden></div>
+
+    <script type="module" src="/app.js"></script>
+  </body>
+</html>

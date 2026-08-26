@@ -1,0 +1,601 @@
+id: LLD-IdentityService
+title: IdentityService — 44 operations, 20 tables
+generatedBy: tools/derive-diagrams.py
+tier: foundation
+index: diagrams/hld/02-services.yaml
+why: '**Twelve contracts read it and it reads almost nothing.** The one service nothing can be deployed
+  without, and the only writer of `pii` — which is what makes a subject-access export and a deletion
+  request answerable at all (ADR-0023).'
+scale: Read-heavy, latency-critical, cached hard. Every request resolves a principal.
+ifDown: '**A restart is an outage everywhere.** Deploys go out first and alone.'
+coverage:
+  operations: 44
+  inAFlow: 21
+  percent: 48%
+  note: '**Flow coverage is how much of this service a journey has walked.** A service under 40% is
+    unwalked rather than under-documented.'
+schemas:
+- schema: identity
+  tables: 16
+  stores:
+  - postgres
+  - redis
+  largestTable: identity.grant
+- schema: pii
+  tables: 4
+  stores:
+  - postgres
+  largestTable: pii.subject
+operationsByContract:
+- contract: identity
+  count: 44
+  operations:
+  - operation: completeSsoAuthorization
+    verb: POST
+    path: /auth/sso/{providerId}/callback
+    scope: tenant
+    permission: null
+    offline: false
+    reads: 3
+    writes: 2
+  - operation: createGrant
+    verb: POST
+    path: /grants
+    scope: venue
+    permission: PERMISSION_GRANT
+    offline: false
+    reads: 2
+    writes: 3
+  - operation: createMfaChallenge
+    verb: POST
+    path: /auth/mfa/challenge
+    scope: tenant
+    permission: null
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: createPrincipal
+    verb: POST
+    path: /principals
+    scope: venue
+    permission: USER_MANAGE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: createRole
+    verb: POST
+    path: /roles
+    scope: venue
+    permission: ROLE_MANAGE
+    offline: false
+    reads: 2
+    writes: 3
+  - operation: deleteGrant
+    verb: DELETE
+    path: /grants/{grantId}
+    scope: venue
+    permission: PERMISSION_GRANT
+    offline: false
+    reads: 2
+    writes: 3
+  - operation: deleteGuestAccount
+    verb: DELETE
+    path: /auth/guest/account
+    scope: tenant
+    permission: null
+    offline: false
+    reads: 2
+    writes: 3
+  - operation: enrolMfaMethod
+    verb: POST
+    path: /auth/mfa/methods
+    scope: tenant
+    permission: null
+    offline: false
+    reads: 3
+    writes: 3
+  - operation: exportSubjectData
+    verb: POST
+    path: /guests/{subjectId}/data-export
+    scope: tenant
+    permission: GUEST_VIEW_PII
+    offline: false
+    reads: 8
+    writes: 1
+  - operation: forceLogout
+    verb: POST
+    path: /auth/sessions/{sessionId}/force-logout
+    scope: venue
+    permission: SESSION_FORCE_LOGOUT
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: getCurrentSession
+    verb: GET
+    path: /auth/session
+    scope: workstation
+    permission: null
+    offline: true
+    reads: 5
+    writes: 1
+  - operation: getGuestSession
+    verb: GET
+    path: /auth/guest/session
+    scope: tenant
+    permission: null
+    offline: true
+    reads: 2
+    writes: 0
+  - operation: getPrincipal
+    verb: GET
+    path: /principals/{principalId}
+    scope: venue
+    permission: USER_MANAGE
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: getSsoConfig
+    verb: GET
+    path: /tenants/sso-config
+    scope: tenant
+    permission: USER_MANAGE
+    offline: false
+    reads: 2
+    writes: 0
+  - operation: grantDelegation
+    verb: POST
+    path: /guests/{subjectId}/delegations
+    scope: venue
+    permission: GUEST_MANAGE
+    offline: false
+    reads: 3
+    writes: 2
+  - operation: guestLogout
+    verb: DELETE
+    path: /auth/guest/session
+    scope: tenant
+    permission: null
+    offline: false
+    reads: 1
+    writes: 1
+  - operation: guestSocialLogin
+    verb: POST
+    path: /auth/guest/social
+    scope: tenant
+    permission: null
+    offline: false
+    reads: 2
+    writes: 3
+  - operation: guestUaePassLogin
+    verb: POST
+    path: /auth/guest/uae-pass
+    scope: tenant
+    permission: null
+    offline: false
+    reads: 2
+    writes: 4
+  - operation: linkGuestCheckout
+    verb: POST
+    path: /auth/guest/link-checkout
+    scope: venue
+    permission: null
+    offline: false
+    reads: 3
+    writes: 3
+  - operation: listActiveSessions
+    verb: GET
+    path: /auth/sessions
+    scope: venue
+    permission: SESSION_FORCE_LOGOUT
+    offline: false
+    reads: 2
+    writes: 0
+  - operation: listDelegations
+    verb: GET
+    path: /guests/{subjectId}/delegations
+    scope: venue
+    permission: GUEST_VIEW
+    offline: false
+    reads: 3
+    writes: 0
+  - operation: listGrants
+    verb: GET
+    path: /grants
+    scope: venue
+    permission: PERMISSION_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listMfaMethods
+    verb: GET
+    path: /auth/mfa/methods
+    scope: tenant
+    permission: null
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listPrincipals
+    verb: GET
+    path: /principals
+    scope: venue
+    permission: USER_MANAGE
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listRoles
+    verb: GET
+    path: /roles
+    scope: venue
+    permission: ROLE_MANAGE
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listSsoProviders
+    verb: GET
+    path: /auth/sso/providers
+    scope: tenant
+    permission: null
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: login
+    verb: POST
+    path: /auth/login
+    scope: tenant
+    permission: null
+    offline: false
+    reads: 5
+    writes: 2
+  - operation: logout
+    verb: POST
+    path: /auth/logout
+    scope: workstation
+    permission: null
+    offline: true
+    reads: 2
+    writes: 2
+  - operation: refreshToken
+    verb: POST
+    path: /auth/refresh
+    scope: tenant
+    permission: null
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: registerGuest
+    verb: POST
+    path: /auth/guest/register
+    scope: tenant
+    permission: null
+    offline: false
+    reads: 2
+    writes: 4
+  - operation: removeMfaMethod
+    verb: DELETE
+    path: /auth/mfa/methods/{methodId}
+    scope: tenant
+    permission: null
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: requestGuestOtp
+    verb: POST
+    path: /auth/guest/otp
+    scope: tenant
+    permission: null
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: resolvePermissions
+    verb: POST
+    path: /permissions/resolve
+    scope: venue
+    permission: PERMISSION_VIEW
+    offline: false
+    reads: 7
+    writes: 2
+  - operation: revokeAllSessions
+    verb: POST
+    path: /auth/sessions/revoke-all
+    scope: venue
+    permission: SESSION_FORCE_LOGOUT
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: selectRole
+    verb: POST
+    path: /auth/select-role
+    scope: tenant
+    permission: null
+    offline: false
+    reads: 4
+    writes: 2
+  - operation: setPasswordPolicy
+    verb: PUT
+    path: /password-policy
+    scope: tenant
+    permission: TENANT_CONFIGURE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: setSegregationRules
+    verb: PUT
+    path: /segregation-rules
+    scope: tenant
+    permission: ROLE_MANAGE
+    offline: false
+    reads: 3
+    writes: 2
+  - operation: setSsoConfig
+    verb: PUT
+    path: /tenants/sso-config
+    scope: tenant
+    permission: USER_MANAGE
+    offline: false
+    reads: 3
+    writes: 3
+  - operation: startSsoAuthorization
+    verb: GET
+    path: /auth/sso/{providerId}/authorize
+    scope: tenant
+    permission: null
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: updatePrincipal
+    verb: PATCH
+    path: /principals/{principalId}
+    scope: venue
+    permission: USER_MANAGE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: verifyGuestEmail
+    verb: POST
+    path: /auth/guest/verify-email
+    scope: tenant
+    permission: GUEST_VIEW
+    offline: false
+    reads: 3
+    writes: 4
+  - operation: verifyGuestOtp
+    verb: POST
+    path: /auth/guest/otp/verify
+    scope: tenant
+    permission: null
+    offline: false
+    reads: 3
+    writes: 3
+  - operation: verifyMfaChallenge
+    verb: POST
+    path: /auth/mfa/challenge/{challengeId}/verify
+    scope: tenant
+    permission: null
+    offline: false
+    reads: 3
+    writes: 4
+  - operation: verifyMfaEnrolment
+    verb: POST
+    path: /auth/mfa/methods/{methodId}
+    scope: tenant
+    permission: null
+    offline: false
+    reads: 2
+    writes: 2
+tables:
+- table: identity.authz_audit
+  columns: 2
+  store: postgres
+  parent: null
+  writtenBy: []
+  foreignWriters: null
+- table: identity.grant
+  columns: 19
+  store: postgres
+  parent: null
+  writtenBy:
+  - identity
+  - orders
+  - public-api
+  foreignWriters:
+  - orders
+  - public-api
+- table: identity.guest_session
+  columns: 1
+  store: redis
+  parent: pii.subject
+  writtenBy:
+  - identity
+  foreignWriters: null
+- table: identity.mfa_challenge
+  columns: 1
+  store: postgres
+  parent: identity.principal
+  writtenBy:
+  - identity
+  foreignWriters: null
+- table: identity.mfa_method
+  columns: 9
+  store: postgres
+  parent: null
+  writtenBy:
+  - identity
+  foreignWriters: null
+- table: identity.mfa_recovery_code
+  columns: 1
+  store: postgres
+  parent: identity.principal
+  writtenBy:
+  - identity
+  foreignWriters: null
+- table: identity.otp_challenge
+  columns: 1
+  store: postgres
+  parent: pii.subject
+  writtenBy:
+  - identity
+  foreignWriters: null
+- table: identity.password_policy
+  columns: 13
+  store: postgres
+  parent: null
+  writtenBy:
+  - identity
+  foreignWriters: null
+- table: identity.principal
+  columns: 9
+  store: postgres
+  parent: null
+  writtenBy:
+  - identity
+  foreignWriters: null
+- table: identity.principal_credential
+  columns: 1
+  store: postgres
+  parent: identity.principal
+  writtenBy: []
+  foreignWriters: null
+- table: identity.role
+  columns: 8
+  store: postgres
+  parent: null
+  writtenBy:
+  - identity
+  foreignWriters: null
+- table: identity.role_permission
+  columns: 5
+  store: postgres
+  parent: identity.role
+  writtenBy:
+  - tenancy
+  foreignWriters:
+  - tenancy
+- table: identity.segregation_rule
+  columns: 7
+  store: postgres
+  parent: null
+  writtenBy:
+  - identity
+  foreignWriters: null
+- table: identity.session
+  columns: 1
+  store: redis
+  parent: identity.principal
+  writtenBy:
+  - identity
+  foreignWriters: null
+- table: identity.sso_group_mapping
+  columns: 6
+  store: postgres
+  parent: null
+  writtenBy:
+  - identity
+  foreignWriters: null
+- table: identity.sso_provider
+  columns: 11
+  store: postgres
+  parent: null
+  writtenBy:
+  - identity
+  foreignWriters: null
+- table: pii.subject
+  columns: 13
+  store: postgres
+  parent: null
+  writtenBy:
+  - identity
+  - marketing-crm
+  foreignWriters:
+  - marketing-crm
+- table: pii.subject_biometric
+  columns: 10
+  store: postgres
+  parent: pii.subject
+  writtenBy:
+  - access
+  foreignWriters:
+  - access
+- table: pii.subject_contact
+  columns: 10
+  store: postgres
+  parent: pii.subject
+  writtenBy:
+  - identity
+  foreignWriters: null
+- table: pii.subject_document
+  columns: 10
+  store: postgres
+  parent: pii.subject
+  writtenBy:
+  - identity
+  foreignWriters: null
+readsFrom:
+- service: MarketingService
+  operations: 5
+- service: OrderService
+  operations: 2
+- service: TenancyService
+  operations: 1
+- service: AccessService
+  operations: 1
+writesOutside:
+- service: OrderService
+  operations: 1
+  why: '**The owner defines the row; this service may only append to it.**'
+- service: TenancyService
+  operations: 1
+  why: '**The owner defines the row; this service may only append to it.**'
+- service: MarketingService
+  operations: 1
+  why: '**The owner defines the row; this service may only append to it.**'
+screens:
+- P01:WEB-016 Login / Register
+- P01:WEB-020 Profile & Preferences
+- P02:GST-015 Memberships
+- P02:GST-042 Simple Registration & OTP
+- P04:POS-001 Begin Shift
+- P04:POS-018 Safe Drop & Cash Transfer Management
+- P06:EMP-001 Sign in
+- P06:EMP-002 Select venue & role
+- P06:EMP-042 Profile
+- P06:EMP-046 Sign out
+- P07:SCN-001 Sign in
+- P08:BO-053 Staff Directory
+- P08:BO-054 Role Assignment
+- P08:BO-057 Training & Certification
+- P08:BO-068 Audit Log
+- P08:BO-142 Store Rules, Controls & Permissions
+- P09:ADM-001 Platform Login / MFA
+- P09:ADM-002 Platform Dashboard
+- P09:ADM-005 Tenant Directory
+- P09:ADM-006 Tenant Hierarchy Explorer
+- P09:ADM-007 Module & Feature Entitlement
+- P09:ADM-008 Subscription & Plan Management
+- P09:ADM-009 Tenant Billing & Invoicing
+- P09:ADM-010 Usage Metering
+- P09:ADM-011 Licence & Seat Management
+- P09:ADM-012 Tenant Isolation & Resource Pool
+- P09:ADM-015 API Rate Limit & Quota Management
+- P09:ADM-020 Platform User Directory
+- P09:ADM-021 Platform Role Management
+- P10:PTR-001 Partner Login / MFA
+- P10:PTR-003 Profile & Company Details
+- P10:PTR-020 Sub-Agent Management
+- P12:SUP-001 Agent Login
+- P13:CMS-001 Tenant Workspace
+- P13:CMS-019 User Access
+- P16:ANL-003 Operational Performance
+flows:
+- F06 Guest enters the venue
+- F08 Steward works a shift on the employee app
+- F102 A brand is set, previewed, published and rolled back
+- F104 A platform operator signs in under MFA
+- F105 A rate limit is set and a developer hits it
+- F106 A security dashboard surfaces something and it is investigated
+- F16 A venue opens for the first time
+- F32 A till opens, trades and settles
+- F56 A guest registers, verifies and sets preferences
+- F61 A gate opens, a steward signs in, and a group is admitted
+- F64 A steward signs in and takes a venue and a role
+- F96 A tenant is provisioned, licensed and its modules enabled
+- F97 A cell is capacity-checked and a tenant is placed on it

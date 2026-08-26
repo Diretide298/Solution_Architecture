@@ -1,0 +1,346 @@
+# reporting — derived from the API contracts, not hand-written
+# Migration: V0021
+#
+# Columns come from schema properties. Types are inferred: format uuid to uuid,
+# date-time to timestamptz, ULID patterns to char(26), Money to numeric(18,4).
+# What is NOT here: partitioning, RLS policies, indexes, the PII split. That is
+# storage design and lives in the migration scripts.
+
+module: reporting
+migration: V0021
+tableCount: 10
+columnCount: 95
+tables:
+  reporting.dashboard:
+    derivedFrom: Dashboard
+    columns:
+    - name: name
+      type: varchar(200)
+      required: true
+    - name: description
+      type: varchar(1000)
+      required: false
+    - name: venue_id
+      type: uuid
+      required: false
+    - name: is_shared
+      type: boolean
+      required: false
+    - name: tiles
+      type: jsonb
+      required: true
+    - name: id
+      type: uuid
+      required: true
+    - name: owner_principal_id
+      type: uuid
+      required: true
+    - name: aggregate_cost
+      type: text
+      required: true
+      description: Combined refresh load of every tile.
+    - name: created_at
+      type: timestamptz
+      required: true
+  reporting.dashboard_tile:
+    derivedFrom: DashboardTile
+    columns:
+    - name: id
+      type: uuid
+      required: true
+    - name: title
+      type: text
+      required: false
+    - name: report_id
+      type: uuid
+      required: true
+    - name: visualisation
+      type: text
+      required: true
+    - name: parameters
+      type: jsonb
+      required: false
+    - name: refresh_seconds
+      type: integer
+      required: false
+      description: Minimum thirty seconds. A tile refreshing every second is a load problem wearing a
+        convenience costume.
+    - name: position
+      type: jsonb
+      required: true
+  reporting.execution:
+    derivedFrom: ReportExecution
+    columns:
+    - name: id
+      type: text
+      required: true
+    - name: report_id
+      type: uuid
+      required: true
+    - name: report_name
+      type: text
+      required: false
+    - name: definition_version
+      type: text
+      required: true
+      description: The version this ran against. With the parameters and scope below, it is everything
+        needed to reproduce the result.
+    - name: status
+      type: jsonb
+      required: true
+    - name: parameters
+      type: jsonb
+      required: false
+    - name: scope_applied
+      type: jsonb
+      required: false
+      description: Scope paths the caller held. What constrained the result.
+    - name: row_count
+      type: integer
+      required: false
+    - name: duration_ms
+      type: integer
+      required: false
+    - name: error
+      type: text
+      required: false
+    - name: requested_by_principal_id
+      type: uuid
+      required: true
+    - name: schedule_id
+      type: uuid
+      required: false
+    - name: requested_at
+      type: timestamptz
+      required: true
+    - name: completed_at
+      type: timestamptz
+      required: false
+    - name: expires_at
+      type: timestamptz
+      required: false
+      description: Results are retained for a limited period, then discarded.
+  reporting.export:
+    derivedFrom: ReportExport
+    columns:
+    - name: id
+      type: text
+      required: true
+    - name: execution_id
+      type: text
+      required: true
+    - name: format
+      type: jsonb
+      required: true
+    - name: status
+      type: text
+      required: true
+    - name: includes_personal_data
+      type: boolean
+      required: false
+    - name: purpose
+      type: text
+      required: false
+    - name: download_url
+      type: text
+      required: false
+      description: Signed and expiring. Present only while status is `ready`.
+    - name: size_bytes
+      type: integer
+      required: false
+    - name: requested_by_principal_id
+      type: uuid
+      required: true
+    - name: requested_at
+      type: timestamptz
+      required: true
+    - name: expires_at
+      type: timestamptz
+      required: false
+  reporting.report_column:
+    derivedFrom: ReportColumn
+    columns:
+    - name: field
+      type: text
+      required: true
+    - name: label
+      type: text
+      required: false
+    - name: aggregation
+      type: jsonb
+      required: false
+    - name: sort_order
+      type: integer
+      required: false
+    - name: sort_direction
+      type: text
+      required: false
+    - name: format
+      type: text
+      required: false
+  reporting.report_definition:
+    derivedFrom: ReportDefinition
+    columns:
+    - name: name
+      type: varchar(200)
+      required: true
+    - name: description
+      type: varchar(1000)
+      required: false
+    - name: category
+      type: jsonb
+      required: true
+    - name: data_source
+      type: jsonb
+      required: true
+    - name: columns
+      type: jsonb
+      required: true
+    - name: filters
+      type: jsonb
+      required: false
+    - name: group_by
+      type: jsonb
+      required: false
+    - name: parameters
+      type: jsonb
+      required: false
+    - name: required_permission
+      type: text
+      required: true
+      description: Permission needed to run this report. **The author cannot assign one they do not hold**
+        — otherwise a venue user could build themselves a tenant-wide view.
+    - name: max_date_range_days
+      type: integer
+      required: false
+      description: Guards against a query spanning years of scan events.
+    - name: id
+      type: uuid
+      required: true
+    - name: version
+      type: text
+      required: true
+    - name: is_system
+      type: boolean
+      required: true
+      description: Shipped with the platform. Cannot be amended, only cloned.
+    - name: is_retired
+      type: boolean
+      required: true
+    - name: estimated_cost
+      type: text
+      required: false
+      description: Informs whether it may run inline or must be queued.
+    - name: created_by_principal_id
+      type: uuid
+      required: false
+    - name: created_at
+      type: timestamptz
+      required: true
+    - name: last_run_at
+      type: timestamptz
+      required: false
+  reporting.report_filter:
+    derivedFrom: ReportFilter
+    columns:
+    - name: field
+      type: text
+      required: true
+    - name: operator
+      type: text
+      required: true
+    - name: value
+      type: text
+      required: false
+    - name: values
+      type: jsonb
+      required: false
+    - name: is_parameter
+      type: boolean
+      required: false
+      description: Prompted at run time rather than fixed. Parameters narrow the result; they never widen
+        scope.
+  reporting.report_parameter:
+    derivedFrom: ReportParameter
+    columns:
+    - name: key
+      type: text
+      required: true
+    - name: label
+      type: text
+      required: true
+    - name: type
+      type: jsonb
+      required: true
+    - name: is_required
+      type: boolean
+      required: true
+    - name: default_value
+      type: text
+      required: false
+  reporting.schedule:
+    derivedFrom: ReportSchedule
+    columns:
+    - name: report_id
+      type: uuid
+      required: true
+    - name: name
+      type: varchar(200)
+      required: false
+    - name: cadence
+      type: jsonb
+      required: true
+    - name: parameters
+      type: jsonb
+      required: false
+    - name: recipients
+      type: jsonb
+      required: true
+    - name: format
+      type: jsonb
+      required: true
+    - name: include_personal_data
+      type: boolean
+      required: false
+    - name: skip_if_empty
+      type: boolean
+      required: false
+      description: An empty report every morning trains people to ignore the report.
+    - name: id
+      type: uuid
+      required: true
+    - name: owner_principal_id
+      type: uuid
+      required: true
+      description: The schedule runs under this principal's permissions, not the recipients'. A standing
+        grant of whatever the owner can see.
+    - name: is_paused
+      type: boolean
+      required: true
+    - name: last_run_at
+      type: timestamptz
+      required: false
+    - name: last_run_status
+      type: jsonb
+      required: false
+    - name: next_run_at
+      type: timestamptz
+      required: false
+    - name: consecutive_failures
+      type: integer
+      required: false
+    - name: created_at
+      type: timestamptz
+      required: true
+  reporting.schedule_recipient:
+    derivedFrom: Recipient
+    columns:
+    - name: kind
+      type: text
+      required: true
+    - name: address
+      type: text
+      required: true
+    - name: principal_id
+      type: uuid
+      required: false

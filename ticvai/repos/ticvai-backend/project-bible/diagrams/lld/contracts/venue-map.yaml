@@ -1,0 +1,193 @@
+id: LLD-venue-map
+title: venue-map — 12 operations
+generatedBy: tools/derive-diagrams.py
+index: diagrams/hld/03-contracts.yaml
+tier: satellite
+service: VenueOpsService
+operations:
+- operation: acceptVenueLabelProposals
+  verb: POST
+  path: /venue-maps/{mapId}/proposals
+  scope: venue
+  permission: VENUE_MAP_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - ai.proposed_action
+  - cache:idempotency
+  - venuemap.map
+  writes:
+  - cache:idempotency
+  - venuemap.point
+- operation: acceptWalkwayProposals
+  verb: POST
+  path: /venue-maps/{mapId}/walkway-proposals
+  scope: venue
+  permission: VENUE_MAP_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - ai.proposed_action
+  - cache:idempotency
+  - venuemap.map
+  - venuemap.point
+  writes:
+  - cache:idempotency
+  - venuemap.path
+  - venuemap.point
+- operation: createVenueMap
+  verb: POST
+  path: /venue-maps
+  scope: venue
+  permission: VENUE_MAP_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - assets.media_asset
+  - cache:idempotency
+  - platform.scope_node
+  - venuemap.map
+  writes:
+  - cache:idempotency
+  - venuemap.map
+- operation: getVenueMap
+  verb: GET
+  path: /venue-maps/{mapId}
+  scope: venue
+  permission: VENUE_MAP_VIEW
+  audience:
+  - staff
+  - guest
+  offline: true
+  reads:
+  - assets.media_asset
+  - venuemap.map
+  - venuemap.path
+  - venuemap.point
+  writes: []
+- operation: getVenueMapGraph
+  verb: GET
+  path: /venue-maps/{mapId}/graph
+  scope: venue
+  permission: VENUE_MAP_VIEW
+  audience:
+  - staff
+  - guest
+  offline: true
+  reads:
+  - cache:resolution
+  - venuemap.map
+  - venuemap.path
+  - venuemap.point
+  writes:
+  - cache:resolution
+- operation: getVenueMapLive
+  verb: GET
+  path: /venue-maps/{mapId}/live
+  scope: venue
+  permission: VENUE_MAP_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - access.scan_event
+  - queue.entry
+  - venuemap.map
+  - venuemap.point
+  writes: []
+- operation: importVenueGeometry
+  verb: POST
+  path: /venue-maps/{mapId}/import
+  scope: venue
+  permission: VENUE_MAP_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - venuemap.map
+  writes:
+  - cache:idempotency
+  - venuemap.import_job
+  - venuemap.path
+  - venuemap.point
+- operation: listVenueMaps
+  verb: GET
+  path: /venue-maps
+  scope: venue
+  permission: VENUE_MAP_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - venuemap.map
+  writes: []
+- operation: publishVenueMap
+  verb: POST
+  path: /venue-maps/{mapId}/publish
+  scope: venue
+  permission: VENUE_MAP_PUBLISH
+  audience:
+  - staff
+  offline: false
+  reads:
+  - assets.media_asset
+  - cache:idempotency
+  - platform.outlet
+  - venuemap.map
+  - venuemap.path
+  - venuemap.point
+  writes:
+  - cache:idempotency
+  - cache:resolution
+  - venuemap.map
+- operation: setPathClosure
+  verb: POST
+  path: /venue-maps/{mapId}/paths/{pathId}/closure
+  scope: venue
+  permission: VENUE_MAP_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - venuemap.path
+  - venuemap.point
+  writes:
+  - cache:idempotency
+  - cache:resolution
+  - venuemap.map
+  - venuemap.path
+- operation: setVenuePoint
+  verb: POST
+  path: /venue-maps/{mapId}/points
+  scope: venue
+  permission: VENUE_MAP_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - access.access_point
+  - cache:idempotency
+  - catalogue.product
+  - platform.outlet
+  - venuemap.map
+  writes:
+  - cache:idempotency
+  - venuemap.point
+- operation: validateVenueMapGraph
+  verb: POST
+  path: /venue-maps/{mapId}/validate-graph
+  scope: venue
+  permission: VENUE_MAP_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - venuemap.map
+  - venuemap.path
+  - venuemap.point
+  writes: []

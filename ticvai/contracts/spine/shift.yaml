@@ -1,0 +1,1411 @@
+openapi: 3.1.0
+info:
+  title: TICVAI Shift & Till
+  version: 1.0.0
+  x-ticvai-screen-count: 19
+  x-ticvai-tier: spine
+  x-ticvai-module: "2 — Ticketing Sales (cash handling)"
+  x-ticvai-capabilities: [C01]
+  x-ticvai-platforms:
+    - "P04 POS"
+    - "P08 Venue Management"
+  description: >
+    ## What this contract covers
+
+    **Cash reconciles to a drawer and a person.**
+
+    | | |
+    |---|---|
+    | **Tier** | spine |
+    | **Matrix domain** | 2 — Ticketing Sales (cash handling) |
+    | **Capabilities** | C01 |
+    | **Consumed by** | P04 POS · P08 Venue Management |
+
+    ## How to read this file
+
+    **This file is a contract.** It is hand-authored and it is the source of truth for one
+    bounded context: server code, client code and mock servers are generated from it, never
+    the other way round. If a field is not here, it does not exist.
+
+    **Contracts are split into two tiers.**
+
+    - **Spine** — the eight contexts everything else depends on: tenancy, identity,
+      catalogue, orders, shift, access, finance, cross-cell. Frozen first. A change here
+      requires a formal change request, because every satellite has pinned against it.
+    - **Satellite** — a domain that builds on the spine and can move independently.
+      Cheaper to change.
+
+    **`paths` are operations.** Each one declares four TICVAI extensions, and Redocly
+    rejects any that does not:
+
+    | Extension | Answers |
+    |---|---|
+    | `x-ticvai-permission` | Which permission the caller needs. From one enum in `shared/permissions.yaml` — never hand-typed |
+    | `x-ticvai-scope-level` | Where in the seven-level hierarchy that permission must be held |
+    | `x-ticvai-offline-capable` | Whether a disconnected terminal may queue this |
+    | `x-ticvai-conflict-policy` | How a replayed operation resolves — `append`, `serverWins`, `manual` |
+
+    Where `x-ticvai-permission` is null, one of these says why: `x-ticvai-auth: service`
+    (cell-to-cell), `x-ticvai-self-scoped` (acts only on the caller's own resources), or
+    `security: []` (genuinely public).
+
+    **`components.schemas` are API schemas — the shape of data on the wire.** They are not
+    database tables. One API schema may become three columns (`Money`) or five tables
+    (`Order`); some have no table at all (`ValidationResult`, `TrialBalance`). Roughly 70%
+    of the DDL derives from these, and the rest — partitioning, RLS, the PII split — is
+    storage design that lives in the migration scripts.
+
+    **Where a schema maps to storage, `x-ticvai-persistence` says so.** The value is a table
+    name, a list of tables, or `none` with a reason. It is documentation of the mapping, not
+    a generator input — the DDL lives in versioned SQL migrations, because partitioning, RLS
+    policies, `ltree` indexes and partial indexes have no expression in OpenAPI.
+
+    **`security` arrays hold OAuth scopes.** Empty means "this scheme, no scopes" — for
+    bearer tokens there is nothing to list. Empty is not the same as absent: absent means
+    unauthenticated.
+
+
+    ## This context
+
+    Shift lifecycle and cash handling at a workstation. Capability C01.
+
+    Settled positions this encodes:
+
+    - One user per workstation at a time. A user must log out or SUSPEND their shift before
+      another logs in. Suspension is a first-class state, not a workaround — it exists so a
+      break can be covered without a blind close-out.
+    - Blind close-out: the operator counts without seeing the expected figure.
+    - Cash lift: traced mid-shift removal from an open float, leaving the shift open.
+    - Supervisor approval is configurable on close AND on open.
+    - Over/short beyond a configured threshold requires explicit acceptance.
+
+    Money carries an explicit scale throughout. Denomination counts are integers of a
+    named denomination, never a derived total the client computed.
+
+servers:
+  - url: https://{cellHost}/api/v1
+    variables:
+      cellHost:
+        default: cell.ticvai.local
+
+security:
+  - bearerAuth: []
+
+tags:
+  - name: shift
+  - name: cash
+
+paths:
+  /shifts:
+    get:
+      operationId: listShifts
+      x-ticvai-consumed-by:
+        - "P04 POS-001 Begin Shift"
+        - "P04 POS-007 Close Shift"
+        - "P04 POS-009 Staff Roster"
+        - "P04 POS-019 Shift Templates & Policies"
+        - "P06 EMP-003 Home — on duty"
+        - "P06 EMP-008 Shift summary"
+        - "P06 EMP-009 End shift"
+        - "P08 BO-039 Shift Directory"
+        - "P08 BO-040 Variance Approval"
+        - "P08 BO-041 Cash Movements"
+        - "P08 BO-042 Banking & Safe"
+        - "P08 BO-100 Venue Home"
+      x-ticvai-audience: [staff]
+      x-ticvai-read-routing: primary   # open-shift state gates workstation actions
+      summary: List shifts
+      tags: [shift]
+      x-ticvai-permission: REPORT_VIEW_WORKSTATION
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - name: workstationId
+          in: query
+          schema: { type: string, format: uuid }
+        - name: status
+          in: query
+          schema: { $ref: '#/components/schemas/ShiftStatus' }
+        - name: openedFrom
+          in: query
+          schema: { type: string, format: date-time }
+        - name: openedTo
+          in: query
+          schema: { type: string, format: date-time }
+        - $ref: '../shared/common.yaml#/components/parameters/PageSize'
+        - $ref: '../shared/common.yaml#/components/parameters/PageCursor'
+      responses:
+        '200':
+          description: Shifts
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '../shared/common.yaml#/components/schemas/Page'
+                  - type: object
+                    properties:
+                      items:
+                        type: array
+                        items: { $ref: '#/components/schemas/Shift' }
+        '403': { $ref: '../shared/common.yaml#/components/responses/Forbidden' }
+
+    post:
+      operationId: openShift
+      x-ticvai-consumed-by:
+        - "P04 POS-001 Begin Shift"
+        - "P04 POS-007 Close Shift"
+        - "P04 POS-009 Staff Roster"
+        - "P04 POS-012 Omnichannel Order & Fulfilment Center"
+        - "P06 EMP-003 Home — on duty"
+        - "P06 EMP-009 End shift"
+        - "P08 BO-039 Shift Directory"
+        - "P08 BO-040 Variance Approval"
+        - "P08 BO-041 Cash Movements"
+        - "P08 BO-042 Banking & Safe"
+      x-ticvai-audience: [staff]
+      summary: Open a shift
+      description: >
+        Fails if another shift is already open on this workstation. Where the venue is
+        configured to require approval on open, the shift is created in
+        `pendingApproval` and cannot transact until approved.
+      tags: [shift]
+      x-ticvai-permission: SHIFT_OPEN
+      x-ticvai-scope-level: workstation
+      x-ticvai-offline-capable: true
+      x-ticvai-conflict-policy: append
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/OpenShiftRequest' }
+      responses:
+        '201':
+          description: Opened, or awaiting approval
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Shift' }
+          headers:
+            X-Consistency-Token:
+              schema: { type: string }
+        '400': { $ref: '../shared/common.yaml#/components/responses/BadRequest' }
+        '403': { $ref: '../shared/common.yaml#/components/responses/Forbidden' }
+        '409':
+          description: >
+            A shift is already open on this workstation, or a required device is absent.
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /denominations:
+    get:
+      operationId: listDenominations
+      x-ticvai-consumed-by:
+        - "P04 POS-001 Begin Shift"
+        - "P04 POS-007 Close Shift"
+        - "P04 POS-011 Returns, Refunds & Exchanges"
+        - "P04 POS-012 Omnichannel Order & Fulfilment Center"
+        - "P04 POS-013 Mobile POS, Event Sales & Offline Operations"
+      summary: The notes and coins a till counts
+      description: >
+        Raised by Tanmay in the 20 August review, and **the table was built and nothing read it** —
+        found by auditing which tables no operation names.
+
+        **Ordered for counting, not by value.** A cashier counts notes highest first and coins in
+        the order they sit in the tray, and `sortOrder` is what makes the count screen match the
+        physical drawer.
+
+        **Inactive denominations are returned by default and marked**, because a till counting a
+        note withdrawn last year still has to record the one in the drawer.
+      tags: [shift]
+      x-ticvai-permission: SHIFT_OPEN
+      x-ticvai-audience: [staff]
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      x-ticvai-offline-capable: true
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - name: includeInactive
+          in: query
+          schema: { type: boolean, default: true }
+      responses:
+        '200':
+          description: Denominations, in counting order
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/Denomination' }
+
+  /deposit-boxes:
+    get:
+      operationId: listDepositBoxes
+      x-ticvai-consumed-by:
+        - "P04 POS-015 Cash Operations Dashboard"
+      x-ticvai-audience: [staff]
+      summary: Cash boxes and who holds them
+      description: >
+        5.8.1. **A deposit box is allocated to a cashier, not to a till.** A cashier moving between
+        workstations takes their float with them, and a workstation used by three people in a day
+        has three boxes through it.
+
+        That separation is what makes a variance attributable to a person rather than to a
+        counter.
+      tags: [shift]
+      x-ticvai-permission: SHIFT_OPEN
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: true
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-read-routing: primary
+      parameters:
+        - name: openOnly
+          in: query
+          schema: { type: boolean }
+        - $ref: '../shared/common.yaml#/components/parameters/PageSize'
+        - $ref: '../shared/common.yaml#/components/parameters/PageCursor'
+      responses:
+        '200':
+          description: Boxes
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/DepositBox' }
+
+    post:
+      operationId: allocateDepositBox
+      x-ticvai-consumed-by:
+        - "P04 POS-016 Till Configuration"
+      x-ticvai-audience: [staff]
+      summary: Give a cashier a box and a float
+      description: >
+        5.8.1 and 5.8.3. **The opening float may be a total or a denomination breakdown** — the
+        14 August MoM found POS-001 offered only denominations, and a supervisor handing over a
+        counted bag should not have to re-count it into fields.
+      tags: [shift]
+      x-ticvai-permission: SHIFT_OPEN
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: true
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/DepositBox' }
+      responses:
+        '201':
+          description: Allocated
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/DepositBox' }
+
+  /deposit-boxes/{boxId}/adjust-float:
+    parameters:
+      - name: boxId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    post:
+      operationId: adjustDepositBoxFloat
+      x-ticvai-consumed-by:
+        - "P04 POS-001 Begin Shift"
+        - "P04 POS-007 Close Shift"
+        - "P04 POS-011 Returns, Refunds & Exchanges"
+        - "P04 POS-012 Omnichannel Order & Fulfilment Center"
+        - "P04 POS-013 Mobile POS, Event Sales & Offline Operations"
+      x-ticvai-audience: [staff]
+      summary: Change the initial fund
+      description: >
+        5.8.4. **Gated on a right the cashier does not have**, because a cashier who can raise
+        their own opening float can cover a shortfall by declaring one.
+      tags: [shift]
+      x-ticvai-permission: CASH_ADD
+      x-ticvai-permission-escalated: DEPOSIT_BOX_MODIFY_OTHER   # where the box is not the caller's own
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [amount, reason]
+              properties:
+                amount: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+                reason: { type: string, maxLength: 300 }
+      responses:
+        '200':
+          description: Adjusted, and recorded against the person who authorised it
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/DepositBox' }
+
+  /deposit-boxes/{boxId}/withdraw:
+    parameters:
+      - name: boxId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    post:
+      operationId: withdrawFromDepositBox
+      x-ticvai-consumed-by:
+        - "P04 POS-013 Mobile POS, Event Sales & Offline Operations"
+        - "P04 POS-018 Safe Drop & Cash Transfer Management"
+      x-ticvai-audience: [staff]
+      summary: A supervisor takes cash out mid-shift
+      description: >
+        5.8.8. **A mid-day skim, and it is not a variance.** Cash removed from a till for banking
+        must reduce the expected close figure, or every busy cashier ends the day apparently
+        short by the amount that was taken from them.
+
+        Two people sign: the supervisor taking it and the cashier it came from.
+      tags: [shift]
+      x-ticvai-permission: CASH_LIFT
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: true
+      x-ticvai-conflict-policy: append
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [amount, witnessPrincipalId]
+              properties:
+                amount: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+                witnessPrincipalId: { type: string, format: uuid }
+                reason: { type: string, enum: [banking, safeDrop, changeOrder, other] }
+                note: { type: string, maxLength: 300 }
+      responses:
+        '201':
+          description: Withdrawn, and the expected close figure reduced
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/DepositBox' }
+
+  /deposit-boxes/close:
+    post:
+      operationId: closeDepositBoxes
+      x-ticvai-consumed-by:
+        - "P04 POS-007 Close Shift"
+        - "P08 BO-024 Payment Exceptions"
+      x-ticvai-audience: [staff]
+      summary: Close one box or all of them
+      description: >
+        5.8.6. **Automated close-out of one or more boxes.** A venue closing at 23:00 with forty
+        tills does not close them one at a time, and a box whose holder has gone home still has to
+        be reconciled.
+
+        A box closed without its holder present is flagged rather than blocked — **the cash is
+        counted by somebody, and who counted it is the record that matters.**
+      tags: [shift]
+      x-ticvai-permission: SHIFT_CLOSE
+      x-ticvai-permission-escalated: SHIFT_CLOSE_OTHER   # closing a box whose holder is not the caller
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                boxIds:
+                  type: array
+                  items: { type: string, format: uuid }
+                allOpenAtVenue: { type: boolean }
+      responses:
+        '200':
+          description: Closed, with a variance per box
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/DepositBox' }
+
+  /shifts/current:
+    get:
+      operationId: getCurrentShift
+      x-ticvai-consumed-by:
+        - "P04 POS-001 Begin Shift"
+        - "P04 POS-007 Close Shift"
+        - "P04 POS-009 Staff Roster"
+        - "P04 POS-012 Omnichannel Order & Fulfilment Center"
+        - "P06 EMP-003 Home — on duty"
+        - "P06 EMP-008 Shift summary"
+        - "P06 EMP-009 End shift"
+        - "P07 SCN-001 Sign in"
+        - "P08 BO-039 Shift Directory"
+        - "P08 BO-040 Variance Approval"
+        - "P08 BO-041 Cash Movements"
+        - "P08 BO-042 Banking & Safe"
+      x-ticvai-audience: [staff]
+      x-ticvai-read-routing: primary   # cash position drives close-out
+      summary: The open or suspended shift on the session's workstation
+      tags: [shift]
+      x-ticvai-permission: SHIFT_OPEN
+      x-ticvai-scope-level: workstation
+      x-ticvai-offline-capable: true
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '200':
+          description: Current shift
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Shift' }
+        '404':
+          description: No shift open on this workstation
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /shifts/{shiftId}:
+    parameters:
+      - name: shiftId
+        in: path
+        required: true
+        schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+    get:
+      operationId: getShift
+      x-ticvai-consumed-by:
+        - "P04 POS-001 Begin Shift"
+        - "P04 POS-007 Close Shift"
+        - "P04 POS-009 Staff Roster"
+        - "P06 EMP-003 Home — on duty"
+        - "P06 EMP-008 Shift summary"
+        - "P06 EMP-009 End shift"
+        - "P08 BO-039 Shift Directory"
+        - "P08 BO-040 Variance Approval"
+        - "P08 BO-041 Cash Movements"
+        - "P08 BO-042 Banking & Safe"
+      x-ticvai-audience: [staff]
+      x-ticvai-read-routing: primary
+      summary: Read a shift
+      tags: [shift]
+      x-ticvai-permission: REPORT_VIEW_WORKSTATION
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: true
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '200':
+          description: Shift
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Shift' }
+        '403': { $ref: '../shared/common.yaml#/components/responses/Forbidden' }
+        '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
+
+  /shifts/{shiftId}/approve-open:
+    parameters:
+      - name: shiftId
+        in: path
+        required: true
+        schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+    post:
+      operationId: approveShiftOpen
+      x-ticvai-consumed-by:
+        - "P04 POS-001 Begin Shift"
+        - "P04 POS-007 Close Shift"
+        - "P04 POS-009 Staff Roster"
+        - "P06 EMP-003 Home — on duty"
+        - "P06 EMP-009 End shift"
+        - "P08 BO-039 Shift Directory"
+        - "P08 BO-040 Variance Approval"
+        - "P08 BO-041 Cash Movements"
+        - "P08 BO-042 Banking & Safe"
+      x-ticvai-audience: [staff]
+      summary: Approve a shift opening outside tolerance
+      description: >
+        A float that does not match the venue's expected amount holds the shift in
+        `pendingApproval` until a supervisor accepts it. Without this the cashier cannot trade,
+        and with it the variance at close has a known starting point.
+      tags: [shift]
+      x-ticvai-permission: SHIFT_APPROVE_OPEN
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [reason]
+              properties:
+                reason: { type: string, minLength: 3, maxLength: 300 }
+      responses:
+        '200':
+          description: Approved and open
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Shift' }
+        '409':
+          description: Shift is not awaiting approval
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /shifts/{shiftId}/reopen:
+    parameters:
+      - name: shiftId
+        in: path
+        required: true
+        schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+    post:
+      operationId: reopenShift
+      x-ticvai-consumed-by:
+        - "P04 POS-001 Begin Shift"
+        - "P04 POS-007 Close Shift"
+        - "P04 POS-009 Staff Roster"
+        - "P06 EMP-003 Home — on duty"
+        - "P06 EMP-009 End shift"
+        - "P08 BO-039 Shift Directory"
+        - "P08 BO-040 Variance Approval"
+        - "P08 BO-041 Cash Movements"
+        - "P08 BO-042 Banking & Safe"
+      x-ticvai-audience: [staff]
+      summary: Reopen a shift closed in error
+      description: >
+        A cashier who closed the wrong till, or a count submitted before the drawer was
+        finished.
+
+        **A reversal, and treated as one.** Requires an approver who is not the person who
+        closed it, and the original close is retained — reopening does not erase the first
+        count, because the difference between the two counts is the thing worth looking at.
+      tags: [shift]
+      x-ticvai-permission: SHIFT_REOPEN
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [reason, approverPrincipalId]
+              properties:
+                reason: { type: string, minLength: 3, maxLength: 500 }
+                approverPrincipalId:
+                  type: string
+                  format: uuid
+                  description: May not be the principal who closed it.
+      responses:
+        '200':
+          description: Reopened
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Shift' }
+        '403':
+          description: Approver is the closing principal
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+        '409':
+          description: Shift is not closed, or the fiscal period has closed over it
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /shifts/{shiftId}/suspend:
+    parameters:
+      - name: shiftId
+        in: path
+        required: true
+        schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+    post:
+      operationId: suspendShift
+      x-ticvai-consumed-by:
+        - "P04 POS-001 Begin Shift"
+        - "P04 POS-007 Close Shift"
+        - "P04 POS-009 Staff Roster"
+        - "P06 EMP-003 Home — on duty"
+        - "P06 EMP-008 Shift summary"
+        - "P06 EMP-009 End shift"
+        - "P08 BO-039 Shift Directory"
+        - "P08 BO-040 Variance Approval"
+        - "P08 BO-041 Cash Movements"
+        - "P08 BO-042 Banking & Safe"
+      x-ticvai-audience: [staff]
+      summary: Suspend a shift so another user can log in
+      description: >
+        The break mechanism. The float and the shift stay intact; the workstation becomes
+        available to another principal. Resuming requires the original principal, or a
+        principal holding SHIFT_CLOSE_OTHER to close it out instead.
+      tags: [shift]
+      x-ticvai-permission: SHIFT_SUSPEND
+      x-ticvai-scope-level: workstation
+      x-ticvai-offline-capable: true
+      x-ticvai-conflict-policy: append
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                reason: { type: string, maxLength: 200 }
+      responses:
+        '200':
+          description: Suspended
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Shift' }
+        '403': { $ref: '../shared/common.yaml#/components/responses/Forbidden' }
+        '409':
+          description: Shift is not in a suspendable state
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /shifts/{shiftId}/resume:
+    parameters:
+      - name: shiftId
+        in: path
+        required: true
+        schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+    post:
+      operationId: resumeShift
+      x-ticvai-consumed-by:
+        - "P04 POS-001 Begin Shift"
+        - "P04 POS-007 Close Shift"
+        - "P04 POS-009 Staff Roster"
+        - "P06 EMP-003 Home — on duty"
+        - "P06 EMP-009 End shift"
+        - "P08 BO-039 Shift Directory"
+        - "P08 BO-040 Variance Approval"
+        - "P08 BO-041 Cash Movements"
+        - "P08 BO-042 Banking & Safe"
+      x-ticvai-audience: [staff]
+      summary: Resume a suspended shift
+      tags: [shift]
+      x-ticvai-permission: SHIFT_OPEN
+      x-ticvai-scope-level: workstation
+      x-ticvai-offline-capable: true
+      x-ticvai-conflict-policy: append
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      responses:
+        '200':
+          description: Resumed
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Shift' }
+        '403':
+          description: >
+            Not the principal who suspended it, and the caller does not hold
+            SHIFT_CLOSE_OTHER.
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+        '409':
+          description: Another shift is now open on this workstation
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /shifts/{shiftId}/close:
+    parameters:
+      - name: shiftId
+        in: path
+        required: true
+        schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+    post:
+      operationId: closeShift
+      x-ticvai-consumed-by:
+        - "P04 POS-001 Begin Shift"
+        - "P04 POS-007 Close Shift"
+        - "P04 POS-009 Staff Roster"
+        - "P06 EMP-003 Home — on duty"
+        - "P06 EMP-009 End shift"
+        - "P08 BO-039 Shift Directory"
+        - "P08 BO-040 Variance Approval"
+        - "P08 BO-041 Cash Movements"
+        - "P08 BO-042 Banking & Safe"
+      x-ticvai-audience: [staff]
+      summary: Blind close-out
+      description: >
+        The operator submits a counted denomination breakdown. The expected figure is not
+        returned before submission — that is what makes the count blind.
+
+        The response carries the variance. Where it exceeds the configured threshold, the
+        shift moves to `pendingVariance` and requires OVERSHORT_ACCEPT to finalise.
+
+        Closing a shift opened by another principal requires SHIFT_CLOSE_OTHER.
+      tags: [shift]
+      x-ticvai-permission: SHIFT_CLOSE
+      x-ticvai-permission-escalated: SHIFT_CLOSE_OTHER   # where the shift belongs to somebody else
+      x-ticvai-scope-level: workstation
+      x-ticvai-offline-capable: true
+      x-ticvai-conflict-policy: append
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/CloseShiftRequest' }
+      responses:
+        '200':
+          description: Closed, or held pending variance acceptance or approval
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ShiftCloseResult' }
+        '400': { $ref: '../shared/common.yaml#/components/responses/BadRequest' }
+        '403': { $ref: '../shared/common.yaml#/components/responses/Forbidden' }
+        '409':
+          description: Shift already closed, or open orders remain
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /shifts/{shiftId}/accept-variance:
+    parameters:
+      - name: shiftId
+        in: path
+        required: true
+        schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+    post:
+      operationId: acceptShiftVariance
+      x-ticvai-consumed-by:
+        - "P04 POS-001 Begin Shift"
+        - "P04 POS-007 Close Shift"
+        - "P04 POS-009 Staff Roster"
+        - "P06 EMP-003 Home — on duty"
+        - "P06 EMP-009 End shift"
+        - "P08 BO-039 Shift Directory"
+        - "P08 BO-040 Variance Approval"
+        - "P08 BO-041 Cash Movements"
+        - "P08 BO-042 Banking & Safe"
+      x-ticvai-audience: [staff]
+      summary: Accept an over/short beyond the threshold
+      tags: [shift]
+      x-ticvai-permission: OVERSHORT_ACCEPT
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: append
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [reason]
+              properties:
+                reason:
+                  type: string
+                  minLength: 3
+                  maxLength: 500
+                  description: Retained for audit. The accepting principal is recorded.
+      responses:
+        '200':
+          description: Accepted and finalised
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Shift' }
+        '403': { $ref: '../shared/common.yaml#/components/responses/Forbidden' }
+
+  /shifts/{shiftId}/no-sale:
+    parameters:
+      - name: shiftId
+        in: path
+        required: true
+        schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+    post:
+      operationId: recordNoSale
+      x-ticvai-consumed-by:
+        - "P04 POS-001 Begin Shift"
+        - "P04 POS-007 Close Shift"
+        - "P04 POS-009 Staff Roster"
+        - "P04 POS-014 Sales Exceptions, Controls & Operational Actions"
+        - "P04 POS-020 Shift Exceptions & Alerts"
+        - "P06 EMP-003 Home — on duty"
+        - "P06 EMP-009 End shift"
+        - "P08 BO-039 Shift Directory"
+        - "P08 BO-040 Variance Approval"
+        - "P08 BO-041 Cash Movements"
+        - "P08 BO-042 Banking & Safe"
+      x-ticvai-audience: [staff]
+      summary: Open the drawer without a sale
+      description: >
+        Change for a guest, a dropped coin, correcting a float. Legitimate and routine.
+
+        **Recorded because it is the classic cover for theft.** A drawer that opens forty times
+        in a shift with four sales is a conversation, and it is only a conversation if someone
+        can see the count. A reason is required for the same reason it is required on a manual
+        discount — attributable, not forbidden.
+      tags: [shift]
+      x-ticvai-permission: SHIFT_SUSPEND
+      x-ticvai-scope-level: workstation
+      x-ticvai-offline-capable: true
+      x-ticvai-conflict-policy: append
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [id, reason, recordedAt]
+              properties:
+                id: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+                reason:
+                  type: string
+                  enum: [changeForGuest, correctFloat, retrieveDroppedCash, tillCheck, other]
+                note: { type: string, maxLength: 300 }
+                recordedAt: { type: string, format: date-time }
+      responses:
+        '201':
+          description: Recorded
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/NoSaleEvent' }
+        '409':
+          description: Shift is not open
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /shifts/{shiftId}/cash-movements:
+    parameters:
+      - name: shiftId
+        in: path
+        required: true
+        schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+    get:
+      operationId: listCashMovements
+      x-ticvai-consumed-by:
+        - "P04 POS-001 Begin Shift"
+        - "P04 POS-007 Close Shift"
+        - "P04 POS-009 Staff Roster"
+        - "P04 POS-013 Mobile POS, Event Sales & Offline Operations"
+        - "P04 POS-015 Cash Operations Dashboard"
+        - "P06 EMP-003 Home — on duty"
+        - "P06 EMP-008 Shift summary"
+        - "P06 EMP-009 End shift"
+        - "P08 BO-039 Shift Directory"
+        - "P08 BO-040 Variance Approval"
+        - "P08 BO-041 Cash Movements"
+        - "P08 BO-042 Banking & Safe"
+      x-ticvai-audience: [staff]
+      x-ticvai-read-routing: primary
+      summary: Lifts, adds and the opening float
+      tags: [cash]
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/PageSize'
+        - $ref: '../shared/common.yaml#/components/parameters/PageCursor'
+      x-ticvai-permission: REPORT_VIEW_WORKSTATION
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: true
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '200':
+          description: Movements in sequence
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/CashMovement' }
+        '403': { $ref: '../shared/common.yaml#/components/responses/Forbidden' }
+
+    post:
+      operationId: createCashMovement
+      x-ticvai-consumed-by:
+        - "P04 POS-001 Begin Shift"
+        - "P04 POS-007 Close Shift"
+        - "P04 POS-013 Mobile POS, Event Sales & Offline Operations"
+        - "P04 POS-017 Cash In / Cash Out Operations"
+        - "P04 POS-018 Safe Drop & Cash Transfer Management"
+        - "P06 EMP-009 End shift"
+        - "P08 BO-039 Shift Directory"
+        - "P08 BO-040 Variance Approval"
+        - "P08 BO-041 Cash Movements"
+        - "P08 BO-042 Banking & Safe"
+      x-ticvai-audience: [staff]
+      summary: Record a cash lift or add
+      description: >
+        A lift removes cash from an open float mid-shift without closing it — the supervisor
+        takes the excess to the safe and the cashier keeps trading. Both directions are
+        traced, both record the authorising principal, and both adjust the expected figure
+        used at close.
+      tags: [cash]
+      x-ticvai-permission: CASH_LIFT
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: true
+      x-ticvai-conflict-policy: append
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/CreateCashMovementRequest' }
+      responses:
+        '201':
+          description: Recorded
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/CashMovement' }
+        '400': { $ref: '../shared/common.yaml#/components/responses/BadRequest' }
+        '403': { $ref: '../shared/common.yaml#/components/responses/Forbidden' }
+        '409':
+          description: Shift is not open, or the lift exceeds the counted float
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+components:
+  schemas:
+    ShiftStatus:
+      type: string
+      enum:
+        - pendingApproval    # awaiting SHIFT_APPROVE_OPEN where configured
+        - open
+        - suspended          # break cover; float intact, workstation released
+        - pendingVariance    # counted, over/short beyond threshold
+        - pendingClosure     # awaiting SHIFT_APPROVE_CLOSE where configured
+        - closed
+        - autoClosed         # closed by the inactivity job, supervisor notified
+
+    DepositBoxStatus:
+      type: string
+      enum: [allocated, open, suspended, closing, closed, reconciled]
+
+    DepositBox:
+      type: object
+      x-ticvai-persistence: "orders.deposit_box"
+      description: >
+        5.8. **Allocated to a cashier, not to a workstation.** A cashier moving between tills takes
+        their float with them, which is what makes a variance attributable to a person.
+      required: [cashierPrincipalId, venueId, openingFloat]
+      properties:
+        id: { type: string, format: uuid, readOnly: true }
+        cashierPrincipalId: { type: string, format: uuid }
+        cashierName: { type: string, readOnly: true }
+        venueId: { type: string, format: uuid }
+        workstationId:
+          type: string
+          format: uuid
+          nullable: true
+          description: Where it is being used now. **Changes during a shift; the box does not.**
+        shiftId: { type: string, format: uuid, nullable: true }
+        status: { $ref: '#/components/schemas/DepositBoxStatus' }
+        openingFloat: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+        openingDenominations:
+          type: array
+          description: >
+            5.8.3. **Either this or a total** — a supervisor handing over a counted bag should not
+            have to re-count it into fields. POS-001 offered only denominations until 14 August.
+          items:
+            type: object
+            properties:
+              denomination: { type: number }
+              count: { type: integer }
+        withdrawnTotal:
+          allOf:
+            - $ref: '../shared/common.yaml#/components/schemas/Money'
+          readOnly: true
+          description: >
+            **Reduces the expected close figure.** Cash skimmed for banking is not a shortfall, and
+            a system that treats it as one makes every busy cashier look short.
+        foreignHoldings:
+          type: array
+          description: >
+            4.6.11 and 6.1.10. **Foreign cash accepted at this till, counted separately by currency.** A
+            till taking USD and EUR alongside AED has three counts and three variances — collapsing them
+            into a base-currency total makes a variance unattributable to the currency that caused it.
+
+            **No opening float in a foreign currency and no change given in one.** Foreign cash only ever
+            comes in, which is what keeps this to one number per currency rather than a full
+            reconciliation each.
+          items:
+            type: object
+            required: [currency, countedAmount]
+            properties:
+              currency:
+                type: string
+                pattern: '^[A-Z]{3}$'
+                x-ticvai-persisted: false
+                description: >
+                  **Resolved from the region, not stored** (ADR-0018, 24 August). Region-scoped and not overri
+                  dable below, so a row in a UAE region is AED and cannot be anything else. **Kept on the wire
+                  , removed from the table** — a client should not walk a hierarchy to read a figure, and the 
+                  database should not hold nine million copies of AED. Four tables genuinely differ from their
+                   region and keep a stored currency: `orders.payment.tender_currency`, `inventory.supplier`, 
+                  `ledger.account`, `control.partner_agreement`.
+              expectedAmount:
+                allOf:
+                  - $ref: '../shared/common.yaml#/components/schemas/Money'
+                description: The sum of tenders taken in this currency during the shift.
+              countedAmount: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+              variance: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+              baseEquivalent:
+                allOf:
+                  - $ref: '../shared/common.yaml#/components/schemas/Money'
+                description: >
+                  **At the rates on the payments, not today's.** A shift closed on Friday and reviewed on
+                  Monday is reviewed at Friday's rates (CF-37).
+        expectedTotal: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+        countedTotal: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+        variance: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+        closedByPrincipalId:
+          type: string
+          format: uuid
+          nullable: true
+          description: >
+            **Flagged where it is not the holder.** A box closed without its holder present is
+            allowed — the cash is counted by somebody, and who counted it is the record.
+        allocatedAt: { type: string, format: date-time }
+        closedAt: { type: string, format: date-time, nullable: true }
+
+    Denomination:
+      x-ticvai-persistence: "platform.denomination"
+      description: >
+        **Raised in review by Tanmay: denominations belong in a table, not in JSON.** He is right,
+        and the reason is stronger than storage tidiness — **`orders.cash_movement.denominations`
+        was a jsonb blob, so a note that stops circulating has nothing to deactivate.**
+
+        The UAE set he supplied is the seed. **His list carries `Coin, 0, COIN`** — a zero-valued
+        coin, which is a transcription slip rather than a denomination, and it is the kind of row a
+        table refuses and a JSON blob accepts silently.
+
+        **Ordered for counting, not by value.** A cashier counts notes highest first and coins in
+        the order they sit in the drawer, and `sortOrder` is what makes the count screen match the
+        physical tray."
+      type: object
+      required: [value, count]
+      properties:
+        id: { type: string, format: uuid }
+        currencyCode: { type: string }
+        displayName:
+          type: string
+          description: What the cashier reads — *AED 500*, *Coin*. Localised, because a count screen is read at speed.
+        kind: { type: string, enum: [note, coin] }
+        sortOrder:
+          type: integer
+          description: >
+            **Counting order, not value order.** Notes highest first, coins as they sit in the tray.
+        isActive:
+          type: boolean
+          default: true
+          description: >
+            **The field that makes this a table.** A note withdrawn from circulation is deactivated
+            and stays in the count history — **a JSON blob cannot deactivate anything**, and
+            deleting the value would rewrite every past cash-up that used it.
+        value:
+          $ref: '../shared/common.yaml#/components/schemas/Money'
+        count:
+          type: integer
+          minimum: 0
+          description: >
+            Units of this denomination. The server computes the total — a client-computed
+            total cannot be reconciled against the count.
+
+    DenominationCount:
+      type: array
+      description: >
+        **A count is a list of lines and the line is the row.** Until 24 August this array carried
+        the persistence hint itself, so `orders.cash_count_line` derived a single column —
+        `shift_id` — and a count line had no denomination, no quantity and no variance.
+
+        **The array is the transport; `CashCountLine` is the row.**
+      items: { $ref: '#/components/schemas/CashCountLine' }
+      minItems: 1
+
+    CashCountLine:
+      x-ticvai-persistence: "orders.cash_count_line"
+      type: object
+      description: >
+        **One denomination, counted once, against one shift.** Raised in review on 24 August:
+        the table was a stub.
+
+        **The denomination is referenced rather than described** — `platform.denomination` already
+        holds the note and coin definitions per currency, and a count line that repeats the face
+        value is a count line that can disagree with the till it was counted on.
+
+        **`countedQuantity` is a quantity and `expectedQuantity` is derived**, not stored: the
+        expectation is the opening float plus every movement, and a stored expectation that drifts
+        from the movements is a variance nobody can explain.
+      required: [shiftId, denominationId, countedQuantity]
+      properties:
+        id: { type: string, format: uuid }
+        shiftId: { type: string, format: uuid }
+        depositBoxId: { type: string, format: uuid, nullable: true }
+        denominationId:
+          type: string
+          format: uuid
+          description: "References `platform.denomination` — face value, kind and sort order live there."
+        countedQuantity:
+          type: integer
+          minimum: 0
+          description: "**How many of this note or coin were in the drawer.**"
+        countedValue:
+          $ref: '../shared/common.yaml#/components/schemas/Money'
+          description: >
+            **Quantity times face value, stored.** Derivable, and stored anyway: a denomination
+            revalued or deactivated later would silently rewrite a historical count.
+        countedBy: { type: string, format: uuid, nullable: true }
+        countedAt: { type: string, format: date-time }
+        recountOf:
+          type: string
+          format: uuid
+          nullable: true
+          description: >
+            **A recount points at what it replaces rather than overwriting it.** `requestRecount`
+            exists because a variance is a question before it is a fact.
+
+    OpenShiftRequest:
+      type: object
+      required: [workstationId, openingFloat]
+      properties:
+        workstationId: { type: string, format: uuid }
+        openingFloat: { $ref: '#/components/schemas/DenominationCount' }
+        depositBoxCode:
+          type: string
+          maxLength: 64
+          description: >
+            Physical container assigned to this shift. Required where the venue configures
+            deposit box allocation.
+        bagNumber:
+          type: string
+          maxLength: 64
+          description: Required where the venue configures bag numbers as mandatory.
+        recordedAt:
+          type: string
+          format: date-time
+          description: >
+            When the device recorded it. Differs from server receipt time for shifts opened
+            offline.
+
+    CloseShiftRequest:
+      type: object
+      required: [countedCash, recordedAt]
+      properties:
+        countedCash: { $ref: '#/components/schemas/DenominationCount' }
+        nonCashDeclared:
+          type: array
+          description: >
+            Declared totals per non-cash tender, for reconciliation against captured
+            payments.
+          items:
+            type: object
+            required: [tender, amount]
+            properties:
+              tender: { type: string }
+              amount: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+        notes: { type: string, maxLength: 1000 }
+        releaseHeldLeases:
+          type: boolean
+          default: true
+          description: >
+            Return unsold inventory leases held by this workstation (ADR-0013 C103). Closing
+            without releasing strands capacity until TTL expiry, which is visible at a gate
+            during peak.
+        recordedAt: { type: string, format: date-time }
+
+    ShiftCloseResult:
+      x-ticvai-persistence: "none — computed"
+      type: object
+      required: [shift, expectedCash, countedCash, variance, requiresAcceptance]
+      properties:
+        shift: { $ref: '#/components/schemas/Shift' }
+        expectedCash:
+          $ref: '../shared/common.yaml#/components/schemas/Money'
+        countedCash:
+          $ref: '../shared/common.yaml#/components/schemas/Money'
+        variance:
+          allOf:
+            - $ref: '../shared/common.yaml#/components/schemas/Money'
+          description: Counted minus expected. Negative is short.
+        requiresAcceptance:
+          type: boolean
+          description: True when the variance exceeds the configured threshold.
+        nonCashVariances:
+          type: array
+          items:
+            type: object
+            required: [tender, declared, captured, variance]
+            properties:
+              tender: { type: string }
+              declared: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+              captured: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+              variance: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+
+    Shift:
+      x-ticvai-persistence: "orders.shift"
+      type: object
+      required: [id, workstationId, venueId, scopePath, principalId, status, currency, currencyScale, openedAt]
+      properties:
+        id:
+          type: string
+          pattern: '^[0-9A-HJKMNP-TV-Z]{26}$'
+          description: Client-generated ULID. Also the idempotency key.
+        workstationId: { type: string, format: uuid }
+        venueId: { type: string, format: uuid }
+        scopePath: { type: string }
+        principalId:
+          type: string
+          format: uuid
+          description: Who opened it. Cash reconciles to a person and a drawer.
+        principalDisplayName: { type: string }
+        incidents:
+          type: array
+          description: >
+            BL-097. **A till has exceptions and there was nowhere to write them** — a no-sale, a
+            drawer opened without a transaction, a manager override, a guest dispute.
+
+            **This is the log a cash-up investigation starts from**, and a shift that balances with
+            four unexplained no-sales is not a shift that balanced.
+          items:
+            type: object
+            properties:
+              kind: { type: string, enum: [noSale, drawerOpen, override, voidAfterPayment, guestDispute, tillJam, priceQuery, other] }
+              at: { type: string, format: date-time }
+              principalId: { type: string, format: uuid }
+              note: { type: string, nullable: true }
+        status: { $ref: '#/components/schemas/ShiftStatus' }
+        currency:
+          type: string
+          pattern: '^[A-Z]{3}$'
+          x-ticvai-persisted: false
+          description: >
+            **Resolved from the region, not stored** (ADR-0018, 24 August). Region-scoped and not overri
+            dable below, so a row in a UAE region is AED and cannot be anything else. **Kept on the wire
+            , removed from the table** — a client should not walk a hierarchy to read a figure, and the 
+            database should not hold nine million copies of AED. Four tables genuinely differ from their
+             region and keep a stored currency: `orders.payment.tender_currency`, `inventory.supplier`, 
+            `ledger.account`, `control.partner_agreement`.
+        currencyScale:
+          type: integer
+          minimum: 0
+          maximum: 4
+          x-ticvai-persisted: false
+          description: >
+            **Resolved from the region, not stored** (ADR-0018, 24 August). Region-scoped and not overri
+            dable below, so a row in a UAE region is AED and cannot be anything else — storing it per ro
+            w is a copy of a fact that cannot differ. **Kept on the wire, removed from the table**: a cl
+            ient reading a figure should not walk a hierarchy to know what it means, and the database sh
+            ould not hold nine million copies of AED. Four tables genuinely differ from their region and
+             keep a stored currency — `orders.payment.tender_currency`, `inventory.supplier`, `ledger.ac
+            count`, `control.partner_agreement`. **A guest paying USD at an AED venue is a real row; a w
+            orkstation with its own currency is a misconfiguration.**
+        depositBoxCode: { type: string, nullable: true }
+        bagNumber: { type: string, nullable: true }
+        openingFloat: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+        salesTotal: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+        refundsTotal: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+        liftsTotal: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+        heldLeaseCount:
+          type: integer
+          description: >
+            Inventory leases currently held by this workstation. Surfaced so an operator
+            closing a shift can see what will be returned.
+        openedAt: { type: string, format: date-time }
+        recordedAt:
+          type: string
+          format: date-time
+          description: When the device recorded the open. Differs from `openedAt` when offline.
+        suspendedAt: { type: string, format: date-time, nullable: true }
+        closedAt: { type: string, format: date-time, nullable: true }
+        syncedAt:
+          type: string
+          format: date-time
+          nullable: true
+          description: Null while the shift has unsynced operations.
+        approvals:
+          type: array
+          items:
+            type: object
+            required: [kind, principalId, at]
+            properties:
+              kind:
+                type: string
+                enum: [open, close, variance]
+              principalId: { type: string, format: uuid }
+              at: { type: string, format: date-time }
+              reason: { type: string }
+
+    CashMovementKind:
+      type: string
+      enum: [openingFloat, lift, add]
+
+    CreateCashMovementRequest:
+      type: object
+      required: [id, kind, amount, recordedAt]
+      properties:
+        id:
+          type: string
+          pattern: '^[0-9A-HJKMNP-TV-Z]{26}$'
+          description: Client-generated ULID.
+        kind: { $ref: '#/components/schemas/CashMovementKind' }
+        amount: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+        denominations:
+          $ref: '#/components/schemas/DenominationCount'
+        reference:
+          type: string
+          maxLength: 64
+          description: Safe drop reference or bag number.
+        reason: { type: string, maxLength: 500 }
+        recordedAt: { type: string, format: date-time }
+
+    NoSaleEvent:
+      type: object
+      x-ticvai-persistence: "orders.no_sale_event"
+      required: [id, shiftId, reason, principalId, recordedAt]
+      properties:
+        id: { type: string }
+        shiftId: { type: string }
+        workstationId: { type: string, format: uuid }
+        reason: { type: string }
+        note: { type: string, nullable: true }
+        principalId: { type: string, format: uuid }
+        recordedAt: { type: string, format: date-time }
+        countThisShift:
+          type: integer
+          description: >
+            Running count. Returned so the terminal can show it — a cashier who can see they
+            are on their ninth no-sale behaves differently from one who cannot.
+
+    CashMovement:
+      x-ticvai-persistence: "orders.cash_movement"
+      allOf:
+        - $ref: '#/components/schemas/CreateCashMovementRequest'
+        - type: object
+          required: [shiftId, authorisedByPrincipalId, sequence]
+          properties:
+            shiftId: { type: string }
+            authorisedByPrincipalId:
+              type: string
+              format: uuid
+              description: The principal who authorised the movement, recorded for audit.
+            sequence:
+              type: integer
+              description: Monotonic within the shift. Preserves order across an offline batch.
+            syncedAt: { type: string, format: date-time, nullable: true }
+
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

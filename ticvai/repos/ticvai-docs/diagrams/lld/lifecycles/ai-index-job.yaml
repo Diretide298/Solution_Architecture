@@ -1,0 +1,63 @@
+id: LLD-AI index job
+title: AI index job — 8 transitions
+generatedBy: tools/derive-diagrams.py
+index: diagrams/hld/04-lifecycles.yaml
+source: states/ai-index-job.yaml
+entity: AI index job
+contract: ai
+enum: IndexJob.status
+enumKind: inline
+enumSchema: IndexJob
+enumProperty: status
+owner: ai
+initial:
+- queued
+terminal:
+- complete
+- failed
+transitions:
+- from: queued
+  to: building
+  operation: reindexSource
+  trigger: operation
+  guard: Picked up by a worker
+- from: building
+  to: verifying
+  trigger: job
+  guard: Every record embedded. **Counts and a sample are checked before the swap** — a shadow collection
+    with a third of its rows missing looks healthy from the outside
+- from: verifying
+  to: swapping
+  trigger: job
+  guard: Verified. The shadow collection is about to become live
+- from: swapping
+  to: complete
+  trigger: job
+  guard: '**Swapped atomically.** Reindexing in place leaves the assistant answering from a half-built
+    index, which is worse than a stale one — stale is wrong in a knowable way'
+- from: building
+  to: failed
+  trigger: job
+  guard: Embedding failed beyond the tolerated rate. **The live collection is untouched**
+- from: verifying
+  to: failed
+  trigger: job
+  guard: Verification found too many missing records. The shadow collection is discarded
+- from: swapping
+  to: failed
+  trigger: job
+  guard: '**The worst case, and the reason swapping is its own state.** A failure here can leave neither
+    collection serving, so the swap is the one step that must be atomic'
+- from: failed
+  to: queued
+  operation: reindexSource
+  trigger: operation
+  guard: Retried
+  isReversal: true
+notes: '`recordsFailed` is the number to watch rather than the status. **A job that completes having
+  silently failed on 3% of its rows is a search that silently misses 3% of the answers**, and nothing
+  else in the system will say so.
+
+
+  A full rebuild always writes to a shadow collection. The live index keeps serving throughout, which
+  is why `building` and `verifying` are not visible to a user.'

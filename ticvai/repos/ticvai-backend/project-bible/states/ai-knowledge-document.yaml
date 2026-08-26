@@ -1,0 +1,57 @@
+# AI knowledge document — state model
+# Contract: ai.KnowledgeDocument.status
+# Checked by tools/check-states.py.
+
+entity: AI knowledge document
+contract: ai
+enum: KnowledgeDocument.status
+enumKind: inline
+enumSchema: KnowledgeDocument
+enumProperty: status
+owner: ai
+initial:
+- processing
+terminal:
+- failed
+- superseded
+transitions:
+- from: processing
+  to: indexed
+  trigger: job
+  guard: Chunked and embedded. **Retrievable from here and not before**
+- from: processing
+  to: failed
+  trigger: job
+  guard: Unreadable, or **extracted to zero characters** — a scanned PDF with no OCR looks successful
+    and retrieves nothing, which is the common failure
+- from: indexed
+  to: processing
+  operation: ingestKnowledgeDocument
+  trigger: operation
+  guard: Re-ingested after the source changed
+  isReversal: true
+- from: indexed
+  to: superseded
+  operation: ingestKnowledgeDocument
+  trigger: operation
+  guard: '**A newer version replaced it.** Superseded rather than deleted — a technician who followed
+    version 2 last week needs version 2 to still exist'
+- from: indexed
+  to: failed
+  trigger: job
+  guard: The embedding model changed and the vectors no longer match the collection. **A collection
+    searched with mismatched embeddings returns plausible nonsense rather than an error**
+- from: failed
+  to: processing
+  operation: ingestKnowledgeDocument
+  trigger: operation
+  guard: Re-uploaded or OCR applied
+  isReversal: true
+notes: '`processing` is the state most systems omit and the one that breaks things. **An upload completes
+  before its chunks exist**, and a screen showing "added" too early sends a user searching for something
+  that is not there yet.
+
+
+  Deletion is not in this model. Removing a document means `removeIndexEntry`, which reaches both Postgres
+  and Qdrant — **nothing cascades between the two stores**, and a document deleted from one while living
+  in the other is an erasure that did not happen.'

@@ -1,0 +1,7833 @@
+TICVAI
+INVENTORY &
+PROCUREMENT
+Backend Structure Module
+FUNCTIONAL REFERENCE DOCUMENT
+Professional Edition
+Prepared for review and implementation reference
+TICVAI
+Powered by Intelligence
+
+TICVAI / INVENTORY & PROCUREMENT BACKEND STRUCTURE
+CONFIDENTIAL | 2
+TABLE OF CONTENTS
+Navigate the module by board and dashboard screen.
+TICVAI INVENTORY & PROCUREMENT — BOARD 1.....................................................................................................4
+SCREEN 1 — Enterprise Inventory Command Center...................................................................................................5
+SCREEN 2 — Inventory Item Master................................................................................................................................6
+SCREEN 3 — Categories, Attributes & Inventory Classification...................................................................................8
+SCREEN 4 — Unit of Measure & Conversion Management..........................................................................................9
+SCREEN 5 — Stock by Location & Real-Time Availability............................................................................................10
+SCREEN 6 — Batch, Lot, Serial & Expiry Management...............................................................................................11
+SCREEN 7 — Inventory Status & Stock Control Rules.................................................................................................13
+SCREEN 8 — Inventory Movement & Transaction History.........................................................................................14
+SCREEN 9 — Reorder Parameters, Min/Max & Stock Policies...................................................................................16
+SCREEN 10 — Inventory Exceptions, Data Quality & AI Control Center...................................................................17
+BOARD 1 — FINAL 10 SCREENS......................................................................................................................................22
+TICVAI INVENTORY & PROCUREMENT — BOARD 2...................................................................................................25
+SCREEN 1 — Warehouse Operations Command Center............................................................................................26
+SCREEN 2 — Warehouse, Zone & Bin Configuration..................................................................................................27
+SCREEN 3 — Storage Rules & Location Assignment...................................................................................................29
+SCREEN 4 — Receiving Dock & Inbound Operations..................................................................................................30
+SCREEN 5 — Inspection, Quality Hold & Put-Away.....................................................................................................32
+SCREEN 6 — Warehouse Task & Workforce Management.........................................................................................34
+SCREEN 7 — Picking & Replenishment Operations....................................................................................................35
+SCREEN 8 — Packing, Staging & Dispatch....................................................................................................................37
+SCREEN 9 — Internal Warehouse Movement & Bin Replenishment........................................................................38
+SCREEN 10 — Warehouse Exceptions, AI Optimization & Control Center...............................................................40
+BOARD 2 — FINAL 10 SCREENS......................................................................................................................................48
+TICVAI INVENTORY & PROCUREMENT — BOARD 3...................................................................................................51
+SCREEN 1 — Inventory Control Command Center......................................................................................................51
+SCREEN 2 — Inventory Transfer Management............................................................................................................53
+SCREEN 3 — Transfer Dispatch, Receipt & Discrepancy Control...............................................................................54
+SCREEN 4 — Stock Count Planning & Scheduling.......................................................................................................56
+SCREEN 5 — Physical & Cycle Count Execution...........................................................................................................57
+SCREEN 6 — Variance Investigation & Root-Cause Management............................................................................59
+SCREEN 7 — Inventory Adjustment & Write-Off Management.................................................................................60
+SCREEN 8 — Inventory Reconciliation & Ledger Control...........................................................................................62
+SCREEN 9 — Shrinkage, Loss & Inventory Accuracy Control.....................................................................................63
+SCREEN 10 — AI Inventory Control & Exception Center............................................................................................64
+BOARD 3 — FINAL 10 SCREENS......................................................................................................................................74
+TICVAI INVENTORY & PROCUREMENT — BOARD 4...................................................................................................77
+SCREEN 1 — Procurement Command Center..............................................................................................................78
+SCREEN 2 — Supplier Master & Supplier Profile.........................................................................................................79
+SCREEN 3 — Supplier Qualification, Compliance & Performance.............................................................................81
+SCREEN 4 — Supplier Item Catalog & Commercial Agreements..............................................................................83
+SCREEN 5 — Purchase Request Creation & Management.........................................................................................84
+SCREEN 6 — Internal Stock & Transfer Check Before Procurement.........................................................................85
+SCREEN 7 — Auto-Replenishment & System-Generated Purchase Requests.........................................................87
+SCREEN 8 — Purchase Request Approval & Budget Control.....................................................................................88
+SCREEN 9 — Procurement Demand Consolidation & Sourcing Preparation..........................................................89
+SCREEN 10 — Procurement AI, Exceptions & Action Center......................................................................................90
+BOARD 4 — FINAL 10 SCREENS......................................................................................................................................99
+TICVAI INVENTORY & PROCUREMENT — BOARD 5.................................................................................................102
+SCREEN 1 — Sourcing & Purchase Order Command Center...................................................................................103
+SCREEN 2 — RFQ Creation & Sourcing Strategy........................................................................................................104
+SCREEN 3 — Supplier Invitation & RFQ Response Management............................................................................106
+SCREEN 4 — Supplier Quotation Management.........................................................................................................107
+SCREEN 5 — Quotation Comparison & Supplier Evaluation....................................................................................108
+SCREEN 6 — Negotiation & Best-and-Final-Offer Management.............................................................................110
+
+TICVAI / INVENTORY & PROCUREMENT BACKEND STRUCTURE
+CONFIDENTIAL | 3
+SCREEN 7 — Award Recommendation & Approval...................................................................................................111
+SCREEN 8 — Purchase Order Creation & Management...........................................................................................112
+SCREEN 9 — PO Amendment, Supplier Acknowledgement & Order Tracking.....................................................113
+SCREEN 10 — Sourcing AI, Savings & Procurement Exception Center..................................................................115
+BOARD 5 — FINAL 10 SCREENS....................................................................................................................................122
+TICVAI INVENTORY & PROCUREMENT — BOARD 6.................................................................................................124
+SCREEN 1 — Procurement Receiving & Matching Command Center....................................................................125
+SCREEN 2 — Expected Deliveries & Receiving Schedule..........................................................................................126
+SCREEN 3 — Supplier Delivery & PO Receiving.........................................................................................................127
+SCREEN 4 — Inspection, Quality Control & Acceptance...........................................................................................129
+SCREEN 5 — Goods Receipt Note (GRN) Management............................................................................................131
+SCREEN 6 — Supplier Invoice Capture & Validation.................................................................................................132
+SCREEN 7 — Two-Way / Three-Way Matching...........................................................................................................133
+SCREEN 8 — Match Exception & Dispute Resolution................................................................................................135
+SCREEN 9 — Finance Handoff, PO Closure & Supplier Performance.....................................................................136
+SCREEN 10 — AI Procurement Completion & Exception Center.............................................................................138
+BOARD 6 — FINAL 10 SCREENS....................................................................................................................................149
+TICVAI INVENTORY & PROCUREMENT — BOARD 7.................................................................................................153
+SCREEN 1 — Inventory & Procurement Executive Command Center....................................................................154
+SCREEN 2 — Demand Forecasting & Consumption Planning.................................................................................155
+SCREEN 3 — Replenishment & Procurement Planning............................................................................................157
+SCREEN 4 — Inventory Optimization & Stock Health...............................................................................................158
+SCREEN 5 — Procurement Spend, Savings & Commercial Analytics......................................................................159
+SCREEN 6 — Supplier Performance & Risk Analytics................................................................................................161
+SCREEN 7 — Warehouse & Inventory Performance Analytics.................................................................................162
+SCREEN 8 — Inventory & Procurement Approval / Control Center........................................................................163
+SCREEN 9 — Integration, API & Automation Control Center...................................................................................164
+SCREEN 10 — TICVAI AI Inventory & Procurement Copilot.....................................................................................166
+BOARD 7 — FINAL 10 SCREENS....................................................................................................................................172
+
+TICVAI / INVENTORY & PROCUREMENT BACKEND STRUCTURE
+CONFIDENTIAL | 4
+TICVAI INVENTORY & PROCUREMENT — BOARD 1
+Inventory Master & Stock Control — Scope of Work
+1. Purpose
+The Inventory Master & Stock Control Board shall provide the centralized enterprise inventory foundation for 
+TICVAI.
+It shall maintain a single source of truth for inventory items, SKU references, stock states, locations, quantities, 
+batches, lots, serial numbers, expiry, reorder parameters, movement history, and stock control rules across all 
+TICVAI modules.
+This Board shall be consumed by:
+ Food & Beverage
+ Retail
+ Rental
+ Resource Management
+ Operations
+ Event Operations
+ Warehouses
+ Procurement
+ Finance
+ Employee App
+ B2C / Guest App where applicable
+ Reporting & AI
+The core inventory model shall follow:
+Inventory Item Category Attributes UOM Tracking Method Stock Location Quantity Stock → → → → → → →
+Status Batch/Lot/Serial Availability Movement Cost Audit → → → → →
+
+TICVAI / INVENTORY & PROCUREMENT BACKEND STRUCTURE
+CONFIDENTIAL | 5
+The dedicated Inventory matrix requires centralized item management, categories, SKU/barcode management, 
+configurable product attributes and variants, UOM management, real-time inventory, multi-location/multiwarehouse stock, available/reserved/on-order/in-transit/damaged quantities, movements, adjustments, returns, 
+write-offs, stock counts, reorder parameters, alerts and batch/lot/serial/expiry tracking.
+PAGE 1 — Enterprise Inventory Command Center
+Purpose
+Provide Inventory, Warehouse, Finance and Operations management with a real-time consolidated view of 
+inventory across the entire TICVAI ecosystem.
+Global Filters
+ Tenant
+ Company
+ Business Unit
+ Park
+ Venue
+ Warehouse
+ Location
+ Inventory Category
+ Module
+ Stock Status
+ Date
+KPI Cards
+ Total Inventory Value
+ Total Inventory Items
+ Total SKUs
+ Units On Hand
+ Available Stock
+ Reserved Stock
+ On-Order Stock
+ In-Transit Stock
+ Damaged / Blocked Stock
+ Low-Stock Items
+ Out-of-Stock Items
+ Overstock Items
+ Expiring Soon
+ Pending Adjustments
+ Inventory Alerts
+Inventory by Business Area
+Example:
+Business Area Inventory Value Item
+s
+Available Reserved Health
+Retail AED 2.85M 4,842 92% 5% Healthy
+F&B AED 1.42M 1,864 88% 4% Warning
+Rental AED 680K 742 84% 11% Healthy
+
+TICVAI / INVENTORY & PROCUREMENT BACKEND STRUCTURE
+CONFIDENTIAL | 6
+Business Area Inventory Value Item
+s
+Available Reserved Health
+Operations AED 940K 1,120 91% 3% Healthy
+Inventory Health
+TICVAI shall identify:
+ Low Stock
+ Stock Shortage
+ Overstock
+ Expiring Inventory
+ Negative Stock
+ Batch Issues
+ Serial Issues
+ Inventory Sync Problems
+ Unapproved Adjustments
+The source matrix explicitly requires overstock, shortage and expiry alerts.
+Quick Actions
++ Inventory Item | Stock Lookup | Adjustment | Movement History | Batch / Serial Lookup | View Alerts
+PAGE 2 — Inventory Item Master
+Purpose
+Provide a centralized master record for every inventory-controlled item in TICVAI.
+The Inventory Item Master shall be separate from a Retail sellable product or F&B menu item.
+For example:
+Retail Product: TICVAI T-Shirt
+↓
+SKU: Black / Medium
+↓
+Inventory Item: INV-RET-TSH-BLK-M
+or:
+F&B Menu Product: Classic Burger
+↓
+Recipe
+↓
+Inventory Items: Beef Patty, Bun, Cheese, Sauce.
+General Information
+Capture:
+ Inventory Item Name
+ Inventory Item Code
+ SKU Reference
+ Barcode
+ Item Type
+ Category
+ Subcategory
+ Description
+
+TICVAI / INVENTORY & PROCUREMENT BACKEND STRUCTURE
+CONFIDENTIAL | 7
+ Brand
+ Manufacturer
+ Supplier Reference
+ Country of Origin
+ Status
+Item Types
+Examples:
+ Retail Merchandise
+ F&B Ingredient
+ F&B Prepared Item
+ Consumable
+ Operating Supply
+ Spare Part
+ Rental Stock
+ Equipment Consumable
+ Packaging Material
+ Uniform
+ Cleaning Material
+ General Inventory
+Item types shall be configurable.
+Inventory Behavior
+Configure:
+ Inventory Tracked
+ Batch Tracked
+ Lot Tracked
+ Serial Tracked
+ Expiry Tracked
+ Barcode Tracked
+ RFID Tracked
+ Negative Stock Allowed
+ Reservation Allowed
+ Transfer Allowed
+ Replenishment Enabled
+Financial Information
+Where authorized:
+ Standard Cost
+ Current Average Cost
+ Valuation Category
+ Inventory Account
+ Consumption Account
+ Adjustment Account
+ Write-Off Account
+The detailed valuation logic should remain integrated with Finance rather than duplicated.
+
+TICVAI / INVENTORY & PROCUREMENT BACKEND STRUCTURE
+CONFIDENTIAL | 8
+PAGE 3 — Categories, Attributes & Inventory Classification
+Purpose
+Provide a flexible hierarchy for grouping and controlling enterprise inventory.
+The matrix explicitly requires inventory item categorization and configurable product attributes.
+Example Hierarchy
+Food & Beverage
+→ Food
+→ Meat
+→ Beef
+or:
+Retail
+→ Merchandise
+→ Apparel
+→ T-Shirts
+or:
+Operations
+→ Maintenance
+→ Electrical
+→ Spare Parts
+Classification Levels
+TICVAI should support configurable structures such as:
+ Division
+ Department
+ Category
+ Subcategory
+ Item Group
+ Family
+ Brand
+ Commodity
+ Usage Type
+Category Defaults
+A category may provide default settings for:
+ UOM
+ Tracking Method
+ Shelf-Life Requirement
+ Reorder Profile
+ Approval Rules
+ Accounting Mapping
+ Warehouse Eligibility
+ Storage Conditions
+Dynamic Attributes
+Example:
+F&B Ingredient
+ Temperature Class
+
+TICVAI / INVENTORY & PROCUREMENT BACKEND STRUCTURE
+CONFIDENTIAL | 9
+ Allergen Reference
+ Shelf Life
+ Storage Type
+Retail Apparel
+ Size
+ Color
+ Material
+Spare Part
+ Equipment Type
+ Manufacturer
+ Part Number
+The attributes should be configurable without software development.
+PAGE 4 — Unit of Measure & Conversion Management
+Purpose
+Provide centralized management of inventory measurement and conversion rules.
+The matrix explicitly requires Unit of Measure management.
+UOM Types
+Examples:
+ Piece
+ Unit
+ Box
+ Case
+ Pack
+ Pallet
+ Kilogram
+ Gram
+ Liter
+ Milliliter
+ Meter
+ Roll
+Base UOM
+Every inventory item shall have a primary inventory UOM.
+Example:
+Milk
+Base UOM:
+Liter
+Purchase UOM:
+Case
+Recipe UOM:
+Milliliter
+Conversion
+Example:
+1 Case
+=
+
+TICVAI / INVENTORY & PROCUREMENT BACKEND STRUCTURE
+CONFIDENTIAL | 10
+12 Bottles
+1 Bottle
+=
+1 Liter
+Therefore:
+1 Case = 12 L
+UOM Rules
+Support:
+ Purchase UOM
+ Inventory UOM
+ Consumption UOM
+ Sales UOM
+ Transfer UOM
+ Count UOM
+Conversion Validation
+TICVAI shall prevent invalid or ambiguous conversions.
+Example:
+Conversion from Case to Liter requires a pack-size definition.
+Effective Dating
+Where conversion rules change, the system shall retain historical rules for prior transactions.
+PAGE 5 — Stock by Location & Real-Time Availability
+Purpose
+Provide a real-time view of inventory quantities across the entire organization.
+The matrix requires real-time inventory tracking across multiple locations and multiple warehouses.
+Inventory Dimensions
+For every Item + Location combination, display:
+ On Hand
+ Available
+ Reserved
+ Allocated
+ On Order
+ In Transit
+ Damaged
+ Blocked
+ Quarantine
+ Returned
+ Pending Inspection
+Stock Formula
+The system shall clearly distinguish:
+On Hand
+from
+Available
+from
+
+TICVAI / INVENTORY & PROCUREMENT BACKEND STRUCTURE
+CONFIDENTIAL | 11
+Available-to-Promise
+Example:
+On Hand:
+100
+Reserved:
+15
+Blocked:
+5
+Available:
+80
+Incoming tomorrow:
+40
+Available-to-Promise according to rule:
+120
+Multi-Location View
+Example:
+INV-BEEF-001 — Beef Patty
+Central Warehouse:
+480
+Main Restaurant:
+72
+VIP Lounge:
+44
+Beach Kiosk:
+18
+In Transit:
+100
+On Order:
+500
+Location Drill-Down
+Selecting a location shall display:
+ Warehouse
+ Zone
+ Bin
+ Stock Status
+ Batch
+ Expiry
+ Last Receipt
+ Last Issue
+ Last Transfer
+ Last Count
+Warehouse zoning and bin structures will be configured more deeply in Board 2.
+PAGE 6 — Batch, Lot, Serial & Expiry Management
+Purpose
+Provide complete traceability for inventory requiring batch, lot, serial or expiry tracking.
+
+TICVAI / INVENTORY & PROCUREMENT BACKEND STRUCTURE
+CONFIDENTIAL | 12
+The matrix explicitly requires batch-number, lot, serial-number and expiry-date tracking.
+Tracking Types
+An inventory item may be configured as:
+ None
+ Batch
+ Lot
+ Serial
+ Batch + Expiry
+ Lot + Expiry
+ Serial + Warranty where applicable
+Batch Record
+Capture:
+ Batch Number
+ Supplier Batch
+ Inventory Item
+ Quantity
+ Manufacture Date
+ Receipt Date
+ Expiry Date
+ Supplier
+ Warehouse
+ Location
+ Quality Status
+Example
+Milk
+Batch:
+MILK-140826-A
+Received:
+14 Aug 2026
+Expiry:
+20 Aug 2026
+Quantity:
+320 L
+Available:
+280 L
+Reserved:
+40 L
+Serial Record
+Example:
+RFID Scanner
+Serial:
+RFID-SCN-18422
+Status:
+Available
+Warehouse:
+Central Warehouse
+
+TICVAI / INVENTORY & PROCUREMENT BACKEND STRUCTURE
+CONFIDENTIAL | 13
+Bin:
+TECH-A04
+Inventory Status
+ Available
+ Reserved
+ Blocked
+ Quarantine
+ Expired
+ Recalled
+ Damaged
+ Consumed
+ Sold
+Expiry Alerts
+The system shall support configurable warnings such as:
+90 Days
+30 Days
+14 Days
+7 Days
+1 Day
+Expired
+FEFO Support
+For expiry-controlled items, TICVAI should support First Expired, First Out allocation recommendations.
+PAGE 7 — Inventory Status & Stock Control Rules
+Purpose
+Provide centralized configuration for how inventory may move between operational states.
+The matrix requires tracking of available, reserved, on-order, in-transit and damaged inventory.
+Standard Stock Statuses
+I recommend supporting at minimum:
+ Available
+ Reserved
+ Allocated
+ Picked
+ Packed
+ In Transit
+ On Order
+ Inspection
+ Quarantine
+ Blocked
+ Damaged
+ Returned
+ Expired
+ Written Off
+
+TICVAI / INVENTORY & PROCUREMENT BACKEND STRUCTURE
+CONFIDENTIAL | 14
+Status Transition Rules
+Example:
+Available
+→ Reserved
+→ Allocated
+→ Picked
+→ Dispatched
+→ In Transit
+→ Received
+→ Available
+Controlled Transitions
+Examples:
+Damaged
+cannot become
+Available
+without inspection/approval.
+Quarantine
+cannot be sold or consumed.
+Expired
+cannot be released for normal use.
+Module Rules
+Stock status behavior may differ by operational context.
+Example:
+Retail Returned Item
+→ Inspection
+→ Available / Damaged
+F&B Returned Ingredient
+→ normally not returned to available consumption unless specifically approved.
+Negative Inventory
+The tenant shall determine:
+ Negative Stock Not Allowed
+ Warning Only
+ Authorized Override
+ Emergency Offline Exception
+All overrides shall be audited.
+PAGE 8 — Inventory Movement & Transaction History
+Purpose
+Maintain complete traceability of every inventory movement.
+The source matrix explicitly requires inventory movement history and inventory audit trails.
+Movement Types
+Support:
+ Goods Receipt
+ Transfer
+
+TICVAI / INVENTORY & PROCUREMENT BACKEND STRUCTURE
+CONFIDENTIAL | 15
+ Consumption
+ Sale
+ Return to Stock
+ Reservation
+ Reservation Release
+ Allocation
+ Picking
+ Dispatch
+ Adjustment
+ Write-Off
+ Production Issue
+ Production Receipt
+ Damage
+ Stock Count Adjustment
+Movement Table
+Time Item Movement From To
+Qt
+y
+Ref
+10:24 T-Shirt M Sale Store Stock Issued -1 POS-18422
+10:18 Beef Patty Consumption Main Restaurant Consumed -12 F&B-18428
+10:10 Water Bottle Transfer WH-A Store 02 -10
+0
+TR-18421
+Transaction Detail
+Display:
+ Movement ID
+ Item
+ Batch / Serial
+ Quantity
+ UOM
+ Source Location
+ Destination
+ Previous Status
+ New Status
+ Cost
+ User/System
+ Device
+ Date / Time
+ Source Module
+ Reference Number
+Source References
+Examples:
+ POS Transaction
+ F&B Order
+ Production Run
+ Transfer
+
+TICVAI / INVENTORY & PROCUREMENT BACKEND STRUCTURE
+CONFIDENTIAL | 16
+ Purchase Order
+ GRN
+ Stock Count
+ Return
+ Rental Transaction
+Immutable History
+Posted inventory transactions should not simply be deleted.
+Corrections should be made using reversal / adjustment transactions while retaining full history.
+PAGE 9 — Reorder Parameters, Min/Max & Stock Policies
+Purpose
+Configure the basic stock-control policies used by replenishment and planning.
+The matrix explicitly requires minimum, maximum, safety stock and reorder-point management.
+Parameters
+Configure by:
+ Item
+ Location
+ Warehouse
+ Store
+ Outlet
+ Season
+ Time Period
+Core Fields
+ Minimum Stock
+ Maximum Stock
+ Safety Stock
+ Reorder Point
+ Reorder Quantity
+ Par Level
+ Lead Time
+ Review Frequency
+Example
+Retail T-Shirt / Main Gift Shop
+Minimum:
+20
+Maximum:
+100
+Safety:
+15
+Reorder Point:
+35
+Reorder Quantity:
+65
+Different Location Profiles
+The same item may have different thresholds.
+
+TICVAI / INVENTORY & PROCUREMENT BACKEND STRUCTURE
+CONFIDENTIAL | 17
+Example:
+Main Gift Shop:
+Par 100
+Exit Kiosk:
+Par 30
+Central Warehouse:
+Par 1,000
+Policy Modes
+Support:
+ Manual
+ Min/Max
+ Reorder Point
+ Fixed Quantity
+ Par Stock
+ Forecast Based
+ AI Recommended
+The advanced forecasting and AI logic will be expanded in Board 6.
+Threshold Alerts
+Examples:
+Inventory below minimum.
+Inventory exceeds maximum.
+Safety stock projected to be breached in 12 hours.
+PAGE 10 — Inventory Exceptions, Data Quality & AI Control Center
+Purpose
+Provide one centralized workspace for detecting inventory-master issues, stock-control exceptions and dataquality risks.
+Exception Categories
+Item Master
+ Duplicate Inventory Item
+ Missing UOM
+ Missing Category
+ Missing Cost
+ Invalid Barcode
+ Missing Tracking Method
+Stock
+ Negative Stock
+ Low Stock
+ Overstock
+ Stock Shortage
+ Reserved > On Hand
+ Location Conflict
+Tracking
+ Batch Missing
+ Serial Duplicate
+
+TICVAI / INVENTORY & PROCUREMENT BACKEND STRUCTURE
+CONFIDENTIAL | 18
+ Expired Stock
+ Expiry Missing
+ Batch Quantity Mismatch
+Integration
+ POS Sync Failure
+ F&B Consumption Sync Failure
+ Warehouse Sync Failure
+ Procurement Sync Failure
+Severity
+Information | Warning | High | Critical
+Example
+Critical — Reserved Quantity Exceeds Available Stock
+Item:
+INV-RET-PLUSH-L
+On Hand:
+18
+Reserved:
+22
+Affected Orders:
+6
+Actions:
+Review Reservations | Check Other Locations | Release Reservation | Create Transfer
+AI — Inventory Data Quality Assistant
+AI should identify configuration problems proactively.
+Example:
+14 inventory items appear to be duplicates based on name, barcode and supplier reference.
+Suggested Action:
+Review Potential Duplicates
+Another example:
+22 items have purchase UOM defined as Case but no Case-to-Base-UOM conversion.
+AI — Stock Risk Detection
+Even at Board 1 level, TICVAI should identify immediate stock-control risks.
+Example:
+Beef Patty
+Current Available:
+72
+Reserved / Forecast Immediate Demand:
+64
+Incoming:
+0
+Result:
+High shortage risk
+Recommendation:
+Review other locations for internal redistribution.
+The actual demand forecasting engine will be handled in Board 6.
+
+TICVAI / INVENTORY & PROCUREMENT BACKEND STRUCTURE
+CONFIDENTIAL | 19
+AI — Expiry Risk
+Example:
+Milk Batch MILK-140826-A
+Available:
+180 L
+Expires:
+Tomorrow
+Expected Consumption:
+96 L
+Potential Expiry:
+84 L
+Recommendation:
+ Prioritize FEFO consumption
+ Transfer to higher-demand outlet
+ Review production requirement
+ITEM MASTER GOVERNANCE
+The Inventory Item Master should support governance throughout its lifecycle.
+Lifecycle
+Draft
+→ Review
+→ Approved
+→ Active
+→ Suspended
+→ Obsolete
+→ Archived
+Validation Before Activation
+TICVAI should check:
+✓ Unique Item Code
+✓ Category
+✓ Base UOM
+✓ Inventory Behavior
+✓ Tracking Method
+✓ Accounting Mapping where required
+✓ Barcode where required
+✓ Storage Profile where required
+Versioning
+Significant master-data changes shall retain:
+ Previous Value
+ New Value
+ Changed By
+ Approved By
+ Effective Date
+ Reason
+
+TICVAI / INVENTORY & PROCUREMENT BACKEND STRUCTURE
+CONFIDENTIAL | 20
+BARCODE / QR / RFID IDENTIFICATION
+The Inventory Item Master shall support identification methods required across F&B and Retail.
+Barcode
+ Internal Barcode
+ Supplier Barcode
+ EAN
+ UPC
+ Code 128
+QR
+May be used for:
+ Inventory Lookup
+ Asset/Item Identification
+ Mobile Operations
+RFID
+Where applicable:
+ EPC
+ RFID Tag Type
+ Read Status
+The matrix also requires barcode management at item-master level.
+MULTI-TENANT & MULTI-COMPANY CONTROL
+Inventory records must respect the TICVAI enterprise hierarchy.
+An item may be:
+Global to Tenant
+or restricted to:
+ Company
+ Business Unit
+ Park
+ Venue
+ Warehouse
+ Module
+Example:
+Water Bottle
+Global Item:
+Yes
+Used By:
+Retail ✓
+F&B ✓
+Events ✓
+This is important because TICVAI should not create separate "Retail Water Bottle" and "F&B Water Bottle" 
+inventory records if they represent the same physical stock item.
+SHARED ITEM VS MODULE PRODUCT
+This distinction shall be explicit.
+Inventory Item
+Represents the physical stock-controlled object.
+
+TICVAI / INVENTORY & PROCUREMENT BACKEND STRUCTURE
+CONFIDENTIAL | 21
+Examples:
+Water Bottle
+Beef Patty
+T-Shirt Black/M
+Cleaning Chemical
+Retail Product
+Represents something sold to the guest.
+F&B Product
+Represents a prepared menu item.
+Procurement Item
+References the same Inventory Item for purchasing.
+Therefore:
+One Inventory Item
+may connect to:
+Retail SKU
+and/or
+F&B Recipe
+and/or
+Procurement Supplier Catalog
+without duplicate stock records.
+APPROVAL ENGINE INTEGRATION
+Board 1 shall use TICVAI's shared Approval Engine.
+Examples:
+New Inventory Item
+→ Inventory Master Data Owner
+Tracking Method Change
+→ Inventory Manager
+UOM Conversion Change
+→ Inventory Manager / Finance where required
+Negative Stock Override
+→ Authorized Role
+Reorder Policy Change
+→ Inventory Manager
+No separate approval mechanism shall be built solely for Inventory.
+AUDIT REQUIREMENTS
+The system shall maintain complete audit history for:
+ Item Creation
+ Item Modification
+ Status Change
+ Category Change
+ UOM Change
+ Barcode Change
+ Batch Change
+ Serial Change
+
+TICVAI / INVENTORY & PROCUREMENT BACKEND STRUCTURE
+CONFIDENTIAL | 22
+ Stock Status Override
+ Reorder Parameter Change
+ Inventory Adjustment
+Audit shall record:
+User + Date/Time + Location + Action + Previous Value + New Value + Reason + Approval
+BOARD 1 — FINAL 10 SCREENS
+# Screen
+1 Enterprise Inventory Command Center
+2 Inventory Item Master
+3 Categories, Attributes & Inventory Classification
+4 Unit of Measure & Conversion Management
+5 Stock by Location & Real-Time Availability
+6 Batch, Lot, Serial & Expiry Management
+7 Inventory Status & Stock Control Rules
+8 Inventory Movement & Transaction History
+9 Reorder Parameters, Min/Max & Stock Policies
+1
+0
+Inventory Exceptions, Data Quality & AI Control Center
+COMPLETE BOARD 1 FLOW
+Create Inventory Item
+↓
+Assign:
+Category + Attributes
+↓
+Configure:
+Base UOM + Conversions
+↓
+Configure:
+Batch / Lot / Serial / Expiry / Barcode / RFID
+↓
+Configure:
+Stock Status Rules
+↓
+Assign:
+Companies / Locations / Warehouses
+↓
+Configure:
+
+TICVAI / INVENTORY & PROCUREMENT BACKEND STRUCTURE
+CONFIDENTIAL | 23
+Min / Max / Safety / Reorder Policies
+↓
+Validation
+↓
+Approval
+↓
+Activate
+↓
+Inventory transactions begin from:
+Procurement / Warehouse / Retail / F&B / Rental / Operations
+↓
+TICVAI continuously tracks:
+On Hand
+Available
+Reserved
+On Order
+In Transit
+Damaged / Blocked
+↓
+Every change generates:
+Inventory Movement + Audit Trail
+↓
+Planning, Warehouse, Procurement and AI consume the same inventory truth.
+ARCHITECTURAL REQUIREMENT
+This Board should establish one central TICVAI Inventory Ledger and Item Master.
+SoftLab should not create separate inventory masters for:
+Retail
+F&B
+Rental
+Warehouse
+Procurement
+Instead:
+Enterprise Inventory Item Master
+↓
+Stock Ledger
+↓
+Warehouse / Location / Bin
+↓
+Batch / Lot / Serial
+↓
+Quantity + Status
+↓
+Cost + Movement + Audit
+Then operational modules consume the same inventory services.
+
+TICVAI / INVENTORY & PROCUREMENT BACKEND STRUCTURE
+CONFIDENTIAL | 24
+That means, for example:
+Retail sale
+→ decrements the shared inventory ledger.
+F&B burger sale
+→ recipe consumption decrements the same shared inventory ledger.
+Procurement receipt
+→ increases the same shared inventory ledger.
+Rental allocation
+→ reserves inventory or an individual tracked item in the same platform-level architecture.
+This Board becomes the foundation for every remaining Inventory & Procurement board, and it is the most 
+important place to prevent duplicated stock data across TICVAI.
+
+TICVAI / INVENTORY & PROCUREMENT BACKEND STRUCTURE
+CONFIDENTIAL | 25
+TICVAI INVENTORY & PROCUREMENT — BOARD 2
+Warehouse, Location & Fulfilment Operations — Scope of Work
+1. Purpose
+The Warehouse, Location & Fulfilment Operations Board shall provide TICVAI with the centralized operational 
+layer for managing warehouses, storage locations, zones, bins, receiving, put-away, internal warehouse 
+movements, picking, packing, staging and dispatch.
+Board 1 established what inventory exists and its enterprise stock position.
+Board 2 shall establish:
+Where is it physically located? How does it enter the warehouse? Where should it be stored? How is it → → →
+picked? How is it packed? How does it leave? → →
+The architecture shall follow:
+Warehouse Zone Storage Location Bin Inventory Item Batch / Serial Stock Status Task → → → → → → → →
+Movement Employee / Device Confirmation → →
+Board 2 shall support warehouse operations serving:
+ Food & Beverage
+ Retail
+ Rental
+ Operations
+ Maintenance
+ Events
+ Temporary / Event Warehouses
+ Central Distribution Centers
+ Venue Stores
+ Back-of-House Storage
+
+TICVAI / INVENTORY & PROCUREMENT BACKEND STRUCTURE
+CONFIDENTIAL | 26
+ Cold / Frozen Storage
+ Secure Storage
+ Quarantine Areas
+It shall use the same Shared Inventory Ledger established in Board 1. Warehouse operations shall create 
+controlled inventory movements against that ledger rather than maintaining a separate warehouse stock balance.
+PAGE 1 — Warehouse Operations Command Center
+Purpose
+Provide Warehouse and Inventory management with a real-time view of all warehouse activity, workload, capacity,
+inventory movement and operational exceptions.
+Global Filters
+ Tenant
+ Company
+ Business Unit
+ Park
+ Venue
+ Warehouse
+ Zone
+ Operation Type
+ Priority
+ Status
+ Shift
+ Date / Time
+KPI Cards
+ Warehouses Active
+ Inventory Value
+ Warehouse Capacity Used %
+ Receipts Today
+ Units Received
+ Pending Put-Away
+ Open Picking Tasks
+ Orders / Transfers Ready to Pack
+ Pending Dispatch
+ In-Transit Shipments
+ Warehouse Tasks
+ Overdue Tasks
+ Receiving Exceptions
+ Picking Accuracy
+ On-Time Dispatch %
+ Critical Alerts
+Operational Pipeline
+The dashboard should visually show:
+Expected Receipts
+→ Receiving
+
+TICVAI / INVENTORY & PROCUREMENT BACKEND STRUCTURE
+CONFIDENTIAL | 27
+→ Inspection
+→ Put-Away
+→ Available Stock
+→ Picking
+→ Packing
+→ Staging
+→ Dispatch
+Example:
+Expected Receipts: 18
+Receiving: 4
+Pending Put-Away: 7
+Picking: 22
+Packing: 9
+Staged: 6
+Ready to Dispatch: 8
+Warehouse Performance
+Warehouse Capacity Receiving Put-Away Picking Dispatch Health
+Central WH 78% 6 4 18 7 Healthy
+F&B WH 84% 4 8 12 5 Warning
+Retail WH 69% 3 2 14 6 Healthy
+Event WH 92% 5 7 22 11 Critical
+Operational Alerts
+Examples:
+F&B Cold Storage is at 94% capacity.
+3 receiving tasks have exceeded SLA.
+Transfer TR-18421 is awaiting picking.
+14 units could not be located during picking.
+Event Warehouse staging area is projected to exceed capacity at 16:30.
+Quick Actions
++ Warehouse | Receive Stock | Put-Away | Create Pick | Pack | Dispatch | Transfer | Task Center
+PAGE 2 — Warehouse, Zone & Bin Configuration
+Purpose
+Configure the physical warehouse structure used by TICVAI.
+The system should support:
+Warehouse
+→ Area
+→ Zone
+→ Aisle
+→ Rack
+→ Shelf
+→ Bin
+
+TICVAI / INVENTORY & PROCUREMENT BACKEND STRUCTURE
+CONFIDENTIAL | 28
+Not every tenant needs every hierarchy level, so the structure should be configurable.
+Warehouse Master
+Capture:
+ Warehouse Name
+ Warehouse Code
+ Company
+ Business Unit
+ Park
+ Venue
+ Address / Location
+ Warehouse Type
+ Operating Hours
+ Manager
+ Status
+Warehouse Types
+Examples:
+ Central Warehouse
+ Retail Warehouse
+ F&B Warehouse
+ Cold Storage
+ Frozen Storage
+ Dry Storage
+ Rental Warehouse
+ Maintenance Warehouse
+ Event Warehouse
+ Temporary Warehouse
+ Secure Warehouse
+Zone Configuration
+Examples:
+Central Warehouse
+→ Receiving Zone
+→ Inspection Zone
+→ General Storage
+→ High-Value Storage
+→ Picking Zone
+→ Packing Zone
+→ Staging Zone
+→ Dispatch Zone
+→ Returns Zone
+→ Quarantine Zone
+Bin Master
+Capture:
+ Bin Code
+ Zone
+ Aisle
+
+TICVAI / INVENTORY & PROCUREMENT BACKEND STRUCTURE
+CONFIDENTIAL | 29
+ Rack
+ Shelf
+ Bin Type
+ Capacity
+ Weight Limit
+ Volume Limit
+ Temperature Requirement
+ Status
+Bin Status
+ Available
+ Occupied
+ Full
+ Reserved
+ Blocked
+ Inspection
+ Maintenance
+Capacity Visualization
+Warehouse managers should be able to see:
+Warehouse Zone Bin Utilization → →
+using percentage and heatmap views.
+PAGE 3 — Storage Rules & Location Assignment
+Purpose
+Determine where inventory is permitted or recommended to be stored.
+TICVAI should not allow arbitrary storage where operational or product rules prohibit it.
+Storage Profiles
+An Inventory Item may require:
+ Ambient
+ Chilled
+ Frozen
+ Dry
+ Secure
+ Hazard-Controlled
+ High-Value
+ Fragile
+ Oversized
+ Food-Safe
+ Quarantine
+Item-to-Location Rules
+Example:
+Fresh Milk
+Storage:
+Chilled
+Temperature:
+
+TICVAI / INVENTORY & PROCUREMENT BACKEND STRUCTURE
+CONFIDENTIAL | 30
+2°C–5°C
+Eligible Zones:
+Cold Storage A / Cold Storage B
+Not Allowed:
+Dry Storage
+Location Assignment
+Rules may consider:
+ Item Category
+ Storage Condition
+ Size
+ Weight
+ Velocity
+ Batch
+ Expiry
+ Hazard Classification where applicable
+ Security Requirement
+ Business Area
+ Picking Frequency
+Fixed vs Dynamic Bins
+Support:
+Fixed Bin
+Item normally stored in designated location.
+Dynamic Bin
+System selects available suitable storage.
+Multiple Items per Bin
+Configurable:
+ Single SKU Only
+ Multiple SKU Allowed
+ Same Batch Only
+ Mixed Batch Allowed
+ Serial-Controlled
+Capacity Validation
+Before assigning inventory:
+Current Bin Occupancy + Incoming Quantity Bin Capacity ≤
+If capacity is exceeded:
+Selected bin cannot accommodate the receipt.
+TICVAI shall recommend another eligible location.
+PAGE 4 — Receiving Dock & Inbound Operations
+Purpose
+Manage inventory entering a warehouse from suppliers, transfers, production, returns or other authorized 
+sources.
+Inbound Sources
+Support:
+
+TICVAI / INVENTORY & PROCUREMENT BACKEND STRUCTURE
+CONFIDENTIAL | 31
+ Purchase Order
+ Inter-Warehouse Transfer
+ Store Return
+ F&B Production
+ Supplier Delivery
+ Event Return
+ Rental Return where inventory-controlled
+ Manual Authorized Receipt
+Expected Receipts
+Display:
+ Receipt / Reference
+ Source
+ Supplier
+ PO / Transfer
+ Expected Date
+ Expected Time
+ Items
+ Units
+ Priority
+ Dock
+ Status
+Receiving Methods
+Employees should be able to receive using:
+ Barcode Scanner
+ QR
+ RFID
+ Mobile Device
+ Employee App
+ Manual Entry
+Receiving Validation
+For each item:
+Expected
+vs
+Received
+vs
+Accepted
+vs
+Rejected / Damaged
+Example:
+Expected:
+100 units
+Received:
+98
+Accepted:
+96
+
+TICVAI / INVENTORY & PROCUREMENT BACKEND STRUCTURE
+CONFIDENTIAL | 32
+Damaged:
+2
+Short:
+2
+Receiving Exceptions
+Support:
+ Short Delivery
+ Over Delivery
+ Wrong Item
+ Wrong Variant
+ Damaged
+ Expired
+ Insufficient Remaining Shelf Life
+ Batch Mismatch
+ Serial Mismatch
+ Unrecognized Barcode
+ Unplanned Delivery
+Dock Assignment
+Where applicable:
+ Dock Number
+ Appointment
+ Vehicle
+ Supplier
+ Arrival Time
+ Start Receiving
+ Complete Receiving
+PAGE 5 — Inspection, Quality Hold & Put-Away
+Purpose
+Control inventory after physical receipt and before it becomes available for operational use.
+Receipt Flow
+Received
+↓
+Inspection Required?
+No
+→ Put-Away
+Yes
+→ Inspection
+→ Accepted / Rejected / Quarantine
+→ Put-Away
+Inspection Information
+Capture:
+ Receipt
+ Item
+
+TICVAI / INVENTORY & PROCUREMENT BACKEND STRUCTURE
+CONFIDENTIAL | 33
+ Batch / Serial
+ Quantity
+ Inspector
+ Inspection Type
+ Condition
+ Result
+ Notes
+ Attachments / Photos where required
+Inspection Results
+ Accepted
+ Accepted with Exception
+ Rejected
+ Quarantine
+ Damaged
+Put-Away Task
+Example:
+PA-18428
+Item:
+Fresh Milk 1L
+Quantity:
+240
+Current Location:
+Receiving Dock 02
+Recommended Location:
+Cold Storage A / Rack 03 / Bin 04
+Priority:
+High
+Reason:
+Expiry-Controlled / FEFO
+Put-Away Strategies
+Support:
+ Fixed Bin
+ Nearest Available Bin
+ Same Item Consolidation
+ Same Batch Consolidation
+ Empty Bin
+ Capacity Optimized
+ Velocity Based
+ FEFO Compatible
+ AI Recommended
+Confirmation
+Employee scans:
+
+TICVAI / INVENTORY & PROCUREMENT BACKEND STRUCTURE
+CONFIDENTIAL | 34
+Item
+↓
+Source Location
+↓
+Destination Bin
+↓
+Quantity
+↓
+Confirm
+The shared inventory ledger updates the item's physical location.
+PAGE 6 — Warehouse Task & Workforce Management
+Purpose
+Create and manage warehouse operational tasks and assign them to employees or teams.
+Task Types
+ Receiving
+ Inspection
+ Put-Away
+ Replenishment
+ Picking
+ Packing
+ Staging
+ Dispatch
+ Internal Movement
+ Stock Count
+ Cycle Count
+ Return Handling
+Task Fields
+ Task Number
+ Task Type
+ Warehouse
+ Zone
+ Priority
+ Item / Order
+ Quantity
+ Source
+ Destination
+ Assigned Employee
+ Team
+ Created Time
+ SLA
+ Status
+
+TICVAI / INVENTORY & PROCUREMENT BACKEND STRUCTURE
+CONFIDENTIAL | 35
+Task Status
+New
+→ Assigned
+→ Accepted
+→ In Progress
+→ Completed
+or
+→ Exception
+Priority
+ Low
+ Normal
+ High
+ Urgent
+ Critical
+Task Queue
+Example:
+Task Type Zone Assigned Priorit
+y
+SLA Status
+PA-18428 Put-Away Cold A Omar A. High 12 min In Progress
+PK-18431 Pick Retail Sara K. Urgent 8 min Assigned
+RC-18434 Receive Dock 2 Team B Normal 24 min In Progress
+Workload Visibility
+Supervisor should see:
+ Employee
+ Active Tasks
+ Completed Tasks
+ Pending Tasks
+ Average Completion Time
+ Current Zone
+Resource Management Integration
+Employee availability, roster and workload should integrate with the common TICVAI Resource Management 
+Engine, rather than Board 2 maintaining a separate employee scheduling system.
+PAGE 7 — Picking & Replenishment Operations
+Purpose
+Manage warehouse picking for stores, F&B outlets, events, internal requests and fulfilment operations.
+Pick Sources
+Picking may originate from:
+ Retail Replenishment
+ F&B Replenishment
+ Store Transfer
+ Warehouse Transfer
+ Event Requirement
+
+TICVAI / INVENTORY & PROCUREMENT BACKEND STRUCTURE
+CONFIDENTIAL | 36
+ Internal Department Request
+ Customer Fulfilment where applicable
+ Production Requirement
+Pick List
+Capture:
+ Pick Number
+ Source Request
+ Warehouse
+ Destination
+ Required Time
+ Priority
+ Items
+ Quantities
+ Assigned Picker
+ Status
+Picking Strategies
+Support:
+ Single Order Picking
+ Batch Picking
+ Wave Picking
+ Zone Picking
+ Priority Picking
+ FEFO
+ FIFO
+ Serial-Specific Picking
+Pick Sequence
+TICVAI should optimize:
+Bin 01 Bin 04 Bin 08 Bin 12 → → →
+instead of unnecessary warehouse movement.
+Scan Validation
+Picker scans:
+Location
+↓
+Item
+↓
+Batch / Serial
+↓
+Quantity
+↓
+Confirm
+Picking Exception
+Examples:
+ Item Not Found
+ Insufficient Quantity
+ Wrong Batch
+
+TICVAI / INVENTORY & PROCUREMENT BACKEND STRUCTURE
+CONFIDENTIAL | 37
+ Damaged Item
+ Barcode Mismatch
+ Serial Mismatch
+ Location Empty
+Short Pick
+Example:
+Requested:
+100
+Picked:
+94
+Short:
+6
+Actions:
+Search Alternate Bin | Substitute where allowed | Partial Fulfilment | Escalate
+PAGE 8 — Packing, Staging & Dispatch
+Purpose
+Manage outbound preparation after inventory has been picked.
+Packing Workspace
+Display:
+ Pick Number
+ Destination
+ Items
+ Picked Quantity
+ Packing Status
+ Package Count
+ Weight
+ Volume
+ Special Handling
+Packing Validation
+The employee verifies:
+Picked Item
+vs
+Required Item
+before closing the package.
+Package Information
+Capture:
+ Package ID
+ Container Type
+ Weight
+ Dimensions
+ Items
+ Quantity
+ Destination
+
+TICVAI / INVENTORY & PROCUREMENT BACKEND STRUCTURE
+CONFIDENTIAL | 38
+ Barcode / QR
+ Seal Number where applicable
+Staging
+After packing:
+Package
+→ assigned to
+Staging Area
+based on:
+ Destination
+ Route
+ Dispatch Time
+ Vehicle
+ Priority
+Dispatch
+Capture:
+ Dispatch Number
+ Destination
+ Vehicle
+ Driver / Courier
+ Packages
+ Departure Time
+ Expected Arrival
+ Status
+Dispatch Lifecycle
+Ready
+→ Staged
+→ Loaded
+→ Dispatched
+→ In Transit
+→ Received
+Dispatch Verification
+Before departure:
+✓ All Packages Loaded
+✓ Correct Destination
+✓ Required Documents
+✓ Temperature Requirements where applicable
+✓ Seal Verification where applicable
+PAGE 9 — Internal Warehouse Movement & Bin Replenishment
+Purpose
+Manage stock movement inside the same warehouse without confusing it with warehouse-to-warehouse 
+transfers.
+Movement Examples
+ Reserve Storage Picking Bin →
+
+TICVAI / INVENTORY & PROCUREMENT BACKEND STRUCTURE
+CONFIDENTIAL | 39
+ Bin Bin →
+ Receiving Inspection →
+ Inspection Storage →
+ Storage Staging →
+ Damaged Quarantine →
+ Returns Inspection →
+Internal Movement
+Capture:
+ Movement Number
+ Item
+ Batch / Serial
+ Quantity
+ Source Bin
+ Destination Bin
+ Reason
+ Employee
+ Priority
+Picking-Bin Replenishment
+Example:
+Picking Bin RET-A01
+Available:
+8
+Minimum:
+20
+Reserve Storage:
+240
+Recommended Replenishment:
+42 units
+Replenishment Trigger
+Support:
+ Minimum Level
+ Fixed Schedule
+ Pick Demand
+ Wave Requirement
+ Event Requirement
+ AI Recommendation
+Bin Consolidation
+TICVAI may identify inefficient storage.
+Example:
+Same SKU exists in:
+Bin A01:
+8 units
+Bin A04:
+12 units
+
+TICVAI / INVENTORY & PROCUREMENT BACKEND STRUCTURE
+CONFIDENTIAL | 40
+Bin B06:
+6 units
+Recommendation:
+Consolidate into Bin A04 to release two storage locations.
+Movement Validation
+System shall validate:
+ Destination Capacity
+ Storage Compatibility
+ Batch Rules
+ Status Rules
+ Serial Rules
+before confirmation.
+PAGE 10 — Warehouse Exceptions, AI Optimization & Control Center
+Purpose
+Provide a centralized operational workspace for warehouse exceptions, bottlenecks and optimization 
+recommendations.
+Exception Categories
+Receiving
+ Late Delivery
+ Receiving SLA Exceeded
+ Quantity Variance
+ Damaged Receipt
+ Unexpected Delivery
+Put-Away
+ Pending Put-Away
+ No Eligible Bin
+ Capacity Conflict
+ Wrong Storage Condition
+Picking
+ Short Pick
+ Item Not Found
+ Wrong Item
+ Batch Mismatch
+ Serial Mismatch
+ Pick SLA Exceeded
+Packing
+ Packing Difference
+ Missing Item
+ Package Weight Difference
+Dispatch
+ Dispatch Delayed
+ Missing Package
+ Vehicle Delay
+
+TICVAI / INVENTORY & PROCUREMENT BACKEND STRUCTURE
+CONFIDENTIAL | 41
+ Receipt Confirmation Missing
+Capacity
+ Warehouse Near Capacity
+ Zone Full
+ Bin Over Capacity
+ Staging Congestion
+Severity
+Information | Warning | High | Critical
+AI — SMART PUT-AWAY
+TICVAI should recommend the most appropriate storage location.
+Example:
+Item
+Water Bottle 500ml
+Quantity:
+1,200
+Candidate Locations
+A01:
+Available Capacity 1,500
+Distance to Picking:
+12m
+A08:
+Capacity 3,000
+Distance:
+38m
+B04:
+Capacity 2,000
+Distance:
+24m
+AI Recommendation
+A01
+Reason:
+ High Sales Velocity
+ Near Picking Area
+ Sufficient Capacity
+ Compatible Storage
+ Expected frequent replenishment
+Actions:
+Accept | Select Alternative | View Analysis
+AI — PICK PATH OPTIMIZATION
+TICVAI should optimize warehouse movement.
+Example:
+Standard Route:
+420 meters
+Optimized Route:
+
+TICVAI / INVENTORY & PROCUREMENT BACKEND STRUCTURE
+CONFIDENTIAL | 42
+286 meters
+Reduction:
+31.9%
+Expected Pick Time:
+18 min 13 min →
+The recommendation should consider:
+ Warehouse Layout
+ Pick Locations
+ Item Sequence
+ Priority
+ Congestion where available
+ Picker Zone
+AI — WAREHOUSE CAPACITY FORECAST
+TICVAI should forecast warehouse utilization using:
+ Current Inventory
+ Expected Purchase Receipts
+ Expected Transfers
+ Event Demand
+ Seasonal Inventory
+ Outbound Forecast
+ Existing Capacity
+Example:
+Event Warehouse is currently 78% utilized and projected to reach 96% on Friday at 14:00 following three 
+scheduled supplier receipts.
+Recommended Actions:
+1. Move slow-moving inventory to Central Warehouse.
+2. Expedite scheduled outbound transfers.
+3. Redirect eligible receipt to alternate warehouse.
+AI — TASK PRIORITIZATION
+Instead of treating all warehouse tasks equally, TICVAI should calculate operational urgency.
+Example:
+Task A
+Retail replenishment
+Stock-Out Risk:
+High
+Guest Revenue Impact:
+AED 12K
+Required:
+45 minutes
+Task B
+General Put-Away
+Stock-Out Risk:
+None
+Required:
+4 hours
+
+TICVAI / INVENTORY & PROCUREMENT BACKEND STRUCTURE
+CONFIDENTIAL | 43
+Recommendation:
+Prioritize Task A
+The user may accept the recommendation or follow configured priority rules.
+AI — BOTTLENECK DETECTION
+TICVAI should identify operational congestion.
+Example:
+Receiving Dock
+Inbound:
+8 shipments
+Available Receiving Teams:
+2
+Average Processing:
+34 min
+Projected Delay:
+76 minutes
+Recommendation:
+Temporarily assign one additional warehouse employee to receiving.
+This recommendation should connect with the Resource Management module.
+AI — SLOT OPTIMIZATION
+TICVAI should analyze item velocity and warehouse location.
+Example:
+High-Velocity Items Stored Far From Picking
+1. Water Bottle
+2. Logo T-Shirt
+3. Packaging Bag
+Estimated unnecessary walking:
+18.4 km/week
+Recommendation:
+Relocate these items to the primary picking zone.
+Expected:
+Picking Time:
+-11%
+Warehouse Travel:
+-16%
+MOBILE / EMPLOYEE APP INTEGRATION
+Board 2 should be heavily integrated with the TICVAI Employee App.
+Warehouse employees should be able to:
+ View Assigned Tasks
+ Scan Barcode
+ Scan QR
+ Scan RFID where supported
+ Receive Goods
+ Record Quantity
+ Record Damage
+ Capture Photo
+
+TICVAI / INVENTORY & PROCUREMENT BACKEND STRUCTURE
+CONFIDENTIAL | 44
+ Confirm Inspection
+ Perform Put-Away
+ Pick Inventory
+ Report Short Pick
+ Pack
+ Stage
+ Dispatch
+ Move Stock
+ Count Stock
+ View Item Location
+ Search Inventory
+Example Employee Task
+Urgent Pick — PK-18431
+Destination:
+Main Gift Shop
+Required:
+10:45
+Items:
+8 SKUs / 64 Units
+Start:
+Begin Picking
+BARCODE / QR / RFID OPERATIONS
+Scanning should be part of the core warehouse architecture, not an optional afterthought.
+Receiving
+Scan:
+Shipment Item Batch / Serial Quantity → → →
+Put-Away
+Scan:
+Item Destination Bin →
+Picking
+Scan:
+Bin Item Quantity → →
+Packing
+Scan:
+Item Package →
+Dispatch
+Scan:
+Package Vehicle / Dispatch →
+Stock Movement
+Scan:
+Source Item Destination → →
+This reduces manual entry and improves inventory accuracy.
+
+TICVAI / INVENTORY & PROCUREMENT BACKEND STRUCTURE
+CONFIDENTIAL | 45
+OFFLINE / CONNECTIVITY HANDLING
+Warehouse mobile workflows should support controlled offline behavior where required.
+When connectivity is temporarily unavailable:
+ Previously assigned tasks remain accessible where supported.
+ Scans may be locally queued.
+ Transactions should receive temporary device references.
+ Synchronization occurs when connectivity returns.
+ Conflicts shall be surfaced for resolution.
+Example:
+Item was moved by another user while device was offline.
+TICVAI should not silently overwrite the newer inventory state.
+F&B INTEGRATION
+Example:
+Main Restaurant requires:
+Beef Patty:
+120
+Cheese:
+80
+Buns:
+120
+F&B Board creates replenishment requirement.
+↓
+Shared Inventory validates stock.
+↓
+Board 2 generates warehouse pick.
+↓
+Warehouse picks.
+↓
+Packs / Stages.
+↓
+Dispatches.
+↓
+Restaurant receives.
+↓
+Shared inventory locations update.
+RETAIL INTEGRATION
+Example:
+Retail Board 4 identifies:
+Main Gift Shop projected T-Shirt shortage.
+↓
+Creates replenishment request.
+↓
+Board 2 creates:
+Pick Task
+↓
+Warehouse picks:
+
+TICVAI / INVENTORY & PROCUREMENT BACKEND STRUCTURE
+CONFIDENTIAL | 46
+100 units
+↓
+Packs
+↓
+Dispatches
+↓
+Store receives
+↓
+Shared Inventory updates.
+PROCUREMENT INTEGRATION
+Example:
+Purchase Order:
+PO-18421
+↓
+Supplier shipment arrives.
+↓
+Board 2:
+Receiving
+↓
+Inspection
+↓
+GRN / Receipt Process
+↓
+Put-Away
+↓
+Shared Inventory increases.
+The procurement and financial matching side will be covered in later Boards.
+RESOURCE MANAGEMENT INTEGRATION
+Warehouse employees and operational resources should come from the shared Resource Engine.
+Example:
+Board 2 forecasts:
+22 picking tasks between 14:00–16:00
+Current Warehouse Staff:
+5
+Required:
+8
+Gap:
+3 Employees
+TICVAI can recommend additional staff through Resource Management rather than maintaining duplicate 
+warehouse rosters.
+APPROVAL ENGINE INTEGRATION
+Board 2 shall use TICVAI's shared Approval Engine where approval is required.
+Examples:
+Unexpected Receipt
+→ Warehouse Supervisor
+
+TICVAI / INVENTORY & PROCUREMENT BACKEND STRUCTURE
+CONFIDENTIAL | 47
+Over-Delivery Above Tolerance
+→ Procurement / Inventory
+Rejected High-Value Goods
+→ Warehouse + Procurement
+Emergency Dispatch
+→ Configurable Approval
+Manual Inventory Movement Override
+→ Inventory Supervisor
+Normal warehouse operations should not be overloaded with unnecessary approvals.
+Approvals should be policy-based and exception-driven.
+ROLE-BASED ACCESS
+Warehouse Director
+Full warehouse visibility.
+Warehouse Manager
+Warehouse configuration + operations.
+Supervisor
+Task management + exceptions.
+Receiver
+Receiving + inspection according to permission.
+Picker
+Assigned picking tasks.
+Packer
+Packing / staging.
+Dispatcher
+Dispatch operations.
+Inventory Controller
+Inventory movement + reconciliation.
+Access shall use TICVAI's common RBAC/PBAC framework.
+AUDIT & TRACEABILITY
+Every warehouse operation shall retain:
+ Transaction / Task ID
+ Inventory Item
+ Batch / Serial
+ Quantity
+ Source
+ Destination
+ Employee
+ Device
+ Date / Time
+ Reference
+ Previous State
+ New State
+ Exception
+ Approval where applicable
+
+TICVAI / INVENTORY & PROCUREMENT BACKEND STRUCTURE
+CONFIDENTIAL | 48
+Management should be able to trace:
+Supplier
+→ Receipt
+→ Batch
+→ Warehouse
+→ Zone
+→ Bin
+→ Pick
+→ Package
+→ Dispatch
+→ Destination
+BOARD 2 — FINAL 10 SCREENS
+# Screen
+1 Warehouse Operations Command Center
+2 Warehouse, Zone & Bin Configuration
+3 Storage Rules & Location Assignment
+4 Receiving Dock & Inbound Operations
+5 Inspection, Quality Hold & Put-Away
+6 Warehouse Task & Workforce Management
+7 Picking & Replenishment Operations
+8 Packing, Staging & Dispatch
+9 Internal Warehouse Movement & Bin Replenishment
+1
+0
+Warehouse Exceptions, AI Optimization & Control Center
+COMPLETE BOARD 2 OPERATIONAL FLOW
+INBOUND
+Supplier / Transfer / Production / Return
+↓
+Expected Receipt
+↓
+Dock / Receiving
+↓
+Scan & Verify
+↓
+Quantity / Batch / Serial Validation
+↓
+Inspection Required?
+Yes
+→ Inspection
+→ Accept / Reject / Quarantine
+
+TICVAI / INVENTORY & PROCUREMENT BACKEND STRUCTURE
+CONFIDENTIAL | 49
+No
+→ Continue
+↓
+Put-Away Recommendation
+↓
+Scan Destination
+↓
+Shared Inventory Location Updated
+↓
+Available Stock
+INTERNAL OPERATIONS
+Available Stock
+↓
+Demand from:
+Retail / F&B / Event / Rental / Operations
+↓
+Warehouse Task
+↓
+Pick
+↓
+Scan Validation
+↓
+Pack
+↓
+Stage
+↓
+Dispatch
+↓
+In Transit
+↓
+Destination Receipt
+↓
+Shared Inventory Updated
+CONTINUOUS OPTIMIZATION
+Warehouse activity
+↓
+AI analyzes:
+Capacity + Tasks + Demand + Item Velocity + SLAs + Locations
+↓
+Detect:
+Congestion / Inefficient Slots / Delays / Short Picks / Capacity Risk
+↓
+Recommend:
+Reprioritize Tasks / Change Bin / Optimize Route / Reallocate Staff / Redirect Stock
+↓
+Human Approval where required
+
+TICVAI / INVENTORY & PROCUREMENT BACKEND STRUCTURE
+CONFIDENTIAL | 50
+↓
+Execute
+↓
+Measure Result
+IMPORTANT ARCHITECTURAL BOUNDARY
+There is one point I recommend we make very clear to SoftLab.
+Board 2 is the Warehouse Execution layer.
+It should not duplicate Board 1's Inventory Ledger, and it should not duplicate Procurement.
+The architecture should be:
+Board 1 — Inventory Master & Stock Ledger
+provides:
+Item + Quantity + Status + Batch + Serial + Cost + Movement
+↓
+Board 2 — Warehouse Execution
+provides:
+Warehouse + Zone + Bin + Receive + Put-Away + Pick + Pack + Stage + Dispatch
+↓
+Later:
+Procurement Boards
+provide:
+Supplier + PR + RFQ + Quote + PO + Supplier Delivery
+Therefore, when a warehouse employee moves 50 units from Receiving Dock 01 Bin A-04 → , Board 2 manages 
+the physical workflow, but the transaction posts into the same Shared Inventory Ledger from Board 1.
+This distinction will prevent SoftLab from accidentally building a separate Warehouse Management System with its
+own inventory balance.
+It also gives us the foundation for Board 3 — Transfers, Counts & Reconciliation, where we should handle 
+enterprise transfers, physical/cycle counts, stock variance, adjustments and reconciliation across all locations.
+
+TICVAI / INVENTORY & PROCUREMENT BACKEND STRUCTURE
+CONFIDENTIAL | 51
+TICVAI INVENTORY & PROCUREMENT — BOARD 3
+Transfers, Stock Counts, Adjustments & Reconciliation — Scope of Work
+1. Purpose
+The Transfers, Stock Counts, Adjustments & Reconciliation Board shall provide TICVAI with the centralized control 
+layer for moving inventory between locations, verifying physical stock, identifying discrepancies, approving 
+adjustments, reconciling inventory balances, and maintaining complete stock accountability.
+Board 1 established:
+What inventory exists and how much stock TICVAI has.
+Board 2 established:
+Where inventory is physically stored and how warehouse operations execute receiving, put-away, picking, 
+packing and dispatch.
+Board 3 shall establish:
+How stock moves between locations How physical stock is verified How discrepancies are investigated → →
+→ → How corrections are controlled How the inventory ledger remains accurate.
+The core architecture shall follow:
+Transfer / Count Request Inventory Item Source Location Destination / Physical Quantity Variance → → → →
+→ → → → → → Investigation Approval Adjustment Inventory Ledger Finance Impact Audit
+Board 3 shall use the same Shared Inventory Ledger from Board 1 and the warehouse/location structure from 
+Board 2.
+PAGE 1 — Inventory Control Command Center
+Purpose
+Provide Inventory Controllers and management with a consolidated view of stock transfers, physical counts, 
+variances, adjustments and reconciliation status.
+
+TICVAI / INVENTORY & PROCUREMENT BACKEND STRUCTURE
+CONFIDENTIAL | 52
+Global Filters
+ Tenant
+ Company
+ Business Unit
+ Park
+ Venue
+ Warehouse
+ Store / Outlet
+ Inventory Category
+ Item / SKU
+ Transfer Status
+ Count Status
+ Variance Status
+ Date / Period
+KPI Cards
+ Transfers Today
+ Transfers In Transit
+ Pending Receipts
+ Transfer Exceptions
+ Counts Scheduled
+ Counts In Progress
+ Counts Completed
+ Items with Variance
+ Total Variance Value
+ Pending Adjustments
+ Shrinkage Value
+ Unexplained Variance
+ Reconciliation Exceptions
+ Critical Alerts
+Transfer Snapshot
+Example:
+Requested: 42
+Approved: 35
+Picking: 8
+In Transit: 14
+Awaiting Receipt: 7
+Completed: 126
+Count Snapshot
+Scheduled Today: 18
+In Progress: 6
+Completed: 9
+Variance Review: 3
+Inventory Accuracy
+Example:
+
+TICVAI / INVENTORY & PROCUREMENT BACKEND STRUCTURE
+CONFIDENTIAL | 53
+98.7%
+Target:
+99.5%
+Critical Alerts
+Examples:
+Transfer TR-18425 has been in transit for 5 hours beyond expected arrival.
+Physical count identified AED 8,420 variance in Retail Warehouse.
+14 serialized items require reconciliation.
+F&B Cold Store variance exceeds configured tolerance.
+Quick Actions
++ Transfer | + Stock Count | Cycle Count | Adjustment | Reconciliation | Variance Review
+PAGE 2 — Inventory Transfer Management
+Purpose
+Create, approve, execute and monitor inventory transfers between TICVAI inventory locations.
+Transfer Types
+Support:
+ Warehouse Warehouse →
+ Warehouse Store →
+ Warehouse F&B Outlet →
+ Store Store →
+ Outlet Outlet →
+ Store / Outlet Warehouse →
+ Venue Venue →
+ Park Park →
+ Event Warehouse Venue →
+ Return to Central Warehouse
+ Emergency Transfer
+Transfer Header
+Capture:
+ Transfer Number
+ Transfer Type
+ Source
+ Destination
+ Requested Date
+ Required Date / Time
+ Priority
+ Requesting Department
+ Requested By
+ Reason
+ Status
+Transfer Items
+For each line:
+ Inventory Item
+
+TICVAI / INVENTORY & PROCUREMENT BACKEND STRUCTURE
+CONFIDENTIAL | 54
+ SKU
+ Batch / Lot
+ Serial Number
+ Requested Quantity
+ Approved Quantity
+ Picked Quantity
+ Dispatched Quantity
+ Received Quantity
+ UOM
+Availability Validation
+Before submission, TICVAI shall validate:
+On Hand
+Available
+Reserved
+Safety Stock
+Source Demand
+Example
+Requested:
+100 Water Bottles
+Source Available:
+280
+Source Safety Stock:
+100
+Available for Transfer:
+180
+Result:
+Transfer Allowed
+Transfer Lifecycle
+Draft
+→ Submitted
+→ Approval where required
+→ Approved
+→ Picking
+→ Packed
+→ Dispatched
+→ In Transit
+→ Received
+→ Reconciled
+→ Completed
+PAGE 3 — Transfer Dispatch, Receipt & Discrepancy Control
+Purpose
+Provide end-to-end control over inventory while it is moving between locations.
+
+TICVAI / INVENTORY & PROCUREMENT BACKEND STRUCTURE
+CONFIDENTIAL | 55
+Dispatch Confirmation
+Capture:
+ Transfer Number
+ Packages
+ Item
+ Quantity
+ Batch / Serial
+ Dispatch Time
+ Vehicle / Courier
+ Employee
+ Seal Number where applicable
+Once dispatched:
+Source Available Stock decreases
+and quantity becomes:
+In Transit
+Destination Receipt
+Receiving location confirms:
+ Item
+ Quantity
+ Batch
+ Serial
+ Condition
+ Received Time
+ Employee
+Example
+Dispatched:
+100 units
+Received:
+98
+Damaged:
+1
+Missing:
+1
+Discrepancy Status
+TICVAI creates:
+Transfer Variance — 2 Units
+The transfer shall not simply close as 100 units received.
+Discrepancy Types
+ Short Receipt
+ Over Receipt
+ Damage in Transit
+ Wrong Item
+ Wrong Variant
+ Batch Mismatch
+ Serial Mismatch
+
+TICVAI / INVENTORY & PROCUREMENT BACKEND STRUCTURE
+CONFIDENTIAL | 56
+ Package Missing
+ Seal Broken
+ Unknown Difference
+Actions
+Accept Variance | Investigate | Return Item | Create Claim | Escalate
+Chain of Custody
+The system should maintain:
+Picked By Packed By Dispatched By Transport Received By → → → →
+for controlled inventory.
+PAGE 4 — Stock Count Planning & Scheduling
+Purpose
+Allow Inventory teams to configure and schedule physical inventory verification.
+Count Types
+Support:
+ Full Physical Inventory
+ Cycle Count
+ Spot Count
+ Blind Count
+ Recount
+ High-Value Count
+ Category Count
+ Bin Count
+ Batch Count
+ Serial Count
+ Event Closing Count
+Count Scope
+A count may target:
+ Company
+ Park
+ Venue
+ Warehouse
+ Zone
+ Bin
+ Store
+ Outlet
+ Category
+ Item
+ SKU
+ Batch
+ Serial Range
+Count Schedule
+Capture:
+ Count Name
+
+TICVAI / INVENTORY & PROCUREMENT BACKEND STRUCTURE
+CONFIDENTIAL | 57
+ Count Type
+ Scope
+ Scheduled Date
+ Start Time
+ Expected Completion
+ Assigned Team
+ Supervisor
+ Freeze Policy
+ Blind Count
+ Recount Threshold
+Recurring Counts
+Support:
+ Daily
+ Weekly
+ Monthly
+ Quarterly
+ Annual
+ Custom Frequency
+ABC-Based Count Frequency
+Example:
+A Items
+Weekly
+B Items
+Monthly
+C Items
+Quarterly
+Count Calendar
+Managers should have:
+Day | Week | Month
+calendar views showing planned counts across locations.
+PAGE 5 — Physical & Cycle Count Execution
+Purpose
+Allow warehouse/store employees to perform inventory counts accurately using mobile or desktop workflows.
+Count Workflow
+Employee opens:
+Count Task CT-18428
+↓
+Select / Scan Location
+↓
+Scan Item
+↓
+Scan Batch / Serial where required
+↓
+Enter Quantity
+
+TICVAI / INVENTORY & PROCUREMENT BACKEND STRUCTURE
+CONFIDENTIAL | 58
+↓
+Confirm
+Counting Methods
+Support:
+ Manual Entry
+ Barcode Scan
+ QR Scan
+ RFID
+ Mobile Device
+ Employee App
+Blind Count
+For controlled counts, the employee should not see the system quantity.
+Example:
+System Quantity:
+Hidden
+Employee Count:
+84
+After submission:
+System:
+87
+Variance:
+-3
+Serial Count
+For serialized inventory:
+Expected Serials
+vs
+Scanned Serials
+TICVAI identifies:
+ Missing Serial
+ Unexpected Serial
+ Duplicate Scan
+ Wrong Location
+Count Progress
+Example:
+Locations:
+48
+Completed:
+31
+Progress:
+64.6%
+Items:
+1,240
+Counted:
+824
+
+TICVAI / INVENTORY & PROCUREMENT BACKEND STRUCTURE
+CONFIDENTIAL | 59
+Count Task Status
+Scheduled
+→ Assigned
+→ In Progress
+→ Submitted
+→ Variance Review
+→ Approved
+→ Posted
+PAGE 6 — Variance Investigation & Root-Cause Management
+Purpose
+Provide a controlled process for investigating differences between physical stock and system stock.
+Variance Calculation
+For each count:
+Physical Quantity – System Quantity = Quantity Variance
+The system shall also calculate:
+Variance Value
+based on the applicable inventory valuation method.
+Example
+SKU:
+TSH-BLK-M
+System:
+120
+Physical:
+113
+Variance:
+-7
+Unit Cost:
+AED 42
+Variance Value:
+-AED 294
+Tolerance Rules
+Configure tolerance by:
+ Item
+ Category
+ Location
+ Quantity
+ Percentage
+ Value
+Example:
+Variance:
+1 unit
+Value:
+AED 3
+
+TICVAI / INVENTORY & PROCUREMENT BACKEND STRUCTURE
+CONFIDENTIAL | 60
+→ Auto Accept where policy permits.
+Variance:
+10 units
+Value:
+AED 4,800
+→ Investigation + Approval Required.
+Root-Cause Categories
+ Counting Error
+ Receiving Error
+ Transfer Error
+ Picking Error
+ POS Sync Issue
+ F&B Consumption Error
+ Damage
+ Waste
+ Return Error
+ Wrong Location
+ UOM Error
+ Batch Error
+ Process Error
+ Unknown
+Investigation Workspace
+Display:
+ Expected Stock
+ Physical Count
+ Variance
+ Recent Transactions
+ Transfers
+ Receipts
+ Sales
+ Consumption
+ Returns
+ Adjustments
+ Employee / Device History
+This allows the controller to investigate before posting an adjustment.
+PAGE 7 — Inventory Adjustment & Write-Off Management
+Purpose
+Provide controlled correction of inventory quantities and values.
+Adjustment Types
+Support:
+ Count Variance
+ Damage
+ Breakage
+
+TICVAI / INVENTORY & PROCUREMENT BACKEND STRUCTURE
+CONFIDENTIAL | 61
+ Expiry
+ Waste
+ Loss
+ Found Stock
+ Wrong Location Correction
+ Batch Correction
+ UOM Correction
+ Return Adjustment
+ System Correction
+ Authorized Manual Adjustment
+Adjustment Record
+Capture:
+ Adjustment Number
+ Item
+ Location
+ Batch / Serial
+ Current Quantity
+ Adjustment Quantity
+ New Quantity
+ Unit Cost
+ Financial Impact
+ Reason Code
+ Notes
+ Supporting Document / Photo
+ Created By
+Example
+ADJ-18422
+Item:
+Limited Edition Mug
+System Quantity:
+48
+Physical:
+45
+Adjustment:
+-3
+Unit Cost:
+AED 28
+Impact:
+-AED 84
+Reason:
+Breakage confirmed.
+Adjustment Lifecycle
+Draft
+→ Submitted
+
+TICVAI / INVENTORY & PROCUREMENT BACKEND STRUCTURE
+CONFIDENTIAL | 62
+→ Review
+→ Approval where required
+→ Posted
+→ Inventory Ledger Updated
+→ Finance Entry where applicable
+Write-Off
+For stock that cannot remain inventory:
+Available / Damaged / Expired
+↓
+Write-Off
+↓
+Inventory removed from usable stock.
+Write-offs shall always retain a reason and audit trail.
+PAGE 8 — Inventory Reconciliation & Ledger Control
+Purpose
+Ensure the Shared Inventory Ledger remains consistent with operational transactions and financial records.
+Reconciliation Areas
+TICVAI should reconcile:
+Inventory Ledger vs Warehouse
+Inventory Ledger vs Retail POS
+Inventory Ledger vs F&B Consumption
+Inventory Ledger vs Procurement Receipts
+Inventory Ledger vs Transfers
+Inventory Ledger vs Physical Counts
+Inventory Ledger vs Finance
+Reconciliation Dashboard
+Example:
+Source Transactions Matched Exceptions Status
+Retail POS 12,480 12,476 4 Warning
+F&B 8,220 8,220 0 Reconciled
+Procurement 840 838 2 Warning
+Transfers 1,240 1,239 1 Warning
+Stock Counts 620 620 0 Reconciled
+Exception Types
+ Missing Inventory Transaction
+ Duplicate Transaction
+ Quantity Mismatch
+ Cost Mismatch
+ Location Mismatch
+ Batch Mismatch
+
+TICVAI / INVENTORY & PROCUREMENT BACKEND STRUCTURE
+CONFIDENTIAL | 63
+ Integration Failure
+ Posting Failure
+Drill-Down
+Example:
+POS-18428
+Retail sold:
+2 units
+Inventory movement:
+1 unit
+Variance:
+-1
+Action:
+Review Transaction | Reprocess | Create Adjustment | Escalate
+Reconciliation Status
+ Matched
+ Pending
+ Exception
+ Investigating
+ Resolved
+ Approved
+PAGE 9 — Shrinkage, Loss & Inventory Accuracy Control
+Purpose
+Provide management with visibility into inventory accuracy, shrinkage, loss and recurring operational problems.
+KPI Cards
+ Inventory Accuracy %
+ Shrinkage %
+ Shrinkage Value
+ Damage Value
+ Expiry Value
+ Waste Value
+ Transfer Loss
+ Count Variance
+ Write-Off Value
+ Unexplained Loss
+Inventory Accuracy
+Track by:
+ Company
+ Warehouse
+ Store
+ Outlet
+ Category
+ Item
+ SKU
+
+TICVAI / INVENTORY & PROCUREMENT BACKEND STRUCTURE
+CONFIDENTIAL | 64
+ Employee / Team where operationally appropriate
+ Period
+Shrinkage Trend
+Example:
+January:
+0.8%
+February:
+0.9%
+March:
+1.4%
+April:
+1.1%
+Target:
+<1.0%
+Root-Cause Breakdown
+Example:
+Damage:
+32%
+Expiry:
+24%
+Transfer Difference:
+14%
+Process Error:
+12%
+Counting Error:
+10%
+Unknown:
+8%
+High-Risk Items
+Identify inventory with repeated discrepancies.
+Example:
+Limited Edition Collectible
+Count Variance Events:
+6
+Variance Value:
+AED 12,800
+Status:
+High Risk
+Location Benchmark
+Compare warehouses/stores by inventory accuracy.
+This should be used for operational improvement and controls rather than automatically attributing discrepancies
+to individual misconduct.
+PAGE 10 — AI Inventory Control & Exception Center
+Purpose
+Provide AI-assisted detection, investigation and recommendation capabilities across transfers, counts, variances 
+and reconciliation.
+
+TICVAI / INVENTORY & PROCUREMENT BACKEND STRUCTURE
+CONFIDENTIAL | 65
+AI Exception Categories
+ Transfer Risk
+ Inventory Variance
+ Shrinkage Pattern
+ Count Anomaly
+ Reconciliation Failure
+ Repeated Adjustment
+ Suspicious Stock Movement Pattern
+ Wrong Location
+ Batch / Serial Mismatch
+ Inventory Accuracy Decline
+AI — TRANSFER RECOMMENDATION
+TICVAI should identify internal redistribution opportunities before external procurement.
+Example:
+Main Gift Shop
+SKU:
+TSH-BLK-M
+Available:
+8
+Forecast Requirement:
+52
+Shortfall:
+44
+Waterpark Shop
+Available:
+86
+Forecast Requirement:
+32
+Excess:
+54
+Recommendation
+Transfer 44 units from Waterpark Shop Main Gift Shop →
+Expected:
+Avoided Stock-Out:
+44 units
+Potential Revenue Protected:
+AED 4,180
+Confidence:
+92%
+Actions:
+Simulate | Create Transfer | Ignore
+AI — TRANSFER RISK
+Before approving a transfer, TICVAI should evaluate the impact on the source.
+Example:
+
+TICVAI / INVENTORY & PROCUREMENT BACKEND STRUCTURE
+CONFIDENTIAL | 66
+Requested:
+80 units
+Source Available:
+120
+Source Forecast Requirement:
+90
+Safety Stock:
+20
+Result:
+High Risk
+Approving 80 units would create a projected source shortage of 70 units.
+Recommendation:
+Transfer maximum 10 units or select alternate source.
+AI — COUNT PRIORITIZATION
+Instead of counting every item equally, TICVAI should recommend count priority based on risk.
+Potential factors:
+ Item Value
+ Sales Velocity
+ Historical Variance
+ Shrinkage History
+ Time Since Last Count
+ Manual Adjustments
+ Transfer Frequency
+ Batch / Serial Sensitivity
+Example
+SKU-1842
+Inventory Value:
+AED 84K
+Last Count:
+42 days ago
+Recent Adjustments:
+6
+Historical Variance:
+4.8%
+AI Recommendation:
+Immediate Cycle Count
+AI — VARIANCE ROOT-CAUSE ASSISTANT
+Example:
+Variance
+Item:
+Water Bottle
+Location:
+Main Gift Shop
+Variance:
+-48 units
+
+TICVAI / INVENTORY & PROCUREMENT BACKEND STRUCTURE
+CONFIDENTIAL | 67
+AI Analysis
+Potential Causes:
+1. Transfer Receipt Mismatch — 68% probability
+Transfer TR-18420 dispatched 200 but destination receipt recorded 152.
+2. POS Sync Issue — 21%
+48 sales transactions were delayed during offline period.
+3. Counting Error — 11%
+Previous count occurred during open trading.
+Recommended Investigation
+Review TR-18420 first.
+The AI should assist investigation, not automatically post the correction.
+AI — SHRINKAGE PATTERN DETECTION
+Example:
+Inventory variance for souvenir mugs has increased across three locations during the last four weeks.
+Observed:
+Expected Shrinkage:
+0.8%
+Actual:
+2.7%
+Estimated Impact:
+AED 18,400
+Possible Factors:
+ Breakage not consistently recorded
+ Transfer receiving differences
+ Stock-count process
+ POS / inventory synchronization
+Recommended Action:
+Perform targeted cycle count and review movement history.
+AI — RECONCILIATION ASSISTANT
+Example:
+14 Retail POS transactions have no corresponding inventory movement.
+Potential Impact:
+27 units
+AED 2,840 inventory value
+Actions:
+Review Transactions | Retry Integration | Create Investigation
+The system should never silently create inventory adjustments simply to force reconciliation.
+TRANSFER REQUEST FROM OPERATIONAL MODULES
+Transfers may originate directly from other TICVAI modules.
+Retail Example
+Retail Board 4 detects low stock.
+
+TICVAI / INVENTORY & PROCUREMENT BACKEND STRUCTURE
+CONFIDENTIAL | 68
+↓
+Request Internal Transfer
+↓
+Board 3 checks:
+ Source Availability
+ Destination Requirement
+ Safety Stock
+ Existing Transfers
+ Forecast Demand
+↓
+Transfer Created.
+F&B Example
+Main Restaurant requires:
+Beef Patty:
+100
+Central F&B Warehouse:
+Available 420
+↓
+Transfer Request
+↓
+Board 3
+↓
+Board 2 executes:
+Pick Pack Dispatch → →
+↓
+Restaurant Receives
+↓
+Board 3 reconciles transfer.
+This separation is important:
+Board 3 controls the transfer transaction.
+Board 2 executes warehouse fulfilment.
+PROCUREMENT CONNECTION
+Before raising external procurement, TICVAI should be capable of checking whether stock exists elsewhere 
+internally.
+Example:
+Main Gift Shop shortage:
+50 units
+Central Warehouse:
+0
+Waterpark Shop:
+40 excess
+Adventure Store:
+20 excess
+TICVAI recommendation:
+Fulfil internally before purchasing externally.
+This gives us the future flow:
+
+TICVAI / INVENTORY & PROCUREMENT BACKEND STRUCTURE
+CONFIDENTIAL | 69
+Demand
+→ Check Local Stock
+→ Check Shared Inventory
+→ Check Internal Transfer Opportunity
+→ If insufficient
+→ Procurement
+This will become especially important in Boards 4–6.
+STOCK FREEZE & COUNT CONTROL
+For physical counts, TICVAI should support configurable count policies.
+Full Freeze
+No inventory movements permitted during count.
+Soft Freeze
+Transactions continue but are separately tracked and reconciled.
+Snapshot Count
+System records inventory state at a specific timestamp.
+Transactions after that timestamp do not alter the count baseline.
+I strongly recommend supporting Snapshot Count, because many TICVAI customers—parks, attractions, 
+restaurants and retail stores—cannot stop operations simply to perform inventory counting.
+RECOUNT RULES
+TICVAI should support automatic recount requirements.
+Example:
+First Count
+System:
+100
+Physical:
+92
+Variance:
+-8%
+Configured Tolerance:
+2%
+Result:
+Recount Required
+The second counter may be different from the first where policy requires segregation of duties.
+COUNT APPROVAL RULES
+Example:
+Variance AED 50 ≤
+Inventory Supervisor
+AED 50–1,000
+Inventory Manager
+AED 1,000–10,000
+Operations / Finance
+> AED 10,000
+Senior Approval
+These thresholds shall be tenant-configurable and use the common TICVAI Approval Engine.
+
+TICVAI / INVENTORY & PROCUREMENT BACKEND STRUCTURE
+CONFIDENTIAL | 70
+SERIALIZED INVENTORY RECONCILIATION
+Serialized items require item-level control.
+Example:
+System expects:
+SER-1001
+SER-1002
+SER-1003
+SER-1004
+Physical scan finds:
+SER-1001
+SER-1002
+SER-1004
+SER-1007
+TICVAI identifies:
+Missing: SER-1003
+Unexpected: SER-1007
+It should not simply show:
+System:
+4
+Physical:
+4
+Variance:
+0.
+Quantity matches, but inventory identity does not.
+BATCH RECONCILIATION
+The same principle applies to batch-controlled inventory.
+Example:
+Total system quantity:
+100
+Total physical:
+100
+But:
+Batch A system:
+60
+Physical:
+40
+Batch B system:
+40
+Physical:
+60
+Result:
+Batch-Level Variance
+even though total item quantity matches.
+This is particularly important for F&B expiry and traceability.
+UOM RECONCILIATION
+Board 3 shall use Board 1 UOM conversions.
+Example:
+
+TICVAI / INVENTORY & PROCUREMENT BACKEND STRUCTURE
+CONFIDENTIAL | 71
+System:
+4 Cases
+Each Case:
+12 Bottles
+Expected:
+48 Bottles
+Physical:
+46 Bottles
+Variance:
+-2 Bottles
+The system should calculate the variance using the correct base UOM and valuation.
+MOBILE / EMPLOYEE APP
+Inventory employees should be able to execute relevant Board 3 workflows from the TICVAI Employee App.
+Transfer
+ View Transfer
+ Pick / Scan
+ Dispatch
+ Receive
+ Report Difference
+Stock Count
+ View Assigned Count
+ Scan Location
+ Scan Item
+ Enter Quantity
+ Scan Serial / Batch
+ Submit Count
+Variance
+Authorized supervisors may:
+ Review Variance
+ Add Notes
+ Attach Photo
+ Request Recount
+Adjustment
+Authorized roles may:
+ Submit Adjustment
+ Select Reason
+ Attach Evidence
+OFFLINE COUNTING
+This is particularly useful for warehouses or venues with unreliable connectivity.
+The Employee App should support controlled offline count execution.
+Downloaded:
+Count Scope + Item References + Locations
+↓
+Employee performs count offline.
+
+TICVAI / INVENTORY & PROCUREMENT BACKEND STRUCTURE
+CONFIDENTIAL | 72
+↓
+Transactions are time-stamped locally.
+↓
+Connection restored.
+↓
+Synchronization.
+↓
+Conflict detection.
+The system shall not silently overwrite inventory changes that occurred during the offline period.
+FINANCE INTEGRATION
+Inventory adjustments with financial impact shall integrate with Finance.
+Example:
+Physical Loss:
+10 units
+Unit Cost:
+AED 80
+Inventory Adjustment:
+-AED 800
+↓
+Inventory Ledger
+↓
+Finance Posting / Accounting Interface
+Board 3 should provide the inventory transaction and reason.
+The Finance module should own the accounting treatment.
+APPROVAL ENGINE INTEGRATION
+Board 3 shall use TICVAI's shared Approval Engine.
+Potential approval events:
+ High-Value Transfer
+ Emergency Transfer
+ Transfer Below Safety Stock
+ Large Count Variance
+ Manual Adjustment
+ Write-Off
+ Reconciliation Correction
+ Reopening Posted Count
+Approval rules may consider:
+ Amount
+ Quantity
+ Category
+ Location
+ Reason
+ User
+ Business Unit
+SEGREGATION OF DUTIES
+Board 3 should support separation of responsibilities.
+
+TICVAI / INVENTORY & PROCUREMENT BACKEND STRUCTURE
+CONFIDENTIAL | 73
+Example:
+Counter
+should not necessarily be the same user as:
+Variance Approver
+and:
+Adjustment Approver
+For sensitive inventory:
+Count Review Approve Post → → →
+may require separate authorized users.
+This shall integrate with TICVAI's common RBAC/PBAC and SoD framework.
+AUDIT & TRACEABILITY
+Every transfer, count and adjustment shall maintain complete history.
+Capture:
+ Transaction ID
+ Item
+ Batch / Serial
+ Quantity
+ Location
+ User
+ Device
+ Date / Time
+ Reason
+ Approval
+ Previous Quantity
+ New Quantity
+ Financial Impact
+ Source Reference
+Example Audit
+ADJ-18422
+Previous:
+48
+New:
+45
+Reason:
+Confirmed Breakage
+Created:
+Inventory Controller
+Approved:
+Inventory Manager
+Financial Impact:
+-AED 84
+Timestamp:
+14 Aug 2026 — 14:42
+
+TICVAI / INVENTORY & PROCUREMENT BACKEND STRUCTURE
+CONFIDENTIAL | 74
+BOARD 3 — FINAL 10 SCREENS
+# Screen
+1 Inventory Control Command Center
+2 Inventory Transfer Management
+3 Transfer Dispatch, Receipt & Discrepancy Control
+4 Stock Count Planning & Scheduling
+5 Physical & Cycle Count Execution
+6 Variance Investigation & Root-Cause Management
+7 Inventory Adjustment & Write-Off Management
+8 Inventory Reconciliation & Ledger Control
+9 Shrinkage, Loss & Inventory Accuracy Control
+1
+0
+AI Inventory Control & Exception Center
+COMPLETE BOARD 3 FLOW
+TRANSFER
+Operational Demand
+↓
+Check Local Stock
+↓
+Check Enterprise Stock
+↓
+Identify Internal Source
+↓
+Transfer Request
+↓
+Availability + Safety Stock Validation
+↓
+Approval where required
+↓
+Board 2:
+Pick Pack Dispatch → →
+↓
+Board 3:
+In Transit
+↓
+Destination:
+Receive + Scan + Verify
+↓
+Quantity Match?
+Yes
+→ Complete Transfer
+
+TICVAI / INVENTORY & PROCUREMENT BACKEND STRUCTURE
+CONFIDENTIAL | 75
+No
+→ Transfer Discrepancy
+→ Investigation
+→ Adjustment / Claim / Resolution
+↓
+Shared Inventory Ledger Updated
+STOCK COUNT
+Count Plan
+↓
+Select:
+Warehouse / Store / Zone / Bin / Category / Item
+↓
+Assign Employees
+↓
+Create Snapshot / Freeze Policy
+↓
+Physical Count
+↓
+Compare:
+System vs Physical
+↓
+Within Tolerance?
+Yes
+→ Approve / Post
+Outside Tolerance?
+→ Recount
+→ Variance Investigation
+→ Root-Cause Analysis
+→ Approval
+→ Inventory Adjustment
+↓
+Shared Inventory Ledger Updated
+↓
+Finance Impact where applicable
+↓
+Audit Trail
+CONTINUOUS CONTROL
+Transfers + Counts + Adjustments + Operational Transactions
+↓
+Reconciliation Engine
+↓
+Detect:
+Missing Transaction / Duplicate / Quantity Difference / Cost Difference / Location Difference / Batch 
+Difference
+↓
+AI Root-Cause Analysis
+
+TICVAI / INVENTORY & PROCUREMENT BACKEND STRUCTURE
+CONFIDENTIAL | 76
+↓
+Investigation
+↓
+Resolution
+↓
+Inventory Accuracy Measurement
+↓
+Continuous Improvement
+IMPORTANT ARCHITECTURAL REQUIREMENT
+Board 3 should not create another inventory balance.
+There must remain one Shared Inventory Ledger.
+The clean architecture is:
+Board 1 — Inventory Master & Stock Ledger
+What do we own?
+↓
+Board 2 — Warehouse Execution
+Where is it and how do warehouse employees physically handle it?
+↓
+Board 3 — Inventory Control
+How does it move between locations, how do we verify it, and how do we correct discrepancies?
+The distinction between Board 2 and Board 3 is particularly important.
+For example:
+Main Gift Shop needs 100 T-Shirts from Central Warehouse.
+Board 3 creates and controls the Transfer.
+↓
+Board 2 performs:
+Pick Pack Stage Dispatch → → →
+↓
+Board 3 performs:
+Destination Receipt Quantity Verification Discrepancy Reconciliation Transfer Closure → → → →
+This prevents duplicated transfer logic and gives TICVAI a clean enterprise inventory architecture.
+After Board 3, the next major layer should be Board 4 — Supplier & Procurement Management, where we move
+from internal stock control into Supplier Purchase Request Requisition RFQ Quotations → → → → →
+Comparison Approval Purchase Order → → .
+
+TICVAI / INVENTORY & PROCUREMENT BACKEND STRUCTURE
+CONFIDENTIAL | 77
+TICVAI INVENTORY & PROCUREMENT — BOARD 4
+Supplier, Purchase Request & Procurement Management — Scope of Work
+1. Purpose
+The Supplier, Purchase Request & Procurement Management Board shall provide TICVAI with the centralized 
+procurement initiation and supplier-management layer for purchasing inventory, consumables, materials, 
+operational supplies, equipment and other approved goods required across the platform.
+Boards 1–3 established:
+Board 1: What inventory exists and how much stock TICVAI has.
+Board 2: Where inventory is physically stored and how warehouse operations execute it.
+Board 3: How inventory moves between locations and how stock accuracy is controlled.
+Board 4 shall establish:
+What do we need to purchase? Why do we need it? Can we fulfil it internally first? Which suppliers → → →
+can provide it? Who approves the requirement? When should procurement begin? → →
+The procurement architecture shall follow:
+Demand Internal Stock Check Replenishment Requirement Purchase Request Approval Supplier → → → → →
+Identification Procurement Process →
+This Board shall be used by:
+ Inventory
+ Warehouse
+ Food & Beverage
+ Retail
+ Rental
+ Resource Management
+ Maintenance
+
+TICVAI / INVENTORY & PROCUREMENT BACKEND STRUCTURE
+CONFIDENTIAL | 78
+ Operations
+ Events
+ Finance
+ Department Managers
+ Employee App
+ AI Replenishment Engine
+The key principle is that Procurement should begin only after TICVAI understands existing enterprise 
+inventory and internal transfer opportunities.
+PAGE 1 — Procurement Command Center
+Purpose
+Provide Procurement, Inventory, Finance and management with a real-time view of purchasing demand, purchase
+requests, supplier activity, approvals and procurement risks.
+Global Filters
+ Tenant
+ Company
+ Business Unit
+ Park
+ Venue
+ Department
+ Warehouse
+ Category
+ Supplier
+ Request Status
+ Priority
+ Buyer
+ Date / Period
+KPI Cards
+ Open Purchase Requests
+ PR Value
+ Pending Approval
+ Approved Requests
+ Urgent Requests
+ Auto-Generated Requests
+ Requests Awaiting Procurement
+ Active Suppliers
+ Suppliers with Issues
+ Procurement Lead Time
+ Potential Internal Fulfilment
+ Budget Exceptions
+ Critical Stock Risks
+Procurement Pipeline
+Display:
+
+TICVAI / INVENTORY & PROCUREMENT BACKEND STRUCTURE
+CONFIDENTIAL | 79
+Demand Identified
+→ Internal Stock Check
+→ PR Draft
+→ Submitted
+→ Approval
+→ Approved
+→ Ready for RFQ / PO
+Example:
+Demand Identified: 42
+Draft PR: 18
+Pending Approval: 14
+Approved: 26
+Ready for RFQ: 11
+Urgent: 5
+Procurement by Business Area
+Business Area Open PRs Value Urgen
+t
+Approval Status
+F&B 18 AED 184K 4 6 Attention
+Retail 12 AED 126K 2 3 Healthy
+Operations 8 AED 92K 1 2 Healthy
+Maintenance 7 AED 148K 2 4 Attention
+Procurement Alerts
+Examples:
+14 inventory items are projected to fall below safety stock before supplier lead time.
+PR-18422 has been awaiting Finance approval for 18 hours.
+Water Bottles requested by Main Gift Shop are available at two other locations.
+Supplier SUP-0042 has three recent late deliveries.
+Quick Actions
++ Purchase Request | Supplier Search | Internal Stock Check | Approval Center | View Procurement Pipeline
+PAGE 2 — Supplier Master & Supplier Profile
+Purpose
+Maintain centralized supplier records that may be used across all TICVAI procurement activities.
+There should be one Supplier Master, not separate supplier databases for Retail, F&B and other modules.
+Supplier General Information
+Capture:
+ Supplier Name
+ Supplier Code
+ Legal Name
+ Supplier Type
+ Registration Number
+ Tax / VAT Number
+
+TICVAI / INVENTORY & PROCUREMENT BACKEND STRUCTURE
+CONFIDENTIAL | 80
+ Country
+ Address
+ Contact Person
+ Email
+ Phone
+ Website
+ Currency
+ Language
+ Status
+Supplier Types
+Examples:
+ F&B Supplier
+ Retail Merchandise Supplier
+ General Supplier
+ Equipment Supplier
+ Maintenance Supplier
+ Packaging Supplier
+ Service Supplier
+ Manufacturer
+ Distributor
+A supplier may belong to multiple types.
+Commercial Information
+Capture:
+ Payment Terms
+ Default Currency
+ Minimum Order Value
+ Minimum Order Quantity
+ Standard Lead Time
+ Delivery Terms
+ Incoterms where applicable
+ Freight Terms
+ Contract Reference
+ Contract Start
+ Contract End
+Supplier Categories
+A supplier may be approved for specific:
+ Categories
+ Subcategories
+ Brands
+ Items
+ Locations
+ Companies
+Supplier Status
+ Draft
+ Under Review
+
+TICVAI / INVENTORY & PROCUREMENT BACKEND STRUCTURE
+CONFIDENTIAL | 81
+ Approved
+ Active
+ Suspended
+ Blocked
+ Expired
+ Archived
+Supplier Documents
+Support attachments such as:
+ Trade License
+ Tax Certificate
+ Bank Information
+ Insurance
+ Certifications
+ Food Safety Documents
+ Contracts
+ Product Certifications
+ Other Compliance Documents
+PAGE 3 — Supplier Qualification, Compliance & Performance
+Purpose
+Control whether suppliers are permitted to participate in procurement and continuously evaluate their 
+performance.
+Qualification Criteria
+Configurable criteria may include:
+ Commercial Registration
+ Tax Registration
+ Bank Verification
+ Insurance
+ Quality Certification
+ Food Safety Certification
+ Product Certification
+ Sustainability Requirement
+ Contract Status
+ Approved Product Categories
+Compliance Status
+Display:
+Valid
+Expiring Soon
+Expired
+Missing
+Example
+Fresh Foods UAE LLC
+Trade License:
+Valid — 184 days
+
+TICVAI / INVENTORY & PROCUREMENT BACKEND STRUCTURE
+CONFIDENTIAL | 82
+Food Safety Certificate:
+Valid — 92 days
+Insurance:
+Expires in 14 days
+Status:
+Warning
+Supplier Performance KPIs
+ On-Time Delivery %
+ Order Fill Rate
+ Quality Acceptance %
+ Quantity Accuracy
+ Price Variance
+ Return Rate
+ Damage Rate
+ Lead-Time Accuracy
+ Invoice Accuracy
+ Response Time
+ Dispute Rate
+Supplier Score
+Example:
+SUP-0042 — Fresh Foods UAE
+Quality:
+94%
+Delivery:
+82%
+Price:
+89%
+Compliance:
+100%
+Overall:
+89 / 100
+Performance Classification
+ Preferred
+ Approved
+ Conditional
+ Watchlist
+ Suspended
+Automatic Alerts
+Example:
+Supplier delivery performance has fallen below 85% for three consecutive months.
+The system may recommend review but should not automatically block the supplier unless configured policy 
+allows it.
+
+TICVAI / INVENTORY & PROCUREMENT BACKEND STRUCTURE
+CONFIDENTIAL | 83
+PAGE 4 — Supplier Item Catalog & Commercial Agreements
+Purpose
+Connect suppliers with the Inventory Item Master from Board 1 and maintain supplier-specific purchasing 
+information.
+Supplier Item Record
+For each Supplier + Inventory Item:
+ Supplier Item Code
+ TICVAI Inventory Item
+ Supplier Description
+ Purchase UOM
+ Pack Size
+ Minimum Order Quantity
+ Unit Price
+ Currency
+ Lead Time
+ Tax
+ Contract Price
+ Effective Date
+ Expiry Date
+ Preferred Supplier
+ Alternative Supplier
+ Status
+Example
+Inventory Item
+Water Bottle 500ml
+Supplier A
+Price:
+AED 1.85
+MOQ:
+1,000
+Lead Time:
+3 Days
+Supplier B
+Price:
+AED 1.72
+MOQ:
+5,000
+Lead Time:
+7 Days
+Supplier C
+Price:
+AED 2.05
+MOQ:
+500
+Lead Time:
+1 Day
+
+TICVAI / INVENTORY & PROCUREMENT BACKEND STRUCTURE
+CONFIDENTIAL | 84
+TICVAI therefore should not determine "best supplier" based only on lowest unit price.
+Commercial Agreements
+Support:
+ Contract Price
+ Volume Price
+ Tiered Price
+ Promotional Price
+ Framework Agreement
+ Fixed Period Price
+ Quantity Break
+Price History
+Maintain historical supplier pricing.
+Example:
+Effective Supplier Item Price
+Jan Supplier A Water Bottle AED 1.70
+Apr Supplier A Water Bottle AED 1.78
+Aug Supplier A Water Bottle AED 1.85
+PAGE 5 — Purchase Request Creation & Management
+Purpose
+Allow departments and operational modules to request the purchase of goods.
+Purchase Request Sources
+A PR may originate from:
+ Manual Employee Request
+ Inventory Reorder
+ Low Stock
+ Forecast Requirement
+ F&B Requirement
+ Retail Requirement
+ Event Requirement
+ Maintenance Requirement
+ Resource Requirement
+ Warehouse Requirement
+ AI Recommendation
+PR Header
+Capture:
+ PR Number
+ Company
+ Business Unit
+ Department
+ Venue
+ Requester
+ Required Date
+
+TICVAI / INVENTORY & PROCUREMENT BACKEND STRUCTURE
+CONFIDENTIAL | 85
+ Priority
+ Reason
+ Budget / Cost Center
+ Project / Event
+ Delivery Location
+PR Lines
+Capture:
+ Inventory Item
+ Description
+ Quantity
+ UOM
+ Estimated Unit Cost
+ Estimated Total
+ Required Date
+ Suggested Supplier
+ Notes
+Non-Catalog Request
+Where policy permits, users may request an item that does not yet exist in the Item Master.
+Example:
+New specialized maintenance component
+This should trigger appropriate master-data review before procurement completion.
+Supporting Documents
+Allow:
+ Specifications
+ Images
+ Supplier Proposal
+ Technical Document
+ Justification
+ Event Requirement
+PAGE 6 — Internal Stock & Transfer Check Before Procurement
+Purpose
+Prevent unnecessary purchasing when suitable inventory already exists somewhere inside the TICVAI enterprise.
+This is a particularly important TICVAI feature.
+Before a PR proceeds to external procurement, the system should check:
+ Local Available Stock
+ Warehouse Stock
+ Other Venue Stock
+ Other Store Stock
+ Other Outlet Stock
+ In-Transit Stock
+ On-Order Stock
+ Reserved Stock
+ Safety Stock
+
+TICVAI / INVENTORY & PROCUREMENT BACKEND STRUCTURE
+CONFIDENTIAL | 86
+ Forecast Demand
+Example
+Main Gift Shop requests:
+100 Water Bottles
+Local Available:
+12
+Central Warehouse:
+0
+Waterpark Shop Excess:
+58
+Adventure Store Excess:
+42
+TICVAI Recommendation
+Internal Transfer Available
+Transfer:
+58 from Waterpark
+42 from Adventure Store
+External Purchase Required:
+0
+Actions:
+Create Transfers | Continue Procurement | Modify Request
+Partial Internal Fulfilment
+Example:
+Required:
+500
+Internal Excess:
+180
+Remaining:
+320
+TICVAI recommends:
+Transfer 180 internally + Procure 320 externally
+Override
+If user continues procurement despite available internal stock:
+Reason Required
+Examples:
+ Different Batch Required
+ Event-Dedicated Stock
+ Internal Stock Not Suitable
+ Transfer Lead Time Too Long
+ Management Decision
+
+TICVAI / INVENTORY & PROCUREMENT BACKEND STRUCTURE
+CONFIDENTIAL | 87
+PAGE 7 — Auto-Replenishment & System-Generated Purchase 
+Requests
+Purpose
+Allow TICVAI to automatically create procurement demand based on inventory policies and operational forecasts.
+Trigger Sources
+ Minimum Stock
+ Reorder Point
+ Safety Stock
+ Par Level
+ Forecast Demand
+ Event Demand
+ Seasonal Requirement
+ Production Requirement
+ Supplier Lead Time
+ Existing On-Order Quantity
+Example
+Beef Patty
+Available:
+420
+Safety Stock:
+200
+Forecast 5-Day Consumption:
+580
+Incoming:
+100
+Projected Position:
+-60
+Recommended Purchase:
+260 units
+System Action
+Depending on tenant policy:
+Option A
+Generate Recommendation Only
+Option B
+Create Draft PR
+Option C
+Create PR and Submit for Approval
+I recommend Option B — Create Draft PR as the standard TICVAI behavior.
+This preserves human control while removing repetitive work.
+Auto-PR Information
+The generated request should explain:
+Why it was created.
+Example:
+
+TICVAI / INVENTORY & PROCUREMENT BACKEND STRUCTURE
+CONFIDENTIAL | 88
+Created because projected inventory will fall below safety stock on 18 Aug based on current demand and supplier 
+lead time.
+PAGE 8 — Purchase Request Approval & Budget Control
+Purpose
+Apply configurable approval workflows before procurement commits to external sourcing.
+Approval Inputs
+Rules may consider:
+ PR Value
+ Department
+ Item Category
+ Company
+ Cost Center
+ Budget
+ Requester
+ Supplier
+ Priority
+ Emergency Status
+Example Approval Matrix
+Up to AED 5,000
+Department Manager
+AED 5,001–25,000
+Department Manager + Finance
+AED 25,001–100,000
+Director + Finance
+Above AED 100,000
+Senior Management
+These thresholds must be tenant-configurable.
+Budget Validation
+Where Finance provides budget information:
+Requested:
+AED 84,000
+Available Budget:
+AED 112,000
+Remaining After PR:
+AED 28,000
+Result:
+Within Budget
+Budget Exception
+Requested:
+AED 84,000
+Available:
+AED 60,000
+Result:
+
+TICVAI / INVENTORY & PROCUREMENT BACKEND STRUCTURE
+CONFIDENTIAL | 89
+Budget Exception
+Actions:
+Return | Modify | Request Exception Approval
+Approval Actions
+ Approve
+ Reject
+ Return for Modification
+ Delegate
+ Request Information
+No separate procurement approval engine shall be built; Board 4 shall use TICVAI's common Approval Engine.
+PAGE 9 — Procurement Demand Consolidation & Sourcing 
+Preparation
+Purpose
+Allow Procurement teams to consolidate approved requirements before initiating RFQ or Purchase Order activity.
+Example
+Approved requirements:
+Main Restaurant:
+100 units
+VIP Lounge:
+60 units
+Beach Kiosk:
+40 units
+Retail Event:
+100 units
+Same Inventory Item:
+Total Requirement = 300 units
+Instead of issuing multiple supplier requests, Procurement may consolidate them.
+Consolidation Criteria
+Support grouping by:
+ Inventory Item
+ Category
+ Supplier
+ Required Date
+ Delivery Location
+ Company
+ Currency
+ Contract
+Procurement Workbench
+Display:
+Requirement Item Qty Needed Supplier Options Action
+PR-18421 Beef Patty 300 18 Aug 3 RFQ
+PR-18422 Water Bottle 2,000 20 Aug 4 RFQ
+
+TICVAI / INVENTORY & PROCUREMENT BACKEND STRUCTURE
+CONFIDENTIAL | 90
+Requirement Item Qty Needed Supplier Options Action
+PR-18423 T-Shirt 500 28 Aug 2 Direct PO
+Sourcing Route
+Authorized users select:
+RFQ
+or
+Direct Purchase Order
+or
+Existing Contract
+or
+Framework Agreement
+according to procurement policy.
+Direct PO Rules
+Example:
+Existing contracted supplier + agreed price + value below threshold
+→ Direct PO permitted.
+Otherwise:
+→ RFQ required.
+The RFQ, quotation comparison and PO process will be expanded in Board 5.
+PAGE 10 — Procurement AI, Exceptions & Action Center
+Purpose
+Provide centralized intelligence for procurement demand, supplier risk, stock availability, budget risk and 
+purchasing opportunities.
+Exception Categories
+ Urgent Stock Requirement
+ PR Approval Delay
+ Duplicate PR
+ Internal Stock Available
+ Budget Exception
+ Supplier Compliance Risk
+ Supplier Lead-Time Risk
+ Price Increase
+ Contract Expiring
+ Repeated Emergency Purchase
+ Excessive Manual Procurement
+AI — PURCHASE NEED RECOMMENDATION
+Example:
+Item
+Water Bottle 500ml
+Available:
+1,420
+
+TICVAI / INVENTORY & PROCUREMENT BACKEND STRUCTURE
+CONFIDENTIAL | 91
+In Transit:
+500
+Forecast 14-Day Demand:
+3,800
+Safety Stock:
+600
+Expected Position:
+-1,480
+Recommendation
+Procure:
+1,500 units
+Required Delivery:
+Before 22 Aug
+Confidence:
+94%
+Explanation
+Based on:
+ Current Inventory
+ Existing Transfers
+ Existing POs
+ Sales Velocity
+ Ticket Forecast
+ Event Schedule
+ Safety Stock
+AI — INTERNAL FULFILMENT BEFORE PURCHASE
+Example:
+PR-18428 requests 120 Logo Caps.
+TICVAI finds:
+Central Warehouse:
+0
+Waterpark:
+80 excess
+Event Warehouse:
+50 excess
+Recommendation:
+Transfer 120 internally instead of purchasing.
+Estimated Purchase Avoidance:
+AED 3,240
+Actions:
+Create Transfer | Continue PR | Review Stock
+AI — DUPLICATE DEMAND DETECTION
+Example:
+F&B Operations submits:
+PR-18420:
+500 Water Bottles
+
+TICVAI / INVENTORY & PROCUREMENT BACKEND STRUCTURE
+CONFIDENTIAL | 92
+Retail submits:
+PR-18426:
+800 Water Bottles
+Event Operations submits:
+PR-18431:
+1,200 Water Bottles
+All required within:
+3 days.
+AI Recommendation:
+Consolidate into one procurement requirement for 2,500 units to improve sourcing efficiency and potential 
+volume pricing.
+AI — SUPPLIER RECOMMENDATION
+TICVAI should evaluate suppliers using more than price.
+Example:
+Factor Supplier A Supplier B Supplier C
+Price AED 1.85 AED 1.72 AED 2.05
+Lead Time 3d 7d 1d
+Delivery Score 96% 84% 98%
+Quality 94% 96% 97%
+MOQ 1,000 5,000 500
+Required:
+1,500 units
+Needed:
+In 3 days
+AI Recommendation
+Supplier A
+Reason:
+ Meets required date
+ Strong delivery history
+ Acceptable MOQ
+ Lower total risk than Supplier B
+ Lower cost than Supplier C
+Confidence:
+91%
+This is a recommendation only; supplier selection remains governed by procurement policy and approvals.
+AI — PRICE ANOMALY DETECTION
+Example:
+Supplier quotation:
+AED 2.15/unit
+Last Purchase:
+AED 1.82
+Contract Reference:
+AED 1.85
+
+TICVAI / INVENTORY & PROCUREMENT BACKEND STRUCTURE
+CONFIDENTIAL | 93
+Increase:
++16.2%
+TICVAI Alert:
+Proposed supplier price materially exceeds recent and contracted pricing.
+Actions:
+Review History | Request Clarification | Compare Suppliers
+AI — PROCUREMENT TIMING
+TICVAI should recommend when to purchase, not only how much.
+Example:
+Current Stock:
+2,400
+Forecast Daily Demand:
+180
+Safety Stock:
+600
+Supplier Lead Time:
+5 Days
+Recommended Order Date:
+18 Aug
+Recommended Delivery:
+23 Aug
+This reduces unnecessary early purchasing and inventory holding.
+AI — EMERGENCY PROCUREMENT ANALYSIS
+TICVAI should monitor repeated urgent purchases.
+Example:
+F&B has raised 14 emergency PRs for Fresh Milk during the past 60 days.
+Potential Cause:
+Reorder Point Too Low
+or
+Supplier Lead-Time Configuration Inaccurate
+Recommendation:
+Review replenishment policy instead of continuing emergency purchasing.
+This connects procurement intelligence back to Board 1 stock policies and Board 6 forecasting.
+PURCHASE REQUEST LIFECYCLE
+The standard lifecycle should be:
+Draft
+→ Internal Stock Check
+→ Submitted
+→ Pending Approval
+→ Approved
+→ Procurement Review
+→ Consolidated where applicable
+→ RFQ / Contract / Direct PO
+→ Converted
+
+TICVAI / INVENTORY & PROCUREMENT BACKEND STRUCTURE
+CONFIDENTIAL | 94
+→ Closed
+Alternative statuses:
+ Returned
+ Rejected
+ Cancelled
+ Partially Converted
+ On Hold
+SUPPLIER ONBOARDING WORKFLOW
+Supplier onboarding should follow:
+Supplier Request
+↓
+Supplier Data
+↓
+Required Documents
+↓
+Compliance Review
+↓
+Commercial Review
+↓
+Finance / Bank Validation where applicable
+↓
+Approval
+↓
+Active Supplier
+Expiry Monitoring
+TICVAI should monitor supplier documentation.
+Example:
+Supplier food-safety certification expires in 14 days.
+Depending on policy:
+Warning
+or
+Prevent New Orders after Expiry
+SUPPLIER DUPLICATE PREVENTION
+Before creating a supplier, TICVAI should search:
+ Legal Name
+ Registration Number
+ Tax Number
+ Bank Details where permitted
+ Email
+ Phone
+Example:
+Potential duplicate supplier detected: Fresh Foods UAE LLC / Fresh Food UAE L.L.C.
+Actions:
+Compare | Merge Request | Continue Creation
+
+TICVAI / INVENTORY & PROCUREMENT BACKEND STRUCTURE
+CONFIDENTIAL | 95
+PROCUREMENT CATEGORY MANAGEMENT
+Procurement should support category ownership.
+Examples:
+F&B
+ Fresh Food
+ Frozen
+ Dry Goods
+ Beverages
+ Packaging
+Retail
+ Apparel
+ Souvenirs
+ Toys
+ Merchandise
+Operations
+ Cleaning
+ Consumables
+ Maintenance
+ Equipment
+Each category may have:
+ Category Manager
+ Approved Suppliers
+ Procurement Policy
+ RFQ Threshold
+ Approval Rules
+ Contract Requirements
+CONTRACT / AGREEMENT REFERENCE
+Board 4 does not need to become a complete Contract Management System, but procurement should be able to 
+reference supplier commercial agreements.
+Capture:
+ Agreement Number
+ Supplier
+ Effective Date
+ Expiry
+ Categories
+ Items
+ Agreed Prices
+ Spend Limit
+ Document
+Contract Alert
+Supplier contract SUP-C-1842 expires in 30 days.
+F&B INTEGRATION
+Example:
+F&B Board identifies:
+
+TICVAI / INVENTORY & PROCUREMENT BACKEND STRUCTURE
+CONFIDENTIAL | 96
+Beef Patty projected shortage.
+↓
+Shared Inventory checks:
+Main Restaurant
+Other Outlets
+F&B Warehouse
+Central Warehouse
+In Transit
+On Order
+↓
+Internal supply insufficient.
+↓
+Board 4 creates:
+Draft Purchase Request
+↓
+Required:
+500 units
+Required Date:
+18 Aug
+Reason:
+Forecast Consumption + Safety Stock
+↓
+Approval
+↓
+Procurement.
+RETAIL INTEGRATION
+Example:
+Retail forecast identifies:
+Concert T-Shirt requirement:
+2,150
+Available + Incoming:
+1,820
+Shortfall:
+330
+Safety Stock:
+100
+Recommended Purchase:
+450 units
+Board 4 creates:
+Draft PR — Event Merchandise
+with event reference automatically attached.
+MAINTENANCE / RESOURCE INTEGRATION
+Example:
+Resource Management identifies maintenance requirement:
+Replacement Scanner Batteries:
+
+TICVAI / INVENTORY & PROCUREMENT BACKEND STRUCTURE
+CONFIDENTIAL | 97
+100
+Available:
+20
+Required:
+120
+↓
+Procurement Requirement:
+100
+The same procurement engine is used.
+We should not create separate purchasing systems for F&B, Retail, Maintenance or Resources.
+EMPLOYEE APP INTEGRATION
+Authorized employees should be able to:
+ Create Purchase Request
+ Search Inventory Item
+ Enter Quantity
+ Select Required Date
+ Add Justification
+ Attach Photo / Document
+ View PR Status
+ Respond to Returned Request
+ Approve / Reject where authorized
+Example
+Purchase Request PR-18422
+Status:
+Pending Finance Approval
+Required:
+20 Aug
+Estimated:
+AED 18,400
+NOTIFICATIONS
+Notifications may be generated for:
+ PR Submitted
+ Approval Required
+ PR Approved
+ PR Rejected
+ PR Returned
+ Supplier Document Expiring
+ Budget Exception
+ Urgent Requirement
+ Procurement Delay
+ Supplier Risk
+Channels may include:
+ Employee App
+ In-App Notification
+
+TICVAI / INVENTORY & PROCUREMENT BACKEND STRUCTURE
+CONFIDENTIAL | 98
+ Email
+ Other configured enterprise channels
+APPROVAL ENGINE
+Board 4 shall consume the common TICVAI Approval Engine.
+Approval workflows should support:
+ Sequential Approval
+ Parallel Approval
+ Conditional Approval
+ Value-Based Approval
+ Category-Based Approval
+ Department-Based Approval
+ Emergency Approval
+ Delegated Approval
+Example
+PR = AED 84,000
+Department Manager
+↓
+Procurement Manager
+↓
+Finance
+↓
+Director
+↓
+Approved
+The procurement module should display approval status but should not maintain a separate approval framework.
+SEGREGATION OF DUTIES
+Procurement should support controls such as:
+Requester = Final Approver
+Supplier Creator = Supplier Approver
+Buyer = Final High-Value PO Approver
+where tenant policy requires it.
+These controls shall use TICVAI's common RBAC/PBAC and SoD architecture.
+AUDIT & TRACEABILITY
+Board 4 shall retain complete history for:
+Supplier
+ Creation
+ Changes
+ Compliance
+ Status
+ Approvals
+Purchase Request
+ Request
+ Modification
+ Approval
+
+TICVAI / INVENTORY & PROCUREMENT BACKEND STRUCTURE
+CONFIDENTIAL | 99
+ Rejection
+ Internal Stock Recommendation
+ Conversion
+Commercial Data
+ Supplier Price
+ MOQ
+ Lead Time
+ Contract Reference
+Audit record:
+User + Date/Time + Action + Previous Value + New Value + Reason + Approval
+BOARD 4 — FINAL 10 SCREENS
+# Screen
+1 Procurement Command Center
+2 Supplier Master & Supplier Profile
+3 Supplier Qualification, Compliance & Performance
+4 Supplier Item Catalog & Commercial Agreements
+5 Purchase Request Creation & Management
+6 Internal Stock & Transfer Check Before Procurement
+7 Auto-Replenishment & System-Generated Purchase Requests
+8 Purchase Request Approval & Budget Control
+9 Procurement Demand Consolidation & Sourcing Preparation
+1
+0
+Procurement AI, Exceptions & Action Center
+COMPLETE BOARD 4 FLOW
+OPERATIONAL DEMAND
+Retail / F&B / Warehouse / Event / Maintenance / Resource Management
+↓
+Inventory Requirement
+↓
+SHARED INVENTORY CHECK
+Local Available
+↓
+Warehouse Available
+↓
+Other Locations
+↓
+In Transit
+↓
+On Order
+↓
+Safety Stock / Forecast
+
+TICVAI / INVENTORY & PROCUREMENT BACKEND STRUCTURE
+CONFIDENTIAL | 100
+↓
+CAN REQUIREMENT BE FULFILLED INTERNALLY?
+YES
+→ Board 3 Internal Transfer
+→ Board 2 Warehouse Execution
+→ Requirement Fulfilled
+PARTIALLY
+→ Internal Transfer
+
+Purchase Remaining Quantity
+NO
+→ Purchase Request
+↓
+Budget / Cost Center Validation
+↓
+Approval
+↓
+Procurement Consolidation
+↓
+Supplier / Contract Evaluation
+↓
+RFQ / Direct PO
+↓
+Board 5
+PROCUREMENT INTELLIGENCE LOOP
+Current Stock
+
+Consumption / Sales
+
+Forecast Demand
+
+Ticket / Event Forecast
+
+Safety Stock
+
+Existing Transfers
+
+Open Purchase Orders
+
+Supplier Lead Time
+↓
+TICVAI PROCUREMENT INTELLIGENCE
+↓
+Recommend:
+Transfer Internally
+or
+Wait
+or
+Purchase
+↓
+If Purchase:
+
+TICVAI / INVENTORY & PROCUREMENT BACKEND STRUCTURE
+CONFIDENTIAL | 101
+What Quantity?
+When?
+Which Supplier Options?
+What Expected Cost?
+↓
+Human Review / Approval
+↓
+Procurement Execution
+↓
+Supplier Performance Measurement
+↓
+Future Recommendation Improvement
+IMPORTANT ARCHITECTURAL REQUIREMENT
+I recommend we make one boundary very clear to SoftLab:
+Board 4 owns:
+Supplier Master + Supplier Qualification + Supplier Catalog + Purchase Request + Internal Stock Check + 
+Approval + Demand Consolidation
+It should not yet own the complete RFQ, quotation and Purchase Order transaction lifecycle.
+That belongs to the next board.
+Therefore:
+Board 4 — Procurement Initiation
+Demand PR Approval Sourcing Requirement → → →
+↓
+Board 5 — Sourcing & Purchase Order
+RFQ Supplier Quotes Comparison Negotiation Award PO → → → → →
+↓
+Later:
+Receiving / GRN / Invoice Matching
+This separation is important because otherwise Board 4 becomes overloaded and SoftLab may mix requesting 
+something with commercially purchasing it.
+The other architectural point I strongly recommend is the Internal Fulfilment Gate:
+Before TICVAI purchases externally, it should always understand whether the requirement can be fulfilled 
+from existing enterprise inventory.
+That gives TICVAI a much stronger workflow than a conventional procurement system:
+Need Check Transfer Procure only the remaining requirement. → → →
+It connects the work we already completed across F&B, Retail, Shared Inventory, Warehouse and Inventory 
+Control into one coherent procurement architecture.
+
+TICVAI / INVENTORY & PROCUREMENT BACKEND STRUCTURE
+CONFIDENTIAL | 102
+TICVAI INVENTORY & PROCUREMENT — BOARD 5
+RFQ, Supplier Quotation, Sourcing & Purchase Order Management — Scope of
+Work
+1. Purpose
+The RFQ, Supplier Quotation, Sourcing & Purchase Order Management Board shall provide TICVAI with the 
+centralized commercial procurement execution layer for converting approved purchasing demand into controlled 
+supplier sourcing and Purchase Orders.
+Board 4 established:
+What needs to be purchased Internal stock check Purchase Request Approval Consolidated → → → →
+procurement demand.
+Board 5 shall establish:
+How do we source it? Which suppliers should be invited? What did each supplier offer? Which offer → → →
+provides the best overall value? Who approves the award? How is the Purchase Order created and → →
+controlled?
+The core lifecycle shall follow:
+Approved Demand Sourcing Strategy RFQ Supplier Quotations Commercial / Technical Evaluation → → → → →
+Comparison Negotiation Award Recommendation Approval Purchase Order Supplier → → → → →
+Acknowledgement Order Tracking →
+The Board shall support purchasing for:
+ Food & Beverage
+ Retail
+ Inventory Replenishment
+ Operations
+ Maintenance
+ Rental
+
+TICVAI / INVENTORY & PROCUREMENT BACKEND STRUCTURE
+CONFIDENTIAL | 103
+ Equipment
+ Events
+ Packaging
+ Consumables
+ General Procurement
+The Board shall integrate with TICVAI's shared:
+ Inventory Engine
+ Supplier Master
+ Approval Engine
+ Finance
+ Budget Control
+ Warehouse
+ Receiving / GRN
+ Employee App
+ Analytics & AI
+PAGE 1 — Sourcing & Purchase Order Command Center
+Purpose
+Provide Procurement management with a real-time overview of RFQs, supplier responses, sourcing decisions, 
+Purchase Orders and commercial exceptions.
+Global Filters
+ Tenant
+ Company
+ Business Unit
+ Procurement Category
+ Buyer
+ Supplier
+ RFQ Status
+ PO Status
+ Priority
+ Required Date
+ Date / Period
+KPI Cards
+ Open RFQs
+ RFQ Value
+ Suppliers Invited
+ Quotations Received
+ Quotations Pending
+ RFQs Closing Today
+ Awards Pending Approval
+ Purchase Orders Created
+ Open PO Value
+ POs Awaiting Supplier Confirmation
+ Late POs
+
+TICVAI / INVENTORY & PROCUREMENT BACKEND STRUCTURE
+CONFIDENTIAL | 104
+ Savings vs Estimate
+ Contract Coverage %
+ Critical Sourcing Alerts
+Sourcing Pipeline
+Display:
+Approved Demand
+→ RFQ Preparation
+→ RFQ Issued
+→ Supplier Response
+→ Evaluation
+→ Negotiation
+→ Award
+→ PO Creation
+→ Supplier Confirmation
+Example:
+Approved Demand: 24
+RFQ Draft: 8
+RFQ Issued: 12
+Evaluation: 7
+Award Pending: 4
+PO Created: 18
+Supplier Confirmation Pending: 5
+Category Spend Snapshot
+Category Open Sourcing PO Value Savings Risk
+F&B 8 AED 620K AED 42K Medium
+Retail 6 AED 410K AED 31K Low
+Maintenance 5 AED 380K AED 18K High
+Operations 3 AED 190K AED 9K Low
+Alerts
+Examples:
+RFQ-18421 closes in 2 hours with only one supplier response.
+Supplier SUP-0042 increased price 16.2% versus last purchase.
+PO-18438 has not been acknowledged by supplier within SLA.
+Award recommendation exceeds approved PR budget by AED 12,800.
+Quick Actions
++ RFQ | Compare Quotes | Award Review | + Purchase Order | Supplier Follow-Up | View 
+Exceptions
+PAGE 2 — RFQ Creation & Sourcing Strategy
+Purpose
+Create a formal Request for Quotation from approved procurement demand.
+
+TICVAI / INVENTORY & PROCUREMENT BACKEND STRUCTURE
+CONFIDENTIAL | 105
+RFQ Sources
+An RFQ may originate from:
+ Single Approved PR
+ Multiple Consolidated PRs
+ Replenishment Requirement
+ Event Requirement
+ Framework Re-Sourcing
+ Contract Expiry
+ Manual Authorized Sourcing
+RFQ Header
+Capture:
+ RFQ Number
+ Company
+ Procurement Category
+ Buyer
+ Requesting Department
+ Delivery Location
+ Required Delivery Date
+ Currency
+ Submission Deadline
+ Evaluation Method
+ Commercial Terms
+ Notes
+RFQ Lines
+For each item:
+ Inventory Item
+ Description
+ Specification
+ Quantity
+ Purchase UOM
+ Required Date
+ Estimated Price
+ Budget Reference
+ Delivery Location
+Sourcing Strategy
+Configure:
+ Open to Approved Suppliers
+ Selected Supplier List
+ Preferred Suppliers Only
+ Contracted Suppliers
+ Emergency Sourcing
+ Single-Source Procurement
+ Competitive RFQ
+Minimum Responses
+Example:
+
+TICVAI / INVENTORY & PROCUREMENT BACKEND STRUCTURE
+CONFIDENTIAL | 106
+Standard Procurement:
+Minimum 3 Quotations
+Emergency:
+Minimum 1
+Strategic / High Value:
+Configurable policy.
+Documents
+Attach:
+ Specifications
+ Drawings
+ Product Images
+ Technical Requirements
+ Terms & Conditions
+ Compliance Requirements
+PAGE 3 — Supplier Invitation & RFQ Response Management
+Purpose
+Manage supplier participation and quotation submission.
+Supplier Selection
+TICVAI should recommend eligible suppliers based on:
+ Approved Category
+ Item Capability
+ Compliance Status
+ Supplier Status
+ Delivery Geography
+ Historical Performance
+ Contract Status
+Supplier Invitation
+Track:
+ Supplier
+ Invitation Date
+ Contact
+ Delivery Status
+ Viewed
+ Response Intent
+ Quotation Submitted
+ Declined
+ No Response
+Supplier Response Status
+ Invited
+ Viewed
+ Participating
+ Submitted
+ Declined
+
+TICVAI / INVENTORY & PROCUREMENT BACKEND STRUCTURE
+CONFIDENTIAL | 107
+ Late
+ Disqualified
+Supplier Portal / Integration
+The architecture should support a future supplier-facing portal or secure external submission mechanism allowing
+suppliers to:
+ View RFQ
+ Download Specification
+ Enter Prices
+ Enter Lead Time
+ Enter MOQ
+ Confirm Tax
+ Confirm Delivery
+ Upload Quote
+ Submit Clarification
+Clarification Management
+Buyer and supplier should be able to record controlled RFQ clarifications.
+Example:
+Supplier asks:
+Is equivalent packaging acceptable?
+Buyer response:
+Yes, subject to food-grade certification.
+All clarifications should remain part of RFQ history.
+PAGE 4 — Supplier Quotation Management
+Purpose
+Capture and normalize supplier offers for comparison.
+Quotation Header
+Capture:
+ Quotation Number
+ Supplier
+ RFQ
+ Quote Date
+ Valid Until
+ Currency
+ Payment Terms
+ Delivery Terms
+ Lead Time
+ Freight
+ Tax
+ Warranty
+ Notes
+Quotation Lines
+Capture:
+ Item
+
+TICVAI / INVENTORY & PROCUREMENT BACKEND STRUCTURE
+CONFIDENTIAL | 108
+ Supplier Item Code
+ Offered Quantity
+ Unit Price
+ Discount
+ Tax
+ Freight Allocation
+ Total Cost
+ MOQ
+ Pack Size
+ Lead Time
+ Delivery Date
+ Substitute Item where permitted
+Landed Cost
+Where applicable, TICVAI should support comparison using:
+Unit Price + Freight + Duty + Applicable Charges = Estimated Landed Cost
+rather than comparing only headline unit price.
+Alternative Offer
+Example:
+Requested:
+Brand A Water Bottle
+Supplier proposes:
+Brand B equivalent
+The alternative should be clearly flagged and require acceptance where specifications differ.
+Quote Validation
+TICVAI should identify:
+ Missing Price
+ Invalid UOM
+ Price Currency Mismatch
+ Delivery After Required Date
+ MOQ Above Requirement
+ Expired Quote
+ Unapproved Substitute
+PAGE 5 — Quotation Comparison & Supplier Evaluation
+Purpose
+Provide a side-by-side sourcing evaluation rather than manually comparing supplier spreadsheets.
+Comparison Example
+Criteria Supplier A Supplier B Supplier C
+Unit Price AED 1.85 AED 1.72 AED 2.05
+Landed Cost AED 1.93 AED 1.84 AED 2.08
+Lead Time 3 Days 7 Days 1 Day
+MOQ 1,000 5,000 500
+
+TICVAI / INVENTORY & PROCUREMENT BACKEND STRUCTURE
+CONFIDENTIAL | 109
+Criteria Supplier A Supplier B Supplier C
+Delivery Score 96% 84% 98%
+Quality Score 94% 96% 97%
+Compliance Pass Pass Pass
+Total Score 91 82 89
+Evaluation Dimensions
+Support weighted evaluation based on:
+ Price
+ Total Cost
+ Lead Time
+ Quality
+ Delivery Performance
+ MOQ
+ Compliance
+ Payment Terms
+ Warranty
+ Supplier Risk
+ Sustainability where applicable
+ Technical Evaluation
+Configurable Weighting
+Example:
+Price:
+35%
+Quality:
+25%
+Delivery:
+20%
+Lead Time:
+10%
+Compliance:
+10%
+Technical vs Commercial Evaluation
+For appropriate procurement:
+Technical Evaluation
+and
+Commercial Evaluation
+should be separable.
+Commercial users should not necessarily influence technical scoring before technical qualification is complete.
+Recommendation
+TICVAI may recommend:
+Best Overall Value
+not merely:
+Lowest Price
+
+TICVAI / INVENTORY & PROCUREMENT BACKEND STRUCTURE
+CONFIDENTIAL | 110
+PAGE 6 — Negotiation & Best-and-Final-Offer Management
+Purpose
+Support controlled supplier negotiation and revised quotations.
+Negotiation Round
+Example:
+RFQ-18421
+Round 1
+Supplier A:
+AED 184K
+Supplier B:
+AED 176K
+Supplier C:
+AED 196K
+Buyer initiates:
+Best & Final Offer
+Supplier Revision
+Track:
+ Original Quote
+ Revised Quote
+ Revision Number
+ Revision Date
+ Price Change
+ Term Change
+ Delivery Change
+ Notes
+Negotiation Log
+Capture:
+ Meeting
+ Call
+ Email Summary
+ Commercial Clarification
+ Requested Revision
+ Supplier Response
+Savings
+TICVAI should calculate:
+Initial Estimate
+vs
+Initial Quote
+vs
+Final Negotiated Price
+Example:
+Budget Estimate:
+AED 200K
+Initial Best Quote:
+AED 186K
+
+TICVAI / INVENTORY & PROCUREMENT BACKEND STRUCTURE
+CONFIDENTIAL | 111
+Final Award:
+AED 174K
+Savings vs Estimate:
+AED 26K / 13%
+Governance
+Negotiation history should not be overwritten.
+Each commercial revision shall be retained.
+PAGE 7 — Award Recommendation & Approval
+Purpose
+Formally recommend the selected supplier and obtain required approvals before commercial commitment.
+Award Recommendation
+Capture:
+ RFQ
+ Recommended Supplier
+ Recommended Lines
+ Total Award Value
+ Delivery Date
+ Commercial Terms
+ Evaluation Score
+ Savings
+ Reason for Selection
+ Buyer Recommendation
+Split Award
+TICVAI should support awarding different lines or quantities to different suppliers.
+Example:
+Supplier A:
+60% quantity
+Supplier C:
+40% quantity
+Reason:
+Capacity / Delivery Risk.
+Award Scenarios
+ Single Supplier
+ Split Supplier
+ Multi-Supplier Framework
+ Partial Award
+ No Award / Re-Tender
+Approval Validation
+Before submission:
+TICVAI checks:
+✓ PR Approved
+✓ Budget Available / Exception Approved
+✓ Supplier Approved
+
+TICVAI / INVENTORY & PROCUREMENT BACKEND STRUCTURE
+CONFIDENTIAL | 112
+✓ Supplier Compliance Valid
+✓ Quote Valid
+✓ Required Evaluation Complete
+✓ Award within Procurement Policy
+Approval Actions
+Approve | Reject | Return | Request Clarification
+Deviation Approval
+If buyer selects a supplier that is not the top system-ranked supplier:
+Reason Required
+Example:
+Supplier A selected over cheaper Supplier B due to delivery date requirement.
+This maintains transparency without forcing the AI recommendation.
+PAGE 8 — Purchase Order Creation & Management
+Purpose
+Convert approved sourcing awards or approved direct-purchase requirements into formal Purchase Orders.
+PO Creation Sources
+ Approved RFQ Award
+ Direct PO
+ Existing Contract
+ Framework Agreement
+ Emergency Procurement
+PO Header
+Capture:
+ PO Number
+ Supplier
+ Company
+ Buyer
+ Currency
+ Order Date
+ Delivery Location
+ Required Date
+ Payment Terms
+ Delivery Terms
+ Contract Reference
+ Cost Center
+ Budget
+ Status
+PO Lines
+ Inventory Item
+ Description
+ Supplier Item
+ Quantity
+ UOM
+
+TICVAI / INVENTORY & PROCUREMENT BACKEND STRUCTURE
+CONFIDENTIAL | 113
+ Unit Price
+ Discount
+ Tax
+ Freight
+ Total
+ Delivery Date
+PO Totals
+Display:
+Subtotal
+Discount
+Freight
+Tax
+Other Charges
+Total PO Value
+PO Lifecycle
+Draft
+→ Approval if required
+→ Issued
+→ Supplier Acknowledged
+→ Partially Delivered
+→ Fully Delivered
+→ Closed
+Alternative statuses:
+ On Hold
+ Amended
+ Cancelled
+ Disputed
+PAGE 9 — PO Amendment, Supplier Acknowledgement & Order 
+Tracking
+Purpose
+Control changes after a PO has been issued and track supplier commitment.
+Supplier Acknowledgement
+Supplier should confirm:
+ PO Received
+ Quantity Accepted
+ Price Accepted
+ Delivery Date
+ Terms
+ Exceptions
+Acknowledgement Status
+ Awaiting
+ Confirmed
+ Confirmed with Changes
+
+TICVAI / INVENTORY & PROCUREMENT BACKEND STRUCTURE
+CONFIDENTIAL | 114
+ Rejected
+ Overdue
+PO Amendment
+Changes may include:
+ Quantity
+ Price
+ Delivery Date
+ Delivery Location
+ Item
+ Commercial Terms
+Amendment Control
+Example:
+PO Value:
+AED 184,000
+Proposed Change:
++AED 28,000
+Change:
++15.2%
+Result:
+Reapproval Required
+Versioning
+PO V1
+↓
+PO V2 Amendment
+↓
+PO V3 Final
+All versions must remain traceable.
+Delivery Schedule
+Support multiple scheduled deliveries.
+Example:
+PO 1,000 units
+Delivery 1:
+400 — 20 Aug
+Delivery 2:
+300 — 27 Aug
+Delivery 3:
+300 — 3 Sep
+Order Tracking
+Display:
+Ordered
+Acknowledged
+Expected
+Shipped, where integrated
+Partially Received
+Received
+Outstanding
+
+TICVAI / INVENTORY & PROCUREMENT BACKEND STRUCTURE
+CONFIDENTIAL | 115
+PAGE 10 — Sourcing AI, Savings & Procurement Exception Center
+Purpose
+Provide AI-driven sourcing recommendations and centralized control of commercial procurement risks.
+Exception Categories
+ Insufficient Supplier Responses
+ Supplier Non-Response
+ Price Increase
+ Quote Above Budget
+ Delivery Date Risk
+ Supplier Compliance Expiry
+ PO Not Acknowledged
+ Late PO
+ Excessive PO Amendment
+ Single-Source Procurement
+ Contract Price Variance
+ MOQ Exception
+AI — SUPPLIER SELECTION RECOMMENDATION
+Example:
+Required:
+1,500 Water Bottles
+Needed:
+Within 3 Days
+Supplier A
+Total:
+AED 2,895
+Lead:
+3 Days
+Delivery:
+96%
+Supplier B
+Total:
+AED 2,760
+Lead:
+7 Days
+Delivery:
+84%
+Supplier C
+Total:
+AED 3,120
+Lead:
+1 Day
+Delivery:
+98%
+
+TICVAI / INVENTORY & PROCUREMENT BACKEND STRUCTURE
+CONFIDENTIAL | 116
+TICVAI Recommendation
+Supplier A
+Reason:
+ Meets required delivery date
+ Strong delivery history
+ Lower cost than Supplier C
+ Supplier B cannot meet required date
+Confidence:
+91%
+Actions:
+View Analysis | Select | Compare | Override
+AI — TOTAL COST ANALYSIS
+TICVAI should consider the true commercial impact.
+Example:
+Supplier A
+Price:
+AED 100K
+Freight:
+AED 8K
+Expected Delay Risk:
+Low
+Supplier B
+Price:
+AED 94K
+Freight:
+AED 12K
+Expected Delay Risk:
+High
+Potential emergency purchasing cost if late:
+AED 18K
+TICVAI may determine Supplier A provides the lower risk-adjusted total cost.
+The system should clearly explain assumptions rather than hiding them.
+AI — PRICE BENCHMARKING
+TICVAI should compare offered prices against internal historical data.
+Example:
+Current Quote:
+AED 12.80
+Last Purchase:
+AED 11.40
+12-Month Average:
+AED 11.65
+Contract Reference:
+AED 11.80
+Variance vs Average:
+
+TICVAI / INVENTORY & PROCUREMENT BACKEND STRUCTURE
+CONFIDENTIAL | 117
++9.9%
+Alert:
+Quotation exceeds recent historical pricing.
+Actions
+Review History | Negotiate | Accept with Reason
+AI — QUOTE NORMALIZATION
+Suppliers may quote in different:
+ Currencies
+ UOMs
+ Pack Sizes
+ Freight Terms
+Example:
+Supplier A:
+AED 120 / Case
+12 units / Case
+= AED 10/unit
+Supplier B:
+USD 2.60 / Unit
+The system should normalize the commercial comparison using approved exchange-rate and UOM services.
+AI — AWARD SCENARIO SIMULATION
+Before awarding, users should be able to simulate sourcing strategies.
+Example:
+Scenario A — Supplier A Only
+Cost:
+AED 180K
+Delivery Risk:
+Low
+Scenario B — Supplier B Only
+Cost:
+AED 169K
+Delivery Risk:
+High
+Scenario C — Split A/B
+Cost:
+AED 174K
+Delivery Risk:
+Medium-Low
+Recommendation:
+Scenario C
+This is especially valuable for large or critical procurement.
+AI — SAVINGS ANALYSIS
+TICVAI should distinguish different types of savings.
+Examples:
+Negotiated Savings
+Initial Quote Final Quote →
+
+TICVAI / INVENTORY & PROCUREMENT BACKEND STRUCTURE
+CONFIDENTIAL | 118
+Budget Savings
+Budget Award →
+Contract Savings
+Spot Purchase Benchmark Contract Price →
+Avoided Cost
+Price Increase Requested Negotiated Price →
+This provides more meaningful procurement analytics later in Board 7.
+DIRECT PO MANAGEMENT
+Not all procurement needs an RFQ.
+Direct PO should be permitted when procurement policy allows, for example:
+ Existing Contract
+ Framework Agreement
+ Sole Approved Supplier
+ Low-Value Purchase
+ Emergency
+ Regulated / Proprietary Item
+The system should require a reason where competitive RFQ is bypassed.
+Example:
+Direct Procurement Reason
+Existing Contract — SUP-C-1842
+Result:
+Permitted
+SINGLE-SOURCE / SOLE-SOURCE CONTROL
+Where only one supplier is used:
+Capture:
+ Reason
+ Business Justification
+ Supplier
+ Value
+ Supporting Document
+ Approval
+Examples:
+ Proprietary Item
+ OEM Requirement
+ Exclusive Distributor
+ Emergency
+ Existing Contract
+High-value single-source purchases should be visible to management.
+PO PRICE / QUANTITY TOLERANCES
+TICVAI should support configurable tolerances that will later be used during receiving and invoice matching.
+Example:
+Quantity Tolerance
+±2%
+
+TICVAI / INVENTORY & PROCUREMENT BACKEND STRUCTURE
+CONFIDENTIAL | 119
+Price Tolerance
+±1%
+These controls should travel with the PO so Board 6 can use them during GRN and invoice matching.
+TAX, CURRENCY & MULTI-CURRENCY PROCUREMENT
+Board 5 shall support procurement in different currencies.
+Example:
+PO Currency:
+USD
+Company Base Currency:
+AED
+Store:
+Original Currency
+Exchange Rate Reference
+Base Currency Equivalent
+Exchange-rate ownership should remain within TICVAI's shared Finance / currency service.
+F&B PROCUREMENT EXAMPLE
+F&B needs:
+Beef Patty — 2,000 units.
+Board 4:
+Approved PR.
+↓
+Board 5:
+RFQ sent to three approved food suppliers.
+↓
+Quotes received.
+↓
+TICVAI compares:
+Price
+Lead Time
+Quality
+Delivery
+MOQ
+↓
+Procurement selects Supplier A.
+↓
+Approval.
+↓
+PO created.
+↓
+Board 6 later handles:
+Receiving + GRN + Invoice Matching
+RETAIL PROCUREMENT EXAMPLE
+Event requires:
+2,500 Concert T-Shirts.
+Board 4 consolidates requirements.
+
+TICVAI / INVENTORY & PROCUREMENT BACKEND STRUCTURE
+CONFIDENTIAL | 120
+↓
+Board 5 RFQ.
+↓
+Supplier A:
+AED 38/unit, 10 days
+Supplier B:
+AED 40/unit, 5 days
+Event:
+7 days away.
+TICVAI highlights:
+Supplier A cannot meet requirement date.
+Supplier B recommended despite higher unit price.
+This is exactly why procurement intelligence must consider business need, not price alone.
+EMPLOYEE APP INTEGRATION
+Authorized procurement employees should be able to:
+ Review RFQ
+ View Supplier Responses
+ Compare Quotations
+ Add Evaluation
+ Review Award
+ Approve / Reject
+ View Purchase Orders
+ Check PO Status
+ Receive Sourcing Alerts
+Complex quotation comparison should remain optimized for desktop, but mobile approval should be supported.
+NOTIFICATIONS
+Generate notifications for:
+ RFQ Issued
+ RFQ Closing Soon
+ Supplier Quote Received
+ Supplier Declined
+ Evaluation Required
+ Award Approval Required
+ Award Approved
+ PO Issued
+ Supplier Acknowledgement Due
+ PO Delivery Delayed
+ PO Amendment Approval
+APPROVAL ENGINE INTEGRATION
+Board 5 shall use TICVAI's common Approval Engine.
+Possible approvals:
+ Single-Source Procurement
+ Sourcing Award
+ High-Value PO
+
+TICVAI / INVENTORY & PROCUREMENT BACKEND STRUCTURE
+CONFIDENTIAL | 121
+ PO Above PR Value
+ Budget Exception
+ PO Amendment
+ Price Above Contract
+ Emergency Purchase
+Example
+Award:
+AED 420,000
+↓
+Procurement Director
+↓
+Finance
+↓
+Business Director
+↓
+Approved
+Approval workflows remain tenant-configurable.
+SEGREGATION OF DUTIES
+The system should support controls such as:
+Requester = Buyer
+Buyer = Award Approver
+Supplier Creator = Supplier Approver
+PO Creator = Final PO Approver
+depending on the customer's internal control policy.
+AUDIT & VERSION CONTROL
+Board 5 shall retain full history for:
+RFQ
+ Creation
+ Supplier Invitations
+ Changes
+ Clarifications
+ Closing
+Quotations
+ Original
+ Revisions
+ Negotiated Offers
+Evaluation
+ Score
+ User
+ Comments
+ Changes
+Award
+ Recommendation
+ Approval
+
+TICVAI / INVENTORY & PROCUREMENT BACKEND STRUCTURE
+CONFIDENTIAL | 122
+ Override Reason
+Purchase Order
+ Creation
+ Amendments
+ Supplier Acknowledgement
+ Status
+No commercial procurement record should be silently overwritten.
+BOARD 5 — FINAL 10 SCREENS
+# Screen
+1 Sourcing & Purchase Order Command Center
+2 RFQ Creation & Sourcing Strategy
+3 Supplier Invitation & RFQ Response Management
+4 Supplier Quotation Management
+5 Quotation Comparison & Supplier Evaluation
+6 Negotiation & Best-and-Final-Offer Management
+7 Award Recommendation & Approval
+8 Purchase Order Creation & Management
+9 PO Amendment, Supplier Acknowledgement & Order Tracking
+1
+0
+Sourcing AI, Savings & Procurement Exception Center
+COMPLETE BOARD 5 FLOW
+Board 4 Approved Procurement Requirement
+↓
+Determine Sourcing Route
+Existing Contract / Direct PO?
+YES
+→ Direct PO controls
+NO
+→ RFQ
+↓
+Select Eligible Suppliers
+↓
+Issue RFQ
+↓
+Supplier Responses
+↓
+Quotation Validation
+↓
+Normalize:
+
+TICVAI / INVENTORY & PROCUREMENT BACKEND STRUCTURE
+CONFIDENTIAL | 123
+Currency + UOM + Freight + Terms
+↓
+Commercial / Technical Evaluation
+↓
+Supplier Comparison
+↓
+Negotiation / BAFO where required
+↓
+AI Recommendation + Buyer Evaluation
+↓
+Award Recommendation
+↓
+Approval
+↓
+Purchase Order
+↓
+Supplier Acknowledgement
+↓
+Delivery Schedule
+↓
+Track Outstanding Quantity
+↓
+Next Board
+Receiving GRN Invoice Matching PO Closure → → →
+ARCHITECTURAL REQUIREMENT
+Board 5 should own the commercial sourcing and Purchase Order lifecycle, but it should not duplicate supplier 
+onboarding from Board 4 or warehouse receiving from Board 2.
+The correct architecture is:
+Board 4 — Procurement Initiation
+Supplier + PR + Internal Stock Check + Approval + Demand Consolidation
+↓
+Board 5 — Sourcing & Commercial Commitment
+RFQ + Quotation + Evaluation + Negotiation + Award + Purchase Order
+↓
+Board 6 — Procurement Receiving & Financial Matching
+Supplier Delivery + Receipt + GRN + Inspection + Invoice + Three-Way Match + Discrepancy + Closure
+The most important principle for this Board is:
+TICVAI should recommend the best procurement decision based on total business value—not automatically
+choose the cheapest quotation.
+Price matters, but so do:
+Delivery Quality Compliance MOQ Reliability Required Date Total Cost Operational Risk. → → → → → → →
+This is particularly important because procurement is directly connected to the rest of TICVAI: a cheaper supplier 
+that delivers after an event, after a restaurant stock-out, or after a high-demand retail period can ultimately cost 
+the customer far more than the difference in unit price.
+
+TICVAI / INVENTORY & PROCUREMENT BACKEND STRUCTURE
+CONFIDENTIAL | 124
+TICVAI INVENTORY & PROCUREMENT — BOARD 6
+Receiving, GRN, Invoice Matching & Procurement Closure — Scope of Work
+1. Purpose
+The Receiving, GRN, Invoice Matching & Procurement Closure Board shall provide TICVAI with the centralized 
+control layer for completing the procurement lifecycle after a Purchase Order has been issued.
+Board 5 established:
+RFQ Supplier Quotation Evaluation Award Purchase Order Supplier Acknowledgement → → → → →
+Board 6 shall establish:
+What did the supplier actually deliver? Was the correct quantity and quality received? What inventory → →
+should become available? Does the supplier invoice match the PO and receipt? Are discrepancies within → →
+tolerance? Can the transaction be financially cleared and the PO closed? →
+The core architecture shall follow:
+Purchase Order Supplier Delivery Receiving Inspection GRN Inventory Update Supplier Invoice → → → → → →
+→ → → → 2-Way / 3-Way Match Exception Resolution Finance PO Closure
+This Board shall integrate directly with:
+Procurement + Warehouse + Shared Inventory + Finance + Supplier Management + Approval Engine + 
+Employee App + AI
+A key architectural principle is that Board 6 must not duplicate the physical warehouse functionality already 
+designed in Board 2. Board 2 executes the physical receiving and put-away operation; Board 6 controls the 
+procurement receipt, GRN, matching, financial handoff and PO closure.
+
+TICVAI / INVENTORY & PROCUREMENT BACKEND STRUCTURE
+CONFIDENTIAL | 125
+PAGE 1 — Procurement Receiving & Matching Command Center
+Purpose
+Provide Procurement, Warehouse, Inventory and Finance teams with a consolidated real-time view of supplier 
+deliveries, GRNs, invoice matching, discrepancies and PO closure.
+Global Filters
+ Tenant
+ Company
+ Business Unit
+ Park
+ Venue
+ Warehouse
+ Supplier
+ Procurement Category
+ Buyer
+ PO Status
+ GRN Status
+ Invoice Match Status
+ Exception Type
+ Date / Period
+KPI Cards
+ Deliveries Expected Today
+ Deliveries Received Today
+ Late Deliveries
+ GRNs Pending
+ GRNs Completed
+ Inspection Pending
+ Invoices Received
+ Fully Matched Invoices
+ Match Exceptions
+ Quantity Variances
+ Price Variances
+ Value Pending Finance
+ POs Ready to Close
+ Critical Exceptions
+Procurement Completion Pipeline
+PO Issued
+→ Supplier Confirmed
+→ Expected Delivery
+→ Received
+→ Inspection
+→ GRN
+→ Invoice
+→ Match
+→ Finance
+
+TICVAI / INVENTORY & PROCUREMENT BACKEND STRUCTURE
+CONFIDENTIAL | 126
+→ Closed
+Example:
+Expected Deliveries: 26
+Received: 18
+Inspection Pending: 5
+GRN Pending: 7
+Invoices Pending Match: 12
+Match Exceptions: 4
+Ready for Finance: 14
+Ready to Close: 9
+Alerts
+Examples:
+PO-18438 expected delivery is 6 hours overdue.
+GRN-18422 contains a 6.4% quantity variance.
+INV-48219 price exceeds PO tolerance by AED 8,400.
+Supplier delivered an expired F&B batch.
+PO-18427 is fully received and financially matched but remains open.
+Quick Actions
+Receive Delivery | Create GRN | Inspect Goods | Match Invoice | Resolve Exception | Close PO
+PAGE 2 — Expected Deliveries & Receiving Schedule
+Purpose
+Provide visibility into upcoming supplier deliveries and allow receiving teams to prepare warehouse capacity, staff 
+and dock resources.
+Expected Delivery List
+Display:
+ PO Number
+ Supplier
+ Delivery Reference
+ Expected Date
+ Expected Time
+ Warehouse
+ Dock
+ Item Count
+ Expected Units
+ Priority
+ Delivery Status
+Delivery Status
+ Scheduled
+ Confirmed
+ Arriving
+ Arrived
+ Receiving
+ Delayed
+
+TICVAI / INVENTORY & PROCUREMENT BACKEND STRUCTURE
+CONFIDENTIAL | 127
+ Completed
+ Cancelled
+Calendar Views
+Support:
+Day | Week | Month | Timeline
+Delivery Appointment
+Capture:
+ Supplier
+ PO
+ Delivery Date
+ Time Slot
+ Vehicle
+ Driver
+ Dock
+ Contact
+ Special Requirements
+Capacity Check
+Before confirming a delivery, TICVAI should consider:
+ Dock Availability
+ Receiving Capacity
+ Warehouse Capacity
+ Cold Storage Capacity
+ Required Employees
+ Existing Delivery Schedule
+Resource Integration
+Example:
+10 supplier deliveries expected between:
+09:00–11:00
+Available receiving teams:
+2
+Projected requirement:
+4
+TICVAI Alert:
+Receiving capacity is insufficient for the scheduled inbound volume.
+Recommendation:
+Reschedule two deliveries or allocate additional staff.
+PAGE 3 — Supplier Delivery & PO Receiving
+Purpose
+Record the supplier's actual delivery against one or multiple Purchase Orders.
+Delivery Identification
+Support:
+ PO Scan
+ Supplier Delivery Note
+
+TICVAI / INVENTORY & PROCUREMENT BACKEND STRUCTURE
+CONFIDENTIAL | 128
+ ASN where supported
+ Barcode
+ QR
+ Manual PO Search
+Receiving Header
+Capture:
+ Receipt Number
+ Supplier
+ PO
+ Delivery Note
+ Warehouse
+ Receiving Dock
+ Arrival Time
+ Receiver
+ Vehicle
+ Seal Number where applicable
+Line-Level Comparison
+For each PO line display:
+Ordered
+Previously Received
+Outstanding
+Delivered Today
+Accepted
+Rejected
+Example
+Ordered:
+1,000
+Previously Received:
+400
+Outstanding:
+600
+Delivered:
+610
+Accepted:
+600
+Rejected:
+10
+Partial Delivery
+TICVAI shall support:
+PO Quantity:
+1,000
+First Receipt:
+400
+Second Receipt:
+350
+
+TICVAI / INVENTORY & PROCUREMENT BACKEND STRUCTURE
+CONFIDENTIAL | 129
+Remaining:
+250
+PO remains:
+Partially Received
+Over-Delivery
+Example:
+Outstanding:
+500
+Supplier Delivered:
+525
+PO Quantity Tolerance:
++2%
+Maximum Permitted:
+510
+Result:
+15 units outside tolerance
+Actions:
+Reject Excess | Exception Approval | Amend PO
+PAGE 4 — Inspection, Quality Control & Acceptance
+Purpose
+Determine whether delivered goods are acceptable before becoming available inventory or progressing to 
+financial matching.
+Inspection Requirement
+Inspection rules may depend on:
+ Item
+ Category
+ Supplier
+ Batch
+ Value
+ F&B Requirement
+ High-Risk Supplier
+ Random Quality Control
+ Contract
+Inspection Types
+ Quantity Inspection
+ Visual Inspection
+ Quality Inspection
+ Temperature Check
+ Expiry Check
+ Batch Verification
+ Serial Verification
+ Specification Check
+ Packaging Check
+
+TICVAI / INVENTORY & PROCUREMENT BACKEND STRUCTURE
+CONFIDENTIAL | 130
+ Damage Inspection
+Inspection Record
+Capture:
+ Receipt
+ Item
+ Batch / Serial
+ Quantity
+ Inspector
+ Inspection Type
+ Result
+ Notes
+ Photo
+ Supporting Document
+Inspection Results
+ Accepted
+ Accepted with Exception
+ Rejected
+ Quarantine
+ Damaged
+ Reinspection Required
+F&B Example
+Fresh Milk
+Required Temperature:
+2°C–5°C
+Received Temperature:
+8°C
+Result:
+Quality Exception
+Actions:
+Reject | Quarantine | Supervisor Review
+Retail Example
+Concert T-Shirt
+Ordered:
+500
+Received:
+500
+Inspection finds:
+24 damaged units
+Accepted:
+476
+Rejected:
+24
+Only accepted inventory should become usable stock.
+
+TICVAI / INVENTORY & PROCUREMENT BACKEND STRUCTURE
+CONFIDENTIAL | 131
+PAGE 5 — Goods Receipt Note (GRN) Management
+Purpose
+Create the formal procurement receipt confirming what the organization accepted from the supplier.
+The GRN shall be the critical bridge between:
+Purchase Order
+and
+Inventory / Finance
+GRN Header
+Capture:
+ GRN Number
+ Receipt Number
+ PO Number
+ Supplier
+ Warehouse
+ Delivery Note
+ Receipt Date
+ GRN Date
+ Receiver
+ Status
+GRN Lines
+For each line:
+ Inventory Item
+ PO Quantity
+ Previously Received
+ Delivered
+ Accepted
+ Rejected
+ GRN Quantity
+ UOM
+ Batch
+ Serial
+ Expiry
+ Unit Cost Reference
+GRN Status
+ Draft
+ Inspection Pending
+ Pending Approval
+ Posted
+ Partially Posted
+ Reversed
+ Cancelled
+Posting GRN
+Once approved and posted:
+
+TICVAI / INVENTORY & PROCUREMENT BACKEND STRUCTURE
+CONFIDENTIAL | 132
+Accepted Quantity
+↓
+Shared Inventory Ledger
+↓
+Correct Inventory Status
+↓
+Warehouse Put-Away where required
+↓
+PO Received Quantity Updated
+Example
+PO:
+1,000 units
+GRN 1:
+400
+GRN 2:
+350
+Total Received:
+750
+Outstanding:
+250
+GRN Reversal
+Posted GRNs should not simply be deleted.
+If an error occurs:
+Original GRN
+↓
+Authorized Reversal
+↓
+Corrected GRN
+with complete audit history.
+PAGE 6 — Supplier Invoice Capture & Validation
+Purpose
+Capture supplier invoices and validate them before financial processing.
+Invoice Capture Methods
+Support:
+ Manual Entry
+ PDF Upload
+ Structured Electronic Invoice
+ API Integration
+ Finance / ERP Integration
+AI-assisted extraction may be used for uploaded invoices, but extracted values should be validated before posting.
+Invoice Header
+Capture:
+ Supplier Invoice Number
+ Supplier
+
+TICVAI / INVENTORY & PROCUREMENT BACKEND STRUCTURE
+CONFIDENTIAL | 133
+ Invoice Date
+ PO Number
+ GRN Reference
+ Currency
+ Subtotal
+ Discount
+ Freight
+ Tax
+ Other Charges
+ Total
+ Payment Terms
+ Due Date
+Invoice Lines
+Capture:
+ Item
+ Quantity
+ UOM
+ Unit Price
+ Tax
+ Discount
+ Line Total
+ PO Reference
+ GRN Reference
+Duplicate Invoice Detection
+TICVAI should check:
+ Supplier
+ Invoice Number
+ Invoice Date
+ Amount
+ PO
+ Document Fingerprint where supported
+Example:
+Potential duplicate invoice detected: INV-48219 was previously submitted on 18 Aug.
+Actions:
+View Existing | Reject Duplicate | Continue with Reason
+PAGE 7 — Two-Way / Three-Way Matching
+Purpose
+Automatically compare procurement documents before financial settlement.
+Two-Way Match
+Purchase Order
+vs
+Supplier Invoice
+Used where receiving confirmation is not required by policy.
+
+TICVAI / INVENTORY & PROCUREMENT BACKEND STRUCTURE
+CONFIDENTIAL | 134
+Three-Way Match
+Purchase Order
+vs
+GRN
+vs
+Supplier Invoice
+This should be the primary control for inventory procurement.
+Matching Dimensions
+Compare:
+ Item
+ Quantity
+ UOM
+ Unit Price
+ Discount
+ Tax
+ Freight
+ Total
+ Currency
+ PO
+ GRN
+Example — Full Match
+PO:
+100 units × AED 20
+GRN:
+100 units
+Invoice:
+100 units × AED 20
+Result:
+MATCHED
+Quantity Exception
+PO:
+100
+GRN:
+95
+Invoice:
+100
+Result:
+Quantity Mismatch — 5 units
+Price Exception
+PO:
+AED 20
+Invoice:
+AED 21
+Tolerance:
+
+TICVAI / INVENTORY & PROCUREMENT BACKEND STRUCTURE
+CONFIDENTIAL | 135
+1%
+Difference:
+5%
+Result:
+Price Exception
+Match Status
+ Fully Matched
+ Matched Within Tolerance
+ Quantity Exception
+ Price Exception
+ Tax Exception
+ Freight Exception
+ Missing GRN
+ Missing PO
+ Duplicate Invoice
+ Manual Review
+PAGE 8 — Match Exception & Dispute Resolution
+Purpose
+Provide a controlled workflow for resolving procurement and invoice discrepancies.
+Exception Types
+Quantity
+ Invoice > GRN
+ Invoice < GRN
+ GRN > PO
+ Short Delivery
+ Over Delivery
+Price
+ Invoice Price > PO
+ Incorrect Discount
+ Contract Price Difference
+Commercial
+ Unexpected Freight
+ Unexpected Charge
+ Tax Difference
+ Currency Difference
+Document
+ Missing PO
+ Missing GRN
+ Duplicate Invoice
+ Invalid Supplier Invoice
+Quality
+ Rejected Goods Invoiced
+ Damaged Goods Invoiced
+
+TICVAI / INVENTORY & PROCUREMENT BACKEND STRUCTURE
+CONFIDENTIAL | 136
+ Quarantined Stock Invoiced
+Resolution Actions
+ Accept Within Tolerance
+ Request Supplier Credit Note
+ Request Corrected Invoice
+ Amend PO
+ Adjust GRN where legitimately required
+ Reject Invoice
+ Partial Approval
+ Escalate
+ Create Supplier Dispute
+Example
+Invoice:
+AED 52,000
+Matched:
+AED 48,000
+Disputed:
+AED 4,000
+Action:
+Approve AED 48,000 + Hold AED 4,000
+where Finance policy supports partial processing.
+Dispute Record
+Capture:
+ Supplier
+ Invoice
+ PO
+ GRN
+ Disputed Amount
+ Reason
+ Owner
+ Open Date
+ Communication
+ Resolution
+ Credit Note Reference
+ Status
+PAGE 9 — Finance Handoff, PO Closure & Supplier Performance
+Purpose
+Complete the procurement lifecycle once receiving and financial matching conditions are satisfied.
+Finance Handoff
+Once matched:
+PO
+
+GRN
+
+
+TICVAI / INVENTORY & PROCUREMENT BACKEND STRUCTURE
+CONFIDENTIAL | 137
+Invoice
+↓
+Approved Match
+↓
+Finance / Accounts Payable
+Board 6 should provide Finance with the validated procurement package.
+Finance should remain responsible for:
+ Accounting Posting
+ AP Ledger
+ Payment Processing
+ Payment Run
+ Bank Execution
+Board 6 should not recreate Accounts Payable.
+Finance Status Returned to Procurement
+Display:
+ Sent to Finance
+ Accepted by Finance
+ Payment Scheduled
+ Paid
+ Finance Exception
+PO Closure Conditions
+A PO may close when:
+✓ Required Goods Received
+✓ GRNs Posted
+✓ Rejected Quantities Resolved
+✓ Invoice Matching Complete
+✓ Outstanding Commitments Resolved
+✓ Finance Handoff Complete
+Closure Types
+ Fully Closed
+ Short Closed
+ Cancelled Balance
+ Closed with Approved Variance
+Short Close Example
+PO:
+1,000 units
+Received:
+980
+Supplier confirms:
+No further delivery.
+Remaining:
+20
+Authorized action:
+Short Close 20 Units
+Reason required.
+
+TICVAI / INVENTORY & PROCUREMENT BACKEND STRUCTURE
+CONFIDENTIAL | 138
+Supplier Performance Update
+After completion, automatically update:
+ Delivery Timeliness
+ Quantity Accuracy
+ Quality Acceptance
+ Price Accuracy
+ Invoice Accuracy
+ Lead-Time Accuracy
+This feeds the Supplier Performance profile from Board 4.
+PAGE 10 — AI Procurement Completion & Exception Center
+Purpose
+Provide AI-assisted monitoring across deliveries, GRNs, invoice matching and procurement closure.
+AI Categories
+ Delivery Risk
+ Quantity Variance
+ Quality Risk
+ Invoice Anomaly
+ Match Exception
+ Duplicate Invoice Risk
+ Supplier Performance Risk
+ PO Closure Delay
+ Procurement Leakage
+ Process Bottleneck
+AI — DELIVERY RISK PREDICTION
+TICVAI should identify likely late deliveries before they become operational problems.
+Example:
+PO-18438
+Supplier:
+Fresh Foods UAE
+Required:
+Tomorrow 08:00
+Supplier Historical On-Time:
+82%
+Current Confirmation:
+Not Received
+Similar Deliveries:
+Average 1.4 days late
+Inventory Cover:
+0.8 days
+AI Assessment
+High Stock-Out Risk
+Recommendation:
+1. Contact supplier immediately.
+
+TICVAI / INVENTORY & PROCUREMENT BACKEND STRUCTURE
+CONFIDENTIAL | 139
+2. Check internal transfer availability.
+3. Identify approved alternative supplier.
+This should connect back to Board 3 and Board 4 rather than creating duplicate functionality.
+AI — RECEIPT ANOMALY DETECTION
+Example:
+Supplier historically delivers:
+98–101% of ordered quantity.
+Current Delivery:
+112%
+AI Alert:
+Delivery quantity is materially above normal supplier behavior and exceeds PO tolerance.
+Recommended:
+Review before acceptance.
+AI — QUALITY TREND DETECTION
+Example:
+Supplier:
+Fresh Foods UAE
+Rejected Quantity:
+Last 30 Days:
+1.2%
+Current Month:
+4.8%
+Primary Cause:
+Temperature Non-Compliance
+AI Alert:
+Supplier rejection rate has increased materially.
+Recommendation:
+Supplier Quality Review
+This should feed Board 4 supplier performance.
+AI — INVOICE EXTRACTION & VALIDATION
+For uploaded supplier invoices, AI may extract:
+ Supplier
+ Invoice Number
+ Invoice Date
+ PO
+ Item
+ Quantity
+ Unit Price
+ Tax
+ Total
+Example:
+AI Extracted
+Invoice:
+INV-48219
+
+TICVAI / INVENTORY & PROCUREMENT BACKEND STRUCTURE
+CONFIDENTIAL | 140
+PO:
+PO-18438
+Total:
+AED 48,420
+Confidence:
+98%
+The user should be able to:
+Confirm | Correct | Review Source
+Low-confidence fields should be highlighted.
+AI — MATCH EXCEPTION ROOT-CAUSE ASSISTANT
+Example:
+Invoice Exception
+Invoice Quantity:
+500
+GRN:
+476
+Difference:
+24
+AI Analysis
+Inspection record shows:
+24 units rejected as damaged.
+Recommended Resolution:
+Request supplier credit note for 24 units.
+Actions:
+Create Dispute | Request Credit Note | Review Inspection
+AI — DUPLICATE INVOICE DETECTION
+Example:
+New Invoice:
+INV-84829
+Supplier:
+Global Beverages
+Amount:
+AED 42,800
+AI identifies another invoice:
+INV-84892
+Same Supplier
+Same PO
+Same Amount
+Same Date
+Similar Document Content
+Risk:
+Possible Duplicate
+The invoice should be held for review rather than automatically rejected.
+
+TICVAI / INVENTORY & PROCUREMENT BACKEND STRUCTURE
+CONFIDENTIAL | 141
+AI — PO CLOSURE RECOMMENDATION
+TICVAI should identify POs that remain operationally open unnecessarily.
+Example:
+PO-18427
+Ordered:
+1,000
+Received:
+1,000
+GRN:
+Posted
+Invoice:
+Fully Matched
+Finance:
+Accepted
+Outstanding:
+0
+Status:
+Open for 9 days
+Recommendation:
+Close PO
+Actions:
+Close | Review | Keep Open with Reason
+AI — PROCUREMENT LEAKAGE DETECTION
+TICVAI should identify where actual procurement cost differs materially from approved or negotiated commercial 
+terms.
+Example:
+Award Value:
+AED 184,000
+Final Invoiced:
+AED 196,400
+Difference:
++AED 12,400 / +6.7%
+Reasons identified:
+Freight:
+AED 6,200
+Price Variance:
+AED 4,800
+Additional Charges:
+AED 1,400
+Recommendation:
+Review commercial leakage before final closure.
+DELIVERY WAREHOUSE INTEGRATION →
+This boundary is important.
+Board 6
+Controls:
+
+TICVAI / INVENTORY & PROCUREMENT BACKEND STRUCTURE
+CONFIDENTIAL | 142
+PO Expected Delivery Procurement Receipt GRN → → →
+Board 2
+Executes:
+Dock Scan Inspection Put-Away Bin → → → →
+Example:
+Supplier arrives.
+↓
+Board 6 identifies:
+PO-18438
+↓
+Board 2 executes physical receiving.
+↓
+Accepted quantities and inspection results return to Board 6.
+↓
+Board 6 creates / posts:
+GRN-18422
+↓
+Board 1 Shared Inventory Ledger updates.
+There should be one physical receipt transaction, not duplicate receiving entries in Board 2 and Board 6.
+INVENTORY STATUS DURING RECEIVING
+Not every received item should immediately become Available.
+Support:
+Received
+→ Inspection Pending
+→ Quarantine
+→ Accepted
+→ Available
+or
+→ Rejected
+→ Supplier Return
+Example
+500 units received.
+450 Accepted
+30 Inspection Pending
+20 Rejected
+Shared inventory should show each status separately.
+BATCH / LOT / EXPIRY RECEIVING
+Particularly important for F&B.
+Capture:
+ Batch
+ Manufacturing Date where applicable
+ Expiry Date
+ Best Before
+ Quantity
+ Supplier Batch
+
+TICVAI / INVENTORY & PROCUREMENT BACKEND STRUCTURE
+CONFIDENTIAL | 143
+ TICVAI Batch Reference
+Shelf-Life Rule
+Example:
+Minimum remaining shelf life:
+60 days
+Received:
+24 days
+Result:
+Reject / Exception Approval
+depending on policy.
+This must integrate with FEFO rules already designed in Inventory and F&B.
+SERIALIZED RECEIVING
+For serialized equipment or merchandise:
+PO:
+10 Scanners
+Supplier delivers:
+10
+Each serial must be captured:
+SER-001
+SER-002
+SER-003
+...
+Quantity alone is not sufficient.
+TICVAI should prevent duplicate serial registration.
+RETURNS TO SUPPLIER
+Rejected goods may generate:
+Return to Supplier
+Capture:
+ Return Number
+ Supplier
+ PO
+ GRN
+ Item
+ Batch / Serial
+ Quantity
+ Reason
+ Dispatch Reference
+ Expected Credit Note
+Return Lifecycle
+Requested
+→ Approved
+→ Prepared
+→ Dispatched
+→ Supplier Confirmed
+
+TICVAI / INVENTORY & PROCUREMENT BACKEND STRUCTURE
+CONFIDENTIAL | 144
+→ Credit Note Pending
+→ Resolved
+The warehouse physical outbound execution can use Board 2.
+CREDIT NOTE MANAGEMENT
+Where an invoice has already been submitted or processed, supplier corrections may require a credit note.
+Capture:
+ Credit Note Number
+ Supplier
+ Original Invoice
+ PO
+ GRN
+ Amount
+ Reason
+ Status
+Match:
+Original Invoice
+−
+Credit Note
+=
+Adjusted Payable Amount
+Finance remains responsible for accounting treatment.
+TOLERANCE MANAGEMENT
+TICVAI should support configurable tolerances.
+Quantity
+Example:
+±2%
+Price
+Example:
+±1%
+Invoice Total
+Example:
+AED 50 absolute tolerance
+Delivery
+Example:
+±1 day
+Rules may vary by:
+ Supplier
+ Category
+ Item
+ Contract
+ Company
+ Value
+Within Tolerance
+May auto-clear according to policy.
+
+TICVAI / INVENTORY & PROCUREMENT BACKEND STRUCTURE
+CONFIDENTIAL | 145
+Outside Tolerance
+Requires exception resolution / approval.
+PARTIAL RECEIPT & PARTIAL INVOICE
+TICVAI must support real procurement scenarios.
+Example:
+PO
+1,000 units
+Delivery 1
+400
+Invoice:
+400
+Delivery 2
+350
+Invoice:
+350
+Remaining
+250
+The PO remains open.
+The system should maintain:
+Ordered Received Invoiced Outstanding → → →
+at line level.
+MULTIPLE GRNs AGAINST ONE PO
+Example:
+PO-18421
+↓
+GRN-01:
+400
+GRN-02:
+350
+GRN-03:
+250
+↓
+Total:
+1,000
+↓
+PO Fully Received
+Similarly, one invoice may reference multiple GRNs where supplier billing arrangements permit.
+ONE INVOICE AGAINST MULTIPLE POs
+Where policy permits:
+Supplier Invoice:
+INV-18429
+References:
+PO-18420
+PO-18421
+PO-18422
+
+TICVAI / INVENTORY & PROCUREMENT BACKEND STRUCTURE
+CONFIDENTIAL | 146
+TICVAI should allocate invoice lines to the correct PO and GRN records before matching.
+F&B EXAMPLE
+Purchase Order
+Fresh Milk:
+500 units
+↓
+Supplier Delivery:
+500
+↓
+Temperature Inspection:
+450 Accepted
+50 Rejected
+↓
+GRN:
+450
+↓
+Shared Inventory:
+450 Inspection Passed / Available after put-away
+↓
+Supplier Invoice:
+500 units
+↓
+Three-Way Match:
+Quantity Exception — 50
+↓
+AI identifies rejected quantity.
+↓
+Request:
+Credit Note / Corrected Invoice
+↓
+Supplier resolves.
+↓
+Finance.
+↓
+PO Closure.
+RETAIL EXAMPLE
+PO
+Concert T-Shirt:
+2,500
+↓
+Delivery:
+2,500
+↓
+Inspection:
+2,476 Accepted
+24 Damaged
+
+TICVAI / INVENTORY & PROCUREMENT BACKEND STRUCTURE
+CONFIDENTIAL | 147
+↓
+GRN:
+2,476
+↓
+Invoice:
+2,500
+↓
+Exception:
+24 units
+↓
+Return to Supplier / Credit Note
+↓
+Invoice Matched
+↓
+Finance
+↓
+PO Closed.
+EMPLOYEE APP INTEGRATION
+Warehouse / Procurement employees should be able to:
+ View Expected Deliveries
+ Scan PO
+ Receive Delivery
+ Scan Item
+ Record Quantity
+ Scan Batch
+ Scan Serial
+ Record Expiry
+ Capture Temperature
+ Report Damage
+ Capture Photo
+ Submit Inspection
+ Create Receipt
+ View GRN
+ Report Exception
+Managers should be able to:
+ Approve GRN Exception
+ Approve Over-Delivery
+ Review Match Exception
+ Approve Short Closure
+Complex invoice matching should remain optimized for desktop.
+APPROVAL ENGINE INTEGRATION
+Board 6 shall use the shared TICVAI Approval Engine.
+Potential approval events:
+ Over-Delivery
+ Receipt Outside Tolerance
+
+TICVAI / INVENTORY & PROCUREMENT BACKEND STRUCTURE
+CONFIDENTIAL | 148
+ Quality Exception Acceptance
+ GRN Reversal
+ Price Variance
+ Invoice Variance
+ Manual Match
+ Supplier Return
+ PO Short Close
+Example
+Invoice Variance:
+AED 250
+→ Auto-clear where policy permits.
+Invoice Variance:
+AED 12,000
+→ Procurement Manager + Finance.
+FINANCE INTEGRATION
+This Board should connect very closely to the Finance module we already designed.
+The boundary should be:
+Inventory & Procurement
+Owns:
+PO + GRN + Match + Procurement Exception
+Finance
+Owns:
+Accounting + AP + Payment + Bank + Financial Reporting
+Therefore:
+Matched Procurement Package
+↓
+Finance
+↓
+AP Posting
+↓
+Payment
+↓
+Payment Status returned to Procurement
+This prevents SoftLab from implementing a second Accounts Payable engine inside Procurement.
+AUDIT & TRACEABILITY
+Every procurement completion transaction shall retain:
+ PO
+ Supplier
+ Delivery
+ Receipt
+ GRN
+ Item
+ Batch / Serial
+ Quantity
+
+TICVAI / INVENTORY & PROCUREMENT BACKEND STRUCTURE
+CONFIDENTIAL | 149
+ Inspection
+ Invoice
+ Match Result
+ Exception
+ Approval
+ User
+ Device
+ Date / Time
+ Previous State
+ New State
+Management should be able to trace:
+PR
+→ RFQ
+→ Quote
+→ Award
+→ PO
+→ Supplier Delivery
+→ Receipt
+→ Inspection
+→ GRN
+→ Inventory
+→ Invoice
+→ Match
+→ Finance
+→ Payment Status
+→ PO Closure
+This gives TICVAI a complete procure-to-pay audit chain.
+BOARD 6 — FINAL 10 SCREENS
+# Screen
+1 Procurement Receiving & Matching Command Center
+2 Expected Deliveries & Receiving Schedule
+3 Supplier Delivery & PO Receiving
+4 Inspection, Quality Control & Acceptance
+5 Goods Receipt Note (GRN) Management
+6 Supplier Invoice Capture & Validation
+7 Two-Way / Three-Way Matching
+8 Match Exception & Dispute Resolution
+9 Finance Handoff, PO Closure & Supplier Performance
+1
+0
+AI Procurement Completion & Exception Center
+
+TICVAI / INVENTORY & PROCUREMENT BACKEND STRUCTURE
+CONFIDENTIAL | 150
+COMPLETE BOARD 6 FLOW
+PURCHASE ORDER
+Board 5 PO Issued
+↓
+Supplier Acknowledgement
+↓
+Delivery Schedule
+↓
+Expected Delivery
+↓
+Supplier Arrives
+↓
+PHYSICAL RECEIVING
+Board 2 executes:
+Dock Scan Quantity Inspection → → →
+↓
+ACCEPTANCE
+Accepted
+→ GRN
+→ Inventory
+→ Put-Away
+Rejected
+→ Quarantine / Return to Supplier
+↓
+INVOICE
+Supplier Invoice
+↓
+Capture / AI Extract
+↓
+Validation
+↓
+THREE-WAY MATCH
+PO
+vs
+GRN
+vs
+Invoice
+↓
+MATCH?
+YES
+→ Finance Handoff
+WITHIN TOLERANCE?
+YES
+→ Auto-Clear according to policy
+
+TICVAI / INVENTORY & PROCUREMENT BACKEND STRUCTURE
+CONFIDENTIAL | 151
+NO
+→ Exception
+→ Investigation
+→ Supplier Dispute / Credit Note / PO Amendment / Authorized Resolution
+↓
+Approved Match
+↓
+Finance / AP
+↓
+Payment Status
+↓
+PO Closure
+↓
+Supplier Performance Updated
+↓
+Audit Complete
+COMPLETE PROCUREMENT ARCHITECTURE — BOARDS 1–6
+At this point, the architecture becomes very clean:
+BOARD 1 — INVENTORY MASTER & STOCK LEDGER
+Item SKU UOM Batch Serial Cost Stock Reorder → → → → → → →
+↓
+BOARD 2 — WAREHOUSE EXECUTION
+Warehouse Zone Bin Receive Put-Away Pick Pack Dispatch → → → → → → →
+↓
+BOARD 3 — INVENTORY CONTROL
+Transfer Count Variance Adjustment Reconciliation → → → →
+↓
+BOARD 4 — PROCUREMENT INITIATION
+Supplier Demand Internal Stock Check PR Approval Consolidation → → → → →
+↓
+BOARD 5 — SOURCING & COMMERCIAL COMMITMENT
+RFQ Quote Compare Negotiate Award PO → → → → →
+↓
+BOARD 6 — PROCUREMENT COMPLETION
+Delivery Inspection GRN Invoice Match Finance Closure → → → → → →
+Key recommendation.
+I would make one requirement especially explicit in the final SOW:
+TICVAI shall implement one continuous Procure-to-Pay transaction chain with shared identifiers and audit 
+history, rather than separate PR, RFQ, PO, warehouse, GRN and invoice systems connected only by manual 
+references.
+For example, from any invoice, an authorized user should be able to navigate backward:
+Invoice GRN Receipt PO Award Supplier Quote RFQ Purchase Request Original Demand → → → → → → → →
+And forward:
+
+TICVAI / INVENTORY & PROCUREMENT BACKEND STRUCTURE
+CONFIDENTIAL | 152
+PR RFQ Award PO Delivery GRN Invoice Finance Status Closure → → → → → → → →
+That is important for TICVAI because it turns Inventory & Procurement into one integrated enterprise engine 
+rather than several disconnected backend modules.
+
+TICVAI / INVENTORY & PROCUREMENT BACKEND STRUCTURE
+CONFIDENTIAL | 153
+TICVAI INVENTORY & PROCUREMENT — BOARD 7
+Planning, Analytics, AI Optimization, Controls & Integration — Scope of Work
+1. Purpose
+Board 7 shall provide the management, intelligence, optimization and governance layer across the complete 
+TICVAI Inventory & Procurement ecosystem.
+Boards 1–6 manage the operational lifecycle:
+Inventory Master Warehouse Transfers & Counts Procurement Demand Sourcing & PO Receiving → → → → →
+& Matching
+Board 7 shall answer the management questions:
+What will we need? When will we need it? Where will shortages occur? Are we carrying too much → → →
+stock? How efficiently are we purchasing? Which suppliers are performing? Where are we losing → → →
+money? What should TICVAI recommend or automate? →
+The Board shall consolidate data from:
+ Inventory
+ Warehouse
+ F&B
+ Retail
+ Rental
+ Resource Management
+ Procurement
+ Suppliers
+ Finance
+ Ticketing / Attendance
+ Events
+
+TICVAI / INVENTORY & PROCUREMENT BACKEND STRUCTURE
+CONFIDENTIAL | 154
+ Historical Sales
+ Reservations
+ Weather/external data where integrated
+ Approval Engine
+ Audit Engine
+The intelligence architecture shall follow:
+Operational Data Forecast Demand Plan Inventory Position Procurement Plan AI → → → → →
+Recommendation Approval / Action Outcome Continuous Learning → → →
+PAGE 1 — Inventory & Procurement Executive Command Center
+Purpose
+Provide senior management with a consolidated real-time view of inventory, warehouse and procurement 
+performance across TICVAI.
+Global Filters
+ Tenant
+ Company
+ Business Unit
+ Park
+ Venue
+ Warehouse
+ Department
+ Category
+ Supplier
+ Period
+ Comparison Period
+Executive KPI Cards
+ Total Inventory Value
+ Available Inventory Value
+ Inventory Turnover
+ Days of Inventory
+ Inventory Accuracy %
+ Stock-Out Rate
+ Overstock Value
+ Slow-Moving Value
+ Dead Stock Value
+ Expiry Risk Value
+ Shrinkage %
+ Open PR Value
+ Open PO Value
+ Procurement Spend
+ Savings
+ Supplier On-Time Delivery %
+ Purchase Price Variance
+ Critical Risks
+
+TICVAI / INVENTORY & PROCUREMENT BACKEND STRUCTURE
+CONFIDENTIAL | 155
+Enterprise Inventory Health
+Example:
+Area Inventory Stock-Out Overstock Accuracy Health
+F&B AED 1.42M 2.1% AED 82K 99.1% Good
+Retail AED 2.85M 3.8% AED 240K 98.4% Warning
+Operations AED 940K 0.8% AED 62K 99.5% Good
+Rental AED 680K 1.4% AED 38K 99.0% Good
+Management Alerts
+Examples:
+AED 420K of inventory is classified as slow-moving.
+Retail stock-out exposure for the upcoming event weekend is estimated at AED 86K revenue.
+3 suppliers have fallen below required delivery-performance thresholds.
+F&B expiry exposure for the next 14 days is AED 18,600.
+Open procurement commitments are projected to exceed monthly plan by 7.4%.
+Quick Actions
+Demand Forecast | Replenishment Plan | Inventory Optimization | Procurement Analytics | Supplier 
+Analytics | AI Recommendations
+PAGE 2 — Demand Forecasting & Consumption Planning
+Purpose
+Forecast future inventory requirements using operational demand rather than relying only on historical averages.
+Forecast Inputs
+TICVAI should support:
+ Historical Consumption
+ Retail Sales
+ F&B Recipe Consumption
+ Ticket Sales
+ Reservations
+ Attendance Forecast
+ Event Schedule
+ Membership Activity
+ Seasonality
+ Day of Week
+ Holidays
+ Promotions
+ Weather where integrated
+ Venue Capacity
+ Existing Bookings
+ Current Inventory
+ Open Purchase Orders
+ Transfers
+ Supplier Lead Time
+
+TICVAI / INVENTORY & PROCUREMENT BACKEND STRUCTURE
+CONFIDENTIAL | 156
+Forecast Hierarchy
+Forecast by:
+Enterprise
+→ Company
+→ Park
+→ Venue
+→ Warehouse
+→ Outlet
+→ Category
+→ Item / SKU
+Example — F&B
+Upcoming Saturday:
+Expected Attendance:
+18,500
+Historical Burger Conversion:
+12.4%
+Forecast Burgers:
+2,294
+Each Burger:
+1 Beef Patty
+Current Available:
+1,420
+Incoming:
+400
+Safety Stock:
+300
+Projected Shortfall:
+774 Patties
+Example — Retail
+Concert Ticket Sales:
+12,800
+Expected Merchandise Conversion:
+18%
+Expected T-Shirt Demand:
+2,304
+Available:
+1,680
+Incoming:
+400
+Projected Shortfall:
+224
+Forecast Views
+Support:
+
+TICVAI / INVENTORY & PROCUREMENT BACKEND STRUCTURE
+CONFIDENTIAL | 157
+Daily | Weekly | Monthly | Seasonal | Event-Based
+Forecast Accuracy
+The system should compare:
+Forecast vs Actual
+and track accuracy over time.
+PAGE 3 — Replenishment & Procurement Planning
+Purpose
+Convert forecast demand and inventory policies into actionable replenishment recommendations.
+Planning Inputs
+For each item/location:
+Current Available
+
+In Transit
+
+Open PO
+
+Expected Production
+−
+Reserved
+−
+Forecast Demand
+−
+Safety Stock
+=
+Projected Inventory Position
+Recommended Actions
+TICVAI may recommend:
+ No Action
+ Internal Replenishment
+ Internal Transfer
+ Purchase
+ Expedite PO
+ Delay PO
+ Reduce PO
+ Cancel Remaining PO where permitted
+ Increase Safety Stock
+ Reduce Safety Stock
+Planning Table
+Item Available Demand Incoming Safet
+y
+Gap Recommendation
+Beef Patty 1,420 2,294 400 300 -774 Purchase
+T-Shirt M 1,680 2,304 400 150 -374 Transfer + Purchase
+Water 500ml 8,400 5,200 2,000 1,500 +3,700 No Purchase
+
+TICVAI / INVENTORY & PROCUREMENT BACKEND STRUCTURE
+CONFIDENTIAL | 158
+Planning Horizon
+Support:
+ Next 24 Hours
+ 3 Days
+ 7 Days
+ 14 Days
+ 30 Days
+ 90 Days
+ Custom
+Planner Actions
+Accept Recommendation
+Modify
+Create Transfer
+Create Draft PR
+Defer
+Ignore with Reason
+PAGE 4 — Inventory Optimization & Stock Health
+Purpose
+Identify inventory that is too high, too low, slow-moving, obsolete or at risk of expiry.
+Inventory Health Classifications
+ Healthy
+ Low Stock
+ Critical
+ Overstock
+ Slow Moving
+ Non-Moving
+ Dead Stock
+ Expiry Risk
+ Obsolete
+Slow-Moving Analysis
+Configurable definitions:
+Example:
+No movement:
+30 Days Slow →
+90 Days Very Slow →
+180 Days Dead Stock →
+Definitions should vary by category.
+Fresh food obviously cannot use the same thresholds as merchandise or spare parts.
+Overstock Analysis
+Example:
+Logo Mug
+Available:
+
+TICVAI / INVENTORY & PROCUREMENT BACKEND STRUCTURE
+CONFIDENTIAL | 159
+1,840
+Average Monthly Demand:
+220
+Inventory Cover:
+8.4 Months
+Target:
+2 Months
+Excess:
+1,400 units
+Value:
+AED 39,200
+Recommended Actions
+ Transfer to Higher-Demand Location
+ Reduce Reorder Quantity
+ Stop Replenishment
+ Return to Supplier where allowed
+ Promotional Action
+ Bundle
+ Markdown recommendation to Retail
+ Consume / Prioritize in F&B
+ Write-Off Review
+Expiry Risk
+Example:
+Fresh Juice:
+240 units
+Expires:
+5 days
+Forecast Consumption:
+140
+Potential Waste:
+100 units
+Estimated Cost:
+AED 1,800
+Recommendation:
+Redistribute to high-demand outlets.
+PAGE 5 — Procurement Spend, Savings & Commercial Analytics
+Purpose
+Provide management with comprehensive visibility into procurement spend and commercial performance.
+KPI Cards
+ Total Spend
+ PO Value
+ Average PO Value
+ Savings
+
+TICVAI / INVENTORY & PROCUREMENT BACKEND STRUCTURE
+CONFIDENTIAL | 160
+ Cost Avoidance
+ Purchase Price Variance
+ Contract Spend %
+ Off-Contract Spend
+ Emergency Procurement %
+ Single-Source Spend
+ Average Procurement Cycle Time
+Spend Analysis
+Analyze by:
+ Supplier
+ Category
+ Department
+ Company
+ Park
+ Venue
+ Buyer
+ Item
+ Month
+ Quarter
+ Year
+Savings Analysis
+Separate:
+Negotiated Savings
+Budget Savings
+Contract Savings
+Volume Savings
+Cost Avoidance
+Example
+Annual Procurement Spend:
+AED 18.4M
+Negotiated Savings:
+AED 820K
+Contract Savings:
+AED 340K
+Cost Avoidance:
+AED 280K
+Total Procurement Value Contribution:
+AED 1.44M
+Purchase Price Variance
+Example:
+Water Bottle
+Previous:
+AED 1.82
+Current:
+
+TICVAI / INVENTORY & PROCUREMENT BACKEND STRUCTURE
+CONFIDENTIAL | 161
+AED 1.95
+Change:
++7.1%
+Annualized Impact:
++AED 84K
+PAGE 6 — Supplier Performance & Risk Analytics
+Purpose
+Provide centralized supplier intelligence based on actual operational performance.
+Supplier Scorecard
+Track:
+ On-Time Delivery
+ Fill Rate
+ Quality Acceptance
+ Quantity Accuracy
+ Price Accuracy
+ Invoice Accuracy
+ Lead-Time Reliability
+ Response Rate
+ Dispute Rate
+ Compliance
+ Contract Status
+Example
+Fresh Foods UAE
+Overall Score:
+89 / 100
+Delivery:
+82%
+Quality:
+96%
+Quantity:
+98%
+Invoice:
+94%
+Compliance:
+100%
+Trend:
+Declining
+Supplier Ranking
+Supplier Spend Delivery Qualit
+y
+Pric
+e
+Overall
+Supplier A AED 2.8M 96% 95% 91% 94
+Supplier B AED 1.9M 84% 97% 96% 89
+Supplier C AED 1.2M 98% 98% 82% 92
+
+TICVAI / INVENTORY & PROCUREMENT BACKEND STRUCTURE
+CONFIDENTIAL | 162
+Supplier Spend Delivery Qualit
+y
+Pric
+e
+Overall
+Risk Indicators
+ Late Delivery Trend
+ Quality Decline
+ Price Inflation
+ Compliance Expiry
+ High Dependency
+ Single Supplier Dependency
+ Repeated Invoice Issues
+ Frequent Short Deliveries
+Supplier Concentration
+Example:
+Category:
+Fresh Food
+Spend with Supplier A:
+72%
+Risk:
+High Dependency
+Recommendation:
+Qualify an alternative supplier.
+PAGE 7 — Warehouse & Inventory Performance Analytics
+Purpose
+Measure the operational effectiveness of warehouse and inventory-control processes.
+Warehouse KPIs
+ Receiving Time
+ Put-Away Time
+ Picking Time
+ Picking Accuracy
+ Packing Accuracy
+ Dispatch SLA
+ Warehouse Capacity %
+ Dock Utilization
+ Task Completion Rate
+ Employee Productivity
+ Inventory Accuracy
+ Count Variance
+ Transfer Accuracy
+
+TICVAI / INVENTORY & PROCUREMENT BACKEND STRUCTURE
+CONFIDENTIAL | 163
+Warehouse Comparison
+Warehouse Accuracy Pick SLA Capacity Error
+s
+Health
+Central 99.6% 97% 78% 0.4% Excellent
+F&B 99.1% 94% 86% 0.9% Good
+Retail 98.4% 91% 72% 1.6% Warning
+Bottleneck Analysis
+Example:
+Receiving:
+12 min avg
+Put-Away:
+42 min avg
+Picking:
+18 min avg
+Packing:
+11 min avg
+AI identifies:
+Put-Away is the primary bottleneck.
+Capacity Heatmap
+Display utilization by:
+Warehouse Zone Day Time → → →
+This helps management anticipate congestion before it occurs.
+PAGE 8 — Inventory & Procurement Approval / Control Center
+Purpose
+Provide authorized management with one centralized workspace for inventory and procurement exceptions 
+requiring approval.
+This shall consume the shared TICVAI Approval Engine, not create another approval framework.
+Approval Categories
+Inventory
+ Stock Adjustment
+ Write-Off
+ Negative Stock Override
+ Large Variance
+ Emergency Transfer
+Warehouse
+ Over-Delivery
+ Manual Movement Override
+ Quality Exception
+Procurement
+ Purchase Request
+ Single-Source Purchase
+ RFQ Award
+
+TICVAI / INVENTORY & PROCUREMENT BACKEND STRUCTURE
+CONFIDENTIAL | 164
+ High-Value PO
+ PO Amendment
+ Budget Exception
+Receiving / Matching
+ GRN Exception
+ Invoice Variance
+ Manual Match
+ Short Close
+Approval Inbox
+Request Type Value Risk Waitin
+g
+Action
+ADJ-1842 Write-Off AED 18K High 2h Review
+PO-1848 PO Award AED 420K Medium 4h Review
+INV-4821 Price Variance AED 8.4K High 1d Review
+SLA
+Display:
+ Within SLA
+ Approaching SLA
+ Overdue
+Escalation
+Approval workflows should support automatic escalation based on TICVAI's common policy engine.
+PAGE 9 — Integration, API & Automation Control Center
+Purpose
+Provide administrators with visibility and control over Inventory & Procurement integrations.
+Integration Areas
+ Retail
+ F&B
+ Finance / ERP
+ Supplier Systems
+ Employee App
+ Resource Management
+ Event Management
+ Ticketing
+ CRM where applicable
+ External Logistics
+ Barcode / RFID Systems
+ BI / Data Warehouse
+Integration Dashboard
+Display:
+ Integration
+ Direction
+ Last Sync
+
+TICVAI / INVENTORY & PROCUREMENT BACKEND STRUCTURE
+CONFIDENTIAL | 165
+ Transactions
+ Success
+ Failed
+ Pending
+ Health
+Example:
+Integration Last Sync Success Faile
+d
+Health
+Retail POS 10:32 12,840 2 Healthy
+F&B 10:31 8,422 0 Healthy
+Finance 10:28 1,840 4 Warning
+Supplier API 10:25 620 8 Warning
+API Capabilities
+Support controlled APIs for:
+ Inventory Lookup
+ Stock Availability
+ Inventory Movement
+ Purchase Request
+ Purchase Order
+ Supplier
+ GRN
+ Invoice Match Status
+ Transfer
+ Replenishment Recommendation
+Event / Webhook Architecture
+Where supported:
+Inventory Updated
+PO Created
+GRN Posted
+Stock Below Threshold
+Supplier Delivery Received
+should be capable of generating platform events for subscribed TICVAI services.
+Integration Exception
+Example:
+Retail POS posted 14 sales while Inventory API was unavailable.
+Status:
+Queued for Reprocessing
+Actions:
+Retry | Investigate | View Transactions
+
+TICVAI / INVENTORY & PROCUREMENT BACKEND STRUCTURE
+CONFIDENTIAL | 166
+PAGE 10 — TICVAI AI Inventory & Procurement Copilot
+Purpose
+Provide a conversational AI layer across the complete Inventory & Procurement module.
+Instead of forcing managers to navigate multiple reports, they should be able to ask TICVAI questions directly.
+Example Questions
+Which items will run out during the next seven days?
+What should I purchase today?
+Which warehouses have excess stock?
+Which suppliers are performing badly?
+Why did F&B food cost increase this month?
+Which POs are likely to arrive late?
+Show me inventory at risk of expiry.
+How much inventory is currently tied up in slow-moving stock?
+Why did Retail inventory accuracy fall?
+Which procurement decisions saved the most money this quarter?
+AI Response Example
+Question:
+What should I purchase for this weekend?
+TICVAI AI
+Based on:
+ 28,400 expected visitors
+ Existing reservations
+ Event schedule
+ Current inventory
+ Open POs
+ Transfers
+ Safety stock
+ Supplier lead times
+I identified:
+14 items requiring action
+Estimated Purchase:
+AED 84,600
+Internal Transfer Opportunity:
+AED 18,200
+Urgent Purchase:
+5 items
+Potential Stock-Out Revenue Exposure:
+AED 42,800
+Actions:
+View Plan | Create Draft PRs | Review Items
+AI — DEMAND FORECASTING
+The AI engine should combine multiple demand signals.
+
+TICVAI / INVENTORY & PROCUREMENT BACKEND STRUCTURE
+CONFIDENTIAL | 167
+Traditional
+Historical Consumption
+
+Operational
+Ticket Sales + Reservations + Events
+
+Commercial
+Promotions + Retail Campaigns
+
+Environmental
+Weather / Seasonality where integrated
+↓
+TICVAI Demand Forecast
+This is especially valuable for TICVAI because inventory demand at attractions and entertainment venues is heavily
+influenced by attendance.
+AI — CROSS-MODULE DEMAND INTELLIGENCE
+This is one of the most important capabilities I recommend.
+Example:
+TICVAI Ticketing sees:
+Saturday Attendance Forecast +32%
+↓
+AI identifies likely impact:
+F&B
+Water:
++28%
+Burgers:
++24%
+Ice Cream:
++38%
+Retail
+Souvenir T-Shirts:
++19%
+Caps:
++17%
+Operations
+Wristbands:
++31%
+↓
+Inventory checks availability.
+↓
+AI identifies shortages.
+↓
+Checks internal redistribution.
+↓
+Creates recommendations.
+↓
+Draft PRs where necessary.
+This connects the entire TICVAI platform instead of treating Inventory as an isolated ERP feature.
+
+TICVAI / INVENTORY & PROCUREMENT BACKEND STRUCTURE
+CONFIDENTIAL | 168
+AI — DYNAMIC SAFETY STOCK
+Instead of using one fixed safety-stock level forever, TICVAI should recommend adjustments based on:
+ Demand Volatility
+ Supplier Reliability
+ Lead Time
+ Season
+ Events
+ Stock-Out Cost
+Example:
+Normal Safety Stock:
+300
+Upcoming Eid period:
+Recommended:
+520
+Reason:
+Expected demand increase + supplier holiday lead-time risk.
+The user must approve changes unless tenant policy explicitly permits automation.
+AI — INVENTORY REBALANCING
+Example:
+Main Gift Shop
+T-Shirt M:
+Available:
+8
+Forecast:
+64
+Waterpark Shop
+Available:
+92
+Forecast:
+30
+Event Store
+Available:
+74
+Forecast:
+22
+AI Recommendation:
+Transfer 56 units to Main Gift Shop
+rather than purchasing additional stock.
+Estimated Purchase Avoidance:
+AED 2,352
+AI — PROCUREMENT CONSOLIDATION
+Example:
+Three departments request the same item:
+F&B:
+500
+
+TICVAI / INVENTORY & PROCUREMENT BACKEND STRUCTURE
+CONFIDENTIAL | 169
+Retail:
+800
+Event:
+1,200
+AI recommends:
+Consolidate 2,500 units into one sourcing event.
+Potential Volume Saving:
+AED 8,400
+AI — CASH & WORKING CAPITAL OPTIMIZATION
+TICVAI should consider the cost of holding unnecessary inventory.
+Example:
+Inventory Value:
+AED 8.4M
+Slow / Excess:
+AED 1.2M
+Potential Reducible Stock:
+AED 640K
+AI Recommendation:
+Reduce selected reorder quantities and delay 6 non-critical Purchase Orders.
+Potential Working Capital Release:
+AED 420K
+Finance should consume these recommendations, but Finance remains responsible for financial accounting.
+AI — EXPLAINABLE RECOMMENDATIONS
+Every major AI recommendation should explain:
+Recommendation
+Purchase 800 units
+Why?
+ Current Available: 320
+ Forecast Demand: 920
+ Safety Stock: 200
+ Incoming PO: 0
+ Supplier Lead Time: 4 days
+ Event begins in 6 days
+Confidence
+93%
+Actions
+Accept | Modify | Simulate | Ignore
+The AI should not behave like a black box.
+AI — SIMULATION / WHAT-IF ANALYSIS
+Managers should be able to simulate scenarios.
+Example:
+What happens if attendance is 20% higher than forecast?
+TICVAI recalculates:
+
+TICVAI / INVENTORY & PROCUREMENT BACKEND STRUCTURE
+CONFIDENTIAL | 170
+ F&B Demand
+ Retail Demand
+ Inventory Shortages
+ Procurement Requirements
+ Warehouse Workload
+ Supplier Capacity
+ Working Capital
+Another example:
+What happens if Supplier A is delayed by 5 days?
+TICVAI identifies affected:
+Items Locations F&B Products Retail Products Events → → → →
+and recommends mitigation.
+AI — RECOMMENDATION GOVERNANCE
+AI recommendations shall have configurable execution modes.
+Level 1 — Insight Only
+AI displays information.
+Level 2 — Recommendation
+AI recommends an action.
+Level 3 — Draft Action
+AI creates:
+ Draft Transfer
+ Draft PR
+ Draft Replenishment
+Level 4 — Auto-Execute Within Policy
+Only where explicitly enabled.
+Example:
+Automatically create internal replenishment below AED 500 equivalent operational value.
+Level 5 — Approval Required
+AI creates action and routes it through the Approval Engine.
+I recommend TICVAI default to Levels 2–3, with Level 4 enabled only for clearly defined low-risk workflows.
+ALERT & EXCEPTION MANAGEMENT
+Board 7 shall consolidate intelligent alerts across all Inventory & Procurement Boards.
+Inventory
+ Low Stock
+ Stock-Out
+ Overstock
+ Expiry
+ Negative Stock
+ Shrinkage
+Warehouse
+ Capacity
+ Picking Delay
+ Receiving Delay
+ Dispatch Delay
+
+TICVAI / INVENTORY & PROCUREMENT BACKEND STRUCTURE
+CONFIDENTIAL | 171
+Procurement
+ PR Delay
+ RFQ Delay
+ Supplier Risk
+ PO Delay
+ Price Increase
+Receiving
+ Quality Failure
+ GRN Exception
+ Invoice Exception
+ Match Failure
+Alert Prioritization
+AI should avoid flooding users.
+Prioritize by:
+Financial Impact + Operational Impact + Guest Impact + Urgency + Probability
+REPORTING & EXPORT
+Board 7 should provide standard reports including:
+ Inventory Valuation
+ Stock Position
+ Stock Movement
+ Inventory Aging
+ Expiry Report
+ Slow-Moving Stock
+ Dead Stock
+ Shrinkage
+ Inventory Accuracy
+ Warehouse Performance
+ Procurement Spend
+ Supplier Spend
+ Supplier Performance
+ Purchase Price Variance
+ Procurement Savings
+ PR Cycle Time
+ PO Cycle Time
+ GRN Performance
+ Invoice Match Performance
+ Procurement Exceptions
+Reports should support:
+View Filter Drill Down Export Schedule → → → →
+ROLE-BASED DASHBOARDS
+Board 7 should not show everyone the same information.
+Inventory Manager
+Stock Health + Accuracy + Replenishment
+
+TICVAI / INVENTORY & PROCUREMENT BACKEND STRUCTURE
+CONFIDENTIAL | 172
+Warehouse Manager
+Capacity + Tasks + SLA + Accuracy
+Procurement Manager
+Spend + RFQ + PO + Savings + Supplier
+Finance
+Inventory Value + Commitments + Variance + Match
+Operations Manager
+Availability + Operational Risk
+Executive
+High-Level KPIs + Risk + Savings + Working Capital
+AI Assistant
+Responses must respect the user's permissions.
+A manager should never retrieve restricted data merely by asking the AI.
+AUDIT & AI GOVERNANCE
+Maintain audit history for:
+ Forecast Changes
+ Manual Overrides
+ AI Recommendations
+ Accepted Recommendations
+ Rejected Recommendations
+ Auto-Created PR
+ Auto-Created Transfer
+ Approval
+ Policy Changes
+Example:
+AI Recommendation
+Transfer:
+100 units
+User Modified:
+80 units
+Reason:
+Expected local event demand.
+This becomes useful feedback for future AI recommendations.
+BOARD 7 — FINAL 10 SCREENS
+# Screen
+1 Inventory & Procurement Executive Command Center
+2 Demand Forecasting & Consumption Planning
+3 Replenishment & Procurement Planning
+4 Inventory Optimization & Stock Health
+5 Procurement Spend, Savings & Commercial Analytics
+6 Supplier Performance & Risk Analytics
+
+TICVAI / INVENTORY & PROCUREMENT BACKEND STRUCTURE
+CONFIDENTIAL | 173
+# Screen
+7 Warehouse & Inventory Performance Analytics
+8 Inventory & Procurement Approval / Control Center
+9 Integration, API & Automation Control Center
+1
+0
+TICVAI AI Inventory & Procurement Copilot
+COMPLETE BOARD 7 INTELLIGENCE FLOW
+DATA
+Ticketing
+
+Events
+
+Reservations
+
+Retail
+
+F&B
+
+Inventory
+
+Warehouse
+
+Procurement
+
+Suppliers
+
+Finance
+↓
+TICVAI INTELLIGENCE LAYER
+Analyze:
+Demand + Stock + Cost + Lead Time + Supplier Performance + Operational Capacity
+↓
+Forecast:
+What will be needed?
+↓
+Determine:
+Where and when?
+↓
+Check:
+Existing Stock + Transfers + Incoming PO
+↓
+Recommend:
+
+TICVAI / INVENTORY & PROCUREMENT BACKEND STRUCTURE
+CONFIDENTIAL | 174
+OPTION 1
+No Action
+OPTION 2
+Replenish Internally
+OPTION 3
+Transfer Between Locations
+OPTION 4
+Purchase
+OPTION 5
+Expedite Existing PO
+OPTION 6
+Reduce / Delay Procurement
+↓
+Simulate Impact
+↓
+Human Review / Approval
+↓
+Execute through Boards 1–6
+↓
+Measure Actual Outcome
+↓
+Improve Future Recommendations
+COMPLETE INVENTORY & PROCUREMENT ARCHITECTURE — BOARDS 1–7
+Board Responsibility
+Board 1 Inventory Master & Stock Control
+Board 2 Warehouse, Location & Fulfilment Operations
+Board 3 Transfers, Counts, Adjustments & Reconciliation
+Board 4 Supplier & Purchase Request Management
+Board 5 RFQ, Sourcing, Quotations & Purchase Orders
+Board 6 Receiving, GRN, Invoice Matching & Procurement Closure
+Board 7 Planning, Analytics, AI Optimization, Controls & Integration
+Architectural recommendation
+Board 7 should not become another transactional system. It should sit above Boards 1–6 as TICVAI's Inventory 
+& Procurement Intelligence Layer.
+The architecture should therefore be:
+
+TICVAI / INVENTORY & PROCUREMENT BACKEND STRUCTURE
+CONFIDENTIAL | 175
+Transactional Engines — Boards 1–6
+↓
+Unified Inventory & Procurement Data
+↓
+BOARD 7 — INTELLIGENCE & CONTROL
+Forecast
+→ Analyze
+→ Detect
+→ Recommend
+→ Simulate
+→ Approve
+↓
+Send execution back to the correct engine:
+Transfer Board 3 →
+Warehouse Task Board 2 →
+Purchase Request Board 4 →
+RFQ / PO Board 5 →
+Receiving / Match Board 6 →
+This prevents AI from becoming a disconnected chatbot. It makes AI an actionable layer on top of the actual 
+TICVAI workflows.
+The strongest differentiator here is the connection between ticket demand and inventory/procurement 
+planning. TICVAI already knows ticket sales, attendance forecasts, events, F&B demand and retail activity. That 
+information should automatically improve inventory forecasts and purchasing decisions.
+For an attractions and entertainment platform, that is considerably more valuable than building a traditional 
+standalone inventory system.

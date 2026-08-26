@@ -1,0 +1,46 @@
+id: LLD-Production run
+title: Production run — 4 transitions
+generatedBy: tools/derive-diagrams.py
+index: diagrams/hld/04-lifecycles.yaml
+source: states/production-run.yaml
+entity: Production run
+contract: fnb
+enum: ProductionRun.status
+enumKind: inline
+enumSchema: ProductionRun
+enumProperty: status
+owner: fnb
+initial:
+- planned
+terminal:
+- completed
+- cancelled
+transitions:
+- from: planned
+  to: inProgress
+  operation: planProductionRun
+  trigger: operation
+  guard: Ingredients issued. **Stock leaves here, not at completion** — a run abandoned halfway has
+    still consumed them
+- from: inProgress
+  to: completed
+  operation: completeProductionRun
+  trigger: operation
+  guard: '**`actualQuantity` against the recipe theoretical.** The gap is waste, theft or a wrong recipe'
+- from: inProgress
+  to: cancelled
+  operation: completeProductionRun
+  trigger: operation
+  guard: Abandoned. **The ingredients are gone and the variance records it** — a cancelled run is not
+    a run that never happened
+- from: planned
+  to: cancelled
+  operation: planProductionRun
+  trigger: operation
+  guard: Cancelled before anything was issued
+notes: '**Stock moves at `inProgress`, not at `completed`.** A run abandoned halfway has consumed its
+  ingredients, and recording the movement at the end means a kitchen that looks fully stocked while
+  the ingredients are on the bench.
+
+
+  **A cancelled run is not a run that never happened** — the variance is the point.'

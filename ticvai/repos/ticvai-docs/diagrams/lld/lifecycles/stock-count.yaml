@@ -1,0 +1,59 @@
+id: LLD-Stock count
+title: Stock count — 7 transitions
+generatedBy: tools/derive-diagrams.py
+index: diagrams/hld/04-lifecycles.yaml
+source: states/stock-count.yaml
+entity: Stock count
+contract: inventory
+enum: CountStatus
+enumKind: named
+enumSchema: CountStatus
+owner: inventory
+initial:
+- open
+terminal:
+- posted
+- cancelled
+transitions:
+- from: open
+  to: counting
+  operation: startStockCount
+  trigger: operation
+  guard: Counting began. **Movements in the counted location are frozen from here**
+- from: counting
+  to: closed
+  operation: postStockCount
+  trigger: operation
+  guard: Blind count submitted. The expected figure was withheld until this point
+- from: closed
+  to: variancePending
+  trigger: job
+  guard: Variance above the threshold
+- from: closed
+  to: posted
+  trigger: job
+  guard: Within tolerance. Adjustments posted
+  emits:
+  - stock.depleted
+- from: variancePending
+  to: posted
+  operation: postStockCount
+  trigger: operation
+  guard: Variance accepted with a reason
+  requiresApproval: true
+  emits:
+  - stock.depleted
+- from: variancePending
+  to: counting
+  operation: recountStockCount
+  trigger: operation
+  guard: Sent back to be recounted rather than accepted
+  isReversal: true
+  requiresApproval: true
+- from: open
+  to: cancelled
+  operation: cancelStockCount
+  trigger: operation
+  guard: Abandoned before counting
+notes: Freezing movements at `counting` is what makes the variance mean anything. A count taken while
+  stock moves measures the movement, not the discrepancy.

@@ -1,0 +1,69 @@
+# Entitlement — state model
+# Contract: access.TicketStatus
+# Checked by tools/check-states.py against the contract enum and the event catalogue.
+
+entity: Entitlement
+contract: access
+enum: TicketStatus
+enumKind: named
+enumSchema: TicketStatus
+owner: access
+initial:
+- issued
+terminal:
+- fullyConsumed
+- expired
+- cancelled
+- surrendered
+transitions:
+- from: issued
+  to: partiallyConsumed
+  operation: validateAccess
+  trigger: operation
+  guard: Entry recorded, entries remain
+  emits:
+  - access.validated
+- from: issued
+  to: fullyConsumed
+  operation: validateAccess
+  trigger: operation
+  guard: Single-entry, or last entry used
+  emits:
+  - access.validated
+- from: partiallyConsumed
+  to: fullyConsumed
+  operation: validateAccess
+  trigger: operation
+  guard: Last remaining entry used
+- from: issued
+  to: expired
+  trigger: timer
+  guard: Validity window passed unused
+- from: partiallyConsumed
+  to: expired
+  trigger: timer
+  guard: Validity window passed with entries remaining
+- from: issued
+  to: cancelled
+  operation: createRefund
+  trigger: cascade
+  guard: Order refunded before use
+  isReversal: true
+- from: issued
+  to: surrendered
+  operation: validateAccess
+  trigger: operation
+  guard: Media taken at the gate. **Surrendered media cannot accept appended entitlements** (CF-58)
+- from: issued
+  to: issued
+  operation: transferOrderTickets
+  trigger: operation
+  guard: Holder changed, state unchanged. A transfer moves who holds it, not where it is in its life
+notes: Modelled here rather than in a contract enum — `TicketStatus` in access is a projection carrying
+  entriesUsed, not a stored status. This is the state the storage layer must hold.
+offlineReachable:
+- issued
+- partiallyConsumed
+openQuestions:
+- The states above are not currently a contract enum. Either access publishes one or this model describes
+  something no API exposes, and the second is worse.

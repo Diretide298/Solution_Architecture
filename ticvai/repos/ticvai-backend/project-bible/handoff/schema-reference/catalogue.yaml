@@ -1,0 +1,398 @@
+# catalogue — derived from the API contracts, not hand-written
+# Migration: V0004
+#
+# Columns come from schema properties. Types are inferred: format uuid to uuid,
+# date-time to timestamptz, ULID patterns to char(26), Money to numeric(18,4).
+# What is NOT here: partitioning, RLS policies, indexes, the PII split. That is
+# storage design and lives in the migration scripts.
+
+module: catalogue
+migration: V0004
+tableCount: 13
+columnCount: 106
+tables:
+  catalogue.alternative_code:
+    derivedFrom: AlternativeCode
+    columns:
+    - name: code
+      type: varchar(128)
+      required: true
+    - name: partner_id
+      type: uuid
+      required: true
+    - name: partner_name
+      type: text
+      required: false
+    - name: variant_id
+      type: uuid
+      required: false
+    - name: note
+      type: varchar(200)
+      required: false
+  catalogue.attribute_axis:
+    derivedFrom: AttributeAxis
+    columns:
+    - name: code
+      type: varchar(64)
+      required: true
+    - name: name
+      type: varchar(200)
+      required: true
+    - name: values
+      type: jsonb
+      required: true
+  catalogue.channel_allocation:
+    derivedFrom: ChannelAllocation
+    columns:
+    - name: channel
+      type: jsonb
+      required: true
+    - name: allocated_units
+      type: integer
+      required: true
+    - name: release_at
+      type: timestamptz
+      required: false
+      description: Unsold units return to the general pool at this time. How distribution holds are freed
+        close to a performance without someone remembering to do it.
+  catalogue.entitlement_template:
+    derivedFrom: EntitlementTemplate
+    columns:
+    - name: id
+      type: uuid
+      required: true
+    - name: code
+      type: varchar(64)
+      required: true
+    - name: name
+      type: varchar(200)
+      required: true
+    - name: validity_kind
+      type: text
+      required: true
+    - name: valid_from_offset_days
+      type: integer
+      required: false
+    - name: valid_for_days
+      type: integer
+      required: false
+    - name: entries_allowed
+      type: integer
+      required: false
+      description: Null means unlimited. The Fast Pass consumption counter lives here.
+    - name: reentry_allowed
+      type: boolean
+      required: false
+    - name: admission_profile_id
+      type: uuid
+      required: false
+    - name: is_transferable
+      type: boolean
+      required: false
+    - name: is_name_bound
+      type: boolean
+      required: false
+      description: True requires a holder name at sale. Most entitlements carry none — identity and entitlement
+        are separate concerns.
+    - name: crosses_cells
+      type: boolean
+      required: false
+      description: True propagates a redemption right to other cells on issue (ADR-0010).
+    - name: is_active
+      type: boolean
+      required: false
+  catalogue.envelope:
+    derivedFrom: Envelope
+    columns:
+    - name: id
+      type: uuid
+      required: true
+    - name: performance_id
+      type: uuid
+      required: true
+    - name: name
+      type: text
+      required: false
+    - name: seat_category_id
+      type: uuid
+      required: false
+    - name: capacity
+      type: integer
+      required: true
+    - name: sold
+      type: integer
+      required: true
+    - name: leased
+      type: integer
+      required: true
+    - name: remaining
+      type: integer
+      required: true
+    - name: has_channel_allocations
+      type: boolean
+      required: false
+      description: True where capacity is divided across channels. Leases then draw from a channel allocation
+        rather than from raw capacity.
+    - name: is_seated
+      type: boolean
+      required: true
+      description: Seated envelopes cannot be leased and are blocked offline. A seat map is not a count.
+  catalogue.event:
+    derivedFrom: Event
+    columns:
+    - name: id
+      type: uuid
+      required: true
+    - name: code
+      type: text
+      required: true
+    - name: name
+      type: text
+      required: true
+    - name: venue_id
+      type: uuid
+      required: true
+    - name: scope_path
+      type: text
+      required: true
+    - name: parent_event_id
+      type: uuid
+      required: false
+      description: For grouped events.
+    - name: performance_count
+      type: integer
+      required: false
+    - name: is_active
+      type: boolean
+      required: false
+  catalogue.inventory_lease:
+    derivedFrom: Lease
+    columns:
+    - name: id
+      type: text
+      required: true
+    - name: envelope_id
+      type: uuid
+      required: true
+    - name: holder_workstation_id
+      type: uuid
+      required: true
+    - name: parent_lease_id
+      type: text
+      required: false
+      description: Present when sub-leased from a venue edge node.
+    - name: requested_units
+      type: integer
+      required: false
+    - name: channel
+      type: jsonb
+      required: false
+      description: Allocation this lease draws from.
+    - name: granted_units
+      type: integer
+      required: true
+      description: May be less than requested — a partial grant is not an error. Constrained by the channel's
+        remaining allocation plus the general pool, never by raw capacity.
+    - name: consumed_units
+      type: integer
+      required: true
+    - name: status
+      type: jsonb
+      required: true
+    - name: acquired_at
+      type: timestamptz
+      required: true
+    - name: expires_at
+      type: timestamptz
+      required: true
+    - name: released_at
+      type: timestamptz
+      required: false
+    - name: force_released_by_principal_id
+      type: uuid
+      required: false
+    - name: force_release_reason
+      type: text
+      required: false
+  catalogue.performance:
+    derivedFrom: Performance
+    columns:
+    - name: id
+      type: uuid
+      required: true
+    - name: event_id
+      type: uuid
+      required: true
+    - name: starts_at
+      type: timestamptz
+      required: true
+    - name: ends_at
+      type: timestamptz
+      required: true
+    - name: status
+      type: text
+      required: true
+    - name: admission_profile_id
+      type: uuid
+      required: false
+    - name: seat_map_id
+      type: uuid
+      required: false
+  catalogue.price:
+    derivedFrom: Price
+    columns:
+    - name: price_list_id
+      type: uuid
+      required: true
+    - name: variant_id
+      type: uuid
+      required: true
+    - name: amount
+      type: numeric(18,4)
+      required: true
+    - name: tax_code_id
+      type: uuid
+      required: false
+  catalogue.price_list:
+    derivedFrom: PriceList
+    columns:
+    - name: id
+      type: uuid
+      required: true
+    - name: code
+      type: text
+      required: true
+    - name: name
+      type: text
+      required: true
+    - name: venue_id
+      type: uuid
+      required: true
+    - name: currency
+      type: char(3)
+      required: true
+    - name: currency_scale
+      type: integer
+      required: true
+    - name: channels
+      type: jsonb
+      required: true
+    - name: valid_from
+      type: timestamptz
+      required: false
+    - name: valid_to
+      type: timestamptz
+      required: false
+    - name: priority
+      type: integer
+      required: false
+      description: Where lists overlap, higher priority wins.
+  catalogue.product:
+    derivedFrom: Product
+    columns:
+    - name: id
+      type: uuid
+      required: true
+    - name: code
+      type: varchar(64)
+      required: true
+    - name: name
+      type: varchar(200)
+      required: true
+    - name: description
+      type: text
+      required: false
+    - name: kind
+      type: jsonb
+      required: true
+    - name: venue_id
+      type: uuid
+      required: true
+    - name: scope_path
+      type: text
+      required: true
+    - name: lifecycle_state
+      type: jsonb
+      required: false
+    - name: is_sellable
+      type: boolean
+      required: true
+      description: True only when live **and** carried by a published bundle. Approval and publication
+        are different acts.
+    - name: has_variants
+      type: boolean
+      required: true
+    - name: variant_count
+      type: integer
+      required: false
+    - name: channels
+      type: jsonb
+      required: false
+    - name: entitlement_template_id
+      type: uuid
+      required: false
+      description: What the buyer receives. Null for products that grant nothing — F&B and retail. Identity
+        and entitlement are separate concerns.
+    - name: blocked_offline
+      type: boolean
+      required: false
+      description: True for seated and retail. Seated because a seat map is not a count; retail because
+        stock depletes in real time.
+    - name: data_mask_values
+      type: jsonb
+      required: false
+      description: Custom fields. JSONB-backed, defined by the venue's data mask.
+  catalogue.published_bundle:
+    derivedFrom: CatalogueBundle
+    columns:
+    - name: version
+      type: text
+      required: true
+    - name: venue_id
+      type: uuid
+      required: true
+    - name: is_delta
+      type: boolean
+      required: true
+    - name: base_version
+      type: text
+      required: false
+      description: Present when `isDelta`. The version this delta applies to.
+    - name: signature
+      type: text
+      required: true
+      description: Detached signature over `contentHash`. The terminal verifies before applying and rolls
+        back on failure — a half-applied catalogue is never traded against.
+    - name: signature_key_id
+      type: text
+      required: true
+    - name: content_hash
+      type: text
+      required: true
+    - name: stale_after
+      type: timestamptz
+      required: true
+    - name: payload
+      type: jsonb
+      required: true
+      description: Products, variants, price lists, prices, tax codes, events, performances, envelope
+        definitions and data mask field definitions. Shape is versioned with the bundle format, not with
+  catalogue.variant:
+    derivedFrom: ProductVariant
+    columns:
+    - name: id
+      type: uuid
+      required: true
+    - name: product_id
+      type: uuid
+      required: true
+    - name: sku
+      type: text
+      required: true
+    - name: axis_values
+      type: jsonb
+      required: true
+    - name: is_active
+      type: boolean
+      required: true
+      description: False when retired. Retired variants are never deleted — orders reference them.

@@ -1,0 +1,737 @@
+# P12 — Support Agent Console
+# Generated from handoff/page-inventory.md. Layout, states and purpose are TODO.
+# Validated against _schema.yaml; component kinds from _components.yaml.
+
+platform:
+  code: P12
+  audience: staff
+  formFactor: web
+  shortName: Venue Support
+  name: Venue Support — Agent Console
+  surface: staffFacing
+  runtime: reactWeb
+  offlineCapable: false
+  themes:
+  - light
+  - dark
+  directions:
+  - ltr
+  - rtl
+  screenCount: 8
+  app: venue-support-web
+  appStatus: not scaffolded
+  packages:
+  - design-tokens
+  - ui
+  - api-client
+  deployment:
+    target: browser, desktop
+    distribution: served from the cell
+    bundleUpdate: immediate on deploy
+    hosting: in-cell, in-region
+    storeReview: false
+    deviceOwnership: agent workstation
+    networkAssumption: corporate network
+    releaseCadence: weekly
+  reachesOtherPlatforms:
+  - screen: ADM-035
+    platform: P09
+    board: P09 TICVAI Web.dc.html#adm-035
+    note: An agent escalates to platform support
+  - screen: PTR-021
+    platform: P10
+    board: P10 Partner Web.dc.html#ptr-021
+    note: A partner query resolved from the partner record
+  operator: venue
+  wireframeBoard: wireframes/P12 Venue Support.dc.html
+  wireframeBoardNote: '**The generated board for the whole platform.** Individual screens keep the client-pack
+    anchor where one exists — a screen the client drew should open the client''s frame — and this renders
+    every screen on the platform including the ones no pack covers.
+
+
+    **Declared 24 August.** The file was written from the first generation and nothing pointed at it:
+    `check-wireframes` has no unmatched-board concept, so the Python suite passed while the viewer flagged
+    an orphan. **A board nobody references is a board nobody reviews.**'
+screens:
+- id: SUP-001
+  name: Agent Login
+  module: TODO
+  purpose: Get someone into the app, fast, on a device that may be shared.
+  wave: 3
+  layout:
+    template: list
+    regions:
+    - name: contentBody
+      components:
+      - kind: searchField
+      - kind: dataTable
+  states:
+    loading: Detail loads
+    emptyFirstRun: Not found — it may have been deleted or moved out of scope
+    emptyNoResults: '**The filter matched nothing, and the data is still there.** The action widens
+      or clears it — distinct from first run, which has nothing to match, and **a screen that shows
+      the same panel for both sends somebody looking for data they already filtered out.**'
+    emptyNoAccess: '**Says which permission is missing, and never renders as an empty list.** This screen
+      needs `SESSION_FORCE_LOGOUT` to use sessions; a person without it sees the reason and who to ask,
+      because an empty table reads as *there is no data* and sends somebody to support with the wrong
+      question.
+
+
+      **Authority is carried by the person, not the device** (ADR-0002) — so signing in again on the
+      same terminal is the way through.'
+    error: Could not load. Editing is blocked
+  wireframe:
+    status: generated
+    board: wireframes/P12 Venue Support.dc.html#sup-001
+  capability: C35
+  apis:
+  - operationId: login
+    contract: identity
+    purpose: from page inventory
+    trigger: onLoad
+  - operationId: forceLogout
+    contract: identity
+    purpose: Supervisor termination of an abandoned session
+    trigger: onAction
+  - operationId: getCurrentSession
+    contract: identity
+    purpose: Current session and effective permissions
+    trigger: onLoad
+  - operationId: getGuestSession
+    contract: identity
+    purpose: Read the current guest session
+    trigger: onLoad
+  - operationId: listActiveSessions
+    contract: identity
+    purpose: List active sessions
+    trigger: onLoad
+  - operationId: listMfaMethods
+    contract: identity
+    purpose: Enrolled MFA methods
+    trigger: onLoad
+  - operationId: listSsoProviders
+    contract: identity
+    purpose: Identity providers configured for this tenant
+    trigger: onLoad
+  - operationId: revokeAllSessions
+    contract: identity
+    purpose: Revoke every session in scope
+    trigger: onAction
+  implementation:
+    app: venue-support-web
+    route: /general/agent-login
+    component: apps/venue-support-web/src/routes/general/AgentLoginList.tsx
+    status: notStarted
+  navigation:
+    isEntryPoint: true
+    inferred: true
+    exitTo:
+    - SUP-002
+    - SUP-003
+    - SUP-004
+  notes: States derived from the screen pattern on 17 August, not individually considered — sound for
+    a list, a form or a money screen, and worth revisiting where this screen is unusual. Purpose derived
+    from the screen name and its operations on 17 August, not from a requirement.
+  density: compact
+  entryState:
+    params:
+    - name: sessionId
+      from: session
+    coldEntry: Resolves from the session; a cold arrival is the ordinary case.
+  requiresModule: core
+  statesDerived: true
+- id: SUP-002
+  name: Agent Dashboard
+  module: TODO
+  purpose: The screen this app sits on. Everything else is entered from here and returns to it.
+  wave: 3
+  layout:
+    template: dashboard
+    regions:
+    - name: contentBody
+      components:
+      - kind: metricTile
+      - kind: chart
+  states:
+    loading: List skeleton; the count renders first
+    emptyFirstRun: Nothing matches. Distinguishes an empty filter from an empty dataset
+    emptyNoAccess: '**Says which permission is missing, and never renders as an empty list.** This screen
+      needs `CASE_MANAGE`, `CASE_VIEW` to manage cases; a person without it sees the reason and who
+      to ask, because an empty table reads as *there is no data* and sends somebody to support with
+      the wrong question.
+
+
+      **Authority is carried by the person, not the device** (ADR-0002) — so signing in again on the
+      same terminal is the way through.
+
+
+      **Also reached when `marketing` is not licensed.** The tenant has not bought this module, which
+      is a commercial answer and not a permission one — say which, because the person to ask is different.'
+    error: Could not load
+  wireframe:
+    status: generated
+    board: wireframes/P12 Venue Support.dc.html#sup-002
+  capability: C32
+  apis:
+  - operationId: listCases
+    contract: marketing-crm
+    purpose: from page inventory
+    trigger: onLoad
+  - operationId: addCaseMessage
+    contract: marketing-crm
+    purpose: Add a message or internal note
+    trigger: onAction
+  - operationId: createCase
+    contract: marketing-crm
+    purpose: Raise a service case
+    trigger: onAction
+  - operationId: escalateCase
+    contract: marketing-crm
+    purpose: Escalate a case
+    trigger: onAction
+  - operationId: getCase
+    contract: marketing-crm
+    purpose: Read a case with its thread
+    trigger: onLoad
+  - operationId: reopenCase
+    contract: marketing-crm
+    purpose: Reopen a resolved case
+    trigger: onAction
+  - operationId: updateCase
+    contract: marketing-crm
+    purpose: Assign, reprioritise or resolve a case
+    trigger: onAction
+  - operationId: listConversations
+    contract: marketing-crm
+    purpose: The omnichannel inbox
+    trigger: onLoad
+  - operationId: setAgentAvailability
+    contract: marketing-crm
+    purpose: An agent goes available, away or offline
+    trigger: onAction
+  implementation:
+    app: venue-support-web
+    route: /general/agent-dashboard
+    component: apps/venue-support-web/src/routes/general/AgentDashboard.tsx
+    status: notStarted
+  navigation:
+    entryFrom:
+    - SUP-001
+    inferred: true
+    exitTo:
+    - SUP-001
+    - SUP-003
+    - SUP-004
+  notes: States derived from the screen pattern on 17 August, not individually considered — sound for
+    a list, a form or a money screen, and worth revisiting where this screen is unusual. Purpose derived
+    from the screen name and its operations on 17 August, not from a requirement.
+  density: compact
+  entryState:
+    params:
+    - name: caseId
+      from: deepLink
+    coldEntry: '**A staff link opened cold resolves the thing or says plainly that it is gone.** No
+      silent redirect — a supervisor following a link from an alert needs to know whether the record
+      moved, closed or never existed, because those are three different next actions. **The scope is
+      resolved from the session, never from the link**: a link cannot move somebody to a venue they
+      do not hold. Arrives with `caseId`.'
+  requiresModule: marketing
+  statesDerived: true
+- id: SUP-003
+  name: Availability & Routing Settings
+  module: TODO
+  purpose: Change how availability behaves here, and see which level the current value came from.
+  wave: 3
+  layout:
+    template: form
+    regions:
+    - name: contentBody
+      components:
+      - kind: textField
+      - kind: primaryButton
+  states:
+    loading: Current values, with the level each resolves from
+    emptyFirstRun: Nothing set at this level — the inherited value is shown and labelled as inherited
+      (ADR-0018)
+    emptyNoAccess: '**Says which permission is missing, and never renders as an empty list.** This screen
+      needs `CASE_MANAGE` to manage cases; a person without it sees the reason and who to ask, because
+      an empty table reads as *there is no data* and sends somebody to support with the wrong question.
+
+
+      **Authority is carried by the person, not the device** (ADR-0002) — so signing in again on the
+      same terminal is the way through.
+
+
+      **Also reached when `marketing` is not licensed.** The tenant has not bought this module, which
+      is a commercial answer and not a permission one — say which, because the person to ask is different.'
+    error: '**Could not load. Saving is blocked**, because a value saved over an unread one silently
+      overwrites what someone else set'
+  wireframe:
+    status: generated
+    board: wireframes/P12 Venue Support.dc.html#sup-003
+  openQuestions:
+  - No contract — agent routing not modelled
+  implementation:
+    app: venue-support-web
+    route: /general/availability-and-routing-settings
+    component: apps/venue-support-web/src/routes/general/AvailabilityAndRoutingSettingsForm.tsx
+    status: notStarted
+  navigation:
+    entryFrom:
+    - SUP-001
+    inferred: true
+    exitTo:
+    - SUP-001
+    - SUP-002
+    - SUP-004
+  notes: States derived from the screen pattern on 17 August, not individually considered — sound for
+    a list, a form or a money screen, and worth revisiting where this screen is unusual. Purpose derived
+    from the screen name and its operations on 17 August, not from a requirement.
+  apis:
+  - operationId: setAgentAvailability
+    contract: marketing-crm
+    purpose: An agent goes available, away or offline
+    trigger: onAction
+  density: compact
+  requiresModule: marketing
+  statesDerived: true
+- id: SUP-004
+  name: Conversation Queue
+  module: TODO
+  purpose: Find the right one quickly, and act on it without opening it.
+  wave: 2
+  layout:
+    template: list
+    regions:
+    - name: contentBody
+      components:
+      - kind: searchField
+      - kind: dataTable
+  states:
+    loading: List skeleton; the count renders first
+    emptyFirstRun: Nothing matches. Distinguishes an empty filter from an empty dataset
+    emptyNoResults: '**The filter matched nothing, and the data is still there.** The action widens
+      or clears it — distinct from first run, which has nothing to match, and **a screen that shows
+      the same panel for both sends somebody looking for data they already filtered out.**'
+    emptyNoAccess: '**Says which permission is missing, and never renders as an empty list.** This screen
+      needs `CASE_MANAGE`, `CASE_VIEW` to manage cases; a person without it sees the reason and who
+      to ask, because an empty table reads as *there is no data* and sends somebody to support with
+      the wrong question.
+
+
+      **Authority is carried by the person, not the device** (ADR-0002) — so signing in again on the
+      same terminal is the way through.
+
+
+      **Also reached when `marketing` is not licensed.** The tenant has not bought this module, which
+      is a commercial answer and not a permission one — say which, because the person to ask is different.'
+    error: Could not load
+  wireframe:
+    status: generated
+    board: wireframes/P12 Venue Support.dc.html#sup-004
+  capability: C32
+  apis:
+  - operationId: listCases
+    contract: marketing-crm
+    purpose: from page inventory
+    trigger: onLoad
+  - operationId: addCaseMessage
+    contract: marketing-crm
+    purpose: Add a message or internal note
+    trigger: onAction
+  - operationId: createCase
+    contract: marketing-crm
+    purpose: Raise a service case
+    trigger: onAction
+  - operationId: escalateCase
+    contract: marketing-crm
+    purpose: Escalate a case
+    trigger: onAction
+  - operationId: getCase
+    contract: marketing-crm
+    purpose: Read a case with its thread
+    trigger: onLoad
+  - operationId: reopenCase
+    contract: marketing-crm
+    purpose: Reopen a resolved case
+    trigger: onAction
+  - operationId: updateCase
+    contract: marketing-crm
+    purpose: Assign, reprioritise or resolve a case
+    trigger: onAction
+  - operationId: listConversations
+    contract: marketing-crm
+    purpose: The omnichannel inbox
+    trigger: onLoad
+  - operationId: claimConversation
+    contract: marketing-crm
+    purpose: An agent takes it
+    trigger: onAction
+  - operationId: transferConversation
+    contract: marketing-crm
+    purpose: Pass it to another agent or queue
+    trigger: onAction
+  implementation:
+    app: venue-support-web
+    route: /general/conversation-queue
+    component: apps/venue-support-web/src/routes/general/ConversationQueueList.tsx
+    status: notStarted
+  navigation:
+    entryFrom:
+    - SUP-001
+    exitTo:
+    - SUP-001
+    - SUP-002
+    - SUP-003
+    - SUP-005
+    inferred: true
+  notes: States derived from the screen pattern on 17 August, not individually considered — sound for
+    a list, a form or a money screen, and worth revisiting where this screen is unusual. Purpose derived
+    from the screen name and its operations on 17 August, not from a requirement. Pulled to Wave 2 (CF-101).
+    **The guest concierge is Phase 1 and a handover needs somewhere to land** — the queue and the workspace
+    move; the rest of the console stays Wave 3.
+  density: compact
+  entryState:
+    params:
+    - name: caseId
+      from: deepLink
+    - name: conversationId
+      from: deepLink
+    coldEntry: A conversation link an agent opens from a notification. Resolves, or says it was closed
+      and by whom.
+  requiresModule: marketing
+  statesDerived: true
+- id: SUP-005
+  name: Live Chat Workspace
+  module: TODO
+  purpose: Work with live chat workspace for this venue.
+  wave: 2
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+  states:
+    loading: Detail loads
+    emptyFirstRun: Not found — it may have been deleted or moved out of scope
+    emptyNoAccess: '**Says which permission is missing, and never renders as an empty list.** This screen
+      needs `CASE_MANAGE`, `CASE_VIEW` to manage cases; a person without it sees the reason and who
+      to ask, because an empty table reads as *there is no data* and sends somebody to support with
+      the wrong question.
+
+
+      **Authority is carried by the person, not the device** (ADR-0002) — so signing in again on the
+      same terminal is the way through.
+
+
+      **Also reached when `marketing` is not licensed.** The tenant has not bought this module, which
+      is a commercial answer and not a permission one — say which, because the person to ask is different.'
+    error: Could not load. Editing is blocked
+  wireframe:
+    status: generated
+    board: wireframes/P12 Venue Support.dc.html#sup-005
+  capability: C32
+  apis:
+  - operationId: addCaseMessage
+    contract: marketing-crm
+    purpose: from page inventory
+    trigger: onLoad
+  - operationId: getCase
+    contract: marketing-crm
+    purpose: Case with its thread
+    trigger: onLoad
+  - operationId: updateCase
+    contract: marketing-crm
+    purpose: Assign, reprioritise, resolve
+    trigger: onLoad
+  - operationId: escalateCase
+    contract: marketing-crm
+    purpose: Escalate with a reason
+    trigger: onLoad
+  - operationId: createCase
+    contract: marketing-crm
+    purpose: Raise a service case
+    trigger: onAction
+  - operationId: listCases
+    contract: marketing-crm
+    purpose: List service cases
+    trigger: onLoad
+  - operationId: reopenCase
+    contract: marketing-crm
+    purpose: Reopen a resolved case
+    trigger: onAction
+  - operationId: getConversation
+    contract: marketing-crm
+    purpose: One conversation and everything before it
+    trigger: onLoad
+  - operationId: sendConversationMessage
+    contract: marketing-crm
+    purpose: Say something, as a guest or an agent
+    trigger: onAction
+  - operationId: closeConversation
+    contract: marketing-crm
+    purpose: End it
+    trigger: onAction
+  - operationId: transferConversation
+    contract: marketing-crm
+    purpose: Pass it to another agent or queue
+    trigger: onAction
+  implementation:
+    app: venue-support-web
+    route: /general/live-chat-workspace
+    component: apps/venue-support-web/src/routes/general/LiveChatWorkspaceDetail.tsx
+    status: notStarted
+  navigation:
+    entryFrom:
+    - SUP-001
+    - SUP-004
+    - SUP-005
+    inferred: true
+    exitTo:
+    - SUP-001
+    - SUP-002
+    - SUP-003
+    flowDerived: true
+  notes: States derived from the screen pattern on 17 August, not individually considered — sound for
+    a list, a form or a money screen, and worth revisiting where this screen is unusual. Purpose derived
+    from the screen name and its operations on 17 August, not from a requirement. Pulled to Wave 2 (CF-101)
+    with SUP-004. An agent needs a queue and a place to answer from; canned responses and SLA reporting
+    can wait.
+  density: compact
+  entryState:
+    params:
+    - name: caseId
+      from: SUP-004
+    - name: conversationId
+      from: SUP-004
+    coldEntry: Resolves from the session; a cold arrival is the ordinary case.
+  requiresModule: marketing
+  statesDerived: true
+- id: SUP-006
+  name: Knowledge Base Search
+  module: TODO
+  purpose: Find something when the guest does not know what it is called.
+  wave: 3
+  layout:
+    template: list
+    regions:
+    - name: contentBody
+      components:
+      - kind: searchField
+      - kind: dataTable
+  states:
+    loading: List skeleton; the count renders first
+    emptyFirstRun: Nothing matches. Distinguishes an empty filter from an empty dataset
+    emptyNoResults: '**The filter matched nothing, and the data is still there.** The action widens
+      or clears it — distinct from first run, which has nothing to match, and **a screen that shows
+      the same panel for both sends somebody looking for data they already filtered out.**'
+    emptyNoAccess: '**Never rendered as an empty list.** A person who cannot see this screen is told
+      so and told who to ask — an empty table reads as *there is no data*, which sends somebody to support
+      with the wrong question.'
+    error: Could not load
+  wireframe:
+    status: generated
+    board: wireframes/P12 Venue Support.dc.html#sup-006
+  capability: C105
+  apis: []
+  implementation:
+    app: venue-support-web
+    route: /general/knowledge-base-search
+    component: apps/venue-support-web/src/routes/general/KnowledgeBaseSearchList.tsx
+    status: notStarted
+  navigation:
+    entryFrom:
+    - SUP-001
+    exitTo:
+    - SUP-001
+    - SUP-002
+    - SUP-003
+    - SUP-005
+    inferred: true
+  notes: States derived from the screen pattern on 17 August, not individually considered — sound for
+    a list, a form or a money screen, and worth revisiting where this screen is unusual. Purpose derived
+    from the screen name and its operations on 17 August, not from a requirement. **41 operations removed
+    24 August.** Every white-label screen across P09, P12 and P13 declared the **identical 41 operations**
+    — a Typography screen that could create banners and a Component Preview that could set FAQs. **The
+    worst instance of the 18 August bulk attach found so far**, and only walking the white-label journey
+    surfaced it.
+  density: compact
+  entryState:
+    params:
+    - name: bannerId
+      from: deepLink
+    - name: pageId
+      from: deepLink
+    - name: policyKind
+      from: deepLink
+    - name: version
+      from: deepLink
+    coldEntry: '**A version link is expected to point at something superseded — that is what versions
+      are for.** The screen opens the requested version read-only, says it is not current, and links
+      to the one that is. **An old version is history, not an error.** Arrives with `bannerId`, `pageId`,
+      `policyKind`.'
+  requiresModule: core
+  statesDerived: true
+- id: SUP-007
+  name: Canned Response Management
+  module: TODO
+  purpose: Find canned response management for this venue.
+  wave: 3
+  layout:
+    template: form
+    regions:
+    - name: contentBody
+      components:
+      - kind: textField
+      - kind: primaryButton
+  states:
+    loading: Current values, with the level each resolves from
+    emptyFirstRun: Nothing set at this level — the inherited value is shown and labelled as inherited
+      (ADR-0018)
+    emptyNoAccess: '**Says which permission is missing, and never renders as an empty list.** This screen
+      needs `MARKETING_MANAGE`, `MARKETING_VIEW` to manage marketings; a person without it sees the
+      reason and who to ask, because an empty table reads as *there is no data* and sends somebody to
+      support with the wrong question.
+
+
+      **Authority is carried by the person, not the device** (ADR-0002) — so signing in again on the
+      same terminal is the way through.
+
+
+      **Also reached when `marketing` is not licensed.** The tenant has not bought this module, which
+      is a commercial answer and not a permission one — say which, because the person to ask is different.'
+    error: '**Could not load. Saving is blocked**, because a value saved over an unread one silently
+      overwrites what someone else set'
+  wireframe:
+    status: generated
+    board: wireframes/P12 Venue Support.dc.html#sup-007
+  capability: C60
+  apis:
+  - operationId: listMessageTemplates
+    contract: marketing-crm
+    purpose: from page inventory
+    trigger: onLoad
+  - operationId: createMessageTemplate
+    contract: marketing-crm
+    purpose: Create a message template
+    trigger: onAction
+  implementation:
+    app: venue-support-web
+    route: /general/canned-response-management
+    component: apps/venue-support-web/src/routes/general/CannedResponseManagementForm.tsx
+    status: notStarted
+  navigation:
+    entryFrom:
+    - SUP-001
+    inferred: true
+    exitTo:
+    - SUP-001
+    - SUP-002
+    - SUP-003
+  notes: States derived from the screen pattern on 17 August, not individually considered — sound for
+    a list, a form or a money screen, and worth revisiting where this screen is unusual. Purpose derived
+    from the screen name and its operations on 17 August, not from a requirement.
+  density: compact
+  requiresModule: marketing
+  statesDerived: true
+- id: SUP-008
+  name: Agent Performance & SLA View
+  module: TODO
+  purpose: Produce agent performance & sla view for this venue.
+  wave: 3
+  layout:
+    template: dashboard
+    regions:
+    - name: contentBody
+      components:
+      - kind: metricTile
+      - kind: chart
+  states:
+    loading: Detail loads
+    emptyFirstRun: Not found — it may have been deleted or moved out of scope
+    emptyNoAccess: '**Says which permission is missing, and never renders as an empty list.** This screen
+      needs `CASE_VIEW`, `REPORT_MANAGE`, `REPORT_VIEW_VENUE` to read cases; a person without it sees
+      the reason and who to ask, because an empty table reads as *there is no data* and sends somebody
+      to support with the wrong question.
+
+
+      **Authority is carried by the person, not the device** (ADR-0002) — so signing in again on the
+      same terminal is the way through.
+
+
+      **Also reached when `analytics` is not licensed.** The tenant has not bought this module, which
+      is a commercial answer and not a permission one — say which, because the person to ask is different.'
+    error: Could not load. Editing is blocked
+  wireframe:
+    status: generated
+    board: wireframes/P12 Venue Support.dc.html#sup-008
+  capability: C21
+  apis:
+  - operationId: runReport
+    contract: reporting
+    purpose: from page inventory
+    trigger: onLoad
+  - operationId: askReportingQuestion
+    contract: reporting
+    purpose: Natural-language reporting query
+    trigger: onAction
+  - operationId: createReport
+    contract: reporting
+    purpose: Create a custom report definition
+    trigger: onAction
+  - operationId: deleteReport
+    contract: reporting
+    purpose: Retire a report definition
+    trigger: onAction
+  - operationId: getFinancialReport
+    contract: finance
+    purpose: P&L, balance sheet or cash flow
+    trigger: onLoad
+  - operationId: getReport
+    contract: reporting
+    purpose: Read a report definition
+    trigger: onLoad
+  - operationId: listReports
+    contract: reporting
+    purpose: List available report definitions
+    trigger: onLoad
+  - operationId: saveNaturalLanguageQuery
+    contract: reporting
+    purpose: Save a natural-language answer as a report definition
+    trigger: onAction
+  - operationId: updateReport
+    contract: reporting
+    purpose: Publish a new version of a definition
+    trigger: onAction
+  - operationId: listConversations
+    contract: marketing-crm
+    purpose: The omnichannel inbox
+    trigger: onLoad
+  implementation:
+    app: venue-support-web
+    route: /general/agent-performance-and-sla-view
+    component: apps/venue-support-web/src/routes/general/AgentPerformanceAndSlaViewDashboard.tsx
+    status: notStarted
+  navigation:
+    entryFrom:
+    - SUP-001
+    inferred: true
+    exitTo:
+    - SUP-001
+    - SUP-002
+    - SUP-003
+  notes: States derived from the screen pattern on 17 August, not individually considered — sound for
+    a list, a form or a money screen, and worth revisiting where this screen is unusual. Purpose derived
+    from the screen name and its operations on 17 August, not from a requirement.
+  density: compact
+  entryState:
+    params:
+    - name: conversationId
+      from: deepLink
+    - name: reportId
+      from: deepLink
+    coldEntry: A conversation link an agent opens from a notification. Resolves, or says it was closed
+      and by whom.
+  requiresModule: analytics
+  statesDerived: true

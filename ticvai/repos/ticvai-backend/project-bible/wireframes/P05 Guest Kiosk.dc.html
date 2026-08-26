@@ -1,0 +1,352 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>P05 Guest Kiosk — wireframe board</title>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#0B1324;--mut:#6B7280;--dim:#8494A8;--line:#DCE3ED;--soft:#E5E7EB;
+--brand:#0D6EFD;--brand2:#00B8FF;--navy:#0C2340;--paper:#FFF;--wash:#F6F8FB}
+*{box-sizing:border-box}
+body{margin:0;background:var(--wash);color:var(--ink);
+font-family:Manrope,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:13px;line-height:1.5}
+a{color:inherit}
+.wrap{max-width:1680px;margin:0 auto;padding:22px 34px 90px}
+.home{font-size:11.5px;color:var(--mut);text-decoration:none;letter-spacing:.02em}
+.head{display:flex;align-items:baseline;justify-content:space-between;gap:20px;
+margin:14px 0 6px;padding-bottom:16px;border-bottom:2px solid var(--ink)}
+.mark{font-size:13px;font-weight:800;letter-spacing:.16em;
+background:linear-gradient(90deg,var(--brand),var(--brand2));-webkit-background-clip:text;
+background-clip:text;color:transparent}
+h1{font-size:19px;font-weight:800;letter-spacing:-.015em;margin:0}
+.meta{font-size:11px;color:var(--mut);font-family:'IBM Plex Mono',ui-monospace,monospace}
+.lede{font-size:12px;color:var(--mut);max-width:74ch;margin:14px 0 0}
+.grp{font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:11px;font-weight:600;
+letter-spacing:.14em;color:var(--dim);text-transform:uppercase;margin:48px 0 16px;
+padding-bottom:9px;border-bottom:1px solid var(--line)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(342px,1fr));gap:30px}
+.scr{display:flex;flex-direction:column;gap:11px;scroll-margin-top:24px}
+.ttl{font-size:15.5px;font-weight:800;letter-spacing:-.01em}
+.pur{font-size:11.5px;color:var(--mut);margin-top:2px}
+.frame{background:var(--paper);border:1px solid var(--soft);border-radius:14px;overflow:hidden;
+height:440px;display:flex;flex-direction:column;box-shadow:0 10px 26px rgba(12,35,64,.07)}
+.frame.dark{background:var(--navy);border-color:#1E3A5F}
+.bar{flex:none;height:30px;display:flex;align-items:center;gap:8px;padding:0 12px;
+border-bottom:1px solid var(--soft);font-size:10.5px;color:var(--mut)}
+.dark .bar{border-color:#1E3A5F;color:#7FA3C9}
+.strip{flex:none;height:20px;display:flex;align-items:center;padding:0 12px;font-size:9.5px;
+letter-spacing:.08em;text-transform:uppercase;background:#FFF7E6;color:#8A6D00;
+border-bottom:1px solid #F0E0B8}
+.body{flex:1;display:flex;min-height:0}
+.rail{flex:none;width:74px;background:var(--navy);display:flex;flex-direction:column;gap:6px;padding:10px 8px}
+.rail i{display:block;height:9px;border-radius:3px;background:#1E3A5F}
+.rail i.on{background:linear-gradient(90deg,var(--brand),var(--brand2))}
+.main{flex:1;padding:12px;display:flex;flex-direction:column;gap:9px;overflow:hidden}
+.side{flex:none;width:96px;border-left:1px solid var(--soft);padding:12px 10px;
+display:flex;flex-direction:column;gap:8px}
+.dark .side{border-color:#1E3A5F}
+.act{flex:none;height:38px;border-top:1px solid var(--soft);display:flex;align-items:center;
+gap:8px;padding:0 12px}
+.dark .act{border-color:#1E3A5F}
+.cmp{border:1px dashed #C7D0DC;border-radius:7px;padding:7px 9px;font-size:10px;color:var(--mut);background:#FAFBFD}
+.dark .cmp{border-color:#264a75;background:#0E2A4C;color:#9FC0E0}
+.cmp b{display:block;font-size:9.5px;letter-spacing:.09em;text-transform:uppercase;
+color:#94A3B4;font-weight:700;margin-bottom:3px}
+.cmp .why{margin-top:5px;font-size:9.5px;color:#7C8899;font-style:italic;line-height:1.45}
+.btn{height:22px;border-radius:6px;padding:0 12px;display:inline-flex;align-items:center;
+font-size:10px;font-weight:700;background:linear-gradient(90deg,var(--brand),var(--brand2));color:#FFF}
+.btn.sec{background:none;border:1px solid var(--soft);color:var(--mut);font-weight:600}
+.foot{font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:9.5px;line-height:1.75;color:#7C8899}
+.foot b{color:#4A5566;font-weight:600}
+.foot .off{color:#8A6D00}
+.tag{display:inline-block;font-size:9px;letter-spacing:.06em;text-transform:uppercase;
+padding:1px 6px;border-radius:4px;background:#EEF2F7;color:#64748B;margin-left:6px}
+.tag.named{background:#FFF1E6;color:#9A5B00}
+.bottom{margin-top:64px;padding-top:16px;border-top:1px solid var(--line);
+display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
+</style></head><body>
+<div class="wrap">
+  <a class="home" href="TICVAI%20Wireframe%20Boards.dc.html">&larr; All boards</a>
+  <div class="head">
+    <div><span class="mark">TICVAI</span>
+      <h1>P05 · Guest Kiosk — Self-Service <span style="font-weight:600;color:#6B7280">(17 screens)</span></h1></div>
+    <div class="meta">guest · kiosk · guest-app</div>
+  </div>
+  <p class="lede"></p>
+  <div class="grp">01 — Sell · 16 screens</div><div class="grid">
+      <div id="ksk-001" class="scr">
+        <div><div class="ttl">KSK-001 · Attract Loop</div>
+        <div class="pur">Pull somebody standing in a queue out of it.</div></div>
+        <div class="frame">
+          <div class="bar">Sell · wave 2 · touchLarge</div>
+          
+          <div class="body"><div class="main"><div class="cmp"><b>detailPanel</b>detailPanel<span class="why">Structure from the wireframe board. Components not yet enumerated.</span></div></div></div>
+          
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> · none declared</div>
+          <div><b>STATES</b> · <span class="off">loading · emptyFirstRun · error · offline</span></div>
+          
+          <div><b>GOES TO</b> · entry point · KSK-002 · KSK-003 · KSK-004</div>
+        </div>
+      </div>
+      <div id="ksk-002" class="scr">
+        <div><div class="ttl">KSK-002 · Language Select</div>
+        <div class="pur">Ask the only question that changes everything else.</div></div>
+        <div class="frame">
+          <div class="bar">Sell · wave 2 · touchLarge</div>
+          
+          <div class="body"><div class="main"><div class="cmp"><b>detailPanel</b>detailPanel<span class="why">Structure from the wireframe board. Components not yet enumerated.</span></div></div></div>
+          
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> · getTenantAppStatus · getTenantConfig</div>
+          <div><b>STATES</b> · <span class="off">loading · emptyFirstRun · emptyNoAccess · error · offline</span></div>
+          
+          <div><b>GOES TO</b> · KSK-001 · KSK-003 · KSK-004</div>
+        </div>
+      </div>
+      <div id="ksk-003" class="scr">
+        <div><div class="ttl">KSK-003 · What are you buying</div>
+        <div class="pur">Get to a product in one touch.</div></div>
+        <div class="frame">
+          <div class="bar">Sell · wave 2 · touchLarge</div>
+          
+          <div class="body"><div class="main"><div class="cmp"><b>detailPanel</b>detailPanel<span class="why">Structure from the wireframe board. Components not yet enumerated.</span></div></div></div>
+          
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> · listProducts</div>
+          <div><b>STATES</b> · <span class="off">loading · emptyFirstRun · emptyNoAccess · error · offline</span></div>
+          
+          <div><b>GOES TO</b> · KSK-001 · KSK-002 · KSK-004</div>
+        </div>
+      </div>
+      <div id="ksk-004" class="scr">
+        <div><div class="ttl">KSK-004 · Choose tickets</div>
+        <div class="pur">Quantities, with targets a gloved hand can hit.</div></div>
+        <div class="frame">
+          <div class="bar">Sell · wave 2 · touchLarge</div>
+          
+          <div class="body"><div class="main"><div class="cmp"><b>detailPanel</b>detailPanel<span class="why">Structure from the wireframe board. Components not yet enumerated.</span></div></div></div>
+          
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> · getAvailability · listProductVariants</div>
+          <div><b>STATES</b> · <span class="off">loading · emptyFirstRun · emptyNoAccess · error · offline</span></div>
+          <div><b>ARRIVES WITH</b> · productId←deepLink</div>
+          <div><b>GOES TO</b> · KSK-001 · KSK-002 · KSK-003 · KSK-005</div>
+        </div>
+      </div>
+      <div id="ksk-005" class="scr">
+        <div><div class="ttl">KSK-005 · Choose a session</div>
+        <div class="pur">Pick a time that still has room.</div></div>
+        <div class="frame">
+          <div class="bar">Sell · wave 2 · touchLarge</div>
+          
+          <div class="body"><div class="main"><div class="cmp"><b>detailPanel</b>detailPanel<span class="why">Structure from the wireframe board. Components not yet enumerated.</span></div></div></div>
+          
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> · acquireLease · getAvailability</div>
+          <div><b>STATES</b> · <span class="off">loading · emptyFirstRun · emptyNoAccess · error · offline</span></div>
+          
+          <div><b>GOES TO</b> · KSK-001 · KSK-002 · KSK-003 · KSK-006</div>
+        </div>
+      </div>
+      <div id="ksk-006" class="scr">
+        <div><div class="ttl">KSK-006 · Review</div>
+        <div class="pur">Show what is being bought before money moves.</div></div>
+        <div class="frame">
+          <div class="bar">Sell · wave 2 · touchLarge</div>
+          
+          <div class="body"><div class="main"><div class="cmp"><b>detailPanel</b>detailPanel<span class="why">Structure from the wireframe board. Components not yet enumerated.</span></div></div></div>
+          
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> · getCart · addCartLine · checkoutCart · evaluatePromotions</div>
+          <div><b>STATES</b> · <span class="off">loading · emptyFirstRun · emptyNoAccess · error · offline</span></div>
+          <div><b>ARRIVES WITH</b> · cartId←session</div>
+          <div><b>GOES TO</b> · KSK-001 · KSK-002 · KSK-003 · KSK-007</div>
+        </div>
+      </div>
+      <div id="ksk-007" class="scr">
+        <div><div class="ttl">KSK-007 · Payment</div>
+        <div class="pur">Take a card, and nothing else.</div></div>
+        <div class="frame">
+          <div class="bar">Sell · wave 2 · touchLarge</div>
+          
+          <div class="body"><div class="main"><div class="cmp"><b>detailPanel</b>detailPanel<span class="why">Structure from the wireframe board. Components not yet enumerated.</span></div></div></div>
+          
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> · createPayment</div>
+          <div><b>STATES</b> · <span class="off">loading · emptyFirstRun · emptyNoAccess · error · offline</span></div>
+          
+          <div><b>GOES TO</b> · KSK-001 · KSK-002 · KSK-003 · KSK-009</div>
+        </div>
+      </div>
+      <div id="ksk-008" class="scr">
+        <div><div class="ttl">KSK-008 · Payment unresolved</div>
+        <div class="pur">Handle the state that has nobody standing next to it.</div></div>
+        <div class="frame">
+          <div class="bar">Sell · wave 2 · touchLarge</div>
+          
+          <div class="body"><div class="main"><div class="cmp"><b>detailPanel</b>detailPanel<span class="why">Structure from the wireframe board. Components not yet enumerated.</span></div></div></div>
+          
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> · inquirePaymentStatus</div>
+          <div><b>STATES</b> · <span class="off">loading · emptyFirstRun · emptyNoAccess · error · offline</span></div>
+          <div><b>ARRIVES WITH</b> · paymentId←deepLink</div>
+          <div><b>GOES TO</b> · KSK-001 · KSK-002 · KSK-003</div>
+        </div>
+      </div>
+      <div id="ksk-009" class="scr">
+        <div><div class="ttl">KSK-009 · Ticket issued</div>
+        <div class="pur">Get the ticket into the guest’s hand.</div></div>
+        <div class="frame">
+          <div class="bar">Sell · wave 2 · touchLarge</div>
+          
+          <div class="body"><div class="main"><div class="cmp"><b>detailPanel</b>detailPanel<span class="why">Structure from the wireframe board. Components not yet enumerated.</span></div></div></div>
+          
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> · transferOrderTickets · getOrder</div>
+          <div><b>STATES</b> · <span class="off">loading · emptyFirstRun · emptyNoAccess · error · offline</span></div>
+          <div><b>ARRIVES WITH</b> · orderId←deepLink</div>
+          <div><b>GOES TO</b> · KSK-001 · KSK-002 · KSK-003</div>
+        </div>
+      </div>
+      <div id="ksk-010" class="scr">
+        <div><div class="ttl">KSK-010 · Print failure</div>
+        <div class="pur">Recover when the paper runs out mid-sale.</div></div>
+        <div class="frame">
+          <div class="bar">Sell · wave 2 · touchLarge</div>
+          
+          <div class="body"><div class="main"><div class="cmp"><b>detailPanel</b>detailPanel<span class="why">Structure from the wireframe board. Components not yet enumerated.</span></div></div></div>
+          
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> · transferOrderTickets</div>
+          <div><b>STATES</b> · <span class="off">loading · emptyFirstRun · error · offline</span></div>
+          <div><b>ARRIVES WITH</b> · orderId←deepLink</div>
+          <div><b>GOES TO</b> · KSK-001 · KSK-002 · KSK-003 · KSK-013</div>
+        </div>
+      </div>
+      <div id="ksk-011" class="scr">
+        <div><div class="ttl">KSK-011 · Collect a booking</div>
+        <div class="pur">Turn a reference into media.</div></div>
+        <div class="frame">
+          <div class="bar">Sell · wave 2 · touchLarge</div>
+          
+          <div class="body"><div class="main"><div class="cmp"><b>detailPanel</b>detailPanel<span class="why">Structure from the wireframe board. Components not yet enumerated.</span></div></div></div>
+          
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> · lookupShopAndDrop · getOrder</div>
+          <div><b>STATES</b> · <span class="off">loading · emptyFirstRun · emptyNoAccess · error · offline</span></div>
+          <div><b>ARRIVES WITH</b> · orderId←deepLink</div>
+          <div><b>GOES TO</b> · KSK-001 · KSK-002 · KSK-003</div>
+        </div>
+      </div>
+      <div id="ksk-012" class="scr">
+        <div><div class="ttl">KSK-012 · Booking found</div>
+        <div class="pur">Confirm it is the right booking, then print.</div></div>
+        <div class="frame">
+          <div class="bar">Sell · wave 2 · touchLarge</div>
+          
+          <div class="body"><div class="main"><div class="cmp"><b>detailPanel</b>detailPanel<span class="why">Structure from the wireframe board. Components not yet enumerated.</span></div></div></div>
+          
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> · transferOrderTickets</div>
+          <div><b>STATES</b> · <span class="off">loading · emptyFirstRun · error · offline</span></div>
+          <div><b>ARRIVES WITH</b> · orderId←deepLink</div>
+          <div><b>GOES TO</b> · KSK-001 · KSK-002 · KSK-003</div>
+        </div>
+      </div>
+      <div id="ksk-013" class="scr">
+        <div><div class="ttl">KSK-013 · Call staff</div>
+        <div class="pur">Get a human, without leaving the kiosk.</div></div>
+        <div class="frame">
+          <div class="bar">Sell · wave 2 · touchLarge</div>
+          
+          <div class="body"><div class="main"><div class="cmp"><b>detailPanel</b>detailPanel<span class="why">Structure from the wireframe board. Components not yet enumerated.</span></div></div></div>
+          
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> · endKioskAssist</div>
+          <div><b>STATES</b> · <span class="off">loading · emptyFirstRun · error · offline</span></div>
+          <div><b>ARRIVES WITH</b> · sessionId←session</div>
+          <div><b>GOES TO</b> · KSK-001 · KSK-002 · KSK-003</div>
+        </div>
+      </div>
+      <div id="ksk-014" class="scr">
+        <div><div class="ttl">KSK-014 · Out of service</div>
+        <div class="pur">Fail in a way that does not strand anybody.</div></div>
+        <div class="frame">
+          <div class="bar">Sell · wave 2 · touchLarge</div>
+          
+          <div class="body"><div class="main"><div class="cmp"><b>detailPanel</b>detailPanel<span class="why">Structure from the wireframe board. Components not yet enumerated.</span></div></div></div>
+          
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> · none declared</div>
+          <div><b>STATES</b> · <span class="off">loading · emptyFirstRun · error · offline</span></div>
+          
+          <div><b>GOES TO</b> · KSK-001 · KSK-002 · KSK-003</div>
+        </div>
+      </div>
+      <div id="ksk-016" class="scr">
+        <div><div class="ttl">KSK-016 · Order Food</div>
+        <div class="pur">Order food from the kiosk and collect it.</div></div>
+        <div class="frame">
+          <div class="bar">Sell · wave 2 · touchLarge</div>
+          
+          <div class="body"><div class="main"><div class="cmp"><b>cardList</b>cardList<span class="why">Photographs, because **a guest at a kiosk with a queue behind them is not reading descriptions**</span></div><div class="cmp"><b>banner</b>banner<span class="why">Allergens shown on the card, not behind a tap. **contains and mayContain are different claims** and a fryer shared with breaded fish makes chips a fis</span></div><div class="cmp"><b>primaryButton</b>Add to order</div></div></div>
+          
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> · getGuestMenu · createGuestFnbOrder</div>
+          <div><b>STATES</b> · <span class="">loading · emptyFirstRun · emptyNoResults · emptyNoAccess · error</span></div>
+          <div><b>ARRIVES WITH</b> · outletId←deepLink</div>
+          <div><b>GOES TO</b> · KSK-017</div>
+        </div>
+      </div>
+      <div id="ksk-017" class="scr">
+        <div><div class="ttl">KSK-017 · Shop</div>
+        <div class="pur">Buy merchandise at the kiosk, or reserve it for collection.</div></div>
+        <div class="frame">
+          <div class="bar">Sell · wave 2 · touchLarge</div>
+          
+          <div class="body"><div class="main"><div class="cmp"><b>cardList</b>cardList</div><div class="cmp"><b>multiSelect</b>Size</div><div class="cmp"><b>primaryButton</b>Add</div><div class="cmp"><b>secondaryButton</b>Reserve for collection<span class="why">BL-019. **Reserve is not buy** — the guest pays at a till or on the app, and this screen is honest about which</span></div></div></div>
+          
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> · listMerchandise · reserveMerchandise</div>
+          <div><b>STATES</b> · <span class="">loading · emptyFirstRun · emptyNoResults · emptyNoAccess · error</span></div>
+          <div><b>ARRIVES WITH</b> · outletId←KSK-016</div>
+          <div><b>GOES TO</b> · nothing declared</div>
+        </div>
+      </div></div><div class="grp">02 — AI · 1 screens</div><div class="grid">
+      <div id="ksk-015" class="scr">
+        <div><div class="ttl">KSK-015 · Assistant</div>
+        <div class="pur">Help a guest choose and pay, and nothing else.</div></div>
+        <div class="frame">
+          <div class="bar">AI · wave 2 · touchLarge</div>
+          
+          <div class="body"><div class="main"><div class="cmp"><b>detailPanel</b>detailPanel</div></div></div>
+          
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> · sendAiMessage · listProducts · getAvailability · handoverToAgent</div>
+          <div><b>STATES</b> · <span class="">loading · emptyFirstRun · emptyNoAccess · error</span></div>
+          <div><b>ARRIVES WITH</b> · conversationId←deepLink</div>
+          <div><b>GOES TO</b> · KSK-001 · SUP-004</div>
+        </div>
+      </div></div>
+  <div class="bottom">
+    <span>Generated by tools/derive-wireframes.py from screens/P05-guest-kiosk.yaml — do not hand-edit</span>
+    <span>P05 · 17 screens · 2 groups</span>
+  </div>
+</div></body></html>

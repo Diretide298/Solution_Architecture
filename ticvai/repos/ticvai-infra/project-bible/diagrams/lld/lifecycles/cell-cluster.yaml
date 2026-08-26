@@ -1,0 +1,38 @@
+id: LLD-Cell cluster
+title: Cell cluster — 4 transitions
+generatedBy: tools/derive-diagrams.py
+index: diagrams/hld/04-lifecycles.yaml
+source: states/cell-cluster.yaml
+entity: Cell cluster
+contract: subscription
+enum: CellCluster.status
+enumKind: inline
+enumSchema: CellCluster
+enumProperty: status
+owner: subscription
+initial:
+- provisioning
+terminal:
+- retired
+transitions:
+- from: provisioning
+  to: active
+  trigger: job
+  guard: Ready to take tenants
+- from: active
+  to: draining
+  trigger: job
+  guard: '**Accepting no new tenants; existing ones still served.** Migration happens over weeks, not
+    in a maintenance window'
+- from: draining
+  to: active
+  operation: launchCellCluster
+  trigger: operation
+  guard: Decommissioning abandoned
+  isReversal: true
+- from: draining
+  to: retired
+  trigger: job
+  guard: Every tenant migrated away. **Only then**
+notes: '`draining` is the state that makes a cluster retirement survivable. **A cluster cannot be retired
+  while a tenant is on it**, and a venue mid-season cannot be moved on a schedule that suits us.'

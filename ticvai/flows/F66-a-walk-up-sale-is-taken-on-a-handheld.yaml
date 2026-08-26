@@ -1,0 +1,71 @@
+$schema: ./_schema.yaml
+id: F66
+name: A walk-up sale is taken on a handheld
+actor: cashier
+capability: Roaming sale
+wave: 2
+frequency: Routine.
+criticality: revenue
+primaryContract: orders
+contracts:
+- orders
+- catalogue
+- access
+platforms:
+- P06
+trigger:
+  description: A queue is building at a window and a supervisor walks out to sell from a handheld. **The
+    device moves; the till does not.**
+offlineBehaviour: '**Sells offline and issues offline.** A roaming seller is by definition away from
+  the network, and a handheld that only works near the office is a handheld nobody carries.'
+steps:
+- step: 1
+  screen: EMP-034
+  action: The seller finds the product and takes the order.
+  operations:
+  - getProduct
+  - createOrder
+  outcome: '**The same catalogue bundle the tills hold.** A roaming seller quoting a different price
+    from the window ten metres away is a complaint.'
+- step: 2
+  screen: EMP-035
+  action: The guest taps a card on the device.
+  operations:
+  - createPayment
+  - capturePayment
+  - inquirePaymentStatus
+  outcome: '**`inquirePaymentStatus` exists because a handheld payment fails differently** — a card
+    reader out of range does not report cleanly, and asking is safer than assuming.'
+  crossesDevice: true
+- step: 3
+  screen: EMP-036
+  action: Media is issued on the spot.
+  operations:
+  - appendEntitlementToMedia
+  - getMediaEntitlements
+  outcome: '**Issued to a wristband or a phone, not printed.** A roaming seller has no printer, which
+    is why this path exists at all.'
+  crossesDevice: true
+branches:
+- at: 2
+  condition: The payment status is unknown — the reader lost signal mid-tap.
+  behaviour: '**`inquirePaymentStatus` before retrying, always.** Retrying a payment that actually succeeded
+    charges a guest twice, and on a handheld that is the common failure.'
+  severity: high
+  resolvedBy: inquirePaymentStatus
+- at: 3
+  condition: The guest has no phone and no wristband.
+  behaviour: Directed to a window for printed media. **A roaming sale that cannot deliver is a sale
+    that should not have been taken.**
+  severity: medium
+  resolvedBy: getMediaEntitlements
+exitStates:
+- state: sold
+  description: Paid and issued on the device.
+- state: paymentUnresolved
+  description: '**Held pending inquiry rather than retried.**'
+- state: deferredToWindow
+  description: Sold, media issued elsewhere.
+notes: '**Written 24 August.** `EMP-034` declared `createProduct` and `updateProduct` — **a roaming
+  handheld that could author the catalogue.** Removed.'
+openQuestions: null

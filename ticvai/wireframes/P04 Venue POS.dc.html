@@ -1,0 +1,798 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>P04 Venue POS — wireframe board</title>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+/* **The Claude Design system, applied to the generated boards on 24 August.**
+   Three client packs render at 1280x700 in this system and 385 screens rendered as
+   dashed-box wireframes — and **a client reviewing both reads the difference as *those screens
+   are not done*.** The information is identical either way; the fidelity is what was being
+   judged.
+
+   Tokens are the packs': #0B1324 rail, #0D6EFD primary, #00B8FF accent, Manrope for UI,
+   IBM Plex Mono for figures and codes. */
+:root{--ink:#0B1324;--mut:#5A6577;--dim:#9AA5B6;--line:#E8ECF3;--edge:#E3E8F0;
+--brand:#0D6EFD;--accent:#00B8FF;--rail:#0B1324;--paper:#FFF;--wash:#F7F9FC;
+--ok:#0E9F6E;--okbg:#E8F6F0;--okline:#BFE3D2;--warn:#8A6D00;--warnbg:#FFF7E6;
+--bad:#A81E1E;--badbg:#FDECEC}
+*{box-sizing:border-box}
+body{margin:0;background:#F2F5F9;color:var(--ink);
+font-family:Manrope,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:13px;line-height:1.55}
+a{color:inherit}
+.wrap{max-width:1420px;margin:0 auto;padding:22px 34px 90px}
+.home{font-size:11.5px;color:var(--mut);text-decoration:none;letter-spacing:.02em}
+.head{display:flex;align-items:baseline;justify-content:space-between;gap:20px;
+margin:14px 0 6px;padding-bottom:16px;border-bottom:2px solid var(--ink)}
+.mark{font-size:13px;font-weight:800;letter-spacing:.16em;
+background:linear-gradient(90deg,var(--brand),var(--accent));-webkit-background-clip:text;
+background-clip:text;color:transparent}
+h1{font-size:19px;font-weight:800;letter-spacing:-.015em;margin:0}
+.meta{font-size:11px;color:var(--mut);font-family:'IBM Plex Mono',ui-monospace,monospace;line-height:1.7}
+.lede{font-size:12.5px;color:var(--mut);max-width:82ch;margin:16px 0 0;line-height:1.65}
+.grp{font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:11px;font-weight:600;
+letter-spacing:.14em;color:var(--dim);text-transform:uppercase;margin:52px 0 18px;
+padding-bottom:9px;border-bottom:1px solid var(--line)}
+.stack{display:flex;flex-direction:column;gap:52px}
+.scr{display:flex;flex-direction:column;gap:13px;scroll-margin-top:24px}
+.hdr{display:flex;align-items:baseline;gap:9px;flex-wrap:wrap}
+.code{font-family:'IBM Plex Mono',monospace;font-size:12px;color:#8494A8}
+.ttl{font-size:16.5px;font-weight:800;letter-spacing:-.015em}
+.pur{font-size:12px;color:#6B7280;margin-top:3px;max-width:96ch}
+.pill{font-size:9px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;
+padding:2px 7px;border-radius:5px;background:#EEF3FA;color:#4A5A70}
+.pill.named{background:var(--warnbg);color:var(--warn)}
+.pill.off{background:var(--okbg);color:var(--ok)}
+
+/* the frame — 1280x700, the packs' dimension */
+.frame{width:1280px;height:700px;display:flex;background:var(--wash);border:1px solid var(--edge);
+border-radius:14px;overflow:hidden;box-shadow:0 16px 38px rgba(12,35,64,.09)}
+.rail{flex:none;width:180px;background:var(--rail);display:flex;flex-direction:column;position:relative}
+.rail::before{content:'';position:absolute;inset:0;
+background:radial-gradient(300px 200px at 0% 4%,rgba(0,184,255,.20),transparent 70%);pointer-events:none}
+.brand{position:relative;padding:15px 14px 13px;border-bottom:1px solid rgba(255,255,255,.08)}
+.brand b{display:block;font-size:14px;font-weight:800;letter-spacing:.1em;
+background:linear-gradient(90deg,#4DA3FF,var(--accent));-webkit-background-clip:text;
+background-clip:text;color:transparent}
+.brand span{display:block;font-size:9.5px;color:#7FA3C9;margin-top:5px}
+.nav{position:relative;display:flex;flex-direction:column;gap:2px;padding:11px 9px}
+.nav i{display:block;padding:8px 10px;border-radius:9px;font-size:11.5px;font-style:normal;color:#8FA8C4}
+.nav i.on{background:linear-gradient(90deg,rgba(13,110,253,.30),rgba(0,184,255,.10));
+color:#fff;font-weight:700}
+.body{flex:1;display:flex;flex-direction:column;min-width:0}
+.top{flex:none;height:54px;display:flex;align-items:center;gap:12px;padding:0 18px;
+background:var(--paper);border-bottom:1px solid var(--line)}
+.top h2{font-size:13.5px;font-weight:800;letter-spacing:-.01em;margin:0}
+.top small{display:block;font-size:10px;color:var(--dim);font-weight:500}
+.acts{margin-left:auto;display:flex;gap:6px}
+.chip{height:32px;display:flex;align-items:center;gap:6px;padding:0 11px;border:1px solid var(--edge);
+border-radius:8px;font-size:11px;font-weight:700;color:var(--mut);background:var(--paper)}
+.chip.live{background:var(--okbg);border-color:var(--okline);color:var(--ok)}
+.chip.live::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--ok)}
+.chip.cta{background:var(--brand);border-color:var(--brand);color:#fff}
+.canvas{flex:1;display:flex;flex-direction:column;gap:12px;padding:14px 16px;min-height:0;overflow:hidden}
+.kpis{flex:none;display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.kpi{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:11px 13px;
+display:flex;flex-direction:column;gap:4px}
+.kpi b{font-size:9.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--dim)}
+.kpi span{font-family:'IBM Plex Mono',monospace;font-size:19px;font-weight:600;letter-spacing:-.02em}
+.panel{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:12px 14px;
+display:flex;flex-direction:column;gap:8px;min-height:0}
+.panel > b{font-size:11px;font-weight:800;letter-spacing:-.005em}
+.panel .why{font-size:10px;color:#7C8899;font-style:italic;line-height:1.5}
+.kind{font-family:'IBM Plex Mono',monospace;font-size:9px;color:var(--dim);
+letter-spacing:.06em;text-transform:uppercase}
+.rows{display:flex;flex-direction:column;gap:6px}
+.row{display:grid;grid-template-columns:1.6fr 1fr 1fr .7fr;gap:10px;align-items:center;
+padding:7px 0;border-top:1px solid #F0F3F8}
+.row:first-child{border-top:0;font-size:9.5px;font-weight:700;letter-spacing:.06em;
+text-transform:uppercase;color:var(--dim)}
+.bar{height:7px;border-radius:4px;background:#EDF1F7}
+.bar i{display:block;height:100%;border-radius:4px;
+background:linear-gradient(90deg,var(--brand),var(--accent))}
+.side{flex:none;width:250px;display:flex;flex-direction:column;gap:10px}
+.two{flex:1;display:flex;gap:12px;min-height:0}
+.grow{flex:1;min-width:0}
+.strip{flex:none;height:26px;display:flex;align-items:center;gap:8px;padding:0 18px;
+background:var(--warnbg);color:var(--warn);font-size:10px;font-weight:700;
+letter-spacing:.05em;text-transform:uppercase;border-bottom:1px solid #F0E0B8}
+.dark .frame{background:#0A1524}
+.dark .top{background:#0E2A4C;border-color:#1E3A5F;color:#E6F0FA}
+.dark .top small{color:#7FA3C9}
+.dark .canvas{background:#0A1524}
+.dark .kpi,.dark .panel{background:#0E2A4C;border-color:#1E3A5F;color:#E6F0FA}
+.dark .row{border-color:#193353}
+.dark .chip{background:#0E2A4C;border-color:#1E3A5F;color:#9FC0E0}
+
+.foot{font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:10px;line-height:1.85;color:#7C8899}
+.foot b{color:#4A5566;font-weight:600}
+.foot .warn{color:var(--warn)}
+.bottom{margin-top:64px;padding-top:16px;border-top:1px solid var(--line);
+display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
+</style></head><body>
+<div class="wrap">
+  <a class="home" href="TICVAI%20Wireframe%20Boards.dc.html">&larr; All boards</a>
+  <div class="head">
+    <div><span class="mark">TICVAI</span>
+      <h1>P04 · Venue POS — Terminal and Tablet <span style="font-weight:600;color:#6B7280">(24 screens)</span></h1></div>
+    <div class="meta">staff · posTerminal · venue-pos</div>
+  </div>
+  <p class="lede"> <strong>4 of these are named in a client board and not written up in it</strong> — the operations are real, the layout is not.</p>
+  <div class="grp">01 — Shift · 3 screens</div><div class="stack">
+      <div id="pos-001" class="scr">
+        <div>
+          <div class="hdr"><span class="code">POS-001</span>
+            <span class="ttl">Begin Shift</span><span class="pill">client board</span><span class="pill off">offline</span><span class="pill">POS-2A, POS-3D</span></div>
+          <div class="pur">Count the opening float and open the till.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>TICVAI</b><span>Shift</span></div><nav class="nav"><i class="">Dashboard</i><i class="on">Shift</i><i class="">Settings</i><i class="">Reports</i><i class="">People</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Begin Shift</h2>
+                <small>Venue POS · wave 1 · touchLarge</small></div>
+              <div class="acts"><div class="chip">This venue &#9662;</div><div class="chip live">Live</div><div class="chip cta">Primary action</div></div>
+            </div>
+            <div class="strip">offline capable · works from the local journal</div>
+            <div class="canvas">
+              <div class="kpis"><div class="kpi"><b>Total</b><span>1,248</span></div><div class="kpi"><b>Active</b><span>978</span></div><div class="kpi"><b>Attention</b><span>142</span></div><div class="kpi"><b>Offline</b><span>12</span></div></div>
+              <div class="two"><div class="grow"><div class="panel"><b>Denomination count</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">Per denomination, from the region settings — the mockup shows AED 200 down to coins. Not a hardcoded list</span></div><div class="panel"><span class="kind">metricTile</span><div class="rows"><div class="bar"><i style="width:78%"></i></div><div class="bar"><i style="width:54%"></i></div><div class="bar"><i style="width:92%"></i></div><div class="bar"><i style="width:36%"></i></div><div class="bar"><i style="width:61%"></i></div></div><span class="why">Computed, never typed</span></div><div class="panel"><b>Notes</b><div class="chip">Notes</div></div></div><div class="side"><div class="panel"><span class="kind">detailPanel</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">Suggested float from the venue default. Advisory, not prefilled — a prefilled count is not a count</span></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; openShift · getCurrentShift · acceptShiftVariance · approveShiftOpen +13</div>
+          <div><b>STATES</b> &middot; <span class="warn">loading · emptyFirstRun · emptyNoAccess · error · offline</span></div>
+          <div><b>ARRIVES WITH</b> &middot; workstationId&larr;session, boxId&larr;session, shiftId&larr;deepLink</div>
+          <div><b>GOES TO</b> &middot; entry point · POS-002 · POS-007 · POS-009 · POS-021 · POS-022</div>
+        </div>
+      </div>
+      <div id="pos-007" class="scr">
+        <div>
+          <div class="hdr"><span class="code">POS-007</span>
+            <span class="ttl">Close Shift</span><span class="pill">client board</span><span class="pill off">offline</span><span class="pill">POS-2F, POS-3F</span></div>
+          <div class="pur">Count the drawer and close the till.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>TICVAI</b><span>Shift</span></div><nav class="nav"><i class="">Dashboard</i><i class="on">Shift</i><i class="">Settings</i><i class="">Reports</i><i class="">People</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Close Shift</h2>
+                <small>Venue POS · wave 1 · touchLarge</small></div>
+              <div class="acts"><div class="chip">This venue &#9662;</div><div class="chip live">Live</div><div class="chip cta">Primary action</div></div>
+            </div>
+            <div class="strip">offline capable · works from the local journal</div>
+            <div class="canvas">
+              <div class="kpis"><div class="kpi"><b>Total</b><span>1,248</span></div><div class="kpi"><b>Active</b><span>978</span></div><div class="kpi"><b>Attention</b><span>142</span></div><div class="kpi"><b>Offline</b><span>12</span></div></div>
+              <div class="two"><div class="grow"><div class="panel"><b>Counted by denomination</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">**Blind count.** The expected figure is withheld until submission — a counter who can see the expected total reconciles to it rather than to the drawer</span></div><div class="panel"><span class="kind">banner</span><div class="strip" style="height:auto;padding:6px 10px;border:0">notice</div><span class="why">Revealed only after submission. Above the venue threshold it needs approval</span></div><div class="panel"><span class="kind">timeline</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">No-sale count, manual discounts, voids — the numbers a supervisor reviews</span></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; closeShift · acceptShiftVariance · recordNoSale · approveShiftOpen +13</div>
+          <div><b>STATES</b> &middot; <span class="warn">loading · emptyFirstRun · emptyNoResults · emptyNoAccess · error · offline</span></div>
+          <div><b>ARRIVES WITH</b> &middot; shiftId&larr;session, boxId&larr;session, saleId&larr;deepLink</div>
+          <div><b>GOES TO</b> &middot; POS-001 · POS-002 · POS-009</div>
+        </div>
+      </div>
+      <div id="pos-009" class="scr">
+        <div>
+          <div class="hdr"><span class="code">POS-009</span>
+            <span class="ttl">Staff Roster</span><span class="pill">client board</span><span class="pill off">offline</span><span class="pill">POS-3A</span></div>
+          <div class="pur">See who is on duty and on which terminal.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>TICVAI</b><span>Shift</span></div><nav class="nav"><i class="">Dashboard</i><i class="on">Shift</i><i class="">Settings</i><i class="">Reports</i><i class="">People</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Staff Roster</h2>
+                <small>Venue POS · wave 2 · touchLarge</small></div>
+              <div class="acts"><div class="chip">This venue &#9662;</div><div class="chip live">Live</div><div class="chip cta">Primary action</div></div>
+            </div>
+            <div class="strip">offline capable · works from the local journal</div>
+            <div class="canvas">
+              <div class="kpis"><div class="kpi"><b>Total</b><span>1,248</span></div><div class="kpi"><b>Active</b><span>978</span></div><div class="kpi"><b>Attention</b><span>142</span></div><div class="kpi"><b>Offline</b><span>12</span></div></div>
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">Staff, role and terminal, shift, sales, status — the columns in the design</span></div><div class="panel"><span class="kind">searchField</span><div class="chip">Search</div><span class="why">Implied by the list template — not declared on the screen.</span></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; listShifts · acceptShiftVariance · approveShiftOpen · closeShift +12</div>
+          <div><b>STATES</b> &middot; <span class="warn">loading · emptyFirstRun · emptyNoResults · emptyNoAccess · error · offline</span></div>
+          <div><b>ARRIVES WITH</b> &middot; shiftId&larr;session</div>
+          <div><b>GOES TO</b> &middot; POS-001 · POS-002 · POS-007</div>
+        </div>
+      </div></div><div class="grp">02 — Sell · 19 screens</div><div class="stack">
+      <div id="pos-002" class="scr">
+        <div>
+          <div class="hdr"><span class="code">POS-002</span>
+            <span class="ttl">Sell — Ticket Catalogue</span><span class="pill">client board</span><span class="pill off">offline</span><span class="pill">RET-3B, RET-3C, RET-3D</span></div>
+          <div class="pur">Find a product and add it to the cart.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>TICVAI</b><span>Sell</span></div><nav class="nav"><i class="">Dashboard</i><i class="on">Sell</i><i class="">Settings</i><i class="">Reports</i><i class="">People</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Sell — Ticket Catalogue</h2>
+                <small>Venue POS · wave 1 · touchLarge</small></div>
+              <div class="acts"><div class="chip">This venue &#9662;</div><div class="chip live">Live</div><div class="chip cta">Primary action</div></div>
+            </div>
+            <div class="strip">offline capable · works from the local journal</div>
+            <div class="canvas">
+              <div class="kpis"><div class="kpi"><b>Today</b><span>AED 48,210</span></div><div class="kpi"><b>Orders</b><span>312</span></div><div class="kpi"><b>Avg basket</b><span>AED 154</span></div><div class="kpi"><b>Refunds</b><span>4</span></div></div>
+              <div class="two"><div class="grow"><div class="panel"><b>Search events, tickets, customers</b><div class="chip">Search events, tickets, customers</div></div><div class="panel"><span class="kind">saleBoard</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">Category tiles then product cards. Layout is the sale board configured per workstation (ADR-0002), not a fixed grid</span></div><div class="panel"><b>Sort by</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div></div><div class="side"><div class="panel"><b>Filters</b><div class="chip">Filters</div></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; listProducts · evaluatePromotions · holdOrder · applyManualDiscount +37</div>
+          <div><b>STATES</b> &middot; <span class="warn">loading · emptyFirstRun · emptyNoResults · emptyNoAccess · error · offline · catalogueStale</span></div>
+          <div><b>ARRIVES WITH</b> &middot; workstationId&larr;session, cardCode&larr;deepLink, cartId&larr;session</div>
+          <div><b>GOES TO</b> &middot; POS-001 · POS-003 · POS-004 · POS-005 · POS-006</div>
+        </div>
+      </div>
+      <div id="pos-003" class="scr">
+        <div>
+          <div class="hdr"><span class="code">POS-003</span>
+            <span class="ttl">Sell — Timed Entry</span><span class="pill off">offline</span></div>
+          <div class="pur">Pick a date, a session and ticket quantities.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>TICVAI</b><span>Sell</span></div><nav class="nav"><i class="">Dashboard</i><i class="on">Sell</i><i class="">Settings</i><i class="">Reports</i><i class="">People</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Sell — Timed Entry</h2>
+                <small>Venue POS · wave 1 · touchLarge</small></div>
+              <div class="acts"><div class="chip">This venue &#9662;</div><div class="chip live">Live</div><div class="chip cta">Primary action</div></div>
+            </div>
+            <div class="strip">offline capable · works from the local journal</div>
+            <div class="canvas">
+              <div class="kpis"><div class="kpi"><b>Today</b><span>AED 48,210</span></div><div class="kpi"><b>Orders</b><span>312</span></div><div class="kpi"><b>Avg basket</b><span>AED 154</span></div><div class="kpi"><b>Refunds</b><span>4</span></div></div>
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">datePicker</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">Seven-day strip, as designed. Region date format</span></div><div class="panel"><span class="kind">cardList</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">Slots with remaining counts and a demand indicator — the mockup shows High, Medium, Low, Sold Out</span></div><div class="panel"><span class="kind">cardList</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">Adult and child with steppers</span></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; getAvailability · acquireLease · listProductVariants · getProduct +6</div>
+          <div><b>STATES</b> &middot; <span class="warn">loading · emptyFirstRun · emptyNoResults · emptyNoAccess · error · offline</span></div>
+          <div><b>ARRIVES WITH</b> &middot; leaseId&larr;deepLink, productId&larr;POS-002</div>
+          <div><b>GOES TO</b> &middot; POS-001 · POS-002 · POS-004 · POS-005 · POS-006</div>
+        </div>
+      </div>
+      <div id="pos-004" class="scr">
+        <div>
+          <div class="hdr"><span class="code">POS-004</span>
+            <span class="ttl">Sell — Seat Map</span><span class="pill off">offline</span></div>
+          <div class="pur">Choose specific seats for a seated event.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>TICVAI</b><span>Sell</span></div><nav class="nav"><i class="">Dashboard</i><i class="on">Sell</i><i class="">Settings</i><i class="">Reports</i><i class="">People</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Sell — Seat Map</h2>
+                <small>Venue POS · wave 2 · touchLarge</small></div>
+              <div class="acts"><div class="chip">This venue &#9662;</div><div class="chip live">Live</div><div class="chip cta">Primary action</div></div>
+            </div>
+            <div class="strip">offline capable · works from the local journal</div>
+            <div class="canvas">
+              <div class="kpis"><div class="kpi"><b>Today</b><span>AED 48,210</span></div><div class="kpi"><b>Orders</b><span>312</span></div><div class="kpi"><b>Avg basket</b><span>AED 154</span></div><div class="kpi"><b>Refunds</b><span>4</span></div></div>
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">seatMap</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">Category filter, zoom, legend. Available, selected, sold, accessible — exactly the four states in the design</span></div><div class="panel"><span class="kind">banner</span><div class="strip" style="height:auto;padding:6px 10px;border:0">notice</div><span class="why">Hold countdown</span></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; getSeatAvailability · createSeatHold · extendSeatHold · getPerformance +7</div>
+          <div><b>STATES</b> &middot; <span class="warn">loading · emptyFirstRun · emptyNoAccess · error · offline</span></div>
+          <div><b>ARRIVES WITH</b> &middot; holdId&larr;deepLink, performanceId&larr;deepLink</div>
+          <div><b>GOES TO</b> &middot; POS-001 · POS-002 · POS-003 · POS-005 · POS-006</div>
+        </div>
+      </div>
+      <div id="pos-006" class="scr">
+        <div>
+          <div class="hdr"><span class="code">POS-006</span>
+            <span class="ttl">Held Orders</span><span class="pill">client board</span><span class="pill off">offline</span><span class="pill">RET-3F</span></div>
+          <div class="pur">Find and resume a parked sale.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>TICVAI</b><span>Sell</span></div><nav class="nav"><i class="">Dashboard</i><i class="on">Sell</i><i class="">Settings</i><i class="">Reports</i><i class="">People</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Held Orders</h2>
+                <small>Venue POS · wave 1 · touchLarge</small></div>
+              <div class="acts"><div class="chip">This venue &#9662;</div><div class="chip live">Live</div><div class="chip cta">Primary action</div></div>
+            </div>
+            <div class="strip">offline capable · works from the local journal</div>
+            <div class="canvas">
+              <div class="kpis"><div class="kpi"><b>Today</b><span>AED 48,210</span></div><div class="kpi"><b>Orders</b><span>312</span></div><div class="kpi"><b>Avg basket</b><span>AED 154</span></div><div class="kpi"><b>Refunds</b><span>4</span></div></div>
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">Label, cashier, age, total. Sorted by age — the oldest is the one about to expire</span></div><div class="panel"><span class="kind">banner</span><div class="strip" style="height:auto;padding:6px 10px;border:0">notice</div><span class="why">Held orders expiring within the hour</span></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; listOrders · resumeOrder · applyManualDiscount · createOrder +10</div>
+          <div><b>STATES</b> &middot; <span class="warn">loading · emptyFirstRun · emptyNoResults · emptyNoAccess · error · offline</span></div>
+          <div><b>ARRIVES WITH</b> &middot; orderId&larr;POS-002</div>
+          <div><b>GOES TO</b> &middot; POS-001 · POS-002 · POS-003 · POS-004</div>
+        </div>
+      </div>
+      <div id="pos-010" class="scr">
+        <div>
+          <div class="hdr"><span class="code">POS-010</span>
+            <span class="ttl">Add to Existing Ticket</span><span class="pill off">offline</span></div>
+          <div class="pur">Sell something onto media the guest is already carrying.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>TICVAI</b><span>Sell</span></div><nav class="nav"><i class="">Dashboard</i><i class="on">Sell</i><i class="">Settings</i><i class="">Reports</i><i class="">People</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Add to Existing Ticket</h2>
+                <small>Venue POS · wave 1 · touchLarge</small></div>
+              <div class="acts"><div class="chip">This venue &#9662;</div><div class="chip live">Live</div><div class="chip cta">Primary action</div></div>
+            </div>
+            <div class="strip">offline capable · works from the local journal</div>
+            <div class="canvas">
+              <div class="kpis"><div class="kpi"><b>Today</b><span>AED 48,210</span></div><div class="kpi"><b>Orders</b><span>312</span></div><div class="kpi"><b>Avg basket</b><span>AED 154</span></div><div class="kpi"><b>Refunds</b><span>4</span></div></div>
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">scanTarget</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">Scan the guest QR, wristband or card first. The media is the join, not the order</span></div><div class="panel"><span class="kind">detailPanel</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">What they already hold — so a cashier does not sell a locker to someone who has one</span></div><div class="panel"><span class="kind">banner</span><div class="strip" style="height:auto;padding:6px 10px;border:0">notice</div><span class="why">Surrendered, expired or blocked media is refused before money is taken, not after</span></div></div><div class="side"><div class="panel"><span class="kind">saleBoard</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">Only variants whose template allows canShareMedia</span></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; getMediaEntitlements · appendEntitlementToMedia · getMediaAsset · getCart +1</div>
+          <div><b>STATES</b> &middot; <span class="warn">loading · emptyFirstRun · emptyNoAccess · error · offline</span></div>
+          <div><b>ARRIVES WITH</b> &middot; mediaCode&larr;deepLink, mediaId&larr;deepLink, cartId&larr;session</div>
+          <div><b>GOES TO</b> &middot; POS-001 · POS-002 · POS-003 · POS-004 · POS-005</div>
+        </div>
+      </div>
+      <div id="pos-011" class="scr">
+        <div>
+          <div class="hdr"><span class="code">POS-011</span>
+            <span class="ttl">Returns, Refunds &amp; Exchanges</span><span class="pill">client board</span><span class="pill off">offline</span><span class="pill">POS-2B, RET-3G</span></div>
+          <div class="pur">Returns, Refunds &amp; Exchanges — from the client design board, 20 August.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>TICVAI</b><span>Sell</span></div><nav class="nav"><i class="">Dashboard</i><i class="on">Sell</i><i class="">Settings</i><i class="">Reports</i><i class="">People</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Returns, Refunds &amp; Exchanges</h2>
+                <small>Venue POS · wave 1 · touchLarge</small></div>
+              <div class="acts"><div class="chip">This venue &#9662;</div><div class="chip live">Live</div><div class="chip cta">Primary action</div></div>
+            </div>
+            <div class="strip">offline capable · works from the local journal</div>
+            <div class="canvas">
+              <div class="kpis"><div class="kpi"><b>Today</b><span>AED 48,210</span></div><div class="kpi"><b>Orders</b><span>312</span></div><div class="kpi"><b>Avg basket</b><span>AED 154</span></div><div class="kpi"><b>Refunds</b><span>4</span></div></div>
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div></div><div class="panel"><b>Confirm</b><div class="chip cta">Confirm</div></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; createRefund · exchangeOrderLines · getReturnPolicy · adjustDepositBoxFloat +5</div>
+          <div><b>STATES</b> &middot; <span class="warn">loading · emptyFirstRun · emptyNoResults · emptyNoAccess · error · offline</span></div>
+          <div><b>ARRIVES WITH</b> &middot; workstationId&larr;session, orderId&larr;deepLink, outletId&larr;deepLink</div>
+          <div><b>GOES TO</b> &middot; POS-002</div>
+        </div>
+      </div>
+      <div id="pos-012" class="scr">
+        <div>
+          <div class="hdr"><span class="code">POS-012</span>
+            <span class="ttl">Omnichannel Order &amp; Fulfilment Center</span><span class="pill named">named only</span><span class="pill off">offline</span><span class="pill">POS-2C, RET-3H</span></div>
+          <div class="pur">Omnichannel Order &amp; Fulfilment Center — from the client design board, 20 August.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>TICVAI</b><span>Sell</span></div><nav class="nav"><i class="">Dashboard</i><i class="on">Sell</i><i class="">Settings</i><i class="">Reports</i><i class="">People</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Omnichannel Order &amp; Fulfilment Center</h2>
+                <small>Venue POS · wave 1 · touchLarge</small></div>
+              <div class="acts"><div class="chip">This venue &#9662;</div><div class="chip live">Live</div><div class="chip cta">Primary action</div></div>
+            </div>
+            <div class="strip">offline capable · works from the local journal</div>
+            <div class="canvas">
+              <div class="kpis"><div class="kpi"><b>Today</b><span>AED 48,210</span></div><div class="kpi"><b>Orders</b><span>312</span></div><div class="kpi"><b>Avg basket</b><span>AED 154</span></div><div class="kpi"><b>Refunds</b><span>4</span></div></div>
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div></div><div class="panel"><b>Confirm</b><div class="chip cta">Confirm</div></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; listOrders · recordOrderHandover · reserveMerchandise · adjustDepositBoxFloat +3</div>
+          <div><b>STATES</b> &middot; <span class="warn">loading · emptyFirstRun · emptyNoResults · emptyNoAccess · error · offline</span></div>
+          <div><b>ARRIVES WITH</b> &middot; workstationId&larr;session, orderId&larr;deepLink, outletId&larr;deepLink</div>
+          <div><b>GOES TO</b> &middot; nothing declared</div>
+        </div>
+      </div>
+      <div id="pos-013" class="scr">
+        <div>
+          <div class="hdr"><span class="code">POS-013</span>
+            <span class="ttl">Mobile POS, Event Sales &amp; Offline Operations</span><span class="pill named">named only</span><span class="pill off">offline</span><span class="pill">POS-2D, POS-2E</span></div>
+          <div class="pur">Mobile POS, Event Sales &amp; Offline Operations — from the client design board, 20 August.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>TICVAI</b><span>Sell</span></div><nav class="nav"><i class="">Dashboard</i><i class="on">Sell</i><i class="">Settings</i><i class="">Reports</i><i class="">People</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Mobile POS, Event Sales &amp; Offline Operat</h2>
+                <small>Venue POS · wave 1 · touchLarge</small></div>
+              <div class="acts"><div class="chip">This venue &#9662;</div><div class="chip live">Live</div><div class="chip cta">Primary action</div></div>
+            </div>
+            <div class="strip">offline capable · works from the local journal</div>
+            <div class="canvas">
+              <div class="kpis"><div class="kpi"><b>Today</b><span>AED 48,210</span></div><div class="kpi"><b>Orders</b><span>312</span></div><div class="kpi"><b>Avg basket</b><span>AED 154</span></div><div class="kpi"><b>Refunds</b><span>4</span></div></div>
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div></div><div class="panel"><b>Confirm</b><div class="chip cta">Confirm</div></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; getOfflinePackage · syncOrders · createOrder · adjustDepositBoxFloat +4</div>
+          <div><b>STATES</b> &middot; <span class="warn">loading · emptyFirstRun · emptyNoResults · emptyNoAccess · error · offline</span></div>
+          <div><b>ARRIVES WITH</b> &middot; workstationId&larr;session, boxId&larr;session, shiftId&larr;session</div>
+          <div><b>GOES TO</b> &middot; POS-002 · POS-020</div>
+        </div>
+      </div>
+      <div id="pos-014" class="scr">
+        <div>
+          <div class="hdr"><span class="code">POS-014</span>
+            <span class="ttl">Sales Exceptions, Controls &amp; Operational Actions</span><span class="pill">client board</span><span class="pill off">offline</span></div>
+          <div class="pur">Sales Exceptions, Controls &amp; Operational Actions — from the client design board, 20 August.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>TICVAI</b><span>Sell</span></div><nav class="nav"><i class="">Dashboard</i><i class="on">Sell</i><i class="">Settings</i><i class="">Reports</i><i class="">People</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Sales Exceptions, Controls &amp; Operational</h2>
+                <small>Venue POS · wave 1 · touchLarge</small></div>
+              <div class="acts"><div class="chip">This venue &#9662;</div><div class="chip live">Live</div><div class="chip cta">Primary action</div></div>
+            </div>
+            <div class="strip">offline capable · works from the local journal</div>
+            <div class="canvas">
+              <div class="kpis"><div class="kpi"><b>Today</b><span>AED 48,210</span></div><div class="kpi"><b>Orders</b><span>312</span></div><div class="kpi"><b>Avg basket</b><span>AED 154</span></div><div class="kpi"><b>Refunds</b><span>4</span></div></div>
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div></div><div class="panel"><b>Confirm</b><div class="chip cta">Confirm</div></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; recordNoSale · voidOrder · applyManualDiscount</div>
+          <div><b>STATES</b> &middot; <span class="warn">loading · emptyFirstRun · emptyNoResults · emptyNoAccess · error · offline</span></div>
+          <div><b>ARRIVES WITH</b> &middot; workstationId&larr;session, orderId&larr;deepLink, shiftId&larr;deepLink</div>
+          <div><b>GOES TO</b> &middot; nothing declared</div>
+        </div>
+      </div>
+      <div id="pos-015" class="scr">
+        <div>
+          <div class="hdr"><span class="code">POS-015</span>
+            <span class="ttl">Cash Operations Dashboard</span><span class="pill">client board</span><span class="pill off">offline</span></div>
+          <div class="pur">Cash Operations Dashboard — from the client design board, 20 August.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>TICVAI</b><span>Sell</span></div><nav class="nav"><i class="">Dashboard</i><i class="on">Sell</i><i class="">Settings</i><i class="">Reports</i><i class="">People</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Cash Operations Dashboard</h2>
+                <small>Venue POS · wave 1 · touchLarge</small></div>
+              <div class="acts"><div class="chip">This venue &#9662;</div><div class="chip live">Live</div><div class="chip cta">Primary action</div></div>
+            </div>
+            <div class="strip">offline capable · works from the local journal</div>
+            <div class="canvas">
+              <div class="kpis"><div class="kpi"><b>Today</b><span>AED 48,210</span></div><div class="kpi"><b>Orders</b><span>312</span></div><div class="kpi"><b>Avg basket</b><span>AED 154</span></div><div class="kpi"><b>Refunds</b><span>4</span></div></div>
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div></div><div class="panel"><b>Confirm</b><div class="chip cta">Confirm</div></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; listCashMovements · listDepositBoxes</div>
+          <div><b>STATES</b> &middot; <span class="warn">loading · emptyFirstRun · emptyNoResults · emptyNoAccess · error · offline</span></div>
+          <div><b>ARRIVES WITH</b> &middot; workstationId&larr;session, shiftId&larr;deepLink</div>
+          <div><b>GOES TO</b> &middot; nothing declared</div>
+        </div>
+      </div>
+      <div id="pos-016" class="scr">
+        <div>
+          <div class="hdr"><span class="code">POS-016</span>
+            <span class="ttl">Till Configuration</span><span class="pill named">named only</span><span class="pill off">offline</span></div>
+          <div class="pur">Till Configuration — from the client design board, 20 August.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>TICVAI</b><span>Sell</span></div><nav class="nav"><i class="">Dashboard</i><i class="on">Sell</i><i class="">Settings</i><i class="">Reports</i><i class="">People</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Till Configuration</h2>
+                <small>Venue POS · wave 1 · touchLarge</small></div>
+              <div class="acts"><div class="chip">This venue &#9662;</div><div class="chip live">Live</div><div class="chip cta">Primary action</div></div>
+            </div>
+            <div class="strip">offline capable · works from the local journal</div>
+            <div class="canvas">
+              <div class="kpis"><div class="kpi"><b>Today</b><span>AED 48,210</span></div><div class="kpi"><b>Orders</b><span>312</span></div><div class="kpi"><b>Avg basket</b><span>AED 154</span></div><div class="kpi"><b>Refunds</b><span>4</span></div></div>
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div></div><div class="panel"><b>Confirm</b><div class="chip cta">Confirm</div></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; allocateDepositBox · configureWorkstation</div>
+          <div><b>STATES</b> &middot; <span class="warn">loading · emptyFirstRun · emptyNoResults · emptyNoAccess · error · offline</span></div>
+          <div><b>ARRIVES WITH</b> &middot; workstationId&larr;session</div>
+          <div><b>GOES TO</b> &middot; nothing declared</div>
+        </div>
+      </div>
+      <div id="pos-017" class="scr">
+        <div>
+          <div class="hdr"><span class="code">POS-017</span>
+            <span class="ttl">Cash In / Cash Out Operations</span><span class="pill">client board</span><span class="pill off">offline</span></div>
+          <div class="pur">Cash In / Cash Out Operations — from the client design board, 20 August.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>TICVAI</b><span>Sell</span></div><nav class="nav"><i class="">Dashboard</i><i class="on">Sell</i><i class="">Settings</i><i class="">Reports</i><i class="">People</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Cash In / Cash Out Operations</h2>
+                <small>Venue POS · wave 1 · touchLarge</small></div>
+              <div class="acts"><div class="chip">This venue &#9662;</div><div class="chip live">Live</div><div class="chip cta">Primary action</div></div>
+            </div>
+            <div class="strip">offline capable · works from the local journal</div>
+            <div class="canvas">
+              <div class="kpis"><div class="kpi"><b>Today</b><span>AED 48,210</span></div><div class="kpi"><b>Orders</b><span>312</span></div><div class="kpi"><b>Avg basket</b><span>AED 154</span></div><div class="kpi"><b>Refunds</b><span>4</span></div></div>
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div></div><div class="panel"><b>Confirm</b><div class="chip cta">Confirm</div></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; createCashMovement</div>
+          <div><b>STATES</b> &middot; <span class="warn">loading · emptyFirstRun · emptyNoResults · emptyNoAccess · error · offline</span></div>
+          <div><b>ARRIVES WITH</b> &middot; workstationId&larr;session, shiftId&larr;deepLink</div>
+          <div><b>GOES TO</b> &middot; nothing declared</div>
+        </div>
+      </div>
+      <div id="pos-018" class="scr">
+        <div>
+          <div class="hdr"><span class="code">POS-018</span>
+            <span class="ttl">Safe Drop &amp; Cash Transfer Management</span><span class="pill">client board</span><span class="pill off">offline</span><span class="pill">POS-3B</span></div>
+          <div class="pur">Safe Drop &amp; Cash Transfer Management — from the client design board, 20 August.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>TICVAI</b><span>Sell</span></div><nav class="nav"><i class="">Dashboard</i><i class="on">Sell</i><i class="">Settings</i><i class="">Reports</i><i class="">People</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Safe Drop &amp; Cash Transfer Management</h2>
+                <small>Venue POS · wave 1 · touchLarge</small></div>
+              <div class="acts"><div class="chip">This venue &#9662;</div><div class="chip live">Live</div><div class="chip cta">Primary action</div></div>
+            </div>
+            <div class="strip">offline capable · works from the local journal</div>
+            <div class="canvas">
+              <div class="kpis"><div class="kpi"><b>Today</b><span>AED 48,210</span></div><div class="kpi"><b>Orders</b><span>312</span></div><div class="kpi"><b>Avg basket</b><span>AED 154</span></div><div class="kpi"><b>Refunds</b><span>4</span></div></div>
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div></div><div class="panel"><b>Confirm</b><div class="chip cta">Confirm</div></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; createCashMovement · withdrawFromDepositBox · createRotaAssignment · listPrincipals +1</div>
+          <div><b>STATES</b> &middot; <span class="warn">loading · emptyFirstRun · emptyNoResults · emptyNoAccess · error · offline</span></div>
+          <div><b>ARRIVES WITH</b> &middot; workstationId&larr;session, boxId&larr;deepLink, shiftId&larr;deepLink</div>
+          <div><b>GOES TO</b> &middot; nothing declared</div>
+        </div>
+      </div>
+      <div id="pos-019" class="scr">
+        <div>
+          <div class="hdr"><span class="code">POS-019</span>
+            <span class="ttl">Shift Templates &amp; Policies</span><span class="pill named">named only</span><span class="pill off">offline</span><span class="pill">POS-3C</span></div>
+          <div class="pur">Shift Templates &amp; Policies — from the client design board, 20 August.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>TICVAI</b><span>Sell</span></div><nav class="nav"><i class="">Dashboard</i><i class="on">Sell</i><i class="">Settings</i><i class="">Reports</i><i class="">People</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Shift Templates &amp; Policies</h2>
+                <small>Venue POS · wave 1 · touchLarge</small></div>
+              <div class="acts"><div class="chip">This venue &#9662;</div><div class="chip live">Live</div><div class="chip cta">Primary action</div></div>
+            </div>
+            <div class="strip">offline capable · works from the local journal</div>
+            <div class="canvas">
+              <div class="kpis"><div class="kpi"><b>Today</b><span>AED 48,210</span></div><div class="kpi"><b>Orders</b><span>312</span></div><div class="kpi"><b>Avg basket</b><span>AED 154</span></div><div class="kpi"><b>Refunds</b><span>4</span></div></div>
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div></div><div class="panel"><b>Confirm</b><div class="chip cta">Confirm</div></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; listShifts · setVenueSettings · getVenueSettings</div>
+          <div><b>STATES</b> &middot; <span class="warn">loading · emptyFirstRun · emptyNoResults · emptyNoAccess · error · offline</span></div>
+          <div><b>ARRIVES WITH</b> &middot; workstationId&larr;session, venueId&larr;deepLink</div>
+          <div><b>GOES TO</b> &middot; nothing declared</div>
+        </div>
+      </div>
+      <div id="pos-020" class="scr">
+        <div>
+          <div class="hdr"><span class="code">POS-020</span>
+            <span class="ttl">Shift Exceptions &amp; Alerts</span><span class="pill">client board</span><span class="pill off">offline</span><span class="pill">POS-3E</span></div>
+          <div class="pur">Shift Exceptions &amp; Alerts — from the client design board, 20 August.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>TICVAI</b><span>Sell</span></div><nav class="nav"><i class="">Dashboard</i><i class="on">Sell</i><i class="">Settings</i><i class="">Reports</i><i class="">People</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Shift Exceptions &amp; Alerts</h2>
+                <small>Venue POS · wave 1 · touchLarge</small></div>
+              <div class="acts"><div class="chip">This venue &#9662;</div><div class="chip live">Live</div><div class="chip cta">Primary action</div></div>
+            </div>
+            <div class="strip">offline capable · works from the local journal</div>
+            <div class="canvas">
+              <div class="kpis"><div class="kpi"><b>Today</b><span>AED 48,210</span></div><div class="kpi"><b>Orders</b><span>312</span></div><div class="kpi"><b>Avg basket</b><span>AED 154</span></div><div class="kpi"><b>Refunds</b><span>4</span></div></div>
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div></div><div class="panel"><b>Confirm</b><div class="chip cta">Confirm</div></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; recordNoSale · listAlerts · createApprovalRequest · decideApprovalRequest +1</div>
+          <div><b>STATES</b> &middot; <span class="warn">loading · emptyFirstRun · emptyNoResults · emptyNoAccess · error · offline</span></div>
+          <div><b>ARRIVES WITH</b> &middot; workstationId&larr;session, shiftId&larr;deepLink, reportId&larr;deepLink</div>
+          <div><b>GOES TO</b> &middot; POS-002 · POS-007</div>
+        </div>
+      </div>
+      <div id="pos-021" class="scr">
+        <div>
+          <div class="hdr"><span class="code">POS-021</span>
+            <span class="ttl">Sell — Food &amp; Drink</span><span class="pill off">offline</span></div>
+          <div class="pur">A guest orders food at a counter and pays.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>TICVAI</b><span>Sell</span></div><nav class="nav"><i class="">Dashboard</i><i class="on">Sell</i><i class="">Settings</i><i class="">Reports</i><i class="">People</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Sell — Food &amp; Drink</h2>
+                <small>Venue POS · wave 1 · touchLarge</small></div>
+              <div class="acts"><div class="chip">This venue &#9662;</div><div class="chip live">Live</div><div class="chip cta">Primary action</div></div>
+            </div>
+            <div class="strip">offline capable · works from the local journal</div>
+            <div class="canvas">
+              <div class="kpis"><div class="kpi"><b>Today</b><span>AED 48,210</span></div><div class="kpi"><b>Orders</b><span>312</span></div><div class="kpi"><b>Avg basket</b><span>AED 154</span></div><div class="kpi"><b>Refunds</b><span>4</span></div></div>
+              <div class="two"><div class="grow"><div class="panel"><b>Menu</b><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">**Sections in the order the outlet set them, not alphabetical.** A menu board that sorts by name puts Desserts above Mains forever.</span></div><div class="panel"><b>Modifiers</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">**A modifier group is attached to the item, not chosen per sale.** *How would you like that cooked* is one group on nine steaks — CF-160.</span></div><div class="panel"><b>Basket</b><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div></div></div><div class="side"><div class="panel"><b>Pay</b><div class="chip cta">Pay</div></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; getGuestMenu · listMenus · listModifierGroups · addCartLine +2</div>
+          <div><b>STATES</b> &middot; <span class="warn">loading · emptyFirstRun · emptyNoResults · emptyNoAccess · error · offline</span></div>
+          <div><b>ARRIVES WITH</b> &middot; workstationId&larr;session, outletId&larr;session, cartId&larr;session</div>
+          <div><b>GOES TO</b> &middot; POS-005 · POS-002</div>
+        </div>
+      </div>
+      <div id="pos-022" class="scr">
+        <div>
+          <div class="hdr"><span class="code">POS-022</span>
+            <span class="ttl">Send to Kitchen</span><span class="pill off">offline</span></div>
+          <div class="pur">The order goes to the pass and the guest is given a number.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>TICVAI</b><span>Sell</span></div><nav class="nav"><i class="">Dashboard</i><i class="on">Sell</i><i class="">Settings</i><i class="">Reports</i><i class="">People</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Send to Kitchen</h2>
+                <small>Venue POS · wave 1 · touchLarge</small></div>
+              <div class="acts"><div class="chip">This venue &#9662;</div><div class="chip live">Live</div><div class="chip cta">Primary action</div></div>
+            </div>
+            <div class="strip">offline capable · works from the local journal</div>
+            <div class="canvas">
+              <div class="kpis"><div class="kpi"><b>Today</b><span>AED 48,210</span></div><div class="kpi"><b>Orders</b><span>312</span></div><div class="kpi"><b>Avg basket</b><span>AED 154</span></div><div class="kpi"><b>Refunds</b><span>4</span></div></div>
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">metricTile</span><div class="rows"><div class="bar"><i style="width:78%"></i></div><div class="bar"><i style="width:54%"></i></div><div class="bar"><i style="width:92%"></i></div><div class="bar"><i style="width:36%"></i></div><div class="bar"><i style="width:61%"></i></div></div><span class="why">Orders ahead, and the oldest. **A cashier quoting a wait needs the number the kitchen is actually working to.**</span></div><div class="panel"><span class="kind">cardList</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div></div><div class="panel"><b>Collected</b><div class="chip cta">Collected</div></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; createFnbOrder · listKitchenTickets · setKitchenTicketStatus · markOrderCollected</div>
+          <div><b>STATES</b> &middot; <span class="warn">loading · emptyFirstRun · emptyNoResults · emptyNoAccess · error · offline</span></div>
+          <div><b>ARRIVES WITH</b> &middot; workstationId&larr;session, outletId&larr;session, orderId&larr;deepLink</div>
+          <div><b>GOES TO</b> &middot; POS-005 · POS-002</div>
+        </div>
+      </div>
+      <div id="pos-023" class="scr">
+        <div>
+          <div class="hdr"><span class="code">POS-023</span>
+            <span class="ttl">Sell — Merchandise</span><span class="pill off">offline</span></div>
+          <div class="pur">A guest buys merchandise at a counter.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>TICVAI</b><span>Sell</span></div><nav class="nav"><i class="">Dashboard</i><i class="on">Sell</i><i class="">Settings</i><i class="">Reports</i><i class="">People</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Sell — Merchandise</h2>
+                <small>Venue POS · wave 1 · touchLarge</small></div>
+              <div class="acts"><div class="chip">This venue &#9662;</div><div class="chip live">Live</div><div class="chip cta">Primary action</div></div>
+            </div>
+            <div class="strip">offline capable · works from the local journal</div>
+            <div class="canvas">
+              <div class="kpis"><div class="kpi"><b>Today</b><span>AED 48,210</span></div><div class="kpi"><b>Orders</b><span>312</span></div><div class="kpi"><b>Avg basket</b><span>AED 154</span></div><div class="kpi"><b>Refunds</b><span>4</span></div></div>
+              <div class="two"><div class="grow"><div class="panel"><b>Scan or search</b><div class="chip">Scan or search</div></div><div class="panel"><span class="kind">cardList</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div></div><div class="panel"><b>Basket</b><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div></div></div><div class="side"><div class="panel"><b>Pay</b><div class="chip cta">Pay</div></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; listMerchandise · lookupMerchandise · addCartLine · createRetailSale +1</div>
+          <div><b>STATES</b> &middot; <span class="warn">loading · emptyFirstRun · emptyNoResults · emptyNoAccess · error · offline</span></div>
+          <div><b>ARRIVES WITH</b> &middot; workstationId&larr;session, outletId&larr;session, cartId&larr;session</div>
+          <div><b>GOES TO</b> &middot; POS-005 · POS-002</div>
+        </div>
+      </div>
+      <div id="pos-024" class="scr">
+        <div>
+          <div class="hdr"><span class="code">POS-024</span>
+            <span class="ttl">Outlet Setup</span><span class="pill off">offline</span></div>
+          <div class="pur">A manager configures this outlet from the floor.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>TICVAI</b><span>Sell</span></div><nav class="nav"><i class="">Dashboard</i><i class="on">Sell</i><i class="">Settings</i><i class="">Reports</i><i class="">People</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Outlet Setup</h2>
+                <small>Venue POS · wave 1 · touchLarge</small></div>
+              <div class="acts"><div class="chip">This venue &#9662;</div><div class="chip live">Live</div><div class="chip cta">Primary action</div></div>
+            </div>
+            <div class="strip">offline capable · works from the local journal</div>
+            <div class="canvas">
+              <div class="kpis"><div class="kpi"><b>Today</b><span>AED 48,210</span></div><div class="kpi"><b>Orders</b><span>312</span></div><div class="kpi"><b>Avg basket</b><span>AED 154</span></div><div class="kpi"><b>Refunds</b><span>4</span></div></div>
+              <div class="two"><div class="grow"><div class="panel"><b>Floor</b><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div></div><div class="panel"><b>Combinations</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">**Declared, not inferred.** Two adjacent tables do not always combine — a pillar, a step, a service run. A host knows which pairs work and a floor plan does not.</span></div><div class="panel"><b>86 an item</b><div class="chip">86 an item</div></div></div><div class="side"><div class="panel"><b>Apply</b><div class="chip cta">Apply</div></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; listOutlets · setTableLayout · setTableCombinations · setItemAvailability +1</div>
+          <div><b>STATES</b> &middot; <span class="warn">loading · emptyFirstRun · emptyNoResults · emptyNoAccess · error · offline</span></div>
+          <div><b>ARRIVES WITH</b> &middot; workstationId&larr;session, outletId&larr;session, itemId&larr;deepLink</div>
+          <div><b>GOES TO</b> &middot; POS-005 · POS-002</div>
+        </div>
+      </div></div><div class="grp">03 — Payment · 1 screens</div><div class="stack">
+      <div id="pos-005" class="scr">
+        <div>
+          <div class="hdr"><span class="code">POS-005</span>
+            <span class="ttl">Payment</span><span class="pill">client board</span><span class="pill off">offline</span><span class="pill">RET-3E</span></div>
+          <div class="pur">Take payment and complete the sale.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>TICVAI</b><span>Payment</span></div><nav class="nav"><i class="">Dashboard</i><i class="on">Payment</i><i class="">Settings</i><i class="">Reports</i><i class="">People</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Payment</h2>
+                <small>Venue POS · wave 1 · touchLarge</small></div>
+              <div class="acts"><div class="chip">This venue &#9662;</div><div class="chip live">Live</div><div class="chip cta">Primary action</div></div>
+            </div>
+            <div class="strip">offline capable · works from the local journal</div>
+            <div class="canvas">
+              <div class="kpis"><div class="kpi"><b>Total</b><span>1,248</span></div><div class="kpi"><b>Active</b><span>978</span></div><div class="kpi"><b>Attention</b><span>142</span></div><div class="kpi"><b>Offline</b><span>12</span></div></div>
+              <div class="two"><div class="grow"><div class="panel"><b>Payment method</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">Card, cash, digital wallet, gift card or voucher, online payment — the five in the design</span></div><div class="panel"><b>Amount received</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><span class="kind">detailPanel</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">Computed live. Quick-tender chips for exact, 250, 300</span></div></div><div class="side"><div class="panel"><span class="kind">paymentTerminal</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; createPayment · inquirePaymentStatus · addTip · reprintReceipt +7</div>
+          <div><b>STATES</b> &middot; <span class="warn">loading · emptyFirstRun · emptyNoAccess · error · offline</span></div>
+          <div><b>ARRIVES WITH</b> &middot; paymentId&larr;deepLink, saleId&larr;deepLink</div>
+          <div><b>GOES TO</b> &middot; POS-001 · POS-002 · POS-010 · POS-021 · POS-022</div>
+        </div>
+      </div></div><div class="grp">04 — Reports · 1 screens</div><div class="stack">
+      <div id="pos-008" class="scr">
+        <div>
+          <div class="hdr"><span class="code">POS-008</span>
+            <span class="ttl">Reports</span><span class="pill off">offline</span></div>
+          <div class="pur">See how the day is going from the terminal.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>TICVAI</b><span>Reports</span></div><nav class="nav"><i class="">Dashboard</i><i class="on">Reports</i><i class="">Settings</i><i class="">Reports</i><i class="">People</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Reports</h2>
+                <small>Venue POS · wave 2 · touchLarge</small></div>
+              <div class="acts"><div class="chip">This venue &#9662;</div><div class="chip live">Live</div><div class="chip cta">Primary action</div></div>
+            </div>
+            <div class="strip">offline capable · works from the local journal</div>
+            <div class="canvas">
+              <div class="kpis"><div class="kpi"><b>Total</b><span>1,248</span></div><div class="kpi"><b>Active</b><span>978</span></div><div class="kpi"><b>Attention</b><span>142</span></div><div class="kpi"><b>Offline</b><span>12</span></div></div>
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">metricTile</span><div class="rows"><div class="bar"><i style="width:78%"></i></div><div class="bar"><i style="width:54%"></i></div><div class="bar"><i style="width:92%"></i></div><div class="bar"><i style="width:36%"></i></div><div class="bar"><i style="width:61%"></i></div></div><span class="why">Gross, tickets, average basket</span></div><div class="panel"><span class="kind">chart</span><div class="rows"><div class="bar"><i style="width:78%"></i></div><div class="bar"><i style="width:54%"></i></div><div class="bar"><i style="width:92%"></i></div><div class="bar"><i style="width:36%"></i></div><div class="bar"><i style="width:61%"></i></div></div><span class="why">Revenue by hour, revenue mix by category — as designed</span></div><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">Top selling products with units, revenue, share</span></div></div><div class="side"><div class="panel"><span class="kind">detailPanel</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">Sales channels and terminal health</span></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; runReport · askReportingQuestion · deleteReport · getFinancialReport +3</div>
+          <div><b>STATES</b> &middot; <span class="warn">loading · emptyFirstRun · emptyNoResults · emptyNoAccess · error · offline</span></div>
+          <div><b>ARRIVES WITH</b> &middot; conversationId&larr;deepLink, reportId&larr;deepLink</div>
+          <div><b>GOES TO</b> &middot; POS-001 · POS-002</div>
+        </div>
+      </div></div>
+  <div class="bottom">
+    <span>Generated by tools/derive-wireframes.py from screens/P04-point-of-sale.yaml — do not hand-edit</span>
+    <span>P04 · 24 screens · 4 groups</span>
+  </div>
+</div></body></html>

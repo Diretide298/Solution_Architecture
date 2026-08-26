@@ -1,0 +1,54 @@
+# Cross-cell wallet authorisation — state model
+# Contract: cross-cell.WalletAuthorisation.status
+# Checked by tools/check-states.py.
+
+entity: Cross-cell wallet authorisation
+contract: cross-cell
+enum: WalletAuthorisation.status
+enumKind: inline
+enumSchema: WalletAuthorisation
+enumProperty: status
+owner: cross-cell
+initial:
+- held
+terminal:
+- captured
+- released
+- expired
+transitions:
+- from: held
+  to: captured
+  operation: captureWalletAuthorisation
+  trigger: operation
+  guard: Spent in full
+- from: held
+  to: partiallyCaptured
+  operation: captureWalletAuthorisation
+  trigger: operation
+  guard: '**Spent less than held.** An F&B tab authorised at 200 and settled at 140'
+- from: partiallyCaptured
+  to: captured
+  operation: captureWalletAuthorisation
+  trigger: operation
+  guard: A further capture closed it
+- from: partiallyCaptured
+  to: released
+  operation: releaseWalletAuthorisation
+  trigger: operation
+  guard: '**The remainder returned.** Holding an unused balance is money a guest cannot spend elsewhere'
+- from: held
+  to: released
+  operation: releaseWalletAuthorisation
+  trigger: operation
+  guard: Nothing spent
+- from: held
+  to: expired
+  trigger: timer
+  guard: '**Released automatically.** A hold nobody released is a guest whose balance is short and who
+    cannot see why'
+- from: partiallyCaptured
+  to: expired
+  trigger: timer
+  guard: The remainder timed out and was returned
+notes: A hold on a wallet in another cell. **Expiry releases automatically rather than waiting for someone
+  to notice** — the failure mode is a guest with a balance they cannot spend and no explanation.

@@ -1,0 +1,702 @@
+id: LLD-subscription
+title: subscription — 55 operations
+generatedBy: tools/derive-diagrams.py
+index: diagrams/hld/03-contracts.yaml
+tier: satellite
+service: ControlService
+operations:
+- operation: addLicenceAddOn
+  verb: POST
+  path: /tenants/{tenantId}/licences/add-ons
+  scope: tenant
+  permission: PLATFORM_TENANT_MANAGE
+  audience: null
+  offline: false
+  reads:
+  - cache:idempotency
+  - control.licence_add_on
+  writes:
+  - cache:idempotency
+  - control.licence_add_on
+- operation: cancelDecommission
+  verb: POST
+  path: /cells/{cellId}/cancel-decommission
+  scope: tenant
+  permission: PLATFORM_CELL_MANAGE
+  audience: null
+  offline: false
+  reads:
+  - cache:idempotency
+  - control.cell
+  writes:
+  - cache:idempotency
+  - control.cell
+- operation: cancelInvoice
+  verb: POST
+  path: /invoices/{invoiceId}/cancel
+  scope: tenant
+  permission: PLATFORM_BILLING_MANAGE
+  audience: null
+  offline: false
+  reads:
+  - cache:idempotency
+  - control.invoice
+  writes:
+  - cache:idempotency
+  - control.invoice
+- operation: cancelSubscription
+  verb: POST
+  path: /subscriptions/{subscriptionId}/cancel
+  scope: tenant
+  permission: PLATFORM_BILLING_MANAGE
+  audience: null
+  offline: false
+  reads:
+  - cache:idempotency
+  - control.subscription
+  - control.tenant
+  writes:
+  - cache:idempotency
+  - control.subscription
+- operation: createPartnerAgreement
+  verb: POST
+  path: /partner-agreements
+  scope: tenant
+  permission: PARTNER_MANAGE
+  audience: null
+  offline: false
+  reads:
+  - cache:idempotency
+  - ledger.fx_rate
+  - platform.tenant
+  writes:
+  - approvals.request
+  - cache:idempotency
+  - control.partner_agreement
+- operation: createPartnerUser
+  verb: POST
+  path: /partners/{partnerId}/users
+  scope: tenant
+  permission: PARTNER_MANAGE
+  audience:
+  - staff
+  - partner
+  offline: false
+  reads:
+  - cache:idempotency
+  - control.partner_agreement
+  - identity.principal
+  - platform.scope_node
+  writes:
+  - cache:idempotency
+  - control.partner_user
+- operation: createPlan
+  verb: POST
+  path: /plans
+  scope: tenant
+  permission: PLATFORM_PLAN_MANAGE
+  audience: null
+  offline: false
+  reads:
+  - cache:idempotency
+  - control.plan
+  writes:
+  - cache:idempotency
+  - control.plan
+- operation: createPlanVersion
+  verb: POST
+  path: /plans/{planId}
+  scope: tenant
+  permission: PLATFORM_PLAN_MANAGE
+  audience: null
+  offline: false
+  reads:
+  - cache:idempotency
+  - control.plan
+  writes:
+  - cache:idempotency
+  - control.plan
+- operation: createTenant
+  verb: POST
+  path: /tenants
+  scope: tenant
+  permission: PLATFORM_TENANT_MANAGE
+  audience: null
+  offline: false
+  reads:
+  - cache:idempotency
+  - control.tenant
+  writes:
+  - cache:idempotency
+  - control.tenant
+- operation: decommissionCell
+  verb: POST
+  path: /cells/{cellId}/decommission
+  scope: tenant
+  permission: PLATFORM_CELL_MANAGE
+  audience: null
+  offline: false
+  reads:
+  - cache:idempotency
+  - control.cell
+  writes:
+  - cache:idempotency
+  - control.cell
+- operation: disputeInvoice
+  verb: POST
+  path: /invoices/{invoiceId}/dispute
+  scope: tenant
+  permission: PLATFORM_BILLING_MANAGE
+  audience: null
+  offline: false
+  reads:
+  - cache:idempotency
+  - control.invoice
+  writes:
+  - cache:idempotency
+  - control.invoice
+- operation: executeTenantMigration
+  verb: POST
+  path: /tenant-migrations/{migrationId}/execute
+  scope: tenant
+  permission: PLATFORM_CELL_MANAGE
+  audience: null
+  offline: false
+  reads:
+  - cache:idempotency
+  - control.tenant_migration
+  writes:
+  - cache:idempotency
+  - control.tenant_migration
+- operation: exportPartnerInvoice
+  verb: POST
+  path: /partners/{partnerId}/invoice-export
+  scope: tenant
+  permission: LEDGER_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - control.partner_agreement
+  - ledger.entry
+  - ledger.legal_entity
+  - orders.sales_order
+  writes:
+  - cache:idempotency
+- operation: generateInvoice
+  verb: POST
+  path: /tenants/{tenantId}/invoices
+  scope: tenant
+  permission: PLATFORM_BILLING_MANAGE
+  audience: null
+  offline: false
+  reads:
+  - cache:idempotency
+  - control.invoice
+  writes:
+  - cache:idempotency
+  - control.invoice
+- operation: getCell
+  verb: GET
+  path: /cells/{cellId}
+  scope: tenant
+  permission: PLATFORM_CELL_VIEW
+  audience: null
+  offline: false
+  reads:
+  - control.cell
+  - control.cell_job
+  writes: []
+- operation: getCellCapacity
+  verb: GET
+  path: /cells/{cellId}/capacity
+  scope: tenant
+  permission: PLATFORM_CELL_VIEW
+  audience: null
+  offline: false
+  reads:
+  - control.cell
+  writes: []
+- operation: getCellHealth
+  verb: GET
+  path: /cells/{cellId}/health
+  scope: tenant
+  permission: PLATFORM_CELL_VIEW
+  audience: null
+  offline: false
+  reads:
+  - control.cell
+  writes: []
+- operation: getCommissionStatement
+  verb: GET
+  path: /partner-agreements/{agreementId}/commission-statement
+  scope: tenant
+  permission: PARTNER_VIEW
+  audience: null
+  offline: false
+  reads:
+  - control.partner_agreement
+  - ledger.fx_rate
+  - orders.refund
+  - orders.sales_order
+  writes: []
+- operation: getEntitlementUsage
+  verb: GET
+  path: /tenants/{tenantId}/entitlement-usage
+  scope: tenant
+  permission: PLATFORM_TENANT_VIEW
+  audience: null
+  offline: false
+  reads:
+  - access.entitlement
+  - control.licence_add_on
+  - control.usage_record
+  writes: []
+- operation: getPlan
+  verb: GET
+  path: /plans/{planId}
+  scope: tenant
+  permission: PLATFORM_TENANT_VIEW
+  audience: null
+  offline: false
+  reads:
+  - control.plan
+  writes: []
+- operation: getSubscription
+  verb: GET
+  path: /tenants/{tenantId}/subscription
+  scope: tenant
+  permission: PLATFORM_TENANT_VIEW
+  audience: null
+  offline: false
+  reads:
+  - control.subscription
+  writes: []
+- operation: getTenant
+  verb: GET
+  path: /tenants/{tenantId}
+  scope: tenant
+  permission: PLATFORM_TENANT_VIEW
+  audience: null
+  offline: false
+  reads:
+  - control.cell
+  - control.subscription
+  - control.tenant
+  writes: []
+- operation: getTenantLicences
+  verb: GET
+  path: /tenants/{tenantId}/licences
+  scope: tenant
+  permission: PLATFORM_TENANT_VIEW
+  audience: null
+  offline: true
+  reads:
+  - control.licence_add_on
+  - control.plan
+  - control.subscription
+  writes: []
+- operation: getUsageMetering
+  verb: GET
+  path: /tenants/{tenantId}/usage
+  scope: tenant
+  permission: PLATFORM_TENANT_VIEW
+  audience: null
+  offline: false
+  reads:
+  - control.subscription
+  - control.usage_record
+  writes: []
+- operation: launchCellCluster
+  verb: POST
+  path: /cell-clusters
+  scope: tenant
+  permission: PLATFORM_CELL_MANAGE
+  audience: null
+  offline: false
+  reads:
+  - cache:idempotency
+  - control.cell_cluster
+  writes:
+  - cache:idempotency
+  - control.cell_cluster
+- operation: listCellClusters
+  verb: GET
+  path: /cell-clusters
+  scope: tenant
+  permission: PLATFORM_CELL_VIEW
+  audience: null
+  offline: false
+  reads:
+  - control.cell_cluster
+  writes: []
+- operation: listCellJobs
+  verb: GET
+  path: /cells/{cellId}/jobs
+  scope: tenant
+  permission: PLATFORM_CELL_VIEW
+  audience: null
+  offline: false
+  reads:
+  - control.cell_job
+  writes: []
+- operation: listChannelListings
+  verb: GET
+  path: /channel-listings
+  scope: venue
+  permission: PARTNER_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - catalogue.product
+  - control.channel_listing
+  writes: []
+- operation: listPartnerAgreements
+  verb: GET
+  path: /partner-agreements
+  scope: tenant
+  permission: PARTNER_MANAGE
+  audience: null
+  offline: false
+  reads:
+  - control.partner_agreement
+  writes: []
+- operation: listPartnerUsers
+  verb: GET
+  path: /partners/{partnerId}/users
+  scope: tenant
+  permission: PARTNER_VIEW
+  audience:
+  - staff
+  - partner
+  offline: false
+  reads:
+  - control.partner_user
+  - identity.principal
+  writes: []
+- operation: listPlans
+  verb: GET
+  path: /plans
+  scope: tenant
+  permission: PLATFORM_TENANT_VIEW
+  audience: null
+  offline: false
+  reads:
+  - control.plan
+  writes: []
+- operation: listSubscriptionInvoices
+  verb: GET
+  path: /tenants/{tenantId}/invoices
+  scope: tenant
+  permission: PLATFORM_BILLING_VIEW
+  audience: null
+  offline: false
+  reads:
+  - control.invoice
+  writes: []
+- operation: listTenantCells
+  verb: GET
+  path: /tenants/{tenantId}/cells
+  scope: tenant
+  permission: PLATFORM_CELL_VIEW
+  audience: null
+  offline: false
+  reads:
+  - control.cell
+  writes: []
+- operation: listTenantMigrations
+  verb: GET
+  path: /tenant-migrations
+  scope: tenant
+  permission: PLATFORM_CELL_VIEW
+  audience: null
+  offline: false
+  reads:
+  - control.tenant_migration
+  writes: []
+- operation: listTenants
+  verb: GET
+  path: /tenants
+  scope: tenant
+  permission: PLATFORM_TENANT_VIEW
+  audience: null
+  offline: false
+  reads:
+  - control.tenant
+  writes: []
+- operation: listVenueTypeTemplates
+  verb: GET
+  path: /venue-type-templates
+  scope: tenant
+  permission: TENANT_VIEW
+  audience:
+  - staff
+  - public
+  offline: false
+  reads:
+  - control.venue_type_template
+  writes: []
+- operation: planTenantMigration
+  verb: POST
+  path: /tenant-migrations
+  scope: tenant
+  permission: PLATFORM_CELL_VIEW
+  audience: null
+  offline: false
+  reads:
+  - cache:idempotency
+  - control.tenant_migration_plan
+  writes:
+  - cache:idempotency
+  - control.tenant_migration_plan
+- operation: previewSubscriptionChange
+  verb: POST
+  path: /tenants/{tenantId}/subscription/preview
+  scope: tenant
+  permission: PLATFORM_TENANT_VIEW
+  audience: null
+  offline: false
+  reads:
+  - cache:idempotency
+  - control.plan
+  - control.subscription
+  - platform.tenant
+  writes:
+  - cache:idempotency
+- operation: provisionCell
+  verb: POST
+  path: /tenants/{tenantId}/cells
+  scope: tenant
+  permission: PLATFORM_CELL_MANAGE
+  audience: null
+  offline: false
+  reads:
+  - cache:idempotency
+  - control.cell
+  writes:
+  - cache:idempotency
+  - control.cell
+- operation: reactivateTenant
+  verb: POST
+  path: /tenants/{tenantId}/reactivate
+  scope: tenant
+  permission: PLATFORM_TENANT_MANAGE
+  audience: null
+  offline: false
+  reads:
+  - cache:idempotency
+  - control.tenant
+  writes:
+  - cache:idempotency
+  - control.tenant
+- operation: recordInvoicePayment
+  verb: POST
+  path: /invoices/{invoiceId}/payment
+  scope: tenant
+  permission: PLATFORM_BILLING_MANAGE
+  audience: null
+  offline: false
+  reads:
+  - cache:idempotency
+  - control.invoice
+  - ledger.fx_rate
+  writes:
+  - cache:idempotency
+  - control.invoice
+- operation: recordUsage
+  verb: POST
+  path: /usage-records
+  scope: tenant
+  permission: null
+  audience: null
+  offline: false
+  reads:
+  - ai.interaction
+  - cache:idempotency
+  - control.usage_record
+  writes:
+  - cache:idempotency
+  - control.usage_record
+- operation: registerPartner
+  verb: POST
+  path: /partner-registrations
+  scope: tenant
+  permission: null
+  audience: null
+  offline: false
+  reads:
+  - cache:idempotency
+  writes:
+  - approvals.request
+  - cache:idempotency
+  - control.partner_agreement
+- operation: removeLicenceAddOn
+  verb: DELETE
+  path: /tenants/{tenantId}/licences/add-ons
+  scope: tenant
+  permission: PLATFORM_TENANT_MANAGE
+  audience: null
+  offline: false
+  reads:
+  - cache:idempotency
+  - control.licence_add_on
+  writes:
+  - cache:idempotency
+  - control.licence_add_on
+  - control.subscription
+- operation: resolveInvoiceDispute
+  verb: POST
+  path: /invoices/{invoiceId}/resolve-dispute
+  scope: tenant
+  permission: PLATFORM_BILLING_MANAGE
+  audience: null
+  offline: false
+  reads:
+  - cache:idempotency
+  - control.invoice
+  writes:
+  - cache:idempotency
+  - control.invoice
+- operation: rollbackTenantMigration
+  verb: POST
+  path: /tenant-migrations/{migrationId}/rollback
+  scope: tenant
+  permission: PLATFORM_CELL_MANAGE
+  audience: null
+  offline: false
+  reads:
+  - cache:idempotency
+  - control.tenant_migration
+  writes:
+  - cache:idempotency
+  - control.tenant_migration
+- operation: setChannelListing
+  verb: PUT
+  path: /channel-listings
+  scope: venue
+  permission: PARTNER_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - catalogue.envelope
+  - catalogue.price_list
+  - catalogue.product
+  writes:
+  - cache:idempotency
+  - control.channel_listing
+- operation: setSubscription
+  verb: PUT
+  path: /tenants/{tenantId}/subscription
+  scope: tenant
+  permission: PLATFORM_TENANT_MANAGE
+  audience: null
+  offline: false
+  reads:
+  - cache:idempotency
+  - control.subscription
+  writes:
+  - cache:idempotency
+  - control.subscription
+- operation: settleAiUsage
+  verb: POST
+  path: /ai-usage/settle
+  scope: tenant
+  permission: PLATFORM_BILLING_MANAGE
+  audience: null
+  offline: false
+  reads:
+  - ai.interaction
+  - ai.policy
+  - cache:idempotency
+  - control.plan
+  - control.subscription
+  writes:
+  - cache:idempotency
+  - control.usage_record
+- operation: submitOnboardingApplication
+  verb: POST
+  path: /onboarding-applications
+  scope: tenant
+  permission: TENANT_VIEW
+  audience:
+  - public
+  offline: false
+  reads:
+  - cache:idempotency
+  - control.plan
+  - control.venue_type_template
+  writes:
+  - cache:idempotency
+  - control.onboarding_application
+- operation: suspendTenant
+  verb: POST
+  path: /tenants/{tenantId}/suspend
+  scope: tenant
+  permission: PLATFORM_TENANT_MANAGE
+  audience: null
+  offline: false
+  reads:
+  - cache:idempotency
+  - control.tenant
+  writes:
+  - cache:idempotency
+  - control.tenant
+- operation: terminateTenant
+  verb: POST
+  path: /tenants/{tenantId}/terminate
+  scope: tenant
+  permission: PLATFORM_TENANT_TERMINATE
+  audience: null
+  offline: false
+  reads:
+  - cache:idempotency
+  - control.subscription
+  - control.tenant
+  writes:
+  - cache:idempotency
+  - control.subscription
+  - control.tenant
+- operation: updateCellTier
+  verb: PATCH
+  path: /cells/{cellId}
+  scope: tenant
+  permission: PLATFORM_CELL_MANAGE
+  audience: null
+  offline: false
+  reads:
+  - cache:idempotency
+  - control.cell_job
+  writes:
+  - cache:idempotency
+  - control.cell_job
+- operation: updatePartnerAgreement
+  verb: PATCH
+  path: /partner-agreements/{agreementId}
+  scope: tenant
+  permission: PARTNER_MANAGE
+  audience: null
+  offline: false
+  reads:
+  - cache:idempotency
+  - control.partner_agreement
+  - ledger.fx_rate
+  writes:
+  - cache:idempotency
+  - control.partner_agreement
+- operation: updateTenant
+  verb: PATCH
+  path: /tenants/{tenantId}
+  scope: tenant
+  permission: PLATFORM_TENANT_MANAGE
+  audience: null
+  offline: false
+  reads:
+  - cache:idempotency
+  - control.tenant
+  writes:
+  - cache:idempotency
+  - control.tenant

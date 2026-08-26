@@ -1,0 +1,71 @@
+id: LLD-Requisition
+title: Requisition — 10 transitions
+generatedBy: tools/derive-diagrams.py
+index: diagrams/hld/04-lifecycles.yaml
+source: states/requisition.yaml
+entity: Requisition
+contract: inventory
+enum: RequisitionStatus
+enumKind: named
+enumSchema: RequisitionStatus
+owner: inventory
+initial:
+- draft
+terminal:
+- closed
+- cancelled
+transitions:
+- from: draft
+  to: pendingApproval
+  operation: createRequisition
+  trigger: operation
+  guard: Submitted
+- from: pendingApproval
+  to: approved
+  operation: approveRequisition
+  trigger: operation
+  guard: Approver is not the requester
+  requiresApproval: true
+- from: pendingApproval
+  to: rejected
+  operation: rejectRequisition
+  trigger: operation
+  guard: Refused with a reason
+  requiresApproval: true
+- from: pendingApproval
+  to: returnedForInfo
+  operation: returnRequisition
+  trigger: operation
+  guard: '**Not a rejection.** Sent back for detail, and the requester can amend rather than start again'
+- from: returnedForInfo
+  to: pendingApproval
+  operation: createRequisition
+  trigger: operation
+  guard: Resubmitted
+- from: rejected
+  to: draft
+  operation: createRequisition
+  trigger: operation
+  guard: Copied into a new draft
+  isReversal: true
+- from: approved
+  to: ordered
+  operation: createPurchaseOrder
+  trigger: cascade
+  guard: A purchase order was raised against it
+- from: ordered
+  to: closed
+  trigger: cascade
+  guard: The purchase order was received or closed short
+- from: draft
+  to: cancelled
+  operation: cancelRequisition
+  trigger: operation
+  guard: Abandoned
+- from: pendingApproval
+  to: cancelled
+  operation: cancelRequisition
+  trigger: operation
+  guard: Withdrawn by the requester
+notes: '`returnedForInfo` is the state that keeps requisitions moving. Without it every incomplete request
+  is a rejection and the requester starts over.'

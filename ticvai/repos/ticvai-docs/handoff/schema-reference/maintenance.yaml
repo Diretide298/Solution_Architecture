@@ -1,0 +1,339 @@
+# maintenance — derived from the API contracts, not hand-written
+# Migration: V0016
+#
+# Columns come from schema properties. Types are inferred: format uuid to uuid,
+# date-time to timestamptz, ULID patterns to char(26), Money to numeric(18,4).
+# What is NOT here: partitioning, RLS policies, indexes, the PII split. That is
+# storage design and lives in the migration scripts.
+
+module: maintenance
+migration: V0016
+tableCount: 6
+columnCount: 98
+tables:
+  maintenance.asset:
+    derivedFrom: Asset
+    columns:
+    - name: asset_tag
+      type: varchar(64)
+      required: true
+    - name: name
+      type: varchar(200)
+      required: true
+    - name: venue_id
+      type: uuid
+      required: true
+    - name: category_id
+      type: uuid
+      required: false
+    - name: location_description
+      type: varchar(500)
+      required: false
+    - name: criticality
+      type: jsonb
+      required: true
+    - name: manufacturer
+      type: varchar(200)
+      required: false
+    - name: model
+      type: varchar(200)
+      required: false
+    - name: serial_number
+      type: varchar(128)
+      required: false
+    - name: commissioned_at
+      type: date
+      required: false
+    - name: warranty_expires_at
+      type: date
+      required: false
+    - name: supplier_id
+      type: uuid
+      required: false
+    - name: linked_product_ids
+      type: jsonb
+      required: false
+      description: Products this asset delivers. A fault here can stop them selling.
+    - name: linked_access_point_id
+      type: uuid
+      required: false
+      description: Access point this asset controls. Out of service blocks it.
+    - name: requires_inspection_to_return
+      type: boolean
+      required: false
+      description: True means a completed inspection is required before return to service. A technician
+        cannot simply declare a ride safe.
+    - name: document_refs
+      type: jsonb
+      required: false
+    - name: id
+      type: uuid
+      required: true
+    - name: status
+      type: jsonb
+      required: true
+    - name: status_reason
+      type: text
+      required: false
+    - name: open_work_order_count
+      type: integer
+      required: false
+    - name: next_maintenance_due_at
+      type: timestamptz
+      required: false
+    - name: is_maintenance_overdue
+      type: boolean
+      required: false
+    - name: last_inspection_at
+      type: timestamptz
+      required: false
+    - name: usage_counter
+      type: numeric
+      required: false
+      description: Cycles, hours or kilometres. Drives usage-based maintenance.
+  maintenance.incident:
+    derivedFrom: Incident
+    columns:
+    - name: id
+      type: text
+      required: true
+    - name: incident_number
+      type: text
+      required: true
+    - name: kind
+      type: jsonb
+      required: true
+    - name: severity
+      type: jsonb
+      required: true
+    - name: status
+      type: jsonb
+      required: true
+    - name: venue_id
+      type: uuid
+      required: true
+    - name: asset_id
+      type: uuid
+      required: false
+    - name: location_description
+      type: text
+      required: false
+    - name: is_reportable
+      type: boolean
+      required: false
+      description: Requires notification to an external authority within a statutory window.
+    - name: notification_due_at
+      type: timestamptz
+      required: false
+    - name: notified_at
+      type: timestamptz
+      required: false
+    - name: assigned_to_principal_id
+      type: uuid
+      required: false
+    - name: reported_by_principal_id
+      type: uuid
+      required: true
+    - name: corrective_work_order_id
+      type: text
+      required: false
+    - name: occurred_at
+      type: timestamptz
+      required: true
+    - name: recorded_at
+      type: timestamptz
+      required: false
+    - name: closed_at
+      type: timestamptz
+      required: false
+    - name: synced_at
+      type: timestamptz
+      required: false
+  maintenance.inspection:
+    derivedFrom: Inspection
+    columns:
+    - name: id
+      type: text
+      required: true
+    - name: template_id
+      type: uuid
+      required: true
+    - name: template_name
+      type: text
+      required: false
+    - name: venue_id
+      type: uuid
+      required: true
+    - name: asset_id
+      type: uuid
+      required: false
+    - name: outcome
+      type: jsonb
+      required: true
+    - name: failed_item_count
+      type: integer
+      required: false
+    - name: failed_safety_critical_count
+      type: integer
+      required: false
+    - name: performed_by_principal_id
+      type: uuid
+      required: true
+      description: An inspection nobody signed is not an inspection.
+    - name: performed_at
+      type: timestamptz
+      required: true
+    - name: recorded_at
+      type: timestamptz
+      required: false
+    - name: synced_at
+      type: timestamptz
+      required: false
+    - name: retain_until
+      type: date
+      required: false
+  maintenance.inspection_template:
+    derivedFrom: InspectionTemplate
+    columns:
+    - name: id
+      type: uuid
+      required: true
+    - name: code
+      type: varchar(64)
+      required: true
+    - name: name
+      type: varchar(200)
+      required: true
+    - name: venue_id
+      type: uuid
+      required: false
+    - name: applies_to_asset_category_id
+      type: uuid
+      required: false
+    - name: frequency
+      type: text
+      required: false
+    - name: items
+      type: jsonb
+      required: true
+    - name: retention_years
+      type: integer
+      required: false
+      description: Compliance inspections are retained alongside the financial trail.
+    - name: is_active
+      type: boolean
+      required: false
+  maintenance.maintenance_plan:
+    derivedFrom: MaintenancePlan
+    columns:
+    - name: id
+      type: uuid
+      required: true
+    - name: name
+      type: varchar(200)
+      required: true
+    - name: asset_id
+      type: uuid
+      required: true
+    - name: asset_category_id
+      type: uuid
+      required: false
+      description: Applies to every asset in the category rather than one.
+    - name: interval_days
+      type: integer
+      required: false
+      description: Elapsed-time trigger.
+    - name: usage_interval
+      type: numeric
+      required: false
+      description: Usage trigger — cycles, hours, kilometres. **Whichever comes first** when both are
+        set. A ride serviced every three months or ten thousand cycles is one plan.
+    - name: lead_time_days
+      type: integer
+      required: false
+      description: How far ahead the work order is generated, so parts can be ordered before the job is
+        already late.
+    - name: task_template
+      type: jsonb
+      required: true
+    - name: last_completed_at
+      type: timestamptz
+      required: false
+    - name: next_due_at
+      type: timestamptz
+      required: false
+    - name: is_active
+      type: boolean
+      required: false
+  maintenance.work_order:
+    derivedFrom: WorkOrder
+    columns:
+    - name: id
+      type: text
+      required: true
+    - name: work_order_number
+      type: text
+      required: true
+    - name: title
+      type: text
+      required: true
+    - name: venue_id
+      type: uuid
+      required: true
+    - name: asset_id
+      type: uuid
+      required: false
+    - name: asset_name
+      type: text
+      required: false
+    - name: status
+      type: jsonb
+      required: true
+    - name: priority
+      type: jsonb
+      required: true
+    - name: kind
+      type: jsonb
+      required: true
+    - name: assigned_to_principal_id
+      type: uuid
+      required: false
+    - name: raised_by_principal_id
+      type: uuid
+      required: false
+    - name: elapsed_minutes
+      type: integer
+      required: false
+    - name: is_timer_running
+      type: boolean
+      required: false
+    - name: due_at
+      type: timestamptz
+      required: false
+    - name: is_overdue
+      type: boolean
+      required: false
+    - name: requires_verification
+      type: boolean
+      required: false
+    - name: source_plan_id
+      type: uuid
+      required: false
+    - name: source_inspection_id
+      type: text
+      required: false
+    - name: source_incident_id
+      type: text
+      required: false
+    - name: created_at
+      type: timestamptz
+      required: true
+    - name: recorded_at
+      type: timestamptz
+      required: false
+    - name: completed_at
+      type: timestamptz
+      required: false
+    - name: synced_at
+      type: timestamptz
+      required: false

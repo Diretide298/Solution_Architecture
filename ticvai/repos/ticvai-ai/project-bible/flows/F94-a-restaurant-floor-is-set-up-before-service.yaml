@@ -1,0 +1,59 @@
+$schema: ./_schema.yaml
+id: F94
+name: A restaurant floor is set up before service
+actor: supervisor
+capability: A restaurant floor is set up before service
+wave: 2
+frequency: As the venue needs it.
+criticality: operational
+primaryContract: fnb
+contracts:
+- fnb
+- seating
+platforms:
+- P06
+trigger:
+  description: Before doors, somebody lays out the room.
+offlineBehaviour: Configuration before service. Nothing offline.
+steps:
+- step: 1
+  screen: EMP-058
+  action: Live Table & Service Management.
+  operations:
+  - reassignServer
+  - setTableCombinations
+  - transferTableVisit
+  - updateTableVisit
+  outcome: '**Drawn by the client as FNB-4A.**'
+- step: 2
+  screen: EMP-060
+  action: Reservation & Table Performance.
+  operations:
+  - getTableMap
+  - listTableReservations
+  outcome: '**Drawn by the client as FNB-4B.**'
+  crossesDevice: true
+- step: 3
+  screen: EMP-061
+  action: Retail Inventory Command Center.
+  operations:
+  - getStockPositions
+  - listStockMovements
+  outcome: '**Drawn by the client as FNB-4C.**'
+  crossesDevice: true
+branches:
+- at: 1
+  condition: A step is not licensed for this tenant.
+  behaviour: '**The chain stops at the module boundary.** `requiresModule` decides — the journey is
+    shorter, not broken.'
+  severity: medium
+  resolvedBy: getModuleEnablement
+exitStates:
+- state: completed
+  description: The chain ran as the client drew it.
+- state: stoppedAtModule
+  description: '**A licence boundary, not a failure.**'
+notes: '**F&B board 4 from the command centre inward.** F80 walks configuration through to the bill;
+  this walks the pre-service setup that F29 assumes has happened. **Derived from the client''s declared
+  `GOES TO` edges.**'
+openQuestions: null

@@ -1,0 +1,168 @@
+id: LLD-workforce
+title: workforce — 12 operations
+generatedBy: tools/derive-diagrams.py
+index: diagrams/hld/03-contracts.yaml
+tier: satellite
+service: TenancyService
+operations:
+- operation: acknowledgeAnnouncement
+  verb: POST
+  path: /announcements/{announcementId}/acknowledge
+  scope: venue
+  permission: WORKFORCE_VIEW
+  audience: null
+  offline: true
+  reads:
+  - cache:idempotency
+  - workforce.announcement
+  writes:
+  - cache:idempotency
+  - workforce.announcement_receipt
+- operation: amendAttendance
+  verb: POST
+  path: /attendance/{recordId}/amend
+  scope: venue
+  permission: WORKFORCE_MANAGE
+  audience: null
+  offline: false
+  reads:
+  - cache:idempotency
+  - workforce.attendance
+  writes:
+  - cache:idempotency
+  - workforce.attendance
+- operation: broadcastToGuests
+  verb: POST
+  path: /guest-broadcast
+  scope: venue
+  permission: ANNOUNCEMENT_PUBLISH
+  audience:
+  - staff
+  offline: false
+  reads:
+  - access.entitlement
+  - cache:idempotency
+  - identity.principal
+  - marketing.guest_profile
+  - venuemap.point
+  writes:
+  - cache:idempotency
+  - marketing.message_dispatch
+  - workforce.announcement
+- operation: createRotaAssignment
+  verb: POST
+  path: /rota-assignments
+  scope: venue
+  permission: WORKFORCE_MANAGE
+  audience: null
+  offline: false
+  reads:
+  - cache:idempotency
+  - identity.grant
+  - identity.principal
+  - platform.workstation
+  writes:
+  - cache:idempotency
+  - workforce.rota_assignment
+- operation: getAnnouncementReach
+  verb: GET
+  path: /announcements/{announcementId}/reach
+  scope: venue
+  permission: WORKFORCE_VIEW
+  audience: null
+  offline: false
+  reads:
+  - identity.principal
+  - workforce.announcement_receipt
+  - workforce.rota_assignment
+  writes: []
+- operation: listAnnouncements
+  verb: GET
+  path: /announcements
+  scope: venue
+  permission: WORKFORCE_VIEW
+  audience: null
+  offline: true
+  reads:
+  - workforce.announcement
+  - workforce.announcement_receipt
+  writes: []
+- operation: listAttendance
+  verb: GET
+  path: /attendance
+  scope: venue
+  permission: WORKFORCE_VIEW
+  audience: null
+  offline: false
+  reads:
+  - workforce.attendance
+  - workforce.rota_assignment
+  writes: []
+- operation: listRotaAssignments
+  verb: GET
+  path: /rota-assignments
+  scope: venue
+  permission: WORKFORCE_VIEW
+  audience: null
+  offline: true
+  reads:
+  - identity.principal
+  - workforce.rota_assignment
+  writes: []
+- operation: publishAnnouncement
+  verb: POST
+  path: /announcements
+  scope: venue
+  permission: ANNOUNCEMENT_PUBLISH
+  audience: null
+  offline: false
+  reads:
+  - cache:idempotency
+  - identity.role
+  - platform.scope_node
+  writes:
+  - cache:idempotency
+  - workforce.announcement
+  - workforce.announcement_receipt
+- operation: recordAttendance
+  verb: POST
+  path: /attendance/clock
+  scope: venue
+  permission: ATTENDANCE_RECORD
+  audience: null
+  offline: true
+  reads:
+  - access.access_point
+  - cache:idempotency
+  - workforce.rota_assignment
+  writes:
+  - cache:idempotency
+  - workforce.attendance
+- operation: requestShiftSwap
+  verb: POST
+  path: /rota-assignments/{assignmentId}/swap
+  scope: venue
+  permission: WORKFORCE_VIEW
+  audience: null
+  offline: false
+  reads:
+  - cache:idempotency
+  - identity.principal
+  - workforce.rota_assignment
+  writes:
+  - approvals.request
+  - cache:idempotency
+  - workforce.shift_swap
+- operation: updateRotaAssignment
+  verb: PATCH
+  path: /rota-assignments/{assignmentId}
+  scope: venue
+  permission: WORKFORCE_MANAGE
+  audience: null
+  offline: false
+  reads:
+  - cache:idempotency
+  - workforce.rota_assignment
+  writes:
+  - cache:idempotency
+  - workforce.rota_assignment

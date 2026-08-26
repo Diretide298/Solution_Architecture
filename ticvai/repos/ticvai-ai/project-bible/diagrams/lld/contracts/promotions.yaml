@@ -1,0 +1,442 @@
+id: LLD-promotions
+title: promotions — 35 operations
+generatedBy: tools/derive-diagrams.py
+index: diagrams/hld/03-contracts.yaml
+tier: satellite
+service: CatalogueService
+operations:
+- operation: analysePromotionConflicts
+  verb: GET
+  path: /promotions/{promotionId}/conflicts
+  scope: venue
+  permission: PRICE_VIEW
+  audience: null
+  offline: false
+  reads:
+  - promotions.promotion
+  writes: []
+- operation: assignCoupon
+  verb: POST
+  path: /coupon-codes/{code}/assign
+  scope: venue
+  permission: PRICE_CONFIGURE
+  audience: null
+  offline: false
+  reads:
+  - cache:idempotency
+  - promotions.coupon_code
+  writes:
+  - cache:idempotency
+  - promotions.coupon_code
+- operation: createBundle
+  verb: POST
+  path: /bundles
+  scope: venue
+  permission: PRODUCT_CONFIGURE
+  audience: null
+  offline: false
+  reads:
+  - cache:idempotency
+  - promotions.allocation_component
+  - promotions.bundle
+  - promotions.bundle_component
+  writes:
+  - cache:idempotency
+  - promotions.allocation_component
+  - promotions.bundle
+  - promotions.bundle_component
+- operation: createCouponCampaign
+  verb: POST
+  path: /coupon-campaigns
+  scope: venue
+  permission: PRICE_CONFIGURE
+  audience: null
+  offline: false
+  reads:
+  - cache:idempotency
+  - promotions.coupon_campaign
+  writes:
+  - cache:idempotency
+  - promotions.coupon_campaign
+- operation: createPromotion
+  verb: POST
+  path: /promotions
+  scope: venue
+  permission: PRICE_CONFIGURE
+  audience: null
+  offline: false
+  reads:
+  - cache:idempotency
+  - promotions.promotion
+  writes:
+  - cache:idempotency
+  - promotions.promotion
+- operation: createUpsellRule
+  verb: POST
+  path: /upsell-rules
+  scope: region
+  permission: PRODUCT_CONFIGURE
+  audience: null
+  offline: false
+  reads:
+  - cache:idempotency
+  - promotions.upsell_rule
+  writes:
+  - cache:idempotency
+  - promotions.upsell_rule
+- operation: createVoucherBatch
+  verb: POST
+  path: /voucher-batches
+  scope: venue
+  permission: PRICE_CONFIGURE
+  audience: null
+  offline: false
+  reads:
+  - cache:idempotency
+  - promotions.voucher_batch
+  writes:
+  - cache:idempotency
+  - promotions.voucher_batch
+- operation: deleteUpsellRule
+  verb: DELETE
+  path: /upsell-rules/{ruleId}
+  scope: venue
+  permission: PRODUCT_CONFIGURE
+  audience: null
+  offline: false
+  reads:
+  - cache:idempotency
+  - promotions.upsell_rule
+  writes:
+  - cache:idempotency
+  - promotions.upsell_rule
+- operation: endPromotion
+  verb: POST
+  path: /promotions/{promotionId}/end
+  scope: venue
+  permission: PRICE_CONFIGURE
+  audience: null
+  offline: false
+  reads:
+  - cache:idempotency
+  - promotions.promotion
+  writes:
+  - cache:idempotency
+  - promotions.promotion
+- operation: evaluatePromotions
+  verb: POST
+  path: /promotions/evaluate
+  scope: venue
+  permission: PRICE_VIEW
+  audience: null
+  offline: true
+  reads:
+  - cache:idempotency
+  - catalogue.price_list
+  - promotions.promotion
+  writes:
+  - cache:idempotency
+- operation: generateCouponCodes
+  verb: POST
+  path: /coupon-campaigns/{campaignId}/codes
+  scope: venue
+  permission: PRICE_CONFIGURE
+  audience: null
+  offline: false
+  reads:
+  - cache:idempotency
+  - promotions.coupon_campaign
+  writes:
+  - cache:idempotency
+  - promotions.coupon_code
+- operation: getBundle
+  verb: GET
+  path: /bundles/{bundleId}
+  scope: venue
+  permission: PRODUCT_VIEW
+  audience: null
+  offline: false
+  reads:
+  - promotions.allocation_component
+  - promotions.bundle
+  - promotions.bundle_component
+  writes: []
+- operation: getCouponCode
+  verb: GET
+  path: /coupon-codes/{code}
+  scope: venue
+  permission: PRICE_VIEW
+  audience: null
+  offline: true
+  reads:
+  - promotions.coupon_code
+  writes: []
+- operation: getPromotion
+  verb: GET
+  path: /promotions/{promotionId}
+  scope: venue
+  permission: PRICE_VIEW
+  audience: null
+  offline: false
+  reads:
+  - promotions.promotion
+  writes: []
+- operation: getPromotionUsage
+  verb: GET
+  path: /promotions/{promotionId}/usage
+  scope: venue
+  permission: PRICE_VIEW
+  audience: null
+  offline: false
+  reads:
+  - promotions.promotion
+  writes: []
+- operation: getRecommendations
+  verb: POST
+  path: /recommendations
+  scope: venue
+  permission: PRODUCT_VIEW
+  audience:
+  - staff
+  - guest
+  offline: false
+  reads:
+  - catalogue.envelope
+  - catalogue.product
+  - marketing.guest_profile
+  - orders.cart
+  - promotions.promotion
+  writes: []
+- operation: getUpsellSuggestions
+  verb: POST
+  path: /upsell-suggestions
+  scope: venue
+  permission: PRODUCT_VIEW
+  audience: null
+  offline: true
+  reads:
+  - cache:idempotency
+  - catalogue.product
+  - promotions.upsell_rule
+  writes:
+  - cache:idempotency
+- operation: listAllocationSplits
+  verb: GET
+  path: /allocation-splits
+  scope: venue
+  permission: LEDGER_VIEW
+  audience: null
+  offline: false
+  reads:
+  - promotions.allocation_component
+  - promotions.allocation_split
+  writes: []
+- operation: listBundles
+  verb: GET
+  path: /bundles
+  scope: venue
+  permission: PRODUCT_VIEW
+  audience: null
+  offline: false
+  reads:
+  - promotions.bundle
+  writes: []
+- operation: listCouponCampaigns
+  verb: GET
+  path: /coupon-campaigns
+  scope: venue
+  permission: PRICE_VIEW
+  audience: null
+  offline: false
+  reads:
+  - promotions.coupon_campaign
+  writes: []
+- operation: listCouponCodes
+  verb: GET
+  path: /coupon-campaigns/{campaignId}/codes
+  scope: venue
+  permission: PRICE_VIEW
+  audience: null
+  offline: false
+  reads:
+  - promotions.coupon_code
+  writes: []
+- operation: listPromotions
+  verb: GET
+  path: /promotions
+  scope: venue
+  permission: PRICE_VIEW
+  audience: null
+  offline: false
+  reads:
+  - promotions.promotion
+  writes: []
+- operation: listUpsellRules
+  verb: GET
+  path: /upsell-rules
+  scope: venue
+  permission: PRODUCT_VIEW
+  audience: null
+  offline: false
+  reads:
+  - promotions.upsell_rule
+  writes: []
+- operation: listVoucherBatches
+  verb: GET
+  path: /voucher-batches
+  scope: venue
+  permission: PRICE_VIEW
+  audience: null
+  offline: false
+  reads:
+  - promotions.voucher_batch
+  writes: []
+- operation: pausePromotion
+  verb: POST
+  path: /promotions/{promotionId}/pause
+  scope: venue
+  permission: PRICE_CONFIGURE
+  audience: null
+  offline: false
+  reads:
+  - cache:idempotency
+  - promotions.promotion
+  writes:
+  - cache:idempotency
+  - promotions.promotion
+- operation: previewAllocationSplit
+  verb: POST
+  path: /allocation-splits/preview
+  scope: venue
+  permission: LEDGER_VIEW
+  audience: null
+  offline: false
+  reads:
+  - cache:idempotency
+  - catalogue.product
+  - promotions.allocation_component
+  writes:
+  - cache:idempotency
+- operation: publishPromotion
+  verb: POST
+  path: /promotions/{promotionId}/publish
+  scope: venue
+  permission: PRICE_CONFIGURE
+  audience: null
+  offline: false
+  reads:
+  - cache:idempotency
+  - promotions.promotion
+  writes:
+  - cache:idempotency
+  - promotions.promotion
+- operation: redeemVoucher
+  verb: POST
+  path: /vouchers/{voucherCode}/redeem
+  scope: venue
+  permission: ORDER_CREATE
+  audience: null
+  offline: false
+  reads:
+  - cache:idempotency
+  - promotions.voucher
+  writes:
+  - cache:idempotency
+  - promotions.voucher
+- operation: setPromotionVariants
+  verb: PUT
+  path: /promotions/{promotionId}/variants
+  scope: venue
+  permission: PRICE_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - promotions.promotion
+  writes:
+  - cache:idempotency
+  - promotions.promotion
+- operation: simulatePromotion
+  verb: POST
+  path: /promotions/{promotionId}/simulate
+  scope: venue
+  permission: PRICE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - catalogue.price
+  - orders.order_line
+  - orders.sales_order
+  - promotions.promotion
+  writes: []
+- operation: unschedulePromotion
+  verb: POST
+  path: /promotions/{promotionId}/unschedule
+  scope: venue
+  permission: PRICE_CONFIGURE
+  audience: null
+  offline: false
+  reads:
+  - cache:idempotency
+  - promotions.promotion
+  writes:
+  - cache:idempotency
+  - promotions.promotion
+- operation: updateBundle
+  verb: PATCH
+  path: /bundles/{bundleId}
+  scope: venue
+  permission: PRODUCT_CONFIGURE
+  audience: null
+  offline: false
+  reads:
+  - cache:idempotency
+  - promotions.allocation_component
+  - promotions.bundle
+  - promotions.bundle_component
+  writes:
+  - cache:idempotency
+  - promotions.allocation_component
+  - promotions.bundle
+  - promotions.bundle_component
+- operation: updatePromotion
+  verb: PATCH
+  path: /promotions/{promotionId}
+  scope: venue
+  permission: PRICE_CONFIGURE
+  audience: null
+  offline: false
+  reads:
+  - cache:idempotency
+  - promotions.promotion
+  writes:
+  - cache:idempotency
+  - promotions.promotion
+- operation: voidCouponCode
+  verb: POST
+  path: /coupon-codes/{code}/void
+  scope: venue
+  permission: PRICE_CONFIGURE
+  audience: null
+  offline: false
+  reads:
+  - cache:idempotency
+  - promotions.coupon_code
+  writes:
+  - cache:idempotency
+  - promotions.coupon_code
+- operation: voidVoucher
+  verb: POST
+  path: /vouchers/{voucherId}/void
+  scope: venue
+  permission: PRICE_CONFIGURE
+  audience: null
+  offline: false
+  reads:
+  - cache:idempotency
+  - promotions.voucher
+  writes:
+  - cache:idempotency
+  - promotions.voucher

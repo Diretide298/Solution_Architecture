@@ -1,0 +1,74 @@
+$schema: ./_schema.yaml
+id: F83
+name: A kitchen works a service from the rail to the exception
+actor: supervisor
+capability: A kitchen works a service from the rail to the exception
+wave: 2
+frequency: As the venue needs it.
+criticality: operational
+primaryContract: fnb
+contracts:
+- fnb
+platforms:
+- P15
+trigger:
+  description: A service starts and tickets arrive.
+offlineBehaviour: '**Entirely offline-capable.** The kitchen still has to send food out.'
+steps:
+- step: 1
+  screen: KIT-001
+  action: Kitchen Operations Command Center.
+  operations:
+  - listFnbOrders
+  - listKitchenStations
+  - listKitchenTickets
+  outcome: '**Drawn by the client as FNB-3A.** 3 operations on this step.'
+- step: 2
+  screen: KIT-002
+  action: Kitchen Display System (KDS).
+  operations:
+  - listKitchenTickets
+  - recallKitchenTicket
+  outcome: '**Drawn by the client as FNB-3B.** 2 operations on this step.'
+- step: 3
+  screen: KIT-003
+  action: Order Firing & Course Management.
+  operations:
+  - prioritiseKitchenTicket
+  - setCourseRules
+  outcome: '**Drawn by the client as FNB-3C.** 2 operations on this step.'
+  crossesDevice: true
+- step: 4
+  screen: KIT-004
+  action: Active Order Management & Fulfilment Journey.
+  operations:
+  - getFnbOrder
+  - listKitchenTickets
+  outcome: '**Drawn by the client as FNB-3D.** 2 operations on this step.'
+  crossesDevice: true
+- step: 5
+  screen: KIT-008
+  action: Exceptions, Re-Fire & Unavailable Items.
+  operations:
+  - list86Events
+  - logKitchenException
+  - setItemAvailability
+  outcome: '**Drawn by the client as FNB-3H.** 3 operations on this step.'
+  crossesDevice: true
+branches:
+- at: 1
+  condition: A step in the chain is not licensed for this tenant.
+  behaviour: '**The chain stops at the module boundary.** `requiresModule` on each screen decides —
+    a tenant without the retail licence does not see the retail half, and the journey is shorter rather
+    than broken.'
+  severity: medium
+  resolvedBy: getModuleEnablement
+exitStates:
+- state: completed
+  description: The chain ran as the client drew it.
+- state: stoppedAtModule
+  description: '**A licence boundary, not a failure.**'
+notes: '**F&B board 3, the kitchen chain the client drew.** F29 walks the table side; this walks the
+  pass. **Derived from the client''s own `GOES TO` edges**, not from an inferred path — a pair of frames
+  the client linked is evidence; a chain assembled from unrelated pairs is a guess.'
+openQuestions: null

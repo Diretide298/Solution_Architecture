@@ -1,0 +1,533 @@
+# guest-app — operated by guest · guest on mobileApp
+# Serves: P02 Guest App — Mobile, P05 Guest Kiosk — Self-Service
+# Derived by tools/derive-frontend.py from screens/*.yaml. Do not hand-edit.
+
+app: guest-app
+operator: guest
+audience: guest
+formFactor: mobileApp
+status: scaffolded
+runtime: reactNative
+offlineCapable: true
+directions:
+- ltr
+- rtl
+platforms:
+- P02 Guest App — Mobile
+- P05 Guest Kiosk — Self-Service
+servesMultiplePlatforms: true
+packages:
+- design-tokens
+- ui
+- api-client
+contracts:
+- access
+- ai
+- catalogue
+- finance
+- fnb
+- games
+- identity
+- marketing-crm
+- orders
+- promotions
+- queue
+- retail
+- seating
+- venue-map
+- white-label
+deployment:
+  target: iOS / Android native
+  distribution: App Store + Play, tenant developer account
+  bundleUpdate: over-the-air for JS; store release for native
+  hosting: n/a — installed
+  storeReview: true
+  deviceOwnership: guest device
+  networkAssumption: mobile data, intermittent
+  releaseCadence: fortnightly, gated by review
+screenCount: 80
+byWave:
+  wave1: 21
+  wave2: 42
+  wave3: 17
+screens:
+- id: GST-001
+  name: Home – Default
+  route: /general/home-default
+  component: apps/guest-app/src/routes/general/HomeDefaultDashboard.tsx
+  wave: 1
+  status: notStarted
+- id: GST-002
+  name: Explore Categories
+  route: /general/explore-categories
+  component: apps/guest-app/src/routes/general/ExploreCategoriesList.tsx
+  wave: 1
+  status: notStarted
+- id: GST-003
+  name: Attractions List
+  route: /general/attractions-list
+  component: apps/guest-app/src/routes/general/AttractionsList.tsx
+  wave: 1
+  status: notStarted
+- id: GST-004
+  name: Attraction Details
+  route: /general/attraction-details
+  component: apps/guest-app/src/routes/general/AttractionDetailsDetail.tsx
+  wave: 1
+  status: notStarted
+- id: GST-005
+  name: What's On
+  route: /general/whats-on
+  component: apps/guest-app/src/routes/general/WhatsOnList.tsx
+  wave: 1
+  status: notStarted
+- id: GST-006
+  name: Event / Exhibition Details
+  route: /general/event-exhibition-details
+  component: apps/guest-app/src/routes/general/EventExhibitionDetailsDetail.tsx
+  wave: 1
+  status: notStarted
+- id: GST-007
+  name: Select Date & Time
+  route: /general/select-date-and-time
+  component: apps/guest-app/src/routes/general/SelectDateAndTimeDetail.tsx
+  wave: 1
+  status: notStarted
+- id: GST-008
+  name: Tickets & Add-ons
+  route: /general/tickets-and-add-ons
+  component: apps/guest-app/src/routes/general/TicketsAndAddOnsList.tsx
+  wave: 1
+  status: notStarted
+- id: GST-009
+  name: Review & Payment
+  route: /general/review-and-payment
+  component: apps/guest-app/src/routes/general/ReviewAndPaymentForm.tsx
+  wave: 1
+  status: notStarted
+- id: GST-010
+  name: Booking Confirmation
+  route: /general/booking-confirmation
+  component: apps/guest-app/src/routes/general/BookingConfirmationDetail.tsx
+  wave: 1
+  status: notStarted
+- id: GST-012
+  name: My Tickets
+  route: /general/my-tickets
+  component: apps/guest-app/src/routes/general/MyTicketsList.tsx
+  wave: 1
+  status: notStarted
+- id: GST-013
+  name: Ticket Details
+  route: /general/ticket-details
+  component: apps/guest-app/src/routes/general/TicketDetailsDetail.tsx
+  wave: 1
+  status: notStarted
+- id: GST-039
+  name: Profile
+  route: /general/profile
+  component: apps/guest-app/src/routes/general/ProfileDashboard.tsx
+  wave: 1
+  status: notStarted
+- id: GST-041
+  name: Checkout Entry
+  route: /general/checkout-entry
+  component: apps/guest-app/src/routes/general/CheckoutEntryForm.tsx
+  wave: 1
+  status: notStarted
+- id: GST-042
+  name: Simple Registration & OTP
+  route: /general/simple-registration-and-otp
+  component: apps/guest-app/src/routes/general/SimpleRegistrationAndOtpDetail.tsx
+  wave: 1
+  status: notStarted
+- id: GST-043
+  name: Arabic / RTL Experience
+  route: /general/arabic-rtl-experience
+  component: apps/guest-app/src/routes/general/ArabicRtlExperienceDetail.tsx
+  wave: 1
+  status: notStarted
+- id: GST-046
+  name: Branded Queue / Waiting Room
+  route: /general/branded-queue-waiting-room
+  component: apps/guest-app/src/routes/general/BrandedQueueWaitingRoomDetail.tsx
+  wave: 1
+  status: notStarted
+- id: GST-047
+  name: Maintenance Page
+  route: /general/maintenance-page
+  component: apps/guest-app/src/routes/general/MaintenancePageDetail.tsx
+  wave: 1
+  status: notStarted
+- id: GST-055
+  name: Dynamic QR Ticket
+  route: /general/dynamic-qr-ticket
+  component: apps/guest-app/src/routes/general/DynamicQrTicketCanvas.tsx
+  wave: 1
+  status: notStarted
+- id: GST-060
+  name: Maintenance / Upgrade Page
+  route: /general/maintenance-upgrade-page
+  component: apps/guest-app/src/routes/general/MaintenanceUpgradePageDetail.tsx
+  wave: 1
+  status: notStarted
+- id: GST-063
+  name: Search
+  route: /search
+  component: apps/guest-app/src/routes/Search.tsx
+  wave: 1
+  status: notStarted
+- id: GST-011
+  name: Wallet Overview
+  route: /general/wallet-overview
+  component: apps/guest-app/src/routes/general/WalletOverviewDashboard.tsx
+  wave: 2
+  status: notStarted
+- id: GST-014
+  name: Ticket Transfer
+  route: /general/ticket-transfer
+  component: apps/guest-app/src/routes/general/TicketTransferDetail.tsx
+  wave: 2
+  status: notStarted
+- id: GST-015
+  name: Memberships
+  route: /general/memberships
+  component: apps/guest-app/src/routes/general/MembershipsDetail.tsx
+  wave: 2
+  status: notStarted
+- id: GST-016
+  name: My Reservations
+  route: /general/my-reservations
+  component: apps/guest-app/src/routes/general/MyReservationsDetail.tsx
+  wave: 2
+  status: notStarted
+- id: GST-017
+  name: Reservation Details
+  route: /general/reservation-details
+  component: apps/guest-app/src/routes/general/ReservationDetailsDetail.tsx
+  wave: 2
+  status: notStarted
+- id: GST-019
+  name: Order History (Wallet)
+  route: /general/order-history-wallet
+  component: apps/guest-app/src/routes/general/OrderHistoryWalletDashboard.tsx
+  wave: 2
+  status: notStarted
+- id: GST-021
+  name: Interactive Map
+  route: /general/interactive-map
+  component: apps/guest-app/src/routes/general/InteractiveMapCanvas.tsx
+  wave: 2
+  status: notStarted
+- id: GST-022
+  name: Attraction Wait Times
+  route: /general/attraction-wait-times
+  component: apps/guest-app/src/routes/general/AttractionWaitTimesDetail.tsx
+  wave: 2
+  status: notStarted
+- id: GST-024
+  name: F&B – Browse & Order
+  route: /general/fandb-browse-and-order
+  component: apps/guest-app/src/routes/general/FandbBrowseAndOrderList.tsx
+  wave: 2
+  status: notStarted
+- id: GST-025
+  name: F&B – Order Tracking
+  route: /general/fandb-order-tracking
+  component: apps/guest-app/src/routes/general/FandbOrderTrackingDetail.tsx
+  wave: 2
+  status: notStarted
+- id: GST-026
+  name: Retail / Merchandise
+  route: /general/retail-merchandise
+  component: apps/guest-app/src/routes/general/RetailMerchandiseDetail.tsx
+  wave: 2
+  status: notStarted
+- id: GST-029
+  name: Venue Info & Services
+  route: /general/venue-info-and-services
+  component: apps/guest-app/src/routes/general/VenueInfoAndServicesDetail.tsx
+  wave: 2
+  status: notStarted
+- id: GST-030
+  name: In-Venue Notifications
+  route: /general/in-venue-notifications
+  component: apps/guest-app/src/routes/general/InVenueNotificationsDetail.tsx
+  wave: 2
+  status: notStarted
+- id: GST-031
+  name: AI Concierge – Home
+  route: /general/ai-concierge-home
+  component: apps/guest-app/src/routes/general/AiConciergeHomeDashboard.tsx
+  wave: 2
+  status: notStarted
+- id: GST-032
+  name: AI Concierge – Chat
+  route: /general/ai-concierge-chat
+  component: apps/guest-app/src/routes/general/AiConciergeChatDetail.tsx
+  wave: 2
+  status: notStarted
+- id: GST-033
+  name: AI Concierge – Contextual Help
+  route: /general/ai-concierge-contextual-help
+  component: apps/guest-app/src/routes/general/AiConciergeContextualHelpDetail.tsx
+  wave: 2
+  status: notStarted
+- id: GST-034
+  name: Lost & Found
+  route: /general/lost-and-found
+  component: apps/guest-app/src/routes/general/LostAndFoundDetail.tsx
+  wave: 2
+  status: notStarted
+- id: GST-037
+  name: Offers & Promotions
+  route: /general/offers-and-promotions
+  component: apps/guest-app/src/routes/general/OffersAndPromotionsDetail.tsx
+  wave: 2
+  status: notStarted
+- id: GST-040
+  name: Help & Support
+  route: /general/help-and-support
+  component: apps/guest-app/src/routes/general/HelpAndSupportDetail.tsx
+  wave: 2
+  status: notStarted
+- id: GST-044
+  name: Multi-Currency & Pricing
+  route: /general/multi-currency-and-pricing
+  component: apps/guest-app/src/routes/general/MultiCurrencyAndPricingDetail.tsx
+  wave: 2
+  status: notStarted
+- id: GST-045
+  name: Ticket Delivery & Sharing
+  route: /general/ticket-delivery-and-sharing
+  component: apps/guest-app/src/routes/general/TicketDeliveryAndSharingDetail.tsx
+  wave: 2
+  status: notStarted
+- id: GST-048
+  name: Upsell / Cross-Sell
+  route: /general/upsell-cross-sell
+  component: apps/guest-app/src/routes/general/UpsellCrossSellDetail.tsx
+  wave: 2
+  status: notStarted
+- id: GST-049
+  name: Interactive Seat Selection
+  route: /general/interactive-seat-selection
+  component: apps/guest-app/src/routes/general/InteractiveSeatSelectionCanvas.tsx
+  wave: 2
+  status: notStarted
+- id: GST-056
+  name: Bundle Package
+  route: /general/bundle-package
+  component: apps/guest-app/src/routes/general/BundlePackageDetail.tsx
+  wave: 2
+  status: notStarted
+- id: GST-057
+  name: Accessibility Information
+  route: /general/accessibility-information
+  component: apps/guest-app/src/routes/general/AccessibilityInformationForm.tsx
+  wave: 2
+  status: notStarted
+- id: GST-061
+  name: Menu Item Detail
+  route: /in-venue-experience/menu-item-detail
+  component: apps/guest-app/src/routes/in-venue-experience/MenuItemDetail.tsx
+  wave: 2
+  status: notStarted
+- id: GST-064
+  name: Loyalty & Rewards
+  route: /loyalty-rewards
+  component: apps/guest-app/src/routes/LoyaltyRewards.tsx
+  wave: 2
+  status: notStarted
+- id: KSK-001
+  name: Attract Loop
+  route: /sell/attract-loop
+  component: apps/guest-app/src/routes/sell/AttractLoopDetail.tsx
+  wave: 2
+  status: notStarted
+- id: KSK-002
+  name: Language Select
+  route: /sell/language-select
+  component: apps/guest-app/src/routes/sell/LanguageSelectDetail.tsx
+  wave: 2
+  status: notStarted
+- id: KSK-003
+  name: What are you buying
+  route: /sell/what-are-you-buying
+  component: apps/guest-app/src/routes/sell/WhatAreYouBuyingDetail.tsx
+  wave: 2
+  status: notStarted
+- id: KSK-004
+  name: Choose tickets
+  route: /sell/choose-tickets
+  component: apps/guest-app/src/routes/sell/ChooseTicketsDetail.tsx
+  wave: 2
+  status: notStarted
+- id: KSK-005
+  name: Choose a session
+  route: /sell/choose-a-session
+  component: apps/guest-app/src/routes/sell/ChooseASessionDetail.tsx
+  wave: 2
+  status: notStarted
+- id: KSK-006
+  name: Review
+  route: /sell/review
+  component: apps/guest-app/src/routes/sell/ReviewDetail.tsx
+  wave: 2
+  status: notStarted
+- id: KSK-007
+  name: Payment
+  route: /sell/payment
+  component: apps/guest-app/src/routes/sell/PaymentDetail.tsx
+  wave: 2
+  status: notStarted
+- id: KSK-008
+  name: Payment unresolved
+  route: /sell/payment-unresolved
+  component: apps/guest-app/src/routes/sell/PaymentUnresolvedDetail.tsx
+  wave: 2
+  status: notStarted
+- id: KSK-009
+  name: Ticket issued
+  route: /sell/ticket-issued
+  component: apps/guest-app/src/routes/sell/TicketIssuedDetail.tsx
+  wave: 2
+  status: notStarted
+- id: KSK-010
+  name: Print failure
+  route: /sell/print-failure
+  component: apps/guest-app/src/routes/sell/PrintFailureDetail.tsx
+  wave: 2
+  status: notStarted
+- id: KSK-011
+  name: Collect a booking
+  route: /sell/collect-a-booking
+  component: apps/guest-app/src/routes/sell/CollectABookingDetail.tsx
+  wave: 2
+  status: notStarted
+- id: KSK-012
+  name: Booking found
+  route: /sell/booking-found
+  component: apps/guest-app/src/routes/sell/BookingFoundDetail.tsx
+  wave: 2
+  status: notStarted
+- id: KSK-013
+  name: Call staff
+  route: /sell/call-staff
+  component: apps/guest-app/src/routes/sell/CallStaffDetail.tsx
+  wave: 2
+  status: notStarted
+- id: KSK-014
+  name: Out of service
+  route: /sell/out-of-service
+  component: apps/guest-app/src/routes/sell/OutOfServiceDetail.tsx
+  wave: 2
+  status: notStarted
+- id: KSK-015
+  name: Assistant
+  route: /kiosk/assistant
+  component: apps/guest-app/src/routes/Assistant.tsx
+  wave: 2
+  status: notStarted
+- id: GST-018
+  name: Add to Calendar / Reminders
+  route: /general/add-to-calendar-reminders
+  component: apps/guest-app/src/routes/general/AddToCalendarRemindersDetail.tsx
+  wave: 3
+  status: notStarted
+- id: GST-020
+  name: Saved Items / Wishlist
+  route: /general/saved-items-wishlist
+  component: apps/guest-app/src/routes/general/SavedItemsWishlistList.tsx
+  wave: 3
+  status: notStarted
+- id: GST-023
+  name: Virtual Queue / Join Queue
+  route: /general/virtual-queue-join-queue
+  component: apps/guest-app/src/routes/general/VirtualQueueJoinQueueDetail.tsx
+  wave: 3
+  status: notStarted
+- id: GST-027
+  name: Parking – Reserve & Pay
+  route: /general/parking-reserve-and-pay
+  component: apps/guest-app/src/routes/general/ParkingReserveAndPayDetail.tsx
+  wave: 3
+  status: notStarted
+- id: GST-028
+  name: Parking – Reservation Confirmed
+  route: /general/parking-reservation-confirmed
+  component: apps/guest-app/src/routes/general/ParkingReservationConfirmedDetail.tsx
+  wave: 3
+  status: notStarted
+- id: GST-035
+  name: Feedback & Ratings
+  route: /general/feedback-and-ratings
+  component: apps/guest-app/src/routes/general/FeedbackAndRatingsList.tsx
+  wave: 3
+  status: notStarted
+- id: GST-036
+  name: Loyalty & Rewards
+  route: /general/loyalty-and-rewards
+  component: apps/guest-app/src/routes/general/LoyaltyAndRewardsDetail.tsx
+  wave: 3
+  status: notStarted
+- id: GST-038
+  name: Digital Companion Mode
+  route: /general/digital-companion-mode
+  component: apps/guest-app/src/routes/general/DigitalCompanionModeDetail.tsx
+  wave: 3
+  status: notStarted
+- id: GST-050
+  name: Resource Booking – Cabana
+  route: /general/resource-booking-cabana
+  component: apps/guest-app/src/routes/general/ResourceBookingCabanaDetail.tsx
+  wave: 3
+  status: notStarted
+- id: GST-051
+  name: Plan Your Adventure – Start
+  route: /general/plan-your-adventure-start
+  component: apps/guest-app/src/routes/general/PlanYourAdventureStartDetail.tsx
+  wave: 3
+  status: notStarted
+- id: GST-052
+  name: Suggested Itineraries
+  route: /general/suggested-itineraries
+  component: apps/guest-app/src/routes/general/SuggestedItinerariesDetail.tsx
+  wave: 3
+  status: notStarted
+- id: GST-053
+  name: Build Your Own Itinerary
+  route: /general/build-your-own-itinerary
+  component: apps/guest-app/src/routes/general/BuildYourOwnItineraryDetail.tsx
+  wave: 3
+  status: notStarted
+- id: GST-054
+  name: AI Optimized Itinerary
+  route: /general/ai-optimized-itinerary
+  component: apps/guest-app/src/routes/general/AiOptimizedItineraryDetail.tsx
+  wave: 3
+  status: notStarted
+- id: GST-058
+  name: Resource Availability (Cabana)
+  route: /general/resource-availability-cabana
+  component: apps/guest-app/src/routes/general/ResourceAvailabilityCabanaDetail.tsx
+  wave: 3
+  status: notStarted
+- id: GST-059
+  name: Plan My Day – In Progress
+  route: /general/plan-my-day-in-progress
+  component: apps/guest-app/src/routes/general/PlanMyDayInProgressDetail.tsx
+  wave: 3
+  status: notStarted
+- id: GST-062
+  name: Shop & Drop Collection
+  route: /in-venue-experience/shop-and-drop-collection
+  component: apps/guest-app/src/routes/in-venue-experience/ShopAndDropCollectionList.tsx
+  wave: 3
+  status: notStarted
+- id: GST-065
+  name: Newsletter & Preferences
+  route: /newsletter-preferences
+  component: apps/guest-app/src/routes/NewsletterPreferences.tsx
+  wave: 3
+  status: notStarted

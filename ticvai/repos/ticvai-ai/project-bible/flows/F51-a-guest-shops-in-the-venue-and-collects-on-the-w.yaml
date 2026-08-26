@@ -1,0 +1,78 @@
+$schema: ./_schema.yaml
+id: F51
+name: A guest shops in the venue and collects on the way out
+actor: guest
+capability: Shop and drop
+wave: 3
+frequency: Routine.
+criticality: revenue
+primaryContract: retail
+contracts:
+- retail
+- orders
+- inventory
+platforms:
+- P01
+- P02
+- P05
+trigger:
+  description: A guest buys something heavy at 11am and does not want to carry it round a venue all
+    day.
+offlineBehaviour: '**Browsing works from cache; reserving does not.** A reservation against stock the
+  device cannot see is a guest promised something already sold.'
+steps:
+- step: 1
+  screen: WEB-033
+  action: They browse the shop.
+  operations:
+  - listMerchandise
+  - lookupMerchandise
+  - addCartLine
+  outcome: '**The same catalogue the tills hold.** A price online that differs from the shelf is a complaint
+    at the counter.'
+- step: 2
+  screen: WEB-033
+  action: The item is reserved for collection.
+  operations:
+  - reserveMerchandise
+  outcome: '**Reserved at purchase, not at collection.** A guest who paid and finds it gone has been
+    sold something the venue did not have.'
+- step: 3
+  screen: GST-062
+  action: On the way out they find their collection point.
+  operations:
+  - lookupShopAndDrop
+  outcome: '**One lookup, one code.** A guest at the exit with four bags to collect wants one screen,
+    not four orders.'
+  crossesDevice: true
+- step: 4
+  screen: KSK-017
+  action: Or they collect from a kiosk.
+  operations:
+  - listMerchandise
+  - reserveMerchandise
+  outcome: '**Unattended collection.** F75 covers what happens when it goes wrong with nobody there.'
+  crossesDevice: true
+branches:
+- at: 2
+  condition: The last one sells at a till while the guest is paying online.
+  behaviour: '**The reservation fails and the sale is refused rather than accepted and disappointed.**
+    An oversell the venue knows about at purchase is a refund it never has to make.'
+  severity: high
+  resolvedBy: reserveMerchandise
+- at: 3
+  condition: The guest leaves without collecting.
+  behaviour: '**Held to the venue policy and then returned to stock.** A collection point full of uncollected
+    bags is a stockroom nobody counted.'
+  severity: medium
+  resolvedBy: lookupShopAndDrop
+exitStates:
+- state: collected
+  description: Bought early, collected late.
+- state: uncollected
+  description: '**Returned to stock after the policy window.**'
+- state: refusedAtPurchase
+  description: Stock gone before payment. **Better here than at the counter.**
+notes: '**Written 24 August.** Shop-and-drop spans three platforms and `lookupShopAndDrop` had never
+  been in a flow.'
+openQuestions: null

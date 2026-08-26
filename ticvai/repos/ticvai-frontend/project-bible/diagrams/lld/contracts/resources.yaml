@@ -1,0 +1,140 @@
+id: LLD-resources
+title: resources — 9 operations
+generatedBy: tools/derive-diagrams.py
+index: diagrams/hld/03-contracts.yaml
+tier: satellite
+service: VenueOpsService
+operations:
+- operation: bookResource
+  verb: POST
+  path: /resource-bookings
+  scope: venue
+  permission: RESOURCE_BOOK
+  audience:
+  - staff
+  - guest
+  offline: false
+  reads:
+  - cache:idempotency
+  - resources.booking
+  - resources.resource
+  writes:
+  - cache:idempotency
+  - resources.booking
+- operation: checkInResource
+  verb: POST
+  path: /resource-bookings/{bookingId}/check-in
+  scope: venue
+  permission: RESOURCE_BOOK
+  audience:
+  - staff
+  offline: true
+  reads:
+  - cache:idempotency
+  - resources.booking
+  - resources.resource
+  writes:
+  - cache:idempotency
+  - orders.stored_value_authorisation
+  - resources.booking
+  - resources.resource
+- operation: checkOutResource
+  verb: POST
+  path: /resource-bookings/{bookingId}/check-out
+  scope: venue
+  permission: RESOURCE_BOOK
+  audience:
+  - staff
+  offline: true
+  reads:
+  - cache:idempotency
+  - pii.subject
+  - resources.booking
+  - resources.resource
+  writes:
+  - cache:idempotency
+  - orders.stored_value_authorisation
+  - resources.booking
+  - resources.resource
+- operation: createResource
+  verb: POST
+  path: /resources
+  scope: venue
+  permission: RESOURCE_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - platform.scope_node
+  - resources.resource
+  writes:
+  - cache:idempotency
+  - resources.resource
+- operation: getResourceAvailability
+  verb: GET
+  path: /resources/{resourceId}/availability
+  scope: venue
+  permission: RESOURCE_VIEW
+  audience:
+  - staff
+  - guest
+  offline: false
+  reads:
+  - maintenance.work_order
+  - resources.booking
+  - resources.resource
+  writes: []
+- operation: getSessionManifest
+  verb: GET
+  path: /sessions/{sessionId}/manifest
+  scope: venue
+  permission: RESOURCE_VIEW
+  audience:
+  - staff
+  offline: true
+  reads:
+  - marketing.consent_record
+  - pii.subject
+  - resources.session_participant
+  writes: []
+- operation: listResources
+  verb: GET
+  path: /resources
+  scope: venue
+  permission: RESOURCE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - resources.resource
+  writes: []
+- operation: reorderSessionManifest
+  verb: PUT
+  path: /sessions/{sessionId}/manifest
+  scope: venue
+  permission: RESOURCE_BOOK
+  audience:
+  - staff
+  offline: true
+  reads:
+  - cache:idempotency
+  - resources.session_participant
+  writes:
+  - cache:idempotency
+  - resources.session_participant
+- operation: setResourceQualifications
+  verb: PUT
+  path: /resources/{resourceId}/qualifications
+  scope: venue
+  permission: RESOURCE_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - identity.principal
+  - resources.resource
+  writes:
+  - cache:idempotency
+  - resources.qualification

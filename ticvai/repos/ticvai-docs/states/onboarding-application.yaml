@@ -1,0 +1,59 @@
+# Onboarding application — state model
+# Contract: subscription.OnboardingApplication.status
+
+entity: Onboarding application
+contract: subscription
+enum: OnboardingApplication.status
+enumKind: inline
+enumSchema: OnboardingApplication
+enumProperty: status
+owner: subscription
+initial:
+- submitted
+terminal:
+- active
+- rejected
+- abandoned
+transitions:
+- from: submitted
+  to: verifying
+  operation: submitOnboardingApplication
+  trigger: operation
+  guard: Checks running. **Nothing is provisioned yet** — an unverified application that provisions
+    a cell is a cell somebody has to clean up
+- from: verifying
+  to: approved
+  operation: submitOnboardingApplication
+  trigger: operation
+  guard: Verified
+- from: verifying
+  to: rejected
+  operation: submitOnboardingApplication
+  trigger: operation
+  guard: Failed verification, with a reason the applicant can act on
+- from: approved
+  to: provisioning
+  operation: submitOnboardingApplication
+  trigger: operation
+  guard: Cell and tenant being created
+- from: provisioning
+  to: active
+  operation: submitOnboardingApplication
+  trigger: operation
+  guard: '**Trial starts here if there is one** — and trial is a date on the plan they will pay for,
+    not a separate plan'
+- from: submitted
+  to: abandoned
+  trigger: timer
+  guard: Never completed. Expires rather than sitting forever
+- from: verifying
+  to: abandoned
+  trigger: timer
+  guard: Verification stalled waiting on the applicant
+notes: '**`provisioning` is the expensive state and it is entered last.** Everything before it is cheap
+  to abandon, which is the whole reason verification precedes provisioning rather than running alongside
+  it.
+
+
+  **Trial is a date, not a state after `active`.** A prospect trials the plan they will pay for, so
+  conversion is a date change rather than a migration.'

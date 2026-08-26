@@ -1,0 +1,331 @@
+# platform — derived from the API contracts, not hand-written
+# Migration: V0001 / V0003 — DONE
+#
+# Columns come from schema properties. Types are inferred: format uuid to uuid,
+# date-time to timestamptz, ULID patterns to char(26), Money to numeric(18,4).
+# What is NOT here: partitioning, RLS policies, indexes, the PII split. That is
+# storage design and lives in the migration scripts.
+
+module: platform
+migration: V0001 / V0003 — DONE
+tableCount: 9
+columnCount: 89
+tables:
+  platform.device:
+    derivedFrom: RegisteredDevice
+    columns:
+    - name: id
+      type: uuid
+      required: true
+    - name: kind
+      type: jsonb
+      required: true
+    - name: driver
+      type: text
+      required: true
+      description: Built to an open standard where one exists — ESC/POS, UnifiedPOS, OSDP. Adding a vendor
+        is a driver plus configuration, not a core change (ADR-0015).
+    - name: identifier
+      type: text
+      required: false
+    - name: workstation_id
+      type: uuid
+      required: true
+    - name: model
+      type: text
+      required: false
+    - name: firmware_version
+      type: text
+      required: false
+    - name: is_required
+      type: boolean
+      required: false
+      description: True blocks shift open when the device is unreachable.
+    - name: status
+      type: text
+      required: false
+    - name: last_heartbeat_at
+      type: timestamptz
+      required: false
+  platform.dsar_request:
+    derivedFrom: DsarRequest
+    columns:
+    - name: request_id
+      type: text
+      required: true
+    - name: guest_link_id
+      type: text
+      required: true
+    - name: kind
+      type: text
+      required: true
+    - name: status
+      type: text
+      required: true
+    - name: created_at
+      type: timestamptz
+      required: true
+    - name: completed_at
+      type: timestamptz
+      required: false
+    - name: cell_results
+      type: jsonb
+      required: true
+  platform.guest_link:
+    derivedFrom: GuestLink
+    columns:
+    - name: guest_link_id
+      type: char(26)
+      required: true
+      description: Pseudonymous. Not derived from any personal data. This is the only identifier that
+        crosses a cell boundary.
+    - name: home_cell_name
+      type: text
+      required: true
+      description: Cell of first registration. Authoritative for the wallet balance.
+    - name: linked_cells
+      type: jsonb
+      required: true
+    - name: consent_version
+      type: text
+      required: true
+      description: Version of the consent notice shown when the link was created. Retained as the transfer
+        basis.
+    - name: linked_at
+      type: timestamptz
+      required: true
+    - name: revoked_at
+      type: timestamptz
+      required: false
+  platform.redemption_right:
+    derivedFrom: RedemptionRight
+    columns:
+    - name: right_id
+      type: char(26)
+      required: true
+    - name: ticket_id
+      type: text
+      required: true
+    - name: guest_link_id
+      type: text
+      required: false
+    - name: issuing_cell_name
+      type: text
+      required: true
+    - name: consuming_cell_name
+      type: text
+      required: true
+    - name: media_codes
+      type: jsonb
+      required: false
+    - name: valid_from
+      type: timestamptz
+      required: true
+    - name: valid_to
+      type: timestamptz
+      required: true
+    - name: admission_profile_id
+      type: uuid
+      required: false
+    - name: venue_id
+      type: uuid
+      required: false
+      description: Null where the right is valid at any venue in the consuming cell.
+    - name: entries_allowed
+      type: integer
+      required: true
+      description: Null means unlimited.
+    - name: entries_consumed
+      type: integer
+      required: true
+    - name: status
+      type: text
+      required: true
+    - name: last_consumed_at
+      type: timestamptz
+      required: false
+    - name: last_reconciled_at
+      type: timestamptz
+      required: false
+  platform.region_settings:
+    derivedFrom: RegionSettings
+    columns:
+    - name: country_code
+      type: text
+      required: true
+      description: ISO 3166-1 alpha-2. Determines the jurisdiction, and therefore the cell.
+    - name: currency_code
+      type: char(3)
+      required: true
+    - name: currency_scale
+      type: integer
+      required: true
+      description: Decimal places for this region's currency. Varies by currency — some use 2, some use
+        3. Money columns are numeric(18,4) and carry the scale explicitly, because a fixed 2-place type
+    - name: time_zone
+      type: text
+      required: true
+      description: IANA zone, e.g. `Asia/Dubai`.
+    - name: date_format
+      type: text
+      required: false
+    - name: number_format
+      type: text
+      required: false
+    - name: fiscal_year_start_month
+      type: integer
+      required: true
+      description: Varies by country.
+    - name: placement
+      type: jsonb
+      required: false
+  platform.sale_board:
+    derivedFrom: SaleBoard
+    columns:
+    - name: id
+      type: uuid
+      required: true
+    - name: code
+      type: varchar(64)
+      required: true
+    - name: name
+      type: varchar(200)
+      required: true
+    - name: venue_id
+      type: uuid
+      required: true
+    - name: kind
+      type: jsonb
+      required: true
+    - name: pages
+      type: jsonb
+      required: true
+    - name: is_active
+      type: boolean
+      required: false
+  platform.scope_node:
+    derivedFrom: ScopeNode
+    columns:
+    - name: id
+      type: uuid
+      required: true
+    - name: level
+      type: jsonb
+      required: true
+    - name: parent_id
+      type: uuid
+      required: false
+    - name: path
+      type: text
+      required: true
+      description: Materialised ltree path, e.g. `t_ref.b_alpha.r_north.v_alpha1`.
+    - name: code
+      type: varchar(64)
+      required: true
+    - name: name
+      type: varchar(200)
+      required: true
+    - name: is_active
+      type: boolean
+      required: true
+      description: False causes every permission query at or beneath this node to resolve to DENY.
+    - name: child_count
+      type: integer
+      required: false
+  platform.wallet_authorisation:
+    derivedFrom: WalletAuthorisation
+    columns:
+    - name: authorisation_id
+      type: text
+      required: true
+    - name: guest_link_id
+      type: text
+      required: true
+    - name: amount
+      type: numeric(18,4)
+      required: true
+    - name: captured_amount
+      type: numeric(18,4)
+      required: false
+    - name: status
+      type: text
+      required: true
+    - name: home_cell_name
+      type: text
+      required: false
+    - name: consuming_cell_name
+      type: text
+      required: false
+    - name: order_id
+      type: text
+      required: false
+    - name: created_at
+      type: timestamptz
+      required: true
+    - name: expires_at
+      type: timestamptz
+      required: true
+  platform.workstation:
+    derivedFrom: Workstation
+    columns:
+    - name: id
+      type: uuid
+      required: true
+    - name: code
+      type: varchar(64)
+      required: true
+    - name: name
+      type: varchar(200)
+      required: true
+    - name: venue_id
+      type: uuid
+      required: true
+    - name: region_id
+      type: uuid
+      required: true
+    - name: department_id
+      type: uuid
+      required: false
+    - name: scope_path
+      type: text
+      required: true
+    - name: sale_board
+      type: jsonb
+      required: true
+      description: Determines which front end loads. Bound to the workstation, not the role — the F&B
+        terminal opens the F&B board. What the operator may then DO within it is governed by their permis
+    - name: access_point_id
+      type: uuid
+      required: false
+      description: Inherited from the workstation, never selected by the operator. Null where the workstation
+        is not at an access point.
+    - name: devices
+      type: jsonb
+      required: false
+    - name: currency
+      type: char(3)
+      required: true
+    - name: currency_scale
+      type: integer
+      required: true
+    - name: time_zone
+      type: text
+      required: true
+    - name: deployment_profile
+      type: jsonb
+      required: false
+    - name: edge_node_id
+      type: uuid
+      required: false
+      description: Present when `deploymentProfile` is `venueEdge`.
+    - name: catalogue_state
+      type: jsonb
+      required: false
+    - name: offline_capable
+      type: boolean
+      required: false
+      description: Derived from `deploymentProfile`. False only for `thin`. Under local-first, catalogue
+        READS are always local on transactional surfaces; this flag governs whether WRITES can be queu
+    - name: is_active
+      type: boolean
+      required: false

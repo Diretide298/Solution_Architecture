@@ -1,0 +1,62 @@
+$schema: ./_schema.yaml
+id: F63
+name: A gate goes offline and reconciles
+actor: gateOperator
+capability: Offline admission and sync
+wave: 1
+frequency: Routine.
+criticality: safety
+primaryContract: access
+contracts:
+- access
+- tenancy
+platforms:
+- P07
+trigger:
+  description: The network drops at a gate mid-session. **Nobody decides this** — the device notices
+    and keeps admitting.
+offlineBehaviour: '**This flow is the offline behaviour.** The package was pulled before the session;
+  every decision is local.'
+steps:
+- step: 1
+  screen: SCN-015
+  action: The package is already on the device from before the session.
+  operations:
+  - getOfflinePackage
+  outcome: '**Pulled before, not during.** A gate that fetches at first scan has already queued.'
+- step: 2
+  screen: SCN-013
+  action: Scans journal locally while the network is gone.
+  operations:
+  - listScans
+  outcome: '**Every scan is kept, including the refusals.** A refusal offline is as much a record as
+    an admission.'
+- step: 3
+  screen: SCN-014
+  action: The network returns and the journal posts.
+  operations:
+  - syncScans
+  outcome: '**In sequence, not by timestamp.** Two handhelds with clocks a minute apart produce an order
+    nobody can reconstruct.'
+branches:
+- at: 2
+  condition: The same guest is scanned at two lanes, both offline.
+  behaviour: '**Both post and the duplicate is a reconciliation task.** The guest is inside either way;
+    the question is which lane counted them, and occupancy was wrong for a period.'
+  severity: medium
+  resolvedBy: syncScans
+- at: 2
+  condition: The offline window exceeds the venue policy.
+  behaviour: '**The gate keeps admitting.** Unlike a till, a gate that stops is a crowd — `maxOfflineHours`
+    warns here rather than blocking.'
+  severity: high
+  resolvedBy: setOfflinePolicy
+exitStates:
+- state: syncedClean
+  description: All scans posted.
+- state: syncedWithDuplicates
+  description: '**Occupancy was wrong and by how much is visible.**'
+notes: '**Written 24 August.** The offline gate and the offline till behave differently at the ceiling
+  and **nothing said so until this flow sat beside F33** — a till that stops selling is a queue; a gate
+  that stops admitting is a crowd.'
+openQuestions: null

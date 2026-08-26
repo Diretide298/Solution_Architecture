@@ -1,0 +1,46 @@
+id: LLD-Group booking
+title: Group booking — 6 transitions
+generatedBy: tools/derive-diagrams.py
+index: diagrams/hld/04-lifecycles.yaml
+source: states/group-booking.yaml
+entity: Group booking
+contract: orders
+enum: GroupBooking.status
+enumKind: inline
+enumSchema: GroupBooking
+enumProperty: status
+owner: orders
+initial:
+- provisional
+terminal:
+- complete
+- cancelled
+transitions:
+- from: provisional
+  to: confirmed
+  trigger: operation
+  guard: Deposit taken or terms agreed
+- from: confirmed
+  to: namesPending
+  trigger: timer
+  guard: '**Attendee capture is required and not done.** A school trip needs names before admission,
+    and this is the state that says so before the coach arrives'
+- from: namesPending
+  to: complete
+  trigger: operation
+  guard: Names collected
+- from: confirmed
+  to: complete
+  trigger: operation
+  guard: No capture required
+- from: provisional
+  to: cancelled
+  trigger: operation
+  guard: Never confirmed
+- from: confirmed
+  to: cancelled
+  trigger: operation
+  guard: Cancelled after confirmation, under the terms
+notes: '**`namesPending` is a state rather than a flag** because it changes what the venue does — a
+  group in it gets a chase, and one that arrives in it gets a conversation at the gate rather than a
+  refusal.'

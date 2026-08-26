@@ -1,0 +1,74 @@
+$schema: ./_schema.yaml
+id: F64
+name: A steward signs in and takes a venue and a role
+actor: supervisor
+capability: Staff sign-in and shift start
+wave: 1
+frequency: Routine.
+criticality: safety
+primaryContract: identity
+contracts:
+- identity
+- tenancy
+- workforce
+platforms:
+- P06
+trigger:
+  description: Somebody arrives for a shift with a shared handheld. **The device is shared and the authority
+    is not.**
+offlineBehaviour: '**Sign-in needs the network.** A credential validated locally is a credential anybody
+  can forge on a device they are holding.'
+steps:
+- step: 1
+  screen: EMP-001
+  action: They sign in.
+  operations:
+  - login
+  - listSsoProviders
+  - listMfaMethods
+  outcome: '**SSO where the venue uses it, MFA where the role demands it.** A gate steward and a finance
+    controller do not need the same ceremony.'
+- step: 2
+  screen: EMP-002
+  action: They pick a venue and a role for the shift.
+  operations:
+  - listRoles
+  - getCurrentSession
+  outcome: '**One person, several roles, one at a time** (ADR-0002). A supervisor covering a lane takes
+    the steward role and loses the supervisor one until they change back.'
+- step: 3
+  screen: EMP-048
+  action: The opening checklist is worked.
+  operations: []
+  outcome: '**Tasks, not a paper list.** A checklist nobody records is a checklist nobody did.'
+- step: 4
+  screen: EMP-003
+  action: They go on duty.
+  operations:
+  - getCurrentShift
+  - listIncidents
+  outcome: '**Open incidents surface before anything else.** A steward starting a shift needs yesterday’s
+    unresolved problem before today’s first task.'
+branches:
+- at: 1
+  condition: MFA is required and the phone is in a locker.
+  behaviour: '**Refused, and the venue has a policy problem rather than a platform one.** A bypass here
+    is a bypass for everybody.'
+  severity: high
+  resolvedBy: listMfaMethods
+- at: 2
+  condition: The principal has no role at this venue.
+  behaviour: Refused at role select, not at first action. **A person who signs in and then cannot do
+    anything has been told the wrong thing.**
+  severity: medium
+  resolvedBy: listRoles
+exitStates:
+- state: onDuty
+  description: Signed in, role taken, checklist worked.
+- state: blockedAtMfa
+  description: '**A separate exit because it is common and it is a venue process failure**, not a platform
+    one.'
+notes: '**Written 24 August.** `EMP-001` and `EMP-002` declared `forceLogout`, `revokeAllSessions` and
+  `listActiveSessions` — **session administration on a sign-in screen.** Bulk-attach residue, removed.
+  `EMP-002` also declared `createRole`: a staff app that could invent its own authority.'
+openQuestions: null

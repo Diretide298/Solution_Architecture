@@ -1,0 +1,484 @@
+id: LLD-seating
+title: seating — 35 operations
+generatedBy: tools/derive-diagrams.py
+index: diagrams/hld/03-contracts.yaml
+tier: satellite
+service: CatalogueService
+operations:
+- operation: allocateBlockedSeats
+  verb: POST
+  path: /seat-blocks/{blockId}/allocate
+  scope: venue
+  permission: ORDER_CREATE
+  audience:
+  - staff
+  - partner
+  offline: false
+  reads:
+  - cache:idempotency
+  - seating.seat_hold
+  writes:
+  - cache:idempotency
+  - seating.seat_hold
+- operation: assignSeats
+  verb: POST
+  path: /performances/{performanceId}/assign-seats
+  scope: venue
+  permission: ORDER_CREATE
+  audience:
+  - staff
+  - guest
+  offline: false
+  reads:
+  - cache:idempotency
+  - catalogue.price
+  - seating.seat
+  - seating.seat_hold
+  - seating.seating_rules
+  writes:
+  - cache:idempotency
+  - seating.seat
+  - seating.seat_hold
+- operation: cloneSeatMap
+  verb: POST
+  path: /seat-maps/{seatMapId}/clone
+  scope: venue
+  permission: CAPACITY_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - seating.seat_map
+  - seating.section
+  writes:
+  - cache:idempotency
+  - seating.seat_map
+  - seating.section
+- operation: commitImportJob
+  verb: POST
+  path: /seat-maps/{seatMapId}/import/{jobId}
+  scope: venue
+  permission: CAPACITY_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - seating.import_job
+  writes:
+  - cache:idempotency
+  - seating.import_job
+- operation: copySeatMapSection
+  verb: POST
+  path: /seat-maps/{seatMapId}/sections/copy
+  scope: venue
+  permission: CAPACITY_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - seating.seat_map
+  - seating.section
+  writes:
+  - cache:idempotency
+  - seating.section
+- operation: createSeatBlock
+  verb: POST
+  path: /seat-blocks
+  scope: venue
+  permission: CAPACITY_CONFIGURE
+  audience:
+  - staff
+  - partner
+  offline: false
+  reads:
+  - cache:idempotency
+  - seating.seat_block
+  writes:
+  - cache:idempotency
+  - seating.seat_block
+- operation: createSeatCategory
+  verb: POST
+  path: /seat-categories
+  scope: venue
+  permission: CAPACITY_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - seating.seat_category
+  writes:
+  - cache:idempotency
+  - seating.seat_category
+- operation: createSeatHold
+  verb: POST
+  path: /seat-holds
+  scope: venue
+  permission: ORDER_CREATE
+  audience:
+  - staff
+  - guest
+  offline: false
+  reads:
+  - cache:idempotency
+  - seating.seat_hold
+  writes:
+  - cache:idempotency
+  - seating.seat_hold
+- operation: createSeatMap
+  verb: POST
+  path: /seat-maps
+  scope: venue
+  permission: CAPACITY_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - seating.seat_map
+  - seating.section
+  writes:
+  - cache:idempotency
+  - seating.seat_map
+  - seating.section
+- operation: createSeatMapTemplate
+  verb: POST
+  path: /seat-map-templates
+  scope: region
+  permission: CAPACITY_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - seating.seat_map_template
+  writes:
+  - cache:idempotency
+  - seating.seat_map_template
+- operation: diffSeatMapVersions
+  verb: GET
+  path: /seat-maps/{seatMapId}/diff
+  scope: venue
+  permission: PRODUCT_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - seating.seat_map
+  - seating.section
+  writes: []
+- operation: extendSeatHold
+  verb: POST
+  path: /seat-holds/{holdId}/extend
+  scope: venue
+  permission: ORDER_CREATE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - seating.seat_hold
+  writes:
+  - cache:idempotency
+  - seating.seat_hold
+- operation: getImportJob
+  verb: GET
+  path: /seat-maps/{seatMapId}/import/{jobId}
+  scope: venue
+  permission: PRODUCT_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - seating.import_job
+  writes: []
+- operation: getSeatAvailability
+  verb: GET
+  path: /performances/{performanceId}/seat-availability
+  scope: venue
+  permission: PRODUCT_VIEW
+  audience:
+  - staff
+  - guest
+  offline: false
+  reads:
+  - seating.seat
+  - seating.seat_category
+  - seating.seat_hold
+  writes: []
+- operation: getSeatHold
+  verb: GET
+  path: /seat-holds/{holdId}
+  scope: venue
+  permission: ORDER_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - seating.seat_hold
+  writes: []
+- operation: getSeatMap
+  verb: GET
+  path: /seat-maps/{seatMapId}
+  scope: venue
+  permission: PRODUCT_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - seating.seat_map
+  - seating.section
+  writes: []
+- operation: getSeatMapImport
+  verb: GET
+  path: /seat-map-imports/{importId}
+  scope: venue
+  permission: PRODUCT_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - seating.seat_map
+  writes: []
+- operation: getSeatingRules
+  verb: GET
+  path: /seat-maps/{seatMapId}/rules
+  scope: venue
+  permission: PRODUCT_VIEW
+  audience:
+  - staff
+  offline: true
+  reads:
+  - seating.seating_rules
+  writes: []
+- operation: importSeatGeometry
+  verb: POST
+  path: /seat-maps/{seatMapId}/import/geometry
+  scope: venue
+  permission: CAPACITY_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - seating.import_job
+  writes:
+  - cache:idempotency
+  - seating.import_job
+- operation: importSeatManifest
+  verb: POST
+  path: /seat-maps/{seatMapId}/import/manifest
+  scope: venue
+  permission: CAPACITY_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - seating.import_job
+  writes:
+  - cache:idempotency
+  - seating.import_job
+- operation: importSeatMap
+  verb: POST
+  path: /seat-map-imports
+  scope: venue
+  permission: CAPACITY_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - assets.media_asset
+  - seating.seat_map_template
+  writes:
+  - cache:idempotency
+  - seating.seat_map
+  - seating.section
+- operation: listSeatBlocks
+  verb: GET
+  path: /seat-blocks
+  scope: venue
+  permission: PRODUCT_VIEW
+  audience:
+  - staff
+  - partner
+  offline: false
+  reads:
+  - seating.seat_block
+  writes: []
+- operation: listSeatCategories
+  verb: GET
+  path: /seat-categories
+  scope: venue
+  permission: PRODUCT_VIEW
+  audience:
+  - staff
+  offline: true
+  reads:
+  - seating.seat_category
+  writes: []
+- operation: listSeatMapTemplates
+  verb: GET
+  path: /seat-map-templates
+  scope: region
+  permission: PRODUCT_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - seating.seat_map_template
+  writes: []
+- operation: listSeatMaps
+  verb: GET
+  path: /seat-maps
+  scope: venue
+  permission: PRODUCT_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - seating.seat_map
+  writes: []
+- operation: listSeats
+  verb: GET
+  path: /seat-maps/{seatMapId}/seats
+  scope: venue
+  permission: PRODUCT_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - seating.seat
+  writes: []
+- operation: publishSeatMap
+  verb: POST
+  path: /seat-maps/{seatMapId}/publish
+  scope: venue
+  permission: CAPACITY_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - seating.seat_map
+  - seating.section
+  writes:
+  - cache:idempotency
+  - seating.seat_map
+  - seating.section
+- operation: recommendSeats
+  verb: POST
+  path: /performances/{performanceId}/seat-recommendations
+  scope: venue
+  permission: PRODUCT_VIEW
+  audience:
+  - staff
+  - guest
+  offline: false
+  reads:
+  - catalogue.performance
+  writes: []
+- operation: releaseSeatBlock
+  verb: DELETE
+  path: /seat-blocks/{blockId}
+  scope: venue
+  permission: CAPACITY_CONFIGURE
+  audience:
+  - staff
+  - partner
+  offline: false
+  reads:
+  - cache:idempotency
+  - seating.seat_block
+  writes:
+  - cache:idempotency
+  - seating.seat_block
+- operation: releaseSeatHold
+  verb: DELETE
+  path: /seat-holds/{holdId}
+  scope: venue
+  permission: ORDER_CREATE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - seating.seat_hold
+  writes:
+  - cache:idempotency
+  - seating.seat_hold
+- operation: setMapZones
+  verb: PUT
+  path: /seat-maps/{seatMapId}/zones
+  scope: venue
+  permission: CAPACITY_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - seating.seat
+  - seating.seat_map
+  writes:
+  - cache:idempotency
+  - seating.zone
+- operation: setSeatingRules
+  verb: PUT
+  path: /seat-maps/{seatMapId}/rules
+  scope: venue
+  permission: CAPACITY_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - seating.seating_rules
+  writes:
+  - cache:idempotency
+  - seating.seating_rules
+- operation: updateSeatMap
+  verb: PATCH
+  path: /seat-maps/{seatMapId}
+  scope: venue
+  permission: CAPACITY_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - seating.seat_map
+  - seating.section
+  writes:
+  - cache:idempotency
+  - seating.seat_map
+  - seating.section
+- operation: updateSeats
+  verb: PATCH
+  path: /seat-maps/{seatMapId}/seats
+  scope: venue
+  permission: CAPACITY_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - seating.seat_map
+  writes:
+  - cache:idempotency
+  - seating.seat_map
+- operation: validateSeatMap
+  verb: POST
+  path: /seat-maps/{seatMapId}/validate
+  scope: venue
+  permission: PRODUCT_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - seating.seat_map
+  writes:
+  - cache:idempotency
+  - seating.seat_map

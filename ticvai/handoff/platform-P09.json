@@ -1,0 +1,852 @@
+{
+ "code": "P09",
+ "name": "TICVAI Web \u2014 Platform Console",
+ "shortName": "TICVAI Web",
+ "app": "ticvai-web",
+ "operator": "ticvai",
+ "audience": "platformAdmin",
+ "formFactor": "web",
+ "offlineCapable": false,
+ "generated": "2026-08-26",
+ "note": "Derived by tools/derive-platform.py. **The gaps section is the point** \u2014 a page listing what exists is a directory; one listing what is missing is a worklist.",
+ "counts": {
+  "screens": 37,
+  "operations": 110,
+  "contracts": 9,
+  "modules": 2,
+  "undrawn": 0,
+  "operationsWithNoScreen": 70
+ },
+ "waves": {
+  "wave1": 11,
+  "wave2": 16,
+  "wave3": 10
+ },
+ "modules": [
+  {
+   "module": "TODO",
+   "screens": 36,
+   "waves": [
+    1,
+    2,
+    3
+   ]
+  },
+  {
+   "module": "AI",
+   "screens": 1,
+   "waves": [
+    1
+   ]
+  }
+ ],
+ "contracts": [
+  {
+   "contract": "subscription",
+   "operations": 33
+  },
+  {
+   "contract": "platform-ops",
+   "operations": 24
+  },
+  {
+   "contract": "white-label",
+   "operations": 20
+  },
+  {
+   "contract": "identity",
+   "operations": 16
+  },
+  {
+   "contract": "ai",
+   "operations": 5
+  },
+  {
+   "contract": "reporting",
+   "operations": 4
+  },
+  {
+   "contract": "cross-cell",
+   "operations": 3
+  },
+  {
+   "contract": "public-api",
+   "operations": 3
+  },
+  {
+   "contract": "tenancy",
+   "operations": 2
+  }
+ ],
+ "screens": [
+  {
+   "id": "ADM-001",
+   "name": "Platform Login / MFA",
+   "module": "TODO",
+   "wave": 1,
+   "route": "/general/platform-login-mfa",
+   "operations": 8,
+   "drawn": true
+  },
+  {
+   "id": "ADM-002",
+   "name": "Platform Dashboard",
+   "module": "TODO",
+   "wave": 1,
+   "route": "/general/platform-dashboard",
+   "operations": 6,
+   "drawn": true
+  },
+  {
+   "id": "ADM-003",
+   "name": "Cross-Tenant Health Dashboard",
+   "module": "TODO",
+   "wave": 2,
+   "route": "/general/cross-tenant-health-dashboard",
+   "operations": 10,
+   "drawn": true
+  },
+  {
+   "id": "ADM-004",
+   "name": "Platform Audit Log",
+   "module": "TODO",
+   "wave": 2,
+   "route": "/general/platform-audit-log",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-005",
+   "name": "Tenant Directory",
+   "module": "TODO",
+   "wave": 1,
+   "route": "/general/tenant-directory",
+   "operations": 15,
+   "drawn": true
+  },
+  {
+   "id": "ADM-006",
+   "name": "Tenant Hierarchy Explorer",
+   "module": "TODO",
+   "wave": 1,
+   "route": "/general/tenant-hierarchy-explorer",
+   "operations": 9,
+   "drawn": true
+  },
+  {
+   "id": "ADM-007",
+   "name": "Module & Feature Entitlement",
+   "module": "TODO",
+   "wave": 1,
+   "route": "/general/module-and-feature-entitlement",
+   "operations": 9,
+   "drawn": true
+  },
+  {
+   "id": "ADM-008",
+   "name": "Subscription & Plan Management",
+   "module": "TODO",
+   "wave": 1,
+   "route": "/general/subscription-and-plan-management",
+   "operations": 19,
+   "drawn": true
+  },
+  {
+   "id": "ADM-009",
+   "name": "Tenant Billing & Invoicing",
+   "module": "TODO",
+   "wave": 2,
+   "route": "/general/tenant-billing-and-invoicing",
+   "operations": 9,
+   "drawn": true
+  },
+  {
+   "id": "ADM-010",
+   "name": "Usage Metering",
+   "module": "TODO",
+   "wave": 2,
+   "route": "/general/usage-metering",
+   "operations": 7,
+   "drawn": true
+  },
+  {
+   "id": "ADM-011",
+   "name": "Licence & Seat Management",
+   "module": "TODO",
+   "wave": 2,
+   "route": "/general/licence-and-seat-management",
+   "operations": 11,
+   "drawn": true
+  },
+  {
+   "id": "ADM-012",
+   "name": "Tenant Isolation & Resource Pool",
+   "module": "TODO",
+   "wave": 1,
+   "route": "/general/tenant-isolation-and-resource-pool",
+   "operations": 8,
+   "drawn": true
+  },
+  {
+   "id": "ADM-013",
+   "name": "Tenant Performance Monitor",
+   "module": "TODO",
+   "wave": 2,
+   "route": "/general/tenant-performance-monitor",
+   "operations": 7,
+   "drawn": true
+  },
+  {
+   "id": "ADM-014",
+   "name": "Auto-Scaling Configuration",
+   "module": "TODO",
+   "wave": 3,
+   "route": "/general/auto-scaling-configuration",
+   "operations": 7,
+   "drawn": true
+  },
+  {
+   "id": "ADM-015",
+   "name": "API Rate Limit & Quota Management",
+   "module": "TODO",
+   "wave": 3,
+   "route": "/general/api-rate-limit-and-quota-management",
+   "operations": 9,
+   "drawn": true
+  },
+  {
+   "id": "ADM-016",
+   "name": "White-Label Branding Management",
+   "module": "TODO",
+   "wave": 2,
+   "route": "/general/white-label-branding-management",
+   "operations": 11,
+   "drawn": true
+  },
+  {
+   "id": "ADM-017",
+   "name": "Domain & Certificate Management",
+   "module": "TODO",
+   "wave": 2,
+   "route": "/general/domain-and-certificate-management",
+   "operations": 4,
+   "drawn": true
+  },
+  {
+   "id": "ADM-018",
+   "name": "Localisation & Language Pack",
+   "module": "TODO",
+   "wave": 2,
+   "route": "/general/localisation-and-language-pack",
+   "operations": 5,
+   "drawn": true
+  },
+  {
+   "id": "ADM-019",
+   "name": "Global Configuration & Defaults",
+   "module": "TODO",
+   "wave": 2,
+   "route": "/general/global-configuration-and-defaults",
+   "operations": 4,
+   "drawn": true
+  },
+  {
+   "id": "ADM-020",
+   "name": "Platform User Directory",
+   "module": "TODO",
+   "wave": 1,
+   "route": "/general/platform-user-directory",
+   "operations": 4,
+   "drawn": true
+  },
+  {
+   "id": "ADM-021",
+   "name": "Platform Role Management",
+   "module": "TODO",
+   "wave": 1,
+   "route": "/general/platform-role-management",
+   "operations": 2,
+   "drawn": true
+  },
+  {
+   "id": "ADM-022",
+   "name": "Release & Version Management",
+   "module": "TODO",
+   "wave": 2,
+   "route": "/general/release-and-version-management",
+   "operations": 7,
+   "drawn": true
+  },
+  {
+   "id": "ADM-023",
+   "name": "Staging Promotion & Approval",
+   "module": "TODO",
+   "wave": 2,
+   "route": "/general/staging-promotion-and-approval",
+   "operations": 7,
+   "drawn": true
+  },
+  {
+   "id": "ADM-024",
+   "name": "Release Notification Composer",
+   "module": "TODO",
+   "wave": 3,
+   "route": "/general/release-notification-composer",
+   "operations": 2,
+   "drawn": true
+  },
+  {
+   "id": "ADM-025",
+   "name": "Tenant Upgrade Scheduler",
+   "module": "TODO",
+   "wave": 2,
+   "route": "/general/tenant-upgrade-scheduler",
+   "operations": 2,
+   "drawn": true
+  },
+  {
+   "id": "ADM-026",
+   "name": "End-of-Support Notice Management",
+   "module": "TODO",
+   "wave": 3,
+   "route": "/general/end-of-support-notice-management",
+   "operations": 2,
+   "drawn": true
+  },
+  {
+   "id": "ADM-027",
+   "name": "Database Migration Console",
+   "module": "TODO",
+   "wave": 1,
+   "route": "/general/database-migration-console",
+   "operations": 6,
+   "drawn": true
+  },
+  {
+   "id": "ADM-028",
+   "name": "Environment Registry",
+   "module": "TODO",
+   "wave": 2,
+   "route": "/general/environment-registry",
+   "operations": 2,
+   "drawn": true
+  },
+  {
+   "id": "ADM-029",
+   "name": "Deployment Monitor",
+   "module": "TODO",
+   "wave": 2,
+   "route": "/general/deployment-monitor",
+   "operations": 12,
+   "drawn": true
+  },
+  {
+   "id": "ADM-030",
+   "name": "Infrastructure Sizing & Scaling Policy",
+   "module": "TODO",
+   "wave": 3,
+   "route": "/general/infrastructure-sizing-and-scaling-policy",
+   "operations": 7,
+   "drawn": true
+  },
+  {
+   "id": "ADM-031",
+   "name": "Security & Compliance Dashboard",
+   "module": "TODO",
+   "wave": 3,
+   "route": "/general/security-and-compliance-dashboard",
+   "operations": 4,
+   "drawn": true
+  },
+  {
+   "id": "ADM-032",
+   "name": "WAF & Security Policy View",
+   "module": "TODO",
+   "wave": 3,
+   "route": "/general/waf-and-security-policy-view",
+   "operations": 7,
+   "drawn": true
+  },
+  {
+   "id": "ADM-033",
+   "name": "Backup & DR Status",
+   "module": "TODO",
+   "wave": 2,
+   "route": "/general/backup-and-dr-status",
+   "operations": 7,
+   "drawn": true
+  },
+  {
+   "id": "ADM-034",
+   "name": "Archival Job Monitor",
+   "module": "TODO",
+   "wave": 3,
+   "route": "/general/archival-job-monitor",
+   "operations": 7,
+   "drawn": true
+  },
+  {
+   "id": "ADM-035",
+   "name": "Support & Escalation Console",
+   "module": "TODO",
+   "wave": 3,
+   "route": "/general/support-and-escalation-console",
+   "operations": 2,
+   "drawn": true
+  },
+  {
+   "id": "ADM-036",
+   "name": "Platform Notification Broadcast",
+   "module": "TODO",
+   "wave": 3,
+   "route": "/general/platform-notification-broadcast",
+   "operations": 2,
+   "drawn": true
+  },
+  {
+   "id": "ADM-037",
+   "name": "AI Provider & Credentials",
+   "module": "AI",
+   "wave": 1,
+   "route": "/ai/providers",
+   "operations": 4,
+   "drawn": true
+  }
+ ],
+ "gaps": {
+  "operationsWithNoScreen": [
+   {
+    "operation": "createKnowledgeCollection",
+    "contract": "ai",
+    "verb": "POST",
+    "summary": "Create a collection"
+   },
+   {
+    "operation": "generateVenueLayout",
+    "contract": "ai",
+    "verb": "POST",
+    "summary": "Draft a seat map from an uploaded plan"
+   },
+   {
+    "operation": "ingestKnowledgeDocument",
+    "contract": "ai",
+    "verb": "POST",
+    "summary": "Add a document"
+   },
+   {
+    "operation": "listIndexSources",
+    "contract": "ai",
+    "verb": "GET",
+    "summary": "What is indexed, and how current it is"
+   },
+   {
+    "operation": "listKnowledgeCollections",
+    "contract": "ai",
+    "verb": "GET",
+    "summary": "Collections available to this tenant"
+   },
+   {
+    "operation": "proposeTranslations",
+    "contract": "ai",
+    "verb": "POST",
+    "summary": ""
+   },
+   {
+    "operation": "proposeWalkways",
+    "contract": "ai",
+    "verb": "POST",
+    "summary": "Find walkable space in a drawing that has no vectors"
+   },
+   {
+    "operation": "reindexSource",
+    "contract": "ai",
+    "verb": "POST",
+    "summary": "Rebuild a source"
+   },
+   {
+    "operation": "removeIndexEntry",
+    "contract": "ai",
+    "verb": "DELETE",
+    "summary": "Remove one record from the index"
+   },
+   {
+    "operation": "setIndexSource",
+    "contract": "ai",
+    "verb": "PUT",
+    "summary": "Declare a source indexed"
+   },
+   {
+    "operation": "setSuggestionProvider",
+    "contract": "ai",
+    "verb": "PUT",
+    "summary": ""
+   },
+   {
+    "operation": "authoriseWalletSpend",
+    "contract": "cross-cell",
+    "verb": "POST",
+    "summary": "Hold funds against the guest's home-cell balance"
+   },
+   {
+    "operation": "captureWalletAuthorisation",
+    "contract": "cross-cell",
+    "verb": "POST",
+    "summary": "Capture a held amount"
+   },
+   {
+    "operation": "getWalletAllocation",
+    "contract": "cross-cell",
+    "verb": "GET",
+    "summary": "The consuming cell's bounded offline allocation"
+   },
+   {
+    "operation": "releaseWalletAuthorisation",
+    "contract": "cross-cell",
+    "verb": "POST",
+    "summary": "Release a hold without capturing"
+   },
+   {
+    "operation": "setWalletAllocationPolicy",
+    "contract": "cross-cell",
+    "verb": "PUT",
+    "summary": "Set the allocation cap policy"
+   },
+   {
+    "operation": "createMfaChallenge",
+    "contract": "identity",
+    "verb": "POST",
+    "summary": "Step-up authentication for a sensitive action"
+   },
+   {
+    "operation": "exportSubjectData",
+    "contract": "identity",
+    "verb": "POST",
+    "summary": "Everything the platform holds about one guest"
+   },
+   {
+    "operation": "setPasswordPolicy",
+    "contract": "identity",
+    "verb": "PUT",
+    "summary": "Length, breach check, lockout and step-up"
+   },
+   {
+    "operation": "setSegregationRules",
+    "contract": "identity",
+    "verb": "PUT",
+    "summary": "Which permissions may not be held together"
+   },
+   {
+    "operation": "skipRolloutCell",
+    "contract": "platform-ops",
+    "verb": "POST",
+    "summary": "Exclude a cell from this wave"
+   },
+   {
+    "operation": "cancelReportExecution",
+    "contract": "reporting",
+    "verb": "DELETE",
+    "summary": "Cancel a running execution"
+   },
+   {
+    "operation": "deleteReportSchedule",
+    "contract": "reporting",
+    "verb": "DELETE",
+    "summary": "Delete a schedule"
+   },
+   {
+    "operation": "exportReportResult",
+    "contract": "reporting",
+    "verb": "POST",
+    "summary": "Export a completed result"
+   },
+   {
+    "operation": "getReportExecution",
+    "contract": "reporting",
+    "verb": "GET",
+    "summary": "Execution status and result"
+   },
+   {
+    "operation": "getReportExport",
+    "contract": "reporting",
+    "verb": "GET",
+    "summary": "Export status and download link"
+   },
+   {
+    "operation": "getReportResult",
+    "contract": "reporting",
+    "verb": "GET",
+    "summary": "Paged result rows"
+   },
+   {
+    "operation": "listAlertRules",
+    "contract": "reporting",
+    "verb": "GET",
+    "summary": "What raises an alert, and when"
+   },
+   {
+    "operation": "listReportFields",
+    "contract": "reporting",
+    "verb": "GET",
+    "summary": "Fields available for a data source"
+   },
+   {
+    "operation": "listReportSchedules",
+    "contract": "reporting",
+    "verb": "GET",
+    "summary": "List scheduled reports"
+   },
+   {
+    "operation": "listSeededReports",
+    "contract": "reporting",
+    "verb": "GET",
+    "summary": ""
+   },
+   {
+    "operation": "updateReportSchedule",
+    "contract": "reporting",
+    "verb": "PATCH",
+    "summary": "Amend, pause or resume a schedule"
+   },
+   {
+    "operation": "cancelInvoice",
+    "contract": "subscription",
+    "verb": "POST",
+    "summary": "Cancel or credit an invoice"
+   },
+   {
+    "operation": "cancelSubscription",
+    "contract": "subscription",
+    "verb": "POST",
+    "summary": "Terminate a tenant subscription"
+   },
+   {
+    "operation": "createPartnerUser",
+    "contract": "subscription",
+    "verb": "POST",
+    "summary": "Add a user to a partner branch"
+   },
+   {
+    "operation": "disputeInvoice",
+    "contract": "subscription",
+    "verb": "POST",
+    "summary": "Raise a dispute"
+   },
+   {
+    "operation": "executeTenantMigration",
+    "contract": "subscription",
+    "verb": "POST",
+    "summary": "Move the tenant"
+   },
+   {
+    "operation": "exportPartnerInvoice",
+    "contract": "subscription",
+    "verb": "POST",
+    "summary": "Partner invoice and settlement, in an ERP format"
+   },
+   {
+    "operation": "launchCellCluster",
+    "contract": "subscription",
+    "verb": "POST",
+    "summary": "Launch an identical cluster"
+   },
+   {
+    "operation": "listCellClusters",
+    "contract": "subscription",
+    "verb": "GET",
+    "summary": "Clusters in a region"
+   },
+   {
+    "operation": "listPartnerUsers",
+    "contract": "subscription",
+    "verb": "GET",
+    "summary": "Users beneath a partner, by branch"
+   },
+   {
+    "operation": "listTenantMigrations",
+    "contract": "subscription",
+    "verb": "GET",
+    "summary": "Tenant moves between cells"
+   },
+   {
+    "operation": "listVenueTypeTemplates",
+    "contract": "subscription",
+    "verb": "GET",
+    "summary": "Starting configurations by venue kind"
+   },
+   {
+    "operation": "planTenantMigration",
+    "contract": "subscription",
+    "verb": "POST",
+    "summary": "Plan moving a tenant to another cell"
+   },
+   {
+    "operation": "recordInvoicePayment",
+    "contract": "subscription",
+    "verb": "POST",
+    "summary": "Record payment against an invoice"
+   },
+   {
+    "operation": "resolveInvoiceDispute",
+    "contract": "subscription",
+    "verb": "POST",
+    "summary": "Resolve a dispute"
+   },
+   {
+    "operation": "rollbackTenantMigration",
+    "contract": "subscription",
+    "verb": "POST",
+    "summary": "Roll a cutover back"
+   },
+   {
+    "operation": "settleAiUsage",
+    "contract": "subscription",
+    "verb": "POST",
+    "summary": "Turn metered AI interactions into a billable usage record"
+   },
+   {
+    "operation": "getRegionSettings",
+    "contract": "tenancy",
+    "verb": "GET",
+    "summary": "Read region settings"
+   },
+   {
+    "operation": "updateRegionSettings",
+    "contract": "tenancy",
+    "verb": "PUT",
+    "summary": "Update region settings"
+   },
+   {
+    "operation": "createBanner",
+    "contract": "white-label",
+    "verb": "POST",
+    "summary": "Create a banner"
+   },
+   {
+    "operation": "createContentBlock",
+    "contract": "white-label",
+    "verb": "POST",
+    "summary": "Author a block of content"
+   },
+   {
+    "operation": "createContentPage",
+    "contract": "white-label",
+    "verb": "POST",
+    "summary": "Create a content page"
+   },
+   {
+    "operation": "createPromoBlock",
+    "contract": "white-label",
+    "verb": "POST",
+    "summary": "Create a promotional block"
+   },
+   {
+    "operation": "deleteBanner",
+    "contract": "white-label",
+    "verb": "DELETE",
+    "summary": "Delete a banner"
+   },
+   {
+    "operation": "deleteContentPage",
+    "contract": "white-label",
+    "verb": "DELETE",
+    "summary": "Delete a content page"
+   },
+   {
+    "operation": "deletePromoBlock",
+    "contract": "white-label",
+    "verb": "DELETE",
+    "summary": "Delete a promotional block"
+   },
+   {
+    "operation": "getFeatureToggles",
+    "contract": "white-label",
+    "verb": "GET",
+    "summary": "Read tenant feature toggles"
+   },
+   {
+    "operation": "getModuleEnablement",
+    "contract": "white-label",
+    "verb": "GET",
+    "summary": "Read module enablement"
+   },
+   {
+    "operation": "getNavigation",
+    "contract": "white-label",
+    "verb": "GET",
+    "summary": "Read navigation"
+   },
+   {
+    "operation": "publishContentBlock",
+    "contract": "white-label",
+    "verb": "POST",
+    "summary": "Publish now, or schedule it"
+   },
+   {
+    "operation": "setFeatureToggles",
+    "contract": "white-label",
+    "verb": "PUT",
+    "summary": "Set feature toggles"
+   },
+   {
+    "operation": "setFooter",
+    "contract": "white-label",
+    "verb": "PUT",
+    "summary": "Footer columns, legal links and social"
+   },
+   {
+    "operation": "setHeader",
+    "contract": "white-label",
+    "verb": "PUT",
+    "summary": "Configure the header"
+   },
+   {
+    "operation": "setMaintenanceMode",
+    "contract": "white-label",
+    "verb": "PUT",
+    "summary": "Enable or clear maintenance mode"
+   },
+   {
+    "operation": "setModuleEnablement",
+    "contract": "white-label",
+    "verb": "PUT",
+    "summary": "Enable or disable modules"
+   },
+   {
+    "operation": "setNavigation",
+    "contract": "white-label",
+    "verb": "PUT",
+    "summary": "Set main and overflow navigation"
+   },
+   {
+    "operation": "updateBanner",
+    "contract": "white-label",
+    "verb": "PATCH",
+    "summary": "Amend or activate a banner"
+   },
+   {
+    "operation": "updateContentPage",
+    "contract": "white-label",
+    "verb": "PUT",
+    "summary": "Amend a content page"
+   },
+   {
+    "operation": "updatePromoBlock",
+    "contract": "white-label",
+    "verb": "PATCH",
+    "summary": "Amend a promotional block"
+   }
+  ],
+  "modulesSplitAcrossWaves": [
+   {
+    "module": "TODO",
+    "waves": [
+     1,
+     2,
+     3
+    ]
+   }
+  ],
+  "screensNotDrawn": [],
+  "flowsNamingAMissingScreen": []
+ }
+}

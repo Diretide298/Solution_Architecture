@@ -1,0 +1,180 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>TICVAI — wireframe boards</title>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#0B1324;--mut:#6B7280;--dim:#8494A8;--line:#DCE3ED;--soft:#E5E7EB;
+--brand:#0D6EFD;--brand2:#00B8FF;--navy:#0C2340;--paper:#FFF;--wash:#F6F8FB}
+*{box-sizing:border-box}
+body{margin:0;background:var(--wash);color:var(--ink);
+font-family:Manrope,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:13px;line-height:1.5}
+a{color:inherit}
+.wrap{max-width:1680px;margin:0 auto;padding:22px 34px 90px}
+.home{font-size:11.5px;color:var(--mut);text-decoration:none;letter-spacing:.02em}
+.head{display:flex;align-items:baseline;justify-content:space-between;gap:20px;
+margin:14px 0 6px;padding-bottom:16px;border-bottom:2px solid var(--ink)}
+.mark{font-size:13px;font-weight:800;letter-spacing:.16em;
+background:linear-gradient(90deg,var(--brand),var(--brand2));-webkit-background-clip:text;
+background-clip:text;color:transparent}
+h1{font-size:19px;font-weight:800;letter-spacing:-.015em;margin:0}
+.meta{font-size:11px;color:var(--mut);font-family:'IBM Plex Mono',ui-monospace,monospace}
+.lede{font-size:12px;color:var(--mut);max-width:74ch;margin:14px 0 0}
+.grp{font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:11px;font-weight:600;
+letter-spacing:.14em;color:var(--dim);text-transform:uppercase;margin:48px 0 16px;
+padding-bottom:9px;border-bottom:1px solid var(--line)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(342px,1fr));gap:30px}
+.scr{display:flex;flex-direction:column;gap:11px;scroll-margin-top:24px}
+.ttl{font-size:15.5px;font-weight:800;letter-spacing:-.01em}
+.pur{font-size:11.5px;color:var(--mut);margin-top:2px}
+.frame{background:var(--paper);border:1px solid var(--soft);border-radius:14px;overflow:hidden;
+height:440px;display:flex;flex-direction:column;box-shadow:0 10px 26px rgba(12,35,64,.07)}
+.frame.dark{background:var(--navy);border-color:#1E3A5F}
+.bar{flex:none;height:30px;display:flex;align-items:center;gap:8px;padding:0 12px;
+border-bottom:1px solid var(--soft);font-size:10.5px;color:var(--mut)}
+.dark .bar{border-color:#1E3A5F;color:#7FA3C9}
+.strip{flex:none;height:20px;display:flex;align-items:center;padding:0 12px;font-size:9.5px;
+letter-spacing:.08em;text-transform:uppercase;background:#FFF7E6;color:#8A6D00;
+border-bottom:1px solid #F0E0B8}
+.body{flex:1;display:flex;min-height:0}
+.rail{flex:none;width:74px;background:var(--navy);display:flex;flex-direction:column;gap:6px;padding:10px 8px}
+.rail i{display:block;height:9px;border-radius:3px;background:#1E3A5F}
+.rail i.on{background:linear-gradient(90deg,var(--brand),var(--brand2))}
+.main{flex:1;padding:12px;display:flex;flex-direction:column;gap:9px;overflow:hidden}
+.side{flex:none;width:96px;border-left:1px solid var(--soft);padding:12px 10px;
+display:flex;flex-direction:column;gap:8px}
+.dark .side{border-color:#1E3A5F}
+.act{flex:none;height:38px;border-top:1px solid var(--soft);display:flex;align-items:center;
+gap:8px;padding:0 12px}
+.dark .act{border-color:#1E3A5F}
+.cmp{border:1px dashed #C7D0DC;border-radius:7px;padding:7px 9px;font-size:10px;color:var(--mut);background:#FAFBFD}
+.dark .cmp{border-color:#264a75;background:#0E2A4C;color:#9FC0E0}
+.cmp b{display:block;font-size:9.5px;letter-spacing:.09em;text-transform:uppercase;
+color:#94A3B4;font-weight:700;margin-bottom:3px}
+.cmp .why{margin-top:5px;font-size:9.5px;color:#7C8899;font-style:italic;line-height:1.45}
+.btn{height:22px;border-radius:6px;padding:0 12px;display:inline-flex;align-items:center;
+font-size:10px;font-weight:700;background:linear-gradient(90deg,var(--brand),var(--brand2));color:#FFF}
+.btn.sec{background:none;border:1px solid var(--soft);color:var(--mut);font-weight:600}
+.foot{font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:9.5px;line-height:1.75;color:#7C8899}
+.foot b{color:#4A5566;font-weight:600}
+.foot .off{color:#8A6D00}
+.tag{display:inline-block;font-size:9px;letter-spacing:.06em;text-transform:uppercase;
+padding:1px 6px;border-radius:4px;background:#EEF2F7;color:#64748B;margin-left:6px}
+.tag.named{background:#FFF1E6;color:#9A5B00}
+.bottom{margin-top:64px;padding-top:16px;border-top:1px solid var(--line);
+display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
+
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(268px,1fr));gap:18px;margin-top:28px}
+.card{display:block;text-decoration:none;background:#FFF;border:1px solid var(--soft);
+border-radius:12px;padding:18px 20px;box-shadow:0 8px 20px rgba(12,35,64,.06)}
+.card:hover{border-color:var(--brand)}
+.code{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--dim);letter-spacing:.1em}
+.nm{font-size:15px;font-weight:800;letter-spacing:-.01em;margin:5px 0 3px}
+.sub{font-size:11.5px;color:var(--mut)}
+.warn{margin-top:8px;font-size:10px;color:#9A5B00;background:#FFF1E6;
+display:inline-block;padding:2px 7px;border-radius:4px}
+</style></head><body>
+<div class="wrap">
+  <div class="head">
+    <div><span class="mark">TICVAI</span><h1>Wireframe boards</h1></div>
+    <div class="meta">15 platforms</div>
+  </div>
+  <p class="lede">One board per platform, every screen on one scrolling page at low fidelity.
+  <strong>A reviewer opens it and reads the whole surface in one pass</strong> — that is the only
+  thing a board is for. Generated from the screen definitions; nothing here is hand-drawn.</p>
+  <div class="cards">
+      <a class="card" href="P01%20Guest%20Web.dc.html">
+        <div class="code">P01</div>
+        <div class="nm">Guest Web — Storefront</div>
+        <div class="sub">35 screens · guest · web</div>
+        
+      </a>
+      <a class="card" href="P02%20Guest%20App.dc.html">
+        <div class="code">P02</div>
+        <div class="nm">Guest App — Mobile</div>
+        <div class="sub">63 screens · guest · mobileApp</div>
+        
+      </a>
+      <a class="card" href="P04%20Venue%20POS.dc.html">
+        <div class="code">P04</div>
+        <div class="nm">Venue POS — Terminal and Tablet</div>
+        <div class="sub">20 screens · staff · posTerminal</div>
+        <div class="warn">4 named only</div>
+      </a>
+      <a class="card" href="P05%20Guest%20Kiosk.dc.html">
+        <div class="code">P05</div>
+        <div class="nm">Guest Kiosk — Self-Service</div>
+        <div class="sub">17 screens · guest · kiosk</div>
+        
+      </a>
+      <a class="card" href="P06%20Venue%20Staff%20App.dc.html">
+        <div class="code">P06</div>
+        <div class="nm">Venue Staff App — Operations</div>
+        <div class="sub">66 screens · staff · mobileApp</div>
+        <div class="warn">10 named only</div>
+      </a>
+      <a class="card" href="P07%20Venue%20Scanner.dc.html">
+        <div class="code">P07</div>
+        <div class="nm">Venue Scanner — Access Control</div>
+        <div class="sub">11 screens · staff · handheld</div>
+        
+      </a>
+      <a class="card" href="P08%20Venue%20Management.dc.html">
+        <div class="code">P08</div>
+        <div class="nm">Venue Management — Back Office</div>
+        <div class="sub">143 screens · staff · web</div>
+        <div class="warn">19 named only</div>
+      </a>
+      <a class="card" href="P09%20TICVAI%20Web.dc.html">
+        <div class="code">P09</div>
+        <div class="nm">TICVAI Web — Platform Console</div>
+        <div class="sub">37 screens · platformAdmin · web</div>
+        
+      </a>
+      <a class="card" href="P10%20Partner%20Web.dc.html">
+        <div class="code">P10</div>
+        <div class="nm">Partner Web — Reseller Portal</div>
+        <div class="sub">21 screens · partner · web</div>
+        
+      </a>
+      <a class="card" href="P11%20Accreditation%20Web.dc.html">
+        <div class="code">P11</div>
+        <div class="nm">Accreditation Web — Applications</div>
+        <div class="sub">8 screens · public · web</div>
+        
+      </a>
+      <a class="card" href="P12%20Venue%20Support.dc.html">
+        <div class="code">P12</div>
+        <div class="nm">Venue Support — Agent Console</div>
+        <div class="sub">8 screens · staff · web</div>
+        
+      </a>
+      <a class="card" href="P13%20Venue%20CMS.dc.html">
+        <div class="code">P13</div>
+        <div class="nm">Venue CMS — White Label</div>
+        <div class="sub">20 screens · staff · web</div>
+        
+      </a>
+      <a class="card" href="P14%20Developer.dc.html">
+        <div class="code">P14</div>
+        <div class="nm">Developer Portal</div>
+        <div class="sub">8 screens · partner · web</div>
+        
+      </a>
+      <a class="card" href="P15%20Kitchen%20Display.dc.html">
+        <div class="code">P15</div>
+        <div class="nm">Kitchen Display — Pass and Stations</div>
+        <div class="sub">10 screens · staff · kiosk</div>
+        
+      </a>
+      <a class="card" href="P16%20Venue%20Analytics.dc.html">
+        <div class="code">P16</div>
+        <div class="nm">Venue Analytics — Cross-Domain Reporting</div>
+        <div class="sub">9 screens · staff · web</div>
+        
+      </a></div>
+  <div class="bottom">
+    <span>Generated by tools/derive-wireframes.py — do not hand-edit</span>
+    <span>15 boards</span>
+  </div>
+</div></body></html>

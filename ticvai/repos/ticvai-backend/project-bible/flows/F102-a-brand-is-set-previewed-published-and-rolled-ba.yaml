@@ -1,0 +1,73 @@
+$schema: ./_schema.yaml
+id: F102
+name: A brand is set, previewed, published and rolled back
+actor: venueManager
+capability: A brand is set, previewed, published and rolled back
+wave: 2
+frequency: As needed.
+criticality: operational
+primaryContract: white-label
+contracts:
+- white-label
+- tenancy
+platforms:
+- P09
+- P13
+trigger:
+  description: A tenant changes their look and it reaches every guest surface.
+offlineBehaviour: '**None of it offline.** A brand published to some surfaces and not others is worse
+  than none.'
+steps:
+- step: 1
+  screen: CMS-001
+  action: Tenant Workspace.
+  operations:
+  - addLicenceAddOn
+  - generateInvoice
+  - getEntitlementUsage
+  - getSsoConfig
+  - getSubscription
+  - getTenant
+  outcome: 15 operations, 15 of them previously unwalked.
+- step: 2
+  screen: CMS-003
+  action: Typography.
+  operations:
+  - getFonts
+  - setFonts
+  outcome: 2 operations, 2 of them previously unwalked.
+- step: 3
+  screen: CMS-006
+  action: Component Preview.
+  operations:
+  - createPreview
+  - diffConfigVersion
+  outcome: 2 operations, 2 of them previously unwalked.
+  crossesDevice: true
+- step: 4
+  screen: ADM-016
+  action: White-Label Branding Management.
+  operations:
+  - createPreview
+  - diffConfigVersion
+  - getAppIcons
+  - getBrandIdentity
+  - setAppIcons
+  outcome: 5 operations, 5 of them previously unwalked.
+  crossesDevice: true
+branches:
+- at: 1
+  condition: The acting principal lacks the permission at this scope.
+  behaviour: '**Refused at the first step, not the last.** ADR-0002 makes authorisation user-driven
+    — a person who gets three steps in and then cannot finish has been told the wrong thing.'
+  severity: medium
+  resolvedBy: resolvePermissions
+exitStates:
+- state: completed
+  description: The journey ran end to end.
+- state: refused
+  description: '**Stopped at a permission or a licence boundary**, with the reason named.'
+notes: '**Every white-label screen declared the identical 41 operations** until 24 August — a Typography
+  screen that could create banners. **221 operations removed across six screens; the worst instance
+  of the 18 August bulk attach found.**'
+openQuestions: null

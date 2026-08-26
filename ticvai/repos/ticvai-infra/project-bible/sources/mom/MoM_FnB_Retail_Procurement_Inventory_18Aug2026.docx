@@ -1,0 +1,195 @@
+**Minutes of Meeting**
+
+*Workshop – Food **&** Beverage, Retail, Procurement **&** Inventory — POS Backend Configuration, Table Management **&** Procurement Deep-Dive*
+
+| **Date** | 18-August-2026 | **Project** | F&B / Retail / Procurement & Inventory |
+| --- | --- | --- | --- |
+| **Meeting Type** | Technical Workshop — POS Backend, Inventory & Procurement | **Prepared by** | Chitrangi Mestry |
+
+**Primary Objective**
+
+Solution/Product team to walk the client through the proposed POS backend configuration for Food & Beverage outlets, table management, and the Inventory & Procurement module, for review, validation and alignment on outlet-level vs. venue-level configuration approach.
+
+**Agenda**
+
+- Walkthrough of the F&B POS backend configuration – outlets, menus, recipes, kitchen and table management
+
+- Discussion on outlet-level vs. venue-level configuration and role-based access control
+
+- Walkthrough of the F&B stock, inventory item master, warehouse structure and costing methods
+
+- Walkthrough of supplier management and purchase order workflows
+
+- Review of the project tracking platform and alignment on next steps
+
+# **4. Detailed Discussion**
+
+## **4.1 F****&****B Command ****Center**** — Overview ****&**** Outlet Setup**
+
+- Allam walked through the FNB Command Center, giving a real-time, consolidated view across all outlets – total sales, orders, average order value, average preparation time, kitchen load, top-selling items and operational alerts.
+
+- Outlets can be categorised into types (fine dining, quick service, coffee, etc.), each with configurable features – e.g., quick-service outlets do not require table booking, while fine-dining outlets need a table layout.
+
+- Every outlet is linked to a main department (Food & Beverage) and sub-department (outlet name), along with cost centres and status.
+
+## **4.2 Recipes, Operating Hours ****&**** Service Channels**
+
+- Recipe-based stock depletion can be configured at the outlet level, either in real time or at end-of-day, depending on outlet type.
+
+- Operating hours and service periods (breakfast, lunch, dinner, late night) can be defined per outlet to analyse revenue by time slot.
+
+- POS & device management allows configuration of receipt printers, kitchen printers and KDS devices per outlet/terminal.
+
+- Service channel configuration allows enabling/disabling specific items per sales channel (POS, kiosk, QR ordering, online) per outlet.
+
+## **4.3 Kitchen ****&**** Preparation Stations**
+
+- Kitchens can be divided into stations (grill, fryer, beverage, dessert, etc.), each mapped to specific printers or KDS devices.
+
+- Order routing and KDS printer rules determine where an item is printed/displayed, based on category or item, with a fallback station/device if the primary one is offline or faulty.
+
+- F&B Controls allow global configuration of approval workflows (e.g., void approval, refund approval) based on amount thresholds and user privileges.
+
+## **4.4 Menu, Product ****&**** Recipe Management**
+
+- The Menu & Product Command Center tracks menus, active recipes and products, and flags products without mapped recipes or with unavailable ingredients.
+
+- Menu Builder defines the front-end POS layout per outlet – categories, item tiles (image, name, price) and configurable button sizes for fast-selling items; agreed the current layout is a reference only and UI/UX can be improved.
+
+- Product creation captures product name, auto-generated PLU code, category/sub-category, pricing type, inventory-tracking toggle, recipe linkage, unit of measurement and preparation time.
+
+- Modifiers can be free or chargeable with minimum/maximum selection rules; combo meals support component selection with upgrade options and additional cost.
+
+- Recipe & BOM management captures ingredient quantity, unit, cost (from purchase data), preparation time, yield, selling price and margin.
+
+- Ingredient substitution allows an alternate ingredient to be used automatically when the primary ingredient is out of stock, subject to availability. Production planning aggregates recipe requirements to forecast prepared-item quantities.
+
+## **4.5 Outlet-Level vs. Venue-Level Configuration — Key Discussion**
+
+A detailed discussion took place on whether F&B configuration (menus, recipes, costing, inventory) should be managed at the venue level or the outlet level, particularly for outlets leased out to third-party operators.
+
+- Qossai noted that when a venue leases a restaurant to a third party, the operator typically manages its own costing, inventory and procurement, with the venue only taking a revenue share (~10%) – favouring outlet-level configuration for leased outlets.
+
+- Chinmay Parab flagged that supporting both venue-level and outlet-level configuration would effectively require two variations of the application/data model, adding development complexity.
+
+- **Decision:** The team agreed to proceed with outlet-level configuration for F&B, applying the same segregation logic to Retail for consistency. Venue-owned, homogeneous outlets (e.g., popcorn/ice-cream booths) may still be set up centrally once and applied across outlets, but the underlying configuration model remains outlet-level.
+
+## **4.6 Role-Based ****&**** Outlet-Level Access Control — Open Item**
+
+- Allam raised the need to restrict a user's visibility/access to specific outlets (e.g., an F&B manager for one outlet should not see other outlets' items).
+
+- Chinmay Parab identified two possible approaches: (a) adding dedicated segregation tables, or (b) introducing a venue/outlet ID key into the existing schema. The first offers granularity but increases long-term maintenance; the second is simpler but needs validation.
+
+- **Action:** Chinmay Parab to evaluate both approaches and confirm the most feasible and efficient option before the next workshop (also relevant for ticketing/event-specific access).
+
+## **4.7 Kitchen Operations ****&**** Course-Wise Ordering**
+
+- The Kitchen Operations Command Center shows live order counts, items pending/firing and kitchen station status.
+
+- Course-wise ordering (mainly for fine dining) groups orders by course (starters, main course, dessert) so the kitchen fires each course at the right time, ensuring freshness.
+
+- A live “fired” timer on each kitchen ticket tracks elapsed time since the order was sent (not a countdown) and resets when a course within that ticket is completed/dished out. Not applicable to quick-service outlets, which print and prepare orders immediately.
+
+## **4.8 Table Management (Fine Dining)**
+
+- A visual floor/table map (main hall, terrace, VIP lounge, etc.) shows table status and allows tables to be tagged with a customer category (e.g., VIP) to help staff prioritise service.
+
+- **Decision on table status flow:** Available → Ordered → Table Closed (post payment) → Reserved (when booked in advance). A separate “Cleaning” status was discussed and deliberately excluded – agreed this is an operational task managed manually by staff and does not need a system status, avoiding unnecessary complexity.
+
+- Reservation module includes table selection (with system recommendations), customer details, guest count, location/outlet, and an optional deposit adjusted against the final bill; walk-in and waitlist management are also supported.
+
+- A per-table activity log (seated, drinks ordered, food ordered, sent to kitchen, course served, etc.) is available, along with actions like Add Guest, Change Server and Transfer Table.
+
+## **4.9 Unified Customer Profile**
+
+- **Decision:** A single, unified customer profile will be used across ticketing, F&B and retail to give a 360° view of guest activity and avoid duplicate records (a known issue in other systems where the same name is created multiple times with spelling variations). Example: a guest who buys tickets online and later dines at a restaurant will be matched by name/mobile number and associated with the same profile.
+
+## **4.10 F****&****B Stock, Wastage ****&**** Requisitions**
+
+- The F&B Stock Command Center shows stock value, low-stock/critical/out-of-stock items and recipe-based ingredient consumption.
+
+- Production execution & batch management tracks planned vs. actual vs. yield quantity and batch losses; wastage/spoilage must be recorded per item to keep costing accurate.
+
+- Requisitions allow an outlet to request replenishment stock from the central warehouse when running low.
+
+- The consolidated F&B Command Center rolls up sales, orders, food cost and gross margin across outlets, with breakdowns by sales channel and hour; dashboards will be role-based (e.g., F&B Director sees all outlets; outlet manager sees only their own).
+
+## **4.11 Inventory ****&**** Procurement — Item Master, UOM ****&**** Costing**
+
+- The Inventory & Procurement module covers both F&B and Retail – total inventory value, item counts and out-of-stock items, broken down by department/sub-department.
+
+- Item Master captures category, item type, status and unit of measurement (UOM), which is essential for accurate recipe costing and handles pack-size conversions (e.g., 1 carton = 24 pieces; 1 case = 2 litres = 2000 ml).
+
+- **Costing methods discussed:** Weighted Average (costing averaged across received batches at different prices – most commonly used) and FIFO (earliest received batch consumed/costed first). The system should support both options.
+
+- Warehouse & location structure supports a customisable hierarchy (e.g., main warehouse → food warehouse → beverage warehouse), with flexibility to receive stock centrally or directly at an outlet/kitchen for fast-moving perishables.
+
+- Expiry tracking must be maintained at batch/date level, and reorder & alert configuration will notify staff when stock reaches a minimum threshold.
+
+## **4.12 Simplification Principle — Guiding Decision**
+
+- **Decision:** While the reference material includes many granular statuses (put-away, picking, packing, dispatching, etc.), the team agreed NOT to implement every status. The goal is to keep day-to-day workflows simple and fast for end users, and this principle should guide UI/UX and workflow design across inventory and warehouse operations.
+
+## **4.13 Supplier ****&**** Purchase Order Management**
+
+- Suppliers can be categorised (F&B, retail, engineering, etc.), with a Supplier Master capturing details, linked item categories, compliance documents and performance scorecards.
+
+- Purchase Request → Approval → Purchase Order is the standard flow when stock needs replenishment; Request for Quotation (RFQ) allows comparing prices from multiple suppliers before finalising an order.
+
+- **Three purchase order types identified:** Regular PO (standard item/quantity/price entry), Contract PO (pre-agreed fixed pricing for a defined period, auto-picked on subsequent orders), and Service PO (for non-inventory items/services such as equipment maintenance).
+
+- Spend analysis provides visibility into category-wise, supplier-wise and contract-wise spend.
+
+## **4.14 Project Tracking Platform (Development Readiness)**
+
+Chinmay Parab shared an overview of the internal tracking platform being built to manage development scope – organising work into “spines”, “satellites” and contracts, and mapping screens, user journeys, API calls and the database tables each API reads from/writes to.
+
+- The tool is intended to help both client and development team validate functionality screen-by-screen and journey-by-journey, and to make AI-assisted development more accurate by having the schema and API structure pre-defined.
+
+- Currently populated in depth for the POS/ticketing module; other modules (Retail, CRM, resource management, seat assignment, etc.) are pending and will be added progressively. The team acknowledged that full 1:1 alignment with the original plan is unrealistic (typically ~80–85% coverage), which is an acceptable working assumption.
+
+# **5. Key Decisions ****&**** Agreements**
+
+- F&B (and, by extension, Retail) configuration will be managed at the outlet level rather than the venue level.
+
+- Table status flow simplified to: Available → Ordered → Table Closed → Reserved (no separate “Cleaning” status).
+
+- A single, unified customer profile will be maintained across ticketing, F&B and retail to avoid duplicate records.
+
+- Inventory/warehouse workflows will be kept simple – not every granular status (put-away, pick, pack, dispatch, etc.) will be implemented in the system.
+
+- System must support both Weighted Average and FIFO costing methods for inventory valuation.
+
+- Three purchase order types – Regular, Contract, and Service – will be supported.
+
+# **6. Open Items / Questions for Follow-Up**
+
+- Outlet-level user access restriction: which approach (segregation tables vs. venue/outlet ID key) is most feasible – Chinmay Parab to evaluate and confirm.
+
+- Final confirmation on whether retail will fully mirror the outlet-level configuration decision made for F&B.
+
+- Detailed design of role-based dashboards (F&B Director vs. outlet-level roles) to be finalised.
+
+- Document explaining each F&B screen (today's and last Friday's session) – pending from Allam.
+
+# **7. Action Items**
+
+| **Action Item** | **Owner** | **Due** | **Status** |
+| --- | --- | --- | --- |
+| Share detailed screen-by-screen documentation covering today's session and last Friday's session | Allam | EOD 18 Aug | Open |
+| Evaluate and confirm the most feasible approach for outlet-level user access restriction (segregation tables vs. venue/outlet ID key) | Chinmay Parab | Before next session | Open |
+| Confirm and share exact timing for the next workshop call | Allam | EOD 18 Aug | Open |
+| Share access links to the development/QA tracking platform (screens, journeys, APIs, schema) | Chinmay Parab | 18–19 Aug | Open |
+| Prepare scope for next session: tracker review, Retail workshop and CRM workshop | Chinmay Parab / Allam | Next session | Open |
+
+# **8. Next Steps**
+
+- Session to begin with a 15–20 minute review of the project tracking platform/tracker.
+
+- Followed by the Retail workshop, then the CRM 
+
+- Allam to confirm exact timing for the next session during the day.
+
+*— End of Minutes —*
+
+ Page 1 of 2

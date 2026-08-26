@@ -1,0 +1,284 @@
+id: LLD-P12
+title: P12 Venue Support — Agent Console — 8 screens
+generatedBy: tools/derive-diagrams.py
+index: diagrams/hld/00-platform.yaml
+audience: staff
+operator: venue
+app: venue-support-web
+formFactor: web
+runtime: reactWeb
+offlineCapable: false
+deployment:
+  target: browser, desktop
+  distribution: served from the cell
+  bundleUpdate: immediate on deploy
+  hosting: in-cell, in-region
+  storeReview: false
+  deviceOwnership: agent workstation
+  networkAssumption: corporate network
+  releaseCadence: weekly
+why: null
+modulesUsed:
+- module: marketing
+  screens: 5
+- module: core
+  screens: 2
+- module: analytics
+  screens: 1
+servicesCalled:
+- service: MarketingService
+  operationCalls: 34
+- service: IdentityService
+  operationCalls: 8
+- service: ReportingService
+  operationCalls: 8
+- service: LedgerService
+  operationCalls: 1
+coverage:
+  screens: 8
+  inAFlow: 3
+  drawn: 8
+  note: '**A screen in no flow has been specified and never walked.** Every flow written in this package
+    has found a defect.'
+screens:
+- screen: SUP-001
+  name: Agent Login
+  module: TODO
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations:
+  - forceLogout
+  - getCurrentSession
+  - getGuestSession
+  - listActiveSessions
+  - listMfaMethods
+  - listSsoProviders
+  - login
+  - revokeAllSessions
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - sessionId<-session
+  goesTo:
+  - SUP-002
+  - SUP-003
+  - SUP-004
+  boardFrames: null
+  wireframe: wireframes/P12 Venue Support.dc.html#sup-001
+  inFlows:
+  - F104 A platform operator signs in under MFA
+- screen: SUP-002
+  name: Agent Dashboard
+  module: TODO
+  requiresModule: marketing
+  wave: 3
+  density: compact
+  operations:
+  - addCaseMessage
+  - createCase
+  - escalateCase
+  - getCase
+  - listCases
+  - listConversations
+  - reopenCase
+  - setAgentAvailability
+  - updateCase
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - caseId<-deepLink
+  goesTo:
+  - SUP-001
+  - SUP-003
+  - SUP-004
+  boardFrames: null
+  wireframe: wireframes/P12 Venue Support.dc.html#sup-002
+  inFlows: null
+- screen: SUP-003
+  name: Availability & Routing Settings
+  module: TODO
+  requiresModule: marketing
+  wave: 3
+  density: compact
+  operations:
+  - setAgentAvailability
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - SUP-001
+  - SUP-002
+  - SUP-004
+  boardFrames: null
+  wireframe: wireframes/P12 Venue Support.dc.html#sup-003
+  inFlows: null
+- screen: SUP-004
+  name: Conversation Queue
+  module: TODO
+  requiresModule: marketing
+  wave: 2
+  density: compact
+  operations:
+  - addCaseMessage
+  - claimConversation
+  - createCase
+  - escalateCase
+  - getCase
+  - listCases
+  - listConversations
+  - reopenCase
+  - transferConversation
+  - updateCase
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - caseId<-deepLink
+  - conversationId<-deepLink
+  goesTo:
+  - SUP-001
+  - SUP-002
+  - SUP-003
+  - SUP-005
+  boardFrames: null
+  wireframe: wireframes/P12 Venue Support.dc.html#sup-004
+  inFlows:
+  - F05 Agent resolves a guest complaint
+  - F24 A guest asks the assistant and ends up with a person
+- screen: SUP-005
+  name: Live Chat Workspace
+  module: TODO
+  requiresModule: marketing
+  wave: 2
+  density: compact
+  operations:
+  - addCaseMessage
+  - closeConversation
+  - createCase
+  - escalateCase
+  - getCase
+  - getConversation
+  - listCases
+  - reopenCase
+  - sendConversationMessage
+  - transferConversation
+  - updateCase
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - caseId<-SUP-004
+  - conversationId<-SUP-004
+  goesTo:
+  - SUP-001
+  - SUP-002
+  - SUP-003
+  boardFrames: null
+  wireframe: wireframes/P12 Venue Support.dc.html#sup-005
+  inFlows:
+  - F05 Agent resolves a guest complaint
+  - F24 A guest asks the assistant and ends up with a person
+- screen: SUP-006
+  name: Knowledge Base Search
+  module: TODO
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - bannerId<-deepLink
+  - pageId<-deepLink
+  - policyKind<-deepLink
+  - version<-deepLink
+  goesTo:
+  - SUP-001
+  - SUP-002
+  - SUP-003
+  - SUP-005
+  boardFrames: null
+  wireframe: wireframes/P12 Venue Support.dc.html#sup-006
+  inFlows: null
+- screen: SUP-007
+  name: Canned Response Management
+  module: TODO
+  requiresModule: marketing
+  wave: 3
+  density: compact
+  operations:
+  - createMessageTemplate
+  - listMessageTemplates
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - SUP-001
+  - SUP-002
+  - SUP-003
+  boardFrames: null
+  wireframe: wireframes/P12 Venue Support.dc.html#sup-007
+  inFlows: null
+- screen: SUP-008
+  name: Agent Performance & SLA View
+  module: TODO
+  requiresModule: analytics
+  wave: 3
+  density: compact
+  operations:
+  - askReportingQuestion
+  - createReport
+  - deleteReport
+  - getFinancialReport
+  - getReport
+  - listConversations
+  - listReports
+  - runReport
+  - saveNaturalLanguageQuery
+  - updateReport
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - conversationId<-deepLink
+  - reportId<-deepLink
+  goesTo:
+  - SUP-001
+  - SUP-002
+  - SUP-003
+  boardFrames: null
+  wireframe: wireframes/P12 Venue Support.dc.html#sup-008
+  inFlows: null

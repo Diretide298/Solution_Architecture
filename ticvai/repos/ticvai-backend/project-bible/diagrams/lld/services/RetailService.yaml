@@ -1,0 +1,443 @@
+id: LLD-RetailService
+title: RetailService — 35 operations, 14 tables
+generatedBy: tools/derive-diagrams.py
+tier: operations
+index: diagrams/hld/02-services.yaml
+why: Merchandise, wallets and gift cards. Modest at 35 operations, and separate because **it is licensed
+  separately** — a venue can run ticketing with no shop.
+scale: Follows the sale. Nothing unusual.
+ifDown: Down means the shop stops; the gates and the restaurant do not.
+coverage:
+  operations: 35
+  inAFlow: 15
+  percent: 43%
+  note: '**Flow coverage is how much of this service a journey has walked.** A service under 40% is
+    unwalked rather than under-documented.'
+schemas:
+- schema: retail
+  tables: 14
+  stores:
+  - postgres
+  largestTable: retail.shop_and_drop
+operationsByContract:
+- contract: retail
+  count: 35
+  operations:
+  - operation: activateGiftCard
+    verb: POST
+    path: /gift-cards/{giftCardId}/activate
+    scope: venue
+    permission: ORDER_CREATE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: adjustWallet
+    verb: POST
+    path: /wallets/{subjectId}/adjust
+    scope: venue
+    permission: LEDGER_POST
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: blockGiftCard
+    verb: POST
+    path: /gift-cards/{cardCode}/block
+    scope: venue
+    permission: PRICE_CONFIGURE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: cancelMerchandiseReservation
+    verb: POST
+    path: /merchandise-reservations/{reservationId}/cancel
+    scope: venue
+    permission: ORDER_CREATE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: closeWallet
+    verb: POST
+    path: /wallets/{walletId}/close
+    scope: venue
+    permission: ORDER_MODIFY
+    offline: false
+    reads: 3
+    writes: 2
+  - operation: collectMerchandiseReservation
+    verb: POST
+    path: /merchandise-reservations/{reservationId}/collect
+    scope: venue
+    permission: ORDER_CREATE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: collectShopAndDrop
+    verb: POST
+    path: /shop-and-drop/{dropId}/collect
+    scope: venue
+    permission: ORDER_MODIFY
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: createMerchandise
+    verb: POST
+    path: /merchandise
+    scope: venue
+    permission: PRODUCT_CONFIGURE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: createRetailExchange
+    verb: POST
+    path: /retail-exchanges
+    scope: venue
+    permission: ORDER_EXCHANGE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: createRetailReturn
+    verb: POST
+    path: /retail-returns
+    scope: venue
+    permission: ORDER_REFUND
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: createRetailSale
+    verb: POST
+    path: /retail-sales
+    scope: workstation
+    permission: ORDER_CREATE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: createShopAndDrop
+    verb: POST
+    path: /shop-and-drop
+    scope: workstation
+    permission: ORDER_CREATE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: disposeShopAndDrop
+    verb: POST
+    path: /shop-and-drop/{dropId}/dispose
+    scope: venue
+    permission: PRODUCT_CONFIGURE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: getGiftCard
+    verb: GET
+    path: /gift-cards/{cardCode}
+    scope: venue
+    permission: ORDER_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: getOutletStock
+    verb: GET
+    path: /outlets/{outletId}/stock-check
+    scope: venue
+    permission: PRODUCT_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: getRetailSale
+    verb: GET
+    path: /retail-sales/{saleId}
+    scope: venue
+    permission: ORDER_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: getReturnPolicy
+    verb: GET
+    path: /outlets/{outletId}/return-policy
+    scope: venue
+    permission: ORDER_VIEW
+    offline: true
+    reads: 2
+    writes: 1
+  - operation: getWallet
+    verb: GET
+    path: /wallets/{subjectId}
+    scope: venue
+    permission: ORDER_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: issueGiftCard
+    verb: POST
+    path: /gift-cards
+    scope: workstation
+    permission: ORDER_CREATE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: listMerchandise
+    verb: GET
+    path: /merchandise
+    scope: venue
+    permission: PRODUCT_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listRetailReturns
+    verb: GET
+    path: /retail-returns
+    scope: venue
+    permission: ORDER_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listRetailSales
+    verb: GET
+    path: /retail-sales
+    scope: venue
+    permission: ORDER_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listWalletTransactions
+    verb: GET
+    path: /wallets/{subjectId}/transactions
+    scope: venue
+    permission: ORDER_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: lookupMerchandise
+    verb: GET
+    path: /merchandise/lookup
+    scope: venue
+    permission: PRODUCT_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: lookupRetailSale
+    verb: GET
+    path: /retail-sales/lookup
+    scope: venue
+    permission: ORDER_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: lookupShopAndDrop
+    verb: GET
+    path: /shop-and-drop/lookup
+    scope: venue
+    permission: ORDER_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: redeemGiftCard
+    verb: POST
+    path: /gift-cards/{giftCardId}/redeem
+    scope: venue
+    permission: ORDER_CREATE
+    offline: false
+    reads: 2
+    writes: 3
+  - operation: reinstateWallet
+    verb: POST
+    path: /wallets/{walletId}/reinstate
+    scope: venue
+    permission: ORDER_MODIFY
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: reprintReceipt
+    verb: POST
+    path: /retail-sales/{saleId}/reprint
+    scope: venue
+    permission: ORDER_REPRINT
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: reserveMerchandise
+    verb: POST
+    path: /outlets/{outletId}/reserve
+    scope: venue
+    permission: ORDER_CREATE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: setReturnPolicy
+    verb: PUT
+    path: /outlets/{outletId}/return-policy
+    scope: venue
+    permission: REGION_CONFIGURE
+    offline: false
+    reads: 2
+    writes: 3
+  - operation: suspendWallet
+    verb: POST
+    path: /wallets/{walletId}/suspend
+    scope: venue
+    permission: ORDER_MODIFY
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: topUpWallet
+    verb: POST
+    path: /wallets/{subjectId}/top-ups
+    scope: workstation
+    permission: ORDER_CREATE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: transferWalletBalance
+    verb: POST
+    path: /wallets/{walletId}/transfer
+    scope: venue
+    permission: WALLET_MANAGE
+    offline: false
+    reads: 3
+    writes: 3
+  - operation: updateMerchandise
+    verb: PATCH
+    path: /merchandise/{merchandiseId}
+    scope: venue
+    permission: PRODUCT_CONFIGURE
+    offline: false
+    reads: 2
+    writes: 2
+tables:
+- table: retail.exchange
+  columns: 8
+  store: postgres
+  parent: null
+  writtenBy:
+  - retail
+  foreignWriters: null
+- table: retail.gift_card
+  columns: 10
+  store: postgres
+  parent: null
+  writtenBy:
+  - retail
+  foreignWriters: null
+- table: retail.merchandise
+  columns: 15
+  store: postgres
+  parent: null
+  writtenBy:
+  - retail
+  foreignWriters: null
+- table: retail.reservation
+  columns: 8
+  store: postgres
+  parent: null
+  writtenBy:
+  - retail
+  foreignWriters: null
+- table: retail.reservation_line
+  columns: 4
+  store: postgres
+  parent: retail.reservation
+  writtenBy: []
+  foreignWriters: null
+- table: retail.return
+  columns: 12
+  store: postgres
+  parent: null
+  writtenBy:
+  - retail
+  foreignWriters: null
+- table: retail.return_line
+  columns: 8
+  store: postgres
+  parent: retail.return
+  writtenBy: []
+  foreignWriters: null
+- table: retail.return_policy
+  columns: 9
+  store: postgres
+  parent: null
+  writtenBy:
+  - retail
+  foreignWriters: null
+- table: retail.sale
+  columns: 13
+  store: postgres
+  parent: null
+  writtenBy:
+  - retail
+  foreignWriters: null
+- table: retail.sale_line
+  columns: 12
+  store: postgres
+  parent: retail.sale
+  writtenBy: []
+  foreignWriters: null
+- table: retail.shop_and_drop
+  columns: 15
+  store: postgres
+  parent: null
+  writtenBy:
+  - retail
+  foreignWriters: null
+- table: retail.shop_and_drop_line
+  columns: 7
+  store: postgres
+  parent: retail.shop_and_drop
+  writtenBy: []
+  foreignWriters: null
+- table: retail.wallet
+  columns: 9
+  store: postgres
+  parent: null
+  writtenBy:
+  - retail
+  foreignWriters: null
+- table: retail.wallet_transaction
+  columns: 10
+  store: postgres
+  parent: retail.wallet
+  writtenBy:
+  - orders
+  - retail
+  foreignWriters:
+  - orders
+readsFrom:
+- service: TenancyService
+  operations: 3
+- service: IdentityService
+  operations: 1
+writesOutside:
+- service: InventoryService
+  operations: 2
+  why: '**The owner defines the row; this service may only append to it.**'
+screens:
+- P01:WEB-021 Wallet & Gift Cards
+- P01:WEB-033 Shop
+- P02:GST-011 Wallet Overview
+- P02:GST-026 Retail / Merchandise
+- P02:GST-062 Shop & Drop Collection
+- P04:POS-002 Sell — Ticket Catalogue
+- P04:POS-005 Payment
+- P04:POS-007 Close Shift
+- P04:POS-011 Returns, Refunds & Exchanges
+- P04:POS-012 Omnichannel Order & Fulfilment Center
+- P04:POS-023 Sell — Merchandise
+- P05:KSK-011 Collect a booking
+- P05:KSK-017 Shop
+- P06:EMP-068 Reservation, Allocation & Omnichannel Inventory
+- P06:EMP-069 Barcode, RFID, Serialized Stock & Traceability
+- P08:BO-007 Product Directory
+- P08:BO-044 F&B Outlets
+- P08:BO-048 Retail Products
+- P08:BO-114 Variants, Attributes, Barcode & RFID Management
+- P08:BO-116 Merchandising & Product Presentation
+flows:
+- F17 A guest buys merchandise and collects later
+- F34 A retail sale, from scan to return
+- F51 A guest shops in the venue and collects on the way out
+- F53 A guest earns, sees and spends loyalty
+- F58 A ticket is sold at a till, added to, and refunded
+- F60 An online order is collected at the counter
+- F78 A supplier is set up and a catalogue is priced and published
+- F81 A retail sale runs from overview to tender
+- F85 Production is planned, costed and released
+- F86 A POS layout is designed, previewed and deployed

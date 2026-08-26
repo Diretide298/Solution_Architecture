@@ -1,0 +1,1101 @@
+[
+ {
+  "domain": "F&B",
+  "screen": "F&B Command Center",
+  "verdict": "improves an existing screen",
+  "existing": "P09 ADM-031",
+  "ops": "getDashboard"
+ },
+ {
+  "domain": "F&B",
+  "screen": "Create / Edit Outlet",
+  "verdict": "improves an existing screen",
+  "existing": "P08 BO-044",
+  "ops": "listOutlets, createOutlet, updateOutlet"
+ },
+ {
+  "domain": "F&B",
+  "screen": "Operating Hours & Service Periods",
+  "verdict": "unresolved \u2014 name gives no operations",
+  "existing": "",
+  "ops": ""
+ },
+ {
+  "domain": "F&B",
+  "screen": "Service Channel Configuration",
+  "verdict": "unresolved \u2014 name gives no operations",
+  "existing": "",
+  "ops": ""
+ },
+ {
+  "domain": "F&B",
+  "screen": "Order Routing & KDS/Printer Rules",
+  "verdict": "improves an existing screen",
+  "existing": "P08 BO-046",
+  "ops": "listKitchenTickets, setKitchenTicketStatus"
+ },
+ {
+  "domain": "F&B",
+  "screen": "Menu & Product Command Center",
+  "verdict": "improves an existing screen",
+  "existing": "P13 CMS-009",
+  "ops": "listMenus, setMenuSections, updateMenu"
+ },
+ {
+  "domain": "F&B",
+  "screen": "Product / PLU Master",
+  "verdict": "unresolved \u2014 name gives no operations",
+  "existing": "",
+  "ops": ""
+ },
+ {
+  "domain": "F&B",
+  "screen": "Combo & Meal Builder",
+  "verdict": "unresolved \u2014 name gives no operations",
+  "existing": "",
+  "ops": ""
+ },
+ {
+  "domain": "F&B",
+  "screen": "Ingredient Substitution, Allergen & Nutrition",
+  "verdict": "unresolved \u2014 name gives no operations",
+  "existing": "",
+  "ops": ""
+ },
+ {
+  "domain": "F&B",
+  "screen": "Central Kitchen & Commissary Management",
+  "verdict": "unresolved \u2014 name gives no operations",
+  "existing": "",
+  "ops": ""
+ },
+ {
+  "domain": "F&B",
+  "screen": "Kitchen Operations Command Center",
+  "verdict": "improves an existing screen",
+  "existing": "P09 ADM-031",
+  "ops": "getDashboard"
+ },
+ {
+  "domain": "F&B",
+  "screen": "Order Firing & Course Management",
+  "verdict": "unresolved \u2014 name gives no operations",
+  "existing": "",
+  "ops": ""
+ },
+ {
+  "domain": "F&B",
+  "screen": "Kitchen Station Workload & Dynamic Routing",
+  "verdict": "unresolved \u2014 name gives no operations",
+  "existing": "",
+  "ops": ""
+ },
+ {
+  "domain": "F&B",
+  "screen": "Guest Collection, Buzzer & Digital Notification",
+  "verdict": "unresolved \u2014 name gives no operations",
+  "existing": "",
+  "ops": ""
+ },
+ {
+  "domain": "F&B",
+  "screen": "SLA, Priority & Service Rules",
+  "verdict": "unresolved \u2014 name gives no operations",
+  "existing": "",
+  "ops": ""
+ },
+ {
+  "domain": "F&B",
+  "screen": "Restaurant Service Command Center",
+  "verdict": "improves an existing screen",
+  "existing": "P09 ADM-031",
+  "ops": "getDashboard"
+ },
+ {
+  "domain": "F&B",
+  "screen": "Table & Seating Configuration",
+  "verdict": "improves an existing screen",
+  "existing": "P08 BO-044",
+  "ops": "getTableMap, setTableLayout, openTableVisit"
+ },
+ {
+  "domain": "F&B",
+  "screen": "Create / Edit Reservation",
+  "verdict": "**new** \u2014 operations exist, no screen",
+  "existing": "",
+  "ops": "listTableReservations, createTableReservation"
+ },
+ {
+  "domain": "F&B",
+  "screen": "Guest Profile & Dining History",
+  "verdict": "improves an existing screen",
+  "existing": "P13 CMS-018",
+  "ops": "getGuestProfile"
+ },
+ {
+  "domain": "F&B",
+  "screen": "Table Order, Bill & Payment Management",
+  "verdict": "improves an existing screen",
+  "existing": "P08 BO-044",
+  "ops": "getTableMap, setTableLayout, openTableVisit"
+ },
+ {
+  "domain": "F&B",
+  "screen": "F&B Stock & Operations Command Center",
+  "verdict": "improves an existing screen",
+  "existing": "P09 ADM-031",
+  "ops": "getDashboard"
+ },
+ {
+  "domain": "F&B",
+  "screen": "Recipe Consumption & Theoretical Inventory",
+  "verdict": "**new** \u2014 operations exist, no screen",
+  "existing": "",
+  "ops": "listRecipes, setRecipe"
+ },
+ {
+  "domain": "F&B",
+  "screen": "Wastage, Spoilage, Returns & Write-Off",
+  "verdict": "improves an existing screen",
+  "existing": "P08 BO-044",
+  "ops": "recordWaste, getReturnPolicy, setReturnPolicy"
+ },
+ {
+  "domain": "F&B",
+  "screen": "Transfers, Distribution & Outlet Receiving",
+  "verdict": "improves an existing screen",
+  "existing": "P08 BO-044",
+  "ops": "createStockTransfer, createGoodsReceipt, listOutlets"
+ },
+ {
+  "domain": "F&B",
+  "screen": "Product Availability, 86 & Operational Food Safety",
+  "verdict": "unresolved \u2014 name gives no operations",
+  "existing": "",
+  "ops": ""
+ },
+ {
+  "domain": "F&B",
+  "screen": "F&B Executive Command Center",
+  "verdict": "improves an existing screen",
+  "existing": "P09 ADM-031",
+  "ops": "getDashboard"
+ },
+ {
+  "domain": "F&B",
+  "screen": "Outlet, Service & Guest Performance",
+  "verdict": "improves an existing screen",
+  "existing": "P08 BO-044",
+  "ops": "listOutlets, createOutlet, updateOutlet"
+ },
+ {
+  "domain": "F&B",
+  "screen": "Food Cost, Margin & Profitability Intelligence",
+  "verdict": "unresolved \u2014 name gives no operations",
+  "existing": "",
+  "ops": ""
+ },
+ {
+  "domain": "F&B",
+  "screen": "Kitchen, Service & Fulfilment Performance",
+  "verdict": "improves an existing screen",
+  "existing": "P09 ADM-031",
+  "ops": "getDashboard"
+ },
+ {
+  "domain": "F&B",
+  "screen": "AI Recommendation, Simulation & Optimization Center",
+  "verdict": "unresolved \u2014 matched only on generic operations",
+  "existing": "",
+  "ops": ""
+ },
+ {
+  "domain": "F&B",
+  "screen": "Outlet Management",
+  "verdict": "improves an existing screen",
+  "existing": "P08 BO-044",
+  "ops": "listOutlets, createOutlet, updateOutlet"
+ },
+ {
+  "domain": "F&B",
+  "screen": "Outlet Types & Templates",
+  "verdict": "improves an existing screen",
+  "existing": "P08 BO-044",
+  "ops": "listOutlets, createOutlet, updateOutlet"
+ },
+ {
+  "domain": "F&B",
+  "screen": "POS & Device Assignment",
+  "verdict": "improves an existing screen",
+  "existing": "P08 BO-036",
+  "ops": "listDevices, registerDevice"
+ },
+ {
+  "domain": "F&B",
+  "screen": "Kitchen & Preparation Stations",
+  "verdict": "unresolved \u2014 name gives no operations",
+  "existing": "",
+  "ops": ""
+ },
+ {
+  "domain": "F&B",
+  "screen": "F&B Global Settings & Controls",
+  "verdict": "unresolved \u2014 name gives no operations",
+  "existing": "",
+  "ops": ""
+ },
+ {
+  "domain": "F&B",
+  "screen": "Menu Builder & POS Layout Designer",
+  "verdict": "improves an existing screen",
+  "existing": "P13 CMS-009",
+  "ops": "listMenus, setMenuSections, updateMenu"
+ },
+ {
+  "domain": "F&B",
+  "screen": "Variants, Modifiers & Special Selling Rules",
+  "verdict": "unresolved \u2014 name gives no operations",
+  "existing": "",
+  "ops": ""
+ },
+ {
+  "domain": "F&B",
+  "screen": "Recipe & BOM Management",
+  "verdict": "**new** \u2014 operations exist, no screen",
+  "existing": "",
+  "ops": "listRecipes, setRecipe"
+ },
+ {
+  "domain": "F&B",
+  "screen": "Production Planning & Production Sheets",
+  "verdict": "**new** \u2014 operations exist, no screen",
+  "existing": "",
+  "ops": "planProductionRun, completeProductionRun"
+ },
+ {
+  "domain": "F&B",
+  "screen": "Availability, Pricing, Channels & Publishing",
+  "verdict": "unresolved \u2014 name gives no operations",
+  "existing": "",
+  "ops": ""
+ },
+ {
+  "domain": "F&B",
+  "screen": "Kitchen Display System (KDS)",
+  "verdict": "improves an existing screen",
+  "existing": "P08 BO-046",
+  "ops": "listKitchenTickets, setKitchenTicketStatus"
+ },
+ {
+  "domain": "F&B",
+  "screen": "Active Order Management & Fulfilment Journey",
+  "verdict": "unresolved \u2014 name gives no operations",
+  "existing": "",
+  "ops": ""
+ },
+ {
+  "domain": "F&B",
+  "screen": "Expeditor & Order Assembly",
+  "verdict": "unresolved \u2014 name gives no operations",
+  "existing": "",
+  "ops": ""
+ },
+ {
+  "domain": "F&B",
+  "screen": "Exceptions, Re-Fire & Unavailable Items",
+  "verdict": "unresolved \u2014 name gives no operations",
+  "existing": "",
+  "ops": ""
+ },
+ {
+  "domain": "F&B",
+  "screen": "Kitchen Performance, AI & Operational Optimization",
+  "verdict": "improves an existing screen",
+  "existing": "P09 ADM-031",
+  "ops": "getDashboard"
+ },
+ {
+  "domain": "F&B",
+  "screen": "Floor Plan & Table Map",
+  "verdict": "improves an existing screen",
+  "existing": "P08 BO-044",
+  "ops": "getTableMap, setTableLayout, openTableVisit"
+ },
+ {
+  "domain": "F&B",
+  "screen": "Reservation Calendar & Timeline",
+  "verdict": "**new** \u2014 operations exist, no screen",
+  "existing": "",
+  "ops": "listTableReservations, createTableReservation"
+ },
+ {
+  "domain": "F&B",
+  "screen": "Walk-In & Waitlist Management",
+  "verdict": "**new** \u2014 operations exist, no screen",
+  "existing": "",
+  "ops": "joinRestaurantWaitlist"
+ },
+ {
+  "domain": "F&B",
+  "screen": "Live Table & Service Management",
+  "verdict": "improves an existing screen",
+  "existing": "P08 BO-044",
+  "ops": "getTableMap, setTableLayout, openTableVisit"
+ },
+ {
+  "domain": "F&B",
+  "screen": "Reservation & Table Performance",
+  "verdict": "improves an existing screen",
+  "existing": "P08 BO-044",
+  "ops": "getTableMap, setTableLayout, openTableVisit"
+ },
+ {
+  "domain": "F&B",
+  "screen": "Outlet Stock & Ingredient Availability",
+  "verdict": "improves an existing screen",
+  "existing": "P08 BO-044",
+  "ops": "listOutlets, createOutlet, updateOutlet"
+ },
+ {
+  "domain": "F&B",
+  "screen": "Production Execution & Batch Management",
+  "verdict": "**new** \u2014 operations exist, no screen",
+  "existing": "",
+  "ops": "planProductionRun, completeProductionRun, listExpiringBatches"
+ },
+ {
+  "domain": "F&B",
+  "screen": "Requisition & Smart Replenishment",
+  "verdict": "improves an existing screen",
+  "existing": "P08 BO-078",
+  "ops": "createRequisition, listRequisitions"
+ },
+ {
+  "domain": "F&B",
+  "screen": "Stock Count, Reconciliation & Variance",
+  "verdict": "improves an existing screen",
+  "existing": "P08 BO-079",
+  "ops": "startStockCount, getCountVariance"
+ },
+ {
+  "domain": "F&B",
+  "screen": "Operational Alerts, AI Replenishment & Action Center",
+  "verdict": "improves an existing screen",
+  "existing": "P04 POS-008",
+  "ops": "listAlerts, acknowledgeAlert"
+ },
+ {
+  "domain": "F&B",
+  "screen": "Sales, Revenue & Channel Analytics",
+  "verdict": "improves an existing screen",
+  "existing": "P09 ADM-031",
+  "ops": "getDashboard"
+ },
+ {
+  "domain": "F&B",
+  "screen": "Product Performance & Menu Engineering",
+  "verdict": "improves an existing screen",
+  "existing": "P13 CMS-009",
+  "ops": "listMenus, setMenuSections, updateMenu"
+ },
+ {
+  "domain": "F&B",
+  "screen": "Inventory, Waste & Production Intelligence",
+  "verdict": "improves an existing screen",
+  "existing": "P08 BO-044",
+  "ops": "recordWaste, planProductionRun, completeProductionRun"
+ },
+ {
+  "domain": "F&B",
+  "screen": "Demand Forecasting & Operational Planning",
+  "verdict": "unresolved \u2014 matched only on generic operations",
+  "existing": "",
+  "ops": ""
+ },
+ {
+  "domain": "F&B",
+  "screen": "AI Assistant, Alerts & Management Action Center",
+  "verdict": "improves an existing screen",
+  "existing": "P04 POS-008",
+  "ops": "listAlerts, acknowledgeAlert"
+ },
+ {
+  "domain": "Retail",
+  "screen": "Retail Command Center",
+  "verdict": "improves an existing screen",
+  "existing": "P09 ADM-031",
+  "ops": "getDashboard"
+ },
+ {
+  "domain": "Retail",
+  "screen": "Store Management",
+  "verdict": "unresolved \u2014 name gives no operations",
+  "existing": "",
+  "ops": ""
+ },
+ {
+  "domain": "Retail",
+  "screen": "Create / Edit Retail Store",
+  "verdict": "unresolved \u2014 name gives no operations",
+  "existing": "",
+  "ops": ""
+ },
+ {
+  "domain": "Retail",
+  "screen": "Store Types & Templates",
+  "verdict": "unresolved \u2014 name gives no operations",
+  "existing": "",
+  "ops": ""
+ },
+ {
+  "domain": "Retail",
+  "screen": "Operating Hours & Sales Periods",
+  "verdict": "unresolved \u2014 name gives no operations",
+  "existing": "",
+  "ops": ""
+ },
+ {
+  "domain": "Retail",
+  "screen": "POS & Device Assignment",
+  "verdict": "improves an existing screen",
+  "existing": "P08 BO-036",
+  "ops": "listDevices, registerDevice"
+ },
+ {
+  "domain": "Retail",
+  "screen": "Sales Channel Configuration",
+  "verdict": "unresolved \u2014 name gives no operations",
+  "existing": "",
+  "ops": ""
+ },
+ {
+  "domain": "Retail",
+  "screen": "Store Inventory & Replenishment Configuration",
+  "verdict": "unresolved \u2014 name gives no operations",
+  "existing": "",
+  "ops": ""
+ },
+ {
+  "domain": "Retail",
+  "screen": "Store Rules, Controls & Permissions",
+  "verdict": "unresolved \u2014 name gives no operations",
+  "existing": "",
+  "ops": ""
+ },
+ {
+  "domain": "Retail",
+  "screen": "Retail Global Settings & Controls",
+  "verdict": "unresolved \u2014 name gives no operations",
+  "existing": "",
+  "ops": ""
+ },
+ {
+  "domain": "Retail",
+  "screen": "Retail Product & Catalog Command Center",
+  "verdict": "improves an existing screen",
+  "existing": "P09 ADM-031",
+  "ops": "getDashboard"
+ },
+ {
+  "domain": "Retail",
+  "screen": "Product / SKU Master",
+  "verdict": "unresolved \u2014 name gives no operations",
+  "existing": "",
+  "ops": ""
+ },
+ {
+  "domain": "Retail",
+  "screen": "Variants, Attributes, Barcode & RFID Management",
+  "verdict": "improves an existing screen",
+  "existing": "P04 POS-002",
+  "ops": "lookupMerchandise"
+ },
+ {
+  "domain": "Retail",
+  "screen": "Category, Brand & Merchandise Hierarchy",
+  "verdict": "improves an existing screen",
+  "existing": "P08 BO-048",
+  "ops": "listMerchandise, createMerchandise"
+ },
+ {
+  "domain": "Retail",
+  "screen": "Catalog Builder & Store Assortment",
+  "verdict": "unresolved \u2014 name gives no operations",
+  "existing": "",
+  "ops": ""
+ },
+ {
+  "domain": "Retail",
+  "screen": "Price Book & Retail Pricing Management",
+  "verdict": "improves an existing screen",
+  "existing": "P08 BO-009",
+  "ops": "listPrices, listPriceLists"
+ },
+ {
+  "domain": "Retail",
+  "screen": "Bundle, Kit & Gift Set Builder",
+  "verdict": "unresolved \u2014 name gives no operations",
+  "existing": "",
+  "ops": ""
+ },
+ {
+  "domain": "Retail",
+  "screen": "Merchandising & Product Presentation",
+  "verdict": "unresolved \u2014 name gives no operations",
+  "existing": "",
+  "ops": ""
+ },
+ {
+  "domain": "Retail",
+  "screen": "Product Availability, Lifecycle & Publishing",
+  "verdict": "unresolved \u2014 name gives no operations",
+  "existing": "",
+  "ops": ""
+ },
+ {
+  "domain": "Retail",
+  "screen": "Product Import, Governance & AI Configuration Assistant",
+  "verdict": "unresolved \u2014 matched only on generic operations",
+  "existing": "",
+  "ops": ""
+ },
+ {
+  "domain": "Retail",
+  "screen": "Retail Sales & POS Command Center",
+  "verdict": "improves an existing screen",
+  "existing": "P09 ADM-031",
+  "ops": "getDashboard"
+ },
+ {
+  "domain": "Retail",
+  "screen": "Retail POS Selling Workspace",
+  "verdict": "unresolved \u2014 name gives no operations",
+  "existing": "",
+  "ops": ""
+ },
+ {
+  "domain": "Retail",
+  "screen": "Guest, Membership, Loyalty & Entitlement Interaction",
+  "verdict": "improves an existing screen",
+  "existing": "P02 GST-036",
+  "ops": "getLoyaltyPosition, getMyMemberships"
+ },
+ {
+  "domain": "Retail",
+  "screen": "Cart, Promotions, Discounts & Price Control",
+  "verdict": "improves an existing screen",
+  "existing": "P01 WEB-032",
+  "ops": "listPromotions, listPrices, listPriceLists"
+ },
+ {
+  "domain": "Retail",
+  "screen": "Checkout, Payment & Receipt",
+  "verdict": "unresolved \u2014 name gives no operations",
+  "existing": "",
+  "ops": ""
+ },
+ {
+  "domain": "Retail",
+  "screen": "Transaction Search, Hold, Recall & Post-Sale Management",
+  "verdict": "unresolved \u2014 name gives no operations",
+  "existing": "",
+  "ops": ""
+ },
+ {
+  "domain": "Retail",
+  "screen": "Returns, Refunds & Exchanges",
+  "verdict": "improves an existing screen",
+  "existing": "P08 BO-044",
+  "ops": "getReturnPolicy, setReturnPolicy"
+ },
+ {
+  "domain": "Retail",
+  "screen": "Omnichannel Order & Fulfilment Center",
+  "verdict": "unresolved \u2014 name gives no operations",
+  "existing": "",
+  "ops": ""
+ },
+ {
+  "domain": "Retail",
+  "screen": "Mobile POS, Event Sales & Offline Operations",
+  "verdict": "unresolved \u2014 matched only on generic operations",
+  "existing": "",
+  "ops": ""
+ },
+ {
+  "domain": "Retail",
+  "screen": "Sales Exceptions, Controls & Operational Action Center",
+  "verdict": "unresolved \u2014 name gives no operations",
+  "existing": "",
+  "ops": ""
+ },
+ {
+  "domain": "Retail",
+  "screen": "Retail Inventory Command Center",
+  "verdict": "improves an existing screen",
+  "existing": "P09 ADM-031",
+  "ops": "getDashboard"
+ },
+ {
+  "domain": "Retail",
+  "screen": "Store Stock & SKU Availability",
+  "verdict": "unresolved \u2014 name gives no operations",
+  "existing": "",
+  "ops": ""
+ },
+ {
+  "domain": "Retail",
+  "screen": "Requisition & Smart Store Replenishment",
+  "verdict": "improves an existing screen",
+  "existing": "P08 BO-078",
+  "ops": "createRequisition, listRequisitions"
+ },
+ {
+  "domain": "Retail",
+  "screen": "Store-to-Store & Warehouse Transfers",
+  "verdict": "improves an existing screen",
+  "existing": "P08 BO-080",
+  "ops": "createStockTransfer, listStockLocations"
+ },
+ {
+  "domain": "Retail",
+  "screen": "Receiving & Store Put-Away",
+  "verdict": "improves an existing screen",
+  "existing": "P08 BO-052",
+  "ops": "createGoodsReceipt"
+ },
+ {
+  "domain": "Retail",
+  "screen": "Stock Count & Cycle Count Management",
+  "verdict": "improves an existing screen",
+  "existing": "P08 BO-079",
+  "ops": "startStockCount, getCountVariance"
+ },
+ {
+  "domain": "Retail",
+  "screen": "Damage, Loss, Shrinkage & Stock Adjustment",
+  "verdict": "unresolved \u2014 name gives no operations",
+  "existing": "",
+  "ops": ""
+ },
+ {
+  "domain": "Retail",
+  "screen": "Reservation, Allocation & Omnichannel Inventory",
+  "verdict": "improves an existing screen",
+  "existing": "P08 BO-081",
+  "ops": "listTableReservations, createTableReservation, listStockLocations"
+ },
+ {
+  "domain": "Retail",
+  "screen": "Barcode, RFID, Serialized Stock & Traceability",
+  "verdict": "improves an existing screen",
+  "existing": "P04 POS-002",
+  "ops": "lookupMerchandise"
+ },
+ {
+  "domain": "Retail",
+  "screen": "Inventory Exceptions, AI Replenishment & Action Center",
+  "verdict": "unresolved \u2014 matched only on generic operations",
+  "existing": "",
+  "ops": ""
+ },
+ {
+  "domain": "Retail",
+  "screen": "Retail Commercial Command Center",
+  "verdict": "improves an existing screen",
+  "existing": "P09 ADM-031",
+  "ops": "getDashboard"
+ },
+ {
+  "domain": "Retail",
+  "screen": "Promotion & Offer Builder",
+  "verdict": "improves an existing screen",
+  "existing": "P01 WEB-032",
+  "ops": "listPromotions"
+ },
+ {
+  "domain": "Retail",
+  "screen": "Promotion Eligibility, Priority & Conflict Rules",
+  "verdict": "improves an existing screen",
+  "existing": "P01 WEB-032",
+  "ops": "listPromotions"
+ },
+ {
+  "domain": "Retail",
+  "screen": "Campaign & Audience Management",
+  "verdict": "unresolved \u2014 name gives no operations",
+  "existing": "",
+  "ops": ""
+ },
+ {
+  "domain": "Retail",
+  "screen": "Coupons, Vouchers & Promotional Codes",
+  "verdict": "improves an existing screen",
+  "existing": "P01 WEB-032",
+  "ops": "listPromotions"
+ },
+ {
+  "domain": "Retail",
+  "screen": "Cross-Sell, Upsell & Recommendation Rules",
+  "verdict": "unresolved \u2014 name gives no operations",
+  "existing": "",
+  "ops": ""
+ },
+ {
+  "domain": "Retail",
+  "screen": "Omnichannel Commerce & Journey Configuration",
+  "verdict": "unresolved \u2014 name gives no operations",
+  "existing": "",
+  "ops": ""
+ },
+ {
+  "domain": "Retail",
+  "screen": "Ticketing, Event & Experience Commerce Integration",
+  "verdict": "unresolved \u2014 name gives no operations",
+  "existing": "",
+  "ops": ""
+ },
+ {
+  "domain": "Retail",
+  "screen": "Personalized Offers & Guest Engagement",
+  "verdict": "unresolved \u2014 name gives no operations",
+  "existing": "",
+  "ops": ""
+ },
+ {
+  "domain": "Retail",
+  "screen": "Promotion Performance, AI Optimization & Action Center",
+  "verdict": "improves an existing screen",
+  "existing": "P01 WEB-032",
+  "ops": "listPromotions, getDashboard"
+ },
+ {
+  "domain": "Retail",
+  "screen": "Retail Executive Command Center",
+  "verdict": "improves an existing screen",
+  "existing": "P09 ADM-031",
+  "ops": "getDashboard"
+ },
+ {
+  "domain": "Retail",
+  "screen": "Sales, Revenue & Channel Analytics",
+  "verdict": "improves an existing screen",
+  "existing": "P09 ADM-031",
+  "ops": "getDashboard"
+ },
+ {
+  "domain": "Retail",
+  "screen": "Store & Operational Performance",
+  "verdict": "improves an existing screen",
+  "existing": "P09 ADM-031",
+  "ops": "getDashboard"
+ },
+ {
+  "domain": "Retail",
+  "screen": "Product, SKU & Merchandise Performance",
+  "verdict": "improves an existing screen",
+  "existing": "P08 BO-048",
+  "ops": "listMerchandise, createMerchandise, getDashboard"
+ },
+ {
+  "domain": "Retail",
+  "screen": "Inventory, Sell-Through & Stock Intelligence",
+  "verdict": "unresolved \u2014 name gives no operations",
+  "existing": "",
+  "ops": ""
+ },
+ {
+  "domain": "Retail",
+  "screen": "Guest, Conversion & Basket Intelligence",
+  "verdict": "unresolved \u2014 name gives no operations",
+  "existing": "",
+  "ops": ""
+ },
+ {
+  "domain": "Retail",
+  "screen": "Promotion, Pricing & Margin Intelligence",
+  "verdict": "improves an existing screen",
+  "existing": "P01 WEB-032",
+  "ops": "listPromotions"
+ },
+ {
+  "domain": "Retail",
+  "screen": "Demand Forecasting & Merchandise Planning",
+  "verdict": "improves an existing screen",
+  "existing": "P08 BO-048",
+  "ops": "listMerchandise, createMerchandise"
+ },
+ {
+  "domain": "Retail",
+  "screen": "AI Recommendation, Simulation & Optimization Center",
+  "verdict": "unresolved \u2014 matched only on generic operations",
+  "existing": "",
+  "ops": ""
+ },
+ {
+  "domain": "Retail",
+  "screen": "AI Assistant, Alerts & Management Action Center",
+  "verdict": "improves an existing screen",
+  "existing": "P04 POS-008",
+  "ops": "listAlerts, acknowledgeAlert"
+ },
+ {
+  "domain": "Retail",
+  "screen": "Product Import, Governance & AI Configuration",
+  "verdict": "unresolved \u2014 matched only on generic operations",
+  "existing": "",
+  "ops": ""
+ },
+ {
+  "domain": "POS",
+  "screen": "Workstation Overview Dashboard",
+  "verdict": "**new** \u2014 operations exist, no screen",
+  "existing": "",
+  "ops": "listWorkstations, configureWorkstation"
+ },
+ {
+  "domain": "POS",
+  "screen": "Workstation Registry",
+  "verdict": "**new** \u2014 operations exist, no screen",
+  "existing": "",
+  "ops": "listWorkstations, configureWorkstation"
+ },
+ {
+  "domain": "POS",
+  "screen": "Workstation Details & Configuration",
+  "verdict": "**new** \u2014 operations exist, no screen",
+  "existing": "",
+  "ops": "listWorkstations, configureWorkstation"
+ },
+ {
+  "domain": "POS",
+  "screen": "Hardware & Peripherals Management",
+  "verdict": "improves an existing screen",
+  "existing": "P08 BO-036",
+  "ops": "listDevices"
+ },
+ {
+  "domain": "POS",
+  "screen": "Live Workstation Health Monitor",
+  "verdict": "**new** \u2014 operations exist, no screen",
+  "existing": "",
+  "ops": "listWorkstations, configureWorkstation"
+ },
+ {
+  "domain": "POS",
+  "screen": "Software, Configuration & Version Management",
+  "verdict": "unresolved \u2014 name gives no operations",
+  "existing": "",
+  "ops": ""
+ },
+ {
+  "domain": "POS",
+  "screen": "Cash Operations Dashboard",
+  "verdict": "unresolved \u2014 matched only on generic operations",
+  "existing": "",
+  "ops": ""
+ },
+ {
+  "domain": "POS",
+  "screen": "Till Configuration",
+  "verdict": "unresolved \u2014 name gives no operations",
+  "existing": "",
+  "ops": ""
+ },
+ {
+  "domain": "POS",
+  "screen": "Opening Float Management",
+  "verdict": "**new** \u2014 operations exist, no screen",
+  "existing": "",
+  "ops": "adjustDepositBoxFloat"
+ },
+ {
+  "domain": "POS",
+  "screen": "Cash In / Cash Out Operations",
+  "verdict": "unresolved \u2014 matched only on generic operations",
+  "existing": "",
+  "ops": ""
+ },
+ {
+  "domain": "POS",
+  "screen": "Safe Drop & Cash Transfer Management",
+  "verdict": "improves an existing screen",
+  "existing": "P06 EMP-008",
+  "ops": "createStockTransfer"
+ },
+ {
+  "domain": "POS",
+  "screen": "Cash Reconciliation & Variance Management",
+  "verdict": "unresolved \u2014 matched only on generic operations",
+  "existing": "",
+  "ops": ""
+ },
+ {
+  "domain": "POS",
+  "screen": "Shift & Operator Dashboard",
+  "verdict": "unresolved \u2014 matched only on generic operations",
+  "existing": "",
+  "ops": ""
+ },
+ {
+  "domain": "POS",
+  "screen": "Operator & Workstation Assignment",
+  "verdict": "**new** \u2014 operations exist, no screen",
+  "existing": "",
+  "ops": "listWorkstations, configureWorkstation"
+ },
+ {
+  "domain": "POS",
+  "screen": "Shift Templates & Policies",
+  "verdict": "unresolved \u2014 matched only on generic operations",
+  "existing": "",
+  "ops": ""
+ },
+ {
+  "domain": "POS",
+  "screen": "Shift Opening & Login",
+  "verdict": "unresolved \u2014 matched only on generic operations",
+  "existing": "",
+  "ops": ""
+ },
+ {
+  "domain": "POS",
+  "screen": "Shift Exceptions & Alerts",
+  "verdict": "improves an existing screen",
+  "existing": "P06 EMP-008",
+  "ops": "listAlerts, acknowledgeAlert"
+ },
+ {
+  "domain": "POS",
+  "screen": "Shift Closing & Settlements",
+  "verdict": "unresolved \u2014 matched only on generic operations",
+  "existing": "",
+  "ops": ""
+ },
+ {
+  "domain": "POS",
+  "screen": "POS Experience Dashboard",
+  "verdict": "unresolved \u2014 name gives no operations",
+  "existing": "",
+  "ops": ""
+ },
+ {
+  "domain": "POS",
+  "screen": "POS Profile Management",
+  "verdict": "unresolved \u2014 name gives no operations",
+  "existing": "",
+  "ops": ""
+ },
+ {
+  "domain": "POS",
+  "screen": "Layout & Journey Builder",
+  "verdict": "unresolved \u2014 name gives no operations",
+  "existing": "",
+  "ops": ""
+ },
+ {
+  "domain": "POS",
+  "screen": "Product & Category Button Configuration",
+  "verdict": "unresolved \u2014 name gives no operations",
+  "existing": "",
+  "ops": ""
+ },
+ {
+  "domain": "POS",
+  "screen": "Sales Rules, Discounts & Promotions",
+  "verdict": "improves an existing screen",
+  "existing": "P01 WEB-032",
+  "ops": "listPromotions"
+ },
+ {
+  "domain": "POS",
+  "screen": "Deployment, Preview & Audit",
+  "verdict": "unresolved \u2014 name gives no operations",
+  "existing": "",
+  "ops": ""
+ },
+ {
+  "domain": "POS",
+  "screen": "Offline Operations Dashboard",
+  "verdict": "unresolved \u2014 matched only on generic operations",
+  "existing": "",
+  "ops": ""
+ },
+ {
+  "domain": "POS",
+  "screen": "Offline Policy & Rules Configuration",
+  "verdict": "unresolved \u2014 matched only on generic operations",
+  "existing": "",
+  "ops": ""
+ },
+ {
+  "domain": "POS",
+  "screen": "Offline Product & Data Cache Management",
+  "verdict": "unresolved \u2014 matched only on generic operations",
+  "existing": "",
+  "ops": ""
+ },
+ {
+  "domain": "POS",
+  "screen": "Connectivity & Auto-Switch Settings",
+  "verdict": "unresolved \u2014 name gives no operations",
+  "existing": "",
+  "ops": ""
+ },
+ {
+  "domain": "POS",
+  "screen": "Offline Transaction Monitor & Sync Queue",
+  "verdict": "improves an existing screen",
+  "existing": "P07 SCN-014",
+  "ops": "syncOrders, listSyncRejections"
+ },
+ {
+  "domain": "POS",
+  "screen": "Offline Alerts, Limits & Audit",
+  "verdict": "improves an existing screen",
+  "existing": "P07 SCN-015",
+  "ops": "listAlerts, acknowledgeAlert"
+ },
+ {
+  "domain": "POS",
+  "screen": "Enterprise Frontline Operations Dashboard",
+  "verdict": "unresolved \u2014 name gives no operations",
+  "existing": "",
+  "ops": ""
+ },
+ {
+  "domain": "POS",
+  "screen": "Venue Operations Dashboard",
+  "verdict": "unresolved \u2014 name gives no operations",
+  "existing": "",
+  "ops": ""
+ },
+ {
+  "domain": "POS",
+  "screen": "Department & Sub-Department Dashboard",
+  "verdict": "unresolved \u2014 name gives no operations",
+  "existing": "",
+  "ops": ""
+ },
+ {
+  "domain": "POS",
+  "screen": "Workstation Operations Dashboard",
+  "verdict": "**new** \u2014 operations exist, no screen",
+  "existing": "",
+  "ops": "listWorkstations, configureWorkstation"
+ },
+ {
+  "domain": "POS",
+  "screen": "Transaction & Exception Monitoring",
+  "verdict": "unresolved \u2014 name gives no operations",
+  "existing": "",
+  "ops": ""
+ },
+ {
+  "domain": "POS",
+  "screen": "Frontline Analytics, AI Insights & Audit",
+  "verdict": "improves an existing screen",
+  "existing": "P04 POS-008",
+  "ops": "getDashboard"
+ }
+]

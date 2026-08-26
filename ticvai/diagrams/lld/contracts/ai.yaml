@@ -1,0 +1,497 @@
+id: LLD-ai
+title: ai — 30 operations
+generatedBy: tools/derive-diagrams.py
+index: diagrams/hld/03-contracts.yaml
+tier: satellite
+service: AiService
+operations:
+- operation: createAiConversation
+  verb: POST
+  path: /conversations
+  scope: venue
+  permission: AI_USE
+  audience:
+  - staff
+  - guest
+  offline: false
+  reads:
+  - ai.conversation
+  - cache:idempotency
+  writes:
+  - ai.conversation
+  - cache:idempotency
+- operation: createKnowledgeCollection
+  verb: POST
+  path: /collections
+  scope: tenant
+  permission: AI_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - ai.chunk_ref
+  - ai.knowledge_collection
+  - cache:idempotency
+  - qdrant:knowledge
+  writes:
+  - ai.knowledge_collection
+  - cache:idempotency
+  - qdrant:knowledge
+- operation: decideProposedAction
+  verb: POST
+  path: /proposed-actions/{actionId}/decide
+  scope: venue
+  permission: AI_APPROVE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - ai.proposed_action
+  - cache:idempotency
+  writes:
+  - ai.interaction
+  - ai.proposed_action
+  - cache:idempotency
+- operation: generateConfiguration
+  verb: POST
+  path: /generate/configuration
+  scope: venue
+  permission: AI_USE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - ai.chunk_ref
+  - ai.policy
+  - ai.provider
+  - cache:idempotency
+  - catalogue.attribute_axis
+  - catalogue.entitlement_template
+  - catalogue.envelope
+  - catalogue.event
+  - catalogue.performance
+  - catalogue.price
+  - catalogue.price_list
+  - catalogue.product
+  - marketing.loyalty_programme
+  - platform.region_settings
+  - platform.scope_node
+  - promotions.promotion
+  - qdrant:knowledge
+  - seating.seat
+  - seating.seat_category
+  - seating.seat_map
+  - seating.seating_rules
+  - seating.section
+  writes:
+  - ai.interaction
+  - ai.proposed_action
+  - cache:idempotency
+  - qdrant:knowledge
+- operation: generateVenueLayout
+  verb: POST
+  path: /generate/venue-layout
+  scope: venue
+  permission: CAPACITY_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - ai.provider
+  - assets.media_asset
+  - cache:idempotency
+  writes:
+  - ai.interaction
+  - ai.layout_draft
+  - cache:idempotency
+- operation: getAiPolicy
+  verb: GET
+  path: /policy
+  scope: tenant
+  permission: AI_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - ai.policy
+  writes: []
+- operation: getAiUsage
+  verb: GET
+  path: /usage
+  scope: tenant
+  permission: AI_AUDIT_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - ai.interaction
+  writes: []
+- operation: ingestKnowledgeDocument
+  verb: POST
+  path: /collections/{collectionId}/documents
+  scope: tenant
+  permission: AI_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - ai.chunk_ref
+  - ai.knowledge_document
+  - cache:embedding
+  - cache:idempotency
+  - qdrant:knowledge
+  writes:
+  - ai.knowledge_document
+  - cache:embedding
+  - cache:idempotency
+  - qdrant:knowledge
+- operation: listAiConversations
+  verb: GET
+  path: /conversations
+  scope: venue
+  permission: AI_USE
+  audience:
+  - staff
+  - guest
+  offline: false
+  reads:
+  - ai.conversation
+  writes: []
+- operation: listAiInteractions
+  verb: GET
+  path: /interactions
+  scope: tenant
+  permission: AI_AUDIT_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - ai.interaction
+  writes: []
+- operation: listAiProviders
+  verb: GET
+  path: /providers
+  scope: region
+  permission: AI_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - ai.provider
+  writes: []
+- operation: listIndexJobs
+  verb: GET
+  path: /index-jobs
+  scope: tenant
+  permission: AI_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - ai.index_job
+  writes: []
+- operation: listIndexSources
+  verb: GET
+  path: /index-sources
+  scope: tenant
+  permission: AI_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - ai.index_job
+  - ai.index_source
+  writes: []
+- operation: listKnowledgeCollections
+  verb: GET
+  path: /collections
+  scope: tenant
+  permission: AI_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - ai.chunk_ref
+  - ai.knowledge_collection
+  - qdrant:knowledge
+  writes: []
+- operation: listProposedActions
+  verb: GET
+  path: /proposed-actions
+  scope: venue
+  permission: AI_APPROVE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - ai.proposed_action
+  writes: []
+- operation: proposeTranslations
+  verb: POST
+  path: /ai/translate
+  scope: tenant
+  permission: TENANT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - ai.policy
+  - ai.provider
+  - cache:idempotency
+  - control.content_block
+  writes:
+  - ai.interaction
+  - ai.proposed_action
+  - cache:idempotency
+- operation: proposeVenueLabels
+  verb: POST
+  path: /ai/venue-map/{mapId}/propose-labels
+  scope: venue
+  permission: VENUE_MAP_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - ai.policy
+  - ai.provider
+  - cache:idempotency
+  - qdrant:knowledge
+  - venuemap.import_job
+  - venuemap.point
+  writes:
+  - ai.interaction
+  - ai.proposed_action
+  - cache:idempotency
+- operation: proposeWalkways
+  verb: POST
+  path: /ai/venue-map/{mapId}/propose-walkways
+  scope: venue
+  permission: VENUE_MAP_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - ai.policy
+  - ai.provider
+  - assets.media_asset
+  - cache:idempotency
+  - venuemap.import_job
+  - venuemap.map
+  writes:
+  - ai.interaction
+  - ai.proposed_action
+  - cache:idempotency
+- operation: recordSuggestionOutcome
+  verb: POST
+  path: /ai/suggestions/{suggestionId}/outcome
+  scope: venue
+  permission: AI_USE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - ai.suggestion
+  - cache:idempotency
+  writes:
+  - ai.suggestion_outcome
+  - cache:idempotency
+- operation: reindexSource
+  verb: POST
+  path: /index-sources/{sourceId}/reindex
+  scope: tenant
+  permission: AI_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - ai.index_source
+  - assets.media_asset
+  - cache:embedding
+  - cache:idempotency
+  - catalogue.entitlement_template
+  - catalogue.product
+  - fnb.menu_item
+  - maintenance.inspection_template
+  - marketing.case
+  - reporting.report_definition
+  - retail.merchandise
+  - whitelabel.content_page
+  - whitelabel.faq_entry
+  - whitelabel.policy
+  writes:
+  - ai.index_entry
+  - ai.index_job
+  - cache:embedding
+  - cache:idempotency
+  - qdrant:knowledge
+- operation: removeIndexEntry
+  verb: DELETE
+  path: /index-sources/{sourceId}/entries/{entryId}
+  scope: tenant
+  permission: AI_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - ai.index_entry
+  - cache:embedding
+  - cache:idempotency
+  writes:
+  - ai.index_entry
+  - cache:embedding
+  - cache:idempotency
+  - qdrant:knowledge
+- operation: requestSuggestion
+  verb: POST
+  path: /ai/suggestions
+  scope: venue
+  permission: AI_USE
+  audience:
+  - staff
+  - guest
+  offline: false
+  reads:
+  - ai.policy
+  - ai.provider
+  - ai.suggestion
+  - cache:idempotency
+  writes:
+  - ai.interaction
+  - ai.suggestion
+  - cache:idempotency
+- operation: semanticSearch
+  verb: POST
+  path: /search
+  scope: venue
+  permission: AI_USE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - ai.chunk_ref
+  - ai.knowledge_collection
+  - ai.knowledge_document
+  - cache:answer
+  - cache:idempotency
+  - catalogue.product
+  - qdrant:knowledge
+  writes:
+  - ai.interaction
+  - cache:answer
+  - cache:idempotency
+  - qdrant:knowledge
+- operation: sendAiMessage
+  verb: POST
+  path: /conversations/{conversationId}/messages
+  scope: venue
+  permission: AI_USE
+  audience:
+  - staff
+  - guest
+  offline: false
+  reads:
+  - ai.chunk_ref
+  - ai.conversation
+  - ai.knowledge_document
+  - ai.message
+  - ai.policy
+  - ai.proposed_action
+  - ai.provider
+  - cache:answer
+  - cache:idempotency
+  - qdrant:knowledge
+  writes:
+  - ai.interaction
+  - ai.message
+  - ai.proposed_action
+  - cache:answer
+  - cache:idempotency
+  - qdrant:knowledge
+- operation: setAiCredential
+  verb: PUT
+  path: /ai-providers/{providerId}/credential
+  scope: tenant
+  permission: AI_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - ai.provider
+  - cache:idempotency
+  writes:
+  - ai.provider
+  - cache:idempotency
+- operation: setAiPolicy
+  verb: PUT
+  path: /policy
+  scope: tenant
+  permission: AI_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - ai.policy
+  - cache:idempotency
+  writes:
+  - ai.policy
+  - cache:idempotency
+- operation: setAiProvider
+  verb: PUT
+  path: /providers
+  scope: region
+  permission: AI_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - ai.provider
+  - cache:idempotency
+  writes:
+  - ai.provider
+  - cache:idempotency
+- operation: setIndexSource
+  verb: PUT
+  path: /index-sources
+  scope: tenant
+  permission: AI_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - ai.index_source
+  - ai.knowledge_collection
+  - cache:idempotency
+  writes:
+  - ai.index_source
+  - cache:idempotency
+- operation: setSuggestionProvider
+  verb: PUT
+  path: /ai/suggestion-providers
+  scope: tenant
+  permission: AI_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - ai.policy
+  - ai.provider
+  - cache:idempotency
+  writes:
+  - ai.policy
+  - cache:idempotency
+  - cache:resolution
+- operation: testAiProvider
+  verb: POST
+  path: /ai-providers/{providerId}/test
+  scope: tenant
+  permission: AI_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - ai.provider
+  - cache:idempotency
+  writes:
+  - ai.interaction
+  - ai.provider
+  - cache:idempotency

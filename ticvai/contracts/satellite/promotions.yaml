@@ -1,0 +1,2101 @@
+openapi: 3.1.0
+info:
+  title: TICVAI Promotions & Bundles
+  version: 0.1.0
+  x-ticvai-screen-count: 22
+  x-ticvai-tier: satellite
+  x-ticvai-module: "4 — Bundles and Promotions"
+  x-ticvai-requirements: 229
+  x-ticvai-capabilities: [C05, C06, C07, C37, C86, C87, C88, C89, C90]
+  x-ticvai-platforms:
+    - "P08 Venue Management"
+    - "P04 POS"
+    - "P01 Guest Web"
+    - "P02 Guest App"
+  description: >
+    ## What this contract covers
+
+    **Discounts, coupons, bundles and revenue allocation.**
+
+    | | |
+    |---|---|
+    | **Tier** | satellite |
+    | **Matrix domain** | 4 — Bundles and Promotions |
+    | **Requirements** | ~229 |
+    | **Capabilities** | C05, C06, C07, C37, C86, C87, C88, C89, C90 |
+    | **Consumed by** | P08 Venue Management · P04 POS · P01 Guest Web · P02 Guest App |
+
+    ## How to read this file
+
+    **This file is a contract.** It is hand-authored and it is the source of truth for one
+    bounded context: server code, client code and mock servers are generated from it, never
+    the other way round. If a field is not here, it does not exist.
+
+    **Contracts are split into two tiers.**
+
+    - **Spine** — the eight contexts everything else depends on: tenancy, identity,
+      catalogue, orders, shift, access, finance, cross-cell. Frozen first. A change here
+      requires a formal change request, because every satellite has pinned against it.
+    - **Satellite** — a domain that builds on the spine and can move independently.
+      Cheaper to change.
+
+    **`paths` are operations.** Each one declares four TICVAI extensions, and Redocly
+    rejects any that does not:
+
+    | Extension | Answers |
+    |---|---|
+    | `x-ticvai-permission` | Which permission the caller needs. From one enum in `shared/permissions.yaml` — never hand-typed |
+    | `x-ticvai-scope-level` | Where in the seven-level hierarchy that permission must be held |
+    | `x-ticvai-offline-capable` | Whether a disconnected terminal may queue this |
+    | `x-ticvai-conflict-policy` | How a replayed operation resolves — `append`, `serverWins`, `manual` |
+
+    Where `x-ticvai-permission` is null, one of these says why: `x-ticvai-auth: service`
+    (cell-to-cell), `x-ticvai-self-scoped` (acts only on the caller's own resources), or
+    `security: []` (genuinely public).
+
+    **`components.schemas` are API schemas — the shape of data on the wire.** They are not
+    database tables. One API schema may become three columns (`Money`) or five tables
+    (`Order`); some have no table at all (`ValidationResult`, `TrialBalance`). Roughly 70%
+    of the DDL derives from these, and the rest — partitioning, RLS, the PII split — is
+    storage design that lives in the migration scripts.
+
+    **`security` arrays hold OAuth scopes.** Empty means "this scheme, no scopes" — for
+    bearer tokens there is nothing to list. Empty is not the same as absent: absent means
+    unauthenticated.
+
+
+    ## This context
+
+    Discounts, coupons, vouchers, bundles, upsell rules and revenue allocation. Domain 4 —
+    229 requirements, plus the bundle and upsell sub-domains of domain 3.
+
+    Positions this encodes:
+
+    - **Allocation splits are a finance concern surfaced here** (12 Aug §16). A bundle sold
+      for one price must divide across its components by percentage or fixed amount, because
+      each component may sit in a different venue, revenue account, tax treatment or legal
+      entity. The split is defined with the bundle and consumed by the ledger.
+    - **Promotion evaluation is deterministic and explainable.** A cashier facing a guest
+      who expected a discount needs to know which rule applied and which did not. Every
+      evaluation returns its working.
+    - **Stacking is explicit, never emergent.** Two promotions that each look reasonable can
+      combine into a free ticket. Precedence and exclusivity are declared, not inferred from
+      the order rules were created in.
+    - **Coupons are issued, not invented.** A master coupon defines the offer; individual
+      codes are generated from it with their own redemption state. That is what makes
+      single-use enforceable.
+    - Promotions read from the local bundle at point of sale (ADR-0013). The evaluation
+      endpoint here is for online channels and for the back office to test a rule before
+      publishing it.
+
+servers:
+  - url: https://{cellHost}/api/v1
+    variables:
+      cellHost:
+        default: cell.ticvai.local
+
+security:
+  - bearerAuth: []
+
+tags:
+  - name: promotion
+  - name: coupon
+  - name: voucher
+  - name: bundle
+  - name: allocation
+  - name: upsell
+  - name: evaluation
+
+paths:
+  # ---------------------------------------------------------------- promotions
+  /promotions/{promotionId}/simulate:
+    parameters:
+      - name: promotionId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    post:
+      operationId: simulatePromotion
+      x-ticvai-consumed-by:
+        - "P08 BO-010 Promotions & Coupons"
+      summary: What this promotion would have cost on real history
+      description: >
+        BL-114. **A promotion is priced by guessing until it runs.** Run it against a past period
+        and the answer is arithmetic: how many orders would have qualified, what the discount would
+        have totalled, and **how much of it would have gone to guests who were going to buy
+        anyway.**
+
+        That last number is the one nobody computes and the one that decides whether a campaign made
+        money.
+
+        **Dry run only — writes nothing.** Same shape as `assessProductChange` and
+        `RecognitionRunResult`, which is the fourth place this pattern appears.
+      tags: [promotions]
+      x-ticvai-permission: PRICE_VIEW
+      x-ticvai-audience: [staff]
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: analytical
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [periodFrom, periodTo]
+              properties:
+                periodFrom: { type: string, format: date }
+                periodTo: { type: string, format: date }
+      responses:
+        '200':
+          description: Simulation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ordersQualifying: { type: integer }
+                  discountTotal: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+                  incrementalOrders:
+                    type: integer
+                    description: >
+                      **Orders that would not have happened without it**, estimated against a
+                      comparable period. The rest of the discount went to guests who were buying
+                      anyway.
+                  budgetBreach: { type: boolean }
+
+  /promotions/{promotionId}/variants:
+    parameters:
+      - name: promotionId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    put:
+      operationId: setPromotionVariants
+      summary: A/B test two versions against each other
+      description: >
+        BL-114. **Split by a stable hash of the subject, not at random per request** — a guest who
+        sees 10% on Monday and 15% on Tuesday has learned to wait.
+      tags: [promotions]
+      x-ticvai-permission: PRICE_CONFIGURE
+      x-ticvai-audience: [staff]
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [variants]
+              properties:
+                variants:
+                  type: array
+                  minItems: 2
+                  maxItems: 4
+                  items:
+                    type: object
+                    properties:
+                      label: { type: string }
+                      trafficPercent: { type: integer }
+                      discountPercent: { type: number }
+      responses:
+        '200':
+          description: Set
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+
+  /recommendations:
+    post:
+      operationId: getRecommendations
+      x-ticvai-consumed-by:
+        - "P08 BO-119 Cross-Sell, Upsell & Recommendation Rules"
+      summary: What else this guest might want
+      description: >
+        BL-068. **Rule-based recommendation exists; profile-and-cart-driven does not**, and the
+        difference is whether a guest who has already bought a family ticket is offered another one.
+
+        **Deterministic fallback, always.** A recommender that returns nothing when the model is
+        unavailable is a checkout with a hole in it, so rules answer when nothing better can.
+
+        **Never recommends what is already in the cart, out of stock, or ineligible for this guest**
+        — three checks that sound obvious and are the three most common defects in shipped
+        recommenders.
+      tags: [promotions]
+      x-ticvai-permission: PRODUCT_VIEW
+      x-ticvai-guest-callable: true
+      x-ticvai-audience: [staff, guest]
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                cartId: { type: string, format: uuid, nullable: true }
+                subjectId: { type: string, format: uuid, nullable: true }
+                surface: { type: string, enum: [checkout, productPage, homepage, postPurchase, kiosk] }
+                maxResults: { type: integer, default: 4 }
+      responses:
+        '200':
+          description: Recommendations
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    productId: { type: string, format: uuid }
+                    reason: { type: string, enum: [frequentlyBoughtTogether, completesVisit, popularNow, previouslyPurchased, ruleBased] }
+                    confidence: { type: number }
+
+  /vouchers/{voucherId}/void:
+    parameters:
+      - name: voucherId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    post:
+      operationId: voidVoucher
+      x-ticvai-audience: [staff]
+      summary: Cancel a voucher
+      description: >
+        Issued in error, or fraud. **Voiding a partly-used voucher does not reverse what was
+        already spent** — that redemption happened and the goods left.
+
+        A voucher could be created and redeemed and never voided until 17 August.
+      tags: [promotions]
+      x-ticvai-permission: PRICE_CONFIGURE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [reason]
+              properties:
+                reason: { type: string, enum: [issuedInError, fraud, campaignCancelled, duplicated] }
+                note: { type: string, maxLength: 300 }
+      responses:
+        '200':
+          description: Voided
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Voucher' }
+
+  /promotions:
+    get:
+      operationId: listPromotions
+      x-ticvai-consumed-by:
+        - "P01 WEB-032 Offers & Promotions"
+        - "P01 WEB-043 Loyalty & Rewards"
+        - "P02 GST-037 Offers & Promotions"
+        - "P04 POS-002 Sell — Ticket Catalogue"
+        - "P08 BO-010 Promotions & Coupons"
+        - "P10 PTR-010 Cart & Quote"
+      x-ticvai-audience: [staff, guest, partner]
+      x-ticvai-read-routing: replica
+      summary: List promotions
+      tags: [promotion]
+      x-ticvai-permission: PRICE_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: true
+      x-ticvai-offline-note: >
+        24 August: **servable from a local cache.** The device holds enough to answer without the 
+        network and the answer may be stale — which is correct for a catalogue and wrong for conte
+        nded state. `getSeatAvailability`, `getSeatHold` and `getPromotionUsage` are deliberately 
+        excluded - **a stale seat is a seat sold twice.**
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - name: venueId
+          in: query
+          schema: { type: string, format: uuid }
+        - name: status
+          in: query
+          schema: { $ref: '#/components/schemas/PromotionStatus' }
+        - name: activeAt
+          in: query
+          schema: { type: string, format: date-time }
+        - $ref: '../shared/common.yaml#/components/parameters/PageSize'
+        - $ref: '../shared/common.yaml#/components/parameters/PageCursor'
+      responses:
+        '200':
+          description: Promotions
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '../shared/common.yaml#/components/schemas/Page'
+                  - type: object
+                    properties:
+                      items:
+                        type: array
+                        items: { $ref: '#/components/schemas/Promotion' }
+        '403': { $ref: '../shared/common.yaml#/components/responses/Forbidden' }
+
+    post:
+      operationId: createPromotion
+      x-ticvai-consumed-by:
+        - "P08 BO-010 Promotions & Coupons"
+        - "P10 PTR-010 Cart & Quote"
+      x-ticvai-audience: [staff, partner]
+      summary: Create a promotion
+      description: >
+        Created in `draft`. A draft promotion never evaluates — publishing is the act that
+        makes it live, and it appears at terminals with the next catalogue bundle.
+      tags: [promotion]
+      x-ticvai-permission: PRICE_CONFIGURE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/CreatePromotionRequest' }
+      responses:
+        '201':
+          description: Created in draft
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Promotion' }
+        '400':
+          description: Conditions are unsatisfiable, or the discount exceeds the configured cap
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /promotions/{promotionId}:
+    parameters:
+      - name: promotionId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    get:
+      operationId: getPromotion
+      x-ticvai-consumed-by:
+        - "P01 WEB-032 Offers & Promotions"
+        - "P02 GST-037 Offers & Promotions"
+        - "P04 POS-002 Sell — Ticket Catalogue"
+        - "P08 BO-010 Promotions & Coupons"
+        - "P10 PTR-010 Cart & Quote"
+      x-ticvai-audience: [staff, guest, partner]
+      x-ticvai-read-routing: replica
+      summary: Read a promotion
+      tags: [promotion]
+      x-ticvai-permission: PRICE_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: true
+      x-ticvai-offline-note: >
+        24 August: **servable from a local cache.** The device holds enough to answer without the 
+        network and the answer may be stale — which is correct for a catalogue and wrong for conte
+        nded state. `getSeatAvailability`, `getSeatHold` and `getPromotionUsage` are deliberately 
+        excluded - **a stale seat is a seat sold twice.**
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '200':
+          description: Promotion
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Promotion' }
+        '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
+
+    patch:
+      operationId: updatePromotion
+      x-ticvai-consumed-by:
+        - "P08 BO-010 Promotions & Coupons"
+        - "P10 PTR-010 Cart & Quote"
+      x-ticvai-audience: [staff, partner]
+      summary: Amend a promotion
+      description: >
+        Amending a live promotion changes behaviour mid-sale. Conditions and discount are
+        editable only in draft; a live promotion may be paused, extended or ended, nothing
+        more.
+      tags: [promotion]
+      x-ticvai-permission: PRICE_CONFIGURE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              minProperties: 1
+              properties:
+                name: { type: string, maxLength: 200 }
+                validTo: { type: string, format: date-time }
+                isPaused: { type: boolean }
+                conditions: { $ref: '#/components/schemas/PromotionConditions' }
+                discount: { $ref: '#/components/schemas/Discount' }
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Promotion' }
+        '409':
+          description: Conditions or discount amended on a live promotion
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /promotions/{promotionId}/pause:
+    parameters:
+      - name: promotionId
+        in: path
+        required: true
+        schema: { type: string }
+    post:
+      operationId: pausePromotion
+      x-ticvai-consumed-by:
+        - "P08 BO-010 Promotions & Coupons"
+        - "P10 PTR-010 Cart & Quote"
+      x-ticvai-audience: [staff, partner]
+      summary: Pause a live promotion
+      description: >
+        **Carts already priced keep their price.** A guest mid-checkout is not repriced — the discount they were shown is the one they pay.
+      tags: [promotion]
+      x-ticvai-permission: PRICE_CONFIGURE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [reason]
+              properties:
+                reason: { type: string }
+      responses:
+        '200':
+          description: Done
+        '409':
+          description: Not in a state that permits this
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /promotions/{promotionId}/end:
+    parameters:
+      - name: promotionId
+        in: path
+        required: true
+        schema: { type: string }
+    post:
+      operationId: endPromotion
+      x-ticvai-consumed-by:
+        - "P08 BO-010 Promotions & Coupons"
+        - "P10 PTR-010 Cart & Quote"
+      x-ticvai-audience: [staff, partner]
+      summary: End a promotion early
+      description: >
+        Distinct from expiry. `expired` means it ran its course; `ended` means somebody decided, and the register should be able to answer which after a bad month.
+      tags: [promotion]
+      x-ticvai-permission: PRICE_CONFIGURE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [reason]
+              properties:
+                reason: { type: string }
+      responses:
+        '200':
+          description: Done
+        '409':
+          description: Not in a state that permits this
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /promotions/{promotionId}/unschedule:
+    parameters:
+      - name: promotionId
+        in: path
+        required: true
+        schema: { type: string }
+    post:
+      operationId: unschedulePromotion
+      x-ticvai-consumed-by:
+        - "P08 BO-010 Promotions & Coupons"
+        - "P10 PTR-010 Cart & Quote"
+      x-ticvai-audience: [staff, partner]
+      summary: Pull a scheduled promotion before it starts
+      description: >
+        Returns it to draft. Nothing has priced against it yet, so nothing needs honouring.
+      tags: [promotion]
+      x-ticvai-permission: PRICE_CONFIGURE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      responses:
+        '200':
+          description: Done
+        '409':
+          description: Not in a state that permits this
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /promotions/{promotionId}/publish:
+    parameters:
+      - name: promotionId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    post:
+      operationId: publishPromotion
+      x-ticvai-consumed-by:
+        - "P08 BO-010 Promotions & Coupons"
+        - "P10 PTR-010 Cart & Quote"
+      x-ticvai-audience: [staff, partner]
+      summary: Publish a promotion
+      description: >
+        Runs conflict analysis first. A promotion that stacks with an existing one to produce
+        a negative or near-zero line price is refused — that combination is discovered at a
+        till otherwise, usually by a guest.
+      tags: [promotion]
+      x-ticvai-permission: PRICE_CONFIGURE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      responses:
+        '200':
+          description: Published
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Promotion' }
+        '409':
+          description: Conflict analysis failed. The response names each conflicting promotion
+          content:
+            application/problem+json:
+              schema: { $ref: '#/components/schemas/StackingProblem' }
+
+  /promotions/{promotionId}/conflicts:
+    parameters:
+      - name: promotionId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    get:
+      operationId: analysePromotionConflicts
+      x-ticvai-consumed-by:
+        - "P04 POS-002 Sell — Ticket Catalogue"
+        - "P08 BO-010 Promotions & Coupons"
+        - "P10 PTR-010 Cart & Quote"
+      x-ticvai-audience: [staff, partner]
+      x-ticvai-read-routing: replica
+      summary: Analyse stacking against live promotions
+      description: >
+        Run before publishing. Reports promotions that overlap on product and period, and
+        what the combined discount would be.
+      tags: [promotion]
+      x-ticvai-permission: PRICE_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '200':
+          description: Analysis
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ConflictAnalysis' }
+
+  /promotions/{promotionId}/usage:
+    parameters:
+      - name: promotionId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    get:
+      operationId: getPromotionUsage
+      x-ticvai-consumed-by:
+        - "P04 POS-002 Sell — Ticket Catalogue"
+        - "P08 BO-010 Promotions & Coupons"
+        - "P10 PTR-010 Cart & Quote"
+      x-ticvai-audience: [staff, partner]
+      x-ticvai-read-routing: analytical
+      summary: Redemption count and discount given
+      description: >
+        Also the enforcement surface for budget caps — a promotion may be configured to stop
+        automatically once a total discount value is reached.
+      tags: [promotion]
+      x-ticvai-permission: PRICE_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '200':
+          description: Usage
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/PromotionUsage' }
+
+  # ---------------------------------------------------------------- coupons
+  /coupon-campaigns:
+    get:
+      operationId: listCouponCampaigns
+      x-ticvai-consumed-by:
+        - "P08 BO-010 Promotions & Coupons"
+      x-ticvai-audience: [staff]
+      x-ticvai-read-routing: replica
+      summary: List coupon campaigns
+      description: >
+        A campaign is the master definition. Individual codes are generated from it and carry
+        their own redemption state.
+      tags: [coupon]
+      x-ticvai-permission: PRICE_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/PageSize'
+        - $ref: '../shared/common.yaml#/components/parameters/PageCursor'
+      responses:
+        '200':
+          description: Campaigns
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '../shared/common.yaml#/components/schemas/Page'
+                  - type: object
+                    properties:
+                      items:
+                        type: array
+                        items: { $ref: '#/components/schemas/CouponCampaign' }
+
+    post:
+      operationId: createCouponCampaign
+      x-ticvai-consumed-by:
+        - "P08 BO-010 Promotions & Coupons"
+      x-ticvai-audience: [staff]
+      summary: Create a coupon campaign
+      tags: [coupon]
+      x-ticvai-permission: PRICE_CONFIGURE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/CreateCouponCampaignRequest' }
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/CouponCampaign' }
+
+  /coupon-campaigns/{campaignId}/codes:
+    parameters:
+      - name: campaignId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    get:
+      operationId: listCouponCodes
+      x-ticvai-consumed-by:
+        - "P08 BO-010 Promotions & Coupons"
+      x-ticvai-audience: [staff]
+      x-ticvai-read-routing: replica
+      summary: List generated codes
+      tags: [coupon]
+      x-ticvai-permission: PRICE_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - name: status
+          in: query
+          schema: { $ref: '#/components/schemas/CouponStatus' }
+        - $ref: '../shared/common.yaml#/components/parameters/PageSize'
+        - $ref: '../shared/common.yaml#/components/parameters/PageCursor'
+      responses:
+        '200':
+          description: Codes
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '../shared/common.yaml#/components/schemas/Page'
+                  - type: object
+                    properties:
+                      items:
+                        type: array
+                        items: { $ref: '#/components/schemas/CouponCode' }
+
+    post:
+      operationId: generateCouponCodes
+      x-ticvai-consumed-by:
+        - "P08 BO-010 Promotions & Coupons"
+      x-ticvai-audience: [staff]
+      summary: Generate codes in bulk
+      description: >
+        Up to fifty thousand at a time. Generation is asynchronous and the batch is exported
+        rather than returned inline — a hundred thousand codes is a file, not a response
+        body.
+      tags: [coupon]
+      x-ticvai-permission: PRICE_CONFIGURE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [quantity]
+              properties:
+                quantity: { type: integer, minimum: 1, maximum: 50000 }
+                prefix: { type: string, maxLength: 16 }
+                length: { type: integer, minimum: 6, maximum: 32, default: 12 }
+                assignToSubjectIds:
+                  type: array
+                  description: >
+                    Personalised codes bound to named guests. Omit for anonymous codes.
+                  items: { type: string, format: uuid }
+      responses:
+        '202':
+          description: Generation queued
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  batchId: { type: string, format: uuid }
+                  quantity: { type: integer }
+                  status:
+                    type: string
+                    enum: [queued, generating, complete, failed]
+
+  /coupon-codes/{code}:
+    parameters:
+      - name: code
+        in: path
+        required: true
+        schema: { type: string }
+    get:
+      operationId: getCouponCode
+      x-ticvai-consumed-by:
+        - "P01 WEB-010 Shopping Cart"
+      x-ticvai-audience: [staff, guest]
+      x-ticvai-read-routing: primary   # single-use enforcement. Replica lag permits a second redemption
+      summary: Look up a code
+      description: >
+        Called at point of sale before applying. Returns whether the code is valid, why not
+        when it is not, and what it would give.
+      tags: [coupon]
+      x-ticvai-permission: PRICE_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: true
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '200':
+          description: Code state
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/CouponCode' }
+        '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
+
+  /coupon-codes/{code}/assign:
+    parameters:
+      - name: code
+        in: path
+        required: true
+        schema: { type: string }
+    post:
+      operationId: assignCoupon
+      x-ticvai-audience: [staff]
+      summary: Assign a coupon to a named guest
+      description: >
+        Allocates an issued code to a subject. Only that guest may redeem it, which is the difference between a campaign code and a service-recovery one.
+      tags: [coupon]
+      x-ticvai-permission: PRICE_CONFIGURE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [subjectId]
+              properties:
+                subjectId: { type: string }
+      responses:
+        '200':
+          description: Done
+        '409':
+          description: Not in a state that permits this
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /coupon-codes/{code}/void:
+    parameters:
+      - name: code
+        in: path
+        required: true
+        schema: { type: string }
+    post:
+      operationId: voidCouponCode
+      x-ticvai-consumed-by:
+        - "P08 BO-010 Promotions & Coupons"
+      x-ticvai-audience: [staff]
+      summary: Void a code
+      description: Cancellation, fraud, or a batch issued in error.
+      tags: [coupon]
+      x-ticvai-permission: PRICE_CONFIGURE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [reason]
+              properties:
+                reason: { type: string, minLength: 3, maxLength: 500 }
+      responses:
+        '200':
+          description: Voided
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/CouponCode' }
+        '409':
+          description: Already redeemed. A redeemed code cannot be voided
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  # ---------------------------------------------------------------- vouchers
+  /voucher-batches:
+    get:
+      operationId: listVoucherBatches
+      x-ticvai-audience: [staff]
+      x-ticvai-read-routing: replica
+      summary: List voucher batches
+      description: >
+        Vouchers carry monetary value and are sold or issued. Distinct from coupons, which
+        modify the price of something else.
+      tags: [voucher]
+      x-ticvai-permission: PRICE_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/PageSize'
+        - $ref: '../shared/common.yaml#/components/parameters/PageCursor'
+      responses:
+        '200':
+          description: Batches
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '../shared/common.yaml#/components/schemas/Page'
+                  - type: object
+                    properties:
+                      items:
+                        type: array
+                        items: { $ref: '#/components/schemas/VoucherBatch' }
+
+    post:
+      operationId: createVoucherBatch
+      x-ticvai-audience: [staff]
+      summary: Issue a voucher batch
+      description: >
+        Issuing vouchers creates a liability, not revenue. Recognition happens on redemption,
+        or as breakage on expiry.
+      tags: [voucher]
+      x-ticvai-permission: PRICE_CONFIGURE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/CreateVoucherBatchRequest' }
+      responses:
+        '201':
+          description: Issued
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/VoucherBatch' }
+
+  /vouchers/{voucherCode}/redeem:
+    parameters:
+      - name: voucherCode
+        in: path
+        required: true
+        schema: { type: string }
+    post:
+      operationId: redeemVoucher
+      x-ticvai-audience: [staff]
+      summary: Redeem voucher value against an order
+      description: >
+        Partial redemption leaves a residual balance where the batch permits it. Where it
+        does not, the unused portion is forfeit and recognised as breakage.
+      tags: [voucher]
+      x-ticvai-permission: ORDER_CREATE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [orderId, amount]
+              properties:
+                orderId: { type: string }
+                amount: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+      responses:
+        '200':
+          description: Redeemed
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Voucher' }
+        '409':
+          description: Expired, already fully redeemed, or amount exceeds the balance
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  # ---------------------------------------------------------------- bundles
+  /bundles:
+    get:
+      operationId: listBundles
+      x-ticvai-audience: [staff]
+      x-ticvai-read-routing: replica
+      summary: List bundles
+      tags: [bundle]
+      x-ticvai-permission: PRODUCT_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - name: kind
+          in: query
+          schema: { $ref: '#/components/schemas/BundleKind' }
+        - $ref: '../shared/common.yaml#/components/parameters/PageSize'
+        - $ref: '../shared/common.yaml#/components/parameters/PageCursor'
+      responses:
+        '200':
+          description: Bundles
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '../shared/common.yaml#/components/schemas/Page'
+                  - type: object
+                    properties:
+                      items:
+                        type: array
+                        items: { $ref: '#/components/schemas/Bundle' }
+
+    post:
+      operationId: createBundle
+      x-ticvai-consumed-by:
+        - "P08 BO-011 Packages & Bundles"
+      x-ticvai-audience: [staff]
+      summary: Create a bundle
+      description: >
+        A bundle is a product whose price differs from the sum of its parts. **The allocation
+        split is mandatory** — without it the ledger cannot divide the revenue, and each
+        component may sit in a different venue, account, tax treatment or legal entity.
+      tags: [bundle]
+      x-ticvai-permission: PRODUCT_CONFIGURE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/CreateBundleRequest' }
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Bundle' }
+        '400':
+          description: >
+            Allocation does not sum to 100 per cent, or fixed amounts do not sum to the
+            bundle price.
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /bundles/{bundleId}:
+    parameters:
+      - name: bundleId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    get:
+      operationId: getBundle
+      x-ticvai-consumed-by:
+        - "P02 GST-056 Bundle Package"
+      x-ticvai-audience: [staff, guest]
+      x-ticvai-read-routing: replica
+      summary: Read a bundle with components and allocation
+      tags: [bundle]
+      x-ticvai-permission: PRODUCT_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: true
+      x-ticvai-offline-note: >
+        24 August: **servable from a local cache.** The device holds enough to answer without the 
+        network and the answer may be stale — which is correct for a catalogue and wrong for conte
+        nded state. `getSeatAvailability`, `getSeatHold` and `getPromotionUsage` are deliberately 
+        excluded - **a stale seat is a seat sold twice.**
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '200':
+          description: Bundle
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Bundle' }
+        '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
+
+    patch:
+      operationId: updateBundle
+      x-ticvai-audience: [staff]
+      summary: Amend a bundle
+      description: >
+        Components and allocation are immutable once the bundle has been sold. Historic
+        orders reference the split that applied when they were placed, and the ledger is
+        append-only.
+      tags: [bundle]
+      x-ticvai-permission: PRODUCT_CONFIGURE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              minProperties: 1
+              properties:
+                name: { type: string, maxLength: 200 }
+                price: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+                validTo: { type: string, format: date-time }
+                isActive: { type: boolean }
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Bundle' }
+        '409':
+          description: Structural change attempted after the bundle has been sold
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  # ---------------------------------------------------------------- allocation
+  /allocation-splits:
+    get:
+      operationId: listAllocationSplits
+      x-ticvai-audience: [staff]
+      x-ticvai-read-routing: replica
+      summary: List allocation split definitions
+      description: >
+        How a bundled price divides across components. Consumed by the ledger at posting and
+        at recognition.
+      tags: [allocation]
+      x-ticvai-permission: LEDGER_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - name: bundleId
+          in: query
+          schema: { type: string, format: uuid }
+        - $ref: '../shared/common.yaml#/components/parameters/PageSize'
+        - $ref: '../shared/common.yaml#/components/parameters/PageCursor'
+      responses:
+        '200':
+          description: Splits
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '../shared/common.yaml#/components/schemas/Page'
+                  - type: object
+                    properties:
+                      items:
+                        type: array
+                        items: { $ref: '#/components/schemas/AllocationSplit' }
+
+  /allocation-splits/preview:
+    post:
+      operationId: previewAllocationSplit
+      x-ticvai-audience: [staff]
+      summary: Preview how an amount divides
+      description: >
+        Distributes to the minor unit and returns the exact figure each component receives.
+
+        Remainder handling matters: a bundle at 100.00 split three ways cannot be 33.33 three
+        times. The remainder is distributed one minor unit at a time, largest weight first,
+        so the parts always sum to the whole. A split that does not reconcile leaves the
+        ledger unbalanced, and the ledger is append-only.
+      tags: [allocation]
+      x-ticvai-permission: LEDGER_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [amount, components]
+              properties:
+                amount: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+                method: { $ref: '#/components/schemas/AllocationMethod' }
+                components:
+                  type: array
+                  minItems: 1
+                  items: { $ref: '#/components/schemas/AllocationComponent' }
+      responses:
+        '200':
+          description: Preview
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/AllocationPreview' }
+        '400':
+          description: Weights sum to zero, or fixed amounts do not sum to the total
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  # ---------------------------------------------------------------- upsell
+  /upsell-rules:
+    get:
+      operationId: listUpsellRules
+      x-ticvai-audience: [staff]
+      x-ticvai-read-routing: replica
+      summary: List upsell and cross-sell rules
+      tags: [upsell]
+      x-ticvai-permission: PRODUCT_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - name: placement
+          in: query
+          schema: { $ref: '#/components/schemas/UpsellPlacement' }
+        - $ref: '../shared/common.yaml#/components/parameters/PageSize'
+        - $ref: '../shared/common.yaml#/components/parameters/PageCursor'
+      responses:
+        '200':
+          description: Rules
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '../shared/common.yaml#/components/schemas/Page'
+                  - type: object
+                    properties:
+                      items:
+                        type: array
+                        items: { $ref: '#/components/schemas/UpsellRule' }
+
+    post:
+      operationId: createUpsellRule
+      x-ticvai-audience: [staff]
+      x-ticvai-config-scope: region
+      summary: Create an upsell rule
+      description: >
+        Rules apply across every channel by default — POS, kiosk, web, app, call centre, B2B
+        and API (3.7.12). A rule that fires on the website but not at a counter is a guest
+        experience inconsistency, so channel restriction is opt-in rather than the default.
+      tags: [upsell]
+      x-ticvai-permission: PRODUCT_CONFIGURE
+      x-ticvai-scope-level: region
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/UpsellRule' }
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/UpsellRule' }
+
+  /upsell-rules/{ruleId}:
+    parameters:
+      - name: ruleId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    delete:
+      operationId: deleteUpsellRule
+      x-ticvai-audience: [staff]
+      summary: Remove an upsell rule
+      tags: [upsell]
+      x-ticvai-permission: PRODUCT_CONFIGURE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      responses:
+        '204': { description: Removed }
+        '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
+
+  /upsell-suggestions:
+    post:
+      operationId: getUpsellSuggestions
+      x-ticvai-consumed-by:
+        - "P01 WEB-008 Add-ons & Upsell"
+        - "P02 GST-048 Upsell / Cross-Sell"
+        - "P08 BO-119 Cross-Sell, Upsell & Recommendation Rules"
+      x-ticvai-audience: [staff, guest]
+      summary: Suggestions for a cart
+      description: >
+        Rule-based today. Where the recommendation engine is enabled it augments this rather
+        than replacing it — a configured rule always outranks a model, because the operator
+        who wrote it had a commercial reason.
+      tags: [upsell]
+      x-ticvai-permission: PRODUCT_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: true
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [venueId, placement, cartLines]
+              properties:
+                venueId: { type: string, format: uuid }
+                placement: { $ref: '#/components/schemas/UpsellPlacement' }
+                channel: { type: string }
+                subjectId: { type: string, format: uuid }
+                cartLines:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      variantId: { type: string, format: uuid }
+                      quantity: { type: integer }
+      responses:
+        '200':
+          description: Suggestions, best first
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [suggestions]
+                properties:
+                  suggestions:
+                    type: array
+                    items: { $ref: '#/components/schemas/UpsellSuggestion' }
+
+  # ---------------------------------------------------------------- evaluation
+  /promotions/evaluate:
+    post:
+      operationId: evaluatePromotions
+      x-ticvai-consumed-by:
+        - "P01 WEB-005 Ticket Type Selection"
+        - "P01 WEB-010 Shopping Cart"
+        - "P01 WEB-032 Offers & Promotions"
+        - "P01 WEB-043 Loyalty & Rewards"
+        - "P02 GST-037 Offers & Promotions"
+        - "P04 POS-002 Sell — Ticket Catalogue"
+        - "P04 POS-021 Sell — Food & Drink"
+        - "P04 POS-023 Sell — Merchandise"
+        - "P05 KSK-006 Review"
+        - "P08 BO-010 Promotions & Coupons"
+        - "P10 PTR-010 Cart & Quote"
+      x-ticvai-audience: [staff, guest, partner]
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      summary: Evaluate promotions against a cart
+      description: >
+        Returns the applied discount **and the working** — which rules matched, which did
+        not, and why. A cashier facing a guest who expected a discount needs an answer, not
+        a total.
+
+        Terminals evaluate locally from the catalogue bundle. This endpoint serves online
+        channels and lets the back office test a rule before publishing it.
+      tags: [evaluation]
+      x-ticvai-permission: PRICE_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: true
+      x-ticvai-conflict-policy: serverWins
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/EvaluatePromotionsRequest' }
+      responses:
+        '200':
+          description: Evaluation
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/PromotionEvaluation' }
+        '400': { $ref: '../shared/common.yaml#/components/responses/BadRequest' }
+
+components:
+  schemas:
+    PromotionStatus:
+      type: string
+      enum: [draft, scheduled, live, paused, expired, ended]
+
+    DiscountKind:
+      type: string
+      enum: [percentage, fixedAmount, fixedPrice, buyXGetY, freeItem, tieredPercentage]
+
+    Discount:
+      x-ticvai-persistence: "none — embedded in promotion"
+      type: object
+      required: [kind]
+      properties:
+        kind: { $ref: '#/components/schemas/DiscountKind' }
+        percentage: { type: number, minimum: 0, maximum: 100 }
+        amount: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+        fixedPrice: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+        buyQuantity: { type: integer, minimum: 1 }
+        getQuantity: { type: integer, minimum: 1 }
+        getDiscountPercentage:
+          type: number
+          minimum: 0
+          maximum: 100
+          description: 100 makes the free items actually free; lower values give a partial discount.
+        tiers:
+          type: array
+          description: For `tieredPercentage` — more units, larger discount.
+          items:
+            type: object
+            required: [minQuantity, percentage]
+            properties:
+              minQuantity: { type: integer, minimum: 1 }
+              percentage: { type: number, minimum: 0, maximum: 100 }
+        maxDiscountAmount:
+          allOf:
+            - $ref: '../shared/common.yaml#/components/schemas/Money'
+          description: Cap on a percentage discount. Prevents an unbounded discount on a large basket.
+
+    PromotionConditions:
+      x-ticvai-persistence: "none — embedded in promotion"
+      type: object
+      description: All conditions must hold. An empty object matches everything.
+      properties:
+        variantIds:
+          type: array
+          items: { type: string, format: uuid }
+        productKinds:
+          type: array
+          items: { type: string }
+        categoryIds:
+          type: array
+          items: { type: string, format: uuid }
+        minQuantity: { type: integer, minimum: 1 }
+        minBasketValue: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+        channels:
+          type: array
+          items: { type: string }
+        purchaseGate:
+          type: boolean
+          default: false
+          description: >
+            BL-037. **`evaluatePromotions` gates a price and nothing gated a sale.** A non-member
+            could buy a member-only product at the member price refused, which is a discount
+            failure rather than an eligibility one.
+
+            True makes these conditions a **precondition of purchase**: fail them and the line
+            cannot be added, not merely charged more. **Evaluated at add-to-cart**, because a guest
+            told at payment has already entered a card.
+        paymentMethod:
+          type: array
+          nullable: true
+          description: >
+            BL-113. **Card-issuer and payment-type promotions** — *10% with a Network International
+            card* is a real campaign a bank co-funds, and it was unexpressible.
+
+            **Evaluated at payment, not at cart**, which is the awkward part: the discount appears
+            after the tender is chosen, and the basket total must be allowed to move at that point.
+          items: { type: string }
+        issuerBins:
+          type: array
+          nullable: true
+          description: >
+            Card BIN ranges, where the campaign is issuer-specific rather than scheme-specific.
+            **The bank supplies these and they change**, so they are data rather than configuration.
+          items: { type: string }
+        componentRedemption:
+          type: string
+          nullable: true
+          enum: [allTogether, independently, sequenced]
+          description: >
+            BL-112. **Per-component redemption inside a bundle was unstated.** A park-plus-lunch
+            bundle where lunch may be used another day behaves differently from one where both must
+            be used on the same visit, and **the difference is revenue recognition, not just
+            convenience.**
+        daysOfWeek:
+          type: array
+          items: { type: integer, minimum: 0, maximum: 6 }
+        startTime: { type: string, pattern: '^([01]\d|2[0-3]):[0-5]\d$' }
+        endTime: { type: string, pattern: '^([01]\d|2[0-3]):[0-5]\d$' }
+        membershipTierIds:
+          type: array
+          items: { type: string, format: uuid }
+        requiresCoupon: { type: boolean, default: false }
+        firstPurchaseOnly: { type: boolean, default: false }
+        performanceIds:
+          type: array
+          items: { type: string, format: uuid }
+        advanceDaysMin:
+          type: integer
+          description: Early-bird — booked at least this many days ahead.
+        advanceDaysMax:
+          type: integer
+          description: Last-minute — booked no more than this many days ahead.
+
+    StackingMode:
+      type: string
+      description: >
+        How this promotion combines with others. Declared, never inferred from creation
+        order — two reasonable promotions can otherwise combine into a free ticket.
+      enum:
+        - exclusive          # nothing else applies
+        - stackable          # combines freely
+        - bestOnly           # only the single best-value promotion applies
+        - stackWithGroup     # combines only within its stacking group
+
+    CreatePromotionRequest:
+      x-ticvai-persistence: "none — request only"
+      type: object
+      required: [code, name, venueId, discount, validFrom]
+      properties:
+        code: { type: string, maxLength: 64, pattern: '^[A-Za-z0-9_-]+$' }
+        name: { type: string, maxLength: 200 }
+        description: { type: string, maxLength: 1000 }
+        venueId: { type: string, format: uuid }
+        discount: { $ref: '#/components/schemas/Discount' }
+        conditions: { $ref: '#/components/schemas/PromotionConditions' }
+        stackingMode:
+          allOf:
+            - $ref: '#/components/schemas/StackingMode'
+          default: bestOnly
+        stackingGroup: { type: string, maxLength: 64 }
+        precedence:
+          type: integer
+          default: 0
+          description: Higher evaluates first where several could apply.
+        validFrom: { type: string, format: date-time }
+        validTo: { type: string, format: date-time }
+        maxRedemptions: { type: integer, nullable: true }
+        maxRedemptionsPerGuest: { type: integer, nullable: true }
+        budgetCap:
+          allOf:
+            - $ref: '../shared/common.yaml#/components/schemas/Money'
+          description: Total discount value after which the promotion stops automatically.
+
+    Promotion:
+      x-ticvai-persistence: "promotions.promotion"
+      allOf:
+        - $ref: '#/components/schemas/CreatePromotionRequest'
+        - type: object
+          required: [id, status]
+          properties:
+            id: { type: string, format: uuid }
+            status: { $ref: '#/components/schemas/PromotionStatus' }
+            isPaused: { type: boolean }
+            redemptionCount: { type: integer }
+            discountGiven: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+            publishedAt: { type: string, format: date-time, nullable: true }
+
+    ConflictAnalysis:
+      x-ticvai-persistence: "none — computed"
+      type: object
+      required: [promotionId, conflicts, worstCaseDiscount]
+      properties:
+        promotionId: { type: string, format: uuid }
+        conflicts:
+          type: array
+          items:
+            type: object
+            required: [otherPromotionId, otherPromotionCode, overlap, combinedDiscount]
+            properties:
+              otherPromotionId: { type: string, format: uuid }
+              otherPromotionCode: { type: string }
+              overlap:
+                type: string
+                enum: [products, period, channel, full]
+              combinedDiscount:
+                type: number
+                description: Combined percentage where both apply to the same line.
+              isBlocking:
+                type: boolean
+                description: True where the combination would produce a negative or near-zero price.
+        worstCaseDiscount:
+          type: number
+          description: Largest combined discount any single line could receive.
+
+    StackingProblem:
+      x-ticvai-persistence: "none — error shape"
+      allOf:
+        - $ref: '../shared/common.yaml#/components/schemas/Problem'
+        - type: object
+          properties:
+            conflicts:
+              type: array
+              items:
+                type: object
+                properties:
+                  promotionCode: { type: string }
+                  combinedDiscount: { type: number }
+                  detail: { type: string }
+
+    PromotionUsage:
+      x-ticvai-persistence: "none — aggregated from ledger and orders"
+      type: object
+      required: [promotionId, redemptionCount, discountGiven]
+      properties:
+        promotionId: { type: string, format: uuid }
+        redemptionCount: { type: integer }
+        discountGiven: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+        budgetCap: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+        budgetRemaining: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+        isBudgetExhausted: { type: boolean }
+        byChannel:
+          type: array
+          items:
+            type: object
+            properties:
+              channel: { type: string }
+              redemptionCount: { type: integer }
+              discountGiven: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+
+    CouponStatus:
+      type: string
+      enum: [issued, assigned, redeemed, expired, voided]
+
+    CreateCouponCampaignRequest:
+      x-ticvai-persistence: "none — request only"
+      type: object
+      required: [code, name, venueId, discount, validFrom]
+      properties:
+        code: { type: string, maxLength: 64 }
+        name: { type: string, maxLength: 200 }
+        venueId: { type: string, format: uuid }
+        discount: { $ref: '#/components/schemas/Discount' }
+        conditions: { $ref: '#/components/schemas/PromotionConditions' }
+        isSingleUse:
+          type: boolean
+          default: true
+          description: >
+            True generates individually redeemable codes. False issues one shared code with
+            a redemption limit.
+        maxRedemptionsPerCode: { type: integer, default: 1 }
+        validFrom: { type: string, format: date-time }
+        validTo: { type: string, format: date-time }
+
+    CouponCampaign:
+      x-ticvai-persistence: "promotions.coupon_campaign"
+      allOf:
+        - $ref: '#/components/schemas/CreateCouponCampaignRequest'
+        - type: object
+          required: [id, generatedCount, redeemedCount]
+          properties:
+            id: { type: string, format: uuid }
+            generatedCount: { type: integer }
+            redeemedCount: { type: integer }
+            isActive: { type: boolean }
+
+    CouponCode:
+      x-ticvai-persistence: "promotions.coupon_code"
+      type: object
+      required: [code, campaignId, status]
+      properties:
+        code: { type: string }
+        campaignId: { type: string, format: uuid }
+        status: { $ref: '#/components/schemas/CouponStatus' }
+        assignedSubjectId: { type: string, format: uuid, nullable: true }
+        redemptionCount: { type: integer }
+        maxRedemptions: { type: integer }
+        discount: { $ref: '#/components/schemas/Discount' }
+        invalidReason:
+          type: string
+          nullable: true
+          description: >
+            Why the code cannot be applied. A cashier reading `expired` to a guest is a very
+            different conversation from reading `already used`.
+          enum: [expired, alreadyRedeemed, voided, notYetValid, wrongVenue, conditionsNotMet, notAssignedToGuest]
+        validFrom: { type: string, format: date-time, nullable: true }
+        validTo: { type: string, format: date-time, nullable: true }
+        redeemedAt: { type: string, format: date-time, nullable: true }
+        redeemedOrderId: { type: string, nullable: true }
+
+    CreateVoucherBatchRequest:
+      x-ticvai-persistence: "none — request only"
+      type: object
+      required: [name, venueId, faceValue, quantity, validTo]
+      properties:
+        name: { type: string, maxLength: 200 }
+        venueId: { type: string, format: uuid }
+        faceValue: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+        quantity: { type: integer, minimum: 1, maximum: 50000 }
+        allowPartialRedemption:
+          type: boolean
+          default: true
+          description: >
+            False forfeits any unused balance, which is then recognised as breakage.
+        validFrom: { type: string, format: date-time }
+        validTo: { type: string, format: date-time }
+        restrictToVariantIds:
+          type: array
+          items: { type: string, format: uuid }
+
+    VoucherBatch:
+      x-ticvai-persistence: "promotions.voucher_batch"
+      allOf:
+        - $ref: '#/components/schemas/CreateVoucherBatchRequest'
+        - type: object
+          required: [id, issuedCount, redeemedValue, outstandingLiability]
+          properties:
+            id: { type: string, format: uuid }
+            issuedCount: { type: integer }
+            redeemedValue: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+            outstandingLiability:
+              allOf:
+                - $ref: '../shared/common.yaml#/components/schemas/Money'
+              description: Unredeemed value. A liability until redeemed or expired.
+
+    Voucher:
+      x-ticvai-persistence: "promotions.voucher"
+      type: object
+      required: [code, batchId, faceValue, balance, status]
+      properties:
+        code: { type: string }
+        batchId: { type: string, format: uuid }
+        faceValue: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+        balance: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+        status:
+          type: string
+          enum: [issued, partiallyRedeemed, redeemed, expired, voided]
+        validTo: { type: string, format: date-time }
+
+    BundleKind:
+      type: string
+      enum: [fixed, dynamic, mandatory, optional, promotional]
+
+    BundleChoiceGroup:
+      type: object
+      x-ticvai-persistence: "promotions.bundle_choice_group"
+      description: >
+        **Pick n from a set** (3.5.10). The shape a dynamic bundle needs and `BundleComponent`
+        could not express — it names specific variants, which describes a fixed bundle with
+        swaps.
+
+        The bundle price does not move with the choice (ADR-0019). **The allocation does.**
+      required: [label, choose, options]
+      properties:
+        id: { type: string, format: uuid, readOnly: true }
+        label:
+          type: string
+          description: What the guest is asked. "Choose 3 attractions".
+        choose:
+          type: integer
+          minimum: 1
+          description: How many options the guest picks.
+        allowDuplicates:
+          type: boolean
+          default: false
+          description: >
+            Whether the same option may be picked twice. False for attractions, sometimes true
+            for F&B.
+        options:
+          type: array
+          minItems: 2
+          items:
+            type: object
+            required: [variantId]
+            properties:
+              variantId: { type: string, format: uuid }
+              quantity: { type: integer, default: 1 }
+              isDefault: { type: boolean, default: false }
+        unavailableBehaviour:
+          type: string
+          enum: [hideOption, hideBundle]
+          default: hideOption
+          description: >
+            An option that has sold out for the chosen date is **not offered**. Where the group
+            can no longer be satisfied at all, the bundle itself becomes unavailable —
+            **it is never sold with a component that cannot be delivered**, because a
+            substitution the guest did not choose is a complaint at the gate.
+
+    BundleComponent:
+      x-ticvai-persistence: "promotions.bundle_component"
+      type: object
+      required: [variantId, quantity]
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+          description: >
+            **Added 20 August.** The schema reference derives table columns from API response schemas, and a response is not a table — this one returned everything a caller needs and not the row's own identity, so the table had no key and no row could be addressed, updated or deleted. Found by an audit of all 365 tables, not by a reader.
+        variantId: { type: string, format: uuid }
+        quantity: { type: integer, minimum: 1 }
+        isOptional: { type: boolean, default: false }
+        substituteVariantIds:
+          type: array
+          items: { type: string, format: uuid }
+          description: For dynamic bundles — guest chooses among these.
+        venueId:
+          type: string
+          format: uuid
+          nullable: true
+          description: >
+            Where this component is redeemed. Differs from the selling venue for multi-venue
+            passes, which is why the allocation split exists.
+
+    AllocationMethod:
+      type: string
+      enum: [percentage, fixedAmount, proRataListPrice]
+
+    AllocationComponent:
+      x-ticvai-persistence: "promotions.allocation_component"
+      type: object
+      required: [variantId]
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+          description: >
+            **Added 20 August.** The schema reference derives table columns from API response schemas, and a response is not a table — this one returned everything a caller needs and not the row's own identity, so the table had no key and no row could be addressed, updated or deleted. Found by an audit of all 365 tables, not by a reader.
+        variantId: { type: string, format: uuid }
+        percentage: { type: number, minimum: 0, maximum: 100 }
+        fixedAmount: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+        listPrice:
+          allOf:
+            - $ref: '../shared/common.yaml#/components/schemas/Money'
+          description: For `proRataListPrice` — weights derived from list prices.
+        revenueAccountId: { type: string, format: uuid }
+        legalEntityId:
+          type: string
+          format: uuid
+          nullable: true
+          description: >
+            Set where the component is earned by a different legal entity. Cross-currency
+            allocation is deferred pending the FX policy decision.
+        venueId: { type: string, format: uuid, nullable: true }
+
+    AllocationSplit:
+      x-ticvai-persistence: "promotions.allocation_split + promotions.allocation_component"
+      type: object
+      required: [id, bundleId, method, components]
+      properties:
+        id: { type: string, format: uuid }
+        bundleId: { type: string, format: uuid }
+        method: { $ref: '#/components/schemas/AllocationMethod' }
+        components:
+          type: array
+          items: { $ref: '#/components/schemas/AllocationComponent' }
+        crossesLegalEntities:
+          type: boolean
+          description: >
+            True where components are earned by different legal entities. Such splits
+            generate inter-company positions.
+
+    AllocationPreview:
+      x-ticvai-persistence: "none — computed"
+      type: object
+      required: [amount, allocations, reconciles]
+      properties:
+        amount: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+        allocations:
+          type: array
+          items:
+            type: object
+            required: [variantId, allocatedAmount]
+            properties:
+              variantId: { type: string, format: uuid }
+              allocatedAmount: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+              percentageOfTotal: { type: number }
+              revenueAccountId: { type: string, format: uuid }
+              remainderUnits:
+                type: integer
+                description: Minor units added or removed by remainder distribution.
+        reconciles:
+          type: boolean
+          description: >
+            Allocations sum exactly to the amount. Always true — a split that does not
+            reconcile is rejected rather than returned.
+
+    CreateBundleRequest:
+      x-ticvai-persistence: "none — request only"
+      type: object
+      required: [code, name, venueId, kind, price, components, allocation]
+      properties:
+        code: { type: string, maxLength: 64 }
+        name: { type: string, maxLength: 200 }
+        description: { type: string, maxLength: 1000 }
+        venueId: { type: string, format: uuid }
+        kind: { $ref: '#/components/schemas/BundleKind' }
+        price: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+        components:
+          type: array
+          minItems: 0
+          items: { $ref: '#/components/schemas/BundleComponent' }
+        choiceGroups:
+          type: array
+          description: >
+            Dynamic bundles (3.5.10). A bundle may carry fixed components and choice groups at
+            once — a family pass with fixed parking and two groups the guest chooses from.
+            **The bundle price does not move with the choice** (ADR-0019).
+          items: { $ref: '#/components/schemas/BundleChoiceGroup' }
+        allocation:
+          type: object
+          required: [method, components]
+          properties:
+            method: { $ref: '#/components/schemas/AllocationMethod' }
+            components:
+              type: array
+              items: { $ref: '#/components/schemas/AllocationComponent' }
+        validFrom: { type: string, format: date-time }
+        validTo: { type: string, format: date-time }
+
+    Bundle:
+      x-ticvai-persistence: "promotions.bundle + promotions.bundle_component"
+      allOf:
+        - $ref: '#/components/schemas/CreateBundleRequest'
+        - type: object
+          required: [id, savingsAmount, isActive, hasBeenSold]
+          properties:
+            id: { type: string, format: uuid }
+            savingsAmount:
+              allOf:
+                - $ref: '../shared/common.yaml#/components/schemas/Money'
+              description: Sum of component list prices less the bundle price.
+            savingsPercentage: { type: number }
+            hasBeenSold:
+              type: boolean
+              description: True locks components and allocation against amendment.
+            isActive: { type: boolean }
+
+    UpsellPlacement:
+      type: string
+      enum: [productDetail, cart, checkout, postPurchase, atGate, inVenue]
+
+    UpsellRule:
+      x-ticvai-persistence: "promotions.upsell_rule"
+      type: object
+      required: [id, name, placement, triggerVariantIds, suggestedVariantIds]
+      properties:
+        id: { type: string, format: uuid }
+        name: { type: string, maxLength: 200 }
+        placement: { $ref: '#/components/schemas/UpsellPlacement' }
+        triggerVariantIds:
+          type: array
+          items: { type: string, format: uuid }
+        triggerCategoryIds:
+          type: array
+          items: { type: string, format: uuid }
+        suggestedVariantIds:
+          type: array
+          minItems: 1
+          items: { type: string, format: uuid }
+        suggestedBundleId: { type: string, format: uuid, nullable: true }
+        channels:
+          type: array
+          description: >
+            Empty applies to every channel. Restriction is opt-in — a rule that fires on the
+            website but not at a counter is a guest experience inconsistency.
+          items: { type: string }
+        priority: { type: integer, default: 0 }
+        maxSuggestions: { type: integer, default: 3 }
+        isActive: { type: boolean }
+
+    UpsellSuggestion:
+      x-ticvai-persistence: "none — computed"
+      type: object
+      required: [variantId, name, price, source, rank]
+      properties:
+        variantId: { type: string, format: uuid }
+        bundleId: { type: string, format: uuid, nullable: true }
+        name: { type: string }
+        price: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+        discountedPrice: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+        source:
+          type: string
+          enum: [rule, recommendation]
+          description: A configured rule always outranks a model.
+        ruleId: { type: string, format: uuid, nullable: true }
+        rank: { type: integer }
+        rationale: { type: string, nullable: true }
+
+    EvaluatePromotionsRequest:
+      x-ticvai-persistence: "none — request only"
+      type: object
+      required: [venueId, channel, lines]
+      properties:
+        venueId: { type: string, format: uuid }
+        channel: { type: string }
+        subjectId: { type: string, format: uuid }
+        membershipTierId: { type: string, format: uuid }
+        couponCodes:
+          type: array
+          items: { type: string }
+        evaluateAt:
+          type: string
+          format: date-time
+          description: For back-office testing of a rule before publishing.
+        lines:
+          type: array
+          minItems: 1
+          items:
+            type: object
+            required: [lineId, variantId, quantity, unitPrice]
+            properties:
+              lineId: { type: string }
+              variantId: { type: string, format: uuid }
+              performanceId: { type: string, format: uuid }
+              quantity: { type: integer, minimum: 1 }
+              unitPrice: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+
+    PromotionEvaluation:
+      x-ticvai-persistence: "none — computed"
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      type: object
+      required: [totalDiscount, lines, applied, rejected]
+      properties:
+        totalDiscount: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+        lines:
+          type: array
+          items:
+            type: object
+            required: [lineId, originalPrice, discountedPrice, discount]
+            properties:
+              lineId: { type: string }
+              originalPrice: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+              discountedPrice: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+              discount: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+              appliedPromotionIds:
+                type: array
+                items: { type: string, format: uuid }
+        applied:
+          type: array
+          items:
+            type: object
+            required: [promotionId, promotionCode, discount]
+            properties:
+              promotionId: { type: string, format: uuid }
+              promotionCode: { type: string }
+              promotionName: { type: string }
+              discount: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+              couponCode: { type: string, nullable: true }
+        rejected:
+          type: array
+          description: >
+            Promotions that matched the products but did not apply, with the reason. This is
+            what a cashier reads to a guest who expected a discount.
+          items:
+            type: object
+            required: [promotionCode, reason]
+            properties:
+              promotionCode: { type: string }
+              promotionName: { type: string }
+              reason:
+                type: string
+                enum:
+                  - conditionsNotMet
+                  - supersededByBetterOffer
+                  - exclusivePromotionApplied
+                  - redemptionLimitReached
+                  - budgetExhausted
+                  - outsideValidPeriod
+                  - wrongChannel
+                  - membershipRequired
+                  - couponRequired
+              detail: { type: string }
+
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

@@ -1,0 +1,128 @@
+# The API: atlasapi.ainfinite.ai
+#
+# One name in front of a browser, two processes behind it. The accounts service
+# on :8787 owns auth, accounts, invites, verdicts, mentions and validation. The
+# reading server on :4173 owns the fifteen routes that parse the delivery
+# package off disk — and owns them exclusively, which is why they have to be
+# named here: :8787 has no code for any of them and answers 404.
+#
+# The fifteen, from server.mjs:
+#   index  detail  session  summary  tooltips  domains  domain  journeys
+#   backend  decisions  diagrams  events  file  lineage  tree
+#
+# `summary` and `diagrams` were added to the reading server after this block was
+# written and were not added here, so both fell through to the accounts service
+# and 404ed — the landing page drew zeroes rather than an error, because a count
+# that failed to load and a count of nothing look the same. deploy.sh now reads
+# this line and server.mjs and refuses when they disagree.
+#
+# A regex location is matched before any prefix location, so the block below
+# wins over `location /` regardless of the order they appear in.
+#
+# Install:
+#   sudo cp deploy/nginx/atlasapi.ainfinite.ai /etc/nginx/sites-available/
+#   sudo ln -sf /etc/nginx/sites-available/atlasapi.ainfinite.ai /etc/nginx/sites-enabled/
+#   sudo nginx -t && sudo systemctl reload nginx
+
+server {
+
+    server_name atlasapi.ainfinite.ai;
+
+    # ── the delivery package, answered by the reading server ──────────────
+    # One prefix and no list of routes, which is the reason the package reads
+    # moved out of `/api/`. Everything under it — every route, every project —
+    # belongs to the reading server, so adding either needs no change here.
+    #
+    # `/pkg/<project>/index`, `/pkg/<project>/wireframes/…`, `/pkg/<project>/frame`.
+    location /pkg/ {
+        proxy_pass http://127.0.0.1:4173;
+
+        proxy_http_version 1.1;
+        proxy_set_header Host              $host;
+        proxy_set_header X-Real-IP         $remote_addr;
+        proxy_set_header X-Forwarded-For   $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header Connection        "";
+
+        # The page lives on atlas.ainfinite.ai and this is atlasapi, so these
+        # reads are cross-origin. Node decides whether to allow the origin and
+        # cannot do that if the header is dropped on the way in.
+        proxy_set_header Origin            $http_origin;
+
+        # /pkg/<project>/events is a long-lived SSE stream. Buffering holds it
+        # until the connection closes, which for a stream is never, and the 120s
+        # used below would cut it every two minutes.
+        proxy_buffering    off;
+        proxy_cache        off;
+        proxy_read_timeout 24h;
+    }
+
+    # ── the same routes under their old names, until the client moves ────
+    #
+    # `/api/` is shared with the accounts service, which is why each package
+    # route has to be named: anything not on this list goes to :8787, which has
+    # no code for it and answers 404. `summary` and `diagrams` were added to
+    # server.mjs and not to this line, and the landing page drew zeroes for weeks
+    # because a count that fails to load and a count of nothing look the same.
+    #
+    # This block is the last thing in the deployment that has to be kept in step
+    # by hand. It comes out when the client calls `/pkg/` for everything.
+    location ~ ^/api/(index|detail|session|summary|tooltips|domains|domain|journeys|backend|decisions|diagrams|events|file|lineage|tree)(/|$) {
+        proxy_pass http://127.0.0.1:4173;
+
+        proxy_http_version 1.1;
+        proxy_set_header Host              $host;
+        proxy_set_header X-Real-IP         $remote_addr;
+        proxy_set_header X-Forwarded-For   $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header Connection        "";
+
+        # The page lives on atlas.ainfinite.ai and this is atlasapi, so these
+        # reads are cross-origin. Node decides whether to allow the origin and
+        # cannot do that if the header is dropped on the way in.
+        proxy_set_header Origin            $http_origin;
+
+        # /api/events is a long-lived SSE stream. Buffering holds it until the
+        # connection closes, which for a stream is never, and the 120s used
+        # below would cut it every two minutes.
+        proxy_buffering    off;
+        proxy_cache        off;
+        proxy_read_timeout 24h;
+    }
+
+    # ── everything else: accounts, invites, verdicts, mentions, /docs ─────
+    location / {
+        proxy_pass http://127.0.0.1:8787;
+
+        proxy_http_version 1.1;
+        proxy_set_header Host              $host;
+        proxy_set_header X-Real-IP         $remote_addr;
+        proxy_set_header X-Forwarded-For   $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header Connection        "";
+
+        proxy_read_timeout 120s;
+    }
+
+    listen [::]:443 ssl; # managed by Certbot
+    listen 443 ssl; # managed by Certbot
+    ssl_certificate /etc/letsencrypt/live/atlasapi.ainfinite.ai/fullchain.pem; # managed by Certbot
+    ssl_certificate_key /etc/letsencrypt/live/atlasapi.ainfinite.ai/privkey.pem; # managed by Certbot
+    include /etc/letsencrypt/options-ssl-nginx.conf; # managed by Certbot
+    ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem; # managed by Certbot
+
+}
+
+server {
+
+    if ($host = atlasapi.ainfinite.ai) {
+        return 301 https://$host$request_uri;
+    } # managed by Certbot
+
+    listen 80;
+    listen [::]:80;
+
+    server_name atlasapi.ainfinite.ai;
+    return 404; # managed by Certbot
+
+}

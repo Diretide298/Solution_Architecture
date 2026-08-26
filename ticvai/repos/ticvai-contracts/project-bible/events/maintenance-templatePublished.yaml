@@ -1,0 +1,51 @@
+# maintenance.templatePublished v1 — published by maintenance
+# Checked by tools/check-states.py.
+
+name: maintenance.templatePublished
+version: 1
+publisher: maintenance
+description: An inspection or procedure template is available for use.
+aggregate: inspectionTemplate
+emittedWhen: Template created or amended
+payload:
+- field: templateId
+  type: uuid
+- field: venueId
+  type: uuid
+- field: appliesToAssetCategory
+  type: string
+- field: isSafetyCritical
+  type: boolean
+  notes: Drives retrieval ranking — a safety procedure should outrank a routine one
+- field: version
+  type: integer
+  notes: '**Supersedes rather than replaces.** A technician who followed version 2 last week needs version
+    2 to still exist'
+- field: publishedAt
+  type: timestamp
+consumers:
+- context: ai
+  purpose: Index the procedure text, section-chunked
+  idempotencyKey: templateId + version
+  onFailure: retryThenDeadLetter
+  isCritical: true
+- context: reporting
+  purpose: Compliance coverage
+  idempotencyKey: templateId + version
+  onFailure: retry
+  isCritical: false
+- context: cache
+  purpose: Drop cached answers under the affected scope. **The same event that invalidates the index
+    invalidates the answer** — a cached answer that outlives a price change has misled a guest on the
+    venue’s behalf, which is worse than a slow one
+  idempotencyKey: scopePath+eventId
+  onFailure: retryThenDeadLetter
+  isCritical: true
+retention: 30 days after publication
+notes: 'Critical because this is the source a technician asks safety questions against. **Answering
+  a chiller-isolation question from a superseded procedure is the failure mode**, which is why the version
+  is in the idempotency key.
+
+
+  No state model emits this: `inspection_template` carries a version and no status. Superseding is a
+  new version, not a state change.'

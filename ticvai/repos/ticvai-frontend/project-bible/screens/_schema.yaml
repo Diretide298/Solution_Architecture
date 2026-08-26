@@ -1,0 +1,227 @@
+$schema: "https://json-schema.org/draft/2020-12/schema"
+$id: "ticvai/screens/_schema.yaml"
+title: TICVAI screen definition
+
+description: >
+  ## What this is
+
+  **The meta-schema for screen definitions.** One file per platform, validated against this.
+
+  Screen definitions sit between the page inventory and the wireframes. The inventory answers
+  *what screens exist*; these answer *what is on them* — regions, components, states,
+  navigation and the permissions that gate each one.
+
+  ## Why YAML rather than a design file
+
+  A wireframe is authoritative for how a screen looks. It is a poor source for what a screen
+  *does*: which endpoint fills each region, what happens when that endpoint returns empty,
+  which permission hides a button, what the offline state is. Those answers live here, and a
+  designer and an engineer reading the same file cannot drift.
+
+  This is the contract a wireframe implements, in the same sense OpenAPI is the contract an
+  endpoint implements.
+
+  ## Segregation
+
+  One file per platform. A team owns a platform, a platform owns a file, and two teams never
+  edit the same one. Shared regions and components live in `_components.yaml`.
+
+  ## The four states rule
+
+  Every data-loading screen declares `loading`, `empty`, `error`, and `offline` where the
+  platform is offline-capable. A screen with only a happy path gets built with only a happy
+  path, and the empty state is the one that reaches production unconsidered.
+
+type: object
+required: [platform, screens]
+properties:
+  platform:
+    type: object
+    required: [code, name, surface, runtime]
+    properties:
+      code: { type: string, pattern: '^P[0-9]{2}$' }
+      name: { type: string }
+      surface: { type: string, enum: [guestFacing, staffFacing, platformAdmin, partner, public] }
+      runtime: { type: string, enum: [reactWeb, reactNative, reactNativeTablet, electron, embedded] }
+      offlineCapable:
+        type: boolean
+        default: false
+        description: Drives whether screens must declare an `offline` state.
+      themes: { type: array, items: { type: string, enum: [light, dark] } }
+      directions:
+        type: array
+        items: { type: string, enum: [ltr, rtl] }
+        description: >
+          RTL is first-class, not a later localisation (CF-42). A platform listing `rtl` has
+          every layout mirrored, not merely translated.
+      breakpoints: { type: array, items: { type: string } }
+      screenCount: { type: integer }
+
+  screens:
+    type: array
+    items:
+      type: object
+      required: [id, name, module, wave, states]
+      properties:
+        id: { type: string, pattern: '^[A-Z]{3}-[0-9]{3}$' }
+        name: { type: string }
+        module: { type: string }
+        requiresModule:
+          type: string
+          enum: [core, ticketing, access, fnb, retail, inventory, seating, membership, marketing,
+                 resources, queue, games, maintenance, accreditation, partner, developerApi,
+                 analytics, ai]
+          description: >
+            **Which licensed module this screen belongs to.** Declared 24 August, and it is the
+            join that did not exist: `moduleKey` was a free string on the licence and `module` was
+            prose on the screen — 38 distinct values, 124 of them literally `TODO` — so **a tenant
+            without an F&B licence was still served every F&B screen.**
+
+            **Distinct from `module`, which is a section name for navigation.** *Sell* is where a
+            screen sits in the back office; `ticketing` is what a tenant bought. A venue can
+            license ticketing and retail and see both under one section.
+
+            **`core` means always on.** A value rather than an absence, because **an empty field
+            and *always on* look identical and only one of them is a decision.**
+        purpose:
+          type: string
+          description: One sentence. What the user came here to do.
+        capability: { type: string }
+        requirements: { type: array, items: { type: string } }
+        wave: { type: integer, minimum: 1, maximum: 4 }
+        permission:
+          type: string
+          description: >
+            Required to reach the screen at all. Null means any authenticated principal, or
+            public. Component-level gating is declared on the component.
+        apis:
+          type: array
+          description: >
+            Every operation this screen calls. Validated against the contracts in CI — a
+            screen referencing an operation that does not exist fails the build, which is how
+            a wireframe drawn against an imagined endpoint gets caught.
+          items:
+            type: object
+            required: [operationId, purpose]
+            properties:
+              operationId: { type: string }
+              purpose: { type: string }
+              trigger: { type: string, enum: [onLoad, onAction, onInterval, onScan, background] }
+        layout:
+          type: object
+          properties:
+            template:
+              type: string
+              enum: [list, detail, form, dashboard, wizard, split, canvas, modal, fullscreen, board]
+            regions:
+              type: array
+              items:
+                type: object
+                required: [name, components]
+                properties:
+                  name: { type: string }
+                  ref: { type: string, description: Shared region from `_components.yaml`. }
+                  components:
+                    type: array
+                    items:
+                      type: object
+                      required: [kind]
+                      properties:
+                        kind:
+                          type: string
+                          description: >
+                            From `_components.yaml`. Not free text — a component that does not
+                            exist there either needs adding deliberately or is the wrong one.
+                        label: { type: string }
+                        bindsTo: { type: string }
+                        permission:
+                          type: string
+                          description: >
+                            Hides the component when absent. Hiding is the default; a disabled
+                            control the user cannot explain is worse than one that is not there.
+                        notes: { type: string }
+        states:
+          type: object
+          required: [loading, empty, error]
+          properties:
+            loading: { type: string }
+            empty: { type: string }
+            error: { type: string }
+            offline:
+              type: string
+              description: >
+                Required where the platform is offline-capable. Served from the local bundle,
+                queued, or refused with a reason.
+            denied: { type: string }
+        entryState:
+          type: object
+          description: >
+            **What the screen arrives holding, and where it came from.** 280 screens call an operation
+            with a path parameter and not one route declared it — `GST-013 Ticket Details` calls
+            `getEntitlement(entitlementId)` on the route `/general/ticket-details`, so **the screen
+            cannot know which ticket it is showing.**
+
+            141 of those have no `entryFrom` either, so **nothing upstream can supply the id.** Raised
+            on 20 August: screens start abruptly, and what is already loaded is unstated.
+
+            A screen that needs a parameter must say so, and say what hands it over. **The alternative
+            is a frontend team guessing, and guessing differently on each screen.**
+          properties:
+            params:
+              type: array
+              description: Path or query parameters the screen cannot render without.
+              items:
+                type: object
+                required: [name, from]
+                properties:
+                  name:
+                    type: string
+                  from:
+                    type: string
+                    description: >
+                      The screen id that supplies it, `session` where it comes from the signed-in
+                      principal or the workstation, or `deepLink` where a guest may arrive cold from
+                      an email or a QR code. **`deepLink` is the one that needs an unhappy path** —
+                      a link opened three weeks late lands on something expired.
+                  optional:
+                    type: boolean
+                    default: false
+            preloaded:
+              type: array
+              description: >
+                What the previous screen already has and hands over, so the screen renders before its
+                own fetch returns. **The difference between a detail screen that flashes a skeleton and
+                one that shows the row you just tapped.**
+              items:
+                type: string
+            coldEntry:
+              type: string
+              description: >
+                What happens when somebody arrives with no upstream screen — a bookmark, a deep link, a
+                refresh. **Every screen taking a parameter can be reached cold**, and a screen with no
+                answer here is one that renders empty and blames the network.
+        navigation:
+          type: object
+          properties:
+            entryFrom: { type: array, items: { type: string } }
+            exitTo: { type: array, items: { type: string } }
+            isEntryPoint: { type: boolean }
+        accessibility:
+          type: object
+          properties:
+            focusOrder: { type: string }
+            announcements: { type: string }
+            notes: { type: string }
+        wireframe:
+          type: object
+          properties:
+            status: { type: string, enum: [notStarted, inProgress, review, approved] }
+            figmaNodeId: { type: string }
+            owner: { type: string }
+        notes: { type: string }
+        openQuestions:
+          type: array
+          items: { type: string }
+          description: >
+            What has to be answered before this screen can be drawn. Preferable to drawing it
+            and discovering the question at build.

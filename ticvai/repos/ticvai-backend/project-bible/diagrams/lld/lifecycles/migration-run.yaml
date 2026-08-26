@@ -1,0 +1,70 @@
+id: LLD-Migration run
+title: Migration run — 9 transitions
+generatedBy: tools/derive-diagrams.py
+index: diagrams/hld/04-lifecycles.yaml
+source: states/migration-run.yaml
+entity: Migration run
+contract: platform-ops
+enum: MigrationRun.status
+enumKind: inline
+enumSchema: MigrationRun
+enumProperty: status
+owner: platform-ops
+initial:
+- queued
+terminal:
+- complete
+- failed
+- rolledBack
+transitions:
+- from: queued
+  to: canary
+  operation: planMigration
+  trigger: operation
+  guard: '**Run against one cell first.** A migration that has never run cannot be trusted against 40'
+- from: canary
+  to: running
+  operation: applyMigration
+  trigger: operation
+  guard: The canary passed. The rest follow
+- from: canary
+  to: failed
+  trigger: job
+  guard: '**Failed on the canary, which is where it should fail.** Nothing else was touched'
+- from: running
+  to: paused
+  operation: pauseRollout
+  trigger: operation
+  guard: Halted mid-wave. Cells already migrated stay migrated
+- from: paused
+  to: running
+  operation: applyMigration
+  trigger: operation
+  guard: Resumed
+  isReversal: true
+- from: running
+  to: complete
+  trigger: job
+  guard: Every cell at the new schema
+- from: running
+  to: failed
+  trigger: job
+  guard: A cell failed mid-wave. **The estate is now mixed**, which is the state to design for rather
+    than avoid
+- from: failed
+  to: rolledBack
+  operation: rollbackRollout
+  trigger: operation
+  guard: '**Only where the migration is reversible.** An additive column is; a dropped one is not, and
+    the plan must say which before it runs'
+- from: paused
+  to: rolledBack
+  operation: rollbackRollout
+  trigger: operation
+  guard: Abandoned and reversed
+notes: '**A mixed estate is normal mid-migration and must be supported, not treated as an error.** Cells
+  migrate at different times by design, so the application has to work against both schemas for the
+  duration.
+
+
+  `canary` exists because the alternative is discovering a migration defect on the fortieth cell.'

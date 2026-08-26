@@ -1,0 +1,308 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Atlas — sign in</title>
+    <script>
+      // Night by default here, whatever the app is set to. Both auth pages are
+      // designed night-first — the lattice, the scrim and the translucent
+      // window are built for a dark stage — and an explicit preference still
+      // wins. Inline and above the stylesheets on purpose: a module would
+      // paint the day palette first and flash.
+      try {
+        if ((localStorage.getItem('ticvai-theme') ?? 'dark') === 'dark') {
+          document.documentElement.dataset.theme = 'dark';
+        }
+      } catch { document.documentElement.dataset.theme = 'dark'; }
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+    href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap"
+    rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/styles.css" />
+    <link rel="stylesheet" href="/layers.css" />
+    <link rel="stylesheet" href="/auth.css" />
+    <link rel="stylesheet" href="/login.css" />
+    <link rel="icon" href="/brand/atlas-mark.png" />
+  </head>
+  <body class="signin-page">
+    <!-- The lattice and the wash that sinks it span both columns, behind
+         everything. Neither listens for anything — see auth-bg.js. -->
+    <canvas class="auth-field" id="signin-field" aria-hidden="true"></canvas>
+    <div class="auth-scrim" aria-hidden="true"></div>
+
+    <section class="signin-form">
+      <div class="signin-stack">
+        <!-- Two cuts of the lockup: one wordmark is white ink and the other
+             dark, and each disappears on the other page's stage. -->
+        <img
+          class="auth-lockup auth-lockup-day"
+          src="/brand/atlast_blackfont.png"
+          alt="Atlas — the context layer for AI-assisted development"
+        />
+        <img
+          class="auth-lockup auth-lockup-night"
+          src="/brand/atlas-lockup.png"
+          alt=""
+          aria-hidden="true"
+        />
+
+        <section id="checking" class="auth-state">
+          <p class="auth-note">One moment…</p>
+        </section>
+
+        <!-- Nobody holds an account yet. Shown once, ever: the moment this
+             succeeds the door closes behind it and everyone after is invited. -->
+        <section id="bootstrap" class="auth-state" hidden>
+          <div class="signin-head">
+            <h1 class="auth-title">Set up the first account</h1>
+            <p class="auth-note">
+              No account exists yet. This one will be the administrator — it can
+              invite everyone else, and it is the only way in until it does. This
+              page is offered only while there are no accounts.
+            </p>
+          </div>
+
+          <div class="signin-fields">
+            <div class="auth-field-row">
+              <label class="auth-label" for="boot-email">Your email</label>
+              <input id="boot-email" class="auth-input" type="email" autocomplete="username"
+                     placeholder="you@softlabsgroup.com" />
+            </div>
+            <div class="auth-field-row">
+              <label class="auth-label" for="boot-name">Your name</label>
+              <input id="boot-name" class="auth-input" type="text" autocomplete="name"
+                     placeholder="How your verdicts will be signed" />
+            </div>
+            <div class="auth-field-row">
+              <label class="auth-label" for="boot-password">Password</label>
+              <input id="boot-password" class="auth-input" type="password"
+                     autocomplete="new-password" placeholder="At least 12 characters" />
+            </div>
+            <div class="auth-field-row">
+              <label class="auth-label" for="boot-confirm">Password again</label>
+              <input id="boot-confirm" class="auth-input" type="password" autocomplete="new-password" />
+            </div>
+            <p class="auth-error" id="boot-error" hidden></p>
+          </div>
+
+          <button id="boot-submit" class="auth-button" type="button">Create the administrator</button>
+          <p class="auth-note auth-fine">
+            Nobody else sees this password, now or later — only a hash of it is
+            kept. Long beats complicated: three or four unrelated words are easier
+            to remember and harder to guess than <code>Passw0rd!</code>
+          </p>
+        </section>
+
+        <!-- the ordinary way in -->
+        <section id="signin" class="auth-state" hidden>
+          <div class="signin-head">
+            <h1 class="auth-title">Sign in</h1>
+            <p class="auth-note">
+              Atlas reads the delivery package straight from the repository.
+              Nothing is uploaded, and nothing leaves the machine it runs on.
+            </p>
+          </div>
+
+          <div class="signin-fields">
+            <div class="auth-field-row">
+              <label class="auth-label" for="email">Email</label>
+              <input id="email" class="auth-input" type="email" autocomplete="username"
+                     placeholder="you@softlabsgroup.com" />
+            </div>
+
+            <!-- Forgot? tells the truth rather than sending a reset mail there
+                 is no machinery for: this package holds a hash and no mailer,
+                 and a dead link on the one screen a stranger sees is worse
+                 than the sentence it stands in for. -->
+            <div class="auth-field-row">
+              <div class="signin-label-row">
+                <label class="auth-label" for="password">Password</label>
+                <button id="forgot" class="signin-forgot" type="button"
+                        aria-expanded="false" aria-controls="forgot-note">Forgot?</button>
+              </div>
+              <input id="password" class="auth-input" type="password"
+                     autocomplete="current-password" placeholder="••••••••••••" />
+              <p class="signin-forgot-note" id="forgot-note" hidden>
+                There is no reset link to send — Atlas keeps a hash of your
+                password and never the password. Ask whoever administers this
+                package to let you back in.
+              </p>
+            </div>
+
+            <p class="auth-error" id="error" hidden></p>
+          </div>
+
+          <button id="submit" class="auth-button" type="button">Sign in</button>
+          <p class="auth-note auth-fine">
+            No account? Access is by invitation. Ask whoever runs the package to
+            send you one — an invite works once and expires after seven days.
+          </p>
+        </section>
+
+        <!-- the service is not running, so there is nothing to sign in to -->
+        <section id="offline" class="auth-state" hidden>
+          <h1 class="auth-title">The service is not running</h1>
+          <p class="auth-note">
+            Signing in needs the accounts service, and it is not answering on
+            <code id="offline-where"></code>.
+          </p>
+          <p class="auth-note">Start both halves together:</p>
+          <pre class="auth-pre">cd viewer
+.\start.ps1</pre>
+          <p class="auth-note auth-fine">Or just the accounts service:</p>
+          <pre class="auth-pre">python -m uvicorn api.main:app --port 8787</pre>
+          <button id="retry" class="auth-button" type="button">Try again</button>
+        </section>
+
+        <!-- Who built it and who it is for. Outside the states, because it is
+             true of the page rather than of any one of them. -->
+        <div class="auth-foot">
+          <span class="auth-rings" aria-hidden="true">
+            <span class="auth-ring"></span><span class="auth-ring"></span>
+          </span>
+          <span class="auth-by">
+            <span class="auth-by-label">Powered by</span>
+            <span class="auth-by-name">Ainfinite<b>Core</b></span>
+          </span>
+          <img class="auth-partner" src="/brand/softlabs-logo.webp" alt="Softlabs Group" />
+        </div>
+      </div>
+    </section>
+
+    <!-- The demonstration. Decoration in the accessibility sense — the door
+         works without it — so it is hidden from assistive technology rather
+         than read out as a file that is never really opened. -->
+    <aside class="signin-demo" aria-hidden="true">
+      <div class="signin-pitch">
+        <span class="signin-eyebrow">The context layer</span>
+        <p class="signin-lede">
+          Every screen, contract and state model in one graph — so an assistant
+          writing code can see what the code is supposed to reach.
+        </p>
+      </div>
+
+      <div class="signin-window" id="demo">
+        <div class="signin-bar">
+          <span class="signin-dots"><i></i><i></i><i></i></span>
+          <span class="signin-file"></span>
+          <span class="signin-lang"></span>
+          <span class="signin-status"><i></i><span class="signin-status-text"></span></span>
+        </div>
+        <div class="signin-code"></div>
+        <div class="signin-findings"></div>
+      </div>
+
+      <div class="signin-stats">
+        <span class="signin-stat"><b>1,043</b><span>operations</span></span>
+        <span class="signin-stat"><b>347</b><span>screens</span></span>
+        <span class="signin-stat"><b>24</b><span>contracts</span></span>
+        <span class="signin-stat"><b>39</b><span>state models</span></span>
+      </div>
+    </aside>
+
+    <script type="module">
+      import { startAuthBackground } from '/auth-bg.js';
+      startAuthBackground(document.getElementById('signin-field'));
+
+      import { startSigninDemo } from '/login-demo.js';
+      startSigninDemo(document.getElementById('demo'));
+
+      import { authState, signIn, bootstrapAccount, apiBase } from '/validation.js';
+
+      const $ = (id) => document.getElementById(id);
+      const show = (which) => {
+        for (const id of ['checking', 'bootstrap', 'signin', 'offline']) {
+          $(id).hidden = id !== which;
+        }
+      };
+
+      // Where to go once in. Set by the viewer when it bounced someone here,
+      // so a deep link survives signing in.
+      // The landing page, not the viewer. Somebody who followed a deep link
+      // into a node still gets sent back to that node — `next` carries it — and
+      // it is only the plain sign-in, with nowhere in particular to be, that
+      // lands on the door.
+      const wanted = new URLSearchParams(location.search).get('next') || '/home.html';
+      const goOn = () => { location.href = wanted.startsWith('/') ? wanted : '/'; };
+
+      async function decide() {
+        show('checking');
+        try {
+          const state = await authState();
+          if (state.signedIn) return goOn();
+          if (state.needsBootstrap) {
+            show('bootstrap');
+            $('boot-email').focus();
+            return;
+          }
+          show('signin');
+          $('email').focus();
+        } catch {
+          $('offline-where').textContent = apiBase();
+          show('offline');
+        }
+      }
+
+      const fail = (id, message) => {
+        $(id).textContent = message;
+        $(id).hidden = false;
+      };
+
+      const doSignIn = async () => {
+        $('error').hidden = true;
+        $('submit').disabled = true;
+        $('submit').textContent = 'Signing in…';
+        try {
+          await signIn($('email').value.trim(), $('password').value);
+          goOn();
+        } catch (error) {
+          fail('error', error.message);
+          $('submit').disabled = false;
+          $('submit').textContent = 'Sign in';
+        }
+      };
+
+      const doBootstrap = async () => {
+        $('boot-error').hidden = true;
+        const password = $('boot-password').value;
+        if (password !== $('boot-confirm').value) {
+          return fail('boot-error', 'Those two passwords are not the same.');
+        }
+        if (password.length < 12) {
+          return fail('boot-error', 'A password needs at least 12 characters.');
+        }
+        $('boot-submit').disabled = true;
+        $('boot-submit').textContent = 'Creating…';
+        try {
+          await bootstrapAccount($('boot-email').value.trim(), $('boot-name').value, password);
+          goOn();
+        } catch (error) {
+          fail('boot-error', error.message);
+          $('boot-submit').disabled = false;
+          $('boot-submit').textContent = 'Create the administrator';
+        }
+      };
+
+      $('submit').onclick = doSignIn;
+      $('boot-submit').onclick = doBootstrap;
+      $('retry').onclick = decide;
+      $('forgot').onclick = () => {
+        const note = $('forgot-note');
+        note.hidden = !note.hidden;
+        $('forgot').setAttribute('aria-expanded', String(!note.hidden));
+      };
+      for (const id of ['email', 'password']) {
+        $(id).addEventListener('keydown', (e) => { if (e.key === 'Enter') doSignIn(); });
+      }
+      for (const id of ['boot-email', 'boot-name', 'boot-password', 'boot-confirm']) {
+        $(id).addEventListener('keydown', (e) => { if (e.key === 'Enter') doBootstrap(); });
+      }
+
+      decide();
+    </script>
+  </body>
+</html>

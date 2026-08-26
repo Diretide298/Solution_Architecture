@@ -1,0 +1,54 @@
+id: LLD-Catalogue import job
+title: Catalogue import job — 6 transitions
+generatedBy: tools/derive-diagrams.py
+index: diagrams/hld/04-lifecycles.yaml
+source: states/catalogue-import-job.yaml
+entity: Catalogue import job
+contract: catalogue
+enum: CatalogueImportJob.status
+enumKind: inline
+enumSchema: CatalogueImportJob
+enumProperty: status
+owner: catalogue
+initial:
+- parsing
+terminal:
+- committed
+- failed
+transitions:
+- from: parsing
+  to: previewReady
+  operation: importProductCatalogue
+  trigger: operation
+  guard: '**Parsed, whether or not anything was found.** `outcome` says which — a job that parses zero
+    products is not a parsed job, which is the lesson `seating.ImportJob` learned first'
+- from: parsing
+  to: failed
+  trigger: timer
+  guard: Unreadable, or the source vanished
+- from: previewReady
+  to: committing
+  operation: commitCatalogueImport
+  trigger: operation
+  guard: '**An operator saw the findings and accepted them.** Two-phase exists so nobody commits 2,847
+    products sight-unseen'
+- from: committing
+  to: committed
+  trigger: operation
+  guard: Applied
+- from: committing
+  to: failed
+  trigger: operation
+  guard: '**Partial application is recorded rather than rolled back** — three thousand products half-created
+    is a state somebody has to see to repair'
+- from: previewReady
+  to: failed
+  trigger: timer
+  guard: Abandoned. A preview nobody commits expires rather than waiting forever
+notes: '**`previewReady` with zero products is still `previewReady`** — the status says the parse finished
+  and `outcome` says what it found. Collapsing them would repeat the defect CF-122 fixed in `seating`,
+  where an import that found nothing reported success.
+
+
+  **`failed` after `committing` is not a rollback.** A partially applied catalogue is a real state and
+  hiding it would leave an operator guessing which half landed.'

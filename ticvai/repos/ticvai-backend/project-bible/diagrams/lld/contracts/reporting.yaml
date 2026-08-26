@@ -1,0 +1,395 @@
+id: LLD-reporting
+title: reporting — 29 operations
+generatedBy: tools/derive-diagrams.py
+index: diagrams/hld/03-contracts.yaml
+tier: satellite
+service: ReportingService
+operations:
+- operation: acknowledgeAlert
+  verb: POST
+  path: /alerts/{alertId}/acknowledge
+  scope: venue
+  permission: REPORT_VIEW_VENUE
+  audience:
+  - staff
+  offline: true
+  reads:
+  - cache:idempotency
+  - identity.principal
+  - reporting.alert
+  writes:
+  - cache:idempotency
+  - reporting.alert
+- operation: askReportingQuestion
+  verb: POST
+  path: /reports/ask
+  scope: venue
+  permission: REPORT_VIEW_VENUE
+  audience: null
+  offline: false
+  reads:
+  - ai.policy
+  - ai.provider
+  - cache:idempotency
+  - reporting.report_column
+  - reporting.report_filter
+  writes:
+  - ai.interaction
+  - cache:idempotency
+  - reporting.report_column
+  - reporting.report_filter
+- operation: cancelReportExecution
+  verb: DELETE
+  path: /report-executions/{executionId}
+  scope: venue
+  permission: REPORT_VIEW_VENUE
+  audience: null
+  offline: false
+  reads:
+  - cache:idempotency
+  - reporting.execution
+  writes:
+  - cache:idempotency
+  - reporting.execution
+- operation: createDashboard
+  verb: POST
+  path: /dashboards
+  scope: tenant
+  permission: REPORT_MANAGE
+  audience: null
+  offline: false
+  reads:
+  - cache:idempotency
+  - reporting.dashboard
+  - reporting.dashboard_tile
+  writes:
+  - cache:idempotency
+  - reporting.dashboard
+  - reporting.dashboard_tile
+- operation: createReport
+  verb: POST
+  path: /reports
+  scope: venue
+  permission: REPORT_MANAGE
+  audience: null
+  offline: false
+  reads:
+  - cache:idempotency
+  - reporting.report_column
+  - reporting.report_definition
+  - reporting.report_filter
+  - reporting.report_parameter
+  writes:
+  - cache:idempotency
+  - reporting.report_column
+  - reporting.report_definition
+  - reporting.report_filter
+  - reporting.report_parameter
+- operation: createReportSchedule
+  verb: POST
+  path: /report-schedules
+  scope: venue
+  permission: REPORT_SCHEDULE
+  audience: null
+  offline: false
+  reads:
+  - cache:idempotency
+  - reporting.schedule
+  - reporting.schedule_recipient
+  writes:
+  - cache:idempotency
+  - reporting.schedule
+  - reporting.schedule_recipient
+- operation: deleteReport
+  verb: DELETE
+  path: /reports/{reportId}
+  scope: venue
+  permission: REPORT_MANAGE
+  audience: null
+  offline: false
+  reads:
+  - cache:idempotency
+  - reporting.report_definition
+  writes:
+  - cache:idempotency
+  - reporting.report_definition
+- operation: deleteReportSchedule
+  verb: DELETE
+  path: /report-schedules/{scheduleId}
+  scope: venue
+  permission: REPORT_SCHEDULE
+  audience: null
+  offline: false
+  reads:
+  - cache:idempotency
+  - reporting.schedule
+  writes:
+  - cache:idempotency
+  - reporting.schedule
+- operation: exportReportResult
+  verb: POST
+  path: /report-executions/{executionId}/export
+  scope: venue
+  permission: REPORT_EXPORT
+  audience: null
+  offline: false
+  reads:
+  - cache:idempotency
+  - reporting.export
+  writes:
+  - cache:idempotency
+  - reporting.export
+- operation: getDashboard
+  verb: GET
+  path: /dashboards/{dashboardId}
+  scope: venue
+  permission: REPORT_VIEW_VENUE
+  audience: null
+  offline: false
+  reads:
+  - reporting.dashboard
+  - reporting.dashboard_tile
+  writes: []
+- operation: getReport
+  verb: GET
+  path: /reports/{reportId}
+  scope: venue
+  permission: REPORT_VIEW_VENUE
+  audience: null
+  offline: false
+  reads:
+  - reporting.report_column
+  - reporting.report_definition
+  - reporting.report_filter
+  - reporting.report_parameter
+  writes: []
+- operation: getReportExecution
+  verb: GET
+  path: /report-executions/{executionId}
+  scope: venue
+  permission: REPORT_VIEW_VENUE
+  audience: null
+  offline: false
+  reads:
+  - reporting.execution
+  writes: []
+- operation: getReportExport
+  verb: GET
+  path: /report-exports/{exportId}
+  scope: venue
+  permission: REPORT_EXPORT
+  audience: null
+  offline: false
+  reads:
+  - reporting.export
+  writes: []
+- operation: getReportResult
+  verb: GET
+  path: /report-executions/{executionId}/result
+  scope: venue
+  permission: REPORT_VIEW_VENUE
+  audience: null
+  offline: false
+  reads:
+  - reporting.execution
+  writes: []
+- operation: getSupplierPerformance
+  verb: GET
+  path: /suppliers/{supplierId}/performance
+  scope: venue
+  permission: REPORT_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - inventory.goods_receipt
+  - inventory.movement
+  - inventory.purchase_order
+  - inventory.supplier
+  writes: []
+- operation: listAlertRules
+  verb: GET
+  path: /alert-rules
+  scope: venue
+  permission: REPORT_VIEW_VENUE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - reporting.alert_rule
+  writes: []
+- operation: listAlerts
+  verb: GET
+  path: /alerts
+  scope: venue
+  permission: REPORT_VIEW_VENUE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - reporting.alert
+  - reporting.alert_rule
+  writes: []
+- operation: listDashboards
+  verb: GET
+  path: /dashboards
+  scope: venue
+  permission: REPORT_VIEW_VENUE
+  audience: null
+  offline: false
+  reads:
+  - reporting.dashboard
+  - reporting.dashboard_tile
+  writes: []
+- operation: listReportExecutions
+  verb: GET
+  path: /report-executions
+  scope: venue
+  permission: REPORT_VIEW_VENUE
+  audience: null
+  offline: false
+  reads:
+  - reporting.execution
+  writes: []
+- operation: listReportFields
+  verb: GET
+  path: /report-fields
+  scope: venue
+  permission: REPORT_VIEW_VENUE
+  audience: null
+  offline: false
+  reads:
+  - reporting.report_field
+  writes: []
+- operation: listReportSchedules
+  verb: GET
+  path: /report-schedules
+  scope: venue
+  permission: REPORT_VIEW_VENUE
+  audience: null
+  offline: false
+  reads:
+  - reporting.schedule
+  writes: []
+- operation: listReports
+  verb: GET
+  path: /reports
+  scope: venue
+  permission: REPORT_VIEW_VENUE
+  audience: null
+  offline: false
+  reads:
+  - reporting.report_definition
+  writes: []
+- operation: listSeededReports
+  verb: GET
+  path: /reports/seeded
+  scope: venue
+  permission: REPORT_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - reporting.report_definition
+  writes: []
+- operation: runReport
+  verb: POST
+  path: /reports/{reportId}/run
+  scope: venue
+  permission: REPORT_VIEW_VENUE
+  audience: null
+  offline: false
+  reads:
+  - cache:idempotency
+  - reporting.execution
+  - reporting.report_definition
+  - reporting.report_parameter
+  writes:
+  - cache:idempotency
+  - reporting.execution
+- operation: saveNaturalLanguageQuery
+  verb: POST
+  path: /reports/ask/{conversationId}/save
+  scope: venue
+  permission: REPORT_MANAGE
+  audience: null
+  offline: false
+  reads:
+  - ai.policy
+  - ai.provider
+  - cache:idempotency
+  - reporting.report_column
+  - reporting.report_definition
+  - reporting.report_filter
+  - reporting.report_parameter
+  writes:
+  - ai.interaction
+  - cache:idempotency
+  - reporting.report_column
+  - reporting.report_definition
+  - reporting.report_filter
+  - reporting.report_parameter
+- operation: setAlertRule
+  verb: PUT
+  path: /alert-rules
+  scope: venue
+  permission: REPORT_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - identity.role
+  - reporting.alert_rule
+  writes:
+  - cache:idempotency
+  - reporting.alert_rule
+- operation: updateDashboard
+  verb: PUT
+  path: /dashboards/{dashboardId}
+  scope: tenant
+  permission: REPORT_MANAGE
+  audience: null
+  offline: false
+  reads:
+  - cache:idempotency
+  - reporting.dashboard
+  - reporting.dashboard_tile
+  writes:
+  - cache:idempotency
+  - reporting.dashboard
+  - reporting.dashboard_tile
+- operation: updateReport
+  verb: PUT
+  path: /reports/{reportId}
+  scope: venue
+  permission: REPORT_MANAGE
+  audience: null
+  offline: false
+  reads:
+  - cache:idempotency
+  - reporting.report_column
+  - reporting.report_definition
+  - reporting.report_filter
+  - reporting.report_parameter
+  writes:
+  - cache:idempotency
+  - reporting.report_column
+  - reporting.report_definition
+  - reporting.report_filter
+  - reporting.report_parameter
+- operation: updateReportSchedule
+  verb: PATCH
+  path: /report-schedules/{scheduleId}
+  scope: venue
+  permission: REPORT_SCHEDULE
+  audience: null
+  offline: false
+  reads:
+  - cache:idempotency
+  - reporting.schedule
+  - reporting.schedule_recipient
+  writes:
+  - cache:idempotency
+  - reporting.schedule
+  - reporting.schedule_recipient
