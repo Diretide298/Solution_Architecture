@@ -442,10 +442,24 @@ if [[ -f "$NGINX_SITE" ]]; then
   # matched with `(/|$)` and a parent already forwards its children. Left
   # whole it is reported as missing forever, and a check that cries wolf is
   # a check that gets ignored.
-  OWNED="$(grep -oE "route === '[a-z-]+(/[a-z-]+)?'" \
-            "$REPO/server.mjs" \
-            | grep -oE "'[a-z-]+(/[a-z-]+)?" | tr -d "'" \
-            | sed 's|/.*||' | sort -u)"
+  # Two spellings, because server.mjs has two. Most routes arrive as
+  # `route === 'index'` after the project prefix is parsed off, but a route
+  # that exists *before* a project is known cannot -- so /pkg/projects, the
+  # registry, is matched on the whole path instead. It was missed for exactly
+  # that reason: nginx never forwarded it, every page 404ed on the first read
+  # it makes, and this check had no idea the route existed.
+  OWNED="$( {
+      grep -oE "route === '[a-z-]+(/[a-z-]+)?'" "$REPO/server.mjs" \
+        | grep -oE "'[a-z-]+(/[a-z-]+)?" | tr -d "'" || true
+      grep -oE "url\.pathname === '/(api|pkg)/[a-z-]+'" "$REPO/server.mjs" \
+        | sed -E "s|.*/(api\|pkg)/([a-z-]+)'|\2|" || true
+    } | sed 's|/.*||' | sort -u)"
+  # An empty list compared against anything passes, which is the failure this
+  # check was rewritten once to escape. server.mjs always owns routes; a list
+  # with none in it means the extraction broke, not that the drift is gone.
+  [[ -n "${OWNED// /}" ]] || die \
+    "no package routes found in $REPO/server.mjs -- the nginx drift check
+cannot run, and an empty list would pass it silently."
   FORWARDED="$(grep -oE '\^/api/\([a-z|-]+\)' "$NGINX_SITE" \
                 | tr -d '^()' | sed 's|/api/||' | tr '|' '\n' | sort -u)"
   # A `location /pkg/` covers every route of every project at once, so the
