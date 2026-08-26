@@ -1370,6 +1370,40 @@ body {
 .jchip.safety, .jchip.compliance { border-color: color-mix(in srgb, var(--error) 55%, transparent); }
 .jchip.safety b, .jchip.compliance b { color: var(--error); }
 
+/* The journeys a screen is part of, on the screen itself.
+   A way through, so it reads as a control rather than as another chip: the
+   accent border and the pointer are the difference between "here is a fact"
+   and "here is somewhere to go". */
+.screen-journeys {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 7px;
+  margin: 0 0 10px;
+}
+.screen-journeys-label {
+  font-size: 10px; letter-spacing: .06em; text-transform: uppercase;
+  color: var(--text-dim);
+}
+.screen-journey {
+  display: inline-flex; align-items: center; gap: 7px;
+  padding: 4px 11px;
+  border: 1px solid color-mix(in srgb, var(--accent) 45%, var(--border));
+  background: color-mix(in srgb, var(--accent) 8%, var(--bg-raised));
+  border-radius: 20px;
+  font: inherit; font-size: 11px;
+  color: var(--text);
+  cursor: pointer;
+  text-align: left;
+}
+.screen-journey:hover,
+.screen-journey:focus-visible {
+  border-color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 16%, var(--bg-raised));
+}
+.screen-journey-step { color: var(--text-dim); font-size: 10px; }
+.screen-journeys-none {
+  font-size: 11px; color: var(--text-dim); font-style: italic;
+  border-bottom: 1px dotted var(--border); cursor: help;
+}
+
 .journey-trigger {
   padding: 9px 12px;
   border-left: 3px solid var(--accent);

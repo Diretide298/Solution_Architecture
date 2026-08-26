@@ -488,6 +488,28 @@ async function main() {
   if (current) auth.rememberProject(current);
   renderProjects(projects, current);
 
+  // The lockup stays on the door.
+  //
+  // It shipped as a bare `href="/"`, and `/` is `index.html`, which sends a
+  // reader back here on the **first** load of a session — it gates that on a
+  // `ticvai-session` flag it sets itself, and the door never sets it. So the
+  // first click went `/home.html?project=ticvai` -> `/` -> `/home.html`,
+  // landing back on the door **with the project dropped from the address**,
+  // and every click after that fell through into whichever package was last
+  // opened. One link, two behaviours, and neither is what a brand mark should
+  // do: **the logo on a landing page is not a way into a package.** Choosing a
+  // package is what the rail and the project row are for, and they say which
+  // one; the lockup says nothing, so it must not pick.
+  //
+  // Pointed at the door itself, carrying the project so the address still names
+  // what the figures below are counting. Still an anchor with a real href, so
+  // middle-click and open-in-new-tab keep working.
+  const lockup = document.querySelector('.home-lockup');
+  if (lockup) {
+    lockup.href = current ? `/home.html?project=${encodeURIComponent(current)}` : '/home.html';
+    lockup.setAttribute('aria-label', 'Atlas');
+  }
+
   // A first visit names no project, and every package read below hangs off one.
   // The address is made to say which -- once, on a cold visit -- so that what a
   // reader copies out of the bar is a link to a package rather than to whatever

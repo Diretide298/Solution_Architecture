@@ -3740,6 +3740,54 @@ function renderScreen() {
   if (screen.wireframe?.status) chips.append(chip('wireframe', screen.wireframe.status));
   head.append(chips);
 
+  // ---- the journeys this screen is part of -----------------------------
+  //
+  // A screen is a still from a sequence, and the question a reader has while
+  // looking at one is *what leads here and what follows*. The answer was only
+  // in the LINKS rail — off-canvas on a phone, and behind a toggle on a tablet
+  // — so from the screen itself there was no way through to the journey it
+  // belongs to, though the view is one tab across.
+  //
+  // Same resolution as the rail's, deliberately: a step naming this screen. A
+  // second way of deciding which flows a screen is in would be a second thing
+  // to keep in step.
+  const journeys = (state.journeys?.flows ?? []).filter(
+    (f) => (f.steps ?? []).some((s) => s.screenId === screen.id)
+  );
+  if (journeys.length) {
+    const row = el('div', 'screen-journeys');
+    row.append(el('span', 'screen-journeys-label',
+      journeys.length === 1 ? 'part of the journey' : `part of ${journeys.length} journeys`));
+    for (const flow of journeys) {
+      const steps = flow.steps.filter((s) => s.screenId === screen.id).map((s) => s.step);
+      const go = el('button', 'screen-journey', `${flow.id} ${flow.name}`);
+      go.type = 'button';
+      go.append(el('span', 'screen-journey-step',
+        steps.length === 1 ? `step ${steps[0]}` : `steps ${steps.join(', ')}`));
+      tip(go, `${flow.id} — ${flow.name}`,
+        `Opens the Journey view at this flow, with **${screen.id}** the step it is showing. `
+        + `This screen is step ${steps.join(', ')} of ${flow.steps.length}.`);
+      // The rail's own handler, not a copy of it.
+      go.onclick = () => { state.journeyId = flow.id; setMode('journey'); };
+      row.append(go);
+    }
+    head.append(row);
+  } else {
+    // Say it is absent rather than drawing nothing. **230 of the 492 screens
+    // are named by no flow step**, so a reader meeting one of them would
+    // otherwise be looking at a missing control and a present one and unable to
+    // tell which. The package's own habit: the Audit says what is missing
+    // rather than the server failing.
+    const row = el('div', 'screen-journeys');
+    const none = el('span', 'screen-journeys-none', 'no journey declares a step on this screen');
+    tip(none, 'Not in a journey',
+      'A flow lists its steps, and each step may name a screen. **No flow names this one**, so '
+      + 'there is no sequence to open it in. It is not a claim that the screen is unreachable — '
+      + 'the LINKS rail still shows what exits to it.');
+    row.append(none);
+    head.append(row);
+  }
+
   if (screen.purpose) head.append(el('div', 'journey-trigger', screen.purpose));
   body.append(head);
 

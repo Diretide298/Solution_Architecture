@@ -187,7 +187,21 @@ export function frameDocument(html, anchor) {
   const css = extractStyles(html);
 
   return '<!doctype html><html><head><meta charset="utf-8">'
-    + '<script src="/wireframes/support.js"></script>'
+    // The boards reference their images relatively — `assets/ticvai-light-logo.png`,
+    // 246 times across the pack — and they are right to: opened from `wireframes/`
+    // that resolves. **This document is served from `/frame`, one level up**, so
+    // every one of them resolved to `/pkg/<project>/assets/…` and 404'd, which is
+    // the broken-image box in the corner of every embedded frame.
+    //
+    // Relative on purpose. The document is `/pkg/<project>/frame` under a project
+    // and `/frame` without one; a relative base lands on `wireframes/` beside
+    // whichever it is, where an absolute `/wireframes/` would only be right for
+    // the second and would quietly read the default project's boards under the
+    // first.
+    + '<base href="wireframes/">'
+    // Relative for the same reason — it was absolute, and worked only because
+    // the pre-project spelling is aliased to the default project.
+    + '<script src="support.js"></script>'
     // The board's own rules first, so what follows can correct them rather than
     // be overridden by them.
     + (css ? `<style>${css}</style>` : '')
