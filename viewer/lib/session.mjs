@@ -182,8 +182,10 @@ async function resolveToken(token, apiBase) {
  * stop. Otherwise `role` says who this is, which is what the payload filter
  * needs — the question is never only "are they in" but "which of them is this".
  *
- * An API path gets 401 and JSON, because something is reading it. A page gets a
- * redirect to the sign-in door, because somebody is.
+ * Something reading gets 401 and JSON — `/api/` and `/pkg/`, the payloads.
+ * Somebody looking gets a redirect to the sign-in door. An embedded preview
+ * gets neither, because a door rendered inside a preview box does not read as
+ * a door; see EMBED_REFUSAL below.
  */
 /**
  * What an embedded preview gets instead of the sign-in page.
@@ -231,7 +233,30 @@ export async function gate(req, res, url, apiBase) {
   const stale = readCookies(req.headers.cookie).length > 0;
   const headers = { 'Cache-Control': 'no-store', ...(stale ? { 'Set-Cookie': CLEAR_STALE } : {}) };
 
-  if (url.pathname.startsWith('/api/')) {
+  // `Sec-Fetch-Dest` separates a thing reading from a person looking, and every
+  // browser that can render an iframe sends it. Read once, because all three
+  // branches below turn on it.
+  const dest = req.headers['sec-fetch-dest'];
+
+  // Something is reading this, so it gets 401 and JSON. Somebody looking gets
+  // the door instead, further down.
+  //
+  // `/pkg/` had to be added: the package reads moved out of `/api/` when the
+  // viewer learned about more than one project, and this branch was left
+  // behind. A signed-out `fetch('/pkg/projects')` fell through to the 302, and
+  // fetch follows a redirect — to `/login.html` on the *API* host, which is not
+  // a path nginx forwards to the reading server, so it answered 404. The
+  // console then blamed `/pkg/projects`, a route that exists and works, and the
+  // one thing the reader needed to be told — that their session had ended —
+  // was the one thing nothing said.
+  //
+  // `empty` is what fetch() and XHR send. A board opened full size in its own
+  // tab is `document` and still wants the sign-in page, which is why this turns
+  // on the destination and not on the prefix alone. An absent header is a
+  // caller that is not a browser, and those are reading too.
+  const reading = url.pathname.startsWith('/api/')
+    || (url.pathname.startsWith('/pkg/') && (dest === 'empty' || dest === undefined));
+  if (reading) {
     res.writeHead(401, { ...headers, 'Content-Type': 'application/json' });
     res.end(JSON.stringify({ error: 'not signed in' }));
     return { answered: true, role: null };
@@ -249,7 +274,6 @@ export async function gate(req, res, url, apiBase) {
   // an iframe sends it. Somebody opening a board full size in a new tab is
   // `document` and still wants the door. An embed wants to be told, in the box,
   // what actually happened.
-  const dest = req.headers['sec-fetch-dest'];
   if (dest === 'iframe' || dest === 'frame' || dest === 'embed' || dest === 'object') {
     res.writeHead(401, { ...headers, 'Content-Type': 'text/html; charset=utf-8' });
     res.end(EMBED_REFUSAL);
