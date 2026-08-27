@@ -270,6 +270,29 @@ def main() -> int:
                     "is a client pack")
 
 
+    # **A screen drawn by a client pack is still drawn by the generator, and that is correct.**
+    # 20 screens moved onto Seat and Dashboards boards on 26 August; `derive-wireframes.py` keeps
+    # writing their frames because it draws every screen on its platform. **`generatedFallback`
+    # records the board they came from**, so a reader can see both and a regeneration cannot
+    # silently take the drawn one away.
+    #
+    # **The failure this guards is the reverse**: a screen pointing at a drawn board whose
+    # generated fallback has stopped existing. That happens when a platform is renamed, and it is
+    # how `P08 Staff Web Back Office` outlived its replacement.
+    for _f in sorted(SCREENS.glob("P*.yaml")):
+        _d = yaml.safe_load(_f.read_text(encoding="utf-8"))
+        for _s in (_d.get("screens") or []):
+            _w = _s.get("wireframe") or {}
+            _gf = _w.get("generatedFallback")
+            if not _gf:
+                continue
+            _fn = _gf.split("#")[0].split("/")[-1]
+            if not (BOARDS / _fn).exists():
+                WARNINGS.append(
+                    f"{_s['id']}: generatedFallback names {_fn}, which is not on disk — the board "
+                    "was renamed or removed after this screen was repointed at a drawn one")
+
+
     for w in WARNINGS[:20]:
         print(f"  WARN  {w}")
     for e in ERRORS:

@@ -205,11 +205,24 @@ for t_ in ['Out is how many foreign keys leave the module; In is how many point 
 #
 # The join is one lookup: a table's schema is its prefix, and the decomposition maps every
 # schema to exactly one owner.
-try:
-    _D = json.load(open('/home/claude/ticvai-pkg/handoff/service-decomposition.json',
-                        encoding='utf-8'))['services']
-except Exception:
+# The third `/home/claude/...` in this file, and the only one that was not a
+# glob — so it failed the other way: `open` raised, `except Exception` caught it,
+# and `_D` became `{}`. Every one of the 379 rows on the Tables sheet showed `—`
+# for Service, which is precisely the column the paragraph above says a backend
+# engineer needs before writing DDL. `Foreign writers` is built from the same
+# object and was empty for the same reason.
+#
+# `_pkg` is the helper the rest of this file already uses to find a handoff
+# file; the decomposition has been sitting in `handoff/` the whole time. The
+# bare `except` is kept for a package that genuinely lacks the file, but it says
+# so now rather than shipping a column of dashes that looks like an answer.
+_svc_path = _pkg('service-decomposition.json')
+if _svc_path is None:
+    print("  WARN  no service-decomposition.json in handoff/ — the Service and "
+          "Foreign writers columns will read as '—' for every table")
     _D = {}
+else:
+    _D = json.load(open(_svc_path, encoding='utf-8'))['services']
 SVC_OF_SCHEMA = {sch: name for name, v in _D.items() for sch in v.get('schemas', [])}
 SVC_CONTRACTS = {name: set(v.get('contracts') or []) for name, v in _D.items()}
 # **Loaded here rather than reusing LIN**, which is read 150 lines further down for the lineage
