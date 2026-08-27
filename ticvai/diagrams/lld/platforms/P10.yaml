@@ -119,8 +119,9 @@ screens:
   - PTR-003
   - PTR-004
   - PTR-007
-  boardFrames: null
-  wireframe: wireframes/P10 Partner Web.dc.html#ptr-002
+  boardFrames:
+  - ptr-002
+  wireframe: wireframes/Dashboards Board.dc.html#ptr-002
   inFlows:
   - F03 Partner books on credit
 - screen: PTR-003
@@ -348,8 +349,9 @@ screens:
   - PTR-001
   - PTR-002
   - PTR-003
-  boardFrames: null
-  wireframe: wireframes/P10 Partner Web.dc.html#ptr-009
+  boardFrames:
+  - seat-3d
+  wireframe: wireframes/Seat Board 3.dc.html#seat-3d
   inFlows: null
 - screen: PTR-010
   name: Cart & Quote

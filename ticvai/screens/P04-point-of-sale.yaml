@@ -706,8 +706,9 @@ screens:
     offline: '**Not available offline.** Seat holds require the primary; two terminals selling the same
       seat is unrecoverable'
   wireframe:
-    status: generated
-    board: wireframes/P04 Venue POS.dc.html#pos-004
+    status: designed
+    board: wireframes/Seat Board 3.dc.html#seat-3a
+    generatedFallback: wireframes/P04 Venue POS.dc.html#pos-004
   permission: ORDER_CREATE
   apis:
   - operationId: getSeatAvailability
@@ -760,7 +761,10 @@ screens:
     base currency only, so the till holds one float and one count per currency it takes in. **Removed
     24 August**: cancelPerformance. **Bulk-attach residue** — the 18 August defect that put identical
     operation sets on unrelated screens. A till does not cancel a performance, a staff app does not
-    create roles, and **a scanner does not run a cash shift.**'
+    create roles, and **a scanner does not run a cash shift.** **Drawn 26 August** — `Seat Board 3.dc.html`
+    frame `seat-3a`. **The frame names this screen on its own face**, which is the first pack to do
+    that: the earlier F&B, POS and Retail boards had to be hand-assigned by purpose after three derivation
+    attempts produced nonsense. **A board that says what it draws removes the guess entirely.**'
   implementation:
     app: venue-pos
     route: /sell/sell-seat-map
@@ -786,6 +790,8 @@ screens:
       event.'
   requiresModule: seating
   statesDerived: true
+  boardFrames:
+  - seat-3a
 - id: POS-005
   name: Payment
   module: Payment

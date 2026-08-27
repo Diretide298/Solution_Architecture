@@ -159,9 +159,9 @@ screens:
       is a commercial answer and not a permission one — say which, because the person to ask is different.'
     error: Each tile fails independently. **One dead cell must not blank the console that manages it**
   wireframe:
-    status: generated
-    board: wireframes/P09 TICVAI Web.dc.html#adm-002
-    derivedFrom: wireframes/Dashboards Board.dc.html#adm-002
+    status: designed
+    board: wireframes/Dashboards Board.dc.html#adm-002
+    generatedFallback: wireframes/P09 TICVAI Web.dc.html#adm-002
   capability: C95
   apis:
   - operationId: listTenants
@@ -214,7 +214,9 @@ screens:
     removeLicenceAddOn, setSsoConfig, suspendTenant, terminateTenant, updateTenant. **`ADM-015 API Rate
     Limit & Quota Management` could create and terminate tenants.** The 18 August bulk attach reached
     the platform console too — provisioning, licensing and SSO were on every screen that mentioned a
-    tenant.'
+    tenant. **Drawn 26 August** — `Dashboards Board` frame `adm-002`. **One board draws five dashboards
+    across five platforms** — platform admin, partner, support, guest web and cross-tenant health. A
+    dashboard is a shape rather than a domain, and the pack recognised that before the package did.'
   density: compact
   entryState:
     params:
@@ -224,7 +226,7 @@ screens:
   requiresModule: membership
   statesDerived: true
   boardFrames:
-  - ADM-002
+  - adm-002
 - id: ADM-003
   name: Cross-Tenant Health Dashboard
   module: TODO
@@ -255,9 +257,9 @@ screens:
     error: '**A cell that does not answer is the finding, not an error.** It is rendered unreachable
       with its last-known state and the age of it'
   wireframe:
-    status: generated
-    board: wireframes/P09 TICVAI Web.dc.html#adm-003
-    derivedFrom: wireframes/Dashboards Board.dc.html#adm-003
+    status: designed
+    board: wireframes/Dashboards Board.dc.html#adm-003
+    generatedFallback: wireframes/P09 TICVAI Web.dc.html#adm-003
   capability: C95
   apis:
   - operationId: getCellHealth
@@ -317,7 +319,10 @@ screens:
   notes: 'Purpose derived from the screen name and its operations on 17 August, not from a requirement.
     **Cross-platform navigation removed 24 August**: SCN-003. **A till does not navigate to a back office
     and a guest app does not navigate to either** — those are device handovers, and a flow declares
-    them with `crossesDevice` rather than a screen pretending there is a link.'
+    them with `crossesDevice` rather than a screen pretending there is a link. **Drawn 26 August** —
+    `Dashboards Board` frame `adm-003`. **One board draws five dashboards across five platforms** —
+    platform admin, partner, support, guest web and cross-tenant health. A dashboard is a shape rather
+    than a domain, and the pack recognised that before the package did.'
   density: compact
   entryState:
     params:
@@ -332,7 +337,7 @@ screens:
   requiresModule: membership
   statesDerived: true
   boardFrames:
-  - ADM-003
+  - adm-003
 - id: ADM-004
   name: Platform Audit Log
   module: TODO

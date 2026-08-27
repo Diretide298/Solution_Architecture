@@ -185,9 +185,9 @@ screens:
       is a commercial answer and not a permission one — say which, because the person to ask is different.'
     error: Could not load
   wireframe:
-    status: generated
-    board: wireframes/P10 Partner Web.dc.html#ptr-002
-    derivedFrom: wireframes/Dashboards Board.dc.html#ptr-002
+    status: designed
+    board: wireframes/Dashboards Board.dc.html#ptr-002
+    generatedFallback: wireframes/P10 Partner Web.dc.html#ptr-002
   capability: C34
   apis:
   - operationId: listOrders
@@ -273,7 +273,10 @@ screens:
     a list, a form or a money screen, and worth revisiting where this screen is unusual. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement. **createRefund removed
     18 August** — attached by module resemblance, not by what this screen does. A screen that does not
-    handle money should not be able to move it (CF-87's class).
+    handle money should not be able to move it (CF-87's class). **Drawn 26 August** — `Dashboards Board`
+    frame `ptr-002`. **One board draws five dashboards across five platforms** — platform admin, partner,
+    support, guest web and cross-tenant health. A dashboard is a shape rather than a domain, and the
+    pack recognised that before the package did.
   density: compact
   entryState:
     params:
@@ -287,7 +290,7 @@ screens:
   requiresModule: partner
   statesDerived: true
   boardFrames:
-  - PTR-002
+  - ptr-002
 - id: PTR-003
   name: Profile & Company Details
   module: TODO
@@ -986,8 +989,9 @@ screens:
       is gone. **Added 25 August with the derived list component**: a screen that lists has to say what
       it shows when the list is empty, and this screen gained the list before it gained the sentence.'
   wireframe:
-    status: generated
-    board: wireframes/P10 Partner Web.dc.html#ptr-009
+    status: designed
+    board: wireframes/Seat Board 3.dc.html#seat-3d
+    generatedFallback: wireframes/P10 Partner Web.dc.html#ptr-009
   capability: C54
   apis:
   - operationId: allocateBlockedSeats
@@ -1019,9 +1023,13 @@ screens:
     - PTR-001
     - PTR-002
     - PTR-003
-  notes: States derived from the screen pattern on 17 August, not individually considered — sound for
+  notes: 'States derived from the screen pattern on 17 August, not individually considered — sound for
     a list, a form or a money screen, and worth revisiting where this screen is unusual. Purpose derived
-    from the screen name and its operations on 17 August, not from a requirement.
+    from the screen name and its operations on 17 August, not from a requirement. **Drawn 26 August**
+    — `Seat Board 3.dc.html` frame `seat-3d`. **The frame names this screen on its own face**, which
+    is the first pack to do that: the earlier F&B, POS and Retail boards had to be hand-assigned by
+    purpose after three derivation attempts produced nonsense. **A board that says what it draws removes
+    the guess entirely.**'
   density: compact
   entryState:
     params:
@@ -1032,6 +1040,8 @@ screens:
       the screen says so and offers the partner''s own list. Arrives with `blockId`.'
   requiresModule: partner
   statesDerived: true
+  boardFrames:
+  - seat-3d
 - id: PTR-010
   name: Cart & Quote
   module: TODO

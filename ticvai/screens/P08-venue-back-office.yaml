@@ -239,8 +239,9 @@ screens:
       a commercial answer and not a permission one — say which, because the person to ask is different.'
     error: Save failed, with the field named. Values are never silently dropped
   wireframe:
-    status: generated
-    board: wireframes/P08 Venue Management.dc.html#bo-002
+    status: designed
+    board: wireframes/Seat Board 2.dc.html#seat-2c
+    generatedFallback: wireframes/P08 Venue Management.dc.html#bo-002
   permission: QUEUE_MANAGE
   apis:
   - operationId: createQueue
@@ -323,6 +324,12 @@ screens:
     coldEntry: Resolves from the session; a cold arrival is the ordinary case.
   requiresModule: queue
   statesDerived: true
+  boardFrames:
+  - seat-2c
+  notes: '**Drawn 26 August** — `Seat Board 2.dc.html` frame `seat-2c`. **The frame names this screen
+    on its own face**, which is the first pack to do that: the earlier F&B, POS and Retail boards had
+    to be hand-assigned by purpose after three derivation attempts produced nonsense. **A board that
+    says what it draws removes the guess entirely.**'
 - id: BO-003
   name: Queue Integration Setup
   module: Access & Venue
@@ -1950,11 +1957,16 @@ screens:
     component: apps/venue-management-web/src/routes/venue-operations/SessionCalendarDetail.tsx
     status: notStarted
   wireframe:
-    status: generated
-    board: wireframes/P08 Venue Management.dc.html#bo-015
-  notes: Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition
+    status: designed
+    board: wireframes/Seat Board 2.dc.html#seat-2a
+    generatedFallback: wireframes/P08 Venue Management.dc.html#bo-015
+  notes: 'Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition
     at all. States derived from the screen pattern on 17 August, not individually considered — sound
-    for a list, a form or a money screen, and worth revisiting where this screen is unusual.
+    for a list, a form or a money screen, and worth revisiting where this screen is unusual. **Drawn
+    26 August** — `Seat Board 2.dc.html` frame `seat-2a`. **The frame names this screen on its own face**,
+    which is the first pack to do that: the earlier F&B, POS and Retail boards had to be hand-assigned
+    by purpose after three derivation attempts produced nonsense. **A board that says what it draws
+    removes the guess entirely.**'
   apis:
   - operationId: listPerformances
     contract: catalogue
@@ -2011,6 +2023,8 @@ screens:
       event.'
   requiresModule: ticketing
   statesDerived: true
+  boardFrames:
+  - seat-2a
 - id: BO-016
   name: Session Template
   module: Sell
@@ -2082,11 +2096,16 @@ screens:
     component: apps/venue-management-web/src/routes/venue-operations/SessionTemplateDetail.tsx
     status: notStarted
   wireframe:
-    status: generated
-    board: wireframes/P08 Venue Management.dc.html#bo-016
-  notes: Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition
+    status: designed
+    board: wireframes/Seat Board 2.dc.html#seat-2b
+    generatedFallback: wireframes/P08 Venue Management.dc.html#bo-016
+  notes: 'Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition
     at all. States derived from the screen pattern on 17 August, not individually considered — sound
-    for a list, a form or a money screen, and worth revisiting where this screen is unusual.
+    for a list, a form or a money screen, and worth revisiting where this screen is unusual. **Drawn
+    26 August** — `Seat Board 2.dc.html` frame `seat-2b`. **The frame names this screen on its own face**,
+    which is the first pack to do that: the earlier F&B, POS and Retail boards had to be hand-assigned
+    by purpose after three derivation attempts produced nonsense. **A board that says what it draws
+    removes the guess entirely.**'
   apis:
   - operationId: listPerformances
     contract: catalogue
@@ -2143,6 +2162,8 @@ screens:
       event.'
   requiresModule: ticketing
   statesDerived: true
+  boardFrames:
+  - seat-2b
 - id: BO-017
   name: Capacity Management
   module: Sell
@@ -2425,11 +2446,16 @@ screens:
     component: apps/venue-management-web/src/routes/venue-operations/ClosuresBlackoutsDetail.tsx
     status: notStarted
   wireframe:
-    status: generated
-    board: wireframes/P08 Venue Management.dc.html#bo-019
-  notes: Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition
+    status: designed
+    board: wireframes/Seat Board 2.dc.html#seat-2d
+    generatedFallback: wireframes/P08 Venue Management.dc.html#bo-019
+  notes: 'Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition
     at all. States derived from the screen pattern on 17 August, not individually considered — sound
-    for a list, a form or a money screen, and worth revisiting where this screen is unusual.
+    for a list, a form or a money screen, and worth revisiting where this screen is unusual. **Drawn
+    26 August** — `Seat Board 2.dc.html` frame `seat-2d`. **The frame names this screen on its own face**,
+    which is the first pack to do that: the earlier F&B, POS and Retail boards had to be hand-assigned
+    by purpose after three derivation attempts produced nonsense. **A board that says what it draws
+    removes the guess entirely.**'
   apis:
   - operationId: listPerformances
     contract: catalogue
@@ -2486,6 +2512,8 @@ screens:
       event.'
   requiresModule: ticketing
   statesDerived: true
+  boardFrames:
+  - seat-2d
 - id: BO-020
   name: F&B Order Management
   module: Food & Beverage
@@ -7428,14 +7456,18 @@ screens:
     component: apps/venue-management-web/src/routes/venue-operations/OpeningHoursCalendarDetail.tsx
     status: notStarted
   wireframe:
-    status: generated
-    board: wireframes/P08 Venue Management.dc.html#bo-063
+    status: designed
+    board: wireframes/Seat Board 1.dc.html#seat-1c
+    generatedFallback: wireframes/P08 Venue Management.dc.html#bo-063
   notes: 'Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition
     at all. States derived from the screen pattern on 17 August, not individually considered — sound
     for a list, a form or a money screen, and worth revisiting where this screen is unusual. **Improved
     20 August against the client design board**, answering 2 board screen(s): Operating Hours & Service
     Periods; Operating Hours & Sales Periods. **The id, flows and navigation are unchanged** — a board
-    specifies a screen further; it does not replace it.'
+    specifies a screen further; it does not replace it. **Drawn 26 August** — `Seat Board 1.dc.html`
+    frame `seat-1c`. **The frame names this screen on its own face**, which is the first pack to do
+    that: the earlier F&B, POS and Retail boards had to be hand-assigned by purpose after three derivation
+    attempts produced nonsense. **A board that says what it draws removes the guess entirely.**'
   apis:
   - operationId: listPerformances
     contract: catalogue
@@ -7504,6 +7536,8 @@ screens:
   provenance: client board, specified
   requiresModule: ticketing
   statesDerived: true
+  boardFrames:
+  - seat-1c
 - id: BO-064
   name: Zones & Areas
   module: Venue Operations
@@ -9998,9 +10032,12 @@ screens:
       here** — an empty list with the filter state hidden elsewhere is a person who thinks the data
       is gone. **Added 25 August with the derived list component**: a screen that lists has to say what
       it shows when the list is empty, and this screen gained the list before it gained the sentence.'
-  notes: CF-123. **A venue may have several maps** — a park map and a floor plan per building are different
+  notes: 'CF-123. **A venue may have several maps** — a park map and a floor plan per building are different
     maps, not layers of one, because a guest on the second floor should not be shown the ground floor
-    toilets.
+    toilets. **Drawn 26 August** — `Seat Board 2.dc.html` frame `seat-2e`. **The frame names this screen
+    on its own face**, which is the first pack to do that: the earlier F&B, POS and Retail boards had
+    to be hand-assigned by purpose after three derivation attempts produced nonsense. **A board that
+    says what it draws removes the guess entirely.**'
   navigation:
     exitTo:
     - BO-093
@@ -10011,8 +10048,9 @@ screens:
     component: apps/venue-management-web/src/routes/venue-mapping/VenueMapList.tsx
     status: notStarted
   wireframe:
-    status: generated
-    board: wireframes/P08 Venue Management.dc.html#bo-092
+    status: designed
+    board: wireframes/Seat Board 2.dc.html#seat-2e
+    generatedFallback: wireframes/P08 Venue Management.dc.html#bo-092
   density: compact
   requiresModule: seating
   statesDerived: true
@@ -10035,6 +10073,8 @@ screens:
         notes: '**A screen that can submit must be leaveable without submitting.**'
         derived: true
         impliedBy: createVenueMap
+  boardFrames:
+  - seat-2e
 - id: BO-093
   name: Map Import & Labelling
   module: Access & Venue
@@ -10071,11 +10111,15 @@ screens:
       is a commercial answer and not a permission one — say which, because the person to ask is different.'
     error: '**Unreadable, or no layer matched.** The two are shown separately — a file that could not
       be opened and a file whose layers nobody claimed need different fixes'
-  notes: CF-123. **Two failure modes on one screen, kept visually apart.** Extraction is deterministic
+  notes: 'CF-123. **Two failure modes on one screen, kept visually apart.** Extraction is deterministic
     and reports which layers it found; labelling is a proposal with a confidence. **A mis-parsed layer
     and a bad suggestion look identical if the screen blurs them**, and the operator is left saying
     only that the map is wrong. **Low-confidence proposals are shown, not filtered** — the shape the
-    assistant is unsure about is the one most worth a human looking at.
+    assistant is unsure about is the one most worth a human looking at. **Drawn 26 August** — `Seat
+    Board 1.dc.html` frame `seat-1a`. **The frame names this screen on its own face**, which is the
+    first pack to do that: the earlier F&B, POS and Retail boards had to be hand-assigned by purpose
+    after three derivation attempts produced nonsense. **A board that says what it draws removes the
+    guess entirely.**'
   navigation:
     exitTo:
     - BO-092
@@ -10086,8 +10130,9 @@ screens:
     component: apps/venue-management-web/src/routes/venue-mapping/VenueMapImportForm.tsx
     status: notStarted
   wireframe:
-    status: generated
-    board: wireframes/P08 Venue Management.dc.html#bo-093
+    status: designed
+    board: wireframes/Seat Board 1.dc.html#seat-1a
+    generatedFallback: wireframes/P08 Venue Management.dc.html#bo-093
   density: compact
   entryState:
     params:
@@ -10114,6 +10159,8 @@ screens:
         notes: '**A screen that can submit must be leaveable without submitting.**'
         derived: true
         impliedBy: importVenueGeometry
+  boardFrames:
+  - seat-1a
 - id: BO-094
   name: Map Editor & Publish
   module: Access & Venue
@@ -10169,7 +10216,10 @@ screens:
     same and are not: **an unreachable point is a defect, and a point reachable only by steps is a map
     that works until a wheelchair user opens it.** **Critical points — first aid, emergency exits, assembly
     points — are listed apart**, because an unreachable gift shop and an unreachable assembly point
-    should not sit in one list of two hundred.'
+    should not sit in one list of two hundred. **Drawn 26 August** — `Seat Board 1.dc.html` frame `seat-1b`.
+    **The frame names this screen on its own face**, which is the first pack to do that: the earlier
+    F&B, POS and Retail boards had to be hand-assigned by purpose after three derivation attempts produced
+    nonsense. **A board that says what it draws removes the guess entirely.**'
   navigation:
     exitTo:
     - BO-092
@@ -10179,8 +10229,9 @@ screens:
     component: apps/venue-management-web/src/routes/venue-mapping/VenueMapEditorForm.tsx
     status: notStarted
   wireframe:
-    status: generated
-    board: wireframes/P08 Venue Management.dc.html#bo-094
+    status: designed
+    board: wireframes/Seat Board 1.dc.html#seat-1b
+    generatedFallback: wireframes/P08 Venue Management.dc.html#bo-094
   density: compact
   entryState:
     params:
@@ -10213,6 +10264,8 @@ screens:
         notes: '**A screen that can submit must be leaveable without submitting.**'
         derived: true
         impliedBy: setVenuePoint
+  boardFrames:
+  - seat-1b
 - id: BO-095
   name: Resources
   module: Access & Venue

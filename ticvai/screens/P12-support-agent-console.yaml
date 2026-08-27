@@ -169,9 +169,9 @@ screens:
       is a commercial answer and not a permission one — say which, because the person to ask is different.'
     error: Could not load
   wireframe:
-    status: generated
-    board: wireframes/P12 Venue Support.dc.html#sup-002
-    derivedFrom: wireframes/Dashboards Board.dc.html#sup-002
+    status: designed
+    board: wireframes/Dashboards Board.dc.html#sup-002
+    generatedFallback: wireframes/P12 Venue Support.dc.html#sup-002
   capability: C32
   apis:
   - operationId: listCases
@@ -225,7 +225,10 @@ screens:
     - SUP-004
   notes: States derived from the screen pattern on 17 August, not individually considered — sound for
     a list, a form or a money screen, and worth revisiting where this screen is unusual. Purpose derived
-    from the screen name and its operations on 17 August, not from a requirement.
+    from the screen name and its operations on 17 August, not from a requirement. **Drawn 26 August**
+    — `Dashboards Board` frame `sup-002`. **One board draws five dashboards across five platforms**
+    — platform admin, partner, support, guest web and cross-tenant health. A dashboard is a shape rather
+    than a domain, and the pack recognised that before the package did.
   density: compact
   entryState:
     params:
@@ -239,7 +242,7 @@ screens:
   requiresModule: marketing
   statesDerived: true
   boardFrames:
-  - SUP-002
+  - sup-002
 - id: SUP-003
   name: Availability & Routing Settings
   module: TODO

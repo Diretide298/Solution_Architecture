@@ -161,8 +161,9 @@ screens:
   - BO-001
   - BO-003
   - BO-004
-  boardFrames: null
-  wireframe: wireframes/P08 Venue Management.dc.html#bo-002
+  boardFrames:
+  - seat-2c
+  wireframe: wireframes/Seat Board 2.dc.html#seat-2c
   inFlows:
   - F09 Event is cancelled and refunded
 - screen: BO-003
@@ -645,8 +646,9 @@ screens:
   - BO-007
   - BO-008
   - BO-009
-  boardFrames: null
-  wireframe: wireframes/P08 Venue Management.dc.html#bo-015
+  boardFrames:
+  - seat-2a
+  wireframe: wireframes/Seat Board 2.dc.html#seat-2a
   inFlows: null
 - screen: BO-016
   name: Session Template
@@ -681,8 +683,9 @@ screens:
   - BO-007
   - BO-008
   - BO-009
-  boardFrames: null
-  wireframe: wireframes/P08 Venue Management.dc.html#bo-016
+  boardFrames:
+  - seat-2b
+  wireframe: wireframes/Seat Board 2.dc.html#seat-2b
   inFlows: null
 - screen: BO-017
   name: Capacity Management
@@ -776,8 +779,9 @@ screens:
   - BO-007
   - BO-008
   - BO-009
-  boardFrames: null
-  wireframe: wireframes/P08 Venue Management.dc.html#bo-019
+  boardFrames:
+  - seat-2d
+  wireframe: wireframes/Seat Board 2.dc.html#seat-2d
   inFlows: null
 - screen: BO-020
   name: F&B Order Management
@@ -2277,8 +2281,9 @@ screens:
   - BO-007
   - BO-008
   - BO-009
-  boardFrames: null
-  wireframe: wireframes/P08 Venue Management.dc.html#bo-063
+  boardFrames:
+  - seat-1c
+  wireframe: wireframes/Seat Board 1.dc.html#seat-1c
   inFlows: null
 - screen: BO-064
   name: Zones & Areas
@@ -3151,8 +3156,9 @@ screens:
   goesTo:
   - BO-093
   - BO-094
-  boardFrames: null
-  wireframe: wireframes/P08 Venue Management.dc.html#bo-092
+  boardFrames:
+  - seat-2e
+  wireframe: wireframes/Seat Board 2.dc.html#seat-2e
   inFlows:
   - F26 A venue maps its site
 - screen: BO-093
@@ -3176,8 +3182,9 @@ screens:
   goesTo:
   - BO-092
   - BO-094
-  boardFrames: null
-  wireframe: wireframes/P08 Venue Management.dc.html#bo-093
+  boardFrames:
+  - seat-1a
+  wireframe: wireframes/Seat Board 1.dc.html#seat-1a
   inFlows:
   - F26 A venue maps its site
 - screen: BO-094
@@ -3204,8 +3211,9 @@ screens:
   - pathId<-deepLink
   goesTo:
   - BO-092
-  boardFrames: null
-  wireframe: wireframes/P08 Venue Management.dc.html#bo-094
+  boardFrames:
+  - seat-1b
+  wireframe: wireframes/Seat Board 1.dc.html#seat-1b
   inFlows:
   - F26 A venue maps its site
 - screen: BO-095

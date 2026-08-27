@@ -274,8 +274,9 @@ screens:
   - POS-003
   - POS-005
   - POS-006
-  boardFrames: null
-  wireframe: wireframes/P04 Venue POS.dc.html#pos-004
+  boardFrames:
+  - seat-3a
+  wireframe: wireframes/Seat Board 3.dc.html#seat-3a
   inFlows:
   - F59 A seat is picked, held and sold at a window
 - screen: POS-005

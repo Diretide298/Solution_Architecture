@@ -101,8 +101,9 @@ screens:
   - SUP-001
   - SUP-003
   - SUP-004
-  boardFrames: null
-  wireframe: wireframes/P12 Venue Support.dc.html#sup-002
+  boardFrames:
+  - sup-002
+  wireframe: wireframes/Dashboards Board.dc.html#sup-002
   inFlows: null
 - screen: SUP-003
   name: Availability & Routing Settings

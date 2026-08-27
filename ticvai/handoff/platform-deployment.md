@@ -6,21 +6,21 @@ This table was maintained by hand until 26 August and held **twelve rows against
 
 **A figure typed once is correct once.** `platform-P01.md` claimed 35 screens against a live 46; the viewer carried *654 operations* in 25 places against a live 1,023. This file is now derived for the same reason both of those were fixed.
 
-**15 platforms · 492 screens · 64 drawn.**
+**15 platforms · 492 screens · 84 drawn.**
 
 | | Short | Purpose | Audience | Form factor | App | Offline | Screens | Drawn |
 |---|---|---|---|---|---|---|---:|---:|
-| P01 | **Guest Web** | Guest Web — Storefront | guest | web | `guest-web` | no | 46 | 0 |
-| P02 | **Guest App** | Guest App — Mobile | guest | mobileApp | `guest-app` | yes | 63 | 0 |
-| P04 | **Venue POS** | Venue POS — Terminal and Tablet | staff | posTerminal | `venue-pos` | yes | 24 | 12 |
+| P01 | **Guest Web** | Guest Web — Storefront | guest | web | `guest-web` | no | 46 | 3 |
+| P02 | **Guest App** | Guest App — Mobile | guest | mobileApp | `guest-app` | yes | 63 | 2 |
+| P04 | **Venue POS** | Venue POS — Terminal and Tablet | staff | posTerminal | `venue-pos` | yes | 24 | 13 |
 | P05 | **Guest Kiosk** | Guest Kiosk — Self-Service | guest | kiosk | `guest-app` | no | 17 | 0 |
-| P06 | **Venue Staff App** | Venue Staff App — Operations | staff | mobileApp | `venue-staff-app` | yes | 66 | 9 |
+| P06 | **Venue Staff App** | Venue Staff App — Operations | staff | mobileApp | `venue-staff-app` | yes | 66 | 10 |
 | P07 | **Venue Scanner** | Venue Scanner — Access Control | staff | handheld | `venue-scanner` | yes | 11 | 0 |
-| P08 | **Venue Management** | Venue Management — Back Office | staff | web | `venue-management-web` | no | 143 | 43 |
-| P09 | **TICVAI Web** | TICVAI Web — Platform Console | platformAdmin | web | `ticvai-web` | no | 37 | 0 |
-| P10 | **Partner Web** | Partner Web — Reseller Portal | partner | web | `partner-web` | no | 21 | 0 |
+| P08 | **Venue Management** | Venue Management — Back Office | staff | web | `venue-management-web` | no | 143 | 51 |
+| P09 | **TICVAI Web** | TICVAI Web — Platform Console | platformAdmin | web | `ticvai-web` | no | 37 | 2 |
+| P10 | **Partner Web** | Partner Web — Reseller Portal | partner | web | `partner-web` | no | 21 | 2 |
 | P11 | **Accreditation Web** | Accreditation Web — Applications | public | web | `accreditation-web` | no | 8 | 0 |
-| P12 | **Venue Support** | Venue Support — Agent Console | staff | web | `venue-support-web` | no | 8 | 0 |
+| P12 | **Venue Support** | Venue Support — Agent Console | staff | web | `venue-support-web` | no | 8 | 1 |
 | P13 | **Venue CMS** | Venue CMS — White Label | staff | web | `venue-management-web` | no | 20 | 0 |
 | P14 | **Developer** | Developer Portal | partner | web | `developer-portal-web` | no | 8 | 0 |
 | P15 | **Kitchen Display** | Kitchen Display — Pass and Stations | staff | kiosk | `kitchen-display` | yes | 10 | 0 |

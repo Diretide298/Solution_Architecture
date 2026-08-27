@@ -3905,8 +3905,9 @@ screens:
     - EMP-003
     inferred: true
   wireframe:
-    status: generated
-    board: wireframes/P06 Venue Staff App.dc.html#emp-030
+    status: designed
+    board: wireframes/Seat Board 4.dc.html#seat-4c
+    generatedFallback: wireframes/P06 Venue Staff App.dc.html#emp-030
   notes: 'Definition derived from the wireframe board on 14 August. Components, states and operations
     still to be written. **Wired to the venue map 18 August (CF-123).** The published map with live
     state on it: 3.2.64 asks for access-control statistics drawn on a graphical map, and the same view
@@ -3914,7 +3915,10 @@ screens:
     so they are separate calls. **Removed 24 August**: getRefundPolicy, setRefundPolicy. **Bulk-attach
     residue, found by walking a journey.** A device-settings screen does not read guest loyalty, a venue
     map does not set a refund policy, a shift summary does not close the shift, and **a rota a steward
-    can rewrite is not a rota.**'
+    can rewrite is not a rota.** **Drawn 26 August** — `Seat Board 4.dc.html` frame `seat-4c`. **The
+    frame names this screen on its own face**, which is the first pack to do that: the earlier F&B,
+    POS and Retail boards had to be hand-assigned by purpose after three derivation attempts produced
+    nonsense. **A board that says what it draws removes the guess entirely.**'
   implementation:
     app: venue-staff-app
     route: /operations/venue-map
@@ -3951,6 +3955,8 @@ screens:
       do not hold. Arrives with `mapId`.'
   requiresModule: ticketing
   statesDerived: true
+  boardFrames:
+  - seat-4c
 - id: EMP-038
   name: Broadcast to team
   module: Operations

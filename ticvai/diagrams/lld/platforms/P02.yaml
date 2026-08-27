@@ -625,8 +625,9 @@ screens:
   - GST-001
   - GST-002
   - GST-003
-  boardFrames: null
-  wireframe: wireframes/P02 Guest App.dc.html#gst-021
+  boardFrames:
+  - seat-4b
+  wireframe: wireframes/Seat Board 4.dc.html#seat-4b
   inFlows:
   - F25 A guest rents a cabana
   - F26 A venue maps its site
@@ -1364,8 +1365,9 @@ screens:
   - GST-001
   - GST-002
   - GST-003
-  boardFrames: null
-  wireframe: wireframes/P02 Guest App.dc.html#gst-049
+  boardFrames:
+  - seat-4a
+  wireframe: wireframes/Seat Board 4.dc.html#seat-4a
   inFlows: null
 - screen: GST-050
   name: Resource Booking – Cabana

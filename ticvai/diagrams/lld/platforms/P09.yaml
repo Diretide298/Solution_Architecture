@@ -111,8 +111,9 @@ screens:
   - ADM-007
   - ADM-008
   - ADM-012
-  boardFrames: null
-  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-002
+  boardFrames:
+  - adm-002
+  wireframe: wireframes/Dashboards Board.dc.html#adm-002
   inFlows: null
 - screen: ADM-003
   name: Cross-Tenant Health Dashboard
@@ -144,8 +145,9 @@ screens:
   - ADM-001
   - ADM-002
   - ADM-004
-  boardFrames: null
-  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-003
+  boardFrames:
+  - adm-003
+  wireframe: wireframes/Dashboards Board.dc.html#adm-003
   inFlows:
   - F19 A membership works in another country
 - screen: ADM-004

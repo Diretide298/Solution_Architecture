@@ -513,8 +513,9 @@ screens:
       is a commercial answer and not a permission one — say which, because the person to ask is different.'
     error: Map unavailable, with the option to continue on best-available instead.
   wireframe:
-    status: generated
-    board: wireframes/P01 Guest Web.dc.html#web-007
+    status: designed
+    board: wireframes/Seat Board 3.dc.html#seat-3b
+    generatedFallback: wireframes/P01 Guest Web.dc.html#web-007
   capability: C51
   navigation:
     entryFrom:
@@ -526,7 +527,11 @@ screens:
     - WEB-008
     - WEB-010
   notes: 'A map with no geometry falls back to category and best-available selection. Availability returns
-    renderMode: list, and the screen renders groups rather than a plan. Never refuses the seated flow.'
+    renderMode: list, and the screen renders groups rather than a plan. Never refuses the seated flow.
+    **Drawn 26 August** — `Seat Board 3.dc.html` frame `seat-3b`. **The frame names this screen on its
+    own face**, which is the first pack to do that: the earlier F&B, POS and Retail boards had to be
+    hand-assigned by purpose after three derivation attempts produced nonsense. **A board that says
+    what it draws removes the guess entirely.**'
   implementation:
     app: guest-web
     route: /booking-and-selection/seat-map-selection
@@ -550,6 +555,8 @@ screens:
       event.'
   requiresModule: seating
   statesDerived: true
+  boardFrames:
+  - seat-3b
 - id: WEB-008
   name: Add-ons & Upsell
   module: Booking & Selection
@@ -1374,9 +1381,9 @@ screens:
     emptyFirstRun: A new account with no orders — offers what to do next
     error: Partial. Each tile fails independently
   wireframe:
-    status: generated
-    board: wireframes/P01 Guest Web.dc.html#web-017
-    derivedFrom: wireframes/Dashboards Board.dc.html#web-017
+    status: designed
+    board: wireframes/Dashboards Board.dc.html#web-017
+    generatedFallback: wireframes/P01 Guest Web.dc.html#web-017
   capability: C36
   apis:
   - operationId: addToWishlist
@@ -1422,6 +1429,9 @@ screens:
     - WEB-018
     - WEB-019
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
+    **Drawn 26 August** — `Dashboards Board` frame `web-017`. **One board draws five dashboards across
+    five platforms** — platform admin, partner, support, guest web and cross-tenant health. A dashboard
+    is a shape rather than a domain, and the pack recognised that before the package did.
   density: compact
   entryState:
     params:
@@ -1438,7 +1448,7 @@ screens:
       from.** Arrives with `deviceId`, `itemId`.'
   requiresModule: marketing
   boardFrames:
-  - WEB-017
+  - web-017
 - id: WEB-018
   name: My Tickets
   module: Account & Self-Service
@@ -2980,11 +2990,17 @@ screens:
     component: apps/guest-web/src/routes/VenueMapWaitTimes.tsx
     status: notStarted
   wireframe:
-    status: generated
-    board: wireframes/P01 Guest Web.dc.html#web-039
+    status: designed
+    board: wireframes/Seat Board 3.dc.html#seat-3c
+    generatedFallback: wireframes/P01 Guest Web.dc.html#web-039
   provenance: parity gap found 24 August — the web could not do what the app could, and a browser can
   notes: '**`getVenueMap` was already `guest` audience and offline-capable and no web screen drew it.**
-    A map in a browser is a map.'
+    A map in a browser is a map. **Drawn 26 August** — `Seat Board 3.dc.html` frame `seat-3c`. **The
+    frame names this screen on its own face**, which is the first pack to do that: the earlier F&B,
+    POS and Retail boards had to be hand-assigned by purpose after three derivation attempts produced
+    nonsense. **A board that says what it draws removes the guess entirely.**'
+  boardFrames:
+  - seat-3c
 - id: WEB-040
   name: Virtual Queue
   module: In-venue Services

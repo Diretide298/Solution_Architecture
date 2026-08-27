@@ -18,7 +18,7 @@ schemas:
   tables: 14
   stores:
   - postgres
-  largestTable: retail.merchandise
+  largestTable: retail.shop_and_drop
 operationsByContract:
 - contract: retail
   count: 35

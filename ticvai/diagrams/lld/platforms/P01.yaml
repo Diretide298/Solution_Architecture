@@ -261,8 +261,9 @@ screens:
   - WEB-006
   - WEB-008
   - WEB-010
-  boardFrames: null
-  wireframe: wireframes/P01 Guest Web.dc.html#web-007
+  boardFrames:
+  - seat-3b
+  wireframe: wireframes/Seat Board 3.dc.html#seat-3b
   inFlows:
   - F02 Guest buys seated tickets
 - screen: WEB-008
@@ -569,8 +570,9 @@ screens:
   - WEB-016
   - WEB-018
   - WEB-019
-  boardFrames: null
-  wireframe: wireframes/P01 Guest Web.dc.html#web-017
+  boardFrames:
+  - web-017
+  wireframe: wireframes/Dashboards Board.dc.html#web-017
   inFlows: null
 - screen: WEB-018
   name: My Tickets
@@ -1139,8 +1141,9 @@ screens:
   - venueId<-session
   goesTo:
   - WEB-001
-  boardFrames: null
-  wireframe: wireframes/P01 Guest Web.dc.html#web-039
+  boardFrames:
+  - seat-3c
+  wireframe: wireframes/Seat Board 3.dc.html#seat-3c
   inFlows: null
 - screen: WEB-040
   name: Virtual Queue

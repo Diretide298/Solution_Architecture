@@ -1507,8 +1507,9 @@ screens:
       is gone. **Added 25 August with the derived list component**: a screen that lists has to say what
       it shows when the list is empty, and this screen gained the list before it gained the sentence.'
   wireframe:
-    status: generated
-    board: wireframes/P02 Guest App.dc.html#gst-021
+    status: designed
+    board: wireframes/Seat Board 4.dc.html#seat-4b
+    generatedFallback: wireframes/P02 Guest App.dc.html#gst-021
   capability: C39
   openQuestions:
   - Inventory cites `GET /venue-map` — no matching operation. Written before the contracts existed.
@@ -1532,7 +1533,11 @@ screens:
     the device.** The platform guarantees the graph — connected, versioned, with step-free marked —
     and the client walks it, because a phone with the graph cached routes with no signal and a server
     round-trip per step does not. **The version is how a stale route is caught**: a guest holding a
-    route across a path that closed this morning gets told, rather than walking into a barrier.'
+    route across a path that closed this morning gets told, rather than walking into a barrier. **Drawn
+    26 August** — `Seat Board 4.dc.html` frame `seat-4b`. **The frame names this screen on its own face**,
+    which is the first pack to do that: the earlier F&B, POS and Retail boards had to be hand-assigned
+    by purpose after three derivation attempts produced nonsense. **A board that says what it draws
+    removes the guess entirely.**'
   apis:
   - operationId: listProducts
     contract: catalogue
@@ -1562,6 +1567,8 @@ screens:
       from.** Arrives with `mapId`.'
   requiresModule: seating
   statesDerived: true
+  boardFrames:
+  - seat-4b
 - id: GST-022
   name: Attraction Wait Times
   module: TODO
@@ -3443,8 +3450,9 @@ screens:
     error: Availability unavailable. **Selection is blocked** — overselling is worse than waiting
     offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
   wireframe:
-    status: generated
-    board: wireframes/P02 Guest App.dc.html#gst-049
+    status: designed
+    board: wireframes/Seat Board 4.dc.html#seat-4a
+    generatedFallback: wireframes/P02 Guest App.dc.html#gst-049
   capability: C53
   implementation:
     app: guest-app
@@ -3459,8 +3467,12 @@ screens:
     - GST-001
     - GST-002
     - GST-003
-  notes: States derived from the screen pattern on 17 August, not individually considered. Purpose derived
-    from the screen name and its operations on 17 August, not from a requirement.
+  notes: 'States derived from the screen pattern on 17 August, not individually considered. Purpose
+    derived from the screen name and its operations on 17 August, not from a requirement. **Drawn 26
+    August** — `Seat Board 4.dc.html` frame `seat-4a`. **The frame names this screen on its own face**,
+    which is the first pack to do that: the earlier F&B, POS and Retail boards had to be hand-assigned
+    by purpose after three derivation attempts produced nonsense. **A board that says what it draws
+    removes the guess entirely.**'
   apis:
   - operationId: getSeatAvailability
     contract: seating
@@ -3483,6 +3495,8 @@ screens:
       event.'
   requiresModule: seating
   statesDerived: true
+  boardFrames:
+  - seat-4a
 - id: GST-050
   name: Resource Booking – Cabana
   module: TODO
