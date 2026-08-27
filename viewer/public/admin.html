@@ -174,6 +174,11 @@
           sign back in, and nothing they have recorded moves. It is the answer
           to a lost laptop or a shared machine, not to somebody leaving.
         </p>
+        <div class="side-filter-row subsearch-row">
+          <input id="subsearch" class="auth-input subsearch-input" type="search"
+                 placeholder="Filter accounts…" autocomplete="off" />
+          <span class="pane-count" id="subsearch-count"></span>
+        </div>
         <div id="accounts" class="admin-table"></div>
         <p class="auth-error" id="account-error" hidden></p>
       </section>
@@ -275,6 +280,7 @@
         createInvite, listInvites, revokeInvite, changePassword, logoutAccount,
         makeReset,
       } from '/validation.js';
+      import { attachSubSearch } from '/subsearch.js';
       import '/theme.js';                      // the saved day/night choice
       import { hideLoader } from '/loader.js'; // and the curtain over the wait
       // The CSV export lives in its own module rather than down here with the
@@ -635,6 +641,16 @@
           $('pw-submit').disabled = false;
         }
       };
+
+      // Narrowing the accounts list. Ninety rows and no way to find one but
+      // Ctrl+F, which highlights the name and leaves the other eighty-nine on
+      // the screen around it. Re-applies as the list redraws — changing a role
+      // rebuilds every row.
+      attachSubSearch(
+        $('subsearch'),
+        [{ box: $('accounts'), rows: '.account-row' }],
+        { count: $('subsearch-count'), noun: 'accounts' },
+      );
     </script>
   </body>
 </html>

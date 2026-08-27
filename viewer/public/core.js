@@ -519,6 +519,23 @@ export const TYPE_LABEL = {
   requestBody: 'request body',
   securityScheme: 'security scheme',
   permission: 'permission',
+  // The kinds search can find that are not contract nodes. Without these a
+  // result's badge fell back to the raw key, so a state model was labelled
+  // `machine` — the app's internal word for it, not the package's.
+  screen: 'screen',
+  flow: 'journey',
+  // Both spellings, because the app and the package disagree and each is right
+  // in its own place: the hash prefix is `machine:`, which is what
+  // `currentSideId` has always emitted, and the search entry's kind is `state`,
+  // which is what `states/` is called. Labelling only one left the other
+  // falling through to the raw key, so a state model's badge read `state`.
+  machine: 'state model',
+  state: 'state model',
+  event: 'event',
+  adr: 'decision',
+  table: 'table',
+  board: 'board',
+  platform: 'platform',
 };
 
 export const escapeHtml = (s) =>

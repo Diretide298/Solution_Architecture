@@ -34,6 +34,7 @@ import { buildDecisions } from './lib/decisions.mjs';
 import { buildDomains } from './lib/domains.mjs';
 import { buildPlatforms } from './lib/platforms.mjs';
 import { buildUiux } from './lib/uiux.mjs';
+import { buildSearch } from './lib/search.mjs';
 import { buildDiagrams, readDiagramDetail } from './lib/diagrams.mjs';
 import { frameDocument } from './lib/wireframes.mjs';
 import { gate } from './lib/session.mjs';
@@ -208,6 +209,7 @@ function newPackage(project) {
     domains: null,
     platforms: null,
     uiux: null,
+    search: null,
     diagrams: null,
     /** the in-flight rebuild, so concurrent requests coalesce onto one */
     indexing: null,
@@ -306,7 +308,7 @@ async function refreshIndex(pkg, reason = 'startup') {
     let index = null, indexSlim = null, detailByFile = null;
     let journeys = null, backend = null, domain = null, decisions = null;
     let lineage = null, tooltips = null, diagrams = null, domains = null;
-    let platforms = null, uiux = null;
+    let platforms = null, uiux = null, search = null;
     try {
       index = await buildIndex(ROOT, pkg.contracts);
       // split once per rebuild, not once per request
@@ -424,12 +426,21 @@ async function refreshIndex(pkg, reason = 'startup') {
       // 58 were. Reads the two directories instead.
       uiux = await buildUiux(ROOT, journeys?.screens ?? []).catch(() => null);
 
+      // What the palette can find. It searched `index.nodes` and nothing
+      // else — 1,979 contract nodes — so a reviewer looking for a screen id,
+      // an ADR or a table got "No match", which reads as "not in this
+      // package" and meant "not a contract". Last, because it is built from
+      // the others.
+      search = await buildSearch(ROOT, {
+        journeys, domain, decisions, backend, uiux, platforms,
+      }).catch(() => null);
+
       // Published together. Until this line the package still answers with the
       // last good build; after it, every part is from this one.
       Object.assign(pkg, {
         index, indexSlim, detailByFile,
         journeys, backend, domain, decisions, lineage, tooltips, diagrams, domains,
-        platforms, uiux,
+        platforms, uiux, search,
       });
       // everything stringified and compressed against the old build is stale
       pkg.packed.clear();
@@ -879,13 +890,24 @@ const server = http.createServer(async (req, res) => {
       return sendCachedJson(res, req, pkg.packed, 'uiux', pkg.uiux);
     }
 
+    if (route === 'search') {
+      if (!pkg.search) await refreshIndex(pkg, 'on demand');
+      return sendCachedJson(res, req, pkg.packed, 'search', pkg.search);
+    }
+
     if (route === 'file' || route === 'tree') {
       const rel = url.searchParams.get('path') ?? '';
       // contain reads to the project root
       const abs = path.resolve(pkg.root, rel);
       // /api/tree parses YAML into a structure; /api/file just shows the source,
-      // so it can also hand back the prose the decisions view links to
-      const allowed = route === 'file' ? /\.(ya?ml|md|json|csv)$/i : /\.ya?ml$/i;
+      // so it can also hand back the prose the decisions view links to.
+      //
+      // `.sql` was not on this list, which was fine while nothing pointed at a
+      // migration. Search does: a table's definition is `CREATE TABLE` in
+      // `backend/V*.sql` and that is the only place 39 of the 379 are actually
+      // written down. Refusing it would leave the one kind of result whose line
+      // is exact as the one kind that cannot be opened.
+      const allowed = route === 'file' ? /\.(ya?ml|md|json|csv|sql)$/i : /\.ya?ml$/i;
       if (!abs.startsWith(pkg.root + path.sep) || !allowed.test(abs)) {
         return send(res, 403, 'refused');
       }

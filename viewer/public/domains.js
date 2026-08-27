@@ -41,6 +41,7 @@
 import '/theme.js';   // the saved day/night choice, before anything paints
 import { hideLoader } from '/loader.js';
 import * as auth from '/validation.js';
+import { attachSubSearch } from '/subsearch.js';
 
 const $ = (id) => document.getElementById(id);
 
@@ -912,3 +913,21 @@ function fail(message) {
     }
   });
 })();
+
+// Narrowing what is already here, which is a different need from the palette's:
+// the palette leaves the page to find something, this stays on it. Attached
+// after the first render so the sections exist; it re-applies itself as the
+// lens redraws, because switching lens replaces every row underneath it.
+attachSubSearch(
+  document.getElementById('subsearch'),
+  // Three containers, not two. `#finding` holds the stuck-state finding and is
+  // easy to miss because it is usually two rows out of 237 — which is exactly
+  // the size of thing a filter has to catch, since two rows left standing under
+  // a filter that matched nothing read as two rows that *did* match.
+  [
+    { box: document.getElementById('members'), rows: '.member-row, .stuck-row' },
+    { box: document.getElementById('finding'), rows: '.stuck-row' },
+    { box: document.getElementById('gaps'), rows: '.gap-row' },
+  ],
+  { count: document.getElementById('subsearch-count'), noun: 'rows' },
+);

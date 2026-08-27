@@ -141,7 +141,7 @@
 
           <button id="search-trigger" class="search-trigger" type="button" aria-label="Search">
             <span class="icon-search" aria-hidden="true"></span>
-            <span class="search-trigger-text">Search operations…</span>
+            <span class="search-trigger-text">Search the package…</span>
             <kbd>Ctrl K</kbd>
           </button>
 
@@ -915,7 +915,7 @@
           id="palette-input"
           class="palette-input"
           type="text"
-          placeholder="Search operations, schemas, permissions, paths…"
+          placeholder="Search screens, operations, tables, decisions, boards…"
           autocomplete="off"
           spellcheck="false"
         />
@@ -934,6 +934,29 @@
           <span class="spacer"></span>
           <span id="palette-count"></span>
         </div>
+      </div>
+    </div>
+
+    <!-- ── the source peek ───────────────────────────────────────────
+         One file at one line, opened from a search result's `file:line`.
+         The contracts reader shows source for contract nodes and nothing
+         else did, so a screen, a state model, an ADR and a migration were
+         all files in the package with no way to look at them. Search now
+         points at all four.
+
+         A peek and not a fifth view: it opens over whatever was on screen
+         and closes back onto it, because "what does that actually say?" is
+         a detour, not a destination. -->
+    <div class="palette-backdrop peek-backdrop" id="peek" hidden>
+      <div class="peek">
+        <div class="peek-head">
+          <div class="peek-heading">
+            <div class="peek-title" id="peek-title"></div>
+            <div class="peek-where" id="peek-where"></div>
+          </div>
+          <button class="peek-close" id="peek-close" type="button" aria-label="Close">esc</button>
+        </div>
+        <div class="peek-body" id="peek-body"></div>
       </div>
     </div>
 

@@ -12,6 +12,7 @@
  * dependency in the frontend, for four charts.
  */
 import * as auth from '/validation.js';
+import { attachSubSearch } from '/subsearch.js';
 import { hue } from '/core.js';
 import { hideLoader } from '/loader.js';
 
@@ -1031,3 +1032,15 @@ function redraw() {
   renderMentions();
   hideLoader();
 })();
+
+// See domains.js. Three sections here, and mentions among them: being named is
+// the one thing on this page a person comes looking for by their own name.
+attachSubSearch(
+  document.getElementById('subsearch'),
+  [
+    { box: document.getElementById('mentions'), rows: '.mention-row' },
+    { box: document.getElementById('contested'), rows: '.contested-row' },
+    { box: document.getElementById('people'), rows: '.people-row' },
+  ],
+  { count: document.getElementById('subsearch-count'), noun: 'rows' },
+);

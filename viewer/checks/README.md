@@ -21,6 +21,8 @@ on an empty database.
 | `pages-check.mjs` | every page loads, every layer renders every one of its modes, and **nothing anywhere logs a console error** |
 | `landing-check.mjs` | the door sends people where it says — the lockup stays on the door rather than falling into a package, all 42 rail-panel links land on the layer *and* mode they name, Overview deselects, and sign out really ends the session |
 | `tip-facts-check.mjs` | every count a tip states is the count the payload holds — the tips write `{operations}` and are measured against `/pkg/<project>/lineage`, `journeys` and `decisions` |
+| `search-check.mjs` | search reaches the whole package and not only the contracts, every `file:line` it reports really is where that artefact is written, and a result opens the artefact's page *and* the source at that line |
+| `subsearch-check.mjs` | every page that lists things can be narrowed, the count keeps its denominator, and a row drawn after the filter was typed is filtered too |
 | `uiux-check.mjs` | the board list holds every board on disk, not only the ones a screen points at; each of the 58 board files and one frame out of each of the 54 with frames actually resolves; and the filters filter |
 
 `pages-check.mjs` is the cheap one to run after any edit to a module under
@@ -98,3 +100,21 @@ to themselves and an admin doing it to somebody else. It is the one harness that
 (that account's sessions, all of them, nobody else's) and a session is only observable
 by whether its cookie still answers. It enrols two throwaway reviewers, so give it a
 scratch store like the rest.
+
+`search-check.mjs` verifies the lines rather than trusting them. The palette
+searched `index.nodes` and nothing else — **1,979 contract nodes out of 3,199
+things in the package** — so a reviewer typing `POS-006` got "No match", which
+reads as *not in this package* and meant *not a contract*. Widening it is easy;
+the part worth holding is that a reported `screens/P04-point-of-sale.yaml:949`
+is really line 949. **A file:line nobody checks is the worst kind of precision:
+it gets believed.** So this fetches the file and reads the line, for a sample of
+every kind, and separately fetches one file of every extension search points at
+— which is how `.sql` turned out to be refused by `/api/file` until the
+migrations became a search destination.
+
+`subsearch-check.mjs` types a string nothing can contain and requires that
+nothing is left showing. A filter that matches everything is indistinguishable
+from one that does nothing, so matching *nothing* is the only assertion that
+separates them — and it is what caught two `.stuck-row`s in a third container on
+`domains.html`, out of 237 rows. Two rows left standing under a filter that
+matched nothing read as two rows that did match.

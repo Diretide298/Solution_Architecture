@@ -1792,6 +1792,89 @@ pre.code {
 }
 .palette-item-kind { flex: none; font-size: 10px; color: var(--text-faint); text-transform: uppercase; letter-spacing: .05em; }
 .palette-item mark { background: transparent; color: var(--accent); font-weight: 600; }
+
+/* Where a result is written. Sits between the name and the kind badge, right
+   aligned, and is the only part of a row that does something different from the
+   row: the row opens the artefact, this opens the source at the line. */
+.palette-item-where {
+  flex: none;
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0;
+  max-width: 34%;
+  padding: 2px 6px;
+  border: 1px solid var(--border-soft);
+  border-radius: 4px;
+  background: transparent;
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--text-faint);
+  cursor: pointer;
+  overflow: hidden;
+}
+.palette-item-where:hover { border-color: var(--accent); color: var(--accent); }
+.palette-where-file { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+/* The line is the part worth reading, so it keeps its colour when the file
+   name beside it is dimmed, and it never truncates. */
+.palette-where-line { flex: none; color: var(--text-dim); font-weight: 600; }
+.palette-item-where:hover .palette-where-line { color: var(--accent); }
+
+/* ── the source peek ─────────────────────────────────────────────────
+   Over the palette, because it is opened from one and has to sit on top of
+   whatever was underneath. */
+.peek-backdrop { z-index: 60; }
+.peek {
+  width: min(1000px, 92vw);
+  max-height: 82vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.45);
+}
+.peek-head {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 11px 14px;
+  border-bottom: 1px solid var(--line);
+}
+.peek-heading { min-width: 0; flex: 1; }
+.peek-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.peek-where {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--text-faint);
+  overflow-wrap: anywhere;
+}
+.peek-close {
+  flex: none;
+  padding: 2px 8px;
+  border: 1px solid var(--border-soft);
+  border-radius: 4px;
+  background: transparent;
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--text-dim);
+  cursor: pointer;
+}
+.peek-close:hover { border-color: var(--accent); color: var(--accent); }
+
+.peek-body { overflow: auto; padding: 0; }
+.peek-loading { padding: 18px 14px; font-size: 12px; color: var(--text-faint); }
+/* The peek scrolls, not the lines inside it — `scrollIntoView` on the target
+   line has to have one scrolling ancestor or it moves the page instead. */
+.peek-code { margin: 0; padding: 8px 0; }
+
 .palette-empty { padding: 26px; text-align: center; color: var(--text-faint); font-size: 12.5px; }
 .palette-foot {
   display: flex; align-items: center; gap: 12px;
@@ -2964,4 +3047,39 @@ html[data-entry] .graph-legend {
   text-decoration: none;
   display: inline-flex;
   align-items: center;
+}
+
+/* The peek shows a window around the line, and says so. */
+.peek-more {
+  display: block;
+  width: 100%;
+  padding: 8px 14px;
+  border: 0;
+  border-top: 1px solid var(--line);
+  background: transparent;
+  font-size: 11px;
+  color: var(--text-faint);
+  text-align: left;
+  cursor: pointer;
+}
+.peek-more:hover { color: var(--accent); }
+
+/* ── the shared sub-search ────────────────────────────────────────────
+   One filter over what a page has already drawn, on the three pages that
+   had none. `platforms`, `uiux` and `validation` filter their data before
+   rendering, which is better, and keep doing it. */
+.subsearch-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 10px 0 4px;
+}
+.subsearch-input { flex: 1; min-width: 0; }
+.subsearch-panel { padding-top: 4px; padding-bottom: 4px; }
+/* Said where the rows were, not in place of the section. A heading with
+   nothing under it reads as a page that failed to load. */
+.subsearch-empty {
+  margin: 10px 0;
+  font-size: 12px;
+  color: var(--text-faint);
 }

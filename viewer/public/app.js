@@ -419,6 +419,61 @@ async function openArtefactHash(hash) {
     return true;
   }
 
+  // The five below were added with search. The palette could only find contract
+  // nodes, so nothing outside the app had ever wanted to point at a flow, a
+  // state model, an event, an ADR or a platform — and the moment search can
+  // find them, every result has to be able to open one.
+  //
+  // Each checks the artefact exists before moving. Landing on the right layer
+  // with the wrong selection looks like the app losing the thing you asked for,
+  // and `return false` lets the caller say so instead.
+  if (kind === 'flow') {
+    await ensureParts(LAYER_PARTS.frontend, 'frontend');
+    if (!state.journeys?.flows?.some((f) => f.id === id)) return false;
+    setLayer('frontend');
+    state.journeyId = id;
+    setMode('journey');
+    return true;
+  }
+
+  if (kind === 'machine') {
+    await ensureParts(LAYER_PARTS.domain, 'domain');
+    if (!state.domain?.machines?.some((m) => m.id === id)) return false;
+    setLayer('domain');
+    state.machineId = id;
+    setMode('states');
+    return true;
+  }
+
+  if (kind === 'event') {
+    await ensureParts(LAYER_PARTS.domain, 'domain');
+    const events = state.domain?.events ?? [];
+    if (!events.some((e) => (e.id ?? e.name) === id)) return false;
+    setLayer('domain');
+    state.eventId = id;
+    setMode('events');
+    return true;
+  }
+
+  if (kind === 'adr') {
+    await ensureParts(LAYER_PARTS.decisions, 'decisions');
+    if (!state.decisions?.adrs?.some((a) => a.id === id)) return false;
+    setLayer('decisions');
+    state.adrId = id;
+    setMode('decision');
+    return true;
+  }
+
+  // `platform-lld`, not `platform`. Frontend has no mode called `platform` —
+  // the one that draws a single platform is the low-level design.
+  if (kind === 'platform') {
+    await ensureParts(LAYER_PARTS.frontend, 'frontend');
+    setLayer('frontend');
+    state.platformKey = id;
+    setMode('platform-lld');
+    return true;
+  }
+
   return false;
 }
 
@@ -11026,6 +11081,146 @@ function zoomDiagram(d, factor) {
   d.draw();
 }
 
+/**
+ * What a result opens.
+ *
+ * A contract result goes through `select()`, which knows how to reach a member
+ * inside a document and put the reader on it. Everything else goes through
+ * `openArtefactHash`, which is the app's own deep-link resolver — so a search
+ * result and a pasted `#screen:POS-006` land in exactly the same place, and
+ * neither can drift from the other.
+ *
+ * When the artefact cannot be opened — a board that lives only on its own page,
+ * or a kind the resolver does not know — this says so instead of leaving the
+ * palette shut over an unchanged view, which reads as the click not registering.
+ */
+async function openResult(result) {
+  closePalette();
+  if (result.node) {
+    select(result.node.id);
+    setMode('reader');
+    return;
+  }
+  if (result.hash && await openArtefactHash(result.hash)) {
+    // The hash is the address, so leave it in the bar. A result is now a link
+    // somebody can send.
+    history.replaceState(null, '', `#${result.hash}`);
+    return;
+  }
+  if (result.href) { location.href = result.href; return; }
+  if (result.file) { openSourceAt(result.file, result.line, result.name ?? result.id); return; }
+  toast(`Nothing in the viewer draws ${result.name ?? result.id} yet`);
+}
+
+/** The dot colour for a result that is not a contract node. */
+const KIND_COLOR = {
+  screen: 'var(--layer-frontend, #6aa9ff)',
+  flow: 'var(--layer-frontend, #6aa9ff)',
+  platform: 'var(--layer-frontend, #6aa9ff)',
+  board: 'var(--ok, #4ac08a)',
+  machine: 'var(--layer-domain, #c88bff)',
+  state: 'var(--layer-domain, #c88bff)',
+  event: 'var(--layer-domain, #c88bff)',
+  table: 'var(--layer-backend, #ffb454)',
+  adr: 'var(--layer-decisions, #ff8fa3)',
+};
+const colorForKind = (kind) => KIND_COLOR[kind] ?? 'var(--text-faint)';
+
+/**
+ * `screens/P04-point-of-sale.yaml` -> `screens/P04-point-of-sale.yaml`, but
+ * `contracts/spine/access.yaml` -> `spine/access.yaml`.
+ *
+ * The leading directory is what the kind badge on the same row already says, so
+ * repeating it costs width and adds nothing. Trimmed only when there is more
+ * than one segment left — a bare filename keeps its folder, because
+ * `baseline.sql` alone does not say it is a migration.
+ */
+function shortFile(rel) {
+  const parts = String(rel).split('/');
+  return parts.length > 2 ? parts.slice(1).join('/') : rel;
+}
+
+/**
+ * One file, at one line.
+ *
+ * The reader shows source for contract nodes and nothing else did — a screen, a
+ * state model, an ADR and a migration are all files in the package with no way
+ * to look at them. Search now points at all four, so "go to the line" needs
+ * somewhere to go.
+ *
+ * Deliberately a peek and not a fifth view: it opens over whatever the reader
+ * was looking at and closes back onto it, because the question it answers
+ * ("what does that actually say?") is a detour and not a destination.
+ */
+async function openSourceAt(file, line, title) {
+  const box = $('peek');
+  if (!box) return;
+  box.hidden = false;
+  $('peek-title').textContent = title ?? file;
+  $('peek-where').textContent = line ? `${file}:${line}` : file;
+  const body = $('peek-body');
+  body.textContent = '';
+  body.append(el('div', 'peek-loading', 'Reading\u2026'));
+
+  let text;
+  try {
+    text = await fetchFile(file);
+  } catch {
+    body.textContent = '';
+    body.append(el('div', 'peek-loading', `Could not read ${file}`));
+    return;
+  }
+
+  const lines = text.split(/\r?\n/);
+  body.textContent = '';
+
+  // A window, not the file. `screens/P01-guest-web-storefront.yaml` is 3,441
+  // lines and the first version of this built a DOM node for every one of them
+  // in order to show somebody line 52 — which worked, and cost a visible pause
+  // on every open. 160 lines either side is more context than anybody reads and
+  // a twentieth of the work.
+  const WINDOW = 160;
+  const from = line == null ? 0 : Math.max(0, line - 1 - WINDOW);
+  const to = line == null ? Math.min(lines.length, WINDOW * 2)
+    : Math.min(lines.length, line + WINDOW);
+
+  const pre = el('pre', 'code peek-code');
+  const draw = (a, b) => {
+    for (let i = a; i < b; i += 1) {
+      pre.append(codeLine(i + 1, lines[i], file, line != null && i + 1 === line));
+    }
+  };
+  draw(from, to);
+  body.append(pre);
+
+  // Said out loud, with the way to see the rest. A window that does not admit
+  // it is a window is a file that looks shorter than it is.
+  if (from > 0 || to < lines.length) {
+    const more = el('button', 'peek-more',
+      `showing lines ${from + 1}\u2013${to} of ${lines.length} \u2014 show the whole file`);
+    more.type = 'button';
+    more.onclick = () => {
+      pre.textContent = '';
+      draw(0, lines.length);
+      more.remove();
+      if (line != null) pre.children[line - 1]?.scrollIntoView({ block: 'center' });
+    };
+    body.append(more);
+  }
+
+  // Centred rather than scrolled-to-top, so the line has its context around it.
+  // `block: 'center'` on a line near the head of a file is a no-op, which is
+  // correct — there is nothing above it to show.
+  if (line != null) {
+    pre.children[line - 1 - from]?.scrollIntoView({ block: 'center' });
+  }
+}
+
+function closePeek() {
+  const box = $('peek');
+  if (box) box.hidden = true;
+}
+
 // ── command palette ──────────────────────────────────────────────────
 let paletteItems = [];
 let paletteActive = 0;
@@ -11036,6 +11231,13 @@ function openPalette() {
   input.value = '';
   input.focus();
   runSearch('');
+  // Fetched on first open, not on boot. Re-run when it lands: somebody typing
+  // immediately would otherwise be searching contracts only and be told "No
+  // match" for a screen id that is about to arrive — the same wrong answer the
+  // old palette gave permanently, now lasting a few hundred milliseconds and
+  // therefore much harder to notice.
+  const pending = ensureSearchIndex();
+  if (pending) pending.then(() => { if (!$('palette').hidden) runSearch(input.value); });
 }
 
 function closePalette() { $('palette').hidden = true; }
@@ -11061,6 +11263,64 @@ function fuzzyScore(haystack, needle) {
   return score - haystack.length * 0.15;
 }
 
+/**
+ * The rest of the package, fetched the first time somebody searches.
+ *
+ * 59KB gzipped of screens, flows, state models, events, ADRs, tables, boards
+ * and platforms — everything the palette could not find. Not on the boot path,
+ * because a reader who never opens the palette should not pay for it, and one
+ * who does waits once.
+ */
+let searchEntries = null;
+let searchLoading = null;
+function ensureSearchIndex() {
+  if (searchEntries || searchLoading) return searchLoading;
+  searchLoading = auth.apiFetch('/api/search')
+    .then((r) => (r.ok ? r.json() : null))
+    .then((payload) => {
+      searchEntries = payload?.entries ?? [];
+      return searchEntries;
+    })
+    .catch(() => { searchEntries = []; return searchEntries; })
+    .finally(() => { searchLoading = null; });
+  return searchLoading;
+}
+
+/**
+ * A contract node in the shape the search entries already have.
+ *
+ * The two sources are different objects describing the same kind of thing, and
+ * the row that draws them should not have to know which it is holding. `node`
+ * rides along because a contract result opens through `select()`, which knows
+ * how to reach a member inside a document; the rest open through their hash.
+ */
+function asResult(node) {
+  return {
+    kind: node.type,
+    id: node.id,
+    name: node.name,
+    sub: node.type === 'operation' ? `${node.method} ${node.path}`
+      : node.type === 'permission' ? `${node.useCount} operations`
+      : node.file,
+    file: node.file ?? null,
+    // A contract file node *is* the file, so pointing at line 1 of it says
+    // nothing. Its members carry the line that matters.
+    line: node.type === 'file' ? null : (node.line ?? null),
+    layer: 'contracts',
+    method: node.method ?? null,
+    node,
+  };
+}
+
+/**
+ * One list, two sources.
+ *
+ * Contract nodes are already in hand and carry their own file and line, so
+ * re-shipping 1,979 of them in the search payload would be a second copy of
+ * something the page has. Everything else comes from `/api/search`. Both are
+ * scored the same way and sorted together — a result list split into "contracts"
+ * and "the rest" would make the reader ask which half their answer is in.
+ */
 function runSearch(query) {
   const needle = query.trim().toLowerCase();
   const results = [];
@@ -11071,11 +11331,25 @@ function runSearch(query) {
       best = Math.max(best, fuzzyScore(node.path, needle) - 20, fuzzyScore(node.title ?? '', needle) - 60);
     }
     if (node.type === 'file') best += 40; // contracts rank above their members
-    if (best > 0 || !needle) results.push({ node, score: best + (node.inCount ?? 0) * 0.3 });
+    if (best > 0 || !needle) {
+      results.push({ item: asResult(node), score: best + (node.inCount ?? 0) * 0.3 });
+    }
+  }
+
+  for (const entry of searchEntries ?? []) {
+    // The id first — `POS-006` and `ADR-0016` are what people type — then the
+    // name, then everything else the entry gathered, each a step further back
+    // so a match on a purpose sentence never outranks a match on an id.
+    const best = Math.max(
+      fuzzyScore(entry.id ?? '', needle),
+      fuzzyScore(entry.name ?? '', needle) - 10,
+      fuzzyScore(entry.terms ?? '', needle) - 120,
+    );
+    if (best > 0 || !needle) results.push({ item: entry, score: best });
   }
 
   results.sort((a, b) => b.score - a.score);
-  paletteItems = results.slice(0, 60).map((r) => r.node);
+  paletteItems = results.slice(0, 60).map((r) => r.item);
   paletteActive = 0;
   renderPalette(needle);
 }
@@ -11090,25 +11364,46 @@ function renderPalette(needle) {
     return;
   }
 
-  paletteItems.forEach((node, i) => {
+  paletteItems.forEach((result, i) => {
     const item = el('div', `palette-item${i === paletteActive ? ' active' : ''}`);
     const dot = el('span', 'type-dot');
-    dot.style.background = colorForNode(node);
+    dot.style.background = result.node ? colorForNode(result.node) : colorForKind(result.kind);
     item.append(dot);
-    if (node.type === 'operation') item.append(el('span', `method ${node.method}`, node.method));
+    if (result.method) item.append(el('span', `method ${result.method}`, result.method));
 
     const main = el('div', 'palette-item-main');
     const title = el('div', 'palette-item-title');
-    title.innerHTML = markMatch(node.name, needle);
+    title.innerHTML = markMatch(result.name ?? result.id ?? '', needle);
     main.append(title);
-    main.append(
-      el('div', 'palette-item-sub',
-        node.type === 'operation' ? node.path
-          : node.type === 'permission' ? `${node.useCount} operations`
-          : node.file)
-    );
+    if (result.sub) main.append(el('div', 'palette-item-sub', result.sub));
     item.append(main);
-    item.append(el('span', 'palette-item-kind', TYPE_LABEL[node.type] ?? node.type));
+
+    // **Where it is written.** The point of the whole thing: a result that says
+    // `screens/P04-point-of-sale.yaml:949` can be opened at that line, and one
+    // that only knows the file says so rather than sending somebody to line 1.
+    // 807 of the 1,220 know the line; 240 know only the file; 173 — the
+    // platforms, and the tables that exist in no migration and no contract —
+    // are written nowhere this can point at, and show nothing at all.
+    if (result.file) {
+      const where = el('button', 'palette-item-where');
+      where.type = 'button';
+      where.append(el('span', 'palette-where-file', shortFile(result.file)));
+      if (result.line) where.append(el('span', 'palette-where-line', `:${result.line}`));
+      where.title = result.line
+        ? `Open ${result.file} at line ${result.line}`
+        : `Open ${result.file}`;
+      // mousedown, not click: the row underneath takes click, and a nested
+      // button would open the artefact *and* the source on one press.
+      where.onmousedown = (e) => { e.preventDefault(); e.stopPropagation(); };
+      where.onclick = (e) => {
+        e.stopPropagation();
+        closePalette();
+        openSourceAt(result.file, result.line, result.name ?? result.id);
+      };
+      item.append(where);
+    }
+
+    item.append(el('span', 'palette-item-kind', TYPE_LABEL[result.kind] ?? result.kind));
     // Hover moves the highlight and nothing else.
     //
     // This called renderPalette(), which empties the box and rebuilds every
@@ -11121,7 +11416,7 @@ function renderPalette(needle) {
     // Keep the caret in the search field. Without this, pressing on a row blurs
     // the input and the arrow keys stop reaching the list.
     item.onmousedown = (e) => e.preventDefault();
-    item.onclick = () => { select(node.id); setMode('reader'); closePalette(); };
+    item.onclick = () => openResult(result);
     box.append(item);
   });
 
@@ -11998,6 +12293,9 @@ function bindUI() {
   $('palette-input').oninput = (e) => runSearch(e.target.value);
   $('palette').onclick = (e) => { if (e.target === $('palette')) closePalette(); };
 
+  $('peek').onclick = (e) => { if (e.target === $('peek')) closePeek(); };
+  $('peek-close').onclick = closePeek;
+
   $('theme-toggle').onclick = () => {
     const next = document.documentElement.dataset.theme !== 'dark' ? 'dark' : 'light';
     document.documentElement.dataset.theme = next;
@@ -12030,6 +12328,13 @@ function bindUI() {
   window.addEventListener('keydown', (e) => {
     const inPalette = !$('palette').hidden;
 
+    // The peek sits over everything, so it takes Escape before anything else
+    // gets a look. Without this the key reached the drawer underneath and shut
+    // that instead, leaving the source open on top of a view that had changed.
+    if (!$('peek').hidden) {
+      if (e.key === 'Escape') { e.preventDefault(); closePeek(); return; }
+    }
+
     if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
       e.preventDefault();
       inPalette ? closePalette() : openPalette();
@@ -12046,8 +12351,11 @@ function bindUI() {
         setPaletteActive(paletteActive - 1);
       } else if (e.key === 'Enter') {
         e.preventDefault();
-        const node = paletteItems[paletteActive];
-        if (node) { select(node.id); setMode('reader'); closePalette(); }
+        // The same door the click uses. These were two code paths opening the
+        // same row, and only one of them learned about the other 1,220 things
+        // the palette can now find.
+        const result = paletteItems[paletteActive];
+        if (result) openResult(result);
       }
       return;
     }
