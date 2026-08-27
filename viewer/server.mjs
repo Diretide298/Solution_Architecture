@@ -33,6 +33,7 @@ import { buildTooltips } from './lib/tooltips.mjs';
 import { buildDecisions } from './lib/decisions.mjs';
 import { buildDomains } from './lib/domains.mjs';
 import { buildPlatforms } from './lib/platforms.mjs';
+import { buildUiux } from './lib/uiux.mjs';
 import { buildDiagrams, readDiagramDetail } from './lib/diagrams.mjs';
 import { frameDocument } from './lib/wireframes.mjs';
 import { gate } from './lib/session.mjs';
@@ -206,6 +207,7 @@ function newPackage(project) {
     decisions: null,
     domains: null,
     platforms: null,
+    uiux: null,
     diagrams: null,
     /** the in-flight rebuild, so concurrent requests coalesce onto one */
     indexing: null,
@@ -304,7 +306,7 @@ async function refreshIndex(pkg, reason = 'startup') {
     let index = null, indexSlim = null, detailByFile = null;
     let journeys = null, backend = null, domain = null, decisions = null;
     let lineage = null, tooltips = null, diagrams = null, domains = null;
-    let platforms = null;
+    let platforms = null, uiux = null;
     try {
       index = await buildIndex(ROOT, pkg.contracts);
       // split once per rebuild, not once per request
@@ -415,12 +417,19 @@ async function refreshIndex(pkg, reason = 'startup') {
       // as "no gaps" rather than "never looked at".
       platforms = await buildPlatforms(ROOT).catch(() => null);
 
+      // Every board on disk, which is a different question from the one
+      // `buildWireframes` answers. That describes the boards a screen points
+      // at, because its job is putting a frame on a screen's page — so a board
+      // nobody has wired up is absent from the payload entirely, and 23 of the
+      // 58 were. Reads the two directories instead.
+      uiux = await buildUiux(ROOT, journeys?.screens ?? []).catch(() => null);
+
       // Published together. Until this line the package still answers with the
       // last good build; after it, every part is from this one.
       Object.assign(pkg, {
         index, indexSlim, detailByFile,
         journeys, backend, domain, decisions, lineage, tooltips, diagrams, domains,
-        platforms,
+        platforms, uiux,
       });
       // everything stringified and compressed against the old build is stale
       pkg.packed.clear();
@@ -863,6 +872,11 @@ const server = http.createServer(async (req, res) => {
     if (route === 'platforms') {
       if (!pkg.platforms) await refreshIndex(pkg, 'on demand');
       return sendCachedJson(res, req, pkg.packed, 'platforms', pkg.platforms);
+    }
+
+    if (route === 'uiux') {
+      if (!pkg.uiux) await refreshIndex(pkg, 'on demand');
+      return sendCachedJson(res, req, pkg.packed, 'uiux', pkg.uiux);
     }
 
     if (route === 'file' || route === 'tree') {

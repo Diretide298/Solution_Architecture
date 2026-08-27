@@ -25,33 +25,33 @@ labels.
 
 | State | Count |
 |---|---|
-| BLOCKED — needs your decision | **3** |
-| OPEN — with the package side | **3** |
+| BLOCKED — needs your decision | **2** |
+| OPEN — with the package side | **4** |
 | OPEN — reviewer experience | **3** |
 | OPEN — correctness | **2** |
 | OPEN — polish | **5** |
-| DONE | **27** |
+| DONE | **32** |
 
 **Nothing is blocking.**
 
 ---
 
-## Blocked — needs a decision from you — 3
+## Blocked — needs a decision from you — 2
 
 | ID | Item | Why it is stuck |
 |---|---|---|
 | **V-03** | Name the reviewer checklist criteria | I can build it; I cannot invent what it should ask. Gates the wording half of V-15 |
 | **V-04** | Change the first administrator's password | Only you can. It was committed to a public repo. **Separately**: `harness.admin@softlabsgroup.com` / `a-long-enough-passphrase` is now public in `checks/*.mjs`. It does *not* authenticate against the live instance, so it is inert — but do not create that account there |
-| **V-24** | Stop the second accounts API on 8788 | `python -m uvicorn api.main:app --port 8788`, pid 13208, started 11:43 on 26 August. A **full second copy of the accounts API** — same routes, same 401 on a bogus login — and its command line sets no `TICVAI_DB`, so it defaults to the real `api/ticvai.db`. `demo.db` no longer exists, so that half of the old row is already done. Stopping a process is denied to me: `Stop-Process -Id 13208 -Force` |
 
-## Open — with the package side — 3
+## Open — with the package side — 4
 
 Raised from the viewer, fixed in the package. Listed here so they are not lost.
 
 | ID | Item |
 |---|---|
-| **V-36** | **The workbook's `Scaling` sheet lost every contract row.** Commit `d200412` carried 25 contracts and 776 routed operations; the 26 August dump has one row reading `TOTAL 0 0 0 0`. Backend › Routing therefore draws nothing, and `pages-check` is 52/1 because of it. The routing data itself is intact — the lineage still carries the replica/primary/analytical split — so this is the sheet's generator, not the source. **No package validator reads this sheet**, which is why all ten still pass |
-| **V-27** | **The UTF-8 stdout guard is missing from 27 of 33 tools**, not the single file the old row named. The failure lands *after* the work: output is written, then the summary line dies on `UnicodeEncodeError` and a correct run exits 1. It only shows on a cp1252 console, so a piped or CI run never sees it. `derive-wireframes.py` and the two tools added on 26 August carry the guard; nothing was retrofitted. Ready-to-run, dry-run first: `scratchpad/apply-utf8-guard.py` |
+| **V-41** | **The same three fixes have now been reverted by a dump twice.** 27 August took the UTF-8 guards off 24 tools, put `/home/claude/...` back in `build-schema-workbook.py`, and restored Python 3.12-only f-strings to `derive-domain.py` and `render-domain.py` — which do not compile on 3.9, so two of the forty tools simply stopped running. Restored both times from this side. A fix that lives only in a file `refresh.sh` regenerates is a fix with a half-life; the guards want to be somewhere the generators cannot overwrite, or emitted by whatever writes those files |
+| **V-42** | **Seven Inventory boards and three F&B boards are still claimed by no screen** — 70 frames drawn and nothing saying what they draw. The Seat pack solved this at the source by naming the screen on the frame's own face, which is why its four boards mapped in one pass; the Inventory pack does not, and 0 of 70 frame names match a screen name. Visible now on `/uiux.html`, sorted to the top |
+| **V-43** | **`design-pack-audit-26-august.md` says `check-wireframes` is at 7 warnings, all Inventory. It is at 15.** The other eight are the boards left behind when their platforms were renamed — `P04 Staff POS`, `P06 Staff App`, `P07 Staff Scanner`, `P08 Staff Web Back Office`, `P09 Admin Web`, `P11 Accreditation`, `P12 Support Console`, `P13 White-Label CMS` — all dating from `d200412` and untouched by that dump. The doc counts the new problem and not the old one |
 | **V-30 / V-33** | Dashboards, and `relationships.csv` columns — **taken by the package side.** Both rows were stale here: six dashboards is eight, and 143-of-514 is 185-of-914 |
 
 ## Open — reviewer experience — 3
@@ -81,10 +81,15 @@ Raised from the viewer, fixed in the package. Listed here so they are not lost.
 
 **Dropped rather than done.** `V-23` was never a bug — the States zoom cap of `1.1` is deliberate and commented. `V-25` asked whether two root tools should be kept or deleted; both now live in `ticvai/tools/`, so the question answered itself. `V-02` wanted a commit split that a fresh history made moot.
 
-## Done — 27
+## Done — 32
 
 | ID | Item |
 |---|---|
+| **V-40** | **UI/UX — every board, on its own page.** `lib/uiux.mjs`, `/pkg/<project>/uiux`, `public/uiux.{html,js,css}`, linked from the viewer's menu and the two rollup pages. `lib/wireframes.mjs` describes only the boards a screen points at, because its job is putting a frame on a screen's page — so **23 of the 58 boards were reachable from nowhere**, including every Inventory board and a hand-built index of 255 frame links, every one of which resolves. Reports frames, how many anything can name, and how many no screen claims: **0 named out of 10 is the signature of an unmapped pack**. `checks/uiux-check.mjs` holds it — 16 passed, and it fetches all 58 board files and a frame out of each of the 54 with frames |
+| **V-24** | Stop the second accounts API on 8788. **Done — nothing is listening on 8788 or 4619 any more.** It was a full second copy of the accounts API with no `TICVAI_DB`, so it defaulted to the real `api/ticvai.db` |
+| **V-36** | The workbook's `Scaling` sheet. Root cause was `build-schema-workbook.py` globbing `/home/claude/...`; `glob.glob` on a missing directory returns `[]` and raises nothing, so the workbook built with two empty sheets. **Restoring it surfaced a third `/home/claude` path in the same file** that no one had found — not a glob, so it failed the other way: `open` raised, `except Exception` swallowed it, and the `Service` column read `—` for all 379 tables. `Foreign writers` was empty with it. Now: Scaling 32 rows and TOTAL 674/46/264/38, Service across 17 services, Foreign writers on 37 tables. See V-41 |
+| **V-27** | The UTF-8 stdout guard, on 31 of 40 tools. See V-41 |
+| **V-44** | **`platforms.html` was excluded from `pages-check` as an orphan and had not been one for some time.** `public/platforms.js` is back and `server.mjs` imports `lib/platforms.mjs`; the page, its script and its payload all answer 200. It was still reachable from nothing but its siblings' header chips, so nobody noticed either way. Linked from the viewer's menu, and both it and `/uiux.html` are in `pages-check` now — **55/0** |
 | **V-01** | Commit and push everything. `atlas` initialised, 6,917 files, **no database staged** — `.gitignore` excludes `api/*.db` and it was verified before the push, not after. Both remotes force-pushed to `d200412` |
 | **V-28** | The Domains lens page — `domains.html`, `.js`, `.css`, all present and rendering. **The row was stale, not the work** |
 | **V-39** | Backend › Routing now says *which* emptiness it is. A missing sheet and a present-but-empty sheet read identically before, and the old message sent a reader looking for a sheet that was there. `lib/backend.mjs` exports `scalingSheet` |

@@ -381,7 +381,8 @@ above 60 they arrive a page at a time on a button that says how many are left.
 | `lib/consumers.mjs` | reads declared consumers from `api-list.md` and the app roster |
 | `lib/journeys.mjs` | joins `flows/` → `screens/` → the contracts, and reads `frontend/` |
 | `lib/boards.mjs` | the design boards in `designs/`, and which platform each belongs to |
-| `lib/wireframes.mjs` | the rendered wireframes in `wireframes/`, matched to screens, flows and platforms by id |
+| `lib/wireframes.mjs` | the rendered wireframes in `wireframes/`, matched to screens, flows and platforms by id — **only the boards something points at**, because its job is putting a frame on a screen's page |
+| `lib/uiux.mjs` | every board in `wireframes/` and `designs/`, read off the disk. The list above cannot show a board nobody has wired up, and 23 of the 58 were reachable from nowhere |
 | `lib/xlsx.mjs` | minimal zip + sheet reader, so the workbook needs no dependency |
 | `lib/backend.mjs` | the schema reference and ADRs, joined back to contract schemas |
 | `lib/migrations.mjs` | the versioned SQL — tables, keys, partitioning, row security |

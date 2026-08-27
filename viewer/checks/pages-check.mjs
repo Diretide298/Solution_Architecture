@@ -26,13 +26,21 @@ const MODES = {
 // The real pages, read off public/ rather than remembered — an invented name
 // here fails as a 404 and reads like a broken page.
 //
-// `/platforms.html` is deliberately not in this list. It is an orphan: the
-// revert on 20 August took `public/platforms.js` and `changes.html` with it and
-// left the HTML behind, so the page loads and then 404s on its own script.
-// Nothing links to it and nothing imports `lib/platforms.mjs` either. It is
-// excluded rather than fixed because the revert was deliberate — but it is
-// named here so the next person finds it on purpose instead of by accident.
-const PAGES = ['/validation.html', '/reviews.html', '/admin.html', '/domains.html'];
+// `/platforms.html` was excluded here as an orphan — the 20 August revert took
+// `public/platforms.js` and `changes.html` with it and left the HTML behind, so
+// the page loaded and then 404d on its own script. **That has not been true for
+// some time**: `public/platforms.js` is back, `server.mjs` imports
+// `lib/platforms.mjs`, and all three of the page, its script and its payload
+// answer 200. An exclusion outlives its reason silently, which is how a page
+// stays untested after it starts working.
+//
+// It was still reachable from nothing but the header chips on its siblings,
+// which is why nobody noticed either way. Linked from the viewer's own menu now,
+// alongside `/uiux.html`.
+const PAGES = [
+  '/validation.html', '/reviews.html', '/admin.html', '/domains.html',
+  '/platforms.html', '/uiux.html',
+];
 
 let pass = 0, fail = 0;
 const check = (n, ok, d = '') => { console.log((ok ? 'PASS  ' : 'FAIL  ') + n + (d ? ' — ' + d : '')); ok ? pass++ : fail++; };

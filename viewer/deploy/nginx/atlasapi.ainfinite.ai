@@ -67,7 +67,7 @@ server {
     #
     # This block is the last thing in the deployment that has to be kept in step
     # by hand. It comes out when the client calls `/pkg/` for everything.
-    location ~ ^/api/(index|detail|projects|session|summary|tooltips|domains|domain|journeys|backend|decisions|diagrams|events|file|lineage|platforms|tree)(/|$) {
+    location ~ ^/api/(index|detail|projects|session|summary|tooltips|domains|domain|journeys|backend|decisions|diagrams|events|file|lineage|platforms|tree|uiux)(/|$) {
         proxy_pass http://127.0.0.1:4173;
 
         proxy_http_version 1.1;

@@ -1,0 +1,174 @@
+/**
+ * The UI/UX board list.
+ *
+ * Its own stylesheet rather than more of `domains.css`, because that file is
+ * already the shared sheet for three pages and the rules below are about one.
+ *
+ * Tokens only — no literal colours. The page renders in whichever theme the
+ * reader chose, and a hex here is a rule that is right in one of them.
+ */
+
+.uiux-folder {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  margin: 20px 0 10px;
+}
+.uiux-folder:first-child { margin-top: 0; }
+
+.uiux-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 380px), 1fr));
+  gap: 10px;
+  /* Each card is as tall as its own contents. Without this, opening the frame
+     list on a board with 73 frames stretches every other card in that row to
+     match it, and two thirds of the row becomes empty space. */
+  align-items: start;
+}
+
+.uiux-card {
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--panel-2);
+  padding: 12px 14px;
+  min-width: 0;
+}
+
+/* A board nothing points at is the point of this page, so it is marked rather
+   than dimmed. Dimming it — which is what `.plat-clean` does for a platform
+   with no gaps — would say "nothing to see", and the opposite is true. */
+.uiux-card.is-unwired { border-color: var(--warning); }
+
+.uiux-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 8px;
+  min-width: 0;
+}
+
+.uiux-name {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text);
+  text-decoration: none;
+  overflow-wrap: anywhere;
+}
+.uiux-name:hover { color: var(--accent); text-decoration: underline; }
+
+.uiux-rev,
+.uiux-kind,
+.uiux-unwired {
+  font-family: var(--mono);
+  font-size: 10px;
+  line-height: 1.6;
+  padding: 1px 6px;
+  border-radius: 999px;
+  border: 1px solid var(--border-soft);
+  color: var(--text-dim);
+  white-space: nowrap;
+}
+.uiux-kind.is-pack { border-color: var(--ok); color: var(--ok); }
+.uiux-kind.is-generated { color: var(--text-faint); }
+.uiux-unwired { border-color: var(--warning); color: var(--warning); }
+
+.uiux-title {
+  margin: 6px 0 0;
+  font-size: 12px;
+  color: var(--text-dim);
+  overflow-wrap: anywhere;
+}
+
+.uiux-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 8px;
+  font-size: 11px;
+  color: var(--text-faint);
+}
+.uiux-plat { color: var(--accent); font-weight: 600; }
+.uiux-file { font-family: var(--mono); overflow-wrap: anywhere; }
+
+.uiux-screens {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 5px;
+  margin-top: 9px;
+}
+.uiux-screens-label,
+.uiux-more {
+  font-size: 11px;
+  color: var(--text-faint);
+}
+.uiux-superseded { color: var(--text-faint); font-style: italic; width: 100%; }
+
+.uiux-screen {
+  font-family: var(--mono);
+  font-size: 10px;
+  padding: 1px 5px;
+  border-radius: 4px;
+  border: 1px solid var(--border-soft);
+  color: var(--text-dim);
+  text-decoration: none;
+}
+.uiux-screen:hover { border-color: var(--accent); color: var(--accent); }
+
+.uiux-frames { margin-top: 9px; }
+.uiux-frames > summary {
+  cursor: pointer;
+  font-size: 11px;
+  color: var(--text-dim);
+}
+.uiux-frames > summary:hover { color: var(--accent); }
+
+.uiux-frame-list {
+  margin-top: 6px;
+  border-top: 1px solid var(--border-soft);
+  /* A board can carry 73 frames. Scrolls inside itself rather than making the
+     card taller than the screen. */
+  max-height: 320px;
+  overflow-y: auto;
+}
+
+.uiux-frame {
+  display: grid;
+  grid-template-columns: 72px 1fr auto;
+  gap: 8px;
+  align-items: baseline;
+  padding: 3px 0;
+  border-bottom: 1px solid var(--border-soft);
+  font-size: 11px;
+}
+.uiux-frame:last-child { border-bottom: 0; }
+
+.uiux-anchor {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--text-dim);
+  text-decoration: none;
+}
+a.uiux-anchor:hover { color: var(--accent); text-decoration: underline; }
+
+.uiux-frame-name { color: var(--text); overflow-wrap: anywhere; }
+.uiux-frame-name.is-unnamed { color: var(--text-faint); font-style: italic; }
+.uiux-frame-src { color: var(--text-faint); font-size: 10px; white-space: nowrap; }
+
+.uiux-note {
+  margin: 9px 0 0;
+  font-size: 11px;
+  color: var(--text-dim);
+}
+
+.uiux-toggles { margin-top: 8px; }
+.uiux-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--text-dim);
+  cursor: pointer;
+}

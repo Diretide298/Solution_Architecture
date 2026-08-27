@@ -43,8 +43,9 @@ const browser = await puppeteer.launch({
 const page = await browser.newPage();
 await page.setViewport({ width: 1600, height: 1000 });
 const errors = [];
-page.on('pageerror', (e) => errors.push(e.message));
-page.on('console', (m) => { if (m.type() === 'error') errors.push(m.text()); });
+let collecting = true;
+page.on('pageerror', (e) => { if (collecting) errors.push(e.message); });
+page.on('console', (m) => { if (collecting && m.type() === 'error') errors.push(m.text()); });
 
 await page.goto(BASE + '/invite.html', { waitUntil: 'domcontentloaded' });
 await page.evaluate(() => localStorage.setItem('ticvai-api', ''));
@@ -140,6 +141,16 @@ check('Overview clears the panel rather than navigating', filled > 0 && cleared 
 
 // ── sign out really ends the session ─────────────────────────────────
 if (gated) {
+  // Stop collecting from here. Signing out is *meant* to make the next package
+  // read fail, and since the gate started answering a signed-out `/pkg/` fetch
+  // with 401 instead of a 302 to the sign-in page, the browser logs that refusal
+  // as a console error. It is the behaviour the two assertions below are for.
+  //
+  // Left in, this passed or failed depending on whether the page got its fetch
+  // away before the browser closed — green in one run and red in the next, off
+  // the same code. A flaky check is worse than no check: it teaches you to rerun
+  // rather than to look.
+  collecting = false;
   await door();
   await page.evaluate(() => {
     [...document.querySelectorAll('button')].find((x) => /sign out/i.test(x.innerText))?.click();

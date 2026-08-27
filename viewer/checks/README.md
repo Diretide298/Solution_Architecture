@@ -21,6 +21,7 @@ on an empty database.
 | `pages-check.mjs` | every page loads, every layer renders every one of its modes, and **nothing anywhere logs a console error** |
 | `landing-check.mjs` | the door sends people where it says — the lockup stays on the door rather than falling into a package, all 42 rail-panel links land on the layer *and* mode they name, Overview deselects, and sign out really ends the session |
 | `tip-facts-check.mjs` | every count a tip states is the count the payload holds — the tips write `{operations}` and are measured against `/pkg/<project>/lineage`, `journeys` and `decisions` |
+| `uiux-check.mjs` | the board list holds every board on disk, not only the ones a screen points at; each of the 58 board files and one frame out of each of the 54 with frames actually resolves; and the filters filter |
 
 `pages-check.mjs` is the cheap one to run after any edit to a module under
 `public/`. `node --check` proves a file parses; it says nothing about whether the
@@ -45,6 +46,30 @@ also walks every layer, since a mode button exists only while its own layer does
 
 It runs against a gated viewer as the others do, or against a throwaway
 `TICVAI_NO_GATE=1` instance with no account at all.
+
+`uiux-check.mjs` exists for the reason the page does. `buildWireframes`
+describes only the boards a screen already points at, because its job is
+putting a frame on a screen's page — so **23 of the 58 boards were reachable
+from nowhere in the viewer**, including every Inventory board and a hand-built
+index of 255 frame links, every one of which resolves. Nothing failed while
+that was true; the boards were simply absent, and absent and non-existent look
+identical. So the first thing this holds is that the number of cards equals the
+number of files on disk, and the second is that every one of those files and a
+frame out of each of them answers 200 — a catalogue whose entries 404 is worse
+than no catalogue, because it says the board is there.
+
+**Point every harness at a throwaway pair rather than 4173/8787.** The two
+environment variables are not the same thing and the difference is easy to get
+backwards: `TICVAI_API` is where the *page* is told to look, and on a
+workstation that has to be the **viewer's** origin, because the viewer serves
+the package and forwards `/api/auth` to the accounts service. Setting it to the
+accounts port instead gets a CORS failure on sign-in, or — worse, because it
+looks like it worked — a signed-in page whose every package read 404s.
+
+```
+TICVAI_VIEWER=http://127.0.0.1:4620 TICVAI_API=http://127.0.0.1:4620 \
+  node checks/uiux-check.mjs
+```
 
 `signoff-check.mjs` **records one real verdict per kind** — six of them now that
 state models and schemas are reviewable — against real artefacts, because checking
