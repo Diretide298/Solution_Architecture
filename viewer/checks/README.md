@@ -21,7 +21,7 @@ on an empty database.
 | `pages-check.mjs` | every page loads, every layer renders every one of its modes, and **nothing anywhere logs a console error** |
 | `landing-check.mjs` | the door sends people where it says — the lockup stays on the door rather than falling into a package, all 42 rail-panel links land on the layer *and* mode they name, Overview deselects, and sign out really ends the session |
 | `tip-facts-check.mjs` | every count a tip states is the count the payload holds — the tips write `{operations}` and are measured against `/pkg/<project>/lineage`, `journeys` and `decisions` |
-| `search-check.mjs` | search reaches the whole package and not only the contracts, every `file:line` it reports really is where that artefact is written, and a result opens the artefact's page *and* the source at that line |
+| `search-check.mjs` | search reaches the whole package and not only the contracts, every `file:line` it reports really is where that artefact is written, a result opens the artefact's page *and* the source at that line, and opening one **lands on the match rather than on the page** |
 | `subsearch-check.mjs` | every page that lists things can be narrowed, the count keeps its denominator, and a row drawn after the filter was typed is filtered too |
 | `uiux-check.mjs` | the board list holds every board on disk, not only the ones a screen points at; each of the 58 board files and one frame out of each of the 54 with frames actually resolves; and the filters filter |
 
@@ -111,6 +111,31 @@ it gets believed.** So this fetches the file and reads the line, for a sample of
 every kind, and separately fetches one file of every extension search points at
 — which is how `.sql` turned out to be refused by `/api/file` until the
 migrations became a search destination.
+
+The landing half is held with a needle **read off the page that is already
+open**, from the bottom of it, and only a word occurring exactly once. A needle
+taken from the heading would already be on screen and "it is in the viewport"
+would pass without anything having scrolled — the run that proves this took a
+word sitting at **2546px in an 1100px window** and found it at 320px afterwards.
+The other half of the claim is that a needle with no literal run of characters
+marks *nothing*: `fuzzyScore` matches a subsequence, so `zzqqxx` still ranks 30
+results, and highlighting the nearest thing would tell a reader *this is what
+you asked for* about a word they did not search for.
+
+**`TICVAI_NO_GATE=1` is not enough for any harness that drives a browser.** The
+gate stops refusing, but the page still asks who it is talking to and redirects
+itself to `/login.html`, so the run ends on the sign-in screen with nothing
+rendered. Give it an accounts service on a scratch store instead:
+
+```
+TICVAI_DB=.../scratch.db python -m uvicorn api.main:app --port 8791
+TICVAI_AUTH=http://127.0.0.1:8791 node server.mjs --port 4620
+```
+
+`_session.mjs` no longer throws when the sign-in fails — it holds the reason and
+raises it only if a read actually comes back 401. A check needing no session
+could not previously run without one, and the useful diagnostic is kept for the
+case where the missing session is genuinely the problem rather than a guess.
 
 `subsearch-check.mjs` types a string nothing can contain and requires that
 nothing is left showing. A filter that matches everything is indistinguishable

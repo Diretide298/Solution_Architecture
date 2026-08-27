@@ -1793,6 +1793,41 @@ pre.code {
 .palette-item-kind { flex: none; font-size: 10px; color: var(--text-faint); text-transform: uppercase; letter-spacing: .05em; }
 .palette-item mark { background: transparent; color: var(--accent); font-weight: 600; }
 
+/* The match, on the page the result opened.
+   Inside the palette a mark only has to be legible against one row, so it is
+   drawn as colour alone. Out here it has to be findable in a page of several
+   hundred rows the reader has not seen yet, which is what the background is
+   for. `inherit` on the colour keeps the surrounding text unchanged: a
+   highlight that also restyles the words is read as the words being different
+   rather than as the words being the ones you asked for. */
+mark.search-hit {
+  background: var(--accent-soft);
+  color: inherit;
+  border-radius: 2px;
+  padding: 0 1px;
+  box-shadow: 0 0 0 1px var(--accent-line);
+}
+
+/* The one it scrolled to, so it is separable from the others already on screen.
+   The ring fades and the mark stays: the flash answers "where did it put me",
+   and after that it is just another match. */
+mark.search-hit-first {
+  background: var(--accent);
+  color: var(--accent-text);
+  animation: search-hit-flash 1.4s ease-out 1;
+}
+
+@keyframes search-hit-flash {
+  0%   { box-shadow: 0 0 0 0 var(--accent); }
+  40%  { box-shadow: 0 0 0 6px transparent; }
+  100% { box-shadow: 0 0 0 1px var(--accent-line); }
+}
+
+/* Somebody who has asked not to be moved at, is not moved at. */
+@media (prefers-reduced-motion: reduce) {
+  mark.search-hit-first { animation: none; }
+}
+
 /* Where a result is written. Sits between the name and the kind badge, right
    aligned, and is the only part of a row that does something different from the
    row: the row opens the artefact, this opens the source at the line. */

@@ -125,11 +125,20 @@ const survived = await page.evaluate(async () => {
   const box = document.getElementById('accounts');
   const one = box.querySelector('.account-row');
   if (!one) return null;
-  const clone = one.cloneNode(true);
-  clone.hidden = false;
-  box.append(clone);           // a row arriving after the filter was typed
+  // A row that cannot match the needle, rather than a clone of an existing one.
+  //
+  // Cloning carried the original's text, so the answer depended on whether some
+  // account failed to match "harness" — true on a populated store and false on
+  // a scratch one holding only the harness account, where the clone matches,
+  // staying visible is *correct*, and this failed for being right. The claim is
+  // about the observer seeing a late arrival, so the row is built to make that
+  // the only thing being measured.
+  const late = document.createElement('div');
+  late.className = one.className;
+  late.textContent = 'zzqqxx-no-such-account';
+  box.append(late);            // a row arriving after the filter was typed
   await new Promise((r) => setTimeout(r, 500));
-  return clone.hidden;
+  return late.hidden;
 });
 check('a row drawn after the filter is filtered too',
   survived === true, survived === null ? 'no rows to test with' : `hidden=${survived}`);

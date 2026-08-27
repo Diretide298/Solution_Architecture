@@ -109,12 +109,20 @@ page.on('console', (m) => { if (m.type() === 'error') errors.push(m.text()); });
 
 await page.goto(BASE + '/invite.html', { waitUntil: 'domcontentloaded' });
 await page.evaluate((a) => localStorage.setItem('ticvai-api', a), API);
+// Tolerated rather than required, so this also runs against a throwaway
+// `TICVAI_NO_GATE=1` instance with no accounts service behind it at all — which
+// is the only way to run it without a session on the real one. Signed in it
+// gets a session; gate-off it does not need one, and either way the reads below
+// answer. An unhandled rejection here used to end the run before a single
+// assertion.
 await page.evaluate(async (a, e, p) => {
-  await fetch(a + '/api/auth/login', {
-    method: 'POST', credentials: 'include',
-    headers: { 'content-type': 'application/json' },
-    body: JSON.stringify({ email: e, password: p }),
-  });
+  try {
+    await fetch(a + '/api/auth/login', {
+      method: 'POST', credentials: 'include',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ email: e, password: p }),
+    });
+  } catch { /* no accounts service: the gate is off or the reads will 401 */ }
 }, API,
   process.env.TICVAI_HARNESS_EMAIL ?? 'harness.admin@softlabsgroup.com',
   process.env.TICVAI_HARNESS_PASSWORD ?? 'a-long-enough-passphrase');
@@ -171,6 +179,88 @@ check('opening a screen result lands on the screen view',
   landed.layer === 'frontend' && landed.mode === 'screen',
   `layer=${landed.layer} mode=${landed.mode} hash=${landed.hash}`);
 check('and leaves a link in the address', landed.hash === `#screen:${screen.id}`, landed.hash);
+
+// ── and lands on the match, not merely on the page ───────────────────
+// Opening the artefact was never the hard part. A screen page runs to several
+// hundred rows, so arriving at the top of the right page and leaving somebody
+// to scan for the word they typed is the work the search was meant to do.
+//
+// The needle is read off the page that is already open, from the *bottom* half
+// of it, and only a word that occurs exactly once. That is what makes this
+// falsifiable: a word taken from the heading would be at the top of the view
+// already, and "it is in the viewport" would pass without anything having
+// scrolled at all.
+const deep = await page.evaluate(() => {
+  const view = document.querySelector('#main .view:not([hidden])');
+  if (!view) return null;
+  const text = view.textContent ?? '';
+  const walker = document.createTreeWalker(view, NodeFilter.SHOW_TEXT);
+  const found = [];
+  let node;
+  while ((node = walker.nextNode())) {
+    const parent = node.parentElement;
+    if (!parent?.offsetParent) continue;
+    for (const word of (node.nodeValue ?? '').split(/[^A-Za-z-]+/)) {
+      if (word.length < 6) continue;
+      // Once in the whole view, so the first mark is unambiguously this one.
+      if (text.split(word).length !== 2) continue;
+      found.push({ word, top: parent.getBoundingClientRect().top });
+    }
+  }
+  if (!found.length) return null;
+  // The furthest down the page, which is the hardest case for the claim.
+  found.sort((a, b) => b.top - a.top);
+  return { word: found[0].word, wasAt: Math.round(found[0].top), height: innerHeight };
+});
+
+if (!deep) {
+  check('a needle deep in the page can be chosen', false, 'no once-only word found');
+} else {
+  check('the needle chosen is genuinely below the fold', deep.wasAt > deep.height,
+    `"${deep.word}" was at ${deep.wasAt}px in a ${deep.height}px window`);
+
+  await search(deep.word);
+  await page.evaluate(() => document.querySelector('.palette-item')?.click());
+  await wait(3500);
+
+  const put = await page.evaluate(() => {
+    const first = document.querySelector('mark.search-hit-first');
+    if (!first) {
+      return { marks: document.querySelectorAll('mark.search-hit').length, first: null };
+    }
+    const r = first.getBoundingClientRect();
+    const view = first.closest('.view');
+    return {
+      marks: document.querySelectorAll('mark.search-hit').length,
+      first: first.textContent,
+      top: Math.round(r.top),
+      inViewport: r.top >= 0 && r.bottom <= innerHeight && r.height > 0,
+      inShowingView: Boolean(view) && !view.hidden,
+      viewId: view?.id ?? null,
+    };
+  });
+
+  check('opening a result marks the words that were typed', Boolean(put.first),
+    put.first ? `"${put.first}", ${put.marks} marked` : `0 marks for "${deep.word}"`);
+  check('and scrolls the first one into the viewport', put.inViewport === true,
+    put.first ? `now at ${put.top}px, was ${deep.wasAt}px` : 'nothing marked');
+  check('inside the view that is actually showing', put.inShowingView === true,
+    put.viewId ?? 'not in a view');
+}
+
+// A needle with no literal run of characters must mark nothing. `fuzzyScore`
+// matches a subsequence too, so `zzqq` can still rank a result — and marking
+// the nearest thing would put a highlight on something nobody searched for,
+// which reads as *this is what you asked for*.
+await search('zzqqxx');
+const rows = await page.evaluate(() => document.querySelectorAll('.palette-item').length);
+if (rows) {
+  await page.evaluate(() => document.querySelector('.palette-item')?.click());
+  await wait(2500);
+}
+const spurious = await page.evaluate(() => document.querySelectorAll('mark.search-hit').length);
+check('a needle nothing literally contains marks nothing', spurious === 0,
+  rows ? `${rows} results, ${spurious} marks` : 'no results to open');
 
 // ── file:line opens the source at that line ──────────────────────────
 await search(screen.id);

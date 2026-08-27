@@ -11096,20 +11096,117 @@ function zoomDiagram(d, factor) {
  */
 async function openResult(result) {
   closePalette();
+  const needle = searchNeedle;
   if (result.node) {
     select(result.node.id);
     setMode('reader');
+    landOnMatch(needle);
     return;
   }
   if (result.hash && await openArtefactHash(result.hash)) {
     // The hash is the address, so leave it in the bar. A result is now a link
     // somebody can send.
     history.replaceState(null, '', `#${result.hash}`);
+    landOnMatch(needle);
     return;
   }
   if (result.href) { location.href = result.href; return; }
   if (result.file) { openSourceAt(result.file, result.line, result.name ?? result.id); return; }
   toast(`Nothing in the viewer draws ${result.name ?? result.id} yet`);
+}
+
+/** Unwrap every mark this made, and put the split text nodes back together. */
+function clearSearchHits(root) {
+  for (const mark of root.querySelectorAll('mark.search-hit')) {
+    const parent = mark.parentNode;
+    if (!parent) continue;
+    parent.replaceChild(document.createTextNode(mark.textContent), mark);
+    // Without this the node stays split at every former mark, so a second pass
+    // over the same paragraph can no longer see a phrase that spans the seam.
+    parent.normalize();
+  }
+}
+
+/**
+ * Put the reader on the words they searched for, once the page has drawn.
+ *
+ * Opening the artefact was only half of "go to the match". A screen page runs
+ * to several hundred rows and the word that matched can be any of them —
+ * landing at the top and leaving somebody to scan for it is the work the search
+ * was meant to have done. The `file:line` chip already lands on the line in the
+ * source; this is the same promise kept against the rendered page.
+ *
+ * **Only a literal occurrence is marked.** `fuzzyScore` also matches a
+ * subsequence, so `pos` scores against `PointOfSale` with no run of characters
+ * anywhere to point at. Marking the closest thing would put a highlight on
+ * something nobody searched for, which is worse than not moving: a highlight is
+ * read as *this is what you asked for*. So when there is no literal hit this
+ * marks nothing and leaves the page where opening the artefact put it.
+ */
+function landOnMatch(needle, attempt = 0) {
+  const main = $('main');
+  if (!main) return;
+  clearSearchHits(main);
+
+  // One character matches most pages at random, and marking every `a` on a
+  // screen is not navigation.
+  if (!needle || needle.length < 2) return;
+
+  const view = main.querySelector('.view:not([hidden])');
+  if (!view) return;
+
+  const walker = document.createTreeWalker(view, NodeFilter.SHOW_TEXT, {
+    acceptNode(node) {
+      if (!node.nodeValue?.toLowerCase().includes(needle)) return NodeFilter.FILTER_REJECT;
+      const parent = node.parentElement;
+      if (!parent || parent.closest('script, style')) return NodeFilter.FILTER_REJECT;
+      // `offsetParent` is null for anything not laid out. A view can hold the
+      // panes of several readings at once with all but one hidden, and a
+      // highlight inside a hidden pane scrolls nowhere and is never seen.
+      if (!parent.offsetParent) return NodeFilter.FILTER_REJECT;
+      return NodeFilter.FILTER_ACCEPT;
+    },
+  });
+
+  const targets = [];
+  // Capped: a needle like `id` occurs thousands of times on a large page, and
+  // wrapping every one of them costs more than it tells anybody.
+  while (targets.length < 200 && walker.nextNode()) targets.push(walker.currentNode);
+
+  if (!targets.length) {
+    // Several modes render from a payload that lands a frame or two after
+    // `setMode` returns, so an empty first look is usually "not drawn yet"
+    // rather than "not there". A few frames, then it accepts the answer.
+    if (attempt < 3) requestAnimationFrame(() => landOnMatch(needle, attempt + 1));
+    return;
+  }
+
+  let first = null;
+  for (const node of targets) {
+    const text = node.nodeValue;
+    const lower = text.toLowerCase();
+    const pieces = document.createDocumentFragment();
+    let at = 0;
+    for (;;) {
+      const found = lower.indexOf(needle, at);
+      if (found === -1) break;
+      if (found > at) pieces.append(text.slice(at, found));
+      const mark = el('mark', 'search-hit', text.slice(found, found + needle.length));
+      pieces.append(mark);
+      first ??= mark;
+      at = found + needle.length;
+    }
+    if (at < text.length) pieces.append(text.slice(at));
+    node.parentNode?.replaceChild(pieces, node);
+  }
+
+  // `center` rather than `nearest`: the match is why the page was opened, so it
+  // belongs where the eye already is, not scrolled just barely into the frame.
+  // The spelling the rest of the file uses for the same question — a smooth
+  // scroll is motion, and somebody who asked for none gets none.
+  const still = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false;
+  first?.scrollIntoView({ block: 'center', behavior: still ? 'auto' : 'smooth' });
+  first?.classList.add('search-hit-first');
 }
 
 /** The dot colour for a result that is not a contract node. */
@@ -11225,6 +11322,10 @@ function closePeek() {
 let paletteItems = [];
 let paletteActive = 0;
 
+// What was typed, kept past the palette closing so the page that opens can put
+// the reader on it. Lowercased once here because every use compares lowercase.
+let searchNeedle = '';
+
 function openPalette() {
   $('palette').hidden = false;
   const input = $('palette-input');
@@ -11323,6 +11424,7 @@ function asResult(node) {
  */
 function runSearch(query) {
   const needle = query.trim().toLowerCase();
+  searchNeedle = needle;
   const results = [];
 
   for (const node of state.index.nodes) {
