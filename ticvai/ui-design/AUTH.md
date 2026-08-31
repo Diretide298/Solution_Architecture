@@ -1,4 +1,4 @@
-# Auth pages — Atlas
+# Auth pages — Aster
 
 Covers the **invite** page and the **sign-in** page, each in a night and a day variant. They share
 one background (the animated node field, specified under *The node field*), one card language and
@@ -9,8 +9,8 @@ one palette; the sign-in page adds a second column.
 Two files, one design: a **night** invite and a **day** invite. Same layout, same copy, same
 animated background; only the palette changes.
 
-- `designs/Atlas Invite.dc.html` — night
-- `designs/Atlas Invite Day.dc.html` — day
+- `designs/Aster Invite.dc.html` — night
+- `designs/Aster Invite Day.dc.html` — day
 
 Replaces `viewer/public/invite.html`. The three states the current page already has
 (`#checking`, `#refused`, `#form`) still apply — the design shows the **form** state. Keep the
@@ -94,16 +94,16 @@ nodes into a grid and only test neighbouring cells. Respect `prefers-reduced-mot
 | beam | rgba(150,235,232,·) | rgba(70,195,192,·) |
 
 ## Brand
-Night uses `brand/atlas-lockup-night.png` at 44px tall. Day cannot — that lockup's wordmark is
-white — so it composes the mark and the wordmark: `brand/atlas-mark-light.png` at 44px, a 1px
-rule, then `ATLAS` in **Montserrat Light**, 22px, letter-spacing .3em, #16323A. If a dark-wordmark
+Night uses `brand/aster-lockup-night.png` at 44px tall. Day cannot — that lockup's wordmark is
+white — so it composes the mark and the wordmark: `brand/aster-mark-day.png` at 44px, a 1px
+rule, then `Aster` in **Montserrat Light**, 22px, letter-spacing .3em, #16323A. If a dark-wordmark
 lockup gets produced later, swap it in and drop the composed version.
 
 
 # Sign-in page
 
-- `designs/Atlas Sign In.dc.html` — night
-- `designs/Atlas Sign In Day.dc.html` — day
+- `designs/Aster Sign In.dc.html` — night
+- `designs/Aster Sign In Day.dc.html` — day
 
 Replaces `viewer/public/login.html`. The existing states (`#checking`, `#bootstrap`, `#signin`)
 still apply; the design shows **signin**. The bootstrap state reuses the same card with its four
@@ -160,9 +160,9 @@ That is what lets the night and day files carry identical scene data with differ
 | warn (the finding) | #D9A143 | #9A6B18 |
 
 **Caret** — a 7×14px block on the active line only, blinking via
-`@keyframes atlas-caret` at `1s steps(1) infinite`.
+`@keyframes aster-caret` at `1s steps(1) infinite`.
 
-**Findings** rise in with `@keyframes atlas-rise` (.35s, 6px). Two tones: **ok** teal, **warn** amber.
+**Findings** rise in with `@keyframes aster-rise` (.35s, 6px). Two tones: **ok** teal, **warn** amber.
 
 **Layout stability** — the code body is a `grid` of `30px minmax(0,1fr)` with
 `min-height:238px; align-content:start`, and the findings tray has `min-height:56px`. Both are

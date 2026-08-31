@@ -85,7 +85,7 @@
 /* The curtain takes the door's own ground rather than the viewer's, because
    `styles.css` is scoped away from `.home-page` on purpose — see the note at
    the head of this file. */
-.home-page .atlas-loader { background: var(--veil); }
+.home-page .aster-loader { background: var(--veil); }
 .home-page .al-text { color: var(--support); }
 
 /* ── the scene ───────────────────────────────────────────────────── */

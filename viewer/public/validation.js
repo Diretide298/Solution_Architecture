@@ -125,7 +125,7 @@ export const asksForWork = (verdict) => ASKS_FOR_WORK.has(verdict);
  * `home.html` remembers the last one opened as a default for the door, and a
  * URL that names one always wins over it.
  */
-const PROJECT_KEY = 'atlas-project';
+const PROJECT_KEY = 'aster-project';
 function readProject() {
   const asked = new URLSearchParams(location.search).get('project');
   if (asked && /^[a-z0-9][a-z0-9-]{0,38}$/.test(asked)) return asked;

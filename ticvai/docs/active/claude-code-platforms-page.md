@@ -1,6 +1,6 @@
 # Build `platforms.html` — the one page in the viewer with no script
 
-**Scope: `atlas/viewer` only.** Do not touch the package. The TICVAI package is being edited in
+**Scope: `aster/viewer` only.** Do not touch the package. The TICVAI package is being edited in
 parallel and `refresh.sh` regenerates 179 derived files from `screens/` and `contracts/` — **if both
 of us run it, the loser's output is silently replaced with no error and no conflict, only a changed
 count.**
@@ -92,9 +92,9 @@ blank div.
 
 - `/platforms.js` exists, `#platforms` fills, all four sort options work
 - `pages-check.mjs` still 53 of 53 — it was 52/1 before the `validation.html` fix
-- No 4xx and no page errors on a fresh profile with `atlas-project` cleared, the same bar the
+- No 4xx and no page errors on a fresh profile with `aster-project` cleared, the same bar the
   project-segment fix was verified against
-- No file outside `atlas/viewer` modified
+- No file outside `aster/viewer` modified
 
 ---
 

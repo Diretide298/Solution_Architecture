@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+<meta name="omelette-print-source" content="v1787302223002197 Aster Deck.dc.html">
+<style>
+  * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  * { animation-delay: -99s !important; animation-duration: .001s !important;
+      animation-iteration-count: 1 !important; animation-fill-mode: both !important;
+      animation-play-state: running !important; transition-duration: 0s !important; }
+</style>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@200;300;400;500;600&family=IBM+Plex+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  body { margin: 0; background: #070A0B; }
+  a { color: #48CFCB; text-decoration: none; }
+  a:hover { color: #7FE3E0; }
+</style>
+</helmet>
+
+<x-import component-from-global-scope="deck-stage" from="./deck-stage.js" width="1920" height="1080" hint-size="100%,100%">
+
+<section data-deck-active data-label="Title" data-screen-label="01" data-speaker-notes="Aster is the architecture and context layer that lets a whole team code with agents without losing control of the system design." style="height:100%;background:#0B0F10;color:#E6EDEC;font-family:'IBM Plex Sans',sans-serif;padding:76px 100px;display:flex;flex-direction:column;box-sizing:border-box;">
+  <div style="display:flex;justify-content:space-between;align-items:center;font-family:'IBM Plex Mono',monospace;font-size:19px;letter-spacing:0.28em;color:#48CFCB;">
+    <span style="color:#5E6B69;">Aster</span><span>BUSINESS DECK · 2026</span>
+  </div>
+  <div style="margin:auto;display:flex;flex-direction:column;align-items:center;text-align:center;gap:52px;max-width:1400px;">
+    <img src="assets/aster-lockup-light.png" alt="Aster" style="height:180px;width:auto;display:block;" />
+    <h1 style="font-size:76px;font-weight:200;letter-spacing:-0.025em;margin:0;line-height:1.1;text-wrap:pretty;">Enterprise architecture for vibe coding</h1>
+    <div style="width:120px;height:1px;background:#48CFCB;"></div>
+    <p style="font-size:28px;line-height:1.55;color:#9BA8A6;margin:0;max-width:1080px;font-weight:300;text-wrap:pretty;">The project intelligence and orchestration layer that enables teams of developers and AI coding agents to build large software systems in parallel — without losing architectural control.</p>
+  </div>
+  <div style="display:flex;justify-content:space-between;align-items:flex-end;">
+    <div style="display:flex;align-items:center;gap:20px;font-family:'IBM Plex Mono',monospace;font-size:22px;letter-spacing:0.2em;color:#48CFCB;">
+      <span>SCOPE</span><span style="color:#3B4645;">→</span><span>MCP</span><span style="color:#3B4645;">→</span><span>AGENTS</span><span style="color:#3B4645;">→</span><span>CODE</span>
+    </div>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:19px;color:#6E7B79;">From scope to software — at agentic speed.</div>
+  </div>
+</section>
+
+<section data-deck-active data-label="Problem" data-screen-label="02" data-speaker-notes="The bottleneck moved. Generation is cheap; alignment is expensive. Land the five failure modes fast, then the gap." style="height:100%;background:#0E1314;color:#E6EDEC;font-family:'IBM Plex Sans',sans-serif;padding:80px 100px;display:flex;flex-direction:column;box-sizing:border-box;">
+  <div style="font-family:'IBM Plex Mono',monospace;font-size:21px;letter-spacing:0.22em;color:#48CFCB;margin:0 0 26px;">THE PROBLEM</div>
+  <div style="display:flex;gap:64px;align-items:flex-start;">
+    <div style="flex:1;">
+      <h1 style="font-size:58px;line-height:1.08;font-weight:400;letter-spacing:-0.02em;margin:0;text-wrap:pretty;">Vibe coding breaks down as projects and teams scale</h1>
+      <p style="font-size:28px;line-height:1.4;color:#8A9694;margin:22px 0 0;font-weight:300;text-wrap:pretty;">AI can generate code quickly. The harder problem is keeping many developers and agents aligned to one system design.</p>
+    </div>
+    <div style="flex:0 0 500px;display:flex;flex-direction:column;gap:12px;padding-top:8px;">
+      <div style="display:flex;justify-content:space-between;font-family:'IBM Plex Mono',monospace;font-size:18px;letter-spacing:0.14em;">
+        <span style="color:#48CFCB;">INTENDED SYSTEM</span><span style="color:#C89B4A;">AS BUILT</span>
+      </div>
+      <div style="display:flex;gap:9px;height:132px;align-items:flex-start;">
+        <div style="flex:1;position:relative;height:100%;"><div style="position:absolute;top:8px;left:0;right:0;height:3px;background:#48CFCB;"></div><div style="position:absolute;top:8px;left:0;right:0;height:3px;background:#C89B4A;"></div></div>
+        <div style="flex:1;position:relative;height:100%;"><div style="position:absolute;top:8px;left:0;right:0;height:3px;background:#48CFCB;"></div><div style="position:absolute;top:20px;left:0;right:0;height:3px;background:#C89B4A;"></div></div>
+        <div style="flex:1;position:relative;height:100%;"><div style="position:absolute;top:8px;left:0;right:0;height:3px;background:#48CFCB;"></div><div style="position:absolute;top:38px;left:0;right:0;height:3px;background:#C89B4A;"></div></div>
+        <div style="flex:1;position:relative;height:100%;"><div style="position:absolute;top:8px;left:0;right:0;height:3px;background:#48CFCB;"></div><div style="position:absolute;top:60px;left:0;right:0;height:3px;background:#C89B4A;"></div></div>
+        <div style="flex:1;position:relative;height:100%;"><div style="position:absolute;top:8px;left:0;right:0;height:3px;background:#48CFCB;"></div><div style="position:absolute;top:86px;left:0;right:0;height:3px;background:#C89B4A;"></div></div>
+        <div style="flex:1;position:relative;height:100%;"><div style="position:absolute;top:8px;left:0;right:0;height:3px;background:#48CFCB;"></div><div style="position:absolute;top:116px;left:0;right:0;height:3px;background:#C89B4A;"></div></div>
+        <div style="flex:0 0 64px;position:relative;height:100%;border-left:1px dashed #3B4645;">
+          <div style="position:absolute;top:52px;left:12px;font-family:'IBM Plex Mono',monospace;font-size:19px;color:#C89B4A;letter-spacing:0.1em;">DRIFT</div>
+        </div>
+      </div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:18px;color:#5E6B69;letter-spacing:0.1em;">EVERY SPRINT →</div>
+    </div>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:1px;background:#232A2C;border:1px solid #232A2C;margin-top:52px;">
+    <div style="background:#141A1B;padding:34px 30px;display:flex;flex-direction:column;gap:16px;">
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:17px;color:#48CFCB;">01</div>
+      <h3 style="font-size:26px;font-weight:500;margin:0;letter-spacing:-0.01em;line-height:1.2;">Context fragmentation</h3>
+      <p style="font-size:20px;line-height:1.5;color:#8A9694;margin:0;font-weight:300;">Each developer and agent sees only part of the project.</p>
+    </div>
+    <div style="background:#141A1B;padding:34px 30px;display:flex;flex-direction:column;gap:16px;">
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:17px;color:#48CFCB;">02</div>
+      <h3 style="font-size:26px;font-weight:500;margin:0;letter-spacing:-0.01em;line-height:1.2;">Architecture drift</h3>
+      <p style="font-size:20px;line-height:1.5;color:#8A9694;margin:0;font-weight:300;">Local AI decisions slowly diverge from the intended system.</p>
+    </div>
+    <div style="background:#141A1B;padding:34px 30px;display:flex;flex-direction:column;gap:16px;">
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:17px;color:#48CFCB;">03</div>
+      <h3 style="font-size:26px;font-weight:500;margin:0;letter-spacing:-0.01em;line-height:1.2;">Parallel conflicts</h3>
+      <p style="font-size:20px;line-height:1.5;color:#8A9694;margin:0;font-weight:300;">Agents duplicate logic, collide on interfaces and break dependencies.</p>
+    </div>
+    <div style="background:#141A1B;padding:34px 30px;display:flex;flex-direction:column;gap:16px;">
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:17px;color:#48CFCB;">04</div>
+      <h3 style="font-size:26px;font-weight:500;margin:0;letter-spacing:-0.01em;line-height:1.2;">Scope drift</h3>
+      <p style="font-size:20px;line-height:1.5;color:#8A9694;margin:0;font-weight:300;">Fast coding can move faster than requirements and acceptance criteria.</p>
+    </div>
+    <div style="background:#141A1B;padding:34px 30px;display:flex;flex-direction:column;gap:16px;">
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:17px;color:#48CFCB;">05</div>
+      <h3 style="font-size:26px;font-weight:500;margin:0;letter-spacing:-0.01em;line-height:1.2;">Integration debt</h3>
+      <p style="font-size:20px;line-height:1.5;color:#8A9694;margin:0;font-weight:300;">Speed is lost later in review, rework and integration.</p>
+    </div>
+  </div>
+  <div style="margin-top:auto;padding-top:48px;">
+    <div style="border-left:2px solid #C89B4A;background:#1A1710;padding:36px 44px;display:flex;gap:56px;align-items:center;">
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:20px;letter-spacing:0.22em;color:#C89B4A;flex:0 0 auto;">THE GAP</div>
+      <p style="font-size:30px;line-height:1.35;margin:0;font-weight:300;text-wrap:pretty;">Coding agents are becoming powerful executors, but large projects still need a shared architectural brain.</p>
+    </div>
+  </div>
+  <div style="margin-top:34px;display:flex;justify-content:space-between;align-items:center;">
+    <img src="assets/aster-lockup-light.png" alt="Aster" style="height:24px;width:auto;display:block;opacity:0.5;" />
+    <span style="font-family:'IBM Plex Mono',monospace;font-size:18px;letter-spacing:0.14em;color:#5E6B69;">02 / 15</span>
+  </div>
+</section>
+
+<section data-deck-active data-label="Why now" data-screen-label="03" data-speaker-notes="Three things changed at once: the executor layer got good, adoption stayed individual, and MCP gave a standard way to deliver context." style="height:100%;background:#0E1314;color:#E6EDEC;font-family:'IBM Plex Sans',sans-serif;padding:80px 100px;display:flex;flex-direction:column;box-sizing:border-box;">
+  <div style="font-family:'IBM Plex Mono',monospace;font-size:21px;letter-spacing:0.22em;color:#48CFCB;margin:0 0 26px;">WHY NOW</div>
+  <h1 style="font-size:58px;line-height:1.08;font-weight:400;letter-spacing:-0.02em;margin:0;max-width:1400px;text-wrap:pretty;">Three shifts arrived within a single product cycle</h1>
+  <p style="font-size:28px;line-height:1.4;color:#8A9694;margin:22px 0 0;max-width:1250px;font-weight:300;text-wrap:pretty;">Each one is well understood on its own. Together they open a layer that nobody owns yet.</p>
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:#232A2C;border:1px solid #232A2C;margin-top:60px;">
+    <div style="background:#141A1B;padding:52px 44px;display:flex;flex-direction:column;gap:22px;">
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:42px;color:#48CFCB;font-weight:300;">01</div>
+      <h3 style="font-size:34px;font-weight:400;margin:0;letter-spacing:-0.02em;line-height:1.15;">Agents crossed the capability line</h3>
+      <p style="font-size:22px;line-height:1.55;color:#8A9694;margin:0;font-weight:300;">Coding agents now produce real modules, not snippets. Execution capacity is no longer the constraint.</p>
+    </div>
+    <div style="background:#141A1B;padding:52px 44px;display:flex;flex-direction:column;gap:22px;">
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:42px;color:#48CFCB;font-weight:300;">02</div>
+      <h3 style="font-size:34px;font-weight:400;margin:0;letter-spacing:-0.02em;line-height:1.15;">Adoption is still per-developer</h3>
+      <p style="font-size:22px;line-height:1.55;color:#8A9694;margin:0;font-weight:300;">Tooling assumes one person and one repo. Nothing coordinates ten agents against one architecture.</p>
+    </div>
+    <div style="background:#141A1B;padding:52px 44px;display:flex;flex-direction:column;gap:22px;">
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:42px;color:#48CFCB;font-weight:300;">03</div>
+      <h3 style="font-size:34px;font-weight:400;margin:0;letter-spacing:-0.02em;line-height:1.15;">MCP standardised context delivery</h3>
+      <p style="font-size:22px;line-height:1.55;color:#8A9694;margin:0;font-weight:300;">A common protocol now carries project knowledge into any agent, so the intelligence layer can stay agent-agnostic.</p>
+    </div>
+  </div>
+  <div style="margin-top:auto;padding-top:52px;">
+    <p style="font-size:38px;font-weight:300;margin:0;letter-spacing:-0.02em;">The executor layer is solved. <span style="color:#48CFCB;">The coordination layer is not.</span></p>
+  </div>
+  <div style="margin-top:34px;display:flex;justify-content:space-between;align-items:center;">
+    <img src="assets/aster-lockup-light.png" alt="Aster" style="height:24px;width:auto;display:block;opacity:0.5;" />
+    <span style="font-family:'IBM Plex Mono',monospace;font-size:18px;letter-spacing:0.14em;color:#5E6B69;">03 / 15</span>
+  </div>
+</section>
+
+<section data-deck-active data-label="Solution" data-screen-label="04" data-speaker-notes="Aster turns intent into agent-ready context in six stages. Walk left to right, then land the closing line." style="height:100%;background:#0E1314;color:#E6EDEC;font-family:'IBM Plex Sans',sans-serif;padding:80px 100px;display:flex;flex-direction:column;box-sizing:border-box;">
+  <div style="font-family:'IBM Plex Mono',monospace;font-size:21px;letter-spacing:0.22em;color:#48CFCB;margin:0 0 26px;">THE SOLUTION</div>
+  <h1 style="font-size:58px;line-height:1.08;font-weight:400;letter-spacing:-0.02em;margin:0;max-width:1500px;text-wrap:pretty;">Aster is the control plane for large-scale AI-assisted development</h1>
+  <p style="font-size:28px;line-height:1.4;color:#8A9694;margin:22px 0 0;max-width:1250px;font-weight:300;text-wrap:pretty;">It turns project intent into structured, agent-ready development context.</p>
+  <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:1px;background:#232A2C;border:1px solid #232A2C;margin-top:56px;">
+    <div style="background:#141A1B;padding:34px 26px;display:flex;flex-direction:column;gap:18px;">
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:17px;color:#48CFCB;letter-spacing:0.1em;">01</div>
+      <h3 style="font-size:27px;font-weight:500;margin:0;letter-spacing:-0.015em;">Scope</h3>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:18px;line-height:1.9;color:#8A9694;">Business goals<br />Requirements<br />Acceptance criteria</div>
+    </div>
+    <div style="background:#141A1B;padding:34px 26px;display:flex;flex-direction:column;gap:18px;">
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:17px;color:#48CFCB;letter-spacing:0.1em;">02</div>
+      <h3 style="font-size:27px;font-weight:500;margin:0;letter-spacing:-0.015em;">Architecture</h3>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:18px;line-height:1.9;color:#8A9694;">Domains<br />Interfaces<br />Data &amp; APIs</div>
+    </div>
+    <div style="background:#141A1B;padding:34px 26px;display:flex;flex-direction:column;gap:18px;">
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:17px;color:#48CFCB;letter-spacing:0.1em;">03</div>
+      <h3 style="font-size:27px;font-weight:500;margin:0;letter-spacing:-0.015em;">Decomposition</h3>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:18px;line-height:1.9;color:#8A9694;">Epics<br />Modules<br />Dependencies</div>
+    </div>
+    <div style="background:#141A1B;padding:34px 26px;display:flex;flex-direction:column;gap:18px;">
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:17px;color:#48CFCB;letter-spacing:0.1em;">04</div>
+      <h3 style="font-size:27px;font-weight:500;margin:0;letter-spacing:-0.015em;">Context</h3>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:18px;line-height:1.9;color:#8A9694;">Rules<br />Decisions<br />Development state</div>
+    </div>
+    <div style="background:#141A1B;padding:34px 26px;display:flex;flex-direction:column;gap:18px;">
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:17px;color:#48CFCB;letter-spacing:0.1em;">05</div>
+      <h3 style="font-size:27px;font-weight:500;margin:0;letter-spacing:-0.015em;">Execution</h3>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:18px;line-height:1.9;color:#8A9694;">MCP<br />Developers<br />Coding agents</div>
+    </div>
+    <div style="background:#141A1B;padding:34px 26px;display:flex;flex-direction:column;gap:18px;">
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:17px;color:#48CFCB;letter-spacing:0.1em;">06</div>
+      <h3 style="font-size:27px;font-weight:500;margin:0;letter-spacing:-0.015em;">Integration</h3>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:18px;line-height:1.9;color:#8A9694;">Review<br />Tests<br />Release readiness</div>
+    </div>
+  </div>
+  <div style="margin-top:auto;padding-top:52px;display:flex;gap:64px;align-items:flex-end;">
+    <p style="font-size:34px;font-weight:300;margin:0;letter-spacing:-0.02em;flex:1;text-wrap:pretty;">Aster maintains the map. Coding agents execute within clearly defined boundaries.</p>
+    <p style="font-size:21px;line-height:1.5;color:#8A9694;margin:0;flex:0 0 520px;font-weight:300;text-wrap:pretty;">The result: parallel AI development without turning the codebase into a collection of disconnected prompts.</p>
+  </div>
+  <div style="margin-top:34px;display:flex;justify-content:space-between;align-items:center;">
+    <img src="assets/aster-lockup-light.png" alt="Aster" style="height:24px;width:auto;display:block;opacity:0.5;" />
+    <span style="font-family:'IBM Plex Mono',monospace;font-size:18px;letter-spacing:0.14em;color:#5E6B69;">04 / 15</span>
+  </div>
+</section>
+
+<section data-deck-active data-label="The loop" data-screen-label="05" data-speaker-notes="The whole system on one slide. Intent becomes a map, the map is served over MCP as scoped context, agents and developers build against it, the gates decide what merges, and the result writes back into the map. The loop is what stops drift." style="height:100%;background:#0E1314;color:#E6EDEC;font-family:'IBM Plex Sans',sans-serif;padding:80px 100px;display:flex;flex-direction:column;box-sizing:border-box;">
+  <div style="font-family:'IBM Plex Mono',monospace;font-size:21px;letter-spacing:0.22em;color:#48CFCB;margin:0 0 26px;">THE LOOP</div>
+  <h1 style="font-size:58px;line-height:1.08;font-weight:400;letter-spacing:-0.02em;margin:0;max-width:1500px;text-wrap:pretty;">Intent to merged code, and back again</h1>
+  <div style="margin-top:36px;flex:1;min-height:0;position:relative;width:1720px;height:600px;">
+    <svg width="1720" height="600" viewBox="0 0 1720 600" style="position:absolute;inset:0;overflow:visible;">
+      <defs>
+        <marker id="loopArrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#5E6B69"></path></marker>
+        <marker id="loopArrowTeal" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#48CFCB"></path></marker>
+      </defs>
+      <g fill="none" stroke="#5E6B69" stroke-width="2" marker-end="url(#loopArrow)">
+        <path d="M280,290 H352"></path>
+        <path d="M720,290 H792"></path>
+        <path d="M1080,290 L1152,90"></path>
+        <path d="M1080,290 H1152"></path>
+        <path d="M1080,290 L1152,358"></path>
+        <path d="M1320,415 V452"></path>
+        <path d="M860,522 H748"></path>
+      </g>
+      <path d="M360,522 H230 V381" fill="none" stroke="#2E4A48" stroke-width="2" stroke-dasharray="7 7" marker-end="url(#loopArrowTeal)"></path>
+    </svg>
+    <div style="position:absolute;left:0px;top:207px;width:280px;height:166px;border:1px solid #232A2C;background:#141A1B;padding:22px 24px;box-sizing:border-box;display:flex;flex-direction:column;gap:10px;">
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:17px;letter-spacing:0.16em;color:#5E6B69;">01</div>
+      <h3 style="font-size:28px;font-weight:500;margin:0;letter-spacing:-0.015em;">Intent</h3>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:18px;line-height:1.5;color:#8A9694;">Goals · requirements<br />designs · repos</div>
+    </div>
+    <div style="position:absolute;left:360px;top:110px;width:360px;height:330px;border:1px solid #48CFCB;background:#10201F;padding:30px 32px;box-sizing:border-box;display:flex;flex-direction:column;gap:14px;">
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:17px;letter-spacing:0.16em;color:#48CFCB;">02</div>
+      <h3 style="font-size:32px;font-weight:500;margin:0;letter-spacing:-0.015em;">The Aster map</h3>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:20px;line-height:1.75;color:#A9C6C4;">Contracts · domain<br />ER · state models<br />Screens · decisions</div>
+      <div style="margin-top:auto;font-size:21px;line-height:1.4;color:#48CFCB;font-weight:300;">One map, many agents, nothing duplicated.</div>
+    </div>
+    <div style="position:absolute;left:800px;top:207px;width:280px;height:166px;border:1px solid #48CFCB;background:#10201F;padding:22px 24px;box-sizing:border-box;display:flex;flex-direction:column;gap:10px;">
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:17px;letter-spacing:0.16em;color:#48CFCB;">03</div>
+      <h3 style="font-size:28px;font-weight:500;margin:0;letter-spacing:-0.015em;">MCP server</h3>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:18px;line-height:1.5;color:#A9C6C4;">Scoped context,<br />per task, on request</div>
+    </div>
+    <div style="position:absolute;left:1160px;top:0px;font-family:'IBM Plex Mono',monospace;font-size:17px;letter-spacing:0.16em;color:#5E6B69;">04 · BUILD</div>
+    <div style="position:absolute;left:1160px;top:30px;width:320px;height:120px;border:1px solid #232A2C;background:#141A1B;padding:22px 26px;box-sizing:border-box;display:flex;flex-direction:column;gap:10px;">
+      <h3 style="font-size:28px;font-weight:500;margin:0;letter-spacing:-0.015em;">Coding agent</h3>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:18px;line-height:1.5;color:#8A9694;">Any agent, any IDE</div>
+    </div>
+    <div style="position:absolute;left:1160px;top:170px;width:320px;height:120px;border:1px solid #232A2C;background:#141A1B;padding:22px 26px;box-sizing:border-box;display:flex;flex-direction:column;gap:10px;">
+      <h3 style="font-size:28px;font-weight:500;margin:0;letter-spacing:-0.015em;">Coding agent</h3>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:18px;line-height:1.5;color:#8A9694;">In parallel, same map</div>
+    </div>
+    <div style="position:absolute;left:1160px;top:310px;width:320px;height:120px;border:1px solid #232A2C;background:#141A1B;padding:22px 26px;box-sizing:border-box;display:flex;flex-direction:column;gap:10px;">
+      <h3 style="font-size:28px;font-weight:500;margin:0;letter-spacing:-0.015em;">Developer</h3>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:18px;line-height:1.5;color:#8A9694;">Same context, reviewing</div>
+    </div>
+    <div style="position:absolute;left:860px;top:455px;width:620px;height:130px;border:1px solid #C89B4A;background:#1A1710;padding:24px 28px;box-sizing:border-box;display:flex;flex-direction:column;gap:10px;">
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:17px;letter-spacing:0.16em;color:#C89B4A;">05 · GATES</div>
+      <h3 style="font-size:29px;font-weight:500;margin:0;letter-spacing:-0.015em;">Nothing merges unverified</h3>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:18px;line-height:1.4;color:#B9A98C;">Correctness · architecture · tests · build</div>
+    </div>
+    <div style="position:absolute;left:360px;top:455px;width:380px;height:130px;border:1px solid #2E4A48;background:#0F1718;padding:24px 28px;box-sizing:border-box;display:flex;flex-direction:column;gap:10px;">
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:17px;letter-spacing:0.16em;color:#48CFCB;">06</div>
+      <h3 style="font-size:29px;font-weight:500;margin:0;letter-spacing:-0.015em;">Merged code</h3>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:18px;line-height:1.4;color:#8A9694;">Reviewed · release-ready</div>
+    </div>
+    <div style="position:absolute;left:0px;top:430px;width:200px;display:flex;flex-direction:column;gap:8px;">
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:18px;letter-spacing:0.16em;color:#48CFCB;">WRITE-BACK</div>
+      <div style="font-size:20px;line-height:1.4;color:#8A9694;font-weight:300;">Every decision returns to the map.</div>
+    </div>
+  </div>
+  <div style="margin-top:30px;display:flex;gap:56px;align-items:flex-end;">
+    <p style="font-size:32px;font-weight:300;margin:0;letter-spacing:-0.02em;flex:1;text-wrap:pretty;">One map in, many agents out, everything verified on the way back.</p>
+    <p style="font-size:20px;line-height:1.5;color:#8A9694;margin:0;flex:0 0 460px;font-weight:300;text-wrap:pretty;">Remove the loop and you have prompts. Keep it and you have an architecture that survives the speed.</p>
+  </div>
+  <div style="margin-top:30px;display:flex;justify-content:space-between;align-items:center;">
+    <img src="assets/aster-lockup-light.png" alt="Aster" style="height:24px;width:auto;display:block;opacity:0.5;" />
+    <span style="font-family:'IBM Plex Mono',monospace;font-size:18px;letter-spacing:0.14em;color:#5E6B69;">05 / 15</span>
+  </div>
+</section>
+
+<section data-deck-active data-label="Product · contracts" data-screen-label="06" data-speaker-notes="Product walkthrough starts here. Every contract, event and consumer in one graph — the spine of the system, queryable by a human or an agent. Figures on screen are one live project." style="height:100%;background:#0B0F10;color:#E6EDEC;font-family:'IBM Plex Sans',sans-serif;padding:80px 100px;display:flex;flex-direction:column;box-sizing:border-box;">
+  <div style="display:flex;justify-content:space-between;align-items:baseline;margin:0 0 26px;">
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:21px;letter-spacing:0.22em;color:#48CFCB;">THE PRODUCT · CONTRACTS</div>
+  </div>
+  <h1 style="font-size:58px;line-height:1.08;font-weight:400;letter-spacing:-0.02em;margin:0;max-width:1400px;text-wrap:pretty;">One system, one map</h1>
+  <div style="display:flex;gap:56px;margin-top:40px;flex:1;min-height:0;align-items:stretch;">
+    <div style="flex:0 0 440px;display:flex;flex-direction:column;gap:32px;">
+      <p style="font-size:25px;line-height:1.5;margin:0;font-weight:300;color:#C4CFCD;text-wrap:pretty;">Every contract, operation and event link in the system, held as one live graph instead of tribal knowledge.</p>
+      <div style="display:flex;flex-direction:column;gap:1px;background:#232A2C;border:1px solid #232A2C;">
+        <div style="background:#141A1B;padding:22px 26px;display:flex;gap:22px;align-items:baseline;">
+          <span style="font-family:'IBM Plex Mono',monospace;font-size:18px;letter-spacing:0.14em;color:#48CFCB;flex:0 0 130px;">SPINE</span>
+          <span style="font-size:20px;line-height:1.45;color:#8A9694;font-weight:300;">The contracts everything else depends on.</span>
+        </div>
+        <div style="background:#141A1B;padding:22px 26px;display:flex;gap:22px;align-items:baseline;">
+          <span style="font-family:'IBM Plex Mono',monospace;font-size:18px;letter-spacing:0.14em;color:#48CFCB;flex:0 0 130px;">SATELLITE</span>
+          <span style="font-size:20px;line-height:1.45;color:#8A9694;font-weight:300;">Domain contracts that can change without a system-wide review.</span>
+        </div>
+        <div style="background:#141A1B;padding:22px 26px;display:flex;gap:22px;align-items:baseline;">
+          <span style="font-family:'IBM Plex Mono',monospace;font-size:18px;letter-spacing:0.14em;color:#C89B4A;flex:0 0 130px;">SHARED</span>
+          <span style="font-size:20px;line-height:1.45;color:#8A9694;font-weight:300;">The centre, referenced almost everywhere — where a careless edit is expensive.</span>
+        </div>
+      </div>
+      <p style="font-size:20px;line-height:1.55;color:#8A9694;margin:0;font-weight:300;text-wrap:pretty;">Spine, satellite and shared contracts are separated, so a change to the centre is visible before it is merged.</p>
+    </div>
+    <div style="flex:1 1 auto;border:1px solid #232A2C;background:#0d1216;overflow:hidden;display:flex;">
+      <img src="assets/ui-contracts.png" alt="Aster contract graph" style="width:100%;height:100%;object-fit:cover;object-position:left top;display:block;" />
+    </div>
+  </div>
+  <div style="margin-top:30px;display:flex;justify-content:space-between;align-items:center;">
+    <img src="assets/aster-lockup-light.png" alt="Aster" style="height:24px;width:auto;display:block;opacity:0.5;" />
+    <span style="font-family:'IBM Plex Mono',monospace;font-size:18px;letter-spacing:0.14em;color:#5E6B69;">06 / 15</span>
+  </div>
+</section>
+
+<section data-deck-active data-label="Product · waves" data-screen-label="07" data-speaker-notes="Delivery planning falls out of the map: screens grouped into waves, with unbuildable screens flagged before anyone writes code." style="height:100%;background:#0B0F10;color:#E6EDEC;font-family:'IBM Plex Sans',sans-serif;padding:80px 100px;display:flex;flex-direction:column;box-sizing:border-box;">
+  <div style="display:flex;justify-content:space-between;align-items:baseline;margin:0 0 26px;">
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:21px;letter-spacing:0.22em;color:#48CFCB;">THE PRODUCT · DELIVERY</div>
+  </div>
+  <h1 style="font-size:58px;line-height:1.08;font-weight:400;letter-spacing:-0.02em;margin:0;max-width:1400px;text-wrap:pretty;">What ships when, and what cannot ship yet</h1>
+  <div style="display:flex;gap:56px;margin-top:40px;flex:1;min-height:0;align-items:stretch;">
+    <div style="flex:1 1 auto;border:1px solid #232A2C;background:#0d1216;overflow:hidden;display:flex;">
+      <img src="assets/ui-waves.png" alt="Aster delivery waves" style="width:100%;height:100%;object-fit:cover;object-position:left top;display:block;" />
+    </div>
+    <div style="flex:0 0 440px;display:flex;flex-direction:column;gap:32px;">
+      <p style="font-size:25px;line-height:1.5;margin:0;font-weight:300;color:#C4CFCD;text-wrap:pretty;">Every screen on every platform, sequenced into delivery waves against real dependencies.</p>
+      <div style="display:flex;flex-direction:column;gap:18px;">
+        <div style="display:flex;flex-direction:column;gap:8px;border-left:2px solid #48CFCB;padding-left:22px;">
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:18px;letter-spacing:0.16em;color:#48CFCB;">BUILDABLE</div>
+          <p style="font-size:21px;line-height:1.5;color:#8A9694;margin:0;font-weight:300;">A screen that names the operation behind it can be handed to an agent today.</p>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:8px;border-left:2px solid #C89B4A;padding-left:22px;">
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:18px;letter-spacing:0.16em;color:#C89B4A;">UNBUILDABLE</div>
+          <p style="font-size:21px;line-height:1.5;color:#8A9694;margin:0;font-weight:300;">A screen that names none is one somebody can draw and nobody can build. Aster finds them, and they are never evenly spread.</p>
+        </div>
+      </div>
+      <p style="font-size:20px;line-height:1.55;color:#8A9694;margin:0;font-weight:300;text-wrap:pretty;">Scope questions get answered before a sprint starts, not during review.</p>
+    </div>
+  </div>
+  <div style="margin-top:30px;display:flex;justify-content:space-between;align-items:center;">
+    <img src="assets/aster-lockup-light.png" alt="Aster" style="height:24px;width:auto;display:block;opacity:0.5;" />
+    <span style="font-family:'IBM Plex Mono',monospace;font-size:18px;letter-spacing:0.14em;color:#5E6B69;">07 / 15</span>
+  </div>
+</section>
+
+<section data-deck-active data-label="Product · domain" data-screen-label="08" data-speaker-notes="Behaviour is modelled, not assumed: every status enum the contracts declare gets a state model, with guards and reversals explicit." style="height:100%;background:#0B0F10;color:#E6EDEC;font-family:'IBM Plex Sans',sans-serif;padding:80px 100px;display:flex;flex-direction:column;box-sizing:border-box;">
+  <div style="display:flex;justify-content:space-between;align-items:baseline;margin:0 0 26px;">
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:21px;letter-spacing:0.22em;color:#48CFCB;">THE PRODUCT · DOMAIN</div>
+  </div>
+  <h1 style="font-size:58px;line-height:1.08;font-weight:400;letter-spacing:-0.02em;margin:0;max-width:1400px;text-wrap:pretty;">Behaviour modelled, not assumed</h1>
+  <div style="display:flex;gap:56px;margin-top:40px;flex:1;min-height:0;align-items:stretch;">
+    <div style="flex:0 0 440px;display:flex;flex-direction:column;gap:32px;">
+      <p style="font-size:25px;line-height:1.5;margin:0;font-weight:300;color:#C4CFCD;text-wrap:pretty;">Every status enum the contracts declare gets a state model behind it — states, transitions, guards and reversals.</p>
+      <div style="display:flex;flex-direction:column;gap:14px;font-size:21px;line-height:1.5;color:#8A9694;font-weight:300;">
+        <div style="display:flex;gap:16px;align-items:baseline;"><span style="font-family:'IBM Plex Mono',monospace;color:#48CFCB;font-size:17px;">01</span><span>Guards and reversals are explicit, so an agent cannot invent a transition.</span></div>
+        <div style="display:flex;gap:16px;align-items:baseline;"><span style="font-family:'IBM Plex Mono',monospace;color:#48CFCB;font-size:17px;">02</span><span>Each model carries owner, initial and terminal states, and offline reachability.</span></div>
+        <div style="display:flex;gap:16px;align-items:baseline;"><span style="font-family:'IBM Plex Mono',monospace;color:#48CFCB;font-size:17px;">03</span><span>Reviewers record a verdict with a reason, and it stays attached to the model.</span></div>
+      </div>
+      <div style="border-left:2px solid #C89B4A;background:#1A1710;padding:24px 26px;">
+        <p style="font-size:20px;line-height:1.5;margin:0;font-weight:300;color:#D8CFBC;text-wrap:pretty;">A verdict with no reason gets rediscovered the hard way. Decisions live next to the thing they decide.</p>
+      </div>
+    </div>
+    <div style="flex:1 1 auto;border:1px solid #232A2C;background:#0d1216;overflow:hidden;display:flex;">
+      <img src="assets/ui-states.png" alt="Aster domain state model" style="width:100%;height:100%;object-fit:cover;object-position:left top;display:block;" />
+    </div>
+  </div>
+  <div style="margin-top:30px;display:flex;justify-content:space-between;align-items:center;">
+    <img src="assets/aster-lockup-light.png" alt="Aster" style="height:24px;width:auto;display:block;opacity:0.5;" />
+    <span style="font-family:'IBM Plex Mono',monospace;font-size:18px;letter-spacing:0.14em;color:#5E6B69;">08 / 15</span>
+  </div>
+</section>
+
+<section data-deck-active data-label="Product · data" data-screen-label="09" data-speaker-notes="The data layer shows what exists versus what is still only derivable from contracts — the gap between designed and built, as a number." style="height:100%;background:#0B0F10;color:#E6EDEC;font-family:'IBM Plex Sans',sans-serif;padding:80px 100px;display:flex;flex-direction:column;box-sizing:border-box;">
+  <div style="display:flex;justify-content:space-between;align-items:baseline;margin:0 0 26px;">
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:21px;letter-spacing:0.22em;color:#48CFCB;">THE PRODUCT · DATA</div>
+  </div>
+  <h1 style="font-size:58px;line-height:1.08;font-weight:400;letter-spacing:-0.02em;margin:0;max-width:1500px;text-wrap:pretty;">The ER model an agent can write against</h1>
+  <div style="display:flex;gap:56px;margin-top:40px;flex:1;min-height:0;align-items:stretch;">
+    <div style="flex:1 1 auto;border:1px solid #232A2C;background:#0d1216;overflow:hidden;display:flex;">
+      <img src="assets/ui-data.png" alt="Aster data layer" style="width:100%;height:100%;object-fit:cover;object-position:left top;display:block;" />
+    </div>
+    <div style="flex:0 0 440px;display:flex;flex-direction:column;gap:28px;">
+      <p style="font-size:25px;line-height:1.5;margin:0;font-weight:300;color:#C4CFCD;text-wrap:pretty;">Tables, columns and cross-schema keys, derived from the contracts — so an agent writing a migration already knows the shape it has to match, and which relationships it must not break.</p>
+      <div style="display:flex;flex-direction:column;gap:1px;background:#232A2C;border:1px solid #232A2C;">
+        <div style="background:#141A1B;padding:22px 26px;display:flex;gap:22px;align-items:baseline;">
+          <span style="font-family:'IBM Plex Mono',monospace;font-size:18px;letter-spacing:0.14em;color:#48CFCB;flex:0 0 150px;">WRITTEN</span>
+          <span style="font-size:20px;line-height:1.45;color:#8A9694;font-weight:300;">Exists as SQL in a migration. The agent extends it.</span>
+        </div>
+        <div style="background:#141A1B;padding:22px 26px;display:flex;gap:22px;align-items:baseline;">
+          <span style="font-family:'IBM Plex Mono',monospace;font-size:18px;letter-spacing:0.14em;color:#48CFCB;flex:0 0 150px;">PART WRITTEN</span>
+          <span style="font-size:20px;line-height:1.45;color:#8A9694;font-weight:300;">Some columns exist, some are still only in the contract.</span>
+        </div>
+        <div style="background:#141A1B;padding:22px 26px;display:flex;gap:22px;align-items:baseline;">
+          <span style="font-family:'IBM Plex Mono',monospace;font-size:18px;letter-spacing:0.14em;color:#C89B4A;flex:0 0 150px;">DERIVABLE</span>
+          <span style="font-size:20px;line-height:1.45;color:#8A9694;font-weight:300;">Known from the contracts, not yet built — a task, not a gap.</span>
+        </div>
+      </div>
+      <p style="font-size:20px;line-height:1.55;color:#8A9694;margin:0;font-weight:300;text-wrap:pretty;">Written, part written and derivable are distinguished, so an agent is told what to create and what already exists.</p>
+    </div>
+  </div>
+  <div style="margin-top:30px;display:flex;justify-content:space-between;align-items:center;">
+    <img src="assets/aster-lockup-light.png" alt="Aster" style="height:24px;width:auto;display:block;opacity:0.5;" />
+    <span style="font-family:'IBM Plex Mono',monospace;font-size:18px;letter-spacing:0.14em;color:#5E6B69;">09 / 15</span>
+  </div>
+</section>
+
+<section data-deck-active data-label="Product · handoff" data-screen-label="10" data-speaker-notes="This is the unit of work an agent receives: one screen, its regions and components, the operations it calls, the flows it sits in, and where it goes next." style="height:100%;background:#0B0F10;color:#E6EDEC;font-family:'IBM Plex Sans',sans-serif;padding:80px 100px;display:flex;flex-direction:column;box-sizing:border-box;">
+  <div style="font-family:'IBM Plex Mono',monospace;font-size:21px;letter-spacing:0.22em;color:#48CFCB;margin:0 0 26px;">THE PRODUCT · HANDOFF</div>
+  <h1 style="font-size:58px;line-height:1.08;font-weight:400;letter-spacing:-0.02em;margin:0;max-width:1500px;text-wrap:pretty;">The unit of work an agent can actually build</h1>
+  <div style="display:flex;gap:56px;margin-top:40px;flex:1;min-height:0;align-items:stretch;">
+    <div style="flex:0 0 440px;display:flex;flex-direction:column;gap:30px;">
+      <p style="font-size:25px;line-height:1.5;margin:0;font-weight:300;color:#C4CFCD;text-wrap:pretty;">One screen, fully specified: wireframe, regions, components, the operations behind it and the flows that reach it.</p>
+      <div style="display:flex;flex-direction:column;gap:20px;">
+        <div style="display:flex;flex-direction:column;gap:8px;">
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:18px;letter-spacing:0.16em;color:#48CFCB;">SCOPED</div>
+          <p style="font-size:21px;line-height:1.5;color:#8A9694;margin:0;font-weight:300;">Regions, components and operations are counted — bounded work, not an open brief.</p>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:8px;">
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:18px;letter-spacing:0.16em;color:#48CFCB;">CONNECTED</div>
+          <p style="font-size:21px;line-height:1.5;color:#8A9694;margin:0;font-weight:300;">Each screen knows what reaches it and what it goes on to, so side effects are visible.</p>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:8px;">
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:18px;letter-spacing:0.16em;color:#48CFCB;">SERVED OVER MCP</div>
+          <p style="font-size:21px;line-height:1.5;color:#8A9694;margin:0;font-weight:300;">The same record a reviewer reads is the context an agent is given.</p>
+        </div>
+      </div>
+    </div>
+    <div style="flex:1 1 auto;border:1px solid #232A2C;background:#0d1216;overflow:hidden;display:flex;">
+      <img src="assets/ui-screen.png" alt="Aster screen specification" style="width:100%;height:100%;object-fit:cover;object-position:right top;display:block;" />
+    </div>
+  </div>
+  <div style="margin-top:30px;display:flex;justify-content:space-between;align-items:center;">
+    <img src="assets/aster-lockup-light.png" alt="Aster" style="height:24px;width:auto;display:block;opacity:0.5;" />
+    <span style="font-family:'IBM Plex Mono',monospace;font-size:18px;letter-spacing:0.14em;color:#5E6B69;">10 / 15</span>
+  </div>
+</section>
+
+<section data-deck-active data-label="In the IDE" data-screen-label="11" data-speaker-notes="This is the loop in practice. The agent calls Aster over MCP from the editor: fetch scoped context, catch up on what changed, write the result back, then run the gates. Exact instruction plus enforced verification is what makes AI-assisted enterprise software workable." style="height:100%;background:#0E1314;color:#E6EDEC;font-family:'IBM Plex Sans',sans-serif;padding:80px 100px;display:flex;flex-direction:column;box-sizing:border-box;">
+  <div style="font-family:'IBM Plex Mono',monospace;font-size:21px;letter-spacing:0.22em;color:#48CFCB;margin:0 0 26px;">HOW IT WORKS</div>
+  <h1 style="font-size:58px;line-height:1.08;font-weight:400;letter-spacing:-0.02em;margin:0;max-width:1500px;text-wrap:pretty;">The agent asks Aster what to build, in the editor</h1>
+  <div style="display:flex;gap:48px;margin-top:36px;flex:1;min-height:0;align-items:stretch;">
+    <div style="flex:1 1 auto;border:1px solid #232A2C;background:#0d1216;overflow:hidden;display:flex;">
+      <img src="assets/ui-ide.png" alt="Aster MCP commands inside the editor" style="width:100%;height:100%;object-fit:cover;object-position:right top;display:block;" />
+    </div>
+    <div style="flex:0 0 500px;display:flex;flex-direction:column;gap:26px;">
+      <p style="font-size:24px;line-height:1.5;margin:0;font-weight:300;color:#C4CFCD;text-wrap:pretty;">Aster ships as an MCP server. The agent calls it from the IDE and gets the exact slice of the map its task needs — contracts, ER model, state machines, screen spec — instead of guessing from the repository.</p>
+      <div style="display:flex;flex-direction:column;gap:1px;background:#232A2C;border:1px solid #232A2C;">
+        <div style="background:#141A1B;padding:14px 20px;display:flex;gap:24px;align-items:baseline;">
+          <span style="font-family:'IBM Plex Mono',monospace;font-size:20px;color:#48CFCB;flex:0 0 150px;">/kb:fetch</span>
+          <span style="font-size:20px;line-height:1.45;color:#8A9694;font-weight:300;">Pull the scoped context for this piece of work.</span>
+        </div>
+        <div style="background:#141A1B;padding:14px 20px;display:flex;gap:24px;align-items:baseline;">
+          <span style="font-family:'IBM Plex Mono',monospace;font-size:20px;color:#48CFCB;flex:0 0 150px;">/kb:catchup</span>
+          <span style="font-size:20px;line-height:1.45;color:#8A9694;font-weight:300;">Re-align the session with what has changed since it started.</span>
+        </div>
+        <div style="background:#141A1B;padding:14px 20px;display:flex;gap:24px;align-items:baseline;">
+          <span style="font-family:'IBM Plex Mono',monospace;font-size:20px;color:#48CFCB;flex:0 0 150px;">/kb:add</span>
+          <span style="font-size:20px;line-height:1.45;color:#8A9694;font-weight:300;">Write the result back so the map stays current.</span>
+        </div>
+        <div style="background:#141A1B;padding:14px 20px;display:flex;gap:24px;align-items:baseline;">
+          <span style="font-family:'IBM Plex Mono',monospace;font-size:20px;color:#48CFCB;flex:0 0 150px;">/lint</span>
+          <span style="font-size:20px;line-height:1.45;color:#8A9694;font-weight:300;">Run the delivery gates — correctness, architecture, tests, build — before it pushes.</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div style="margin-top:28px;padding-top:28px;border-top:1px solid #232A2C;display:flex;gap:48px;align-items:baseline;">
+    <p style="font-size:30px;line-height:1.3;font-weight:300;margin:0;letter-spacing:-0.02em;flex:1;text-wrap:pretty;">Exact context plus enforced gates is what makes AI-assisted enterprise software realistic — not just fast prototypes.</p>
+    <p style="font-size:20px;line-height:1.5;color:#8A9694;margin:0;flex:0 0 420px;font-weight:300;text-wrap:pretty;">Agent-agnostic: every improvement in the model layer makes Aster more valuable.</p>
+  </div>
+  <div style="margin-top:24px;display:flex;justify-content:space-between;align-items:center;">
+    <img src="assets/aster-lockup-light.png" alt="Aster" style="height:24px;width:auto;display:block;opacity:0.5;" />
+    <span style="font-family:'IBM Plex Mono',monospace;font-size:18px;letter-spacing:0.14em;color:#5E6B69;">11 / 15</span>
+  </div>
+</section>
+
+<section data-deck-active data-label="Landscape" data-screen-label="12" data-speaker-notes="Four adjacent categories, none owning the layer. Our position: system-level context, multi-agent, enterprise scale." style="height:100%;background:#0E1314;color:#E6EDEC;font-family:'IBM Plex Sans',sans-serif;padding:80px 100px;display:flex;flex-direction:column;box-sizing:border-box;">
+  <div style="font-family:'IBM Plex Mono',monospace;font-size:21px;letter-spacing:0.22em;color:#48CFCB;margin:0 0 26px;">LANDSCAPE</div>
+  <h1 style="font-size:58px;line-height:1.08;font-weight:400;letter-spacing:-0.02em;margin:0;max-width:1400px;text-wrap:pretty;">Everyone is building the executor. Nobody owns the map.</h1>
+  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:#232A2C;border:1px solid #232A2C;margin-top:56px;">
+    <div style="background:#141A1B;padding:38px 32px;display:flex;flex-direction:column;gap:16px;min-height:320px;">
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:18px;letter-spacing:0.14em;color:#5E6B69;">CODING AGENTS</div>
+      <p style="font-size:21px;line-height:1.5;color:#8A9694;margin:0;font-weight:300;">Strong at generating code inside one repository and one developer's session.</p>
+      <p style="font-size:19px;line-height:1.5;color:#C89B4A;margin:auto 0 0;font-weight:300;">No system-level memory.</p>
+    </div>
+    <div style="background:#141A1B;padding:38px 32px;display:flex;flex-direction:column;gap:16px;min-height:320px;">
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:18px;letter-spacing:0.14em;color:#5E6B69;">PROJECT TOOLS</div>
+      <p style="font-size:21px;line-height:1.5;color:#8A9694;margin:0;font-weight:300;">Track tickets and people. The architecture lives in documents beside them.</p>
+      <p style="font-size:19px;line-height:1.5;color:#C89B4A;margin:auto 0 0;font-weight:300;">Not machine-readable.</p>
+    </div>
+    <div style="background:#141A1B;padding:38px 32px;display:flex;flex-direction:column;gap:16px;min-height:320px;">
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:18px;letter-spacing:0.14em;color:#5E6B69;">DIAGRAM &amp; DOCS</div>
+      <p style="font-size:21px;line-height:1.5;color:#8A9694;margin:0;font-weight:300;">Capture intent well, then drift from the code the moment it ships.</p>
+      <p style="font-size:19px;line-height:1.5;color:#C89B4A;margin:auto 0 0;font-weight:300;">Snapshot, not state.</p>
+    </div>
+    <div style="background:#10201F;padding:38px 32px;display:flex;flex-direction:column;gap:16px;min-height:320px;border-left:2px solid #48CFCB;">
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:18px;letter-spacing:0.14em;color:#48CFCB;">Aster</div>
+      <p style="font-size:21px;line-height:1.5;color:#C4CFCD;margin:0;font-weight:300;">System-level context, kept current, served to many agents and many people at once.</p>
+      <p style="font-size:19px;line-height:1.5;color:#48CFCB;margin:auto 0 0;font-weight:300;">The coordination layer.</p>
+    </div>
+  </div>
+  <div style="margin-top:auto;padding-top:52px;">
+    <p style="font-size:34px;font-weight:300;margin:0;letter-spacing:-0.02em;max-width:1500px;text-wrap:pretty;">The defensible asset is the map itself: the longer a team builds on Aster, the more of their system only Aster knows.</p>
+  </div>
+  <div style="margin-top:34px;display:flex;justify-content:space-between;align-items:center;">
+    <img src="assets/aster-lockup-light.png" alt="Aster" style="height:24px;width:auto;display:block;opacity:0.5;" />
+    <span style="font-family:'IBM Plex Mono',monospace;font-size:18px;letter-spacing:0.14em;color:#5E6B69;">12 / 15</span>
+  </div>
+</section>
+
+<section data-deck-active data-label="Market" data-screen-label="13" data-speaker-notes="Who buys, in what order. Start where the pain is sharpest — teams already running agents at scale and losing control." style="height:100%;background:#0E1314;color:#E6EDEC;font-family:'IBM Plex Sans',sans-serif;padding:80px 100px;display:flex;flex-direction:column;box-sizing:border-box;">
+  <div style="font-family:'IBM Plex Mono',monospace;font-size:21px;letter-spacing:0.22em;color:#48CFCB;margin:0 0 26px;">MARKET &amp; WEDGE</div>
+  <h1 style="font-size:58px;line-height:1.08;font-weight:400;letter-spacing:-0.02em;margin:0;max-width:1400px;text-wrap:pretty;">Start where losing control is most expensive</h1>
+  <div style="display:flex;gap:32px;margin-top:56px;align-items:stretch;">
+    <div style="flex:1.1;border:1px solid #48CFCB;background:#10201F;padding:40px 36px;display:flex;flex-direction:column;gap:18px;">
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:18px;letter-spacing:0.16em;color:#48CFCB;">ENTRY POINT</div>
+      <h3 style="font-size:30px;font-weight:400;margin:0;letter-spacing:-0.02em;line-height:1.2;">Teams building multi-platform products with agents</h3>
+      <p style="font-size:21px;line-height:1.5;color:#A9C6C4;margin:0;font-weight:300;">Hundreds of screens, dozens of services, one architecture — and drift they can already feel.</p>
+    </div>
+    <div style="flex:1;border:1px solid #232A2C;background:#141A1B;padding:40px 36px;display:flex;flex-direction:column;gap:18px;">
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:18px;letter-spacing:0.16em;color:#5E6B69;">EXPAND</div>
+      <h3 style="font-size:30px;font-weight:400;margin:0;letter-spacing:-0.02em;line-height:1.2;">Software houses and delivery agencies</h3>
+      <p style="font-size:21px;line-height:1.5;color:#8A9694;margin:0;font-weight:300;">Many projects, thin architecture capacity, direct margin from parallel agent throughput.</p>
+    </div>
+    <div style="flex:1;border:1px solid #232A2C;background:#141A1B;padding:40px 36px;display:flex;flex-direction:column;gap:18px;">
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:18px;letter-spacing:0.16em;color:#5E6B69;">SCALE</div>
+      <h3 style="font-size:30px;font-weight:400;margin:0;letter-spacing:-0.02em;line-height:1.2;">Enterprise engineering organisations</h3>
+      <p style="font-size:21px;line-height:1.5;color:#8A9694;margin:0;font-weight:300;">Governance, audit and architectural control are procurement requirements, not features.</p>
+    </div>
+  </div>
+  <div style="margin-top:auto;padding-top:52px;display:flex;gap:56px;align-items:flex-end;">
+    <p style="font-size:32px;font-weight:300;margin:0;letter-spacing:-0.02em;flex:1;text-wrap:pretty;">Budget already exists — it is spent on architects, rework and integration. Aster moves that spend, it does not create a new line.</p>
+    <p style="font-size:20px;line-height:1.5;color:#8A9694;margin:0;flex:0 0 480px;font-weight:300;text-wrap:pretty;">Sizing to be added from your own bottom-up model: target accounts × seats × price.</p>
+  </div>
+  <div style="margin-top:34px;display:flex;justify-content:space-between;align-items:center;">
+    <img src="assets/aster-lockup-light.png" alt="Aster" style="height:24px;width:auto;display:block;opacity:0.5;" />
+    <span style="font-family:'IBM Plex Mono',monospace;font-size:18px;letter-spacing:0.14em;color:#5E6B69;">13 / 15</span>
+  </div>
+</section>
+
+<section data-deck-active data-label="Model & traction" data-screen-label="14" data-speaker-notes="How we charge and where we are. Fill the traction column with your real numbers before sending this out." style="height:100%;background:#0E1314;color:#E6EDEC;font-family:'IBM Plex Sans',sans-serif;padding:80px 100px;display:flex;flex-direction:column;box-sizing:border-box;">
+  <div style="font-family:'IBM Plex Mono',monospace;font-size:21px;letter-spacing:0.22em;color:#48CFCB;margin:0 0 26px;">MODEL &amp; TRACTION</div>
+  <h1 style="font-size:58px;line-height:1.08;font-weight:400;letter-spacing:-0.02em;margin:0;max-width:1400px;text-wrap:pretty;">Priced per project, expanded per team</h1>
+  <div style="display:flex;gap:56px;margin-top:52px;flex:1;min-height:0;">
+    <div style="flex:1.3;align-self:flex-start;display:flex;flex-direction:column;gap:1px;background:#232A2C;border:1px solid #232A2C;">
+      <div style="background:#141A1B;padding:34px 36px;display:flex;gap:36px;align-items:baseline;">
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:18px;letter-spacing:0.16em;color:#48CFCB;flex:0 0 180px;">PROJECT</div>
+        <p style="font-size:22px;line-height:1.5;margin:0;font-weight:300;color:#C4CFCD;">A subscription per active project map — the unit customers already think in.</p>
+      </div>
+      <div style="background:#141A1B;padding:34px 36px;display:flex;gap:36px;align-items:baseline;">
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:18px;letter-spacing:0.16em;color:#48CFCB;flex:0 0 180px;">SEATS</div>
+        <p style="font-size:22px;line-height:1.5;margin:0;font-weight:300;color:#C4CFCD;">Reviewers, architects and product owners who read and approve the map.</p>
+      </div>
+      <div style="background:#141A1B;padding:34px 36px;display:flex;gap:36px;align-items:baseline;">
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:18px;letter-spacing:0.16em;color:#48CFCB;flex:0 0 180px;">AGENT USAGE</div>
+        <p style="font-size:22px;line-height:1.5;margin:0;font-weight:300;color:#C4CFCD;">Context served over MCP grows with agent throughput, so revenue tracks adoption.</p>
+      </div>
+      <div style="background:#141A1B;padding:34px 36px;display:flex;gap:36px;align-items:baseline;">
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:18px;letter-spacing:0.16em;color:#48CFCB;flex:0 0 180px;">ENTERPRISE</div>
+        <p style="font-size:22px;line-height:1.5;margin:0;font-weight:300;color:#C4CFCD;">Private deployment, audit retention and governance controls.</p>
+      </div>
+    </div>
+    <div style="flex:1;display:flex;flex-direction:column;gap:24px;">
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:18px;letter-spacing:0.16em;color:#5E6B69;">WHERE WE ARE</div>
+      <div style="display:flex;flex-direction:column;gap:20px;">
+        <div style="border-left:2px solid #48CFCB;padding-left:22px;">
+          <p style="font-size:22px;line-height:1.5;margin:0;font-weight:300;">Working product, running against a real multi-platform project — the screens in this deck are live.</p>
+        </div>
+        <div style="border-left:2px solid #232A2C;padding-left:22px;">
+          <p style="font-size:22px;line-height:1.5;margin:0;font-weight:300;color:#8A9694;">Contracts, domain, data, delivery and decisions surfaces shipped and in daily use.</p>
+        </div>
+        <div style="border-left:2px solid #C89B4A;padding-left:22px;">
+          <p style="font-size:22px;line-height:1.5;margin:0;font-weight:300;color:#D8CFBC;">Design partners, usage and revenue to be filled in with your current figures.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div style="margin-top:30px;display:flex;justify-content:space-between;align-items:center;">
+    <img src="assets/aster-lockup-light.png" alt="Aster" style="height:24px;width:auto;display:block;opacity:0.5;" />
+    <span style="font-family:'IBM Plex Mono',monospace;font-size:18px;letter-spacing:0.14em;color:#5E6B69;">14 / 15</span>
+  </div>
+</section>
+
+<section data-deck-active data-label="The ask" data-screen-label="15" data-speaker-notes="Close on the ask and the three things the money buys. Replace the amount and milestones with your real round." style="height:100%;background:#0B0F10;color:#E6EDEC;font-family:'IBM Plex Sans',sans-serif;padding:80px 100px;display:flex;flex-direction:column;box-sizing:border-box;">
+  <div style="font-family:'IBM Plex Mono',monospace;font-size:21px;letter-spacing:0.22em;color:#48CFCB;margin:0 0 26px;">THE ASK</div>
+  <h1 style="font-size:66px;line-height:1.06;font-weight:300;letter-spacing:-0.025em;margin:0;max-width:1500px;text-wrap:pretty;">Own the coordination layer before the executors commoditise</h1>
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:#232A2C;border:1px solid #232A2C;margin-top:64px;">
+    <div style="background:#141A1B;padding:44px 40px;display:flex;flex-direction:column;gap:18px;">
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:18px;letter-spacing:0.16em;color:#48CFCB;">PRODUCT</div>
+      <p style="font-size:22px;line-height:1.5;margin:0;font-weight:300;color:#C4CFCD;">Harden the MCP layer and the write-back path, so the map stays current without human upkeep.</p>
+    </div>
+    <div style="background:#141A1B;padding:44px 40px;display:flex;flex-direction:column;gap:18px;">
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:18px;letter-spacing:0.16em;color:#48CFCB;">DESIGN PARTNERS</div>
+      <p style="font-size:22px;line-height:1.5;margin:0;font-weight:300;color:#C4CFCD;">A small cohort of multi-platform teams running Aster end to end on live delivery.</p>
+    </div>
+    <div style="background:#141A1B;padding:44px 40px;display:flex;flex-direction:column;gap:18px;">
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:18px;letter-spacing:0.16em;color:#48CFCB;">GO TO MARKET</div>
+      <p style="font-size:22px;line-height:1.5;margin:0;font-weight:300;color:#C4CFCD;">First enterprise motion: architects and delivery leads as the buying centre.</p>
+    </div>
+  </div>
+  <div style="margin-top:auto;padding-top:56px;display:flex;justify-content:space-between;align-items:flex-end;gap:56px;">
+    <div style="display:flex;flex-direction:column;gap:20px;">
+      <p style="font-size:38px;font-weight:300;margin:0;letter-spacing:-0.02em;">Raising <span style="color:#48CFCB;">[amount]</span> to reach <span style="color:#48CFCB;">[milestone]</span>.</p>
+      <div style="display:flex;align-items:center;gap:20px;font-family:'IBM Plex Mono',monospace;font-size:20px;letter-spacing:0.2em;color:#48CFCB;">
+        <span>SCOPE</span><span style="color:#3B4645;">→</span><span>MCP</span><span style="color:#3B4645;">→</span><span>AGENTS</span><span style="color:#3B4645;">→</span><span>CODE</span>
+      </div>
+    </div>
+    <img src="assets/aster-lockup-light.png" alt="Aster" style="height:64px;width:auto;display:block;" />
+  </div>
+</section>
+
+</x-import>
+
+</x-dc>
+</body>
+</html>

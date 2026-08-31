@@ -55,7 +55,7 @@ const AUTH_BASE = process.env.TICVAI_AUTH ?? 'http://127.0.0.1:8787';
  * loopback in every arrangement. This is the separate question of what address
  * to put in front of a visitor, and it only has an answer in the split
  * deployment — the reading server on atlas.example.com and the accounts service
- * on atlasapi.example.com.
+ * on asterapi.example.com.
  *
  * Unset, every page keeps calling this origin and server.mjs proxies onward,
  * which is what a workstation and the one-origin deployment both want.
@@ -1112,7 +1112,7 @@ for (const pkg of packages.values()) {
 
 server.listen(args.port, args.host, () => {
   const url = `http://localhost:${args.port}`;
-  console.log(`\n  Atlas package viewer  →  ${url}`);
+  console.log(`\n  Aster package viewer  →  ${url}`);
   for (const pkg of packages.values()) {
     console.log(`  ${pkg.id.padEnd(14)} ${pkg.root}`);
     console.log(`  ${''.padEnd(14)} /pkg/${pkg.id}/… · watching `

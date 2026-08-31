@@ -1,10 +1,10 @@
-# Invite page — Atlas
+# Invite page — Aster
 
 Two files, one design: a **night** invite and a **day** invite. Same layout, same copy, same
 animated background; only the palette changes.
 
-- `designs/Atlas Invite.dc.html` — night
-- `designs/Atlas Invite Day.dc.html` — day
+- `designs/Aster Invite.dc.html` — night
+- `designs/Aster Invite Day.dc.html` — day
 
 Replaces `viewer/public/invite.html`. The three states the current page already has
 (`#checking`, `#refused`, `#form`) still apply — the design shows the **form** state. Keep the
@@ -88,7 +88,7 @@ nodes into a grid and only test neighbouring cells. Respect `prefers-reduced-mot
 | beam | rgba(150,235,232,·) | rgba(70,195,192,·) |
 
 ## Brand
-Night uses `brand/atlas-lockup-night.png` at 44px tall. Day cannot — that lockup's wordmark is
-white — so it composes the mark and the wordmark: `brand/atlas-mark-light.png` at 44px, a 1px
-rule, then `ATLAS` in **Montserrat Light**, 22px, letter-spacing .3em, #16323A. If a dark-wordmark
+Night uses `brand/aster-lockup-night.png` at 44px tall. Day cannot — that lockup's wordmark is
+white — so it composes the mark and the wordmark: `brand/aster-mark-day.png` at 44px, a 1px
+rule, then `Aster` in **Montserrat Light**, 22px, letter-spacing .3em, #16323A. If a dark-wordmark
 lockup gets produced later, swap it in and drop the composed version.

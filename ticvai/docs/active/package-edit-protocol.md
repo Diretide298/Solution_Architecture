@@ -34,7 +34,7 @@ collide**, because both are upstream of the same derived output.
 | | Writes | Runs `refresh.sh` |
 |---|---|---|
 | **Me** | `contracts/`, `screens/`, `states/`, `flows/`, `events/`, `tools/`, `docs/` | **Yes, once, at the end** |
-| **Claude Code** | `atlas/viewer` only | **Never** |
+| **Claude Code** | `aster/viewer` only | **Never** |
 
 **When Claude Code needs a package change**, it sends the diff and I apply it. Not because its edits
 are worse — three of them were correct and I destroyed them — but because **the package has one

@@ -79,8 +79,8 @@ SESSION_COOKIE = "ticvai_session"
 # host-only, which is the tighter default and all either arrangement needs.
 #
 # It is required the moment the two halves are on different names — the reading
-# server on atlas.example.com and this service on atlasapi.example.com. The
-# browser sends a host-only cookie set by atlasapi back to atlasapi and nowhere
+# server on atlas.example.com and this service on asterapi.example.com. The
+# browser sends a host-only cookie set by asterapi back to asterapi and nowhere
 # else, so the node gate, which reads the same cookie off its own requests to
 # decide who is asking, would never see one and would bounce every page to the
 # sign-in door in a loop. TICVAI_COOKIE_DOMAIN=.example.com is what makes one

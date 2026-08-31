@@ -1,4 +1,4 @@
-# Handoff: Atlas — viewer UI redesign
+# Handoff: Aster — viewer UI redesign
 
 ## Screens in this package
 The **landing page** — five layer nodes in 3D space, scrolled through and clicked into — has its own
@@ -12,8 +12,8 @@ flows, state models, migrations). Two files, one design: a **day** theme and a *
 the same layout, content and component set. The nav moved from a vertical rail to a **two-row top
 bar**, and the body dropped to three columns.
 
-Brand: the product is **Atlas — the context layer for AI-assisted development**. The header carries
-the Atlas lockup (mark + wordmark) as a single image; the foot of the left column carries a
+Brand: the product is **Aster — the context layer for AI-assisted development**. The header carries
+the Aster lockup (mark + wordmark) as a single image; the foot of the left column carries a
 **Powered by AinfiniteCore** lockup with the **Softlabs Group** logo beside it.
 
 ## About the design files
@@ -28,7 +28,7 @@ than introducing a framework.
 
 - `Viewer Redesign - Topbar.dc.html` — day theme
 - `Viewer Redesign - Topbar Night.dc.html` — night theme
-- `Atlas Landing.dc.html` — the landing page (spec in `LANDING.md`)
+- `Aster Landing.dc.html` — the landing page (spec in `LANDING.md`)
 
 The landing page links into the shell as `Viewer Redesign - Topbar Night.dc.html#layer=<Name>`;
 the shell reads that hash on load and on `hashchange` and opens on that layer's first view.
@@ -44,8 +44,8 @@ Full viewport height, `min-width:1180px`, `overflow-x:auto`. Desktop-only by int
 1180px the page scrolls horizontally rather than crushing the main column.
 
 **Row 1 — dark chrome bar, 64px.** `padding:0 22px`, `display:flex; align-items:center; gap:20px`.
-- Brand: the Atlas lockup as one image, `height:46px; width:auto`. Two files, one per theme —
-  `brand/atlas-lockup-day.png` on the day chrome, `brand/atlas-lockup-night.png` on the night
+- Brand: the Aster lockup as one image, `height:46px; width:auto`. Two files, one per theme —
+  `brand/aster-lockup-day.png` on the day chrome, `brand/aster-lockup-night.png` on the night
   chrome. Both are background-keyed to transparent, so they sit on any dark surface. No typeset
   wordmark and no tagline in the bar: the lockup carries the name, and the tagline lives in the
   image `alt`.
@@ -241,15 +241,15 @@ Spacing: 4 / 6 / 8 / 9 / 10 / 11 / 13 / 14 / 15 / 16 / 18 / 19 / 20 / 22 / 24 px
 Scrollbars: 10px, palette-neutral thumb, 3px transparent border, `background-clip:content-box`.
 
 ## Assets
-`assets/brand/` — the Atlas identity.
-- `atlas-lockup-day.png` / `atlas-lockup-night.png` — the header lockups, transparent background.
+`assets/brand/` — the Aster identity.
+- `aster-lockup-day.png` / `aster-lockup-night.png` — the header lockups, transparent background.
   These are the two files the viewer actually loads.
-- `atlas-mark.png` — mark only, transparent, for favicons, avatars and tight spaces.
-- `atlas-logo-light.svg` / `atlas-logo-night.svg` — a redrawn vector lockup (mark as geometry,
+- `aster-mark.png` — mark only, transparent, for favicons, avatars and tight spaces.
+- `aster-logo-light.svg` / `aster-logo-night.svg` — a redrawn vector lockup (mark as geometry,
   wordmark as text in Montserrat Light, tagline in Montserrat Medium). Useful when the logo has to
   scale past raster limits — print, large display. The text is live text referencing Montserrat by
   name, so outline it before sending anywhere the font is not installed.
-- `atlas-mark-light.svg` / `atlas-mark-night.svg` — the vector mark alone.
+- `aster-mark-day.svg` / `aster-mark-night.svg` — the vector mark alone.
 - `assets/softlabs-logo.webp` — partner logo, rendered white via `filter:brightness(0) invert(1)`
   in the powered-by strip. A true white SVG/PNG would be crisper; swap when available.
 - The AinfiniteCore mark is **CSS, not an asset**: two 14px overlapping bordered circles

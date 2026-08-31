@@ -5,7 +5,7 @@ the delivery package. Everything below is either waiting on you or waiting to be
 built. Read it, then say which.
 
 ```
-Desktop/atlas/
+Desktop/aster/
 ├── viewer/     this repo — server.mjs at the root, deploy/ inside
 └── ticvai/     the delivery package — its own repo, no viewer in it
 ```
@@ -20,7 +20,7 @@ apart from one commit. Nothing has been deleted anywhere.
 **1 · Neither new repo has a remote.** Nothing is pushed.
 
 ```bash
-cd ~/Desktop/atlas/viewer && git remote add origin <url> && git push -u origin main
+cd ~/Desktop/aster/viewer && git remote add origin <url> && git push -u origin main
 cd ~/Desktop/atlas/ticvai && git remote add origin <url> && git push -u origin main
 ```
 

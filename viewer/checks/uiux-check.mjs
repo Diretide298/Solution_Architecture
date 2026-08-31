@@ -112,7 +112,7 @@ check('the lead states the counts it measured',
 // The loading curtain has to come down. It is the one failure that leaves a
 // page looking like it is still working when it has finished.
 const curtain = await page.evaluate(() => {
-  const box = document.getElementById('atlas-loader');
+  const box = document.getElementById('aster-loader');
   return !box || box.classList.contains('is-done');
 });
 check('the loading curtain lifts', curtain);

@@ -16,13 +16,13 @@
   body { font-family: 'Plus Jakarta Sans', system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
   a { color: #48CFCB; text-decoration: none; }
   a:hover { color: #48CFCB; }
-  @keyframes atlasFlow { to { stroke-dashoffset: -100; } }
-  @keyframes atlasComet { to { stroke-dashoffset: -104; } }
-  @keyframes atlasOrbit { to { stroke-dashoffset: -60; } }
-  @keyframes atlasSonar { 0% { transform: scale(.72); opacity: .5; } 65% { opacity: 0; } 100% { transform: scale(2.5); opacity: 0; } }
-  @keyframes atlasBob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-2.5px); } }
-  @keyframes atlasTwinkle { 0%, 100% { opacity: .08; } 50% { opacity: .5; } }
-  @keyframes atlasBreathe { 0%, 100% { filter: brightness(1); } 50% { filter: brightness(1.22); } }
+  @keyframes asterFlow { to { stroke-dashoffset: -100; } }
+  @keyframes asterComet { to { stroke-dashoffset: -104; } }
+  @keyframes asterOrbit { to { stroke-dashoffset: -60; } }
+  @keyframes asterSonar { 0% { transform: scale(.72); opacity: .5; } 65% { opacity: 0; } 100% { transform: scale(2.5); opacity: 0; } }
+  @keyframes asterBob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-2.5px); } }
+  @keyframes asterTwinkle { 0%, 100% { opacity: .08; } 50% { opacity: .5; } }
+  @keyframes asterBreathe { 0%, 100% { filter: brightness(1); } 50% { filter: brightness(1.22); } }
   *, *::before, *::after { box-sizing: border-box; }
   ::-webkit-scrollbar { width: 10px; height: 10px; }
   ::-webkit-scrollbar-thumb { background: #3E3E3E; border-radius: 99px; border: 3px solid transparent; background-clip: content-box; }
@@ -32,7 +32,7 @@
 <div style="display:flex;flex-direction:column;height:100vh;min-width:1180px;background:#1A1A1A;color:#EDEDED;font-size:14px">
 
   <header style="background:#111111;display:flex;align-items:center;gap:20px;padding:0 22px;height:64px;flex:none">
-    <img src="brand/atlas-lockup-night.png" alt="Atlas — the context layer for AI-assisted development" style="height:46px;width:auto;display:block;flex:none" />
+    <img src="brand/aster-lockup-night.png" alt="Aster — the context layer for AI-assisted development" style="height:46px;width:auto;display:block;flex:none" />
     <span style="width:1px;height:26px;background:rgba(255,255,255,.13);flex:none"></span>
     <nav style="display:flex;align-items:center;gap:3px;background:#0C0C0C;border-radius:11px;padding:4px;flex:none">
       <sc-for list="{{ layers }}" as="l" hint-placeholder-count="5">

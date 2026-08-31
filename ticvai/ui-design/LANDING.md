@@ -1,11 +1,11 @@
-# Handoff: Atlas landing page
+# Handoff: Aster landing page
 
-The entry page for Atlas. Five nodes in 3D space — one per layer of the delivery package — that you
+The entry page for Aster. Five nodes in 3D space — one per layer of the delivery package — that you
 scroll through, click into, and back out of. It is the same visual language as the Contracts → Graph
 sphere (`GRAPH.md`); read that first, because the renderer here is the same engine at a different
 scale, and this document only records what differs.
 
-Design file: `designs/Atlas Landing.dc.html`. **Design reference, not production code** — recreate it
+Design file: `designs/Aster Landing.dc.html`. **Design reference, not production code** — recreate it
 in the viewer's own environment (vanilla ES modules, no framework).
 
 ## What it is
@@ -92,7 +92,7 @@ picks the nearest within `max(46px, radius · 1.25)`. The 46px floor exists so t
 
 ## The chrome
 
-- **Hero, top-left, 430px column.** Atlas night lockup at 42px, then `Five layers, one reference
+- **Hero, top-left, 430px column.** Aster night lockup at 42px, then `Five layers, one reference
   graph.` at 34px/800/−0.028em, a 14.5px/1.62 support line, and two figures — 668 artefacts
   indexed · 1043 operations — as 19px/800 numerals with 11px/600 labels.
 - **Rail, right edge, vertically centred.** An `OVERVIEW` button in 9.5px/700 uppercase

@@ -7,7 +7,7 @@ script lives inside the viewer half — so the clone is the repository and the
 `cd` is into `viewer`:
 
 ```
-atlas/
+aster/
 |-- viewer/     server.mjs, lib/, public/, api/, and deploy/ within it
 `-- ticvai/     the delivery package -- contracts, screens, flows, states
 ```
@@ -88,7 +88,7 @@ box.
 
 **`TICVAI_COOKIE_DOMAIN` is not optional here.** The gate in `lib/session.mjs`
 reads the session cookie off requests to :4173 to decide who is asking. A
-cookie set by `atlasapi` without a domain goes back to `atlasapi` and nowhere
+cookie set by `asterapi` without a domain goes back to `asterapi` and nowhere
 else, so :4173 would see no cookie, call everybody a stranger, and redirect
 every page to the sign-in door — which then signs you in successfully and
 bounces you straight back. Scope it to the shared parent and no higher; a
@@ -101,7 +101,7 @@ The proxy in `server.mjs` stays in place and simply goes unused by the browser.
 Nothing has to be removed, and unsetting `TICVAI_API_PUBLIC` puts the one-origin
 arrangement back.
 
-Both names need a certificate — see below — and `atlasapi` puts `/docs` on the
+Both names need a certificate — see below — and `asterapi` puts `/docs` on the
 public internet, so put a basic-auth or an IP rule in front of it if that is not
 wanted.
 
