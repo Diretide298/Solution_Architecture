@@ -55,11 +55,22 @@ const LAYOUT = {
   // whole point of the arrangement above. It is also true of the thing: this is
   // not a fifth kind of artefact, it is a cut through two of the others.
   services:  { pos: [ 0.10, -1.55, -0.30], flat: [ 0.00,  0.86], up: false, tier: 'satellite' },
+  // Outside Frontend, on the same side, further from the centre. It has one
+  // lane and that lane goes to Frontend: a board resolves against a screen and
+  // against nothing else. Placing it out past the corner it hangs off says that
+  // — it is the only body here that does not reach Contracts, and it should not
+  // look like it does.
+  //
+  // Missing from this table, `LAYOUT[key].tier` threw while the focus panel was
+  // being built, so the row was in the rail, the body was in the graph, and
+  // clicking either opened an empty panel and killed the page's scripts.
+  uiux:      { pos: [-2.30,  1.52,  0.85], flat: [-1.34, -0.95], up: true,  tier: 'satellite' },
 };
 
 /** What the headline number counts, and where on disk it comes from. */
 const UNITS = {
   frontend:  { unit: 'screens',      from: 'screens/ · flows/ · frontend/ · wireframes/' },
+  uiux:      { unit: 'design boards', from: 'wireframes/ · designs/ · ui-design/' },
   contracts: { unit: 'contracts',    from: 'the OpenAPI contracts' },
   // State models, not status enums. A status enum is a list of values a
   // contract declares — it is not a lifecycle, and under a layer named for
@@ -81,6 +92,10 @@ const BLURB = {
   frontend:
     'What a person sees. Every screen, the journeys that string them together, and which app '
     + 'builds each one — with every operation a screen names resolved against the contracts.',
+  uiux:
+    'What has actually been drawn, and what has not. Every design board on disk — including the '
+    + 'ones no screen points at — the screens of a platform on one canvas, and the gap between '
+    + 'the screens each app names and the ones somebody has drawn.',
   contracts:
     'The API, and the join between every other layer. Hand-authored; servers and clients are '
     + 'generated from it, never the reverse, so everything else here is drawn by resolving '
@@ -111,6 +126,11 @@ const BLURB = {
  */
 const LINKS = [
   ['frontend', 'contracts'],
+  // One lane, to Frontend. UI/UX draws the screens that layer declares and
+  // nothing else — a board resolves against a screen, never against a contract
+  // or a table — so joining it any further would draw a relation that is not
+  // there. Same argument as the two Services lanes below.
+  ['uiux', 'frontend'],
   ['contracts', 'domain'],
   ['contracts', 'backend'],
   ['contracts', 'decisions'],
@@ -123,7 +143,7 @@ const LINKS = [
   ['backend', 'services'],
 ];
 
-const ORDER = ['frontend', 'contracts', 'domain', 'backend', 'services', 'decisions'];
+const ORDER = ['frontend', 'uiux', 'contracts', 'domain', 'backend', 'services', 'decisions'];
 
 // Six bodies in a full viewport, against thirty on a ring inside a panel.
 // Same formula, three times the scale — see `spread` in galaxy.js.
@@ -242,28 +262,6 @@ function renderRail() {
     row.addEventListener('click', () => focus(key));
     rail.append(row);
   }
-
-  // UI/UX, under the six.
-  //
-  // Not a seventh layer — it has no hub in the graph, no modes and no key in a
-  // deep link — but it is where the design work is, and the door is where a
-  // reader decides what they are looking at. It was reachable only from inside
-  // the viewer's own chrome, which you have to have already gone somewhere else
-  // to see. An `<a>` and not a `.rail-row`: the rows above focus the graph and
-  // stay on this page, and this one leaves it. Sharing their class would have
-  // made it look like a seventh thing to focus and would have put a navigation
-  // into the middle of a set of filters.
-  const away = document.createElement('a');
-  away.className = 'rail-away';
-  away.href = `/?project=${encodeURIComponent(auth.project() ?? '')}&layer=uiux`;
-  const awayName = document.createElement('span');
-  awayName.className = 'rail-name';
-  awayName.textContent = 'UI/UX';
-  const awayNote = document.createElement('span');
-  awayNote.className = 'rail-away-note';
-  awayNote.textContent = 'screens, flows and design boards';
-  away.append(awayName, awayNote);
-  rail.append(away);
 }
 
 /** The viewer, at a given layer and optionally a given view, in this package. */

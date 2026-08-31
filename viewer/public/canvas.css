@@ -429,23 +429,23 @@ body.is-lane .cv-band-label { color: var(--accent, #4ac0b8); }
   .canvas-world { will-change: auto; }
 }
 
-/* ── the layer takes the whole stage ────────────────────────────────
-   The viewer's own file tree and its links pane are both answers to "what does
-   the thing I selected connect to", asked of the index. This layer answers that
-   itself — the rail is a list of platforms and the detail panel is the links —
-   so with all three on screen there were 570px of rails in front of a 730px
-   canvas, and two of them were about a selection this layer does not make.
-
-   Only for this layer, and by attribute rather than by a class somebody has to
-   remember to set: `renderLayers` already stamps `data-layer` on the body. */
-body[data-layer="uiux"] #sidebar-left,
-body[data-layer="uiux"] #sidebar-right {
+/* ── the canvas takes the whole stage ───────────────────────────────
+   Keyed on the *view*, not on the layer. Boards and Platforms are sheets and
+   keep the viewer's chrome exactly as every other sheet in the app does — the
+   file tree on the left, the links pane on the right. This one view does not,
+   for the same reason the graph would not if it had a rail of its own: it is a
+   pan-and-zoom surface with its own list of platforms down one side and its own
+   detail panel down the other, and with the viewer's two as well there were
+   570px of navigation in front of a 730px canvas, two of them answering a
+   question this view answers itself. */
+body[data-mode="uiux-screens"] #sidebar-left,
+body[data-mode="uiux-screens"] #sidebar-right {
   display: none;
 }
 /* The columns go with them. `.app` is a three-column grid with named areas, so
-   hiding the two asides on their own leaves their tracks behind — a 260px gap
-   on the left and a links-pane-wide one on the right, holding nothing. */
-body[data-layer="uiux"] .app {
+   hiding the two asides on their own leaves their tracks behind — holding
+   nothing. */
+body[data-mode="uiux-screens"] .app {
   grid-template-columns: minmax(0, 1fr);
   grid-template-areas:
     "top"

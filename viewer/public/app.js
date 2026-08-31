@@ -529,6 +529,10 @@ function layerCount(key) {
   const nodes = state.index?.nodes ?? [];
   switch (key) {
     case 'frontend': return state.journeys?.screens?.length ?? null;
+    // Boards, not screens. Frontend counts what the package *declares*; this
+    // counts what has been *drawn* of it, and the two differing is the whole
+    // reason there are two tabs.
+    case 'uiux': return state.uiux?.stats?.boards ?? null;
     case 'contracts': return nodes.filter((n) => n.type === 'operation').length || null;
     case 'domain': return state.domain?.machines?.length ?? null;
     case 'backend': return state.backend?.tables?.length ?? null;
@@ -857,6 +861,10 @@ const LAYER_PARTS = {
   // this layer's subject happens to live in the diagrams payload.
   domain: ['domain', 'diagrams'],
   decisions: ['decisions'],
+  // `journeys` because every view here is about the screens the Frontend layer
+  // declares — the canvas draws them, the boards are checked against them and
+  // the platform gaps are the difference between the two.
+  uiux: ['uiux', 'journeys'],
   // The map checks its own table counts against the workbook, so it needs the
   // backend part to draw honestly rather than merely to draw.
   services: ['diagrams', 'backend'],
@@ -1256,6 +1264,7 @@ export function setMode(mode) {
   }
 
   state.mode = mode;
+  document.body.dataset.mode = mode;
   // Here rather than at the end: the galaxy scopes and the data view both
   // return early further down, and a position recorded only on the paths that
   // fall through is worse than one never recorded at all.

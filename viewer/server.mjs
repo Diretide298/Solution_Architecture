@@ -729,9 +729,13 @@ const server = http.createServer(async (req, res) => {
       // Taken off the package once. Every name below is the same name it was
       // when there was one package, which is the point — what changed is where
       // the payloads come from, not what any of them says.
-      const { index, journeys, backend, domain, decisions, diagrams } = pkg;
+      const { index, journeys, backend, domain, decisions, diagrams, uiux } = pkg;
       const counts = {
         frontend: journeys?.screens?.length ?? 0,
+        // Boards, not screens. The Frontend layer counts screens and UI/UX
+        // counts what has been *drawn* of them — two numbers about the same
+        // product that differ, which is the whole reason the layer exists.
+        uiux: uiux?.stats?.boards ?? 0,
         contracts: index?.stats?.files ?? 0,
         // State models, not status enums — the layer is named Lifecycles and a
         // status enum is not one. 114 here against 113 in
@@ -757,6 +761,7 @@ const server = http.createServer(async (req, res) => {
       const take = (list, of) => (list ?? []).slice(0, NAMES).map(of).filter(Boolean);
       const items = {
         frontend: take(journeys?.screens, (s2) => s2.name || s2.id),
+        uiux: take(uiux?.boards, (b) => b.name || b.file),
         contracts: take(index?.nodes?.filter((n) => n.type === 'file'), (n) => n.name),
         domain: take(domain?.machines, (m) => m.entity || m.id),
         backend: take(backend?.tables, (t) => t.name),
@@ -776,6 +781,12 @@ const server = http.createServer(async (req, res) => {
         // two homes.
         detail: {
           frontend: { flows: journeys?.flows?.length ?? 0, apps: journeys?.apps?.length ?? 0 },
+          uiux: {
+            frames: uiux?.stats?.frames ?? 0,
+            // The number worth putting on the front: a board nobody has wired
+            // up is the one most worth looking at.
+            unclaimed: uiux?.stats?.unwired ?? 0,
+          },
           contracts: {
             operations: index?.stats?.operations ?? 0,
             schemas: index?.stats?.schemas ?? 0,
