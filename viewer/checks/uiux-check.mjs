@@ -95,6 +95,25 @@ if (!readable) {
   check('and the page invents none', phantom.length === 0,
     phantom.length ? phantom.slice(0, 4).join(', ') : 'none');
 }
+// No board reports the same frame twice.
+//
+// Anchors are folded to lower case, and 65 of the 100 boards carry each one in
+// both cases — `id="FNB-6A"` on the frame and `id="fnb-6a"` on the thumbnail
+// that links to it. Counting both reported 1829 frames against 1362 drawn, and
+// every figure on the page derived from it was a third too high. The page puts
+// that number in 25px type, so it is held here rather than eyeballed.
+const doubled = payload.boards
+  .map((b) => ({ b, extra: b.frames.length - new Set(b.frames.map((f) => f.anchor)).size }))
+  .filter((x) => x.extra > 0);
+check('no board counts the same frame twice', doubled.length === 0,
+  `${doubled.length} boards double-count `
+  + `${doubled.reduce((n, x) => n + x.extra, 0)} frames, e.g. ${doubled[0]?.b.name}`);
+// And the total is the sum of the parts, which is what makes the headline
+// figure a measurement rather than a second opinion.
+check('the frame total is the sum of the boards',
+  S.frames === payload.boards.reduce((n, b) => n + b.frameCount, 0),
+  `${S.frames} claimed, ${payload.boards.reduce((n, b) => n + b.frameCount, 0)} summed`);
+
 check('wired and unwired account for all of them', S.wired + S.unwired === S.boards,
   `${S.wired} + ${S.unwired} vs ${S.boards}`);
 // The two drawn counts partition the screens: a screen is drawn by a pack or by
@@ -153,18 +172,57 @@ await page.evaluate(async (a, e, p) => {
 
 // The board index is a view of the `uiux` layer now, not a page of its own.
 await page.goto(`${BASE}/?layer=uiux&mode=uiux-boards`, { waitUntil: 'domcontentloaded' });
-await page.waitForSelector('.uiux-card', { timeout: 30000 }).catch(() => {});
+await page.waitForSelector('.bd-tile', { timeout: 30000 }).catch(() => {});
 await wait(2500);
 
-const cards = await page.evaluate(() => document.querySelectorAll('.uiux-card').length);
-check('the page draws a card per board', cards === S.boards, `${cards} cards, ${S.boards} boards`);
+const tiles = await page.evaluate(() => document.querySelectorAll('.bd-tile').length);
+check('the map draws a tile per board', tiles === S.boards, `${tiles} tiles, ${S.boards} boards`);
 
-const marked = await page.evaluate(() => document.querySelectorAll('.uiux-card.is-unwired').length);
+const marked = await page.evaluate(() => document.querySelectorAll('.bd-tile.is-unwired').length);
 check('and marks the ones nothing points at', marked === S.unwired,
   `${marked} marked, ${S.unwired} unwired`);
 
+// ── the tiles are all one size ───────────────────────────────────────
+// The map replaced a masonry of cards whose heights came from their contents,
+// so a row of four was four different shapes and the eye spent its effort on
+// the mosaic rather than on the colours inside it. "One board, one tile, one
+// size" is the rule that layout is for, and a rule nothing holds is a rule that
+// comes back the first time somebody adds a line to a tile.
+const boxes = await page.evaluate(() => [...document.querySelectorAll('.bd-tile')].map((t) => {
+  const r = t.getBoundingClientRect();
+  return { w: Math.round(r.width), h: Math.round(r.height), top: Math.round(r.top) };
+}));
+const heights = [...new Set(boxes.map((b) => b.h))];
+check('every tile is the same height', heights.length === 1,
+  `${heights.length} distinct heights: ${heights.slice(0, 5).join(', ')}`);
+
+// Width is checked per row rather than across the page, because that is the
+// actual claim: two tiles side by side are the same size.
+const rows = new Map();
+for (const b of boxes) {
+  if (!rows.has(b.top)) rows.set(b.top, []);
+  rows.get(b.top).push(b.w);
+}
+const ragged = [...rows.entries()].filter(([, ws]) => new Set(ws).size > 1);
+check('and tiles side by side are the same width', ragged.length === 0,
+  ragged.length ? `${ragged.length} ragged rows, first: ${ragged[0][1].join(', ')}` : `${rows.size} rows`);
+
+// One chip per frame, up to the cap the tile stops at. If this drifts, the tile
+// is either hiding frames silently or growing to fit them — the two failures
+// the fixed height exists to prevent.
+const CHIP_CAP = 60;
+const chips = await page.evaluate(() => document.querySelectorAll('.bd-tile .bd-chip').length);
+const wantChips = payload.boards.reduce((n, b) => n + Math.min(b.frameCount, CHIP_CAP), 0);
+check('a chip per frame, and the overflow is counted not dropped', chips === wantChips,
+  `${chips} chips, ${wantChips} expected`);
+const more = await page.evaluate(() => [...document.querySelectorAll('.bd-chip-more')]
+  .reduce((n, e) => n + Number(e.textContent.replace('+', '')), 0));
+const wantMore = payload.boards.reduce((n, b) => n + Math.max(0, b.frameCount - CHIP_CAP), 0);
+check('and the overflow adds up to the rest of them', more === wantMore,
+  `+${more} counted, +${wantMore} over the cap`);
+
 const lead = await page.evaluate(() => document.getElementById('lead')?.textContent ?? '');
-check('the lead states the counts it measured',
+check('the header states the counts it measured',
   lead.includes(String(S.boards)) && lead.includes(String(S.unwired)), lead.slice(0, 90));
 
 // The loading curtain has to come down. It is the one failure that leaves a
@@ -175,37 +233,94 @@ const curtain = await page.evaluate(() => {
 });
 check('the loading curtain lifts', curtain);
 
+// ── the rail ─────────────────────────────────────────────────────────
+// Every board nothing points at, by name. This is the group the page was
+// written for: a board no screen claims appears nowhere else in the viewer, so
+// if the rail drops one it is unreachable again and the page has quietly
+// reverted to being the thing it replaced.
+const railed = await page.evaluate(
+  () => [...document.querySelectorAll('.bd-tree .bd-row-label')].map((n) => n.textContent)
+);
+const orphans = payload.boards.filter((b) => !b.wired).map((b) => b.name);
+const droppedFromRail = orphans.filter((n) => !railed.includes(n));
+check('the rail lists every board nothing points at', droppedFromRail.length === 0,
+  `${orphans.length} unwired, missing: ${droppedFromRail.slice(0, 3).join(', ')}`);
+
+// Picking one narrows the map to it and fills the panel on the right.
+const firstOrphan = payload.boards.filter((b) => !b.wired)
+  .sort((a, b) => b.frameCount - a.frameCount || a.name.localeCompare(b.name))[0];
+if (firstOrphan) {
+  await page.evaluate((name) => {
+    const row = [...document.querySelectorAll('.bd-tree .bd-row')]
+      .find((r) => r.querySelector('.bd-row-label')?.textContent === name);
+    row?.click();
+  }, firstOrphan.name);
+  await wait(600);
+  const picked = await page.evaluate(() => ({
+    tiles: document.querySelectorAll('.bd-tile').length,
+    title: document.querySelector('.bd-detail-title')?.textContent ?? '',
+    frames: document.querySelectorAll('.bd-frame').length,
+  }));
+  check('picking a board in the rail narrows the map to it', picked.tiles === 1,
+    `${picked.tiles} tiles`);
+  check('and the panel on the right is that board', picked.title === firstOrphan.name,
+    `"${picked.title}" vs "${firstOrphan.name}"`);
+  check('with a row per frame to claim', picked.frames === firstOrphan.frameCount,
+    `${picked.frames} rows, ${firstOrphan.frameCount} frames`);
+  // Back to everything: clicking the selected row again clears it.
+  await page.evaluate((name) => {
+    const row = [...document.querySelectorAll('.bd-tree .bd-row')]
+      .find((r) => r.querySelector('.bd-row-label')?.textContent === name);
+    row?.click();
+  }, firstOrphan.name);
+  await wait(500);
+}
+
+// The Kinds rail replaces what used to be a `<select>`. Same job, and it is now
+// the only way to reach it, so it is the thing worth driving.
+await page.evaluate(() => {
+  document.querySelector('.bd-tabs button[data-rail="kinds"]')?.click();
+});
+await wait(400);
+await page.evaluate(() => {
+  const row = [...document.querySelectorAll('.bd-tree .bd-row')]
+    .find((r) => r.querySelector('.bd-row-label')?.textContent === 'drawn by hand');
+  row?.click();
+});
+await wait(600);
+const packs = await page.evaluate(() => document.querySelectorAll('.bd-tile').length);
+const packCount = payload.boards.filter((b) => b.kind === 'pack').length;
+check('the kinds rail picks out the hand-drawn packs', packs === packCount,
+  `${packs} shown, ${packCount} packs`);
+
+// Clear it, and go back to the folders rail.
+await page.evaluate(() => {
+  const row = [...document.querySelectorAll('.bd-tree .bd-row')]
+    .find((r) => r.querySelector('.bd-row-label')?.textContent === 'drawn by hand');
+  row?.click();
+  document.querySelector('.bd-tabs button[data-rail="folders"]')?.click();
+});
+await wait(500);
+
 // ── the filters actually filter ──────────────────────────────────────
 await page.evaluate(() => {
   const t = document.getElementById('only-unwired');
   t.checked = true; t.dispatchEvent(new Event('change'));
 });
 await wait(700);
-const onlyUnwired = await page.evaluate(() => document.querySelectorAll('.uiux-card').length);
-check('"only boards nothing points at" shows exactly those', onlyUnwired === S.unwired,
+const onlyUnwired = await page.evaluate(() => document.querySelectorAll('.bd-tile').length);
+check('"unwired only" shows exactly those', onlyUnwired === S.unwired,
   `${onlyUnwired} shown, ${S.unwired} unwired`);
 
 await page.evaluate(() => {
   const t = document.getElementById('only-unwired');
   t.checked = false; t.dispatchEvent(new Event('change'));
-  const k = document.getElementById('kind');
-  k.value = 'pack'; k.dispatchEvent(new Event('change'));
-});
-await wait(700);
-const packs = await page.evaluate(() => document.querySelectorAll('.uiux-card').length);
-const packCount = payload.boards.filter((b) => b.kind === 'pack').length;
-check('the kind filter picks out the hand-drawn packs', packs === packCount,
-  `${packs} shown, ${packCount} packs`);
-
-await page.evaluate(() => {
-  const k = document.getElementById('kind');
-  k.value = ''; k.dispatchEvent(new Event('change'));
   const f = document.getElementById('filter');
   f.value = 'inventory'; f.dispatchEvent(new Event('input'));
 });
 await wait(700);
 const filtered = await page.evaluate(
-  () => [...document.querySelectorAll('.uiux-name')].map((n) => n.textContent)
+  () => [...document.querySelectorAll('.bd-tile-name')].map((n) => n.textContent)
 );
 // Not "every result is named Inventory". The filter searches the board, its
 // platforms, the screens it draws *and its frame names*, which the placeholder
@@ -224,11 +339,39 @@ check('the text filter reaches the frame names, not just the board names',
   + `${expected.filter((b) => !/inventory/i.test(b.name)).length} matched on their contents alone`);
 
 // A count beside a filter box with no denominator is a number that lies, so the
-// folder heading has to say "n of m" once anything is filtered out.
+// section heading has to say "n of m" once anything is filtered out.
 const heading = await page.evaluate(
   () => document.querySelector('.uiux-folder')?.textContent ?? ''
 );
-check('a filtered folder heading keeps its denominator', / of \d+$/.test(heading), heading);
+check('a filtered section heading keeps its denominator', / of \d+$/.test(heading), heading);
+
+// ── the other two middle views ───────────────────────────────────────
+await page.evaluate(() => {
+  const f = document.getElementById('filter');
+  f.value = ''; f.dispatchEvent(new Event('input'));
+  document.querySelector('.bd-seg button[data-view="list"]')?.click();
+});
+await wait(900);
+const cards = await page.evaluate(() => document.querySelectorAll('.uiux-card').length);
+check('the list view draws a card per board', cards === S.boards,
+  `${cards} cards, ${S.boards} boards`);
+
+await page.evaluate(() => document.querySelector('.bd-seg button[data-view="frames"]')?.click());
+await wait(1200);
+const ROW_CAP = 600;
+const frameRows = await page.evaluate(() => document.querySelectorAll('.bd-table tbody tr').length);
+check('the frames view draws the worklist', frameRows === Math.min(S.frames, ROW_CAP),
+  `${frameRows} rows, ${S.frames} frames (cap ${ROW_CAP})`);
+
+// The claim list is the button in the header, and it has one job: unclaimed
+// frames only, in the frames view.
+await page.evaluate(() => document.getElementById('bd-claim')?.click());
+await wait(1200);
+const claimRows = await page.evaluate(() => document.querySelectorAll('.bd-table tbody tr').length);
+const unclaimed = S.frames - S.framesClaimed;
+check('"the claim list" shows the unclaimed frames and nothing else',
+  claimRows === Math.min(unclaimed, ROW_CAP),
+  `${claimRows} rows, ${unclaimed} unclaimed (cap ${ROW_CAP})`);
 
 check('no console or page errors', errors.length === 0, errors.slice(0, 3).join(' | '));
 

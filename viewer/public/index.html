@@ -866,52 +866,78 @@
         </section>
 
         <section class="view uiux-view sheet" id="view-uiux-boards" hidden>
-          <!-- the reading column the board index was written for -->
-          <div class="admin-main domains-main">
-            <section class="admin-panel">
-              <h1 class="auth-title">Every board, and what each one draws</h1>
-              <p class="auth-note" id="lead">Loading…</p>
+          <!--
+            A workbench, not a reading column.
 
-              <p class="auth-note auth-fine">
-                Read off the disk, not off the screens. The rest of the viewer shows a
-                board <em>through</em> a screen that points at it, which is right for
-                reviewing a screen and is why a board nobody has wired up appears
-                nowhere at all — <strong id="fine-unwired">several</strong> of them,
-                including a hand-built index of every frame in the package. A board
-                nobody has claimed is not a board that does not exist; it is the one
-                most worth looking at, because somebody drew it and the package cannot
-                yet say what it draws.
-              </p>
+            The board index was a filter box over a masonry of cards, and it
+            answered "what boards are there" perfectly well. It could not answer
+            the question anybody actually arrives with — *which of the 1829
+            frames does nothing claim, and where are they* — because the only
+            way to see a board's frames was to open its card and read a list.
 
-              <div class="invite-row">
-                <input id="filter" class="auth-input" type="text"
-                       placeholder="Filter by board, platform, screen or frame…" />
-                <select id="kind" class="scope-select">
-                  <option value="">every kind</option>
-                  <option value="pack">drawn by hand</option>
-                  <option value="generated">generated</option>
-                  <option value="index">contents pages</option>
-                  <option value="single">single artboards</option>
-                </select>
-                <select id="sort" class="scope-select">
-                  <option value="unclaimed">most unclaimed frames first</option>
-                  <option value="name">by name</option>
-                  <option value="frames">most frames first</option>
-                  <option value="modified">most recently changed</option>
-                </select>
+            Three columns, then. What to look at down the left, what is drawn
+            across the middle, and the one board you picked down the right.
+          -->
+          <div class="bd">
+            <div class="bd-head">
+              <p class="bd-lead" id="lead">Loading…</p>
+              <button type="button" class="bd-claim" id="bd-claim">The claim list</button>
+            </div>
+
+            <div class="bd-shell">
+              <!-- ── what to look at ───────────────────────────────── -->
+              <aside class="bd-rail">
+                <div class="bd-tabs" id="bd-tabs" role="tablist">
+                  <button type="button" class="is-on" data-rail="folders">Folders</button>
+                  <button type="button" data-rail="platforms">Platforms</button>
+                  <button type="button" data-rail="kinds">Kinds</button>
+                </div>
+                <div class="bd-rail-find">
+                  <input id="bd-rail-filter" class="bd-input" type="search"
+                         placeholder="Filter…" aria-label="Filter the list on the left" />
+                  <span class="bd-rail-count" id="bd-rail-count"></span>
+                </div>
+                <div class="bd-callout" id="bd-callout"></div>
+                <nav class="bd-tree" id="bd-tree" aria-label="Boards, by folder"></nav>
+              </aside>
+
+              <!-- ── what is drawn ─────────────────────────────────── -->
+              <div class="bd-main">
+                <div class="bd-bar">
+                  <div class="seg bd-seg" id="bd-seg">
+                    <button type="button" class="on" data-view="map">Map</button>
+                    <button type="button" data-view="list">List</button>
+                    <button type="button" data-view="frames">Frames</button>
+                  </div>
+                  <select id="bd-group" class="scope-select" aria-label="How to group the boards">
+                    <option value="folder">grouped by folder</option>
+                    <option value="platform">grouped by platform</option>
+                    <option value="kind">grouped by kind</option>
+                    <option value="none">not grouped</option>
+                  </select>
+                  <label class="bd-check">
+                    <input type="checkbox" id="only-unwired" /> unwired only
+                  </label>
+                  <label class="bd-check">
+                    <input type="checkbox" id="bd-unclaimed" /> unclaimed only
+                  </label>
+                  <input id="filter" class="bd-input bd-find" type="search"
+                         placeholder="Filter by board, platform, screen or frame…"
+                         aria-label="Filter the boards" />
+                </div>
+
+                <div class="bd-scroll" id="bd-scroll">
+                  <div class="bd-figures" id="bd-figures"></div>
+                  <div class="bd-legend" id="bd-legend"></div>
+                  <div id="bd-body"></div>
+                </div>
               </div>
-              <div class="uiux-toggles">
-                <label class="uiux-toggle"><input type="checkbox" id="only-unwired" /> only boards nothing points at</label>
-              </div>
-            </section>
 
-            <section class="admin-panel">
-              <div id="boards"></div>
-            </section>
-
+              <!-- ── the one you picked ────────────────────────────── -->
+              <aside class="bd-detail" id="bd-detail" aria-live="polite"></aside>
+            </div>
           </div>
         </section>
-
         <section class="view uiux-view sheet" id="view-uiux-platforms" hidden>
           <!-- the same column, for the platform gaps -->
           <div class="admin-main domains-main">

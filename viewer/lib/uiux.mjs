@@ -142,13 +142,30 @@ function splitRef(ref) {
  */
 function framesIn(html) {
   const hits = [...html.matchAll(ANCHOR)];
-  return hits.map((m, i) => {
+
+  // Anchors are folded to lower case because a screen may point at `#FNB-6A`
+  // and the board may write `id="fnb-6a"`, and they are the same frame. That
+  // fold is also why this has to de-duplicate: 65 of the 100 boards carry each
+  // anchor twice, once in each case — `id="FNB-6A"` on the frame and
+  // `id="fnb-6a"` on the thumbnail that links to it — and counting both
+  // reported 1829 frames where the package draws 1362. A frame counted twice
+  // is not two frames, and every figure derived from it was 34% too high.
+  //
+  // The copy that carries a `ttl` wins, because that is the one the board
+  // names itself; `/frame?anchor=` resolves to whichever comes first in the
+  // file either way, so nothing downstream can tell them apart.
+  const byAnchor = new Map();
+  for (const [i, m] of hits.entries()) {
     const from = m.index;
     const to = i + 1 < hits.length ? hits[i + 1].index : html.length;
     const region = html.slice(from, to);
     const ttl = /<span[^>]*class="[^"]*\bttl\b[^"]*"[^>]*>([^<]*)</i.exec(region)?.[1];
-    return { anchor: m[1].toLowerCase(), ttl: ttl ? decode(ttl) : null };
-  });
+    const anchor = m[1].toLowerCase();
+    const found = { anchor, ttl: ttl ? decode(ttl) : null };
+    const kept = byAnchor.get(anchor);
+    if (!kept || (!kept.ttl && found.ttl)) byAnchor.set(anchor, found);
+  }
+  return [...byAnchor.values()];
 }
 
 async function describe(dir, folder, rel) {

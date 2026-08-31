@@ -1,32 +1,599 @@
 /**
- * The UI/UX board list.
+ * The board workbench.
  *
  * Its own stylesheet rather than more of `domains.css`, because that file is
  * already the shared sheet for three pages and the rules below are about one.
  *
  * Tokens only — no literal colours. The page renders in whichever theme the
  * reader chose, and a hex here is a rule that is right in one of them.
+ *
+ * Two prefixes on purpose. `.bd-*` is the workbench — the rails, the figures,
+ * the map. `.uiux-*` is the card, which is now one of three middle views rather
+ * than the whole page, and kept as it was because it is the reading view and it
+ * reads well.
  */
 
+/* ── the shell ──────────────────────────────────────────────────────
+   Three columns under one header. `.view` is `position:absolute; inset:0`, so
+   this fills the stage and every column scrolls inside itself — the page never
+   scrolls as a whole, which is what makes the rail usable while the middle is
+   two thousand frames long. */
+.bd {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  height: 100%;
+  min-height: 0;
+}
+
+.bd-head {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 8px 16px;
+  border-bottom: 1px solid var(--line);
+  flex: none;
+}
+.bd-lead {
+  margin: 0;
+  min-width: 0;
+  font-size: 12px;
+  color: var(--text-dim);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.bd-claim {
+  margin-left: auto;
+  flex: none;
+  padding: 5px 12px;
+  border: 1px solid var(--accent-line);
+  border-radius: 999px;
+  background: var(--accent-soft);
+  color: var(--accent-text);
+  font: 600 11.5px/1.4 inherit;
+  cursor: pointer;
+}
+.bd-claim:hover { border-color: var(--accent); }
+
+.bd-shell {
+  display: grid;
+  grid-template-columns: 250px minmax(0, 1fr) 340px;
+  min-height: 0;
+}
+
+/* ── the rail ───────────────────────────────────────────────────────
+   The worklist, and it is a worklist rather than a table of contents: the
+   folders are three rows and the other two groups are the boards and platforms
+   that nothing has claimed yet. */
+.bd-rail,
+.bd-detail {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  background: var(--panel);
+}
+.bd-rail { border-right: 1px solid var(--line); }
+.bd-detail { border-left: 1px solid var(--line); overflow-y: auto; padding: 14px 16px 28px; }
+
+.bd-tabs {
+  display: flex;
+  flex: none;
+  border-bottom: 1px solid var(--line);
+}
+.bd-tabs button {
+  flex: 1;
+  padding: 8px 4px;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  background: none;
+  color: var(--text-faint);
+  font: 600 11.5px/1.4 inherit;
+  cursor: pointer;
+}
+.bd-tabs button:hover { color: var(--text-dim); }
+.bd-tabs button.is-on { color: var(--text); border-bottom-color: var(--accent); }
+
+.bd-rail-find {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  flex: none;
+}
+.bd-rail-count { flex: none; font-family: var(--mono); font-size: 10.5px; color: var(--text-faint); }
+
+.bd-input {
+  width: 100%;
+  min-width: 0;
+  padding: 5px 8px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: var(--bg-panel);
+  color: var(--text);
+  font: 12px/1.4 inherit;
+}
+.bd-input:focus { outline: none; border-color: var(--accent); }
+.bd-input::placeholder { color: var(--text-faint); }
+
+/* The backlog, said once and in one place. It is a button as well as a
+   statement — the number is the reason somebody opened this layer, so pressing
+   it should go to the rows it counts. */
+.bd-callout {
+  margin: 0 10px 10px;
+  padding: 10px 12px;
+  border: 1px solid var(--warm-line);
+  border-left: 3px solid var(--warning);
+  border-radius: 8px;
+  background: var(--warm-fill);
+  color: var(--warm-text);
+  font-size: 11.5px;
+  line-height: 1.5;
+  cursor: pointer;
+  flex: none;
+}
+.bd-callout:hover { border-color: var(--warning); }
+.bd-callout p { margin: 0; }
+.bd-callout-lead {
+  font-size: 21px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+  color: var(--warning);
+}
+.bd-callout.is-clear {
+  border-color: var(--accent-line);
+  border-left-color: var(--accent);
+  background: var(--accent-soft);
+  color: var(--accent-text);
+  cursor: default;
+}
+.bd-callout.is-clear .bd-callout-lead { font-size: 13px; color: var(--accent-text); }
+
+.bd-tree { flex: 1; min-height: 0; overflow-y: auto; padding: 0 6px 20px; }
+
+.bd-group {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 12px 0 4px;
+  padding: 0 6px;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+}
+.bd-group-caret { font-size: 9px; color: var(--accent); }
+.bd-group-count { margin-left: auto; font-family: var(--mono); font-weight: 500; letter-spacing: 0; }
+
+/* One row, one line. A board called `P07 Staff Scanner (old)` wrapping onto a
+   second line turns the rail into a ragged column where nothing lines up, and
+   the full name is in the tooltip. */
+.bd-row {
+  display: flex;
+  align-items: baseline;
+  gap: 7px;
+  width: 100%;
+  padding: 4px 6px;
+  border: 0;
+  border-radius: 5px;
+  background: none;
+  color: var(--text-dim);
+  font: 12px/1.5 inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.bd-row:hover { background: var(--bg-hover); color: var(--text); }
+.bd-row.is-on { background: var(--accent-soft); color: var(--accent-text); }
+.bd-row-code {
+  flex: none;
+  font-family: var(--mono);
+  font-size: 9.5px;
+  color: var(--text-faint);
+}
+.bd-row.is-on .bd-row-code { color: var(--accent-text); }
+.bd-row-label {
+  min-width: 0;
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.bd-row-count {
+  flex: none;
+  font-family: var(--mono);
+  font-size: 10.5px;
+  color: var(--text-faint);
+}
+.bd-row.is-on .bd-row-count { color: var(--accent-text); }
+
+/* ── the middle ─────────────────────────────────────────────────── */
+.bd-main { display: flex; flex-direction: column; min-width: 0; min-height: 0; }
+
+.bd-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 14px;
+  border-bottom: 1px solid var(--line);
+  flex: none;
+}
+.bd-seg { flex: none; }
+.bd-find { margin-left: auto; max-width: 300px; }
+.bd-check {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  flex: none;
+  font-size: 11.5px;
+  color: var(--text-dim);
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.bd-scroll { flex: 1; min-height: 0; overflow-y: auto; padding: 14px 14px 40px; }
+
+/* ── the figures ────────────────────────────────────────────────── */
+.bd-figures {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 10px;
+}
+.bd-figure {
+  padding: 12px 14px 11px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--panel-2);
+}
+.bd-figure-value {
+  margin: 0;
+  font-size: 25px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+}
+.bd-figure.is-ok .bd-figure-value { color: var(--ok); }
+.bd-figure.is-warn .bd-figure-value { color: var(--warning); }
+.bd-figure-label {
+  margin: 5px 0 0;
+  font-family: var(--mono);
+  font-size: 9.5px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+}
+/* Named `-meter` and not `-bar`. There was a `.uiux-bar` in this file that was
+   the section header, and a second `.uiux-bar` that was a 5px progress track;
+   the track won, and every heading on the layer rendered as a stripe. */
+.bd-meter {
+  height: 3px;
+  margin: 9px 0 0;
+  border-radius: 999px;
+  background: var(--divider);
+  overflow: hidden;
+}
+.bd-meter-fill { height: 100%; border-radius: 999px; background: var(--text-faint); }
+.bd-figure.is-ok .bd-meter-fill { background: var(--ok); }
+.bd-figure.is-warn .bd-meter-fill { background: var(--warning); }
+.bd-figure-note {
+  margin: 8px 0 0;
+  font-size: 11px;
+  line-height: 1.45;
+  color: var(--text-faint);
+}
+
+/* ── the legend ─────────────────────────────────────────────────── */
+.bd-legend {
+  display: flex;
+  align-items: flex-start;
+  gap: 18px;
+  margin: 12px 2px 4px;
+  flex-wrap: wrap;
+}
+.bd-keys { display: flex; flex-wrap: wrap; gap: 14px; }
+.bd-key {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  color: var(--text-dim);
+}
+.bd-key-rule {
+  width: 14px;
+  height: 3px;
+  border-radius: 2px;
+  background: var(--warning);
+}
+.bd-legend-note {
+  margin: 0;
+  flex: 1;
+  min-width: 220px;
+  font-size: 11px;
+  line-height: 1.5;
+  color: var(--text-faint);
+}
+
+/* ── section heads ──────────────────────────────────────────────── */
+.bd-section-head {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  margin: 22px 0 9px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--border-soft);
+}
 .uiux-folder {
+  margin: 0;
   font-size: 12px;
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--text-dim);
-  margin: 20px 0 10px;
 }
-.uiux-folder:first-child { margin-top: 0; }
+.bd-section-note {
+  display: flex;
+  gap: 12px;
+  margin-left: auto;
+  font-family: var(--mono);
+  font-size: 10.5px;
+  color: var(--text-faint);
+}
+.bd-section-note .is-warn { color: var(--warning); }
 
-/* Columns, not a grid.
-   `align-items: start` already stopped a tall card stretching its row, but it
-   could not stop it leaving a hole underneath: a row containing P08 Venue
-   Management, whose 92 screen chips make it eight times the height of the card
-   beside it, is two thirds empty space. These cards have nothing to align — no
-   shared baseline, no reading order across a row — so they pack.
+/* ── the map ────────────────────────────────────────────────────────
+   Every tile the same size, and the size is fixed rather than derived.
 
-   `break-inside: avoid` is what stops a card being sawn in half at a column
-   boundary. */
+   Sizing a tile by how much it draws is the more informative layout and it is
+   unreadable: it packs into a ragged wall where a row of four is four
+   different shapes, and a reader spends their attention on the mosaic instead
+   of on the colours inside it. One board, one tile, one size — and the
+   quantities live in the chips and the footer, where a row compares straight
+   across. */
+.bd-map {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+  gap: 10px;
+}
+.bd-tile {
+  display: flex;
+  flex-direction: column;
+  /* Tall enough for the 60-chip cap at the narrowest column and no taller.
+     The height is a constant rather than a max, so a five-frame board and a
+     ninety-frame board are the same box. */
+  height: 116px;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  background: var(--panel-2);
+  cursor: pointer;
+  min-width: 0;
+}
+.bd-tile:hover { border-color: var(--accent); }
+.bd-tile:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+.bd-tile.is-picked { border-color: var(--accent); box-shadow: inset 0 0 0 1px var(--accent); }
+/* A rule down the edge, not a ring around the whole tile. On this package a
+   majority of the boards are unwired, and a full amber border on the majority
+   of a page is not a warning — it is the background. */
+.bd-tile.is-unwired { border-left: 3px solid var(--warning); padding-left: 10px; }
+
+.bd-tile-head { display: flex; align-items: baseline; gap: 8px; min-width: 0; }
+.bd-tile-name {
+  flex: 1;
+  min-width: 0;
+  font-size: 12.5px;
+  font-weight: 700;
+  line-height: 1.3;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.bd-tile-code { flex: none; font-family: var(--mono); font-size: 9.5px; color: var(--text-faint); }
+
+/* The chips are the tile. They start at the top of the space left over so a
+   board with ten frames and a board with ninety line up on their first row. */
+.bd-chips {
+  display: flex;
+  flex-wrap: wrap;
+  align-content: flex-start;
+  gap: 3px;
+  flex: 1;
+  min-height: 0;
+  margin: 9px 0 0;
+  overflow: hidden;
+}
+.bd-chips.is-inline { flex: none; margin: 9px 0 0; max-height: 42px; }
+
+.bd-chip {
+  width: 9px;
+  height: 9px;
+  border-radius: 2px;
+  border: 1px solid transparent;
+  flex: none;
+}
+.bd-chip.is-ok { background: var(--accent-bright); }
+.bd-chip.is-named { background: var(--warning); }
+.bd-chip.is-bare { background: none; border-color: var(--border-strong); }
+.bd-chip-more {
+  font-family: var(--mono);
+  font-size: 9px;
+  line-height: 9px;
+  color: var(--text-faint);
+  align-self: center;
+}
+.bd-chips-none { font-size: 11px; color: var(--text-faint); font-style: italic; }
+
+.bd-tile-foot {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin-top: 8px;
+  font-size: 10.5px;
+  color: var(--text-faint);
+  flex: none;
+}
+.bd-tile-kind { min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.bd-tile-left { margin-left: auto; flex: none; color: var(--warning); font-weight: 600; }
+.bd-tile-done { margin-left: auto; flex: none; color: var(--ok); }
+
+/* ── the frame table ────────────────────────────────────────────── */
+.bd-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+.bd-table th {
+  padding: 6px 10px;
+  border-bottom: 1px solid var(--line);
+  text-align: left;
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+  position: sticky;
+  top: 0;
+  background: var(--bg-panel);
+}
+.bd-table td {
+  padding: 5px 10px;
+  border-bottom: 1px solid var(--border-soft);
+  vertical-align: baseline;
+  color: var(--text);
+}
+.bd-table tr.is-bare td,
+.bd-table tr.is-named td { color: var(--text-dim); }
+.bd-table td.is-unnamed { color: var(--text-faint); font-style: italic; }
+.bd-table td.bd-dim { color: var(--text-faint); font-size: 11px; }
+
+.bd-anchor {
+  font-family: var(--mono);
+  font-size: 10.5px;
+  color: var(--text-dim);
+  text-decoration: none;
+}
+a.bd-anchor:hover { color: var(--accent); text-decoration: underline; }
+
+.bd-linkish {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--text-dim);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.bd-linkish:hover { color: var(--accent); text-decoration: underline; }
+
+.bd-none { margin: 16px 2px; font-size: 12px; color: var(--text-faint); }
+
+/* ── the panel on the right ─────────────────────────────────────── */
+.bd-pills { display: flex; flex-wrap: wrap; gap: 6px; }
+.bd-pill {
+  font-family: var(--mono);
+  font-size: 10px;
+  line-height: 1.6;
+  padding: 1px 7px;
+  border-radius: 999px;
+  border: 1px solid var(--border-soft);
+  color: var(--text-dim);
+}
+.bd-pill.is-warn { border-color: var(--warning); color: var(--warning); }
+.bd-pill.is-pack { border-color: var(--ok); color: var(--ok); }
+
+.bd-detail-eyebrow {
+  margin: 0 0 6px;
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+}
+.bd-detail-title {
+  margin: 9px 0 0;
+  font-size: 17px;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  line-height: 1.25;
+  overflow-wrap: break-word;
+}
+.bd-detail-sub { margin: 4px 0 0; font-size: 12px; color: var(--text-dim); }
+.bd-detail-path {
+  margin: 5px 0 0;
+  font-family: var(--mono);
+  font-size: 10.5px;
+  color: var(--text-faint);
+  overflow-wrap: anywhere;
+}
+.bd-detail-lead { margin: 12px 0 0; font-size: 12.5px; line-height: 1.6; color: var(--text-dim); }
+.bd-detail-lead strong { color: var(--text); font-weight: 600; }
+.bd-detail-none { margin: 6px 0 0; font-size: 12px; color: var(--text-faint); font-style: italic; }
+
+/* The board itself, one click away. Not an inline preview: these run to
+   hundreds of kilobytes of exported design markup with scripts of their own,
+   and framing one inside the viewer means inheriting whatever it logs. */
+.bd-open {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  grid-template-areas: "mark label" "mark note";
+  align-items: center;
+  gap: 0 10px;
+  margin: 13px 0 0;
+  padding: 12px 14px;
+  border: 1px dashed var(--line);
+  border-radius: 9px;
+  background: var(--panel-2);
+  text-decoration: none;
+}
+.bd-open:hover { border-color: var(--accent); border-style: solid; }
+.bd-open-mark { grid-area: mark; font-size: 17px; color: var(--accent); }
+.bd-open-label { grid-area: label; font-size: 12.5px; font-weight: 700; color: var(--text); }
+.bd-open-note {
+  grid-area: note;
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--text-faint);
+  overflow-wrap: anywhere;
+}
+
+.bd-dl {
+  display: grid;
+  grid-template-columns: 84px 1fr;
+  gap: 4px 10px;
+  margin: 14px 0 0;
+  font-size: 12px;
+}
+.bd-dl dt { font-family: var(--mono); font-size: 10.5px; color: var(--text-faint); }
+.bd-dl dd { margin: 0; color: var(--text); }
+.bd-dl dd.is-warn { color: var(--warning); font-weight: 600; }
+
+.bd-detail-h3 {
+  margin: 20px 0 7px;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+}
+
+.bd-frame-list { border-top: 1px solid var(--border-soft); }
+.bd-frame {
+  display: grid;
+  grid-template-columns: 64px 1fr;
+  gap: 8px;
+  align-items: baseline;
+  padding: 4px 0;
+  border-bottom: 1px solid var(--border-soft);
+  font-size: 11.5px;
+}
+/* The claimed ones are context; the ones still to do are the list. */
+.bd-frame.is-ok { opacity: 0.55; }
+.bd-frame-name { color: var(--text); overflow-wrap: anywhere; }
+.bd-frame-name.is-unnamed { color: var(--text-faint); font-style: italic; }
+
+/* ── the card, which is now the List view ───────────────────────── */
+/* Columns, not a grid. `align-items: start` stops a tall card stretching its
+   row but cannot stop it leaving a hole underneath: a row holding a board whose
+   92 screen chips make it eight times the height of the card beside it is two
+   thirds empty space. These cards have nothing to align — no shared baseline,
+   no reading order across a row — so they pack. */
 .uiux-grid {
   columns: 3 340px;
   column-gap: 12px;
@@ -43,21 +610,16 @@
   background: var(--panel-2);
   padding: 12px 14px;
   min-width: 0;
+  cursor: pointer;
 }
-
-/* A board nothing points at is the point of this page, so it is marked rather
-   than dimmed. Dimming it — which is what `.plat-clean` does for a platform
-   with no gaps — would say "nothing to see", and the opposite is true. */
-/* A rule down the edge, not a ring around the whole card.
-   **55 of the 100 boards are unwired.** A full amber border on the majority of
-   a page is not a warning, it is the background — and it made the page read as
-   broken rather than as a page with a real backlog on it. The rule is quiet
-   enough to be a majority and visible enough to scan for. */
+.uiux-card:hover { border-color: var(--accent); }
+.uiux-card.is-picked { border-color: var(--accent); box-shadow: inset 0 0 0 1px var(--accent); }
 .uiux-card.is-unwired {
   border-color: var(--line);
   border-left: 3px solid var(--warning);
   padding-left: 11px;
 }
+.uiux-card.is-unwired:hover { border-color: var(--accent); border-left-color: var(--warning); }
 
 .uiux-name {
   display: block;
@@ -141,59 +703,40 @@
 }
 .uiux-screen:hover { border-color: var(--accent); color: var(--accent); }
 
-.uiux-frames { margin-top: 9px; }
-.uiux-frames > summary {
-  cursor: pointer;
-  font-size: 11px;
-  color: var(--text-dim);
-}
-.uiux-frames > summary:hover { color: var(--accent); }
-
-.uiux-frame-list {
-  margin-top: 6px;
-  border-top: 1px solid var(--border-soft);
-  /* A board can carry 73 frames. Scrolls inside itself rather than making the
-     card taller than the screen. */
-  max-height: 320px;
-  overflow-y: auto;
-}
-
-.uiux-frame {
-  display: grid;
-  grid-template-columns: 72px 1fr auto;
-  gap: 8px;
-  align-items: baseline;
-  padding: 3px 0;
-  border-bottom: 1px solid var(--border-soft);
-  font-size: 11px;
-}
-.uiux-frame:last-child { border-bottom: 0; }
-
-.uiux-anchor {
-  font-family: var(--mono);
-  font-size: 10px;
-  color: var(--text-dim);
-  text-decoration: none;
-}
-a.uiux-anchor:hover { color: var(--accent); text-decoration: underline; }
-
-.uiux-frame-name { color: var(--text); overflow-wrap: anywhere; }
-.uiux-frame-name.is-unnamed { color: var(--text-faint); font-style: italic; }
-.uiux-frame-src { color: var(--text-faint); font-size: 10px; white-space: nowrap; }
-
 .uiux-note {
   margin: 9px 0 0;
   font-size: 11px;
   color: var(--text-dim);
 }
 
-.uiux-toggles { margin-top: 8px; }
-.uiux-toggle {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 12px;
-  color: var(--text-dim);
-  cursor: pointer;
+/* ── the workbench takes the whole stage ────────────────────────────
+   Keyed on the view, not on the layer. Platforms is a sheet and keeps the
+   viewer's chrome exactly as every other sheet does — the file tree on the
+   left, the links pane on the right. Boards does not, for the same reason
+   Screens & flows does not: it has a rail of its own down one side and a
+   detail panel down the other, and with the viewer's two as well there were
+   570px of navigation in front of the thing being navigated, two of them
+   answering a question this view answers itself. */
+body[data-mode="uiux-boards"] #sidebar-left,
+body[data-mode="uiux-boards"] #sidebar-right {
+  display: none;
+}
+/* The columns go with them. `.app` is a three-column grid with named areas, so
+   hiding the two asides on their own leaves their tracks behind, holding
+   nothing. */
+body[data-mode="uiux-boards"] .app {
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-areas:
+    "top"
+    "main";
 }
 
+/* ── narrow ─────────────────────────────────────────────────────────
+   The app is desktop-only by intent and refuses to crush below 1180px, but
+   between there and 1500px three columns plus the viewer's own chrome is too
+   much. The detail panel is the one that folds: it is a second view of
+   something already on the page. */
+@media (max-width: 1500px) {
+  .bd-shell { grid-template-columns: 220px minmax(0, 1fr) 300px; }
+  .bd-map { grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); }
+}

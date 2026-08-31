@@ -26,7 +26,7 @@ on an empty database.
 | `search-check.mjs` | search reaches the whole package and not only the contracts, every `file:line` it reports really is where that artefact is written, a result opens the artefact's page *and* the source at that line, and opening one **lands on the match rather than on the page** |
 | `subsearch-check.mjs` | every page that lists things can be narrowed, the count keeps its denominator, and a row drawn after the filter was typed is filtered too |
 | `er-drag-check.mjs` | a box you drop in an ER diagram is still there six seconds later, and a double-click hands it back to the simulation |
-| `uiux-check.mjs` | the board list holds every board on disk, not only the ones a screen points at; each of the 58 board files and one frame out of each of the 54 with frames actually resolves; and the filters filter |
+| `uiux-check.mjs` | the board workbench holds every board on disk, not only the ones a screen points at; no board counts the same frame twice; every tile is one size; each board file and one frame out of each board with frames resolves; and the rail, the filters and all three middle views do what they say |
 
 `pages-check.mjs` is the cheap one to run after any edit to a module under
 `public/`. `node --check` proves a file parses; it says nothing about whether the
@@ -58,10 +58,20 @@ putting a frame on a screen's page — so **23 of the 58 boards were reachable
 from nowhere in the viewer**, including every Inventory board and a hand-built
 index of 255 frame links, every one of which resolves. Nothing failed while
 that was true; the boards were simply absent, and absent and non-existent look
-identical. So the first thing this holds is that the number of cards equals the
+identical. So the first thing this holds is that the number of tiles equals the
 number of files on disk, and the second is that every one of those files and a
 frame out of each of them answers 200 — a catalogue whose entries 404 is worse
 than no catalogue, because it says the board is there.
+
+Two of its assertions are about arithmetic rather than about links. **No board
+may count the same frame twice**: anchors are folded to lower case, and 65 of
+the 100 boards carry each one in both cases — `id="FNB-6A"` on the frame and
+`id="fnb-6a"` on the thumbnail that links to it — which reported 1829 frames
+where the package draws 1362 and made every figure on the page a third too
+high. **Every tile is one size**, checked as one distinct height across the page
+and one width within each row: the map replaced a masonry whose card heights
+came from their contents, and a rule that nothing holds comes back the first
+time somebody adds a line to a tile.
 
 **Point every harness at a throwaway pair rather than 4173/8787.** The two
 environment variables are not the same thing and the difference is easy to get
