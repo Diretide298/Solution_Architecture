@@ -54,7 +54,7 @@ const AUTH_BASE = process.env.TICVAI_AUTH ?? 'http://127.0.0.1:8787';
  * AUTH_BASE above is this process talking to that one, over loopback, and stays
  * loopback in every arrangement. This is the separate question of what address
  * to put in front of a visitor, and it only has an answer in the split
- * deployment — the reading server on atlas.example.com and the accounts service
+ * deployment — the reading server on aster.example.com and the accounts service
  * on asterapi.example.com.
  *
  * Unset, every page keeps calling this origin and server.mjs proxies onward,
@@ -75,7 +75,7 @@ const AUTH_BASE = process.env.TICVAI_AUTH ?? 'http://127.0.0.1:8787';
  * accounts service uses, so the two halves are configured once.
  */
 const ALLOWED_ORIGINS = new Set([
-  'https://atlas.ainfinite.ai',
+  'https://aster.ainfinite.ai',
   'http://localhost:4173', 'http://127.0.0.1:4173',
   ...(process.env.TICVAI_ORIGINS ?? '').split(',').map((o) => o.trim()).filter(Boolean),
 ]);

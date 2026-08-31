@@ -20,7 +20,7 @@
 //
 // No trailing /api — every path below already starts with one, and call() joins
 // them as `${API}${path}`, so a base ending in /api asks for /api/api/....
-const API_DEPLOYED = 'https://atlasapi.ainfinite.ai';
+const API_DEPLOYED = 'https://asterapi.ainfinite.ai';
 
 // A workstation is the exception, and only a workstation: there the two halves
 // are on separate ports on this machine and the deployed address is the wrong

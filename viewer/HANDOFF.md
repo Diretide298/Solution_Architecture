@@ -21,10 +21,10 @@ apart from one commit. Nothing has been deleted anywhere.
 
 ```bash
 cd ~/Desktop/aster/viewer && git remote add origin <url> && git push -u origin main
-cd ~/Desktop/atlas/ticvai && git remote add origin <url> && git push -u origin main
+cd ~/Desktop/aster/ticvai && git remote add origin <url> && git push -u origin main
 ```
 
-**2 · Decide about `repos/` before the first push.** `atlas/ticvai/repos/` is
+**2 · Decide about `repos/` before the first push.** `aster/ticvai/repos/` is
 5,762 files of generated `project-bible` mirrors, already 14 files out of date —
 `tools/check-package.py` fails on exactly that and did so before the split too.
 If `tools/derive-mirrors.py` still makes them they do not belong in a repository
@@ -36,8 +36,8 @@ now is a delete.
 right for a while and the server has never been given it.
 
 ```bash
-sudo cp deploy/nginx/atlasapi.ainfinite.ai /etc/nginx/sites-available/
-sudo ln -sf /etc/nginx/sites-available/atlasapi.ainfinite.ai /etc/nginx/sites-enabled/
+sudo cp deploy/nginx/asterapi.ainfinite.ai /etc/nginx/sites-available/
+sudo ln -sf /etc/nginx/sites-available/asterapi.ainfinite.ai /etc/nginx/sites-enabled/
 sudo nginx -t && sudo systemctl reload nginx
 ```
 
@@ -134,11 +134,11 @@ TICVAI_NO_GATE=1 node server.mjs --port 4619
 and stay that way. Throwaway instances go on 4619+.
 
 **Route names live in two files while the alias lasts** — `server.mjs` owns them,
-`deploy/nginx/atlasapi.ainfinite.ai` forwards them, and `deploy.sh` greps both
+`deploy/nginx/asterapi.ainfinite.ai` forwards them, and `deploy.sh` greps both
 and dies when they disagree. `location /pkg/` satisfies the check on its own.
 
 **The package's own checkers pass with warnings, and the warnings matter.** From
-`atlas/ticvai`: `check-wireframes` PASS/13, `check-screens` PASS/657,
+`aster/ticvai`: `check-wireframes` PASS/13, `check-screens` PASS/657,
 `check-traceability` PASS/0, `check-package` FAILS on the six stale mirrors.
 `check-wireframes` prints only the first 20 warnings — a warning that "appears"
 may just have become visible.

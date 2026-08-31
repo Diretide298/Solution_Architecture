@@ -1,4 +1,4 @@
-# The API: atlasapi.ainfinite.ai
+# The API: asterapi.ainfinite.ai
 #
 # One name in front of a browser, two processes behind it. The accounts service
 # on :8787 owns auth, accounts, invites, verdicts, mentions and validation. The
@@ -20,13 +20,13 @@
 # wins over `location /` regardless of the order they appear in.
 #
 # Install:
-#   sudo cp deploy/nginx/atlasapi.ainfinite.ai /etc/nginx/sites-available/
-#   sudo ln -sf /etc/nginx/sites-available/atlasapi.ainfinite.ai /etc/nginx/sites-enabled/
+#   sudo cp deploy/nginx/asterapi.ainfinite.ai /etc/nginx/sites-available/
+#   sudo ln -sf /etc/nginx/sites-available/asterapi.ainfinite.ai /etc/nginx/sites-enabled/
 #   sudo nginx -t && sudo systemctl reload nginx
 
 server {
 
-    server_name atlasapi.ainfinite.ai;
+    server_name asterapi.ainfinite.ai;
 
     # ── the delivery package, answered by the reading server ──────────────
     # One prefix and no list of routes, which is the reason the package reads
@@ -44,7 +44,7 @@ server {
         proxy_set_header X-Forwarded-Proto $scheme;
         proxy_set_header Connection        "";
 
-        # The page lives on atlas.ainfinite.ai and this is atlasapi, so these
+        # The page lives on aster.ainfinite.ai and this is asterapi, so these
         # reads are cross-origin. Node decides whether to allow the origin and
         # cannot do that if the header is dropped on the way in.
         proxy_set_header Origin            $http_origin;
@@ -77,7 +77,7 @@ server {
         proxy_set_header X-Forwarded-Proto $scheme;
         proxy_set_header Connection        "";
 
-        # The page lives on atlas.ainfinite.ai and this is atlasapi, so these
+        # The page lives on aster.ainfinite.ai and this is asterapi, so these
         # reads are cross-origin. Node decides whether to allow the origin and
         # cannot do that if the header is dropped on the way in.
         proxy_set_header Origin            $http_origin;
@@ -106,8 +106,8 @@ server {
 
     listen [::]:443 ssl; # managed by Certbot
     listen 443 ssl; # managed by Certbot
-    ssl_certificate /etc/letsencrypt/live/atlasapi.ainfinite.ai/fullchain.pem; # managed by Certbot
-    ssl_certificate_key /etc/letsencrypt/live/atlasapi.ainfinite.ai/privkey.pem; # managed by Certbot
+    ssl_certificate /etc/letsencrypt/live/asterapi.ainfinite.ai/fullchain.pem; # managed by Certbot
+    ssl_certificate_key /etc/letsencrypt/live/asterapi.ainfinite.ai/privkey.pem; # managed by Certbot
     include /etc/letsencrypt/options-ssl-nginx.conf; # managed by Certbot
     ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem; # managed by Certbot
 
@@ -115,14 +115,14 @@ server {
 
 server {
 
-    if ($host = atlasapi.ainfinite.ai) {
+    if ($host = asterapi.ainfinite.ai) {
         return 301 https://$host$request_uri;
     } # managed by Certbot
 
     listen 80;
     listen [::]:80;
 
-    server_name atlasapi.ainfinite.ai;
+    server_name asterapi.ainfinite.ai;
     return 404; # managed by Certbot
 
 }

@@ -1,4 +1,4 @@
-# Atlas — the viewer and the delivery packages it reads, in one tree.
+# Aster — the viewer and the delivery packages it reads, in one tree.
 #
 # viewer/ and ticvai/ were separate repositories until 26 August. Their prior
 # histories are not in here: they were moved to Desktop/atlas-prior-git/ intact

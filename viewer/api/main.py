@@ -55,7 +55,7 @@ app.add_middleware(
     allow_origins=[
         "http://localhost:4173", "http://127.0.0.1:4173",
         "http://localhost:8787", "http://127.0.0.1:8787",
-        "https://atlas.ainfinite.ai",
+        "https://aster.ainfinite.ai",
     ] + _extra,
     allow_credentials=True,
     allow_methods=["GET", "POST", "DELETE"],
@@ -79,7 +79,7 @@ SESSION_COOKIE = "ticvai_session"
 # host-only, which is the tighter default and all either arrangement needs.
 #
 # It is required the moment the two halves are on different names — the reading
-# server on atlas.example.com and this service on asterapi.example.com. The
+# server on aster.example.com and this service on asterapi.example.com. The
 # browser sends a host-only cookie set by asterapi back to asterapi and nowhere
 # else, so the node gate, which reads the same cookie off its own requests to
 # decide who is asking, would never see one and would bounce every page to the

@@ -1,4 +1,4 @@
-# The front end: atlas.ainfinite.ai
+# The front end: aster.ainfinite.ai
 #
 # Everything goes to the node process on :4173 — the pages, the assets, and the
 # package routes it answers itself. There is deliberately no `location /api/`
@@ -7,17 +7,17 @@
 # reroute those routes but to delete them: a 404 carrying FastAPI's
 # {"detail":"Not Found"} from routes the node server plainly defines.
 #
-# The browser calls atlasapi.ainfinite.ai for every API read now, so nothing on
+# The browser calls asterapi.ainfinite.ai for every API read now, so nothing on
 # this name needs a path split at all.
 #
 # Install:
-#   sudo cp deploy/nginx/atlas.ainfinite.ai /etc/nginx/sites-available/
-#   sudo ln -sf /etc/nginx/sites-available/atlas.ainfinite.ai /etc/nginx/sites-enabled/
+#   sudo cp deploy/nginx/aster.ainfinite.ai /etc/nginx/sites-available/
+#   sudo ln -sf /etc/nginx/sites-available/aster.ainfinite.ai /etc/nginx/sites-enabled/
 #   sudo nginx -t && sudo systemctl reload nginx
 
 server {
 
-    server_name atlas.ainfinite.ai;
+    server_name aster.ainfinite.ai;
 
     location / {
         proxy_pass http://127.0.0.1:4173;
@@ -34,8 +34,8 @@ server {
 
     listen [::]:443 ssl ipv6only=on; # managed by Certbot
     listen 443 ssl; # managed by Certbot
-    ssl_certificate /etc/letsencrypt/live/atlas.ainfinite.ai/fullchain.pem; # managed by Certbot
-    ssl_certificate_key /etc/letsencrypt/live/atlas.ainfinite.ai/privkey.pem; # managed by Certbot
+    ssl_certificate /etc/letsencrypt/live/aster.ainfinite.ai/fullchain.pem; # managed by Certbot
+    ssl_certificate_key /etc/letsencrypt/live/aster.ainfinite.ai/privkey.pem; # managed by Certbot
     include /etc/letsencrypt/options-ssl-nginx.conf; # managed by Certbot
     ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem; # managed by Certbot
 
@@ -43,14 +43,14 @@ server {
 
 server {
 
-    if ($host = atlas.ainfinite.ai) {
+    if ($host = aster.ainfinite.ai) {
         return 301 https://$host$request_uri;
     } # managed by Certbot
 
     listen 80;
     listen [::]:80;
 
-    server_name atlas.ainfinite.ai;
+    server_name aster.ainfinite.ai;
     return 404; # managed by Certbot
 
 }

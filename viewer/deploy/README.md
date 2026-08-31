@@ -13,7 +13,7 @@ aster/
 ```
 
 ```
-git clone <this repo> /opt/atlas && cd /opt/atlas/viewer
+git clone <this repo> /opt/aster && cd /opt/aster/viewer
 sudo ./deploy/deploy.sh --admin you@softlabsgroup.com
 ```
 
@@ -21,12 +21,12 @@ Run it again whenever you want to deploy. It is idempotent: every step checks
 before it acts.
 
 ```
-cd /opt/atlas && git pull && cd viewer && sudo ./deploy/deploy.sh
+cd /opt/aster && git pull && cd viewer && sudo ./deploy/deploy.sh
 ```
 
 That copies **both** halves: `viewer/` into `/srv/ticvai/viewer`, and every
 package registered in `projects.json` to the place its own `root` points at, so
-`"root": "../ticvai"` means `/srv/ticvai/ticvai` on the server and `atlas/ticvai`
+`"root": "../ticvai"` means `/srv/ticvai/ticvai` on the server and `aster/ticvai`
 in the checkout without either having to know about the other.
 
 It did not always. The packages were separate repositories placed beside the
@@ -62,8 +62,8 @@ The arrangement above puts everything on one name and lets `server.mjs` forward
 what the accounts service owns. To give the service its own name instead —
 
 ```
-   atlas.ainfinite.ai      →  :4173   the package, and the gate
-   atlasapi.ainfinite.ai   →  :8787   accounts, invites, verdicts, /docs
+   aster.ainfinite.ai      →  :4173   the package, and the gate
+   asterapi.ainfinite.ai   →  :8787   accounts, invites, verdicts, /docs
 ```
 
 — the browser has to be told where to call, both halves have to agree the call
@@ -71,8 +71,8 @@ is allowed, and, the part that is easy to miss, **one cookie has to be visible
 to both names**. Four variables in `/srv/ticvai/ecosystem.config.cjs`:
 
 ```
-ticvai-viewer:  TICVAI_API_PUBLIC     = https://atlasapi.ainfinite.ai
-ticvai-api:     TICVAI_ORIGINS        = https://atlas.ainfinite.ai
+ticvai-viewer:  TICVAI_API_PUBLIC     = https://asterapi.ainfinite.ai
+ticvai-api:     TICVAI_ORIGINS        = https://aster.ainfinite.ai
                 TICVAI_COOKIE_DOMAIN  = .ainfinite.ai
                 TICVAI_SECURE_COOKIE  = 1
 ```
