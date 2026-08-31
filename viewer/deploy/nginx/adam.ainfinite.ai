@@ -1,0 +1,74 @@
+# The front end: adam.ainfinite.ai, and aster.ainfinite.ai until it retires
+#
+# Everything goes to the node process on :4173 — the pages, the assets, and the
+# package routes it answers itself. There is deliberately no `location /api/`
+# here. One used to send /api/ to :8787, and because the accounts service has no
+# /api/index, /api/session, /api/tooltips or /api/domains, the effect was not to
+# reroute those routes but to delete them: a 404 carrying FastAPI's
+# {"detail":"Not Found"} from routes the node server plainly defines.
+#
+# The browser calls adamapi.ainfinite.ai for every API read now, so nothing on
+# this name needs a path split at all.
+#
+# Install:
+# The certificate paths below still name aster, deliberately: they are the
+# cert that exists. Point a server block at a cert that is not on disk and
+# nginx refuses to start -- it does not fall back, and it takes the other
+# site down with it. Certbot rewrites these two lines itself when it issues
+# a certificate covering both names. Do not edit them by hand.
+#
+# Install (the old symlink has the old filename and has to go):
+#   sudo cp deploy/nginx/adam.ainfinite.ai /etc/nginx/sites-available/
+#   sudo rm -f /etc/nginx/sites-enabled/aster.ainfinite.ai
+#   sudo ln -sf /etc/nginx/sites-available/adam.ainfinite.ai /etc/nginx/sites-enabled/
+#   sudo nginx -t && sudo systemctl reload nginx
+
+server {
+
+    # Both names on one block, which is what makes this a rename rather than
+    # a cutover. `aster` is the name with traffic on it and stays until
+    # nothing has called it for a while; `adam` answers the moment its A
+    # record and its certificate exist.
+    server_name adam.ainfinite.ai aster.ainfinite.ai;
+
+    location / {
+        proxy_pass http://127.0.0.1:4173;
+
+        proxy_http_version 1.1;
+        proxy_set_header Host              $host;
+        proxy_set_header X-Real-IP         $remote_addr;
+        proxy_set_header X-Forwarded-For   $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header Connection        "";
+
+        proxy_read_timeout 120s;
+    }
+
+    listen [::]:443 ssl ipv6only=on; # managed by Certbot
+    listen 443 ssl; # managed by Certbot
+    ssl_certificate /etc/letsencrypt/live/aster.ainfinite.ai/fullchain.pem; # managed by Certbot
+    ssl_certificate_key /etc/letsencrypt/live/aster.ainfinite.ai/privkey.pem; # managed by Certbot
+    include /etc/letsencrypt/options-ssl-nginx.conf; # managed by Certbot
+    ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem; # managed by Certbot
+
+}
+
+server {
+
+    # `$host` and not a literal, so the redirect follows whichever name was
+    # asked for instead of sending adam traffic to aster.
+    if ($host ~ ^(adam|aster)\.ainfinite\.ai$) {
+        return 301 https://$host$request_uri;
+    } # was: managed by Certbot
+
+    listen 80;
+    listen [::]:80;
+
+    # Both names on one block, which is what makes this a rename rather than
+    # a cutover. `aster` is the name with traffic on it and stays until
+    # nothing has called it for a while; `adam` answers the moment its A
+    # record and its certificate exist.
+    server_name adam.ainfinite.ai aster.ainfinite.ai;
+    return 404; # managed by Certbot
+
+}

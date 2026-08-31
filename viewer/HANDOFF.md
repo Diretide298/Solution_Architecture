@@ -36,8 +36,9 @@ now is a delete.
 right for a while and the server has never been given it.
 
 ```bash
-sudo cp deploy/nginx/asterapi.ainfinite.ai /etc/nginx/sites-available/
-sudo ln -sf /etc/nginx/sites-available/asterapi.ainfinite.ai /etc/nginx/sites-enabled/
+sudo cp deploy/nginx/adamapi.ainfinite.ai /etc/nginx/sites-available/
+sudo rm -f /etc/nginx/sites-enabled/asterapi.ainfinite.ai
+sudo ln -sf /etc/nginx/sites-available/adamapi.ainfinite.ai /etc/nginx/sites-enabled/
 sudo nginx -t && sudo systemctl reload nginx
 ```
 
@@ -134,7 +135,7 @@ TICVAI_NO_GATE=1 node server.mjs --port 4619
 and stay that way. Throwaway instances go on 4619+.
 
 **Route names live in two files while the alias lasts** — `server.mjs` owns them,
-`deploy/nginx/asterapi.ainfinite.ai` forwards them, and `deploy.sh` greps both
+`deploy/nginx/adamapi.ainfinite.ai` forwards them, and `deploy.sh` greps both
 and dies when they disagree. `location /pkg/` satisfies the check on its own.
 
 **The package's own checkers pass with warnings, and the warnings matter.** From

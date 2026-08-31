@@ -62,8 +62,8 @@ The arrangement above puts everything on one name and lets `server.mjs` forward
 what the accounts service owns. To give the service its own name instead —
 
 ```
-   aster.ainfinite.ai      →  :4173   the package, and the gate
-   asterapi.ainfinite.ai   →  :8787   accounts, invites, verdicts, /docs
+   adam.ainfinite.ai      →  :4173   the package, and the gate
+   adamapi.ainfinite.ai   →  :8787   accounts, invites, verdicts, /docs
 ```
 
 — the browser has to be told where to call, both halves have to agree the call
@@ -71,16 +71,26 @@ is allowed, and, the part that is easy to miss, **one cookie has to be visible
 to both names**. Four variables in `/srv/ticvai/ecosystem.config.cjs`:
 
 ```
-ticvai-viewer:  TICVAI_API_PUBLIC     = https://asterapi.ainfinite.ai
-ticvai-api:     TICVAI_ORIGINS        = https://aster.ainfinite.ai
+ticvai-viewer:  TICVAI_API_PUBLIC     = https://adamapi.ainfinite.ai
+ticvai-api:     TICVAI_ORIGINS        = https://adam.ainfinite.ai,https://aster.ainfinite.ai
                 TICVAI_COOKIE_DOMAIN  = .ainfinite.ai
                 TICVAI_SECURE_COOKIE  = 1
 ```
 
 Then `pm2 restart ticvai-viewer ticvai-api --update-env`.
 
+Both blocks in `deploy/nginx/` answer to their `aster` name as well, on the same
+certificate, and will until nothing has called it for a while. **Renaming a name
+that has traffic on it is an alias first and a removal much later** — the record
+and the certificate are the slow parts, and neither moves because a file
+changed.
+
 `TICVAI_API_PUBLIC` is written into every page as `<meta name="ticvai-api">` and
-read by `validation.js`. It is a meta tag rather than a line in the eight HTML
+read by `validation.js`. **It is one value and not a list**, so it moves with the
+DNS and not before — it is the address the browser is told to call, and an
+address that can be argued out of being itself fails quietly. `API_DEPLOYED` in
+`public/validation.js` is the same value for a workstation and moves in the same
+commit. It is a meta tag rather than a line in the eight HTML
 files because the address belongs to a deployment and those files are the same
 in all of them. `TICVAI_AUTH` is a different question and stays on loopback:
 that is this process asking the other one who you are, which never leaves the
@@ -88,7 +98,7 @@ box.
 
 **`TICVAI_COOKIE_DOMAIN` is not optional here.** The gate in `lib/session.mjs`
 reads the session cookie off requests to :4173 to decide who is asking. A
-cookie set by `asterapi` without a domain goes back to `asterapi` and nowhere
+cookie set by `adamapi` without a domain goes back to `adamapi` and nowhere
 else, so :4173 would see no cookie, call everybody a stranger, and redirect
 every page to the sign-in door — which then signs you in successfully and
 bounces you straight back. Scope it to the shared parent and no higher; a
@@ -101,20 +111,40 @@ The proxy in `server.mjs` stays in place and simply goes unused by the browser.
 Nothing has to be removed, and unsetting `TICVAI_API_PUBLIC` puts the one-origin
 arrangement back.
 
-Both names need a certificate — see below — and `asterapi` puts `/docs` on the
+Both names need a certificate — see below — and `adamapi` puts `/docs` on the
 public internet, so put a basic-auth or an IP rule in front of it if that is not
 wanted.
 
-### Why there is no nginx
+### nginx: what it does here, and what the deploy will not do to it
 
-It was doing exactly one job — putting both halves on one origin — and the node
-process can do that itself in the code it already had for asking the accounts
+There was a period with no nginx at all, and the reasoning was sound while it
+lasted: it was doing exactly one job — putting both halves on one origin — and
+the node process already does that in the code it had for asking the accounts
 service who you are. A reverse proxy earns its place with TLS termination,
-caching, or load across several backends. None of those apply yet, and until
-they do it is a third thing to install, configure, reload and get wrong.
+caching, or load across several backends.
 
-When there is a certificate to terminate, put nginx back in front of :4173 and
-nothing else changes.
+TLS is now the case that earns it. There are two names with Let's Encrypt
+certificates on them, and nginx terminates both and decides which process
+answers:
+
+```
+   adam.ainfinite.ai  ──▶ :4173   everything, no path split at all
+   adamapi.ainfinite.ai ─▶ :8787  everything except /pkg/ and the package
+                                  routes, which go to :4173
+```
+
+The blocks live in `deploy/nginx/`, one file per name, and **`deploy.sh` never
+installs, edits or reloads them.** A deploy that can take a certificate down is
+a worse trade than a deploy that leaves it alone. What the script does instead
+is *read* the API block and refuse to finish if the routes named there disagree
+with the routes `server.mjs` actually owns — that list is kept in two files, and
+it drifted once: `summary` and `diagrams` were added to the reading server and
+not to nginx, so they fell through to the accounts service and 404ed for weeks,
+and the landing page drew zeroes rather than an error, because a count that
+failed to load and a count of nothing look the same.
+
+So installing a block is by hand, and the install lines are in the header
+comment of each file.
 
 ### Why PM2 and not systemd units
 

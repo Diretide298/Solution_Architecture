@@ -16,9 +16,13 @@
 # deploy that can take the certificates down is a worse trade than a deploy that
 # leaves them alone.
 #
-#   aster.ainfinite.ai      -> :4173, all of it
-#   asterapi.ainfinite.ai   -> :8787, except the thirteen package routes the
-#                              node process owns, which go to :4173
+#   adam.ainfinite.ai      -> :4173, all of it
+#   adamapi.ainfinite.ai   -> :8787, except the thirteen package routes the
+#                             node process owns, which go to :4173
+#
+# Each block also still answers to its aster name, on the same certificate, and
+# will until nothing has called it for a while. A rename of a live name is an
+# alias first and a removal much later.
 #
 # Two names means one site rather than two only if the session cookie is scoped
 # to the parent both sit under, which is what COOKIE_DOMAIN below is for, and
@@ -72,7 +76,10 @@ ADMIN_EMAIL=""
 #     sudo -E ./deploy/deploy.sh
 #
 # sudo -E, or sudo drops them and you silently get the defaults below.
-PUBLIC_ORIGIN="${PUBLIC_ORIGIN-https://aster.ainfinite.ai}"
+# Both names, because this becomes TICVAI_ORIGINS, which the accounts service
+# splits on commas -- so an origin that does not resolve yet is simply never
+# sent and costs nothing, while the day adam's record exists it already works.
+PUBLIC_ORIGIN="${PUBLIC_ORIGIN-https://adam.ainfinite.ai,https://aster.ainfinite.ai}"
 COOKIE_DOMAIN="${COOKIE_DOMAIN-.ainfinite.ai}"
 SECURE_COOKIE="${SECURE_COOKIE-1}"
 
@@ -426,7 +433,7 @@ note "viewer up on $VIEWER_PORT"
 # server.mjs is the authority, because that is where a route comes into
 # existence. A new one now fails the deploy with its own name in the message
 # rather than 404ing in somebody's browser later.
-NGINX_SITE="$REPO/deploy/nginx/asterapi.ainfinite.ai"
+NGINX_SITE="$REPO/deploy/nginx/adamapi.ainfinite.ai"
 if [[ -f "$NGINX_SITE" ]]; then
   # server.mjs spells a route as `route === 'index'` since the reads moved to
   # /pkg/<project>/. Matched on that form: the old pattern looked for
@@ -475,7 +482,7 @@ cannot run, and an empty list would pass it silently."
   [[ -z "${MISSING// /}" ]] || die \
     "nginx does not forward $(echo "$MISSING" | sed 's|[a-z-][a-z-]*|/api/&|g')\
  — the accounts service will answer them 404. Add them to the location regex in\
- deploy/nginx/asterapi.ainfinite.ai."
+ deploy/nginx/adamapi.ainfinite.ai."
   note "nginx forwards every package route server.mjs owns"
 fi
 

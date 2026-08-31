@@ -55,7 +55,7 @@ const AUTH_BASE = process.env.TICVAI_AUTH ?? 'http://127.0.0.1:8787';
  * loopback in every arrangement. This is the separate question of what address
  * to put in front of a visitor, and it only has an answer in the split
  * deployment — the reading server on aster.example.com and the accounts service
- * on asterapi.example.com.
+ * on adamapi.example.com.
  *
  * Unset, every page keeps calling this origin and server.mjs proxies onward,
  * which is what a workstation and the one-origin deployment both want.

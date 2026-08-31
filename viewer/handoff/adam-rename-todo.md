@@ -1,62 +1,87 @@
 # Adam: what the rename could not do from here
 
 The product is Adam. The viewer says so everywhere a reader can see it — titles,
-alt text, the sign-in copy, the loading curtain, the brand files. Four kinds of
-"aster" were left alone on purpose, and three of them need a decision from you
-rather than an edit from anyone.
+alt text, the sign-in copy, the loading curtain, the brand files — and the
+deployment says so everywhere a file can say it: both nginx blocks, `deploy.sh`,
+the CORS lists and the install instructions.
+
+What is left is the part no edit reaches. A hostname is a DNS record and a
+certificate, not a string in a repository, so the two live names still answer
+and the two new ones do not exist yet. Section 1 is the order to fix that in.
+The storage keys below are a separate decision and a smaller one.
 
 ---
 
 ## 1 · The hostnames, and the certificates behind them
 
-These are live DNS names with Let's Encrypt certificates issued against them.
-Editing a file does not move a record or reissue a certificate; it only makes
-the file disagree with the server.
+The files are done and aliased. **What is left is DNS and one certbot run**, and
+neither of those is an edit anybody can make from here.
 
 ```
 aster.ainfinite.ai      →  :4173   the package, and the gate
 asterapi.ainfinite.ai   →  :8787   accounts, invites, verdicts, /docs
 ```
 
-They are still spelled `aster` in:
+Those two are live DNS with Let's Encrypt certificates issued against them, and
+they are still the names that answer. `adam.ainfinite.ai` and
+`adamapi.ainfinite.ai` have no record, no certificate and no traffic.
 
-| where | what it is |
+### What the tree already says
+
+| where | state |
 | --- | --- |
-| `deploy/nginx/aster.ainfinite.ai` | filename **and** `server_name`, `ssl_certificate` paths |
-| `deploy/nginx/asterapi.ainfinite.ai` | the same, for the API |
-| `deploy/deploy.sh` | `PUBLIC_ORIGIN` default, and the `NGINX_SITE` path it greps |
-| `deploy/README.md`, `HANDOFF.md` | the install instructions, which must match the filenames |
-| `api/main.py` | CORS allow-list |
-| `server.mjs` | `ALLOWED_ORIGINS` |
-| `public/validation.js` | `API_DEPLOYED`, the deployed accounts-service base |
+| `deploy/nginx/adam.ainfinite.ai` | renamed; `server_name adam… aster…`, both |
+| `deploy/nginx/adamapi.ainfinite.ai` | renamed; `server_name adamapi… asterapi…`, both |
+| `deploy/deploy.sh` | `NGINX_SITE` points at the renamed file; `PUBLIC_ORIGIN` carries both origins |
+| `api/main.py`, `server.mjs` | both origins in the CORS list and in `ALLOWED_ORIGINS` |
+| `deploy/README.md`, `HANDOFF.md` | the adam names, and the install lines that remove the old symlink |
+| `public/validation.js` | **still `asterapi`** — one value, not a list, and it moves with the DNS |
 
-Two of those are lists, so both spellings are named in them already —
-`https://adam.ainfinite.ai` sits beside `https://aster.ainfinite.ai` in
-`api/main.py` and `server.mjs`. An origin that does not resolve is inert, so
-this costs nothing now and means the front end works the moment the name does.
+**The `ssl_certificate` lines in both blocks still name aster, deliberately.**
+They name the certificate that exists. Point a server block at a cert that is
+not on disk and nginx refuses to start — it does not fall back, and it takes
+every other site on the box down with it. Certbot rewrites those lines itself.
 
-`API_DEPLOYED` in `public/validation.js` is a single value, not a list, and
-deliberately so — the comment above it explains why an address that can be
-argued out of being itself goes wrong quietly. It has to be changed in one
-commit, at the same time as the DNS.
+### The order, and it matters
 
-**To finish the move, in this order:**
+1. **A records** for `adam.ainfinite.ai` and `adamapi.ainfinite.ai`, pointing at
+   the same address as the aster pair. Wait for them to resolve.
+2. **Install the renamed blocks and drop the old symlinks** — the filenames
+   changed, so a plain `cp` leaves the old ones enabled and nginx then has two
+   blocks claiming the same `server_name`:
+   ```
+   sudo cp deploy/nginx/adam.ainfinite.ai deploy/nginx/adamapi.ainfinite.ai      /etc/nginx/sites-available/
+   sudo rm -f /etc/nginx/sites-enabled/aster.ainfinite.ai               /etc/nginx/sites-enabled/asterapi.ainfinite.ai
+   sudo ln -sf /etc/nginx/sites-available/adam.ainfinite.ai /etc/nginx/sites-enabled/
+   sudo ln -sf /etc/nginx/sites-available/adamapi.ainfinite.ai /etc/nginx/sites-enabled/
+   sudo nginx -t && sudo systemctl reload nginx
+   ```
+   At this point adam answers on **:80 only** — the https block is still on the
+   aster certificate, which does not cover the new name, so an https request to
+   adam gets a name-mismatch warning. That is expected and step 3 ends it.
+3. **Expand the certificates rather than issuing new ones**, so there is never a
+   moment when a name that resolves has no certificate:
+   ```
+   sudo certbot --nginx --cert-name aster.ainfinite.ai      -d aster.ainfinite.ai -d adam.ainfinite.ai
+   sudo certbot --nginx --cert-name asterapi.ainfinite.ai      -d asterapi.ainfinite.ai -d adamapi.ainfinite.ai
+   ```
+   `--cert-name` keeps the existing lineage, so the `ssl_certificate` paths in
+   the blocks stay correct and the renewal timer needs nothing.
+4. **Point the browser at the new name**, and only now. Two values, one commit,
+   because they are the same fact written twice:
+   - `TICVAI_API_PUBLIC` in `/srv/ticvai/ecosystem.config.cjs` →
+     `https://adamapi.ainfinite.ai`
+   - `API_DEPLOYED` in `public/validation.js` → the same
+   Then `pm2 restart ticvai-viewer ticvai-api --update-env` and a deploy.
+5. **Re-read `HANDOFF.md` (~line 137) before touching routes.** Route names live
+   in **two** files while an alias lasts — `server.mjs` owns them and the API's
+   nginx block forwards them — and `deploy.sh` greps both and dies when they
+   disagree.
+6. **Retire the aster names last**, once nothing has called them for a while:
+   drop them from `server_name`, from `PUBLIC_ORIGIN`, from the two CORS lists,
+   and re-run certbot without them.
 
-1. Add `A` records for `adam.ainfinite.ai` and `adamapi.ainfinite.ai`.
-2. `certbot --nginx -d adam.ainfinite.ai -d adamapi.ainfinite.ai`.
-3. Copy `deploy/nginx/aster.ainfinite.ai` → `deploy/nginx/adam.ainfinite.ai`
-   and the same for the API block; put both names in `server_name` while the
-   alias lasts, so nothing in flight breaks.
-4. Change `PUBLIC_ORIGIN` and `NGINX_SITE` in `deploy/deploy.sh`, and
-   `API_DEPLOYED` in `public/validation.js`, together.
-5. `HANDOFF.md` (~line 137) is the thing to re-read before step 3: route names
-   live in **two** files while an alias lasts — `server.mjs` owns them and the
-   API's nginx block forwards them — and `deploy.sh` greps both and dies when
-   they disagree. A second server block is a second place that list can drift.
-6. Retire the `aster` names only once nothing has called them for a while.
-
-Until step 6, `aster.ainfinite.ai` is the address that answers. Do not delete
-the old server blocks to tidy up.
+Until step 6, aster is a name that answers. Do not tidy it away early.
 
 ---
 
