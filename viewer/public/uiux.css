@@ -18,14 +18,14 @@
    this fills the stage and every column scrolls inside itself — the page never
    scrolls as a whole, which is what makes the rail usable while the middle is
    two thousand frames long. */
-.bd {
+.ux-page {
   display: grid;
   grid-template-rows: auto minmax(0, 1fr);
   height: 100%;
   min-height: 0;
 }
 
-.bd-head {
+.ux-head {
   display: flex;
   align-items: center;
   gap: 14px;
@@ -33,7 +33,7 @@
   border-bottom: 1px solid var(--line);
   flex: none;
 }
-.bd-lead {
+.ux-lead {
   margin: 0;
   min-width: 0;
   font-size: 12px;
@@ -54,33 +54,38 @@
   cursor: pointer;
 }
 .bd-claim:hover { border-color: var(--accent); }
+.ux-head .scope-select { margin-left: auto; flex: none; max-width: 240px; }
 
-.bd-shell {
+/* Rail, then the work. Boards adds a detail panel; Platforms does not, because
+   its cards *are* the detail and a panel repeating one of them would be a
+   second copy of something already on screen. */
+.ux-shell {
   display: grid;
-  grid-template-columns: 250px minmax(0, 1fr) 340px;
+  grid-template-columns: 250px minmax(0, 1fr);
   min-height: 0;
 }
+.ux-shell.has-detail { grid-template-columns: 250px minmax(0, 1fr) 340px; }
 
 /* ── the rail ───────────────────────────────────────────────────────
    The worklist, and it is a worklist rather than a table of contents: the
    folders are three rows and the other two groups are the boards and platforms
    that nothing has claimed yet. */
-.bd-rail,
+.ux-rail,
 .bd-detail {
   display: flex;
   flex-direction: column;
   min-height: 0;
   background: var(--panel);
 }
-.bd-rail { border-right: 1px solid var(--line); }
+.ux-rail { border-right: 1px solid var(--line); }
 .bd-detail { border-left: 1px solid var(--line); overflow-y: auto; padding: 14px 16px 28px; }
 
-.bd-tabs {
+.ux-tabs {
   display: flex;
   flex: none;
   border-bottom: 1px solid var(--line);
 }
-.bd-tabs button {
+.ux-tabs button {
   flex: 1;
   padding: 8px 4px;
   border: 0;
@@ -90,19 +95,19 @@
   font: 600 11.5px/1.4 inherit;
   cursor: pointer;
 }
-.bd-tabs button:hover { color: var(--text-dim); }
-.bd-tabs button.is-on { color: var(--text); border-bottom-color: var(--accent); }
+.ux-tabs button:hover { color: var(--text-dim); }
+.ux-tabs button.is-on { color: var(--text); border-bottom-color: var(--accent); }
 
-.bd-rail-find {
+.ux-rail-find {
   display: flex;
   align-items: center;
   gap: 8px;
   padding: 8px 10px;
   flex: none;
 }
-.bd-rail-count { flex: none; font-family: var(--mono); font-size: 10.5px; color: var(--text-faint); }
+.ux-rail-count { flex: none; font-family: var(--mono); font-size: 10.5px; color: var(--text-faint); }
 
-.bd-input {
+.ux-input {
   width: 100%;
   min-width: 0;
   padding: 5px 8px;
@@ -112,13 +117,13 @@
   color: var(--text);
   font: 12px/1.4 inherit;
 }
-.bd-input:focus { outline: none; border-color: var(--accent); }
-.bd-input::placeholder { color: var(--text-faint); }
+.ux-input:focus { outline: none; border-color: var(--accent); }
+.ux-input::placeholder { color: var(--text-faint); }
 
 /* The backlog, said once and in one place. It is a button as well as a
    statement — the number is the reason somebody opened this layer, so pressing
    it should go to the rows it counts. */
-.bd-callout {
+.ux-callout {
   margin: 0 10px 10px;
   padding: 10px 12px;
   border: 1px solid var(--warm-line);
@@ -131,27 +136,27 @@
   cursor: pointer;
   flex: none;
 }
-.bd-callout:hover { border-color: var(--warning); }
-.bd-callout p { margin: 0; }
-.bd-callout-lead {
+.ux-callout:hover { border-color: var(--warning); }
+.ux-callout p { margin: 0; }
+.ux-callout-lead {
   font-size: 21px;
   font-weight: 800;
   letter-spacing: -0.02em;
   line-height: 1.1;
   color: var(--warning);
 }
-.bd-callout.is-clear {
+.ux-callout.is-clear {
   border-color: var(--accent-line);
   border-left-color: var(--accent);
   background: var(--accent-soft);
   color: var(--accent-text);
   cursor: default;
 }
-.bd-callout.is-clear .bd-callout-lead { font-size: 13px; color: var(--accent-text); }
+.ux-callout.is-clear .ux-callout-lead { font-size: 13px; color: var(--accent-text); }
 
-.bd-tree { flex: 1; min-height: 0; overflow-y: auto; padding: 0 6px 20px; }
+.ux-tree { flex: 1; min-height: 0; overflow-y: auto; padding: 0 6px 20px; }
 
-.bd-group {
+.ux-group {
   display: flex;
   align-items: center;
   gap: 6px;
@@ -163,13 +168,13 @@
   text-transform: uppercase;
   color: var(--text-faint);
 }
-.bd-group-caret { font-size: 9px; color: var(--accent); }
-.bd-group-count { margin-left: auto; font-family: var(--mono); font-weight: 500; letter-spacing: 0; }
+.ux-group-caret { font-size: 9px; color: var(--accent); }
+.ux-group-count { margin-left: auto; font-family: var(--mono); font-weight: 500; letter-spacing: 0; }
 
 /* One row, one line. A board called `P07 Staff Scanner (old)` wrapping onto a
    second line turns the rail into a ragged column where nothing lines up, and
    the full name is in the tooltip. */
-.bd-row {
+.ux-row {
   display: flex;
   align-items: baseline;
   gap: 7px;
@@ -183,32 +188,63 @@
   text-align: left;
   cursor: pointer;
 }
-.bd-row:hover { background: var(--bg-hover); color: var(--text); }
-.bd-row.is-on { background: var(--accent-soft); color: var(--accent-text); }
-.bd-row-code {
+.ux-row:hover { background: var(--bg-hover); color: var(--text); }
+.ux-row.is-on { background: var(--accent-soft); color: var(--accent-text); }
+.ux-row-code {
   flex: none;
   font-family: var(--mono);
   font-size: 9.5px;
   color: var(--text-faint);
 }
-.bd-row.is-on .bd-row-code { color: var(--accent-text); }
-.bd-row-label {
+.ux-row.is-on .ux-row-code { color: var(--accent-text); }
+.ux-row-label {
   min-width: 0;
   flex: 1;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
-.bd-row-count {
+.ux-row-count {
   flex: none;
   font-family: var(--mono);
   font-size: 10.5px;
   color: var(--text-faint);
 }
-.bd-row.is-on .bd-row-count { color: var(--accent-text); }
+.ux-row.is-on .ux-row-count { color: var(--accent-text); }
+/* A count that is a backlog rather than a size. Platforms uses it for gaps;
+   the selected row still wins, because a selected amber row on an amber tint
+   is unreadable. */
+.ux-row-count.is-warn { color: var(--warning); font-weight: 600; }
+.ux-row.is-on .ux-row-count.is-warn { color: var(--accent-text); }
+
+/* The two-line row.
+   A journey is `F48` and "A guest finds it, queues for it, and eats" and "6
+   steps", and the middle one is a sentence. Ellipsising all three onto one line
+   throws away the only part worth reading, so where the content is a code, a
+   name and a measurement the row gets a second line — the same row, taller. */
+.ux-row.is-tall {
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr);
+  grid-template-areas: 'code label' 'code meta';
+  gap: 1px 8px;
+  padding: 7px 8px;
+  color: var(--text);
+}
+.ux-row.is-tall .ux-row-code { grid-area: code; align-self: center; }
+.ux-row.is-tall .ux-row-label { grid-area: label; font-size: 12.5px; line-height: 1.35; }
+.ux-row.is-tall.is-on .ux-row-label { font-weight: 600; }
+.ux-row-meta {
+  grid-area: meta;
+  font-size: 11px;
+  color: var(--text-faint);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.ux-row.is-on .ux-row-meta { color: var(--accent-text); }
 
 /* ── the middle ─────────────────────────────────────────────────── */
-.bd-main { display: flex; flex-direction: column; min-width: 0; min-height: 0; }
+.ux-main { display: flex; flex-direction: column; min-width: 0; min-height: 0; }
 
 .bd-bar {
   display: flex;
@@ -231,7 +267,19 @@
   white-space: nowrap;
 }
 
-.bd-scroll { flex: 1; min-height: 0; overflow-y: auto; padding: 14px 14px 40px; }
+.ux-scroll { flex: 1; min-height: 0; overflow-y: auto; padding: 14px 14px 40px; }
+
+/* The sentence a page opens with. Not a hero: it is read once and then
+   scrolled past for the rest of the session, so it is set as a note rather
+   than as a headline. */
+.ux-preamble {
+  margin: 0 0 16px;
+  max-width: 84ch;
+  font-size: 12.5px;
+  line-height: 1.65;
+  color: var(--text-faint);
+}
+.ux-preamble strong { color: var(--text-dim); font-weight: 600; }
 
 /* ── the figures ────────────────────────────────────────────────── */
 .bd-figures {
@@ -482,7 +530,7 @@ a.bd-anchor:hover { color: var(--accent); text-decoration: underline; }
 }
 .bd-linkish:hover { color: var(--accent); text-decoration: underline; }
 
-.bd-none { margin: 16px 2px; font-size: 12px; color: var(--text-faint); }
+.ux-none { margin: 16px 2px; font-size: 12px; color: var(--text-faint); }
 
 /* ── the panel on the right ─────────────────────────────────────── */
 .bd-pills { display: flex; flex-wrap: wrap; gap: 6px; }
@@ -718,13 +766,16 @@ a.bd-anchor:hover { color: var(--accent); text-decoration: underline; }
    570px of navigation in front of the thing being navigated, two of them
    answering a question this view answers itself. */
 body[data-mode="uiux-boards"] #sidebar-left,
-body[data-mode="uiux-boards"] #sidebar-right {
+body[data-mode="uiux-boards"] #sidebar-right,
+body[data-mode="uiux-platforms"] #sidebar-left,
+body[data-mode="uiux-platforms"] #sidebar-right {
   display: none;
 }
 /* The columns go with them. `.app` is a three-column grid with named areas, so
    hiding the two asides on their own leaves their tracks behind, holding
    nothing. */
-body[data-mode="uiux-boards"] .app {
+body[data-mode="uiux-boards"] .app,
+body[data-mode="uiux-platforms"] .app {
   grid-template-columns: minmax(0, 1fr);
   grid-template-areas:
     "top"
@@ -737,6 +788,6 @@ body[data-mode="uiux-boards"] .app {
    much. The detail panel is the one that folds: it is a second view of
    something already on the page. */
 @media (max-width: 1500px) {
-  .bd-shell { grid-template-columns: 220px minmax(0, 1fr) 300px; }
+  .ux-shell { grid-template-columns: 220px minmax(0, 1fr) 300px; }
   .bd-map { grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); }
 }

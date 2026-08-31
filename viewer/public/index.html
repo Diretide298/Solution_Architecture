@@ -786,30 +786,36 @@
                the stage and the detail panel stack down the middle of the view. -->
           <div class="canvas-main">
 
-              <aside class="canvas-rail" id="rail">
-                <div class="canvas-rail-head">
-                  <input id="rail-filter" class="auth-input canvas-search" type="text"
+              <!-- The layer's rail, the same one Boards and Platforms use. The
+                   structure is this view's own — see the note on the platform list
+                   below — but the tabs, the filter, the group headings and the rows
+                   are the shared components, so moving between the three views does
+                   not change what kind of place this is. -->
+              <aside class="canvas-rail ux-rail" id="rail">
+                <div class="ux-rail-find">
+                  <input id="rail-filter" class="ux-input" type="search"
                          placeholder="Find a screen or a journey…" />
+                  <span class="ux-rail-count" id="rail-count"></span>
                 </div>
 
                 <!-- The platform is the first question and the canvas holds one at a
                      time, so the list of them is the first thing in the rail and it
-                     stays put when one is picked. Everything under it is scoped to the
-                     pick: the journeys are the ones that touch this platform, the
-                     screens are the ones on it. -->
+                     stays put when one is picked. That is why this is not a tab like
+                     Boards' three: everything under it is scoped to the pick, and a
+                     scope you cannot see is a scope you forget you set. -->
                 <div class="canvas-rail-platforms">
-                  <h2 class="canvas-rail-title">Platforms <span id="count-platforms"></span></h2>
-                  <div class="canvas-rail-list" id="rail-platforms"></div>
+                  <h2 class="ux-group"><span class="ux-group-caret">▾</span>Platforms<span class="ux-group-count" id="count-platforms"></span></h2>
+                  <div class="ux-tree canvas-rail-list" id="rail-platforms"></div>
                 </div>
 
-                <div class="canvas-rail-tabs" role="tablist">
-                  <button class="canvas-tab is-on" id="tab-journeys" role="tab" aria-selected="true">Journeys <span id="count-journeys"></span></button>
-                  <button class="canvas-tab" id="tab-screens" role="tab" aria-selected="false">Screens <span id="count-screens"></span></button>
+                <div class="ux-tabs" role="tablist">
+                  <button type="button" class="is-on" id="tab-journeys" role="tab" aria-selected="true">Journeys <span id="count-journeys"></span></button>
+                  <button type="button" id="tab-screens" role="tab" aria-selected="false">Screens <span id="count-screens"></span></button>
                 </div>
                 <p class="canvas-rail-scope" id="rail-scope"></p>
 
-                <div class="canvas-rail-body" id="rail-journeys"></div>
-                <div class="canvas-rail-body" id="rail-screens" hidden></div>
+                <div class="ux-tree canvas-rail-body" id="rail-journeys"></div>
+                <div class="ux-tree canvas-rail-body" id="rail-screens" hidden></div>
               </aside>
 
               <section class="canvas-stage">
@@ -878,31 +884,31 @@
             Three columns, then. What to look at down the left, what is drawn
             across the middle, and the one board you picked down the right.
           -->
-          <div class="bd">
-            <div class="bd-head">
-              <p class="bd-lead" id="lead">Loading…</p>
+          <div class="ux-page">
+            <div class="ux-head">
+              <p class="ux-lead" id="lead">Loading…</p>
               <button type="button" class="bd-claim" id="bd-claim">The claim list</button>
             </div>
 
-            <div class="bd-shell">
+            <div class="ux-shell has-detail">
               <!-- ── what to look at ───────────────────────────────── -->
-              <aside class="bd-rail">
-                <div class="bd-tabs" id="bd-tabs" role="tablist">
+              <aside class="ux-rail">
+                <div class="ux-tabs" id="bd-tabs" role="tablist">
                   <button type="button" class="is-on" data-rail="folders">Folders</button>
                   <button type="button" data-rail="platforms">Platforms</button>
                   <button type="button" data-rail="kinds">Kinds</button>
                 </div>
-                <div class="bd-rail-find">
-                  <input id="bd-rail-filter" class="bd-input" type="search"
+                <div class="ux-rail-find">
+                  <input id="bd-rail-filter" class="ux-input" type="search"
                          placeholder="Filter…" aria-label="Filter the list on the left" />
-                  <span class="bd-rail-count" id="bd-rail-count"></span>
+                  <span class="ux-rail-count" id="bd-rail-count"></span>
                 </div>
-                <div class="bd-callout" id="bd-callout"></div>
-                <nav class="bd-tree" id="bd-tree" aria-label="Boards, by folder"></nav>
+                <div class="ux-callout" id="bd-callout"></div>
+                <nav class="ux-tree" id="bd-tree" aria-label="Boards, by folder"></nav>
               </aside>
 
               <!-- ── what is drawn ─────────────────────────────────── -->
-              <div class="bd-main">
+              <div class="ux-main">
                 <div class="bd-bar">
                   <div class="seg bd-seg" id="bd-seg">
                     <button type="button" class="on" data-view="map">Map</button>
@@ -921,12 +927,12 @@
                   <label class="bd-check">
                     <input type="checkbox" id="bd-unclaimed" /> unclaimed only
                   </label>
-                  <input id="filter" class="bd-input bd-find" type="search"
+                  <input id="filter" class="ux-input bd-find" type="search"
                          placeholder="Filter by board, platform, screen or frame…"
                          aria-label="Filter the boards" />
                 </div>
 
-                <div class="bd-scroll" id="bd-scroll">
+                <div class="ux-scroll" id="bd-scroll">
                   <div class="bd-figures" id="bd-figures"></div>
                   <div class="bd-legend" id="bd-legend"></div>
                   <div id="bd-body"></div>
@@ -939,37 +945,50 @@
           </div>
         </section>
         <section class="view uiux-view sheet" id="view-uiux-platforms" hidden>
-          <!-- the same column, for the platform gaps -->
-          <div class="admin-main domains-main">
-            <section class="admin-panel">
-              <h1 class="auth-title">The platforms, and what each is missing</h1>
-              <p class="auth-note" id="plat-lead">Loading…</p>
+          <!-- The same shell Boards uses, and the same rail. This was a reading
+               column with a filter and a sort above it, which meant the only way
+               to reach P13 was to scroll past twelve other platforms — on a page
+               whose entire subject is which platform you are looking at. -->
+          <div class="ux-page">
+            <div class="ux-head">
+              <p class="ux-lead" id="plat-lead">Loading…</p>
+              <select id="plat-sort" class="scope-select" aria-label="How to order the platforms">
+                <option value="gaps">most gaps first</option>
+                <option value="code">in platform order</option>
+                <option value="size">largest first</option>
+                <option value="undrawn">most undrawn first</option>
+              </select>
+            </div>
 
-              <p class="auth-note auth-fine">
-                A page listing what exists is a directory; one listing what is missing
-                is a worklist. Every gap below is <strong>derived</strong> — closure
-                over the lineage, the flows and the boards — so nothing here depends on
-                somebody having remembered to write it down. What no checker can derive
-                is whether a gap is a missing page or an endpoint nobody needs, and
-                that is what a verdict on a platform records.
-              </p>
+            <div class="ux-shell">
+              <aside class="ux-rail">
+                <div class="ux-tabs" id="plat-tabs" role="tablist">
+                  <button type="button" class="is-on" data-rail="platforms">Platforms</button>
+                  <button type="button" data-rail="gaps">Gaps</button>
+                </div>
+                <div class="ux-rail-find">
+                  <input id="plat-filter" class="ux-input" type="search"
+                         placeholder="Filter…" aria-label="Filter the platforms" />
+                  <span class="ux-rail-count" id="plat-count"></span>
+                </div>
+                <div class="ux-callout" id="plat-callout"></div>
+                <nav class="ux-tree" id="plat-tree" aria-label="Platforms"></nav>
+              </aside>
 
-              <div class="invite-row">
-                <input id="plat-filter" class="auth-input" type="text"
-                       placeholder="Filter by platform, app, module or screen…" />
-                <select id="plat-sort" class="scope-select">
-                  <option value="gaps">most gaps first</option>
-                  <option value="code">in platform order</option>
-                  <option value="size">largest first</option>
-                  <option value="undrawn">most undrawn first</option>
-                </select>
+              <div class="ux-main">
+                <div class="ux-scroll" id="plat-scroll">
+                  <p class="ux-preamble">
+                    A page listing what exists is a directory; one listing what is missing
+                    is a worklist. Every gap below is <strong>derived</strong> — closure
+                    over the lineage, the flows and the boards — so nothing here depends on
+                    somebody having remembered to write it down. What no checker can derive
+                    is whether a gap is a missing page or an endpoint nobody needs, and
+                    that is what a verdict on a platform records.
+                  </p>
+                  <div id="platforms"></div>
+                </div>
               </div>
-            </section>
-
-            <section class="admin-panel">
-              <div id="platforms"></div>
-            </section>
-
+            </div>
           </div>
         </section>
 

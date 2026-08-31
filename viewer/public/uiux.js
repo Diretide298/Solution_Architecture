@@ -176,21 +176,21 @@ function platformsWithNoPack() {
 }
 
 function railRow({ label, code, count, active, on, title }) {
-  const row = el('button', `bd-row${active ? ' is-on' : ''}`);
+  const row = el('button', `ux-row${active ? ' is-on' : ''}`);
   row.type = 'button';
-  if (code) row.append(el('span', 'bd-row-code', code));
-  row.append(el('span', 'bd-row-label', label));
-  if (count != null) row.append(el('span', 'bd-row-count', String(count)));
+  if (code) row.append(el('span', 'ux-row-code', code));
+  row.append(el('span', 'ux-row-label', label));
+  if (count != null) row.append(el('span', 'ux-row-count', String(count)));
   if (title) row.title = title;
   row.onclick = on;
   return row;
 }
 
 function railGroup(label, count) {
-  const head = el('div', 'bd-group');
-  head.append(el('span', 'bd-group-caret', '▾'));
+  const head = el('div', 'ux-group');
+  head.append(el('span', 'ux-group-caret', '▾'));
   head.append(el('span', null, label));
-  if (count != null) head.append(el('span', 'bd-group-count', String(count)));
+  if (count != null) head.append(el('span', 'ux-group-count', String(count)));
   return head;
 }
 
@@ -314,7 +314,7 @@ function drawTree() {
     }));
   }
 
-  if (!rows) tree.append(el('p', 'bd-none', 'Nothing in the rail matches that.'));
+  if (!rows) tree.append(el('p', 'ux-none', 'Nothing in the rail matches that.'));
   $('bd-rail-count').textContent = String(rows);
 }
 
@@ -598,7 +598,7 @@ function framesTable(shown) {
   }
   const wrap = el('div', 'bd-frames');
   if (!rows.length) {
-    wrap.append(el('p', 'bd-none', 'No frame matches that.'));
+    wrap.append(el('p', 'ux-none', 'No frame matches that.'));
     return wrap;
   }
 
@@ -642,7 +642,7 @@ function framesTable(shown) {
   wrap.append(table);
 
   if (rows.length > ROW_CAP) {
-    wrap.append(el('p', 'bd-none',
+    wrap.append(el('p', 'ux-none',
       `${rows.length} frames match. The first ${ROW_CAP} are drawn — narrow it with the filter or the rail.`));
   }
   return wrap;
@@ -654,7 +654,7 @@ function drawBody() {
   const shown = shownBoards();
 
   if (!shown.length) {
-    body.append(el('p', 'bd-none', 'No board matches that.'));
+    body.append(el('p', 'ux-none', 'No board matches that.'));
     return;
   }
 
@@ -854,11 +854,11 @@ function drawCallout() {
   box.textContent = '';
   if (!unclaimed) {
     box.classList.add('is-clear');
-    box.append(el('p', 'bd-callout-lead', 'Every frame is claimed'));
+    box.append(el('p', 'ux-callout-lead', 'Every frame is claimed'));
     box.append(el('p', null, 'There is no mapping backlog on this package.'));
     return;
   }
-  box.append(el('p', 'bd-callout-lead', String(unclaimed)));
+  box.append(el('p', 'ux-callout-lead', String(unclaimed)));
   box.append(el('p', null,
     `frames no screen claims, across ${plural(boards, 'board')}. `
     + 'That is the mapping job, and it is the whole reason this layer has a worklist.'));

@@ -95,6 +95,8 @@ const state = {
   open: new Set(),    // which cards are expanded
   sort: 'gaps',
   filter: '',
+  rail: 'platforms',              // which tree the rail is showing
+  sel: { type: 'all', value: null },
 };
 
 /**
@@ -155,6 +157,18 @@ function matches(p) {
   return [p.code, p.name, p.shortName, p.app, p.audience, p.formFactor]
     .filter(Boolean)
     .some((v) => String(v).toLowerCase().includes(needle));
+}
+
+/** How many of a given gap kind a platform has. */
+const gapsOf = (p, key) => (p.gaps?.[key] ?? []).length;
+
+/** The rail's selection, as a predicate over the platforms. */
+function inSelection(p) {
+  const { type, value } = state.sel;
+  if (type === 'platform') return p.code === value;
+  if (type === 'gap') return gapsOf(p, value) > 0;
+  if (type === 'clean') return p.gapTotal === 0;
+  return true;
 }
 
 /** One `label · value` fact, as the head's third and fourth columns want it. */
@@ -299,11 +313,138 @@ function renderCard(p) {
   return card;
 }
 
+// ── the rail ─────────────────────────────────────────────────────────
+// The same components Boards and Screens & flows use. What differs is what is
+// in it: this page is about which platform you are looking at, so the platforms
+// are the tree, and the four gap kinds are the second way in — "show me every
+// platform with a flow naming a screen that does not exist" is a question the
+// sort control could not ask.
+
+function railRow({ label, code, count, active, on, title, tone }) {
+  const row = el('button', `ux-row${active ? ' is-on' : ''}`);
+  row.type = 'button';
+  if (code) row.append(el('span', 'ux-row-code', code));
+  row.append(el('span', 'ux-row-label', label));
+  if (count != null) {
+    row.append(el('span', `ux-row-count${tone ? ' is-' + tone : ''}`, String(count)));
+  }
+  if (title) row.title = title;
+  row.onclick = on;
+  return row;
+}
+
+function railGroup(label, count) {
+  const head = el('div', 'ux-group');
+  head.append(el('span', 'ux-group-caret', '\u25be'));
+  head.append(el('span', null, label));
+  if (count != null) head.append(el('span', 'ux-group-count', String(count)));
+  return head;
+}
+
+function pickSel(type, value) {
+  const same = state.sel.type === type && state.sel.value === value;
+  state.sel = same ? { type: 'all', value: null } : { type, value };
+  drawTree();
+  draw();
+  $('plat-scroll').scrollTop = 0;
+}
+
+function drawTree() {
+  const tree = $('plat-tree');
+  const needle = state.filter.trim().toLowerCase();
+  const hit = (s) => !needle || String(s).toLowerCase().includes(needle);
+  tree.textContent = '';
+  let rows = 0;
+  const add = (node) => { tree.append(node); rows += 1; };
+
+  if (state.rail === 'platforms') {
+    // Worst first, which is the order the page defends everywhere else: a
+    // directory is alphabetical, a worklist is not.
+    const withGaps = state.platforms.filter((p) => p.gapTotal > 0 && matches(p))
+      .sort((a, b) => b.gapTotal - a.gapTotal || a.code.localeCompare(b.code));
+    const clean = state.platforms.filter((p) => p.gapTotal === 0 && matches(p))
+      .sort((a, b) => a.code.localeCompare(b.code));
+
+    if (withGaps.length) {
+      tree.append(railGroup('With gaps', state.stats?.withGaps ?? withGaps.length));
+      for (const p of withGaps) {
+        add(railRow({
+          code: p.code,
+          label: p.shortName || p.name || p.code,
+          count: p.gapTotal,
+          tone: 'warn',
+          active: state.sel.type === 'platform' && state.sel.value === p.code,
+          title: `${p.gapTotal} gap${p.gapTotal === 1 ? '' : 's'} on ${p.code}`,
+          on: () => pickSel('platform', p.code),
+        }));
+      }
+    }
+    if (clean.length) {
+      tree.append(railGroup('Clean', state.stats?.clean ?? clean.length));
+      for (const p of clean) {
+        add(railRow({
+          code: p.code,
+          label: p.shortName || p.name || p.code,
+          active: state.sel.type === 'platform' && state.sel.value === p.code,
+          title: `nothing derived is missing on ${p.code}`,
+          on: () => pickSel('platform', p.code),
+        }));
+      }
+    }
+  }
+
+  if (state.rail === 'gaps') {
+    tree.append(railGroup('Kinds of gap', GAP_KINDS.length));
+    for (const [key, , label, hint] of GAP_KINDS) {
+      if (!hit(label)) continue;
+      const total = state.platforms.reduce((n, p) => n + gapsOf(p, key), 0);
+      const on = state.platforms.filter((p) => gapsOf(p, key) > 0).length;
+      add(railRow({
+        label,
+        count: total,
+        tone: total ? 'warn' : null,
+        active: state.sel.type === 'gap' && state.sel.value === key,
+        title: `${hint} — on ${on} platform${on === 1 ? '' : 's'}`,
+        on: () => pickSel('gap', key),
+      }));
+    }
+    tree.append(railGroup('State', 1));
+    add(railRow({
+      label: 'nothing missing',
+      count: state.stats?.clean ?? 0,
+      active: state.sel.type === 'clean',
+      on: () => pickSel('clean', null),
+    }));
+  }
+
+  if (!rows) tree.append(el('p', 'ux-none', 'Nothing in the rail matches that.'));
+  $('plat-count').textContent = String(rows);
+}
+
+function drawCallout() {
+  const s = state.stats;
+  const box = $('plat-callout');
+  box.textContent = '';
+  if (!s) return;
+  if (!s.gaps) {
+    box.classList.add('is-clear');
+    box.append(el('p', 'ux-callout-lead', 'No gaps'));
+    box.append(el('p', null, 'Nothing derived is missing on any platform.'));
+    return;
+  }
+  box.append(el('p', 'ux-callout-lead', String(s.gaps)));
+  box.append(el('p', null,
+    `derived gaps across ${s.withGaps} of the ${s.platforms} platforms, `
+    + `${s.clean} of them clean. Every one is closure over the lineage, the flows `
+    + 'and the boards rather than something somebody wrote down.'));
+}
+
 function draw() {
   const box = $('platforms');
   box.textContent = '';
 
-  const rows = state.platforms.filter(matches).sort(SORTS[state.sort] ?? SORTS.gaps);
+  const rows = state.platforms.filter(inSelection).filter(matches)
+    .sort(SORTS[state.sort] ?? SORTS.gaps);
 
   if (!state.platforms.length) {
     box.append(el('p', 'plat-none',
@@ -312,7 +453,9 @@ function draw() {
     return;
   }
   if (!rows.length) {
-    box.append(el('p', 'plat-none', `Nothing matches “${state.filter}”.`));
+    box.append(el('p', 'plat-none', state.filter
+      ? `Nothing matches “${state.filter}”.`
+      : 'Nothing on the left matches that.'));
     return;
   }
 
@@ -363,9 +506,18 @@ function renderLead() {
   }
 
   renderLead();
+  drawCallout();
+  drawTree();
   draw();
   hideLoader();
 
-  $('plat-filter').oninput = (e) => { state.filter = e.target.value; draw(); };
+  $('plat-tabs').onclick = (e) => {
+    const b = e.target.closest('button[data-rail]');
+    if (!b) return;
+    state.rail = b.dataset.rail;
+    for (const t of $('plat-tabs').querySelectorAll('button')) t.classList.toggle('is-on', t === b);
+    drawTree();
+  };
+  $('plat-filter').oninput = (e) => { state.filter = e.target.value; drawTree(); draw(); };
   $('plat-sort').onchange = (e) => { state.sort = e.target.value; draw(); };
 })();

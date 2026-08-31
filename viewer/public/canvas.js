@@ -1116,12 +1116,12 @@ function drawRail() {
   const pbox = $('rail-platforms');
   pbox.replaceChildren();
   for (const p of state.platforms) {
-    const row = el('button', 'cv-row');
+    const row = el('button', 'ux-row is-tall cv-row');
     row.type = 'button';
     row.dataset.id = p.id;
-    row.append(el('span', 'cv-row-id', p.id));
-    row.append(el('span', 'cv-row-name', p.name));
-    row.append(el('span', 'cv-row-meta',
+    row.append(el('span', 'ux-row-code', p.id));
+    row.append(el('span', 'ux-row-label', p.name));
+    row.append(el('span', 'ux-row-meta',
       `${p.screens} screen${p.screens === 1 ? '' : 's'} · ${p.journeys} journey${p.journeys === 1 ? '' : 's'}`));
     row.classList.toggle('is-on', p.id === state.platform);
     row.onclick = () => setPlatform(p.id);
@@ -1136,29 +1136,29 @@ function drawRail() {
   jbox.replaceChildren();
   const flows = journeysOn(state.platform);
   for (const { flow, steps, on } of flows) {
-    const row = el('button', 'cv-row');
+    const row = el('button', 'ux-row is-tall cv-row');
     row.type = 'button';
     row.dataset.id = flow.id;
-    row.append(el('span', 'cv-row-id', flow.id));
-    row.append(el('span', 'cv-row-name', flow.name ?? ''));
-    row.append(el('span', 'cv-row-meta',
+    row.append(el('span', 'ux-row-code', flow.id));
+    row.append(el('span', 'ux-row-label', flow.name ?? ''));
+    row.append(el('span', 'ux-row-meta',
       on === steps ? `${steps} steps` : `${on} of ${steps} steps here`));
     row.classList.toggle('is-on', flow.id === state.journey);
     row.onclick = () => pickJourney(flow.id);
     jbox.append(row);
   }
   $('count-journeys').textContent = String(flows.length);
-  if (!flows.length) jbox.append(el('p', 'cv-rail-empty', 'No journey passes through this platform.'));
+  if (!flows.length) jbox.append(el('p', 'ux-none', 'No journey passes through this platform.'));
 
   const sbox = $('rail-screens');
   sbox.replaceChildren();
   for (const s of screensOn(state.platform)) {
-    const row = el('button', 'cv-row');
+    const row = el('button', 'ux-row is-tall cv-row');
     row.type = 'button';
     row.dataset.id = s.id;
-    row.append(el('span', 'cv-row-id', s.id));
-    row.append(el('span', 'cv-row-name', s.name ?? ''));
-    row.append(el('span', 'cv-row-meta', `wave ${s.wave ?? '—'} · ${s.module ?? ''}`));
+    row.append(el('span', 'ux-row-code', s.id));
+    row.append(el('span', 'ux-row-label', s.name ?? ''));
+    row.append(el('span', 'ux-row-meta', `wave ${s.wave ?? '—'} · ${s.module ?? ''}`));
     row.onclick = () => { select(s.id); centreOn(s.id); };
     sbox.append(row);
   }
@@ -1183,7 +1183,7 @@ function wireRail() {
     { box: $('rail-platforms'), rows: '.cv-row' },
     { box: $('rail-journeys'), rows: '.cv-row' },
     { box: $('rail-screens'), rows: '.cv-row' },
-  ], { onEmpty: 'Nothing here matches that.' });
+  ], { onEmpty: 'Nothing here matches that.', count: $('rail-count') });
 }
 
 // ── boot ─────────────────────────────────────────────────────────────

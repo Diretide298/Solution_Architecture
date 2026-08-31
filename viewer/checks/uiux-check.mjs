@@ -239,7 +239,7 @@ check('the loading curtain lifts', curtain);
 // if the rail drops one it is unreachable again and the page has quietly
 // reverted to being the thing it replaced.
 const railed = await page.evaluate(
-  () => [...document.querySelectorAll('.bd-tree .bd-row-label')].map((n) => n.textContent)
+  () => [...document.querySelectorAll('.ux-tree .ux-row-label')].map((n) => n.textContent)
 );
 const orphans = payload.boards.filter((b) => !b.wired).map((b) => b.name);
 const droppedFromRail = orphans.filter((n) => !railed.includes(n));
@@ -251,8 +251,8 @@ const firstOrphan = payload.boards.filter((b) => !b.wired)
   .sort((a, b) => b.frameCount - a.frameCount || a.name.localeCompare(b.name))[0];
 if (firstOrphan) {
   await page.evaluate((name) => {
-    const row = [...document.querySelectorAll('.bd-tree .bd-row')]
-      .find((r) => r.querySelector('.bd-row-label')?.textContent === name);
+    const row = [...document.querySelectorAll('.ux-tree .ux-row')]
+      .find((r) => r.querySelector('.ux-row-label')?.textContent === name);
     row?.click();
   }, firstOrphan.name);
   await wait(600);
@@ -269,8 +269,8 @@ if (firstOrphan) {
     `${picked.frames} rows, ${firstOrphan.frameCount} frames`);
   // Back to everything: clicking the selected row again clears it.
   await page.evaluate((name) => {
-    const row = [...document.querySelectorAll('.bd-tree .bd-row')]
-      .find((r) => r.querySelector('.bd-row-label')?.textContent === name);
+    const row = [...document.querySelectorAll('.ux-tree .ux-row')]
+      .find((r) => r.querySelector('.ux-row-label')?.textContent === name);
     row?.click();
   }, firstOrphan.name);
   await wait(500);
@@ -279,12 +279,12 @@ if (firstOrphan) {
 // The Kinds rail replaces what used to be a `<select>`. Same job, and it is now
 // the only way to reach it, so it is the thing worth driving.
 await page.evaluate(() => {
-  document.querySelector('.bd-tabs button[data-rail="kinds"]')?.click();
+  document.querySelector('.ux-tabs button[data-rail="kinds"]')?.click();
 });
 await wait(400);
 await page.evaluate(() => {
-  const row = [...document.querySelectorAll('.bd-tree .bd-row')]
-    .find((r) => r.querySelector('.bd-row-label')?.textContent === 'drawn by hand');
+  const row = [...document.querySelectorAll('.ux-tree .ux-row')]
+    .find((r) => r.querySelector('.ux-row-label')?.textContent === 'drawn by hand');
   row?.click();
 });
 await wait(600);
@@ -295,10 +295,10 @@ check('the kinds rail picks out the hand-drawn packs', packs === packCount,
 
 // Clear it, and go back to the folders rail.
 await page.evaluate(() => {
-  const row = [...document.querySelectorAll('.bd-tree .bd-row')]
-    .find((r) => r.querySelector('.bd-row-label')?.textContent === 'drawn by hand');
+  const row = [...document.querySelectorAll('.ux-tree .ux-row')]
+    .find((r) => r.querySelector('.ux-row-label')?.textContent === 'drawn by hand');
   row?.click();
-  document.querySelector('.bd-tabs button[data-rail="folders"]')?.click();
+  document.querySelector('.ux-tabs button[data-rail="folders"]')?.click();
 });
 await wait(500);
 
@@ -372,6 +372,39 @@ const unclaimed = S.frames - S.framesClaimed;
 check('"the claim list" shows the unclaimed frames and nothing else',
   claimRows === Math.min(unclaimed, ROW_CAP),
   `${claimRows} rows, ${unclaimed} unclaimed (cap ${ROW_CAP})`);
+
+// ── one rail, three views ────────────────────────────────────────────
+// The layer's three views were three different places: a canvas with its own
+// rail, a board list with a filter box, and a platform page that was a reading
+// column with no navigation at all — so on Platforms the only way to reach P13
+// was to scroll past twelve other platforms, on a page whose whole subject is
+// which platform you are looking at.
+//
+// They share `.ux-rail` now, and the assertion is that all three still do. A
+// shared component that two of three views use is not a shared component; it is
+// a copy waiting to drift.
+for (const [mode, waitFor] of [
+  ['uiux-screens', '.cv-row'],
+  ['uiux-boards', '.bd-tile'],
+  ['uiux-platforms', '.plat-card'],
+]) {
+  await page.goto(`${BASE}/?layer=uiux&mode=${mode}`, { waitUntil: 'domcontentloaded' });
+  await page.waitForSelector(waitFor, { timeout: 30000 }).catch(() => {});
+  await wait(2200);
+  const rail = await page.evaluate(() => {
+    const view = document.querySelector('.view:not([hidden]) .ux-rail');
+    return {
+      present: Boolean(view),
+      tabs: view ? view.querySelectorAll('.ux-tabs button').length : 0,
+      groups: view ? view.querySelectorAll('.ux-group').length : 0,
+      rows: view ? view.querySelectorAll('.ux-row').length : 0,
+      find: view ? Boolean(view.querySelector('.ux-rail-find .ux-input')) : false,
+    };
+  });
+  check(`${mode} carries the layer's rail`,
+    rail.present && rail.tabs >= 2 && rail.groups >= 1 && rail.rows > 0 && rail.find,
+    `rail=${rail.present} tabs=${rail.tabs} groups=${rail.groups} rows=${rail.rows} filter=${rail.find}`);
+}
 
 check('no console or page errors', errors.length === 0, errors.slice(0, 3).join(' | '));
 

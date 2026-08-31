@@ -28,33 +28,9 @@
   border-right: 1px solid var(--line, #23262b);
   background: var(--panel, #14171a);
 }
-.canvas-rail-head { padding: 12px; }
-.canvas-search { width: 100%; }
-
-.canvas-rail-tabs {
-  display: flex;
-  gap: 4px;
-  padding: 0 12px 10px;
-  border-bottom: 1px solid var(--line, #23262b);
-}
-.canvas-tab {
-  flex: 1;
-  padding: 7px 10px;
-  font: inherit;
-  font-size: 12px;
-  color: var(--text-faint, #8b949e);
-  background: transparent;
-  border: 1px solid transparent;
-  border-radius: 7px;
-  cursor: pointer;
-}
-.canvas-tab:hover { color: var(--text, #e6edf3); }
-.canvas-tab.is-on {
-  color: var(--accent-text, #0b0e11);
-  background: var(--accent, #4ac0b8);
-  border-color: var(--accent, #4ac0b8);
-}
-.canvas-tab span { opacity: .7; font-family: var(--mono); font-size: 11px; }
+/* The tabs, the filter row, the group headings and the rows are `.ux-*` in
+   uiux.css — the layer's rail components, shared with Boards and Platforms.
+   What stays here is what is this view's own: how the rail divides. */
 
 /* The platform list keeps a third of the rail and scrolls inside it, so a
    fifteen-platform package does not push the journeys off the bottom and a
@@ -64,19 +40,9 @@
   flex-direction: column;
   min-height: 0;
   max-height: 34vh;
-  border-bottom: 1px solid var(--line, #23262b);
+  border-bottom: 1px solid var(--line);
 }
-.canvas-rail-title {
-  margin: 0;
-  padding: 4px 14px 8px;
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: .07em;
-  text-transform: uppercase;
-  color: var(--text-faint, #8b949e);
-}
-.canvas-rail-title span { font-family: var(--mono); letter-spacing: 0; opacity: .7; }
-.canvas-rail-list { flex: 1; min-height: 0; overflow-y: auto; padding: 0 8px 8px; }
+.canvas-rail-list { flex: 1; min-height: 0; }
 
 /* Which platform the two lists below are about. The tabs say "Journeys" and
    "Screens"; without this they read as every journey and every screen in the
@@ -90,55 +56,10 @@
 }
 
 .canvas-rail-body { flex: 1; min-height: 0; overflow-y: auto; padding: 8px; }
-.cv-rail-empty { margin: 10px 8px; font-size: 12px; color: var(--text-faint, #8b949e); }
 
 /* An exit that leaves the sheet. Same chip, drawn as a doorway rather than a
    step, because following it swaps the platform under the reader. */
 .chip.is-away { border-style: dashed; opacity: .88; }
-
-/* A row is a code, a name and a line of numbers. The selected one is marked
-   with a bar down its left rather than a box around it: fifteen boxed rows in a
-   300px rail is a stack of cards, and only one of them is the answer. */
-.cv-row {
-  position: relative;
-  display: grid;
-  grid-template-columns: 46px minmax(0, 1fr);
-  grid-template-areas: 'id name' 'id meta';
-  gap: 1px 10px;
-  width: 100%;
-  padding: 8px 10px;
-  text-align: left;
-  font: inherit;
-  color: var(--text, #e6edf3);
-  background: transparent;
-  border: 0;
-  border-radius: 9px;
-  cursor: pointer;
-}
-.cv-row::before {
-  content: '';
-  position: absolute;
-  left: 2px; top: 8px; bottom: 8px;
-  width: 2px;
-  border-radius: 2px;
-  background: transparent;
-}
-.cv-row:hover { background: var(--panel-2, #1b1f24); }
-.cv-row.is-on { background: color-mix(in srgb, var(--accent, #4ac0b8) 13%, transparent); }
-.cv-row.is-on::before { background: var(--accent, #4ac0b8); }
-.cv-row.is-on .cv-row-name { font-weight: 600; }
-.cv-row-id {
-  grid-area: id;
-  align-self: center;
-  font-family: var(--mono); font-size: 11px; font-weight: 500;
-  color: var(--text-faint, #8b949e);
-}
-.cv-row.is-on .cv-row-id { color: var(--accent, #4ac0b8); }
-.cv-row-name {
-  grid-area: name; font-size: 12.5px; line-height: 1.35;
-  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
-}
-.cv-row-meta { grid-area: meta; font-size: 11px; color: var(--text-faint, #8b949e); }
 
 /* ── the stage ──────────────────────────────────────────────────── */
 .canvas-stage { display: flex; flex-direction: column; min-width: 0; min-height: 0; }
