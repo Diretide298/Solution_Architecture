@@ -156,37 +156,49 @@ function framesBlock(board) {
   return box;
 }
 
+/**
+ * One board.
+ *
+ * The head is **two fixed rows, and neither of them wraps**. It used to be one
+ * flex row holding the name, the revision, the kind and, on the 55 boards
+ * nothing points at, a pill reading "nothing points at this" — which pushed the
+ * pill onto a second line on most cards and a third on some, so the grid was a
+ * field of cards of different heights with badges hanging off them at random.
+ * Name on its own line, then one line of facts, ellipsised. A card's height now
+ * varies with what is *in* the board rather than with how its title happened to
+ * break.
+ */
 function card(board) {
   const box = el('article', `uiux-card${board.wired ? '' : ' is-unwired'}`);
 
-  const head = el('div', 'uiux-head');
   const open = el('a', 'uiux-name', board.name);
   open.href = auth.pkgAsset(board.url);
   open.target = '_blank';
   open.rel = 'noopener';
-  head.append(open);
-  if (board.revision) head.append(el('span', 'uiux-rev', board.revision));
-
-  const kind = KINDS[board.kind] ?? { label: board.kind, hint: '' };
-  const badge = el('span', `uiux-kind is-${board.kind}`, kind.label);
-  badge.title = kind.hint;
-  head.append(badge);
-
-  if (!board.wired) {
-    const warn = el('span', 'uiux-unwired', 'nothing points at this');
-    warn.title = 'No screen names this board, so it appears nowhere else in the viewer.';
-    head.append(warn);
-  }
-  box.append(head);
+  open.title = board.file;
+  box.append(open);
 
   if (board.title && board.title !== board.name) box.append(el('p', 'uiux-title', board.title));
 
-  const meta = el('div', 'uiux-meta');
-  if (board.platforms.length) meta.append(el('span', 'uiux-plat', board.platforms.join(' · ')));
-  meta.append(el('span', null, bytes(board.bytes)));
-  meta.append(el('span', null, day(board.modified)));
-  meta.append(el('span', 'uiux-file', board.file));
-  box.append(meta);
+  // One line, in the order a reader asks: what kind of board, who points at it,
+  // how big, how recent. `nothing points at this` is a phrase rather than a
+  // pill because a pill among pills reads as a category, and this is a state.
+  const facts = el('p', 'uiux-facts');
+  const kind = KINDS[board.kind] ?? { label: board.kind, hint: '' };
+  const kindTag = el('span', `uiux-kind is-${board.kind}`, kind.label);
+  kindTag.title = kind.hint;
+  facts.append(kindTag);
+  if (board.revision) facts.append(el('span', 'uiux-rev', board.revision));
+
+  if (board.platforms.length) {
+    facts.append(el('span', 'uiux-plat', board.platforms.join(' · ')));
+  } else if (!board.wired) {
+    const warn = el('span', 'uiux-unwired', 'nothing points at this');
+    warn.title = 'No screen names this board, so it appears nowhere else in the viewer.';
+    facts.append(warn);
+  }
+  facts.append(el('span', 'uiux-dim', `${bytes(board.bytes)} · ${day(board.modified)}`));
+  box.append(facts);
 
   if (board.screens.length) box.append(screensBlock(board));
   if (board.frameCount) box.append(framesBlock(board));

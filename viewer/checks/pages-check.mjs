@@ -48,6 +48,10 @@ const MODES = {
 // list only asserts the document loaded.
 const PAGES = [
   '/validation.html', '/reviews.html', '/admin.html', '/domains.html',
+  // The delivery audit. Admin-only, and the harness account is an admin — a
+  // reviewer gets a sentence explaining what it is instead, which is a
+  // different assertion and belongs in the client harness rather than here.
+  '/audit.html',
 ];
 
 let pass = 0, fail = 0;

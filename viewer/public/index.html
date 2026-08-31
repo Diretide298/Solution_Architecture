@@ -1049,6 +1049,11 @@
               your own password all live on one page.
             </p>
             <a class="auth-button" href="/admin.html">Manage accounts and invites</a>
+            <!-- `#account-admin` is hidden unless the session says admin, which is
+                 where this belongs: it is about how the delivery package was built
+                 rather than about what is in it, and a client opening it would
+                 learn nothing they came for. -->
+            <a class="auth-button auth-button-quiet" href="/audit.html">Audit the delivery package</a>
           </div>
 
           <button id="signout" class="auth-button auth-button-quiet" type="button">Sign out</button>

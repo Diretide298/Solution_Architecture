@@ -1,0 +1,126 @@
+/* The dump audit.
+
+   A reading page, not a dashboard. It is read once when a delivery lands and
+   then argued about, so it is set as prose with the figures pulled out — a wall
+   of tiles would make a reader hunt for the sentence that says what happened. */
+
+.au-main { max-width: 1080px; }
+
+.au-hero { padding: 6px 2px 22px; border-bottom: 1px solid var(--line); }
+.au-eyebrow {
+  margin: 0 0 8px;
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+.au-title { margin: 0; font-size: 30px; font-weight: 800; letter-spacing: -0.02em; line-height: 1.15; }
+.au-sub { margin: 10px 0 0; max-width: 72ch; font-size: 14px; line-height: 1.65; color: var(--text-dim); }
+
+.au-h2 {
+  margin: 34px 0 4px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+}
+.au-h3 { margin: 30px 0 8px; font-size: 17px; font-weight: 700; letter-spacing: -0.01em; }
+.au-lead { margin: 0 0 14px; max-width: 78ch; font-size: 13.5px; line-height: 1.65; color: var(--text-dim); }
+.au-fine { margin: 10px 0 0; max-width: 78ch; font-size: 12px; line-height: 1.6; color: var(--text-faint); }
+
+/* ── the live figures ───────────────────────────────────────────── */
+.au-figures {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(196px, 1fr));
+  gap: 14px;
+  margin: 14px 0 6px;
+}
+.au-figure {
+  padding: 14px 16px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--panel-2);
+}
+/* A figure that is a symptom rather than a fact. Amber on the rule down the
+   side and on the number; the card itself stays quiet, because two of these on
+   a page of five would otherwise read as an alarm. */
+.au-figure.is-bad { border-left: 3px solid var(--warning); padding-left: 13px; }
+.au-figure.is-bad .au-figure-value { color: var(--warning); }
+.au-figure-label {
+  margin: 0 0 6px;
+  font-family: var(--mono);
+  font-size: 10.5px;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+}
+.au-figure-value { margin: 0; font-size: 26px; font-weight: 800; letter-spacing: -0.02em; }
+.au-figure-note { margin: 7px 0 0; font-size: 11.5px; line-height: 1.5; color: var(--text-faint); }
+
+/* ── the callout ────────────────────────────────────────────────── */
+.au-callout {
+  margin: 6px 0 4px;
+  padding: 16px 18px;
+  border: 1px solid var(--line);
+  border-left: 3px solid var(--warning);
+  border-radius: 12px;
+  background: var(--panel-2);
+}
+.au-callout p { margin: 0 0 10px; max-width: 76ch; font-size: 13px; line-height: 1.65; }
+.au-callout p:last-child { margin-bottom: 0; }
+.au-pre {
+  margin: 0 0 12px;
+  padding: 11px 13px;
+  border-radius: 8px;
+  background: var(--bg);
+  font-family: var(--mono);
+  font-size: 11.5px;
+  line-height: 1.55;
+  color: var(--warning);
+  white-space: pre-wrap;
+}
+
+/* ── tables ─────────────────────────────────────────────────────── */
+.au-table {
+  width: 100%;
+  margin: 12px 0 0;
+  border-collapse: collapse;
+  font-size: 12.5px;
+}
+.au-table th {
+  padding: 7px 10px;
+  border-bottom: 1px solid var(--line);
+  text-align: left;
+  font-family: var(--mono);
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+}
+.au-table td {
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--border-soft);
+  line-height: 1.5;
+  vertical-align: top;
+  color: var(--text-dim);
+}
+.au-table td:first-child { color: var(--text); }
+.au-table tr:last-child td { border-bottom: 0; }
+
+.au-code {
+  font-family: var(--mono);
+  font-size: 11.5px;
+  /* These are paths, and a path broken at a random character is a path you
+     cannot copy. It wraps at the separators or it scrolls. */
+  overflow-wrap: anywhere;
+  color: var(--text);
+}
+
+@media (max-width: 720px) {
+  .au-title { font-size: 24px; }
+  .au-table { font-size: 12px; }
+  .au-table th, .au-table td { padding: 6px 7px; }
+}
