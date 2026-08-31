@@ -14,7 +14,7 @@ This is the shape. Anything that generates a dump should produce it.
 Three things at the same level, none inside another:
 
 ```
-adrov/
+adam/
 ├── viewer/                 the reading server and the pages — its own repo
 │   ├── server.mjs
 │   ├── projects.json       ← which packages, and where

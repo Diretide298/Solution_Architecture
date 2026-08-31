@@ -274,9 +274,9 @@
   height: 14px;
   vertical-align: -2px;
   background: var(--accent-ink);
-  animation: adrov-caret 1s steps(1) infinite;
+  animation: adam-caret 1s steps(1) infinite;
 }
-@keyframes adrov-caret { 0%, 45% { opacity: 1; } 55%, 100% { opacity: 0; } }
+@keyframes adam-caret { 0%, 45% { opacity: 1; } 55%, 100% { opacity: 0; } }
 
 .signin-findings {
   display: flex;
@@ -298,7 +298,7 @@
   background: var(--chip-fill);
   border: 1px solid var(--chip-line);
   color: var(--chip-ink);
-  animation: adrov-rise 0.35s ease both;
+  animation: adam-rise 0.35s ease both;
 }
 .signin-finding i {
   display: block;
@@ -320,7 +320,7 @@
   --chip-ink: var(--warn-ink);
   --chip-dot: var(--warn-dot);
 }
-@keyframes adrov-rise { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+@keyframes adam-rise { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
 
 .signin-stats { display: flex; flex-wrap: wrap; gap: 22px; max-width: 640px; }
 .signin-stat { display: flex; flex-direction: column; gap: 3px; }

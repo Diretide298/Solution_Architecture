@@ -228,7 +228,7 @@ check('the header states the counts it measured',
 // The loading curtain has to come down. It is the one failure that leaves a
 // page looking like it is still working when it has finished.
 const curtain = await page.evaluate(() => {
-  const box = document.getElementById('adrov-loader');
+  const box = document.getElementById('adam-loader');
   return !box || box.classList.contains('is-done');
 });
 check('the loading curtain lifts', curtain);

@@ -55,12 +55,12 @@ app.add_middleware(
     allow_origins=[
         "http://localhost:4173", "http://127.0.0.1:4173",
         "http://localhost:8787", "http://127.0.0.1:8787",
-        # Two spellings of the same front end. The product is Adrov, but
+        # Two spellings of the same front end. The product is Adam, but
         # aster.ainfinite.ai is a live name with a certificate against it,
         # so it stays until DNS and certbot have caught up; both are named
-        # here meanwhile. See viewer/handoff/adrov-rename-todo.md.
+        # here meanwhile. See viewer/handoff/adam-rename-todo.md.
         "https://aster.ainfinite.ai",
-        "https://adrov.ainfinite.ai",
+        "https://adam.ainfinite.ai",
     ] + _extra,
     allow_credentials=True,
     allow_methods=["GET", "POST", "DELETE"],

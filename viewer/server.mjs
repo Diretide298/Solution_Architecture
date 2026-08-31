@@ -75,11 +75,11 @@ const AUTH_BASE = process.env.TICVAI_AUTH ?? 'http://127.0.0.1:8787';
  * accounts service uses, so the two halves are configured once.
  */
 const ALLOWED_ORIGINS = new Set([
-  // Both spellings of the deployed front end. The name is Adrov now, but
+  // Both spellings of the deployed front end. The name is Adam now, but
   // aster.ainfinite.ai is what DNS and the certificate still say, so it is
-  // the one that answers; adrov is listed ready for the day it does.
+  // the one that answers; adam is listed ready for the day it does.
   'https://aster.ainfinite.ai',
-  'https://adrov.ainfinite.ai',
+  'https://adam.ainfinite.ai',
   'http://localhost:4173', 'http://127.0.0.1:4173',
   ...(process.env.TICVAI_ORIGINS ?? '').split(',').map((o) => o.trim()).filter(Boolean),
 ]);
@@ -1161,7 +1161,7 @@ for (const pkg of packages.values()) {
 
 server.listen(args.port, args.host, () => {
   const url = `http://localhost:${args.port}`;
-  console.log(`\n  Adrov package viewer  →  ${url}`);
+  console.log(`\n  Adam package viewer  →  ${url}`);
   for (const pkg of packages.values()) {
     console.log(`  ${pkg.id.padEnd(14)} ${pkg.root}`);
     console.log(`  ${''.padEnd(14)} /pkg/${pkg.id}/… · watching `

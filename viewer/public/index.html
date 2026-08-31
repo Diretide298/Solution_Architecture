@@ -14,7 +14,7 @@
         }
       } catch { /* storage can be denied outright; day is a fine fallback */ }
     </script>
-    <title>Adrov — TICVAI delivery package</title>
+    <title>Adam — TICVAI delivery package</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -28,7 +28,7 @@
     <link rel="stylesheet" href="/domains.css" />
     <link rel="stylesheet" href="/uiux.css" />
     <link rel="stylesheet" href="/canvas.css" />
-    <link rel="icon" href="/brand/adrov-mark.png" />
+    <link rel="icon" href="/brand/adam-mark.png" />
     <script>
       // A new browser session starts at the door.
       //
@@ -70,19 +70,19 @@
       // one that never lifts is no page, so this fires whatever else breaks.
       // `loader.js` sets `claimed` on import, which is how a page with a script
       // of its own says it will lower the curtain at the right moment instead.
-      window.__adrovLoader = { claimed: false };
+      window.__adamLoader = { claimed: false };
       (function () {
         var down = function () {
-          var box = document.getElementById('adrov-loader');
+          var box = document.getElementById('adam-loader');
           if (box) { box.classList.add('is-done'); setTimeout(function () { box.remove(); }, 700); }
         };
-        window.__adrovLoader.timer = setTimeout(down, 12000);
+        window.__adamLoader.timer = setTimeout(down, 12000);
         window.addEventListener('load', function () {
           // A page with no script of its own has nothing to say when it is
           // ready, so `load` is as good as it gets. One that imported loader.js
           // is left alone: on the viewer, `load` fires long before the index
           // has been read.
-          setTimeout(function () { if (!window.__adrovLoader.claimed) down(); }, 300);
+          setTimeout(function () { if (!window.__adamLoader.claimed) down(); }, 300);
         });
       })();
     </script>
@@ -93,7 +93,7 @@
          JavaScript misses the module fetch, which is the part of the
          wait it exists to cover. `loader.js` takes it down; the guard in
          the head above is what happens if nothing ever does. -->
-    <div class="adrov-loader" id="adrov-loader" role="status" aria-live="polite">
+    <div class="adam-loader" id="adam-loader" role="status" aria-live="polite">
       <svg class="al-mark" viewBox="0 0 210 210" aria-hidden="true" focusable="false"><g class="al-links"><line class="al-link" style="--i:1" x1="105.0" y1="18.5" x2="148.9" y2="28.9"/><line class="al-link" style="--i:3" x1="148.9" y1="28.9" x2="177.6" y2="63.1"/><line class="al-link" style="--i:5" x1="177.6" y1="63.1" x2="192.9" y2="105.0"/><line class="al-link" style="--i:7" x1="192.9" y1="105.0" x2="180.1" y2="148.4"/><line class="al-link" style="--i:9" x1="180.1" y1="148.4" x2="148.6" y2="180.5"/><line class="al-link" style="--i:11" x1="148.6" y1="180.5" x2="105.0" y2="192.3"/><line class="al-link" style="--i:13" x1="105.0" y1="192.3" x2="62.1" y2="179.3"/><line class="al-link" style="--i:15" x1="62.1" y1="179.3" x2="32.5" y2="146.8"/><line class="al-link" style="--i:17" x1="32.5" y1="146.8" x2="18.1" y2="105.0"/><line class="al-link" style="--i:19" x1="18.1" y1="105.0" x2="32.9" y2="63.4"/><line class="al-link" style="--i:21" x1="32.9" y1="63.4" x2="62.9" y2="32.1"/><line class="al-link" style="--i:23" x1="62.9" y1="32.1" x2="105.0" y2="18.5"/><line class="al-link" style="--i:1" x1="105.0" y1="18.5" x2="143.0" y2="75.0"/><line class="al-link" style="--i:3" x1="148.9" y1="28.9" x2="143.0" y2="75.0"/><line class="al-link" style="--i:4" x1="177.6" y1="63.1" x2="143.0" y2="75.0"/><line class="al-link" style="--i:7" x1="192.9" y1="105.0" x2="149.0" y2="139.0"/><line class="al-link" style="--i:8" x1="180.1" y1="148.4" x2="149.0" y2="139.0"/><line class="al-link" style="--i:11" x1="148.6" y1="180.5" x2="107.0" y2="161.0"/><line class="al-link" style="--i:12" x1="105.0" y1="192.3" x2="107.0" y2="161.0"/><line class="al-link" style="--i:15" x1="62.1" y1="179.3" x2="59.0" y2="135.0"/><line class="al-link" style="--i:16" x1="32.5" y1="146.8" x2="59.0" y2="135.0"/><line class="al-link" style="--i:19" x1="18.1" y1="105.0" x2="71.0" y2="79.0"/><line class="al-link" style="--i:20" x1="32.9" y1="63.4" x2="71.0" y2="79.0"/><line class="al-link" style="--i:21" x1="62.9" y1="32.1" x2="71.0" y2="79.0"/><line class="al-link" style="--i:19" x1="71.0" y1="79.0" x2="89.0" y2="123.0"/><line class="al-link" style="--i:5" x1="143.0" y1="75.0" x2="127.0" y2="115.0"/><line class="al-link" style="--i:14" x1="59.0" y1="135.0" x2="107.0" y2="161.0"/><line class="al-link" style="--i:8" x1="149.0" y1="139.0" x2="127.0" y2="115.0"/><line class="al-link" style="--i:13" x1="89.0" y1="123.0" x2="107.0" y2="161.0"/></g><path class="al-glyph" d="M105,28 C110,64 124,116 151,161 C134,150 119,136 105,127 C91,136 76,150 59,161 C86,116 100,64 105,28 Z"/><path class="al-stand" d="M105,128 L105,176 M105,158 L90,171 M105,158 L120,171"/><g class="al-nodes"><circle class="al-node" style="--i:0" cx="105.0" cy="18.5" r="6.6"/><circle class="al-node" style="--i:2" cx="148.9" cy="28.9" r="6.1"/><circle class="al-node" style="--i:4" cx="177.6" cy="63.1" r="5.5"/><circle class="al-node" style="--i:6" cx="192.9" cy="105.0" r="6.5"/><circle class="al-node" style="--i:8" cx="180.1" cy="148.4" r="5.4"/><circle class="al-node" style="--i:10" cx="148.6" cy="180.5" r="5.6"/><circle class="al-node" style="--i:12" cx="105.0" cy="192.3" r="6.3"/><circle class="al-node" style="--i:14" cx="62.1" cy="179.3" r="5.3"/><circle class="al-node" style="--i:16" cx="32.5" cy="146.8" r="6.6"/><circle class="al-node" style="--i:18" cx="18.1" cy="105.0" r="6.7"/><circle class="al-node" style="--i:20" cx="32.9" cy="63.4" r="5.2"/><circle class="al-node" style="--i:22" cx="62.9" cy="32.1" r="5.4"/><circle class="al-node" style="--i:20" cx="71.0" cy="79.0" r="4.6"/><circle class="al-node" style="--i:3" cx="143.0" cy="75.0" r="5.2"/><circle class="al-node" style="--i:16" cx="59.0" cy="135.0" r="4.4"/><circle class="al-node" style="--i:9" cx="149.0" cy="139.0" r="4.8"/><circle class="al-node" style="--i:12" cx="107.0" cy="161.0" r="4.2"/><circle class="al-node" style="--i:15" cx="89.0" cy="123.0" r="3.6"/><circle class="al-node" style="--i:8" cx="127.0" cy="115.0" r="3.4"/></g></svg>
       <p class="al-text">Reading the delivery package…</p>
     </div>
@@ -128,11 +128,11 @@
                here would be two names for the same picture. -->
           <!-- Back to the door. It used to point at "/", which is this page, so
                the lockup was a reload button dressed as a link. -->
-          <a class="brand" href="/home.html" aria-label="Adrov — every layer">
+          <a class="brand" href="/home.html" aria-label="Adam — every layer">
             <img
               class="brand-lockup"
-              src="/brand/adrov-lockup-night.png"
-              alt="Adrov — the context layer for AI-assisted development"
+              src="/brand/adam-lockup-night.png"
+              alt="Adam — the context layer for AI-assisted development"
             />
           </a>
 

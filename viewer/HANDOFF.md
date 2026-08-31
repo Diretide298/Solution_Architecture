@@ -5,7 +5,7 @@ the delivery package. Everything below is either waiting on you or waiting to be
 built. Read it, then say which.
 
 ```
-Desktop/adrov/
+Desktop/adam/
 ├── viewer/     this repo — server.mjs at the root, deploy/ inside
 └── ticvai/     the delivery package — its own repo, no viewer in it
 ```
@@ -20,11 +20,11 @@ apart from one commit. Nothing has been deleted anywhere.
 **1 · Neither new repo has a remote.** Nothing is pushed.
 
 ```bash
-cd ~/Desktop/adrov/viewer && git remote add origin <url> && git push -u origin main
-cd ~/Desktop/adrov/ticvai && git remote add origin <url> && git push -u origin main
+cd ~/Desktop/adam/viewer && git remote add origin <url> && git push -u origin main
+cd ~/Desktop/adam/ticvai && git remote add origin <url> && git push -u origin main
 ```
 
-**2 · Decide about `repos/` before the first push.** `adrov/ticvai/repos/` is
+**2 · Decide about `repos/` before the first push.** `adam/ticvai/repos/` is
 5,762 files of generated `project-bible` mirrors, already 14 files out of date —
 `tools/check-package.py` fails on exactly that and did so before the split too.
 If `tools/derive-mirrors.py` still makes them they do not belong in a repository
@@ -138,7 +138,7 @@ and stay that way. Throwaway instances go on 4619+.
 and dies when they disagree. `location /pkg/` satisfies the check on its own.
 
 **The package's own checkers pass with warnings, and the warnings matter.** From
-`adrov/ticvai`: `check-wireframes` PASS/13, `check-screens` PASS/657,
+`adam/ticvai`: `check-wireframes` PASS/13, `check-screens` PASS/657,
 `check-traceability` PASS/0, `check-package` FAILS on the six stale mirrors.
 `check-wireframes` prints only the first 20 warnings — a warning that "appears"
 may just have become visible.
