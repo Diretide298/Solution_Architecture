@@ -23,6 +23,11 @@
     />
     <link rel="stylesheet" href="/styles.css" />
     <link rel="stylesheet" href="/layers.css" />
+    <!-- the UI/UX layer's three views were pages of their own until they
+         became a tab; their stylesheets came with them -->
+    <link rel="stylesheet" href="/domains.css" />
+    <link rel="stylesheet" href="/uiux.css" />
+    <link rel="stylesheet" href="/canvas.css" />
     <link rel="icon" href="/brand/aster-mark.png" />
     <script>
       // A new browser session starts at the door.
@@ -766,6 +771,182 @@
           </article>
         </section>
 
+        <!-- ── UI/UX ─────────────────────────────────────────────────
+             Three views of the design work, lifted out of three standalone
+             pages. The markup is theirs unchanged; what changed is that it is
+             `#view-*` sections of the viewer rather than three documents with
+             three headers and three ideas of what the navigation should be.
+
+             Each one's module is imported the first time its tab is opened —
+             see `openUiux` in app.js. A reader who never opens this layer pays
+             nothing for it. -->
+        <section class="view uiux-view" id="view-uiux-screens" hidden>
+          <!-- The three-pane frame the canvas lays itself out in. It was this
+               view's `<main>` while it was a page of its own; without it the rail,
+               the stage and the detail panel stack down the middle of the view. -->
+          <div class="canvas-main">
+
+              <aside class="canvas-rail" id="rail">
+                <div class="canvas-rail-head">
+                  <input id="rail-filter" class="auth-input canvas-search" type="text"
+                         placeholder="Find a screen or a journey…" />
+                </div>
+
+                <!-- The platform is the first question and the canvas holds one at a
+                     time, so the list of them is the first thing in the rail and it
+                     stays put when one is picked. Everything under it is scoped to the
+                     pick: the journeys are the ones that touch this platform, the
+                     screens are the ones on it. -->
+                <div class="canvas-rail-platforms">
+                  <h2 class="canvas-rail-title">Platforms <span id="count-platforms"></span></h2>
+                  <div class="canvas-rail-list" id="rail-platforms"></div>
+                </div>
+
+                <div class="canvas-rail-tabs" role="tablist">
+                  <button class="canvas-tab is-on" id="tab-journeys" role="tab" aria-selected="true">Journeys <span id="count-journeys"></span></button>
+                  <button class="canvas-tab" id="tab-screens" role="tab" aria-selected="false">Screens <span id="count-screens"></span></button>
+                </div>
+                <p class="canvas-rail-scope" id="rail-scope"></p>
+
+                <div class="canvas-rail-body" id="rail-journeys"></div>
+                <div class="canvas-rail-body" id="rail-screens" hidden></div>
+              </aside>
+
+              <section class="canvas-stage">
+                <div class="canvas-bar">
+                  <select id="platform" class="scope-select" aria-label="Platform"></select>
+                  <!-- Back out of a journey to the platform's board. It is the way back
+                       from a lane, so it is a button and not a checkbox. -->
+                  <button class="chip" id="show-board" type="button">Board</button>
+                  <!-- Three settings, not a checkbox, because "all" and "none" are not
+                       the only two useful answers and the middle one is the best of
+                       them. **A link that crosses from one module to another is the one
+                       worth drawing**: it is the navigation the shelves cannot show,
+                       where a journey leaves ordering and arrives in payments. The
+                       links inside a module are drawn too, faintly — they are mostly
+                       the package guessing that everything in a module reaches
+                       everything else in it, which is true and not interesting.
+                       Whatever this says, the links of the screen you pick are always
+                       drawn. -->
+                  <select id="links-mode" class="scope-select" aria-label="Links">
+                    <option value="cross">links that cross modules</option>
+                    <option value="all">every link</option>
+                    <option value="none">no links</option>
+                  </select>
+                  <label class="uiux-toggle"><input type="checkbox" id="show-inferred" checked /> including inferred</label>
+                  <span class="canvas-spacer"></span>
+                  <span class="canvas-note" id="canvas-note"></span>
+                  <span class="canvas-note canvas-note-quiet" id="frame-note"></span>
+                  <div class="canvas-zoom">
+                    <button class="chip" id="reset-layout" type="button" title="Put the cards back where the layout put them">Reset</button>
+                    <button class="chip" id="zoom-out" type="button" title="Zoom out">−</button>
+                    <span id="zoom-level">100%</span>
+                    <button class="chip" id="zoom-in" type="button" title="Zoom in">+</button>
+                    <button class="chip" id="zoom-fit" type="button" title="Fit everything">Fit</button>
+                  </div>
+                </div>
+
+                <div class="canvas-viewport" id="viewport" tabindex="0"
+                     aria-label="Screen canvas. Drag the background to move, scroll to zoom, drag a screen to move it, click a screen to open it.">
+                  <div class="canvas-world" id="world">
+                    <!-- Three layers, and the order is the whole reason there are three.
+                         The shelves are painted under the links so a shelf can have a
+                         fill without hiding every link that crosses it, and the cards
+                         sit over the links so a link arrives at a card rather than
+                         across it. -->
+                    <div class="canvas-bands" id="bands"></div>
+                    <svg class="canvas-edges" id="edges" aria-hidden="true"></svg>
+                    <div class="canvas-nodes" id="nodes"></div>
+                  </div>
+                </div>
+            </section>
+
+            <aside class="canvas-detail" id="detail" hidden aria-live="polite"></aside>
+          </div>
+        </section>
+
+        <section class="view uiux-view sheet" id="view-uiux-boards" hidden>
+          <!-- the reading column the board index was written for -->
+          <div class="admin-main domains-main">
+            <section class="admin-panel">
+              <h1 class="auth-title">Every board, and what each one draws</h1>
+              <p class="auth-note" id="lead">Loading…</p>
+
+              <p class="auth-note auth-fine">
+                Read off the disk, not off the screens. The rest of the viewer shows a
+                board <em>through</em> a screen that points at it, which is right for
+                reviewing a screen and is why a board nobody has wired up appears
+                nowhere at all — <strong id="fine-unwired">several</strong> of them,
+                including a hand-built index of every frame in the package. A board
+                nobody has claimed is not a board that does not exist; it is the one
+                most worth looking at, because somebody drew it and the package cannot
+                yet say what it draws.
+              </p>
+
+              <div class="invite-row">
+                <input id="filter" class="auth-input" type="text"
+                       placeholder="Filter by board, platform, screen or frame…" />
+                <select id="kind" class="scope-select">
+                  <option value="">every kind</option>
+                  <option value="pack">drawn by hand</option>
+                  <option value="generated">generated</option>
+                  <option value="index">contents pages</option>
+                  <option value="single">single artboards</option>
+                </select>
+                <select id="sort" class="scope-select">
+                  <option value="unclaimed">most unclaimed frames first</option>
+                  <option value="name">by name</option>
+                  <option value="frames">most frames first</option>
+                  <option value="modified">most recently changed</option>
+                </select>
+              </div>
+              <div class="uiux-toggles">
+                <label class="uiux-toggle"><input type="checkbox" id="only-unwired" /> only boards nothing points at</label>
+              </div>
+            </section>
+
+            <section class="admin-panel">
+              <div id="boards"></div>
+            </section>
+
+          </div>
+        </section>
+
+        <section class="view uiux-view sheet" id="view-uiux-platforms" hidden>
+          <!-- the same column, for the platform gaps -->
+          <div class="admin-main domains-main">
+            <section class="admin-panel">
+              <h1 class="auth-title">The platforms, and what each is missing</h1>
+              <p class="auth-note" id="plat-lead">Loading…</p>
+
+              <p class="auth-note auth-fine">
+                A page listing what exists is a directory; one listing what is missing
+                is a worklist. Every gap below is <strong>derived</strong> — closure
+                over the lineage, the flows and the boards — so nothing here depends on
+                somebody having remembered to write it down. What no checker can derive
+                is whether a gap is a missing page or an endpoint nobody needs, and
+                that is what a verdict on a platform records.
+              </p>
+
+              <div class="invite-row">
+                <input id="plat-filter" class="auth-input" type="text"
+                       placeholder="Filter by platform, app, module or screen…" />
+                <select id="plat-sort" class="scope-select">
+                  <option value="gaps">most gaps first</option>
+                  <option value="code">in platform order</option>
+                  <option value="size">largest first</option>
+                  <option value="undrawn">most undrawn first</option>
+                </select>
+              </div>
+            </section>
+
+            <section class="admin-panel">
+              <div id="platforms"></div>
+            </section>
+
+          </div>
+        </section>
+
         <section class="view audit" id="view-audit" hidden>
           <div class="audit-head">
             <h2>Contract audit</h2>
@@ -859,8 +1040,7 @@
                Platforms and UI/UX were reachable only from each other's header
                chips, so the way in was to already be on one of them. -->
           <a class="auth-button auth-button-quiet" href="/domains.html">Domain lenses</a>
-          <a class="auth-button auth-button-quiet" href="/platforms.html">Platforms and their gaps</a>
-          <a class="auth-button auth-button-quiet" href="/uiux.html">UI/UX — every board</a>
+          <a class="auth-button auth-button-quiet" href="/?layer=uiux">UI/UX — screens, flows and boards</a>
 
           <!-- admin only: the door to everything about accounts -->
           <div id="account-admin" hidden>

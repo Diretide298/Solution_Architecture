@@ -208,21 +208,44 @@ const deep = await page.evaluate(() => {
     }
   }
   if (!found.length) return null;
-  // The furthest down the page, which is the hardest case for the claim.
+  // Furthest down first, which is the hardest case for the claim. Several of
+  // them, not one — see the loop below.
   found.sort((a, b) => b.top - a.top);
-  return { word: found[0].word, wasAt: Math.round(found[0].top), height: innerHeight };
+  return { words: found.slice(0, 5).map((f) => ({ word: f.word, wasAt: Math.round(f.top) })),
+           height: innerHeight };
 });
 
 if (!deep) {
   check('a needle deep in the page can be chosen', false, 'no once-only word found');
 } else {
-  check('the needle chosen is genuinely below the fold', deep.wasAt > deep.height,
-    `"${deep.word}" was at ${deep.wasAt}px in a ${deep.height}px window`);
+  // **Several candidates, because the first result is not guaranteed to be the
+  // page the word came from.** `fuzzyScore` ranks the whole package, so typing
+  // a word lifted off a screen can legitimately open something else — and on
+  // that page the word really is absent, so "0 marks" is the correct answer and
+  // the check was failing the code for being right. It flaked about one run in
+  // four that way.
+  //
+  // So this tries candidates until one actually lands on a page containing it,
+  // and says so plainly if none do rather than passing on a technicality.
+  let deepWord = null;
+  let landed = null;
+  for (const candidate of deep.words) {
+    await search(candidate.word);
+    await page.evaluate(() => document.querySelector('.palette-item')?.click());
+    await wait(3500);
+    const here = await page.evaluate((w) => {
+      const view = document.querySelector('#main .view:not([hidden])');
+      return (view?.textContent ?? '').toLowerCase().includes(w.toLowerCase());
+    }, candidate.word);
+    if (here) { deepWord = candidate; landed = true; break; }
+  }
 
-  await search(deep.word);
-  await page.evaluate(() => document.querySelector('.palette-item')?.click());
-  await wait(3500);
+  check('a needle from deep in a page opens a page that holds it', landed === true,
+    deepWord ? `"${deepWord.word}"` : `none of ${deep.words.length} candidates landed on their own page`);
+  const deepAt = deepWord ?? deep.words[0];
 
+  check('the needle chosen is genuinely below the fold', deepAt.wasAt > deep.height,
+    `"${deepAt.word}" was at ${deepAt.wasAt}px in a ${deep.height}px window`);
   const put = await page.evaluate(() => {
     const first = document.querySelector('mark.search-hit-first');
     if (!first) {
@@ -241,9 +264,9 @@ if (!deep) {
   });
 
   check('opening a result marks the words that were typed', Boolean(put.first),
-    put.first ? `"${put.first}", ${put.marks} marked` : `0 marks for "${deep.word}"`);
+    put.first ? `"${put.first}", ${put.marks} marked` : `0 marks for "${deepAt.word}"`);
   check('and scrolls the first one into the viewport', put.inViewport === true,
-    put.first ? `now at ${put.top}px, was ${deep.wasAt}px` : 'nothing marked');
+    put.first ? `now at ${put.top}px, was ${deepAt.wasAt}px` : 'nothing marked');
   check('inside the view that is actually showing', put.inShowingView === true,
     put.viewId ?? 'not in a view');
 }

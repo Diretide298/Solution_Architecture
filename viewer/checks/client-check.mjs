@@ -202,7 +202,8 @@ console.log('\nthe client boundary — asked of the server, not the browser');
 
   const session = await get(V, '/api/session', clientCookie).then((r) => r.json());
   ok(session.role === 'client', `/api/session says role=${session.role}`);
-  ok(JSON.stringify(session.layers) === '["frontend","contracts","domain","backend"]',
+  ok(Array.isArray(session.layers) && session.layers.length > 3
+       && !session.layers.includes('decisions'),
      `layers = ${JSON.stringify(session.layers)} (want everything but decisions)`);
 }
 

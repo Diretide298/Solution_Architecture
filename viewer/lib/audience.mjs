@@ -95,9 +95,13 @@ export function isDecisionFile(rel, files) {
  * never disagree — the browser is told what it has, not asked to guess.
  */
 export function layersFor(role) {
+  // `uiux` is here for both roles deliberately. It is the most client-facing
+  // layer there is — the screens, drawn — and the one a client is most likely to
+  // have an opinion about. Withholding it would be withholding the part of the
+  // package that was made for them.
   return role === 'client'
-    ? ['frontend', 'contracts', 'domain', 'backend', 'services']
-    : ['frontend', 'contracts', 'domain', 'backend', 'services', 'decisions'];
+    ? ['frontend', 'uiux', 'contracts', 'domain', 'backend', 'services']
+    : ['frontend', 'uiux', 'contracts', 'domain', 'backend', 'services', 'decisions'];
 }
 
 /** null means "whatever the layer normally offers". A client gets every mode

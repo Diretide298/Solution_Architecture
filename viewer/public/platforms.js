@@ -325,7 +325,7 @@ function renderLead() {
   const drawn = [...state.byCode.values()].reduce((n, f) => n + f.designed, 0);
   const undrawnPlatforms = state.platforms
     .filter((p) => !(state.byCode.get(p.code)?.designed)).length;
-  $('lead').textContent =
+  $('plat-lead').textContent =
     `${s.platforms} platforms · ${s.screens} screens · ${s.gaps} gaps across ${s.withGaps} of them, `
     + `${s.clean} clean. ${drawn} screens are drawn by hand; ${undrawnPlatforms} platforms have none. `
     + `Derived ${s.generated}.`;
@@ -335,14 +335,16 @@ function renderLead() {
   if (!(await auth.requireSignIn())) return hideLoader();
 
   const me = auth.account();
-  $('whoami').textContent = me ? `${me.name || me.email} · ${me.role}` : '';
+  // Optional: inside the viewer these views are sections of a page that
+  // already says who you are, so there is no `#whoami` to fill.
+  $('whoami')?.replaceChildren(me ? `${me.name || me.email} · ${me.role}` : '');
 
   let platforms, journeys;
   try {
     [platforms, journeys] = await Promise.all([json('/api/platforms'), json('/api/journeys')]);
   } catch (error) {
     hideLoader();
-    $('lead').textContent = `Could not read the package: ${error.message}`;
+    $('plat-lead').textContent = `Could not read the package: ${error.message}`;
     return;
   }
 
@@ -364,6 +366,6 @@ function renderLead() {
   draw();
   hideLoader();
 
-  $('filter').oninput = (e) => { state.filter = e.target.value; draw(); };
-  $('sort').onchange = (e) => { state.sort = e.target.value; draw(); };
+  $('plat-filter').oninput = (e) => { state.filter = e.target.value; draw(); };
+  $('plat-sort').onchange = (e) => { state.sort = e.target.value; draw(); };
 })();

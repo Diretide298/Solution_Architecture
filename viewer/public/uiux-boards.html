@@ -16,7 +16,7 @@
         var to = new URLSearchParams();
         if (q.get('project')) to.set('project', q.get('project'));
         to.set('layer', 'uiux');
-        to.set('mode', 'uiux-platforms');
+        to.set('mode', 'uiux-boards');
         // `?platform=` on the old canvas address is read by the canvas itself,
         // so it has to survive the hop.
         if (q.get('platform')) to.set('platform', q.get('platform'));

@@ -242,6 +242,28 @@ function renderRail() {
     row.addEventListener('click', () => focus(key));
     rail.append(row);
   }
+
+  // UI/UX, under the six.
+  //
+  // Not a seventh layer — it has no hub in the graph, no modes and no key in a
+  // deep link — but it is where the design work is, and the door is where a
+  // reader decides what they are looking at. It was reachable only from inside
+  // the viewer's own chrome, which you have to have already gone somewhere else
+  // to see. An `<a>` and not a `.rail-row`: the rows above focus the graph and
+  // stay on this page, and this one leaves it. Sharing their class would have
+  // made it look like a seventh thing to focus and would have put a navigation
+  // into the middle of a set of filters.
+  const away = document.createElement('a');
+  away.className = 'rail-away';
+  away.href = `/?project=${encodeURIComponent(auth.project() ?? '')}&layer=uiux`;
+  const awayName = document.createElement('span');
+  awayName.className = 'rail-name';
+  awayName.textContent = 'UI/UX';
+  const awayNote = document.createElement('span');
+  awayNote.className = 'rail-away-note';
+  awayNote.textContent = 'screens, flows and design boards';
+  away.append(awayName, awayNote);
+  rail.append(away);
 }
 
 /** The viewer, at a given layer and optionally a given view, in this package. */

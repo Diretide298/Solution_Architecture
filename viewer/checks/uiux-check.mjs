@@ -12,6 +12,10 @@
  * The second is that the links work. A catalogue whose entries 404 is worse
  * than no catalogue: it says the board is there.
  */
+import { readFile, readdir } from 'node:fs/promises';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+
 import puppeteer from 'puppeteer-core';
 import { authed, VIEWER, API } from './_session.mjs';
 
@@ -38,6 +42,59 @@ check('it counts boards from the disk', S.boards === payload.boards.length,
 check('every board is in a folder that reports it',
   payload.boards.length === payload.folders.reduce((n, f) => n + f.count, 0),
   payload.folders.map((f) => `${f.id}=${f.count}`).join(', '));
+
+// ── against the disk, not against itself ─────────────────────────────
+// The two checks above compare the payload to the payload. They pass whatever
+// `buildUiux` decides to read, which is exactly the bug this page exists for
+// one level up: `ui-design/designs/` held seven drawn boards and the reader
+// knew two directory names, so seven boards were missing and every count above
+// agreed with every other count.
+//
+// So this walks the package. The directories are named here rather than
+// imported from the reader, because a list the reader also owns cannot
+// contradict it — that is the whole failure being guarded against.
+const HERE = path.dirname(fileURLToPath(import.meta.url));
+const VIEWER_DIR = path.join(HERE, '..');
+const ON_DISK = [
+  ['wireframes', 'wireframes'],
+  ['designs', 'designs'],
+  ['ui-design', path.join('ui-design', 'designs')],
+];
+const IS_BOARD = /[._]dc\.html$/i;
+
+let pkgRoot = null;
+try {
+  const registryFile = JSON.parse(await readFile(path.join(VIEWER_DIR, 'projects.json'), 'utf8'));
+  const entry = (registryFile.projects ?? []).find((p) => p.id === project);
+  if (entry?.root) pkgRoot = path.resolve(VIEWER_DIR, entry.root);
+} catch { /* not beside this checkout */ }
+
+const found = [];
+let readable = false;
+if (pkgRoot) {
+  for (const [id, rel] of ON_DISK) {
+    const names = await readdir(path.join(pkgRoot, rel)).catch(() => null);
+    if (names === null) continue;
+    readable = true;
+    for (const name of names.filter((n) => IS_BOARD.test(n))) found.push(`${id}/${name}`);
+  }
+}
+
+if (!readable) {
+  // Said out loud rather than passed. A disk check that silently skips when it
+  // cannot see the disk is a check that reports success for doing nothing.
+  check('the package is beside this checkout, so the disk can be compared',
+    false, `no readable board folder under ${pkgRoot ?? 'projects.json (unreadable)'}`);
+} else {
+  const listed = new Set(payload.boards.map((b) => `${b.folder}/${b.file}`));
+  const missing = found.filter((f) => !listed.has(f));
+  const phantom = [...listed].filter((f) => !found.includes(f));
+  check('every board file on disk is on the page', missing.length === 0,
+    `${found.length} on disk, ${listed.size} listed`
+    + (missing.length ? ` | missing: ${missing.slice(0, 4).join(', ')}` : ''));
+  check('and the page invents none', phantom.length === 0,
+    phantom.length ? phantom.slice(0, 4).join(', ') : 'none');
+}
 check('wired and unwired account for all of them', S.wired + S.unwired === S.boards,
   `${S.wired} + ${S.unwired} vs ${S.boards}`);
 // The two drawn counts partition the screens: a screen is drawn by a pack or by
@@ -94,7 +151,8 @@ await page.evaluate(async (a, e, p) => {
   process.env.TICVAI_HARNESS_EMAIL ?? 'harness.admin@softlabsgroup.com',
   process.env.TICVAI_HARNESS_PASSWORD ?? 'a-long-enough-passphrase');
 
-await page.goto(BASE + '/uiux.html', { waitUntil: 'domcontentloaded' });
+// The board index is a view of the `uiux` layer now, not a page of its own.
+await page.goto(`${BASE}/?layer=uiux&mode=uiux-boards`, { waitUntil: 'domcontentloaded' });
 await page.waitForSelector('.uiux-card', { timeout: 30000 }).catch(() => {});
 await wait(2500);
 

@@ -13,11 +13,22 @@
  * most worth seeing, because somebody drew it and the package cannot say what
  * it draws. So this reads the directory.
  *
- * Two folders, because they are the same kind of artefact and were split by
+ * Three folders, because they are the same kind of artefact and were split by
  * where they came from rather than by what they are:
  *
- *   wireframes/   the platform boards and the client's topic packs
- *   designs/      the design-language boards
+ *   wireframes/          the platform boards and the client's topic packs
+ *   designs/             the design-language boards
+ *   ui-design/designs/   the drawn product design — the finished treatment of
+ *                        the screens the wireframes only block out
+ *
+ * The third was invisible for the same reason the unwired boards were, one
+ * level up: this read two directory names and there were three. Seven boards —
+ * sign-in, invite, landing and the topbar, each in day and night — drawn,
+ * committed, and reachable from nowhere in the viewer.
+ *
+ * `id` and `dir` are separate here because that folder is nested. The id is
+ * what the board's URL and its grouping are keyed on, so it has to stay a
+ * single segment; the dir is where the files are.
  *
  * A frame's name comes from whichever source actually knows it:
  *
@@ -36,8 +47,9 @@ import { readdir, readFile, stat } from 'node:fs/promises';
 import path from 'node:path';
 
 const FOLDERS = [
-  { id: 'wireframes', label: 'Wireframes' },
-  { id: 'designs', label: 'Design language' },
+  { id: 'wireframes', dir: 'wireframes', label: 'Wireframes' },
+  { id: 'designs', dir: 'designs', label: 'Design language' },
+  { id: 'ui-design', dir: 'ui-design/designs', label: 'Product design' },
 ];
 
 /** The same pattern `buildWireframes` matches anchors with, and for its reasons:
@@ -173,7 +185,7 @@ export async function buildUiux(root, screens = []) {
   const folders = [];
 
   for (const folder of FOLDERS) {
-    const dir = path.join(root, folder.id);
+    const dir = path.join(root, ...folder.dir.split('/'));
     const found = await stat(dir).catch(() => null);
     if (!found?.isDirectory()) {
       folders.push({ ...folder, present: false, count: 0 });

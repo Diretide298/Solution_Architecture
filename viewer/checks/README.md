@@ -23,6 +23,7 @@ on an empty database.
 | `tip-facts-check.mjs` | every count a tip states is the count the payload holds — the tips write `{operations}` and are measured against `/pkg/<project>/lineage`, `journeys` and `decisions` |
 | `search-check.mjs` | search reaches the whole package and not only the contracts, every `file:line` it reports really is where that artefact is written, a result opens the artefact's page *and* the source at that line, and opening one **lands on the match rather than on the page** |
 | `subsearch-check.mjs` | every page that lists things can be narrowed, the count keeps its denominator, and a row drawn after the filter was typed is filtered too |
+| `er-drag-check.mjs` | a box you drop in an ER diagram is still there six seconds later, and a double-click hands it back to the simulation |
 | `uiux-check.mjs` | the board list holds every board on disk, not only the ones a screen points at; each of the 58 board files and one frame out of each of the 54 with frames actually resolves; and the filters filter |
 
 `pages-check.mjs` is the cheap one to run after any edit to a module under
@@ -136,6 +137,15 @@ TICVAI_AUTH=http://127.0.0.1:8791 node server.mjs --port 4620
 raises it only if a read actually comes back 401. A check needing no session
 could not previously run without one, and the useful diagnostic is kept for the
 case where the missing session is genuinely the problem rather than a guess.
+
+`er-drag-check.mjs` exists because the obvious version of it passes on the
+broken code. The three simulated views re-heat on every pointer move of a drag,
+so a box was released at mouseup into a field still carrying ~0.2 of alpha and
+was carried off by gravity over the next second and a half — **294px in the ER
+view, 93px in Data, 69px in the local graph**, measured with the fix stashed.
+Read the position immediately after the release and every one of those is zero.
+So it waits six seconds and allows two pixels, and it refuses to call a
+double-click a release unless something was pinned to release.
 
 `subsearch-check.mjs` types a string nothing can contain and requires that
 nothing is left showing. A filter that matches everything is indistinguishable

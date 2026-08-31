@@ -582,6 +582,11 @@ function renderLayers() {
     button.onclick = () => setLayer(layer.key);
     bar.append(button);
   });
+
+  // The UI/UX link that used to sit here, after a divider, is gone: **it is a
+  // tab now.** A link beside the tabs pointing at the tab next to it is the
+  // clutter it was added to fix, one turn further round.
+
   renderModes();
 }
 
@@ -1199,6 +1204,46 @@ function syncUrl() {
   history.replaceState(null, '', `${location.pathname}?${query}${location.hash}`);
 }
 
+/**
+ * Bring up one of the UI/UX views, the first time it is asked for.
+ *
+ * The module is fetched here rather than at boot. Between them these three pull
+ * the whole `journeys` payload, every board on disk and the platform gap
+ * analysis — none of which a reader looking at contracts has any use for, and
+ * all of which used to be three separate documents precisely to keep it off the
+ * viewer's critical path. A dynamic import keeps that property without keeping
+ * the three documents.
+ *
+ * Each module self-boots on import: it signs in (already done), finds its own
+ * markup by id — which is now inside the section above rather than a page of
+ * its own — and draws. So this only has to import it once and then get out of
+ * the way. The canvas is the exception: it measures a viewport to fit itself
+ * into, and a hidden section measures zero, so it is told to fit again once it
+ * is on screen.
+ */
+const uiuxLoaded = new Map();
+function openUiux(mode) {
+  const src = {
+    'uiux-screens': '/canvas.js',
+    'uiux-boards': '/uiux.js',
+    'uiux-platforms': '/platforms.js',
+  }[mode];
+  if (!src) return;
+  if (!uiuxLoaded.has(mode)) {
+    uiuxLoaded.set(mode, import(src).catch((e) => {
+      // A view that failed to load has to say so in the place the view would
+      // have been. An empty panel reads as "there is nothing here", which is a
+      // different and much worse claim.
+      const box = $(`view-${mode}`);
+      if (box) box.append(el('p', 'auth-note', `Could not load this view: ${e.message}`));
+    }));
+  }
+  // Now that the section is on screen and has a size, let the canvas fit to it.
+  uiuxLoaded.get(mode)?.then(() => {
+    if (mode === 'uiux-screens') window.__canvasFit?.();
+  });
+}
+
 export function setMode(mode) {
   // a keyboard shortcut can name a view another layer owns — follow it there
   if (!layerOf(state.layer).modes.some(([m]) => m === mode)) {
@@ -1226,6 +1271,8 @@ export function setMode(mode) {
   // by the time a view has been asked for, its layer's payload is either here
   // or on its way; either way the tray and the summary want re-reading
   queueMicrotask(() => { refreshLayerCounts(); renderLayerSummary(); });
+  if (mode.startsWith('uiux-')) { openUiux(mode); return; }
+
   if (mode === 'graph') {
     // A galaxy scope parks its frame loop when the view goes away, so coming
     // back has to ask for it again — and the force renderer is not drawing at

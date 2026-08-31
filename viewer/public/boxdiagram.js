@@ -2,11 +2,28 @@
 // their fields) and the Data view (tables with their columns). Boxes carry
 // rows, so collision has to work on rectangles.
 //
-// Boxes are placed in a hierarchy, not thrown into a force simulation: a table
-// sits below the tables it references, so the diagram opens as something you
-// can read top to bottom. Anything can then be dragged anywhere, and stays
-// where it is put — the physics is only used to settle a drag, never to decide
-// the initial arrangement. Re-picking the scope restores the tidy layout.
+// **There is no simulation.** Boxes are placed in a hierarchy — a table sits
+// below the tables it references — so the diagram opens as something you can
+// read top to bottom, and then nothing moves it but a hand.
+//
+// There was one, and it was the whole problem. Repulsion, springs, gravity
+// toward the origin and two collision passes ran under a decaying alpha, and
+// **every interaction re-heated them**: `mousedown` on a box re-heated by 0.25,
+// so *clicking a table to read it* set the entire diagram drifting for a second
+// and a half and left it somewhere else. A reader who had spent a minute
+// learning the shape of a schema lost it by pointing at one table.
+//
+// Pinning the dropped box was tried first and is not enough. It fixes the box
+// you touched and leaves every other box on the canvas free to wander, which is
+// the same complaint one box smaller: the structure is the thing being read,
+// and a structure that rearranges itself when you look at it cannot be read at
+// all.
+//
+// So the arrangement is deterministic and it is final. `relayout()` computes it
+// and records where it put each box; a drag moves one box and nothing else; a
+// double-click puts that box back where the layout had it; re-picking the scope
+// lays the whole thing out again. The only loop left is the pulse that animates
+// a hovered box's edges, which moves nothing.
 
 import { enableTouch } from './touch.js';
 import { hue, alpha } from './core.js';
@@ -74,8 +91,6 @@ export class BoxDiagram {
     this.width = 900;
     this.height = 600;
     this.transform = { x: 0, y: 0, k: 1 };
-    this.alpha = 0;
-    this.running = false;
 
     this._drag = null;
     this._pan = null;
@@ -118,6 +133,11 @@ export class BoxDiagram {
         h: HEADER_H + PAD_Y * 2 + shown * ROW_H + (total > MAX_ROWS ? ROW_H : 0),
         x: keepPositions ? old.x : 0,
         y: keepPositions ? old.y : 0,
+        // A box the reader dropped somewhere is pinned there, and the pin
+        // survives a live reload of the same scope for exactly the reason the
+        // position does — it is the reader's arrangement, not ours.
+        fx: keepPositions ? old.fx : undefined,
+        fy: keepPositions ? old.fy : undefined,
         vx: 0,
         vy: 0,
         degree: 0,
@@ -148,9 +168,11 @@ export class BoxDiagram {
       this.userAdjusted = false;
       this.relayout();
     }
-    // no simulation on open — the layout is already the answer
-    this.alpha = 0;
-    this._run();
+    // The layout is the answer, so there is nothing to converge on. `onSettle`
+    // still has to fire — the auto-fit waits on it — so it fires on the next
+    // frame, which is when the first draw has happened and the extent it wants
+    // to fit is real.
+    this._settle();
   }
 
   /**
@@ -158,8 +180,16 @@ export class BoxDiagram {
    * the most-referenced things — the tables the rest of the schema hangs off —
    * end up along the top. Deterministic, so the same data always draws the
    * same picture.
+   *
+   * This is the reset, so it also drops every hand-placed box: a tidy layout
+   * that half its boxes were still nailed out of is not the tidy layout.
+   *
+   * @param {{keep?: boolean}} [opts]  `keep` holds the boxes the reader moved
+   *   where they left them. Used when a box is folded open and the rows have to
+   *   re-flow around its new height — re-flowing is expected there, throwing
+   *   away somebody's arrangement is not.
    */
-  relayout() {
+  relayout({ keep = false } = {}) {
     const nodes = this.nodes;
     if (!nodes.length) return;
 
@@ -255,22 +285,69 @@ export class BoxDiagram {
     const midY = y / 2;
     for (const node of nodes) {
       node.y -= midY;
-      node.vx = 0;
-      node.vy = 0;
       delete node._bary;
+      // Where the layout put it. Kept on the node so a double-click can put it
+      // back — with no simulation to hand a box to, "release" has to mean
+      // something, and the only meaningful thing it can mean is *here*.
+      node.lx = node.x;
+      node.ly = node.y;
+      if (keep && node.fx != null) {
+        node.x = node.fx;
+        node.y = node.fy;
+      } else {
+        node.fx = undefined;
+        node.fy = undefined;
+      }
     }
     this.draw();
   }
 
-  _run() {
-    if (this.running) return;
-    this.running = true;
-    this._raf = requestAnimationFrame(() => this._tick());
+  /**
+   * Put a hand-placed box — or, with no argument, all of them — back where the
+   * layout had it. Double-click is the gesture.
+   *
+   * It snaps rather than animating. An animation here would be a box moving on
+   * its own, which is the thing this file no longer does, and the reader asked
+   * for it this time so there is nothing to soften.
+   */
+  unpin(node) {
+    let any = false;
+    for (const n of node ? [node] : this.nodes) {
+      if (n.fx == null) continue;
+      n.fx = undefined;
+      n.fy = undefined;
+      if (n.lx != null) { n.x = n.lx; n.y = n.ly; }
+      any = true;
+    }
+    if (any) {
+      this.userAdjusted = true;
+      this.draw();
+    }
+    return any;
   }
 
-  reheat(alpha = 0.5) {
-    this.alpha = Math.max(this.alpha, alpha);
-    this._run();
+  /** How many boxes the reader has placed by hand. Read by the harness. */
+  pinnedCount() {
+    return this.nodes.reduce((n, node) => n + (node.fx == null ? 0 : 1), 0);
+  }
+
+  /** Draw, then tell whoever is waiting that the picture is final. */
+  _settle() {
+    cancelAnimationFrame(this._raf);
+    this._raf = requestAnimationFrame(() => {
+      this._raf = null;
+      this.draw();
+      this.onSettle?.();
+    });
+  }
+
+  /**
+   * Kept because callers outside this file say it, and because a name that
+   * still exists and does nothing is easier to find than one that was deleted
+   * from under them. There is no field to heat.
+   */
+  reheat() {
+    this._settle();
   }
 
   /**
@@ -288,107 +365,21 @@ export class BoxDiagram {
         return;
       }
       this._flowPhase = (this._flowPhase + PULSE_SPEED) % PULSE_GAP;
-      if (!this.running) this.draw();
+      this.draw();
       this._flowRaf = requestAnimationFrame(step);
     };
     this._flowRaf = requestAnimationFrame(step);
   }
 
-  // ── simulation ──────────────────────────────────────────────────
-  _tick() {
-    const nodes = this.nodes;
-    const n = nodes.length;
-
-    if (this.alpha > 0.01 && n) {
-      const repulsion = Math.max(60000, 20000 + n * 900);
-
-      for (let i = 0; i < n; i++) {
-        const a = nodes[i];
-        for (let j = i + 1; j < n; j++) {
-          const b = nodes[j];
-          let dx = b.x - a.x;
-          let dy = b.y - a.y;
-          let d2 = dx * dx + dy * dy;
-          if (d2 > 4.5e6) continue;
-          if (d2 < 1e-6) {
-            dx = (Math.random() - 0.5) * 2;
-            dy = (Math.random() - 0.5) * 2;
-            d2 = dx * dx + dy * dy;
-          }
-          const d = Math.sqrt(d2);
-          const effective = Math.max(d, 90);
-          const force = repulsion / (effective * effective);
-          a.vx -= (dx / d) * force; a.vy -= (dy / d) * force;
-          b.vx += (dx / d) * force; b.vy += (dy / d) * force;
-        }
-      }
-
-      for (const edge of this.edges) {
-        const { source: a, target: b } = edge;
-        const dx = b.x - a.x;
-        const dy = b.y - a.y;
-        const d = Math.sqrt(dx * dx + dy * dy) || 0.01;
-        const rest = 300;
-        const force = (d - rest) * 0.03;
-        a.vx += (dx / d) * force; a.vy += (dy / d) * force;
-        b.vx -= (dx / d) * force; b.vy -= (dy / d) * force;
-      }
-
-      const MAX_SPEED = 90;
-      for (const node of nodes) {
-        if (node === this._drag?.node) continue;
-        node.vx -= node.x * 0.01;
-        node.vy -= node.y * 0.01;
-        node.vx *= 0.8;
-        node.vy *= 0.8;
-        const speed = Math.hypot(node.vx, node.vy);
-        if (speed > MAX_SPEED) {
-          node.vx = (node.vx / speed) * MAX_SPEED;
-          node.vy = (node.vy / speed) * MAX_SPEED;
-        }
-        node.x += node.vx * this.alpha;
-        node.y += node.vy * this.alpha;
-      }
-
-      // rectangle collision — push apart along the axis of least overlap
-      for (let pass = 0; pass < 2; pass++) {
-        for (let i = 0; i < n; i++) {
-          const a = nodes[i];
-          for (let j = i + 1; j < n; j++) {
-            const b = nodes[j];
-            const gapX = (a.w + b.w) / 2 + 26;
-            const gapY = (a.h + b.h) / 2 + 20;
-            const dx = b.x - a.x;
-            const dy = b.y - a.y;
-            const overlapX = gapX - Math.abs(dx);
-            const overlapY = gapY - Math.abs(dy);
-            if (overlapX <= 0 || overlapY <= 0) continue;
-
-            if (overlapX < overlapY) {
-              const push = (overlapX / 2) * (dx < 0 ? -1 : 1);
-              if (a !== this._drag?.node) a.x -= push;
-              if (b !== this._drag?.node) b.x += push;
-            } else {
-              const push = (overlapY / 2) * (dy < 0 ? -1 : 1);
-              if (a !== this._drag?.node) a.y -= push;
-              if (b !== this._drag?.node) b.y += push;
-            }
-          }
-        }
-      }
-
-      this.alpha *= 0.965;
-    }
-
-    this.draw();
-
-    if (this.alpha > 0.01 || this._drag) {
-      this._raf = requestAnimationFrame(() => this._tick());
-    } else {
-      this.running = false;
-      this.onSettle?.();
-    }
-  }
+  // ── no simulation ───────────────────────────────────────────────
+  // What used to be here: an O(n²) repulsion pass, a spring pass over the
+  // edges, gravity toward the origin, a velocity integrator and two rectangle
+  // collision passes, all under a decaying alpha that every interaction
+  // re-heated. Thirty-odd tables' worth of that ran on every click.
+  //
+  // The layered placement in `relayout()` already puts the boxes where they
+  // belong and leaves no overlaps to resolve, so all of it was work spent
+  // undoing a good arrangement. A drag repaints; nothing else moves.
 
   // ── view ────────────────────────────────────────────────────────
   _resize() {
@@ -520,8 +511,11 @@ export class BoxDiagram {
     node.hiddenRows = total - shown;
     node.h += grew;
     node.y += grew / 2; // keep the header still; the box opens downward
+    // the pin is on the box, so it moves with it rather than snapping the box
+    // back to where its header used to be halfway through the next frame
+    if (node.fx != null) node.fy = node.y;
     this.userAdjusted = true;
-    this.reheat(0.12);
+    this.relayout({ keep: true });
     this.draw();
     return true;
   }
@@ -680,6 +674,12 @@ export class BoxDiagram {
       // answer to "what is connected to this", so it is marked rather than
       // merely left undimmed
       const neighbour = !selected && related?.has(node.id);
+      // A box the reader nailed down. Said with the border, which is the one
+      // thing on this box already carrying "how much does this matter to you"
+      // — selected is heaviest, a neighbour of it next, this next, the rest
+      // hairline. No new colour and no badge: it is a state of the reader's
+      // arrangement, not a fact about the schema.
+      const pinned = node.fx != null;
       ctx.globalAlpha = faded ? 0.18 : 1;
 
       // body
@@ -695,12 +695,14 @@ export class BoxDiagram {
         ctx.fill();
         ctx.shadowBlur = 0;
       }
-      ctx.lineWidth = selected ? 2.6 : neighbour ? 1.8 : 1;
+      ctx.lineWidth = selected ? 2.6 : neighbour ? 1.8 : pinned ? 1.6 : 1;
       ctx.strokeStyle = selected
         ? accent
         : neighbour
           ? alpha(accent, .55)
-          : border;
+          : pinned
+            ? dim
+            : border;
       ctx.stroke();
 
       // A caption above the box, not inside it.
@@ -800,8 +802,10 @@ export class BoxDiagram {
     canvas.addEventListener('mousedown', (e) => {
       const node = this.nodeAt(e.offsetX, e.offsetY);
       if (node) {
+        // No re-heat. This line was `this.reheat(0.25)`, and it is the whole
+        // bug: pressing on a table to read it set every box on the canvas
+        // moving.
         this._drag = { node, moved: false, sx: e.offsetX, sy: e.offsetY };
-        this.reheat(0.25);
       } else {
         this._pan = { x: e.offsetX, y: e.offsetY, tx: this.transform.x, ty: this.transform.y };
         canvas.style.cursor = 'grabbing';
@@ -814,10 +818,12 @@ export class BoxDiagram {
         const world = this.toWorld(e.clientX - rect.left, e.clientY - rect.top);
         this._drag.node.x = world.x;
         this._drag.node.y = world.y;
-        this._drag.node.vx = 0;
-        this._drag.node.vy = 0;
-        if (Math.abs(e.clientX - rect.left - this._drag.sx) > 3) this._drag.moved = true;
-        this.reheat(0.2);
+        // Both axes. This asked about x alone, so a box dragged straight up or
+        // down was released as an unmoved *click* — it selected the box and,
+        // worse, never counted as an arrangement worth keeping.
+        if (Math.abs(e.clientX - rect.left - this._drag.sx) > 3 ||
+            Math.abs(e.clientY - rect.top - this._drag.sy) > 3) this._drag.moved = true;
+        this.draw();
         return;
       }
       if (this._pan) {
@@ -837,6 +843,16 @@ export class BoxDiagram {
         if (this.foldAt(node, x, y)) this.toggleFold(node);
         else if (row?.refTarget) this.onRow(row, node);
         else this.onSelect(node);
+      } else if (this._drag) {
+        // Dropped. Pin it here — see the note at the top of the file for what
+        // happened when it was simply handed back.
+        // Dropped. `fx`/`fy` is now a record of "a hand put this here", not a
+        // pin against a field — there is no field. It survives a fold, and a
+        // double-click reads it to know there is something to undo.
+        const node = this._drag.node;
+        node.fx = node.x;
+        node.fy = node.y;
+        this.userAdjusted = true;
       }
       this._drag = null;
       this._pan = null;
@@ -859,6 +875,15 @@ export class BoxDiagram {
         if (this._flowing) this._flowRun();
         this.draw();
       }
+    });
+
+    // Double-click a box somebody moved to put it back where the layout had
+    // it. The conventional gesture, and — short of re-picking the scope — the
+    // only way back. On a box nobody moved it does nothing, so the single-click
+    // behaviour above is untouched for every box on a fresh diagram.
+    canvas.addEventListener('dblclick', (e) => {
+      const node = this.nodeAt(e.offsetX, e.offsetY);
+      if (node) this.unpin(node);
     });
 
     canvas.addEventListener('mouseleave', () => {

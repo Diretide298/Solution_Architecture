@@ -18,6 +18,10 @@ import { authed, VIEWER, API } from './_session.mjs';
 
 const MODES = {
   frontend: ['screen', 'journey', 'apps', 'waves', 'audit'],
+  // UI/UX was three standalone pages in `PAGES` below until it became a layer.
+  // Same coverage, better: this walks it the way a reader does, and it asserts
+  // the view rendered rather than merely that the document loaded.
+  uiux: ['uiux-screens', 'uiux-boards', 'uiux-platforms'],
   contracts: ['graph', 'structure', 'er', 'lineage', 'reader', 'audit'],
   domain: ['states', 'events', 'audit'],
   backend: ['data', 'migrations', 'routing', 'audit'],
@@ -37,9 +41,13 @@ const MODES = {
 // It was still reachable from nothing but the header chips on its siblings,
 // which is why nobody noticed either way. Linked from the viewer's own menu now,
 // alongside `/uiux.html`.
+// The pages that are still pages. `/uiux.html`, `/uiux-boards.html`,
+// `/canvas.html` and `/platforms.html` are not: they are views of the `uiux`
+// layer above, and the four addresses now redirect into it. They are covered by
+// the MODES walk, which is stricter — it asserts the view *rendered*, where this
+// list only asserts the document loaded.
 const PAGES = [
   '/validation.html', '/reviews.html', '/admin.html', '/domains.html',
-  '/platforms.html', '/uiux.html',
 ];
 
 let pass = 0, fail = 0;
@@ -126,6 +134,30 @@ for (const path of PAGES) {
   await wait(3500);
   const filled = await page.evaluate(() => document.querySelectorAll('main *').length > 20);
   check(path + ' renders content', filled);
+}
+
+// ── the four retired addresses still land somewhere real ─────────────
+// A redirect that 404s, loops, or drops the project is a dead link, and a dead
+// link that used to work is worse than one that never did — it is in somebody's
+// bookmarks.
+for (const [from, mode] of [
+  ['/uiux.html', 'uiux-screens'],
+  ['/canvas.html', 'uiux-screens'],
+  ['/uiux-boards.html', 'uiux-boards'],
+  ['/platforms.html', 'uiux-platforms'],
+]) {
+  CURRENT = from;
+  await page.goto(VIEWER + from + `?project=${encodeURIComponent(openProject)}`,
+                  { waitUntil: 'domcontentloaded' });
+  await wait(5000);
+  const landed = await page.evaluate((m) => ({
+    url: location.pathname + location.search,
+    layer: document.body.dataset.layer ?? '',
+    filled: (document.getElementById('view-' + m)?.querySelectorAll('*').length ?? 0) > 20,
+  }), mode);
+  check(from + ' still lands on the UI/UX layer',
+    landed.layer === 'uiux' && landed.url.includes(`mode=${mode}`) && landed.filled,
+    `${landed.url} — layer=${landed.layer}, rendered=${landed.filled}`);
 }
 
 check('no console or page errors anywhere', errors.length === 0,

@@ -231,7 +231,9 @@ function draw() {
   await auth.requireSignIn();
 
   const me = auth.account();
-  $('whoami').textContent = me ? `${me.name || me.email} · ${me.role}` : '';
+  // Optional: inside the viewer these views are sections of a page that
+  // already says who you are, so there is no `#whoami` to fill.
+  $('whoami')?.replaceChildren(me ? `${me.name || me.email} · ${me.role}` : '');
 
   let uiux;
   try {

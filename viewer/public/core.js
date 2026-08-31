@@ -34,6 +34,36 @@ export const LAYERS = [
     groups: [['platforms', 'Platforms'], ['modules', 'Modules'], ['waves', 'Waves']],
   },
   {
+    // **UI/UX is a layer, not a set of pages beside the app.**
+    //
+    // It was three standalone pages with their own header, their own navigation
+    // and their own idea of what the chrome should look like — which is how it
+    // ended up with a row of five unrelated chips and no way to tell where you
+    // were. A section of the product does not need a second application to live
+    // in; it needs a tab.
+    //
+    // The cost that argument usually loses to is load time, and it does not
+    // apply: every layer here fetches its own payload the first time it is
+    // opened, and these three views are *imported* the first time they are
+    // opened as well. Nothing about the design work is fetched, parsed or drawn
+    // for a reader who never opens the tab.
+    key: 'uiux',
+    label: 'UI/UX',
+    hint: 'screens, flows and the design boards they are drawn on',
+    tip:
+      'The design work. **screens/** and **flows/** drawn as a canvas you can move ' +
+      'around, one platform at a time; every board on disk, including the ones no ' +
+      'screen points at; and what each platform is still missing. Navigation the ' +
+      'package inferred is marked as inferred throughout — two thirds of it is a ' +
+      'guess, and a picture is the easiest place to forget that.',
+    modes: [
+      ['uiux-screens', 'Screens & flows'],
+      ['uiux-boards', 'Boards'],
+      ['uiux-platforms', 'Platforms'],
+    ],
+    groups: [['platforms', 'Platforms'], ['modules', 'Modules']],
+  },
+  {
     key: 'contracts',
     label: 'Contracts',
     hint: 'the API — the join between the other two layers',
@@ -349,6 +379,7 @@ export const MODE_TIPS = {
 
 export const layerOf = (key) => LAYERS.find((l) => l.key === key) ?? LAYERS[1];
 export const VIEWS = [
+  'uiux-screens', 'uiux-boards', 'uiux-platforms',
   'graph', 'structure', 'er', 'lineage', 'journey', 'screen', 'apps', 'waves',
   'states', 'events', 'data', 'migrations', 'routing', 'reader', 'decisions', 'audit',
   'timeline', 'supersession', 'register', 'decision',

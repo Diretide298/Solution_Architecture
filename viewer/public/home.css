@@ -482,3 +482,32 @@
     min-height: 32px;
   }
 }
+
+/* UI/UX, under the six.
+
+   The rows above are filters — they focus the graph and stay on this page. This
+   one leaves, so it is a link, it is set off by a rule above it, and it carries
+   a line of its own saying what is on the other side. A navigation that looks
+   like the filters beside it is a navigation people click by accident and then
+   learn not to click at all. */
+.home-rail .rail-away {
+  display: block;
+  margin-top: 14px;
+  padding: 11px 0 0;
+  border-top: 1px solid var(--hairline, rgb(255 255 255 / .08));
+  text-decoration: none;
+  color: inherit;
+}
+.home-rail .rail-away .rail-name {
+  display: block;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--support);
+}
+.home-rail .rail-away .rail-away-note {
+  display: block;
+  margin-top: 2px;
+  font-size: 11px;
+  color: var(--meta-dim);
+}
+.home-rail .rail-away:hover .rail-name { color: var(--accent-bright, #6fe3d8); }

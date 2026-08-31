@@ -3,6 +3,13 @@
 // Naive O(n^2) repulsion — fine for the few hundred nodes any single scope
 // renders, and it keeps the layout stable and dependency-free. The simulation
 // cools with an alpha decay and parks itself, then only re-heats on interaction.
+//
+// A node that has been dragged is *pinned* where it was let go. It used not to
+// be: a drag re-heats the field on every pointer move, so the node was handed
+// back at mouseup to a simulation still carrying ~0.25 of alpha, and gravity,
+// the springs and the two collision passes pulled it out from under the cursor
+// over the following second. `fx`/`fy` on a node mean "this is where it is";
+// every pass that moves a node checks for them, and a double-click clears them.
 
 import { enableTouch } from './touch.js';
 import { hue, alpha } from './core.js';
@@ -122,9 +129,18 @@ export class Graph {
       const old = previous.get(source.id);
       const angle = i * 2.399963; // golden angle
       const r = spread * Math.sqrt((i + 0.5) / nodes.length);
+      // A node the reader dragged keeps its pin across a reload of the same
+      // scope, for the reason it keeps its position: the arrangement is theirs.
+      // A placed layout has no pins — its coordinates already mean something,
+      // and the simulation never runs over it.
       const seeded = this.placed
-        ? { x: source.x, y: source.y }
-        : { x: old?.x ?? Math.cos(angle) * r, y: old?.y ?? Math.sin(angle) * r };
+        ? { x: source.x, y: source.y, fx: undefined, fy: undefined }
+        : {
+            x: old?.x ?? Math.cos(angle) * r,
+            y: old?.y ?? Math.sin(angle) * r,
+            fx: old?.fx,
+            fy: old?.fy,
+          };
       return { ...source, ...seeded, vx: 0, vy: 0, degree: 0 };
     });
 
@@ -204,11 +220,41 @@ export class Graph {
     }
   }
 
+  /**
+   * Hand a pinned node — or, with no argument, all of them — back to the
+   * simulation. Double-click is the gesture; this is what it calls.
+   *
+   * The re-heat is small on purpose: the released node has to be free to move,
+   * and nothing else on the graph has to.
+   */
+  unpin(node) {
+    let any = false;
+    for (const n of node ? [node] : this.nodes) {
+      if (n.fx == null) continue;
+      n.fx = undefined;
+      n.fy = undefined;
+      any = true;
+    }
+    if (any) this.reheat(0.25);
+    return any;
+  }
+
+  /** How many nodes the reader has nailed down. Read by the harness. */
+  pinnedCount() {
+    return this.nodes.reduce((n, node) => n + (node.fx == null ? 0 : 1), 0);
+  }
+
   _tick() {
     const nodes = this.nodes;
     const n = nodes.length;
 
     if (this.alpha > 0.008 && n) {
+      // A node being dragged, or one dropped and pinned, still pushes on
+      // everything around it — that is how its neighbours settle around the new
+      // arrangement — but nothing pushes back on it. Every pass below that
+      // would move a node asks this first.
+      const held = (node) => node === this._drag?.node || node.fx != null;
+
       // Repulsion, scaled so dense graphs spread further apart. The near-field
       // distance is floored: an unclamped 1/d^2 term between two nearly
       // coincident nodes produces a velocity spike that diverges immediately.
@@ -265,7 +311,11 @@ export class Graph {
       const gravity = 0.0032 * Math.min(1, 40 / Math.max(40, n));
       const MAX_SPEED = 55;
       for (const node of nodes) {
-        if (node === this._drag?.node) continue;
+        // Held nodes are integrated by the pointer, or not at all. The velocity
+        // is cleared rather than merely unapplied: left to accumulate, the
+        // forces from the passes above would fire the node across the canvas
+        // the instant it was released.
+        if (held(node)) { node.vx = 0; node.vy = 0; continue; }
         node.vx -= node.x * gravity;
         node.vy -= node.y * gravity;
         node.vx *= 0.82;
@@ -306,8 +356,8 @@ export class Graph {
             const push = (minDistance - d) / 2;
             const ux = dx / d;
             const uy = dy / d;
-            if (a !== this._drag?.node) { a.x -= ux * push; a.y -= uy * push; }
-            if (b !== this._drag?.node) { b.x += ux * push; b.y += uy * push; }
+            if (!held(a)) { a.x -= ux * push; a.y -= uy * push; }
+            if (!held(b)) { b.x += ux * push; b.y += uy * push; }
           }
 
           // ---- the labels, pushed apart sideways only
@@ -321,9 +371,22 @@ export class Graph {
           // separates the text and leaves the graph's shape intact
           const push = (gap - spread) / 2;
           const dir = horizontal === 0 ? (i % 2 ? 1 : -1) : Math.sign(horizontal);
-          if (a !== this._drag?.node) a.x -= dir * push * 0.5;
-          if (b !== this._drag?.node) b.x += dir * push * 0.5;
+          if (!held(a)) a.x -= dir * push * 0.5;
+          if (!held(b)) b.x += dir * push * 0.5;
         }
+      }
+
+      // Belt and braces. Whatever the passes above did, a pinned node is where
+      // it was put — so "it stays exactly where you dropped it" holds by
+      // construction rather than by whoever writes the next force remembering
+      // to ask. The node under the pointer is exempt: the pointer moves it, and
+      // its pin is rewritten on drop.
+      for (const node of nodes) {
+        if (node.fx == null || node === this._drag?.node) continue;
+        node.x = node.fx;
+        node.y = node.fy;
+        node.vx = 0;
+        node.vy = 0;
       }
 
       this.alpha *= 0.97;
@@ -557,6 +620,14 @@ export class Graph {
         ctx.lineWidth = 2;
         ctx.strokeStyle = text;
         ctx.stroke();
+      } else if (node.fx != null) {
+        // Pinned. Said with the ring, which already carries "how much does this
+        // one matter to you" — selected heaviest, hovered next, this next,
+        // nothing at all for the rest. Dimmer and thinner than a hover, so a
+        // pinned node reads as held rather than as pointed at.
+        ctx.lineWidth = 1.4;
+        ctx.strokeStyle = dim;
+        ctx.stroke();
       }
 
       // labels — only when they will be readable and uncluttered
@@ -624,6 +695,20 @@ export class Graph {
 
     window.addEventListener('mouseup', () => {
       if (this._drag && !this._drag.moved) this.onSelect(this._drag.node);
+      else if (this._drag) {
+        // Dropped. Pin it here — see the note at the top of the file for what
+        // happened when it was simply handed back to a still-warm field.
+        const node = this._drag.node;
+        node.fx = node.x;
+        node.fy = node.y;
+        node.vx = 0;
+        node.vy = 0;
+        this.userAdjusted = true;
+        // The drag re-heated on every pointer move. The reader is done, so the
+        // neighbours are let settle out of the new arrangement rather than
+        // churning around it for another second.
+        this.alpha = Math.min(this.alpha, 0.15);
+      }
       this._drag = null;
       this._pan = null;
       canvas.classList.remove('dragging');
@@ -667,9 +752,17 @@ export class Graph {
       { passive: false }
     );
 
+    // Double-click opens the node — except on one the reader has pinned, where
+    // it releases the pin instead. Two gestures on one event, and this is the
+    // way round that reads: a pin is something you put there deliberately a
+    // moment ago, so undoing it is the likelier intent, and the second
+    // double-click opens it as it always did. Every node nobody has moved is
+    // unaffected.
     canvas.addEventListener('dblclick', (e) => {
       const node = this.nodeAt(e.offsetX, e.offsetY);
-      if (node) this.onSelect(node, { open: true });
+      if (!node) return;
+      if (node.fx != null) this.unpin(node);
+      else this.onSelect(node, { open: true });
     });
 
     // Fingers. Dragging a node is deliberately not offered: one finger has to

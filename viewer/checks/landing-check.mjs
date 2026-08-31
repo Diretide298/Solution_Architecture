@@ -124,6 +124,50 @@ for (const name of rails) {
 check('every panel link lands on the layer and mode it names',
   wrong.length === 0, `${total} links${wrong.length ? ', wrong: ' + wrong.slice(0, 3).join(' | ') : ''}`);
 
+// ── the rollups in the account panel ────────────────────────────────
+// The loop above walks `#home-panel`, which `app.js` builds per layer. The
+// rollups — domains, platforms, the board list, the canvas — are not in it:
+// they sit in the account panel in the static markup, and were never checked
+// here. That is the same hole they were added to plug. `platforms.html` was an
+// orphan for weeks reachable only from a sibling page's header chip, and
+// nothing failed the whole time, because a link nobody follows and a page
+// nobody serves look identical from here.
+// On the viewer, not the door. `#account-signed` is in `index.html` and is
+// `hidden` until the account panel is opened — the links are in the DOM the
+// whole time, which is what this needs. The door carries none of them.
+await page.goto(`${BASE}/?project=${encodeURIComponent(project)}`, { waitUntil: 'domcontentloaded' });
+await wait(4500);
+const rollups = await page.evaluate(() =>
+  [...document.querySelectorAll('#account-signed a[href$=".html"]')]
+    .map((a) => a.getAttribute('href'))
+    .filter((h, i, all) => h && all.indexOf(h) === i));
+
+// An empty list passes any test you can write about its contents. This one
+// found nothing on the first run — wrong page — and reported PASS, which is the
+// same silent hole the nginx drift check had.
+check('the viewer offers rollups at all', rollups.length >= 4, `${rollups.length} found`);
+
+// UI/UX used to be a link in the layer strip, set off by a divider, because it
+// was a page beside the app. It is a layer now, so the assertion that belongs
+// here is that the strip *offers the tab* — and `renderLayers` clears the tray
+// on every draw, so this reads it after switching layers, which is the state a
+// hand-appended link would not have survived.
+await page.evaluate(() => document.querySelector('#layers button:nth-child(3)')?.click());
+await wait(2500);
+const uiuxTab = await page.evaluate(() =>
+  [...document.querySelectorAll('#layers button')].some((b) => b.dataset.layer === 'uiux'));
+check('the layer strip carries UI/UX', uiuxTab, uiuxTab ? '' : 'no uiux tab in the tray');
+
+const deadRollups = [];
+for (const href of rollups) {
+  await page.goto(BASE + href, { waitUntil: 'domcontentloaded' });
+  await wait(4500);
+  const n = await page.evaluate(() => document.querySelectorAll('main *, .canvas-main *').length);
+  if (n <= 20) deadRollups.push(`${href} -> ${n} nodes`);
+}
+check('every rollup the viewer offers actually opens', deadRollups.length === 0,
+  `${rollups.length} rollups: ${rollups.join(', ')}${deadRollups.length ? ' | dead: ' + deadRollups.join(' | ') : ''}`);
+
 // ── Overview deselects rather than navigating ────────────────────────
 // `.rail-overview` is a class, not an id. A probe using getElementById finds
 // nothing, clicks nothing, and reads the *previous* state as this one's result.

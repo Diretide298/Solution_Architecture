@@ -694,7 +694,8 @@ const server = http.createServer(async (req, res) => {
     // A name nobody registered. 404 rather than falling through to the static
     // handler, which would answer a mistyped project with index.html and a
     // reader with a viewer that never loads and never says why.
-    if (!pkg && (route || rest.startsWith('/wireframes/') || rest.startsWith('/designs/'))) {
+    if (!pkg && (route || rest.startsWith('/wireframes/') || rest.startsWith('/designs/')
+                 || rest.startsWith('/ui-design/'))) {
       return send(res, 404, JSON.stringify({
         error: projectId ? `no project called "${projectId}"` : 'no projects are registered',
         projects: [...packages.keys()],
@@ -975,6 +976,26 @@ const server = http.createServer(async (req, res) => {
       return send(res, 200, body, MIME[path.extname(target).toLowerCase()] ?? 'application/octet-stream');
     }
 
+    // The drawn product design, one level down in `ui-design/designs/`. Served
+    // under a single-segment prefix rather than its own path, because the
+    // folder id is what a board's URL is keyed on and a nested id would put a
+    // slash inside it.
+    //
+    // The whole folder again, not just the boards: these pull `support.js`,
+    // `softlabs-logo.webp` and `brand/*.png` by relative path, so serving the
+    // documents alone renders a column of unstyled text with broken images.
+    if (rest.startsWith('/ui-design/')) {
+      const designRoot = path.join(pkg.root, 'ui-design', 'designs');
+      const target = path.resolve(designRoot, decodeURIComponent(rest.slice('/ui-design/'.length)));
+      if (!target.startsWith(designRoot + path.sep)) return send(res, 403, 'refused');
+
+      const file = await stat(target).catch(() => null);
+      if (!file?.isFile()) return send(res, 404, 'not found');
+
+      const body = await readFile(target);
+      return send(res, 200, body, MIME[path.extname(target).toLowerCase()] ?? 'application/octet-stream');
+    }
+
     // --- one frame out of a board ------------------------------------------
     // /frame?board=P01%20Guest%20Web.dc.html&anchor=web-002
     //
@@ -1002,6 +1023,19 @@ const server = http.createServer(async (req, res) => {
       // classes out with it.
       const doc = frameDocument(await readFile(target, 'utf8'), anchor);
       if (!doc) return send(res, 404, `${boardName} has no frame #${anchor}`);
+
+      // `?still=1` — the same frame with its scripts taken out, for the canvas,
+      // which mounts a few dozen of these at thumbnail size.
+      //
+      // The alternative was `allow-scripts` on the iframe, and that is the
+      // wrong trade twice over: a thumbnail has no behaviour to run, and
+      // `allow-scripts` beside `allow-same-origin` is a sandbox that can remove
+      // its own sandbox. Left sandboxed with the scripts still in the document,
+      // the browser blocks each one and logs it — a real console error, on
+      // every tile, for a file doing exactly what was intended.
+      if (url.searchParams.get('still') === '1') {
+        return send(res, 200, doc.replace(/<script\b[^>]*>[\s\S]*?<\/script\s*>/gi, ''), MIME['.html']);
+      }
       return send(res, 200, doc, MIME['.html']);
     }
 

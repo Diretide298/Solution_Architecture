@@ -1,0 +1,453 @@
+/* The screen canvas.
+
+   Three panes that do not scroll the page: a rail of journeys and screens, the
+   canvas itself, and a detail panel that appears when something is picked. The
+   page is fixed to the viewport because a pan/zoom surface inside a scrolling
+   document fights the document for the wheel, and the wheel is how you zoom. */
+
+/* `position: absolute; inset: 0` because this is a `.view` of the viewer now,
+   and that is what a view is. It used to be `fixed` under a 56px header,
+   because it used to be a page — inside the viewer that measured itself against
+   the window and laid the rail out over the layer tabs. */
+.canvas-main {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  grid-template-columns: 300px minmax(0, 1fr);
+  min-height: 0;
+}
+.canvas-main:has(.canvas-detail:not([hidden])) {
+  grid-template-columns: 300px minmax(0, 1fr) 360px;
+}
+
+/* ── the rail ───────────────────────────────────────────────────── */
+.canvas-rail {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  border-right: 1px solid var(--line, #23262b);
+  background: var(--panel, #14171a);
+}
+.canvas-rail-head { padding: 12px; }
+.canvas-search { width: 100%; }
+
+.canvas-rail-tabs {
+  display: flex;
+  gap: 4px;
+  padding: 0 12px 10px;
+  border-bottom: 1px solid var(--line, #23262b);
+}
+.canvas-tab {
+  flex: 1;
+  padding: 7px 10px;
+  font: inherit;
+  font-size: 12px;
+  color: var(--text-faint, #8b949e);
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 7px;
+  cursor: pointer;
+}
+.canvas-tab:hover { color: var(--text, #e6edf3); }
+.canvas-tab.is-on {
+  color: var(--accent-text, #0b0e11);
+  background: var(--accent, #4ac0b8);
+  border-color: var(--accent, #4ac0b8);
+}
+.canvas-tab span { opacity: .7; font-family: var(--mono); font-size: 11px; }
+
+/* The platform list keeps a third of the rail and scrolls inside it, so a
+   fifteen-platform package does not push the journeys off the bottom and a
+   three-platform one does not leave a hole. */
+.canvas-rail-platforms {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  max-height: 34vh;
+  border-bottom: 1px solid var(--line, #23262b);
+}
+.canvas-rail-title {
+  margin: 0;
+  padding: 4px 14px 8px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .07em;
+  text-transform: uppercase;
+  color: var(--text-faint, #8b949e);
+}
+.canvas-rail-title span { font-family: var(--mono); letter-spacing: 0; opacity: .7; }
+.canvas-rail-list { flex: 1; min-height: 0; overflow-y: auto; padding: 0 8px 8px; }
+
+/* Which platform the two lists below are about. The tabs say "Journeys" and
+   "Screens"; without this they read as every journey and every screen in the
+   package, which is what they used to be. */
+.canvas-rail-scope {
+  margin: 0;
+  padding: 8px 14px 0;
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--accent, #4ac0b8);
+}
+
+.canvas-rail-body { flex: 1; min-height: 0; overflow-y: auto; padding: 8px; }
+.cv-rail-empty { margin: 10px 8px; font-size: 12px; color: var(--text-faint, #8b949e); }
+
+/* An exit that leaves the sheet. Same chip, drawn as a doorway rather than a
+   step, because following it swaps the platform under the reader. */
+.chip.is-away { border-style: dashed; opacity: .88; }
+
+/* A row is a code, a name and a line of numbers. The selected one is marked
+   with a bar down its left rather than a box around it: fifteen boxed rows in a
+   300px rail is a stack of cards, and only one of them is the answer. */
+.cv-row {
+  position: relative;
+  display: grid;
+  grid-template-columns: 46px minmax(0, 1fr);
+  grid-template-areas: 'id name' 'id meta';
+  gap: 1px 10px;
+  width: 100%;
+  padding: 8px 10px;
+  text-align: left;
+  font: inherit;
+  color: var(--text, #e6edf3);
+  background: transparent;
+  border: 0;
+  border-radius: 9px;
+  cursor: pointer;
+}
+.cv-row::before {
+  content: '';
+  position: absolute;
+  left: 2px; top: 8px; bottom: 8px;
+  width: 2px;
+  border-radius: 2px;
+  background: transparent;
+}
+.cv-row:hover { background: var(--panel-2, #1b1f24); }
+.cv-row.is-on { background: color-mix(in srgb, var(--accent, #4ac0b8) 13%, transparent); }
+.cv-row.is-on::before { background: var(--accent, #4ac0b8); }
+.cv-row.is-on .cv-row-name { font-weight: 600; }
+.cv-row-id {
+  grid-area: id;
+  align-self: center;
+  font-family: var(--mono); font-size: 11px; font-weight: 500;
+  color: var(--text-faint, #8b949e);
+}
+.cv-row.is-on .cv-row-id { color: var(--accent, #4ac0b8); }
+.cv-row-name {
+  grid-area: name; font-size: 12.5px; line-height: 1.35;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.cv-row-meta { grid-area: meta; font-size: 11px; color: var(--text-faint, #8b949e); }
+
+/* ── the stage ──────────────────────────────────────────────────── */
+.canvas-stage { display: flex; flex-direction: column; min-width: 0; min-height: 0; }
+
+.canvas-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 14px;
+  border-bottom: 1px solid var(--line, #23262b);
+  background: var(--panel, #14171a);
+  flex-wrap: wrap;
+}
+.canvas-bar .scope-select { max-width: 300px; }
+/* The zoom controls are one object, so they are drawn as one: a bordered group
+   rather than four chips that happen to be next to each other. */
+.canvas-zoom {
+  padding: 3px;
+  border: 1px solid var(--line, #23262b);
+  border-radius: 10px;
+  background: var(--bg, #0f1113);
+}
+.canvas-zoom .chip { border-color: transparent; background: transparent; }
+.canvas-zoom .chip:hover { border-color: var(--line, #23262b); background: var(--panel-2, #1b1f24); }
+.canvas-spacer { flex: 1; }
+.canvas-note { font-size: 11.5px; color: var(--text-faint, #8b949e); font-family: var(--mono); }
+.canvas-zoom { display: flex; align-items: center; gap: 6px; }
+.canvas-zoom #zoom-level {
+  min-width: 44px; text-align: center;
+  font-family: var(--mono); font-size: 11.5px; color: var(--text-faint, #8b949e);
+}
+
+.canvas-viewport {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+  cursor: grab;
+  background:
+    radial-gradient(circle at 1px 1px, var(--line, #23262b) 1px, transparent 0) 0 0 / 32px 32px,
+    var(--bg, #0f1113);
+  outline-offset: -2px;
+}
+.canvas-viewport.is-dragging { cursor: grabbing; }
+
+.canvas-world {
+  position: absolute;
+  top: 0; left: 0;
+  transform-origin: 0 0;
+  will-change: transform;
+}
+/* Shelves, then links, then cards. The stack is load-bearing: a filled shelf
+   in the node layer painted over every link crossing it, which is how the first
+   cut lost most of them. */
+.canvas-bands { position: absolute; top: 0; left: 0; }
+.canvas-edges { position: absolute; top: 0; left: 0; overflow: visible; pointer-events: none; }
+.canvas-nodes { position: relative; }
+
+/* ── the shelves ────────────────────────────────────────────────── */
+/* One per module. The grouping is the package's own, and it is the only one a
+   reviewer navigates by — "the ordering screens", not "screens 40 to 70". */
+.cv-band {
+  position: absolute;
+  border: 1px solid var(--line, #23262b);
+  border-radius: 18px;
+  background: color-mix(in srgb, var(--panel, #14171a) 55%, transparent);
+  pointer-events: none;
+}
+.cv-band-head {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  padding: 17px 22px 0;
+}
+.cv-band-label {
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--text, #e6edf3);
+}
+.cv-band-note {
+  font-family: var(--mono);
+  font-size: 11.5px;
+  color: var(--text-faint, #8b949e);
+}
+/* A lane is one journey rather than a shelf of screens, so it is drawn as the
+   thing it is: an accent edge down the left, the way a quote is marked. */
+body.is-lane .cv-band {
+  border-color: color-mix(in srgb, var(--accent, #4ac0b8) 40%, var(--line, #23262b));
+  border-left-width: 3px;
+}
+body.is-lane .cv-band-label { color: var(--accent, #4ac0b8); }
+
+/* ── a screen ───────────────────────────────────────────────────── */
+.cv-card {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+  overflow: hidden;
+  font: inherit;
+  text-align: left;
+  background: var(--panel, #14171a);
+  border: 1px solid var(--line, #23262b);
+  border-radius: 12px;
+  box-shadow: 0 1px 2px rgb(0 0 0 / .32), 0 6px 18px -10px rgb(0 0 0 / .5);
+  cursor: grab;
+  transition: border-color .12s, box-shadow .12s, transform .12s;
+}
+.cv-card:hover {
+  border-color: var(--accent, #4ac0b8);
+  box-shadow: 0 3px 6px rgb(0 0 0 / .36), 0 18px 38px -14px rgb(0 0 0 / .7),
+              0 0 0 3px color-mix(in srgb, var(--accent, #4ac0b8) 18%, transparent);
+  transform: translateY(-3px) scale(1.012);
+  z-index: 3;
+}
+/* At the far end of a link from the card under the pointer. Outlined rather
+   than lifted: lifting these too would make eight cards jump at once, and the
+   question is which ones are connected, not which one is important. */
+.cv-card.is-linked {
+  border-color: color-mix(in srgb, var(--accent, #4ac0b8) 65%, var(--line, #23262b));
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent, #4ac0b8) 35%, transparent);
+  z-index: 2;
+}
+/* Everything the pointer is not asking about steps back. Only while something
+   is hovered — a sheet at rest is not dimmed. */
+.canvas-world.is-hovering .cv-card:not(:hover):not(.is-linked):not(.is-selected) {
+  opacity: .55;
+  transition: opacity .14s;
+}
+.cv-card.is-selected {
+  border-color: var(--accent, #4ac0b8);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent, #4ac0b8) 55%, transparent),
+              0 16px 34px -16px rgb(0 0 0 / .7);
+  z-index: 3;
+}
+/* Moved by hand. Marked, because a card somebody dragged is no longer where the
+   layout says it should be, and a sheet you cannot tell that about is a sheet
+   you cannot trust. */
+.cv-card.is-moved { border-style: dashed; }
+.cv-card.is-dragging {
+  cursor: grabbing;
+  transform: none;
+  z-index: 4;
+  box-shadow: 0 0 0 2px var(--accent, #4ac0b8), 0 26px 50px -18px rgb(0 0 0 / .8);
+  transition: none;
+}
+
+/* A step in a lane that lives on another platform. Drawn, because a journey
+   that crosses to the back office and back is most of what the flows describe,
+   and cutting the lane at the boundary would draw a four-step journey where
+   there is an eight-step one. */
+.cv-card.is-ghost {
+  background: transparent;
+  border-style: dashed;
+  box-shadow: none;
+  opacity: .62;
+}
+.cv-card.is-ghost .cv-frame { background: transparent; }
+
+/* The step number in a lane — the one thing a flow diagram must not make you
+   count. */
+.cv-step {
+  position: absolute;
+  top: 8px; left: 8px;
+  z-index: 2;
+  min-width: 22px;
+  padding: 2px 6px;
+  border-radius: 999px;
+  background: var(--accent, #4ac0b8);
+  color: var(--accent-text, #0b0e11);
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 700;
+  text-align: center;
+}
+
+.cv-frame {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+  background: var(--bg, #0f1113);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.cv-noframe { font-family: var(--mono); font-size: 11px; color: var(--text-faint, #8b949e); }
+
+/* The frame is a full page shrunk into a tile. `transform` rather than a width,
+   because the document inside lays out at its own width and squeezing the
+   element reflows it into something that is not what the board looks like. */
+.cv-iframe {
+  position: absolute;
+  top: 0; left: 0;
+  width: 1200px;
+  height: 900px;
+  border: 0;
+  transform: scale(0.1933);      /* 232 / 1200 */
+  transform-origin: 0 0;
+  pointer-events: none;
+}
+
+.cv-label {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  padding: 5px 8px;
+  border-top: 1px solid var(--line, #23262b);
+  background: var(--panel, #14171a);
+}
+.cv-id { font-family: var(--mono); font-size: 10.5px; color: var(--accent, #4ac0b8); flex: none; }
+.cv-name {
+  font-size: 11.5px; color: var(--text, #e6edf3);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+
+/* ── the links ──────────────────────────────────────────────────── */
+.cv-edge {
+  stroke: var(--line-strong, #363b42);
+  stroke-width: 1.2;
+  fill: none;                    /* a path, not a line — these are curves now */
+  opacity: .3;
+}
+/* The handoffs. A link that leaves the module it starts in is the one the
+   shelves cannot show, so it is the one drawn plainly; everything else sits
+   behind it. */
+.cv-edge.is-cross {
+  stroke: color-mix(in srgb, var(--accent, #4ac0b8) 62%, var(--line-strong, #363b42));
+  stroke-width: 1.7;
+  opacity: .72;
+}
+/* Dashed and dimmer, because it is the package's guess rather than anybody's
+   decision. Two thirds of these are inferred, and drawn identically they would
+   read as a designed flow. */
+.cv-edge.is-inferred { stroke-dasharray: 5 6; opacity: .34; }
+.cv-edge.is-near { stroke: var(--accent, #4ac0b8); stroke-width: 2.2; opacity: 1; }
+/* The rest, while one screen is being asked about. Not hidden — a link that
+   disappears reads as a link that is not there — just faint enough that the
+   lit ones are the only thing the eye follows. */
+.canvas-edges.is-focused .cv-edge:not(.is-near):not(.is-journey) { opacity: .09; }
+.canvas-edges .cv-edge { transition: opacity .14s, stroke-width .14s; }
+.cv-edge.is-journey {
+  stroke: var(--accent, #4ac0b8);
+  stroke-width: 2.4;
+  opacity: 1;
+  stroke-dasharray: none;
+}
+.cv-arrowhead { fill: var(--line-strong, #363b42); }
+.cv-arrowhead.is-cross { fill: color-mix(in srgb, var(--accent, #4ac0b8) 62%, var(--line-strong, #363b42)); }
+.cv-arrowhead.is-near, .cv-arrowhead.is-journey { fill: var(--accent, #4ac0b8); }
+
+/* ── the detail panel ───────────────────────────────────────────── */
+.canvas-detail {
+  min-height: 0;
+  overflow-y: auto;
+  padding: 16px;
+  border-left: 1px solid var(--line, #23262b);
+  background: var(--panel, #14171a);
+}
+.cv-detail-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.cv-detail-id { font-family: var(--mono); font-size: 13px; color: var(--accent, #4ac0b8); }
+.cv-detail-name { margin: 10px 0 2px; font-size: 17px; }
+.cv-detail-where { margin: 0 0 10px; font-size: 11.5px; color: var(--text-faint, #8b949e); }
+.cv-detail-purpose { margin: 0 0 14px; font-size: 13px; line-height: 1.5; }
+.cv-detail-sub { margin: 18px 0 8px; font-size: 12px; text-transform: uppercase; letter-spacing: .05em; color: var(--text-faint, #8b949e); }
+
+.cv-facts {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 5px 14px;
+  margin: 0 0 14px;
+  font-size: 12px;
+}
+.cv-facts dt { color: var(--text-faint, #8b949e); }
+.cv-facts dd { margin: 0; }
+
+.cv-links, .cv-journey-links { display: flex; flex-wrap: wrap; gap: 6px; }
+.cv-journey-links .chip { font-size: 11px; }
+
+@media (max-width: 1100px) {
+  .canvas-main { grid-template-columns: 1fr; }
+  .canvas-main:has(.canvas-detail:not([hidden])) { grid-template-columns: 1fr; }
+  .canvas-rail { display: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .canvas-world { will-change: auto; }
+}
+
+/* ── the layer takes the whole stage ────────────────────────────────
+   The viewer's own file tree and its links pane are both answers to "what does
+   the thing I selected connect to", asked of the index. This layer answers that
+   itself — the rail is a list of platforms and the detail panel is the links —
+   so with all three on screen there were 570px of rails in front of a 730px
+   canvas, and two of them were about a selection this layer does not make.
+
+   Only for this layer, and by attribute rather than by a class somebody has to
+   remember to set: `renderLayers` already stamps `data-layer` on the body. */
+body[data-layer="uiux"] #sidebar-left,
+body[data-layer="uiux"] #sidebar-right {
+  display: none;
+}
+/* The columns go with them. `.app` is a three-column grid with named areas, so
+   hiding the two asides on their own leaves their tracks behind — a 260px gap
+   on the left and a links-pane-wide one on the right, holding nothing. */
+body[data-layer="uiux"] .app {
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-areas:
+    "top"
+    "main";
+}

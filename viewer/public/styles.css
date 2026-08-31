@@ -1986,7 +1986,8 @@ mark.search-hit-first {
     scrollbar-width: none;
   }
   .layer-tray::-webkit-scrollbar, .view-tabs::-webkit-scrollbar { display: none; }
-  .layer-tray button, .mode { flex: none; white-space: nowrap; }
+  .layer-tray button, .layer-away, .mode { flex: none; white-space: nowrap; }
+  .layer-tray-divider { flex: none; }
 
   /* same argument for the per-view toolbars, which are just as dense */
   .graph-toolbar {
@@ -2125,7 +2126,7 @@ mark.search-hit-first {
      tablet band rather than wrapping. Wrapping is what made the row taller than
      --topbar-h, which is what sent the second chrome row off the side. */
   .layer-tray { order: 1; flex: 1 0 100%; min-width: 0; }
-  .layer-tray button { padding: 6px 9px; min-height: 30px; }
+  .layer-tray button, .layer-away { padding: 6px 9px; min-height: 30px; }
 
   /* the wordmark is the first thing to give up its width to the layer rail;
      the mark alone still says which window this is */
