@@ -123,7 +123,33 @@
 .home-hero > * { pointer-events: auto; }
 
 .home-lockup { display: inline-block; }
-.home-lockup img { height: 42px; width: auto; display: block; }
+/* The door's one piece of branding, and it was sitting at the size the viewer's
+   top bar uses -- 42px, chosen to fit beside a row of controls. Nothing sits
+   beside it here, and at that size it read as chrome on a page that is nine
+   tenths empty. At 96px it is the subject, which is what a door is for.
+
+   96 is the ceiling the composition sets, not a preference: the hero is 430px
+   wide and the lockup is 3.57 times as wide as it is tall, so 96px spends 343
+   of those 430. The cut is 200px tall, so this is still under half scale and
+   does not soften.
+
+   `clamp` rather than a media query because the hero is also capped at
+   `calc(100vw - 104px)`, and 343px is wider than that allows below a 447px
+   viewport. Scaling with the viewport keeps the two cuts' aspect ratios intact
+   -- they differ by 4px in width at this height -- where a `max-width` against
+   a fixed height would have squashed one of them. */
+.home-lockup img {
+  height: clamp(52px, 11vw, 96px);
+  width: auto;
+  display: block;
+  /* The scene behind this moves, and both cuts have a ground they lose against:
+     the dark day cut over the scene's `multiply` ink, the white night cut over
+     an additive cluster. `--scrim` is already the colour that hides the scene
+     in each theme, so it is the right halo in both -- pale under day, near
+     black under night. Two passes because one at 0.8-odd alpha fades out before
+     it reaches the ink. */
+  filter: drop-shadow(0 0 14px var(--scrim)) drop-shadow(0 0 5px var(--scrim));
+}
 /* Qualified with `img`, because `.home-lockup img` above sets `display: block`
    and out-specifies a bare class — which renders both cuts, one ghosted over
    the other. */
@@ -133,7 +159,9 @@
 
 /* ── the project list ─────────────────────────────── */
 .home-eyebrow {
-  margin: 30px 0 12px;
+  /* A little further off the lockup than it was, because the lockup grew and
+     the gap read as the two of them being one block. */
+  margin: 36px 0 12px;
   font-size: 11px;
   font-weight: 600;
   letter-spacing: 0.1em;
