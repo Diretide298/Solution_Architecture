@@ -99,7 +99,7 @@ const state = {
   // said they were not.
   links: 'cross',
   showInferred: true,
-  tab: 'journeys',
+  tab: 'platforms',
 };
 
 // ── cards somebody moved ─────────────────────────────────────────────
@@ -146,6 +146,22 @@ function applyMoved(nodes) {
     n.moved = true;
   }
   return nodes;
+}
+
+/**
+ * Hand a screen to the Frontend layer.
+ *
+ * `hashchange` is what carries it, so an id that is already in the address
+ * would arrive as no change at all — double-clicking the same card twice would
+ * work once. Clearing it first with `replaceState` costs no history entry and
+ * makes the second time behave like the first.
+ */
+function openScreen(id) {
+  const want = `screen:${id}`;
+  if (decodeURIComponent(location.hash.slice(1)) === want) {
+    history.replaceState(null, '', location.pathname + location.search);
+  }
+  location.hash = want;
 }
 
 /** `wireframes/P01 Guest Web.dc.html#web-001` -> { board, anchor } */
@@ -682,7 +698,8 @@ function drawNodes() {
     card.dataset.id = n.id;
     card.title = n.ghost
       ? `${n.id} · ${n.screen.name ?? ''} — on ${n.screen.platform ?? 'another platform'}`
-      : `${n.id} · ${n.screen.name ?? ''}`;
+        + '\nDouble-click to go there'
+      : `${n.id} · ${n.screen.name ?? ''}\nDouble-click to open it in Frontend`;
 
     // The step number, in a lane. It is the one thing a flow diagram must not
     // make you count.
@@ -704,6 +721,32 @@ function drawNodes() {
     card.append(label);
 
     card.onclick = () => select(n.id);
+    // Double-click opens the screen's own page in the Frontend layer.
+    //
+    // A single click picks a card and fills the panel beside it, which is the
+    // right weight for "what is this one" while reading a sheet of a hundred
+    // and forty. It is the wrong weight for "take me to it" — that was three
+    // deliberate acts: pick the card, read down the panel, find the link.
+    //
+    // Through `#screen:<id>` rather than by assigning an address. That is the
+    // app's own artefact route: `openArtefactHash` loads the Frontend layer's
+    // parts, sets the layer, sets the screen and sets the mode, and the whole
+    // thing happens without a reload because this canvas is a view of that same
+    // page. Assigning `/?layer=frontend&mode=screen&id=…` would reload and land
+    // on the *view* without the screen — nothing reads that `id`.
+    //
+    // A ghost is a step on another platform rather than a screen on this sheet.
+    // Double-clicking one crosses to where it lives, which is what its chip in
+    // the detail panel does.
+    card.addEventListener('dblclick', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      if (n.ghost) {
+        if (n.screen.platform) { setPlatform(n.screen.platform); select(n.id); centreOn(n.id); }
+        return;
+      }
+      openScreen(n.id);
+    });
     card.addEventListener('pointerenter', () => setHover(n.id));
     card.addEventListener('pointerleave', () => setHover(null));
     wireCardDrag(card, n);
@@ -781,14 +824,17 @@ function drawDetail() {
     if (blank) { a.target = '_blank'; a.rel = 'noopener'; }
     links.append(a);
   };
-  link(`/?layer=frontend&mode=screen&id=${encodeURIComponent(s.id)}`, 'Open in Frontend');
-  link(`/#screen:${encodeURIComponent(s.id)}`, 'Deep link');
+  // `#screen:` and not `?layer=frontend&mode=screen&id=`. Nothing reads that
+  // `id`: the app takes `layer` and `mode` off the query and the artefact off
+  // the hash, so the old form reloaded the page and landed on the Frontend
+  // screen view showing whichever screen was there before.
+  link(`/#screen:${encodeURIComponent(s.id)}`, 'Open in Frontend');
   const ref = frameRef(s);
   if (ref) {
     link(auth.pkgAsset(`/frame?board=${encodeURIComponent(ref.board)}&anchor=${encodeURIComponent(ref.anchor)}`),
       'The frame', true);
   }
-  if (s.file) link(`/uiux.html`, 'Every board');
+  if (s.file) link('/?layer=uiux&mode=uiux-boards', 'Every board');
   box.append(links);
 
   const through = state.flows.filter((f) => (f.steps ?? []).some((st) => st.screenId === s.id));
@@ -1011,6 +1057,21 @@ function wireViewport() {
   // A drag that ends on a card must not also open it.
   vp.addEventListener('click', (e) => { if (moved > 6) { e.stopPropagation(); e.preventDefault(); } }, true);
 
+  // And a click on the sheet itself lets go of the card.
+  //
+  // Escape did this and the panel's own close button did this; the gesture
+  // everybody actually tries — click the empty space — did nothing, so a sheet
+  // stayed half-lit with nine tenths of its links at 9% opacity until somebody
+  // found one of the other two. `moved > 6` is the same threshold that tells a
+  // pan from a tap everywhere else here, so panning the sheet does not drop the
+  // selection out from under you.
+  vp.addEventListener('click', (e) => {
+    if (moved > 6) return;
+    if (e.target.closest('.cv-card')) return;
+    if (!state.selected) return;
+    closeDetail();
+  });
+
   vp.addEventListener('wheel', (e) => {
     e.preventDefault();
     const box = vp.getBoundingClientRect();
@@ -1105,78 +1166,150 @@ function setPlatform(id) {
   buildSheet();
   drawRail();
   noteSheet();
+  if (state.tab === 'platforms') showTab('journeys');
+}
+
+/** A heading in the tree, in the layer's rail components. */
+function railGroup(label, count) {
+  const head = el('div', 'ux-group');
+  head.append(el('span', 'ux-group-caret', '▾'));
+  head.append(el('span', null, label));
+  if (count != null) head.append(el('span', 'ux-group-count', String(count)));
+  return head;
+}
+
+/** A row: a code, a name and a measurement. */
+function railRow({ code, label, meta, on, active, id }) {
+  const row = el('button', 'ux-row is-tall cv-row');
+  row.type = 'button';
+  row.dataset.id = id;
+  row.append(el('span', 'ux-row-code', code));
+  row.append(el('span', 'ux-row-label', label ?? ''));
+  row.append(el('span', 'ux-row-meta', meta));
+  row.classList.toggle('is-on', Boolean(active));
+  row.onclick = on;
+  return row;
+}
+
+/**
+ * What the two lists below are about, said in words.
+ *
+ * This was a line of mono type under the tabs, and before that the platform
+ * list itself sat above them taking a third of the rail — both for the same
+ * reason, which is right: everything under the tabs is scoped to one platform,
+ * and without saying so "Journeys" reads as every journey in the package, which
+ * is what it used to be. Stating it here costs nothing once the platform has
+ * been chosen, and it is on screen whichever tab is showing.
+ */
+function drawScope() {
+  const box = $('rail-scope');
+  box.textContent = '';
+  const here = state.platforms.find((p) => p.id === state.platform);
+  if (!here) {
+    box.append(el('p', 'ux-callout-lead', 'Pick a platform'));
+    box.append(el('p', null, 'The canvas holds one at a time. Everything below is scoped to it.'));
+    box.onclick = null;
+    return;
+  }
+  box.append(el('p', 'ux-callout-lead', here.id));
+  box.append(el('p', null,
+    `${here.name} · ${here.screens} screen${here.screens === 1 ? '' : 's'} `
+    + `· ${here.journeys} journey${here.journeys === 1 ? '' : 's'}. `
+    + 'The journeys and screens below are this platform’s.'));
+  box.title = 'Back to the platform list';
+  box.onclick = () => showTab('platforms');
 }
 
 function drawRail() {
-  // **Platforms first, and always on screen.** The rail used to open on a list
-  // of every journey in the package and a list of every screen in it, neither
-  // of which is a thing a reader is looking for until they have said which
-  // platform they are reviewing. It is the first question, so it is the first
-  // list, and it does not go away when one is picked.
+  // **The platform is the first question**, so it is the first tab and the one
+  // the rail opens on. The rail used to open on a list of every journey in the
+  // package and a list of every screen in it, neither of which is a thing a
+  // reader is looking for until they have said which platform they are
+  // reviewing.
   const pbox = $('rail-platforms');
   pbox.replaceChildren();
+  pbox.append(railGroup('Platforms', state.platforms.length));
   for (const p of state.platforms) {
-    const row = el('button', 'ux-row is-tall cv-row');
-    row.type = 'button';
-    row.dataset.id = p.id;
-    row.append(el('span', 'ux-row-code', p.id));
-    row.append(el('span', 'ux-row-label', p.name));
-    row.append(el('span', 'ux-row-meta',
-      `${p.screens} screen${p.screens === 1 ? '' : 's'} · ${p.journeys} journey${p.journeys === 1 ? '' : 's'}`));
-    row.classList.toggle('is-on', p.id === state.platform);
-    row.onclick = () => setPlatform(p.id);
-    pbox.append(row);
+    pbox.append(railRow({
+      id: p.id, code: p.id, label: p.name,
+      meta: `${p.screens} screen${p.screens === 1 ? '' : 's'} · ${p.journeys} journey${p.journeys === 1 ? '' : 's'}`,
+      active: p.id === state.platform,
+      on: () => setPlatform(p.id),
+    }));
   }
   $('count-platforms').textContent = String(state.platforms.length);
 
-  const here = state.platforms.find((p) => p.id === state.platform);
-  $('rail-scope').textContent = here ? `on ${here.id} — ${here.name}` : '';
+  drawScope();
 
+  // Two groups, because a journey that runs entirely here and one that passes
+  // through on its way somewhere else are two different things to review, and
+  // the difference was a phrase at the end of a line nobody read.
   const jbox = $('rail-journeys');
   jbox.replaceChildren();
   const flows = journeysOn(state.platform);
-  for (const { flow, steps, on } of flows) {
-    const row = el('button', 'ux-row is-tall cv-row');
-    row.type = 'button';
-    row.dataset.id = flow.id;
-    row.append(el('span', 'ux-row-code', flow.id));
-    row.append(el('span', 'ux-row-label', flow.name ?? ''));
-    row.append(el('span', 'ux-row-meta',
-      on === steps ? `${steps} steps` : `${on} of ${steps} steps here`));
-    row.classList.toggle('is-on', flow.id === state.journey);
-    row.onclick = () => pickJourney(flow.id);
-    jbox.append(row);
+  const journeyRow = ({ flow, steps, on }) => railRow({
+    id: flow.id, code: flow.id, label: flow.name ?? '',
+    meta: on === steps ? `${steps} steps` : `${on} of ${steps} steps here`,
+    active: flow.id === state.journey,
+    on: () => pickJourney(flow.id),
+  });
+  const whole = flows.filter((f) => f.on === f.steps);
+  const part = flows.filter((f) => f.on < f.steps);
+  if (whole.length) {
+    jbox.append(railGroup('Wholly here', whole.length));
+    for (const f of whole) jbox.append(journeyRow(f));
+  }
+  if (part.length) {
+    jbox.append(railGroup('Passing through', part.length));
+    for (const f of part) jbox.append(journeyRow(f));
   }
   $('count-journeys').textContent = String(flows.length);
   if (!flows.length) jbox.append(el('p', 'ux-none', 'No journey passes through this platform.'));
 
+  // By module, which is the grouping the sheet itself is shelved by — so the
+  // rail and the canvas are the same picture in two shapes.
   const sbox = $('rail-screens');
   sbox.replaceChildren();
-  for (const s of screensOn(state.platform)) {
-    const row = el('button', 'ux-row is-tall cv-row');
-    row.type = 'button';
-    row.dataset.id = s.id;
-    row.append(el('span', 'ux-row-code', s.id));
-    row.append(el('span', 'ux-row-label', s.name ?? ''));
-    row.append(el('span', 'ux-row-meta', `wave ${s.wave ?? '—'} · ${s.module ?? ''}`));
-    row.onclick = () => { select(s.id); centreOn(s.id); };
-    sbox.append(row);
+  const screens = screensOn(state.platform);
+  const byModule = new Map();
+  for (const s of screens) {
+    const mod = s.module || 'Unmoduled';
+    if (!byModule.has(mod)) byModule.set(mod, []);
+    byModule.get(mod).push(s);
   }
-  $('count-screens').textContent = String(screensOn(state.platform).length);
+  for (const [mod, mine] of [...byModule].sort((a, b) => a[0].localeCompare(b[0]))) {
+    sbox.append(railGroup(mod, mine.length));
+    for (const s of mine) {
+      sbox.append(railRow({
+        id: s.id, code: s.id, label: s.name ?? '',
+        meta: `wave ${s.wave ?? '—'}`,
+        on: () => { select(s.id); centreOn(s.id); },
+      }));
+    }
+  }
+  $('count-screens').textContent = String(screens.length);
+  if (!screens.length) sbox.append(el('p', 'ux-none', 'No screen is on this platform.'));
+}
+
+const RAIL_TABS = [
+  ['tab-platforms', 'rail-platforms', 'platforms'],
+  ['tab-journeys', 'rail-journeys', 'journeys'],
+  ['tab-screens', 'rail-screens', 'screens'],
+];
+
+function showTab(name) {
+  state.tab = name;
+  for (const [tabId, boxId, id] of RAIL_TABS) {
+    const on = id === name;
+    $(tabId).classList.toggle('is-on', on);
+    $(tabId).setAttribute('aria-selected', String(on));
+    $(boxId).hidden = !on;
+  }
 }
 
 function wireRail() {
-  const tabs = [['tab-journeys', 'rail-journeys', 'journeys'], ['tab-screens', 'rail-screens', 'screens']];
-  for (const [tabId, boxId, name] of tabs) {
-    $(tabId).onclick = () => {
-      state.tab = name;
-      for (const [t, b] of tabs.map((x) => [x[0], x[1]])) {
-        const on = t === tabId;
-        $(t).classList.toggle('is-on', on);
-        $(t).setAttribute('aria-selected', String(on));
-        $(b).hidden = !on;
-      }
-    };
+  for (const [tabId, , name] of RAIL_TABS) {
+    $(tabId).onclick = () => showTab(name);
   }
 
   attachSubSearch($('rail-filter'), [

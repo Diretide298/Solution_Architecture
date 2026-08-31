@@ -154,6 +154,22 @@
 }
 .ux-callout.is-clear .ux-callout-lead { font-size: 13px; color: var(--accent-text); }
 
+/* The scope, not a backlog. Same block, accent rather than amber: it states
+   what you are looking at, and an amber panel saying "P01" reads as a fault
+   with P01. */
+.ux-callout.is-scope {
+  border-color: var(--accent-line);
+  border-left-color: var(--accent);
+  background: var(--accent-soft);
+  color: var(--accent-text);
+}
+.ux-callout.is-scope .ux-callout-lead {
+  font-family: var(--mono);
+  font-size: 15px;
+  letter-spacing: 0;
+  color: var(--accent-text);
+}
+
 .ux-tree { flex: 1; min-height: 0; overflow-y: auto; padding: 0 6px 20px; }
 
 .ux-group {

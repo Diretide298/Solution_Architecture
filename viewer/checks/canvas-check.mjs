@@ -220,8 +220,12 @@ check('clicking a screen opens its detail', detail.open && Boolean(detail.name),
   `${picked} — "${detail.name}"`);
 check('which states whether the navigation was declared or guessed',
   detail.facts.includes('Navigation'), detail.facts.join(', '));
-check('and leads back into the Frontend layer',
-  detail.links.some((h) => h.includes('layer=frontend') && h.includes('mode=screen')),
+// `#screen:<id>` and not `?layer=frontend&mode=screen&id=<id>`. The app takes
+// the layer and the mode off the query and the artefact off the hash, so the
+// query form landed on the Frontend screen view showing whichever screen was
+// there before — right page, wrong screen, and nothing failed.
+check('and leads back to this screen in the Frontend layer',
+  detail.links.some((h) => h === `#screen:${picked}` || h.endsWith(`/#screen:${picked}`)),
   detail.links.filter(Boolean).slice(0, 3).join(' | '));
 
 // ── the sheet actually changes ───────────────────────────────────────
@@ -245,6 +249,158 @@ if (other) {
   // the phone.
   check('and says so in the address', swapped.address.includes(`platform=${otherId}`),
     swapped.address);
+}
+
+// ── what the pointer lights ──────────────────────────────────────────
+// Hovering a card answers three questions at once, and the third one is the
+// one that needed the animation: which links are this screen's, which cards are
+// at the far end, and **which way each link runs**. Colour and weight answer
+// the first two. They cannot answer the third — the arrowheads are seven pixels
+// at a zoom where a card is two hundred, and a screen can light a dozen links
+// at once, a good share of them curving back on themselves.
+//
+// So a lit link flows, the same way a lit boundary does in the diagrams. This
+// asserts the animation is actually running rather than merely declared: a
+// keyframe name in the computed style proves the rule matched, and two readings
+// of `stroke-dashoffset` a moment apart prove it is moving. A paused or
+// zero-duration animation passes the first and fails the second, which is
+// exactly the failure worth catching — a rule that matches and does nothing.
+const litCard = await page.evaluate(() => {
+  const inView = [...document.querySelectorAll('.cv-card')].map((c) => {
+    const r = c.getBoundingClientRect();
+    return { id: c.dataset.id, x: r.x + r.width / 2, y: r.y + r.height / 2, w: r.width };
+  }).filter((c) => c.x > 340 && c.y > 230 && c.x < 1600 && c.y < 980 && c.w > 40);
+  return inView[0] ?? null;
+});
+
+if (!litCard) {
+  check('a card is in view to hover', false, 'none inside the viewport at this zoom');
+} else {
+  await page.mouse.move(litCard.x, litCard.y);
+  await wait(900);
+  const lit = await page.evaluate(() => {
+    const svg = document.querySelector('.canvas-edges');
+    const near = document.querySelectorAll('.cv-edge.is-near');
+    const dim = document.querySelector('.cv-edge:not(.is-near):not(.is-journey)');
+    const cs = near[0] ? getComputedStyle(near[0]) : null;
+    return {
+      focused: svg?.classList.contains('is-focused') ?? false,
+      near: near.length,
+      animation: cs?.animationName ?? null,
+      duration: cs?.animationDuration ?? null,
+      dim: dim ? Number(getComputedStyle(dim).opacity) : null,
+      linked: document.querySelectorAll('.cv-card.is-linked').length,
+    };
+  });
+  check('hovering a screen lights its links', lit.focused && lit.near > 0,
+    `focused=${lit.focused}, ${lit.near} lit on ${litCard.id}`);
+  check('and steps the rest back rather than hiding them',
+    lit.dim !== null && lit.dim > 0 && lit.dim < 0.2,
+    `the rest sit at ${lit.dim}`);
+  check('and outlines the screens at the far end', lit.linked > 0, `${lit.linked} linked`);
+  check('a lit link is given the flow animation',
+    /^cv-flow/.test(lit.animation ?? '') && lit.duration !== '0s',
+    `animation "${lit.animation}" for ${lit.duration}`);
+
+  const first = await page.evaluate(
+    () => getComputedStyle(document.querySelector('.cv-edge.is-near')).strokeDashoffset);
+  await wait(280);
+  const second = await page.evaluate(
+    () => getComputedStyle(document.querySelector('.cv-edge.is-near')).strokeDashoffset);
+  check('and it is actually running', first !== second, `dashoffset ${first} -> ${second}`);
+
+  // Off the card, everything goes back. A sheet that stayed focused after the
+  // pointer left would leave nine tenths of the links at 9% opacity for good.
+  await page.mouse.move(4, 4);
+  await wait(500);
+  const rest = await page.evaluate(() => ({
+    focused: document.querySelector('.canvas-edges')?.classList.contains('is-focused') ?? false,
+    near: document.querySelectorAll('.cv-edge.is-near').length,
+  }));
+  check('and it all comes back when the pointer leaves',
+    !rest.focused && rest.near === 0, `focused=${rest.focused}, ${rest.near} still lit`);
+}
+
+// ── the sheet lets go, and a double-click hands the screen on ────────
+// Both are about the same thing: a single click is "what is this one", and the
+// two ways out of it were a keyboard shortcut and a close button in a panel.
+// The gesture everybody actually tries — click the empty space — did nothing,
+// so a sheet stayed half-lit with nine tenths of its links at 9% opacity.
+const target = await page.evaluate(() => {
+  // In view, or the click lands on the background. The sheet is wherever the
+  // checks above left it panned, and a card's rect can be well off-screen.
+  const inView = [...document.querySelectorAll('.cv-card:not(.is-ghost)')].map((c) => {
+    const r = c.getBoundingClientRect();
+    return { id: c.dataset.id, x: r.x + r.width / 2, y: r.y + r.height / 2, w: r.width };
+  }).filter((c) => c.x > 340 && c.y > 230 && c.x < 1600 && c.y < 980 && c.w > 40);
+  return inView[0] ?? null;
+});
+
+if (!target) {
+  check('a card is in view to click', false, 'none inside the viewport at this zoom');
+} else {
+  await page.mouse.click(target.x, target.y);
+  await wait(400);
+  const picked = await page.evaluate(() => ({
+    selected: document.querySelectorAll('.cv-card.is-selected').length,
+    detail: !document.getElementById('detail')?.hidden,
+  }));
+  check('a click picks the screen and opens the panel',
+    picked.selected === 1 && picked.detail,
+    `${picked.selected} selected, panel open=${picked.detail}`);
+
+  // A point on the sheet with no card under it, found rather than guessed: the
+  // detail panel takes 360px off the right of the window while it is open, so a
+  // fixed corner lands on the panel and the click never reaches the canvas.
+  const empty = await page.evaluate(() => {
+    const vp = document.getElementById('viewport').getBoundingClientRect();
+    for (let y = vp.bottom - 24; y > vp.top + 24; y -= 17) {
+      for (let x = vp.right - 24; x > vp.left + 24; x -= 23) {
+        const hit = document.elementFromPoint(x, y);
+        if (hit && !hit.closest('.cv-card')) return { x, y };
+      }
+    }
+    return null;
+  });
+  if (!empty) throw new Error('no empty point on the sheet to click');
+  await page.mouse.click(empty.x, empty.y);
+  await wait(400);
+  const dropped = await page.evaluate(() => ({
+    selected: document.querySelectorAll('.cv-card.is-selected').length,
+    detail: !document.getElementById('detail')?.hidden,
+    focused: document.querySelector('.canvas-edges')?.classList.contains('is-focused') ?? false,
+  }));
+  check('and clicking the sheet lets go of it',
+    dropped.selected === 0 && !dropped.detail && !dropped.focused,
+    `${dropped.selected} selected, panel open=${dropped.detail}, edges focused=${dropped.focused}`);
+
+  // ── and the double-click hands it to Frontend ──
+  // Not `?layer=frontend&mode=screen&id=`: nothing reads that `id`, so the old
+  // form reloaded and landed on the Frontend screen view showing whatever was
+  // there before. `#screen:<id>` is the app's own artefact route and it moves
+  // without a reload, because this canvas is a view of that same page.
+  //
+  // Two press/release pairs, and `count` rather than `clickCount`. Chrome
+  // raises `dblclick` off the *second* release in a sequence, and puppeteer-core
+  // 25 spells the option `count` — passing `clickCount` drops it silently, both
+  // releases arrive with `detail: 1`, and the handler is never reached. The
+  // first cut of this check did exactly that and reported working code as
+  // broken.
+  await page.mouse.click(target.x, target.y);
+  await page.mouse.click(target.x, target.y, { count: 2 });
+  await wait(2500);
+
+  const landed = await page.evaluate(() => ({
+    hash: decodeURIComponent(location.hash),
+    layer: document.body.dataset.layer,
+    mode: document.body.dataset.mode,
+    canvasShown: !document.getElementById('view-uiux-screens')?.hidden,
+  }));
+  check('double-clicking a screen hands it to the Frontend layer',
+    landed.hash === `#screen:${target.id}`, `address is "${landed.hash}"`);
+  check('and the viewer actually moves there',
+    landed.layer === 'frontend' && landed.mode === 'screen' && !landed.canvasShown,
+    `layer=${landed.layer}, mode=${landed.mode}, canvas still shown=${landed.canvasShown}`);
 }
 
 check('no console or page errors', errors.length === 0, errors.slice(0, 3).join(' | '));

@@ -32,30 +32,6 @@
    uiux.css — the layer's rail components, shared with Boards and Platforms.
    What stays here is what is this view's own: how the rail divides. */
 
-/* The platform list keeps a third of the rail and scrolls inside it, so a
-   fifteen-platform package does not push the journeys off the bottom and a
-   three-platform one does not leave a hole. */
-.canvas-rail-platforms {
-  display: flex;
-  flex-direction: column;
-  min-height: 0;
-  max-height: 34vh;
-  border-bottom: 1px solid var(--line);
-}
-.canvas-rail-list { flex: 1; min-height: 0; }
-
-/* Which platform the two lists below are about. The tabs say "Journeys" and
-   "Screens"; without this they read as every journey and every screen in the
-   package, which is what they used to be. */
-.canvas-rail-scope {
-  margin: 0;
-  padding: 8px 14px 0;
-  font-family: var(--mono);
-  font-size: 11px;
-  color: var(--accent, #4ac0b8);
-}
-
-.canvas-rail-body { flex: 1; min-height: 0; overflow-y: auto; padding: 8px; }
 
 /* An exit that leaves the sheet. Same chip, drawn as a doorway rather than a
    step, because following it swaps the platform under the reader. */
@@ -302,6 +278,48 @@ body.is-lane .cv-band-label { color: var(--accent, #4ac0b8); }
    lit ones are the only thing the eye follows. */
 .canvas-edges.is-focused .cv-edge:not(.is-near):not(.is-journey) { opacity: .09; }
 .canvas-edges .cv-edge { transition: opacity .14s, stroke-width .14s; }
+
+/* A lit link flows the way it runs — the same movement the diagrams give a lit
+   boundary, and for the same reason.
+
+   Colour and weight say *which* links belong to the screen under the pointer.
+   They do not say which way any of them runs, and on this sheet that is the
+   harder half: the arrowheads are seven pixels at a zoom where a card is two
+   hundred, a good share of the links curve back on themselves, and one screen
+   can light a dozen at once. A travelling dash answers it before anything is
+   read, and separates what reaches this screen from what it reaches.
+
+   Every path is built `M <from> ... <to>` by `edgePath`, so the drawing order
+   already carries the direction. No new data.
+
+   The offset is two whole dash periods, so the loop has no seam, and only
+   `stroke-dashoffset` animates — it composites without touching layout, which
+   matters when a hover can light a dozen paths over a sheet of 143 cards. */
+@keyframes cv-flow {
+  from { stroke-dashoffset: 0; }
+  to   { stroke-dashoffset: -24; }
+}
+/* An inferred link keeps its own dash while it flows. Overriding the pattern
+   would drop the one thing it says — that the package guessed this — for
+   exactly as long as somebody is looking at it. Its period is 11 rather than
+   12, so it needs an offset of its own, and it runs slower so that two links
+   out of the same card do not read as one moving thing. */
+@keyframes cv-flow-inferred {
+  from { stroke-dashoffset: 0; }
+  to   { stroke-dashoffset: -22; }
+}
+.canvas-edges.is-focused .cv-edge.is-near {
+  stroke-dasharray: 7 5;
+  animation: cv-flow 820ms linear infinite;
+}
+.canvas-edges.is-focused .cv-edge.is-near.is-inferred {
+  stroke-dasharray: 5 6;
+  animation: cv-flow-inferred 1180ms linear infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .canvas-edges.is-focused .cv-edge.is-near,
+  .canvas-edges.is-focused .cv-edge.is-near.is-inferred { animation: none; }
+}
 .cv-edge.is-journey {
   stroke: var(--accent, #4ac0b8);
   stroke-width: 2.4;
