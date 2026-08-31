@@ -170,7 +170,7 @@ chown -R "$APP_USER:$APP_USER" "$APP_DIR"
 # section below still only *checks* that they are there, because that was the
 # whole arrangement. In this tree they are siblings inside one repository:
 #
-#   aster/
+#   adrov/
 #   ├── viewer/     this, with deploy/deploy.sh inside it
 #   └── ticvai/     the delivery package
 #

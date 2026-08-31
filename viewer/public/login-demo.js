@@ -59,9 +59,9 @@ const SCENES = [
     ],
   },
   {
-    file: 'aster/resolve_refs.py', lang: 'python', status: 'resolving',
+    file: 'adrov/resolve_refs.py', lang: 'python', status: 'resolving',
     lines: [
-      ['from aster.graph import Contract, Ref', 'com'],
+      ['from adrov.graph import Contract, Ref', 'com'],
       ['', 'val'],
       ['def resolve(spec: dict) -> list[Ref]:', 'key'],
       ['    out = []', 'val'],
@@ -121,7 +121,7 @@ const SCENES = [
   {
     file: 'client/useAvailability.ts', lang: 'typescript', status: 'linking',
     lines: [
-      ['import { getAvailability } from "@aster/orders";', 'com'],
+      ['import { getAvailability } from "@adrov/orders";', 'com'],
       ['', 'val'],
       ['export function useAvailability(id: string) {', 'key'],
       ['  return useQuery({', 'acc'],

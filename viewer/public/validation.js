@@ -125,6 +125,10 @@ export const asksForWork = (verdict) => ASKS_FOR_WORK.has(verdict);
  * `home.html` remembers the last one opened as a default for the door, and a
  * URL that names one always wins over it.
  */
+// Still spelled `aster-`, and so are the three keys in canvas.js and
+// uiux.js. A storage key is not a name the reader ever sees; it is a name
+// their browser already holds a value under, and renaming one throws that
+// value away without saying so. The product rename does not reach in here.
 const PROJECT_KEY = 'aster-project';
 function readProject() {
   const asked = new URLSearchParams(location.search).get('project');

@@ -527,7 +527,7 @@ async function main() {
   const lockup = document.querySelector('.home-lockup');
   if (lockup) {
     lockup.href = current ? `/home.html?project=${encodeURIComponent(current)}` : '/home.html';
-    lockup.setAttribute('aria-label', 'Aster');
+    lockup.setAttribute('aria-label', 'Adrov');
   }
 
   // A first visit names no project, and every package read below hangs off one.

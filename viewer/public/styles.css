@@ -556,7 +556,7 @@ body {
 
    The mark is drawn rather than served here — the two brand files are <img>
    sources and CSS cannot reach inside one. This is the same geometry, lifted
-   from `brand/aster-mark-day.svg`, with the ink as tokens so one copy serves
+   from `brand/adrov-mark-day.svg`, with the ink as tokens so one copy serves
    both themes.
 
    The animation is a sweep, not a spin: the logo is a network on a sphere, so
@@ -574,7 +574,7 @@ body {
   --loader-veil: #0f1113;
 }
 
-.aster-loader {
+.adrov-loader {
   position: fixed;
   inset: 0;
   z-index: 400;             /* over the chrome, the rails and every dialog */
@@ -587,7 +587,7 @@ body {
   opacity: 1;
   transition: opacity 0.42s ease;
 }
-.aster-loader.is-done { opacity: 0; pointer-events: none; }
+.adrov-loader.is-done { opacity: 0; pointer-events: none; }
 
 .al-mark { width: 92px; height: 92px; display: block; overflow: visible; }
 
@@ -653,7 +653,7 @@ body {
      still the mark, and this is the one frame of it worth showing. */
   .al-link, .al-node { animation: none; opacity: 0.75; transform: none; }
   .al-node { opacity: 1; }
-  .aster-loader { transition: none; }
+  .adrov-loader { transition: none; }
 }
 
 @media (max-width: 520px) {
@@ -2500,7 +2500,7 @@ kbd:has(.icon-arrow) { display: inline-flex; align-items: center; padding: 4px 5
 
 /* No curtain. Not hidden — never rendered: the markup is inline in the body and
    a frame of loading screen is exactly the thing this is removing. */
-html[data-entry] .aster-loader { display: none !important; }
+html[data-entry] .adrov-loader { display: none !important; }
 
 /* What fills the screen instead: the field, across the whole viewport.
  *

@@ -23,14 +23,14 @@
  * case where the claim never arrives.
  */
 
-const ID = 'aster-loader';
+const ID = 'adrov-loader';
 
 // Claimed on import: the head snippet watches this to decide whether anything
 // is going to lower the curtain deliberately, or whether it has to do it on
 // `load` for a page that ships no script at all.
 if (typeof window !== 'undefined') {
-  window.__asterLoader = window.__asterLoader ?? {};
-  window.__asterLoader.claimed = true;
+  window.__adrovLoader = window.__adrovLoader ?? {};
+  window.__adrovLoader.claimed = true;
 }
 
 /** Down, and out of the accessibility tree with it. */
@@ -39,7 +39,7 @@ export function hideLoader() {
   if (!box || box.classList.contains('is-done')) return;
   box.classList.add('is-done');
   box.setAttribute('aria-hidden', 'true');
-  clearTimeout(window.__asterLoader?.timer);
+  clearTimeout(window.__adrovLoader?.timer);
 
   // Removed rather than left transparent: it covers the viewport, and a
   // pointer-events:none overlay is still one focus trap and one stacking

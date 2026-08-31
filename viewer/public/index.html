@@ -14,7 +14,7 @@
         }
       } catch { /* storage can be denied outright; day is a fine fallback */ }
     </script>
-    <title>Aster — TICVAI delivery package</title>
+    <title>Adrov — TICVAI delivery package</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -28,7 +28,7 @@
     <link rel="stylesheet" href="/domains.css" />
     <link rel="stylesheet" href="/uiux.css" />
     <link rel="stylesheet" href="/canvas.css" />
-    <link rel="icon" href="/brand/aster-mark.png" />
+    <link rel="icon" href="/brand/adrov-mark.png" />
     <script>
       // A new browser session starts at the door.
       //
@@ -70,19 +70,19 @@
       // one that never lifts is no page, so this fires whatever else breaks.
       // `loader.js` sets `claimed` on import, which is how a page with a script
       // of its own says it will lower the curtain at the right moment instead.
-      window.__asterLoader = { claimed: false };
+      window.__adrovLoader = { claimed: false };
       (function () {
         var down = function () {
-          var box = document.getElementById('aster-loader');
+          var box = document.getElementById('adrov-loader');
           if (box) { box.classList.add('is-done'); setTimeout(function () { box.remove(); }, 700); }
         };
-        window.__asterLoader.timer = setTimeout(down, 12000);
+        window.__adrovLoader.timer = setTimeout(down, 12000);
         window.addEventListener('load', function () {
           // A page with no script of its own has nothing to say when it is
           // ready, so `load` is as good as it gets. One that imported loader.js
           // is left alone: on the viewer, `load` fires long before the index
           // has been read.
-          setTimeout(function () { if (!window.__asterLoader.claimed) down(); }, 300);
+          setTimeout(function () { if (!window.__adrovLoader.claimed) down(); }, 300);
         });
       })();
     </script>
@@ -93,7 +93,7 @@
          JavaScript misses the module fetch, which is the part of the
          wait it exists to cover. `loader.js` takes it down; the guard in
          the head above is what happens if nothing ever does. -->
-    <div class="aster-loader" id="aster-loader" role="status" aria-live="polite">
+    <div class="adrov-loader" id="adrov-loader" role="status" aria-live="polite">
       <svg class="al-mark" viewBox="0 0 210 210" aria-hidden="true" focusable="false"><g class="al-links"><line class="al-link" style="--i:1" x1="105.0" y1="18.5" x2="148.9" y2="28.9"/><line class="al-link" style="--i:3" x1="148.9" y1="28.9" x2="177.6" y2="63.1"/><line class="al-link" style="--i:5" x1="177.6" y1="63.1" x2="192.9" y2="105.0"/><line class="al-link" style="--i:7" x1="192.9" y1="105.0" x2="180.1" y2="148.4"/><line class="al-link" style="--i:9" x1="180.1" y1="148.4" x2="148.6" y2="180.5"/><line class="al-link" style="--i:11" x1="148.6" y1="180.5" x2="105.0" y2="192.3"/><line class="al-link" style="--i:13" x1="105.0" y1="192.3" x2="62.1" y2="179.3"/><line class="al-link" style="--i:15" x1="62.1" y1="179.3" x2="32.5" y2="146.8"/><line class="al-link" style="--i:17" x1="32.5" y1="146.8" x2="18.1" y2="105.0"/><line class="al-link" style="--i:19" x1="18.1" y1="105.0" x2="32.9" y2="63.4"/><line class="al-link" style="--i:21" x1="32.9" y1="63.4" x2="62.9" y2="32.1"/><line class="al-link" style="--i:23" x1="62.9" y1="32.1" x2="105.0" y2="18.5"/><line class="al-link" style="--i:1" x1="105.0" y1="18.5" x2="143.0" y2="75.0"/><line class="al-link" style="--i:3" x1="148.9" y1="28.9" x2="143.0" y2="75.0"/><line class="al-link" style="--i:4" x1="177.6" y1="63.1" x2="143.0" y2="75.0"/><line class="al-link" style="--i:7" x1="192.9" y1="105.0" x2="149.0" y2="139.0"/><line class="al-link" style="--i:8" x1="180.1" y1="148.4" x2="149.0" y2="139.0"/><line class="al-link" style="--i:11" x1="148.6" y1="180.5" x2="107.0" y2="161.0"/><line class="al-link" style="--i:12" x1="105.0" y1="192.3" x2="107.0" y2="161.0"/><line class="al-link" style="--i:15" x1="62.1" y1="179.3" x2="59.0" y2="135.0"/><line class="al-link" style="--i:16" x1="32.5" y1="146.8" x2="59.0" y2="135.0"/><line class="al-link" style="--i:19" x1="18.1" y1="105.0" x2="71.0" y2="79.0"/><line class="al-link" style="--i:20" x1="32.9" y1="63.4" x2="71.0" y2="79.0"/><line class="al-link" style="--i:21" x1="62.9" y1="32.1" x2="71.0" y2="79.0"/><line class="al-link" style="--i:19" x1="71.0" y1="79.0" x2="89.0" y2="123.0"/><line class="al-link" style="--i:5" x1="143.0" y1="75.0" x2="127.0" y2="115.0"/><line class="al-link" style="--i:14" x1="59.0" y1="135.0" x2="107.0" y2="161.0"/><line class="al-link" style="--i:8" x1="149.0" y1="139.0" x2="127.0" y2="115.0"/><line class="al-link" style="--i:13" x1="89.0" y1="123.0" x2="107.0" y2="161.0"/></g><path class="al-glyph" d="M105,28 C110,64 124,116 151,161 C134,150 119,136 105,127 C91,136 76,150 59,161 C86,116 100,64 105,28 Z"/><path class="al-stand" d="M105,128 L105,176 M105,158 L90,171 M105,158 L120,171"/><g class="al-nodes"><circle class="al-node" style="--i:0" cx="105.0" cy="18.5" r="6.6"/><circle class="al-node" style="--i:2" cx="148.9" cy="28.9" r="6.1"/><circle class="al-node" style="--i:4" cx="177.6" cy="63.1" r="5.5"/><circle class="al-node" style="--i:6" cx="192.9" cy="105.0" r="6.5"/><circle class="al-node" style="--i:8" cx="180.1" cy="148.4" r="5.4"/><circle class="al-node" style="--i:10" cx="148.6" cy="180.5" r="5.6"/><circle class="al-node" style="--i:12" cx="105.0" cy="192.3" r="6.3"/><circle class="al-node" style="--i:14" cx="62.1" cy="179.3" r="5.3"/><circle class="al-node" style="--i:16" cx="32.5" cy="146.8" r="6.6"/><circle class="al-node" style="--i:18" cx="18.1" cy="105.0" r="6.7"/><circle class="al-node" style="--i:20" cx="32.9" cy="63.4" r="5.2"/><circle class="al-node" style="--i:22" cx="62.9" cy="32.1" r="5.4"/><circle class="al-node" style="--i:20" cx="71.0" cy="79.0" r="4.6"/><circle class="al-node" style="--i:3" cx="143.0" cy="75.0" r="5.2"/><circle class="al-node" style="--i:16" cx="59.0" cy="135.0" r="4.4"/><circle class="al-node" style="--i:9" cx="149.0" cy="139.0" r="4.8"/><circle class="al-node" style="--i:12" cx="107.0" cy="161.0" r="4.2"/><circle class="al-node" style="--i:15" cx="89.0" cy="123.0" r="3.6"/><circle class="al-node" style="--i:8" cx="127.0" cy="115.0" r="3.4"/></g></svg>
       <p class="al-text">Reading the delivery package…</p>
     </div>
@@ -128,11 +128,11 @@
                here would be two names for the same picture. -->
           <!-- Back to the door. It used to point at "/", which is this page, so
                the lockup was a reload button dressed as a link. -->
-          <a class="brand" href="/home.html" aria-label="Aster — every layer">
+          <a class="brand" href="/home.html" aria-label="Adrov — every layer">
             <img
               class="brand-lockup"
-              src="/brand/aster-lockup-night.png"
-              alt="Aster — the context layer for AI-assisted development"
+              src="/brand/adrov-lockup-night.png"
+              alt="Adrov — the context layer for AI-assisted development"
             />
           </a>
 
@@ -786,36 +786,33 @@
                the stage and the detail panel stack down the middle of the view. -->
           <div class="canvas-main">
 
-              <!-- The layer's rail, the same one Boards and Platforms use. The
-                   structure is this view's own — see the note on the platform list
-                   below — but the tabs, the filter, the group headings and the rows
-                   are the shared components, so moving between the three views does
-                   not change what kind of place this is. -->
+              <!-- The layer's rail, the same one Boards and Platforms use, and
+                   the same shape: tabs, filter, what is in scope, then the tree.
+
+                   The platform used to sit above the tabs in a pane of its own,
+                   because everything below it is scoped to that pick and a scope
+                   you cannot see is a scope you forget you set. That argument was
+                   right and the answer was wrong — the scope belongs in the
+                   callout, where it is stated in words and is on screen whichever
+                   tab is showing, rather than in a list taking a third of the rail
+                   long after it has been used. -->
               <aside class="canvas-rail ux-rail" id="rail">
-                <div class="ux-rail-find">
-                  <input id="rail-filter" class="ux-input" type="search"
-                         placeholder="Find a screen or a journey…" />
-                  <span class="ux-rail-count" id="rail-count"></span>
-                </div>
-
-                <!-- The platform is the first question and the canvas holds one at a
-                     time, so the list of them is the first thing in the rail and it
-                     stays put when one is picked. That is why this is not a tab like
-                     Boards' three: everything under it is scoped to the pick, and a
-                     scope you cannot see is a scope you forget you set. -->
-                <div class="canvas-rail-platforms">
-                  <h2 class="ux-group"><span class="ux-group-caret">▾</span>Platforms<span class="ux-group-count" id="count-platforms"></span></h2>
-                  <div class="ux-tree canvas-rail-list" id="rail-platforms"></div>
-                </div>
-
                 <div class="ux-tabs" role="tablist">
-                  <button type="button" class="is-on" id="tab-journeys" role="tab" aria-selected="true">Journeys <span id="count-journeys"></span></button>
+                  <button type="button" class="is-on" id="tab-platforms" role="tab" aria-selected="true">Platforms <span id="count-platforms"></span></button>
+                  <button type="button" id="tab-journeys" role="tab" aria-selected="false">Journeys <span id="count-journeys"></span></button>
                   <button type="button" id="tab-screens" role="tab" aria-selected="false">Screens <span id="count-screens"></span></button>
                 </div>
-                <p class="canvas-rail-scope" id="rail-scope"></p>
+                <div class="ux-rail-find">
+                  <input id="rail-filter" class="ux-input" type="search"
+                         placeholder="Find a screen or a journey…"
+                         aria-label="Find a screen or a journey" />
+                  <span class="ux-rail-count" id="rail-count"></span>
+                </div>
+                <div class="ux-callout is-scope" id="rail-scope"></div>
 
-                <div class="ux-tree canvas-rail-body" id="rail-journeys"></div>
-                <div class="ux-tree canvas-rail-body" id="rail-screens" hidden></div>
+                <div class="ux-tree" id="rail-platforms"></div>
+                <div class="ux-tree" id="rail-journeys" hidden></div>
+                <div class="ux-tree" id="rail-screens" hidden></div>
               </aside>
 
               <section class="canvas-stage">

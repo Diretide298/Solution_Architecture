@@ -2,7 +2,7 @@
  * The door sends people where it says it does.
  *
  * `home.html` is the first thing a reader sees and the only page with no
- * harness. It shipped a lockup labelled **"Aster — open the viewer"** that did
+ * harness. It shipped a lockup labelled **"Adrov — open the viewer"** that did
  * not open the viewer: `href="/"` is `index.html`, which bounces a reader back
  * to the door on the **first** load of a session — it gates that on a
  * `ticvai-session` flag it sets itself, and the door never sets it. So the first
@@ -85,7 +85,7 @@ check('the lockup stays on the door', afterLockup.includes('/home.html') && laye
 check('and it keeps the project in the address', afterLockup.includes(`project=${project}`),
   afterLockup.replace(BASE, ''));
 check('the lockup does not claim to open the viewer',
-  (await page.evaluate(() => document.querySelector('.home-lockup')?.getAttribute('aria-label') ?? '')) === 'Aster');
+  (await page.evaluate(() => document.querySelector('.home-lockup')?.getAttribute('aria-label') ?? '')) === 'Adrov');
 
 // ── every panel link lands where it says ─────────────────────────────
 await door();

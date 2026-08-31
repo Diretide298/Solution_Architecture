@@ -7,13 +7,13 @@ script lives inside the viewer half — so the clone is the repository and the
 `cd` is into `viewer`:
 
 ```
-aster/
+adrov/
 |-- viewer/     server.mjs, lib/, public/, api/, and deploy/ within it
 `-- ticvai/     the delivery package -- contracts, screens, flows, states
 ```
 
 ```
-git clone <this repo> /opt/aster && cd /opt/aster/viewer
+git clone <this repo> /opt/adrov && cd /opt/adrov/viewer
 sudo ./deploy/deploy.sh --admin you@softlabsgroup.com
 ```
 
@@ -21,12 +21,12 @@ Run it again whenever you want to deploy. It is idempotent: every step checks
 before it acts.
 
 ```
-cd /opt/aster && git pull && cd viewer && sudo ./deploy/deploy.sh
+cd /opt/adrov && git pull && cd viewer && sudo ./deploy/deploy.sh
 ```
 
 That copies **both** halves: `viewer/` into `/srv/ticvai/viewer`, and every
 package registered in `projects.json` to the place its own `root` points at, so
-`"root": "../ticvai"` means `/srv/ticvai/ticvai` on the server and `aster/ticvai`
+`"root": "../ticvai"` means `/srv/ticvai/ticvai` on the server and `adrov/ticvai`
 in the checkout without either having to know about the other.
 
 It did not always. The packages were separate repositories placed beside the

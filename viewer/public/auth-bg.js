@@ -1,7 +1,7 @@
 /**
  * The node field behind the invite card. From `ui-design/INVITE.md`.
  *
- * The Aster mark is a network drawn on a sphere, so the page it sits on draws
+ * The Adrov mark is a network drawn on a sphere, so the page it sits on draws
  * the same thing at large: a lattice that continuously forms and dissolves.
  *
  * The load-bearing detail is that **there is no edge list**. Every frame, every
