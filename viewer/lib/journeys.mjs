@@ -108,6 +108,14 @@ function indexScreens(files, problems) {
         deployment: platform.deployment ?? null,
         accessibility: screen.accessibility ?? null,
         wireframe: screen.wireframe ?? null,
+        // A screen names a board two ways and they are not the same claim.
+        // `wireframe.board` is the one drawing it calls its own; `boardFrames`
+        // is every frame it owns, and on a module screen that is most of them
+        // -- BO-044 names one board in `wireframe` and eighteen frames here,
+        // nine F&B and nine Retail, because configuring an outlet and
+        // configuring a store are the same screen under a different licence.
+        // Carrying only the first reported those seventeen as unclaimed.
+        boardFrames: Array.isArray(screen.boardFrames) ? screen.boardFrames : [],
         implementation: screen.implementation ?? null,
         openQuestions: Array.isArray(screen.openQuestions) ? screen.openQuestions : [],
         notes: screen.notes ?? null,

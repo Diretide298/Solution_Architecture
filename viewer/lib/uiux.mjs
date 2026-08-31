@@ -220,15 +220,25 @@ export async function buildUiux(root, screens = []) {
   }
 
   // ---- what each board draws, according to the screens ----------------------
-  // Two ways a screen can name a board and they mean different things, so they
+  // Three ways a screen can name a board and they mean different things, so they
   // are kept apart rather than merged into one "used by" list:
   //
   //   board              this screen is drawn here
+  //   frame              this screen owns that frame, from `boardFrames`
   //   generatedFallback  it *was* drawn here, and still is by the generator, but
   //                      a client pack draws it now
   //
-  // Collapsing them would report a superseded generated board as current, which
-  // is the thing `generatedFallback` was added to make visible.
+  // Collapsing board and generatedFallback would report a superseded generated
+  // board as current, which is the thing `generatedFallback` was added to make
+  // visible.
+  //
+  // `frame` is the one this read used to be missing, and it cost 76 frames.
+  // `wireframe.board` carries at most one anchor, so a screen that owns nine
+  // frames on a board declares one of them there and the other eight only in
+  // `boardFrames`; reading the first alone filed the other eight as "no screen
+  // claims this" while a screen had claimed them since 18 August. It is the
+  // same trap the package's own ingestion audit names first -- boardFrames is a
+  // reference too -- reproduced here on the reading side.
   const byFile = new Map(boards.map((b) => [`${b.folder}/${b.file}`.toLowerCase(), b]));
   const claims = new Map(); // board id -> claims[]
   const push = (ref, screen, via) => {
@@ -249,6 +259,7 @@ export async function buildUiux(root, screens = []) {
   for (const screen of screens ?? []) {
     push(screen?.wireframe?.board, screen, 'board');
     push(screen?.wireframe?.generatedFallback, screen, 'generatedFallback');
+    for (const ref of screen?.boardFrames ?? []) push(ref, screen, 'frame');
   }
 
   for (const board of boards) {
@@ -300,13 +311,17 @@ export async function buildUiux(root, screens = []) {
       // the generator draws every screen on every platform and each of them
       // points at its own generated frame — a figure that is true and says
       // nothing.
+      // A `frame` claim counts here for the same reason a `board` one does: the
+      // pack drew that screen, and which of the two keys the author reached for
+      // is not a fact about the drawing. Only `generatedFallback` is the other
+      // thing -- a board that no longer draws what it used to.
       screensDrawn: new Set(
         boards.filter((b) => b.kind === 'pack')
-          .flatMap((b) => b.screens.filter((s) => s.via === 'board').map((s) => s.id))
+          .flatMap((b) => b.screens.filter((s) => s.via !== 'generatedFallback').map((s) => s.id))
       ).size,
       screensGenerated: new Set(
         boards.filter((b) => b.kind === 'generated')
-          .flatMap((b) => b.screens.filter((s) => s.via === 'board').map((s) => s.id))
+          .flatMap((b) => b.screens.filter((s) => s.via !== 'generatedFallback').map((s) => s.id))
       ).size,
     },
   };

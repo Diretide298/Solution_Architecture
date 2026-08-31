@@ -158,14 +158,17 @@ const isFiltered = () =>
 
 /** Platforms no hand-drawn pack covers — the other half of the worklist.
  *
- *  Only `via: 'board'` claims from a `pack` board count. The generator draws
- *  every screen on every platform, so counting every claim says every platform
- *  is covered, which is true of the generated drawing and false of the design.
+ *  Only claims from a `pack` board count. The generator draws every screen on
+ *  every platform, so counting its claims too says every platform is covered,
+ *  which is true of the generated drawing and false of the design.
+ *
+ *  `generatedFallback` is excluded for the same reason and no other: it says a
+ *  board *used to* draw this. `board` and `frame` both say a pack draws it now.
  */
 function platformsWithNoPack() {
   const covered = new Set(
     state.boards.filter((b) => b.kind === 'pack')
-      .flatMap((b) => b.screens.filter((s) => s.via === 'board').map((s) => s.platform))
+      .flatMap((b) => b.screens.filter((s) => s.via !== 'generatedFallback').map((s) => s.platform))
       .filter(Boolean)
   );
   return state.platforms
@@ -406,7 +409,7 @@ function tile(board) {
   if (board.frameCount) {
     for (const f of board.frames.slice(0, CHIP_CAP)) {
       const chip = el('span', `bd-chip is-${frameState(f)}`);
-      chip.title = `${f.anchor} — ${f.name ?? 'no screen names this frame'}`;
+      chip.title = `${f.anchor} — ${f.name ?? 'nothing names this frame'}`;
       chips.append(chip);
     }
     if (board.frameCount > CHIP_CAP) {
@@ -434,17 +437,30 @@ function tile(board) {
   return box;
 }
 
+/** One entry per screen, in the order the claims arrived.
+ *
+ *  A screen claims a board once through `wireframe.board` and once per frame
+ *  through `boardFrames`, so BO-044 arrives ten times on Retail Board 1 -- the
+ *  drawing it calls its own, plus the nine frames it owns. Folding by id is what
+ *  keeps a chip list from repeating one screen ten times over.
+ */
+function byScreen(claims) {
+  const seen = new Map();
+  for (const c of claims) if (!seen.has(c.id)) seen.set(c.id, c);
+  return [...seen.values()];
+}
+
 /** The screens a board draws, kept in two lists because they mean two things. */
 function screensBlock(board) {
   const wrap = el('div', 'uiux-screens');
-  const current = board.screens.filter((s) => s.via === 'board');
-  const superseded = board.screens.filter((s) => s.via === 'generatedFallback');
+  const current = byScreen(board.screens.filter((s) => s.via !== 'generatedFallback'));
+  const superseded = byScreen(board.screens.filter((s) => s.via === 'generatedFallback'));
 
   if (current.length) {
     wrap.append(el('span', 'uiux-screens-label', `draws ${plural(current.length, 'screen')}`));
     for (const s of current.slice(0, 12)) {
       const chip = el('a', 'uiux-screen', s.id);
-      chip.href = `/?layer=frontend&mode=screen&id=${encodeURIComponent(s.id)}`;
+      chip.href = `/#screen:${encodeURIComponent(s.id)}`;
       chip.title = s.name ? `${s.id} — ${s.name}` : s.id;
       wrap.append(chip);
     }
@@ -505,7 +521,7 @@ function card(board) {
     const strip = el('div', 'bd-chips is-inline');
     for (const f of board.frames.slice(0, CHIP_CAP)) {
       const chip = el('span', `bd-chip is-${frameState(f)}`);
-      chip.title = `${f.anchor} — ${f.name ?? 'no screen names this frame'}`;
+      chip.title = `${f.anchor} — ${f.name ?? 'nothing names this frame'}`;
       strip.append(chip);
     }
     if (board.frameCount > CHIP_CAP) {
@@ -625,7 +641,7 @@ function framesTable(shown) {
       anchorCell.append(el('span', 'bd-anchor', f.anchor));
     }
     tr.append(anchorCell);
-    tr.append(el('td', f.name ? '' : 'is-unnamed', f.name ?? 'no screen names this frame'));
+    tr.append(el('td', f.name ? '' : 'is-unnamed', f.name ?? 'nothing names this frame'));
 
     const boardCell = el('td');
     const pickIt = el('button', 'bd-linkish', b.name);
@@ -782,14 +798,14 @@ function drawDetail() {
   fact('platform', board.platforms.join(' · ') || 'nothing declares one', !board.platforms.length);
   box.append(facts);
 
-  const current = board.screens.filter((s) => s.via === 'board');
-  const superseded = board.screens.filter((s) => s.via === 'generatedFallback');
+  const current = byScreen(board.screens.filter((s) => s.via !== 'generatedFallback'));
+  const superseded = byScreen(board.screens.filter((s) => s.via === 'generatedFallback'));
   if (current.length || superseded.length) {
     box.append(el('h3', 'bd-detail-h3', `Screens — ${current.length} drawn here`));
     const wrap = el('div', 'uiux-screens');
     for (const s of current.slice(0, 40)) {
       const chip = el('a', 'uiux-screen', s.id);
-      chip.href = `/?layer=frontend&mode=screen&id=${encodeURIComponent(s.id)}`;
+      chip.href = `/#screen:${encodeURIComponent(s.id)}`;
       chip.title = s.name ? `${s.id} — ${s.name}` : s.id;
       wrap.append(chip);
     }
@@ -827,7 +843,7 @@ function drawDetail() {
         row.append(el('span', 'bd-anchor', f.anchor));
       }
       row.append(el('span', `bd-frame-name${f.name ? '' : ' is-unnamed'}`,
-        f.name ?? 'no screen names this frame'));
+        f.name ?? 'nothing names this frame'));
       list.append(row);
     }
     box.append(list);
