@@ -3,181 +3,181 @@
   "access": {
    "tier": "spine",
    "operations": 19,
-   "module": "3 \u2014 Admission and Access",
+   "module": "3 — Admission and Access",
    "title": "TICVAI Access Control",
-   "tip": "## What this contract covers **The highest-frequency operation in a venue. Must work with no network.** | | | |---|---| | **Tier** | spine | | **Matrix domain** | 3 \u2014 Admission and Access | | **Requirements** | ~201 | | **Capabilities** | C09, C10, C23, C25, C26, C29 | | **Consumed by** | P07 Access Handheld \u00b7 P04 POS \u00b7 P06 Staff Ops App | ## How to read this file **This file is a contract.** It i"
+   "tip": "## What this contract covers **The highest-frequency operation in a venue. Must work with no network.** | | | |---|---| | **Tier** | spine | | **Matrix domain** | 3 — Admission and Access | | **Requirements** | ~201 | | **Capabilities** | C09, C10, C23, C25, C26, C29 | | **Consumed by** | P07 Access Handheld · P04 POS · P06 Staff Ops App | ## How to read this file **This file is a contract.** It i"
   },
   "catalogue": {
    "tier": "spine",
    "operations": 45,
-   "module": "1 \u2014 Ticketing Catalogue",
+   "module": "1 — Ticketing Catalogue",
    "title": "TICVAI Catalogue & Entitlement",
-   "tip": "## What this contract covers **Defines what can be sold and what it grants.** | | | |---|---| | **Tier** | spine | | **Matrix domain** | 1 \u2014 Ticketing Catalogue | | **Requirements** | ~312 | | **Capabilities** | C20, C79, C80, C81, C84, C85, C102, C103, C104 | | **Consumed by** | P08 Venue Back Office \u00b7 P04 POS \u00b7 P01 Guest Web \u00b7 P02 Guest App \u00b7 P05 Kiosk \u00b7 P10 Partner Portal | ## How to read this "
+   "tip": "## What this contract covers **Defines what can be sold and what it grants.** | | | |---|---| | **Tier** | spine | | **Matrix domain** | 1 — Ticketing Catalogue | | **Requirements** | ~312 | | **Capabilities** | C20, C79, C80, C81, C84, C85, C102, C103, C104 | | **Consumed by** | P08 Venue Back Office · P04 POS · P01 Guest Web · P02 Guest App · P05 Kiosk · P10 Partner Portal | ## How to read this "
   },
   "cross-cell": {
    "tier": "spine",
    "operations": 16,
-   "module": "Cross-cutting \u2014 multi-region",
+   "module": "Cross-cutting — multi-region",
    "title": "TICVAI Cross-Cell",
-   "tip": "## What this contract covers **Makes a multi-region tenant behave as one platform without moving personal data.** | | | |---|---| | **Tier** | spine | | **Matrix domain** | Cross-cutting \u2014 multi-region | | **Capabilities** | C56, C37 | | **Consumed by** | Control Plane \u00b7 cell-to-cell | ## How to read this file **This file is a contract.** It is hand-authored and it is the source of truth for one b"
+   "tip": "## What this contract covers **Makes a multi-region tenant behave as one platform without moving personal data.** | | | |---|---| | **Tier** | spine | | **Matrix domain** | Cross-cutting — multi-region | | **Capabilities** | C56, C37 | | **Consumed by** | Control Plane · cell-to-cell | ## How to read this file **This file is a contract.** It is hand-authored and it is the source of truth for one b"
   },
   "finance": {
    "tier": "spine",
    "operations": 46,
-   "module": "5 \u2014 F&B & Guest Management (accounting and revenue recognition)",
+   "module": "5 — F&B & Guest Management (accounting and revenue recognition)",
    "title": "TICVAI Finance & Ledger",
-   "tip": "## What this contract covers **The append-only record of everything. Corrections are entries, never edits.** | | | |---|---| | **Tier** | spine | | **Matrix domain** | 5 \u2014 F&B & Guest Management (accounting and revenue recognition) | | **Requirements** | ~327 | | **Capabilities** | C41, C42, C43, C44, C45, C46, C47, C48, C49, C50 | | **Consumed by** | P08 Venue Back Office | ## How to read this fi"
+   "tip": "## What this contract covers **The append-only record of everything. Corrections are entries, never edits.** | | | |---|---| | **Tier** | spine | | **Matrix domain** | 5 — F&B & Guest Management (accounting and revenue recognition) | | **Requirements** | ~327 | | **Capabilities** | C41, C42, C43, C44, C45, C46, C47, C48, C49, C50 | | **Consumed by** | P08 Venue Back Office | ## How to read this fi"
   },
   "identity": {
    "tier": "spine",
    "operations": 38,
-   "module": "17 \u2014 Guest Mobile App & Branding (auth) + cross-cutting staff auth",
+   "module": "17 — Guest Mobile App & Branding (auth) + cross-cutting staff auth",
    "title": "TICVAI Identity & Authorisation",
-   "tip": "## What this contract covers **Defines who is asking, and what they may do.** | | | |---|---| | **Tier** | spine | | **Matrix domain** | 17 \u2014 Guest Mobile App & Branding (auth) + cross-cutting staff auth | | **Requirements** | ~107 | | **Capabilities** | C35, C36, C56 | | **Consumed by** | All platforms | ## How to read this file **This file is a contract.** It is hand-authored and it is the sourc"
+   "tip": "## What this contract covers **Defines who is asking, and what they may do.** | | | |---|---| | **Tier** | spine | | **Matrix domain** | 17 — Guest Mobile App & Branding (auth) + cross-cutting staff auth | | **Requirements** | ~107 | | **Capabilities** | C35, C36, C56 | | **Consumed by** | All platforms | ## How to read this file **This file is a contract.** It is hand-authored and it is the sourc"
   },
   "orders": {
    "tier": "spine",
    "operations": 38,
-   "module": "2 \u2014 Ticketing Sales",
+   "module": "2 — Ticketing Sales",
    "title": "TICVAI Order & Payment",
-   "tip": "## What this contract covers **Money moves here. One atomic transaction with entitlement and ledger.** | | | |---|---| | **Tier** | spine | | **Matrix domain** | 2 \u2014 Ticketing Sales | | **Requirements** | ~343 | | **Capabilities** | C02, C03, C04, C34, C47 | | **Consumed by** | P04 POS \u00b7 P01 Guest Web \u00b7 P02 Guest App \u00b7 P05 Kiosk \u00b7 P10 Partner Portal \u00b7 P12 Support Console | ## How to read this file"
+   "tip": "## What this contract covers **Money moves here. One atomic transaction with entitlement and ledger.** | | | |---|---| | **Tier** | spine | | **Matrix domain** | 2 — Ticketing Sales | | **Requirements** | ~343 | | **Capabilities** | C02, C03, C04, C34, C47 | | **Consumed by** | P04 POS · P01 Guest Web · P02 Guest App · P05 Kiosk · P10 Partner Portal · P12 Support Console | ## How to read this file"
   },
   "shift": {
    "tier": "spine",
    "operations": 13,
-   "module": "2 \u2014 Ticketing Sales (cash handling)",
+   "module": "2 — Ticketing Sales (cash handling)",
    "title": "TICVAI Shift & Till",
-   "tip": "## What this contract covers **Cash reconciles to a drawer and a person.** | | | |---|---| | **Tier** | spine | | **Matrix domain** | 2 \u2014 Ticketing Sales (cash handling) | | **Capabilities** | C01 | | **Consumed by** | P04 POS \u00b7 P08 Venue Back Office | ## How to read this file **This file is a contract.** It is hand-authored and it is the source of truth for one bounded context: server code, clien"
+   "tip": "## What this contract covers **Cash reconciles to a drawer and a person.** | | | |---|---| | **Tier** | spine | | **Matrix domain** | 2 — Ticketing Sales (cash handling) | | **Capabilities** | C01 | | **Consumed by** | P04 POS · P08 Venue Back Office | ## How to read this file **This file is a contract.** It is hand-authored and it is the source of truth for one bounded context: server code, clien"
   },
   "tenancy": {
    "tier": "spine",
    "operations": 18,
-   "module": "Cross-cutting \u2014 organisation hierarchy",
+   "module": "Cross-cutting — organisation hierarchy",
    "title": "TICVAI Tenancy & Organisation",
-   "tip": "## What this contract covers **Defines where everything else lives.** | | | |---|---| | **Tier** | spine | | **Matrix domain** | Cross-cutting \u2014 organisation hierarchy | | **Capabilities** | C95, C20 | | **Consumed by** | P08 Venue Back Office \u00b7 P04 POS \u00b7 P07 Access Handheld \u00b7 P09 Platform Admin | ## How to read this file **This file is a contract.** It is hand-authored and it is the source of tru"
+   "tip": "## What this contract covers **Defines where everything else lives.** | | | |---|---| | **Tier** | spine | | **Matrix domain** | Cross-cutting — organisation hierarchy | | **Capabilities** | C95, C20 | | **Consumed by** | P08 Venue Back Office · P04 POS · P07 Access Handheld · P09 Platform Admin | ## How to read this file **This file is a contract.** It is hand-authored and it is the source of tru"
   },
   "assets": {
    "tier": "satellite",
    "operations": 10,
-   "module": "21 \u2014 Digital Asset Management",
+   "module": "21 — Digital Asset Management",
    "title": "TICVAI Digital Media Library",
-   "tip": "## What this contract covers **The single library every image, video and document is referenced from.** | | | |---|---| | **Tier** | satellite | | **Matrix domain** | 21 \u2014 Digital Asset Management | | **Requirements** | ~15 | | **Capabilities** | C77 | | **Consumed by** | P08 Venue Back Office \u00b7 P13 White-Label CMS \u00b7 P02 Guest App \u00b7 P01 Guest Web | ## How to read this file **This file is a contrac"
+   "tip": "## What this contract covers **The single library every image, video and document is referenced from.** | | | |---|---| | **Tier** | satellite | | **Matrix domain** | 21 — Digital Asset Management | | **Requirements** | ~15 | | **Capabilities** | C77 | | **Consumed by** | P08 Venue Back Office · P13 White-Label CMS · P02 Guest App · P01 Guest Web | ## How to read this file **This file is a contrac"
   },
   "fnb": {
    "tier": "satellite",
    "operations": 41,
-   "module": "7 \u2014 F&B POS  \u00b7  5 \u2014 F&B & Guest Management (service)",
+   "module": "7 — F&B POS  ·  5 — F&B & Guest Management (service)",
    "title": "TICVAI Food & Beverage",
-   "tip": "## What this contract covers **Menus, table service and kitchen handoff. KDS is an integration point, not a build.** | | | |---|---| | **Tier** | satellite | | **Matrix domain** | 7 \u2014 F&B POS \u00b7 5 \u2014 F&B & Guest Management (service) | | **Requirements** | ~151 | | **Capabilities** | C05, C06, C07, C08, C27, C36, C90 | | **Consumed by** | P04 POS \u00b7 P02 Guest App \u00b7 KDS integration | ## How to read thi"
+   "tip": "## What this contract covers **Menus, table service and kitchen handoff. KDS is an integration point, not a build.** | | | |---|---| | **Tier** | satellite | | **Matrix domain** | 7 — F&B POS · 5 — F&B & Guest Management (service) | | **Requirements** | ~151 | | **Capabilities** | C05, C06, C07, C08, C27, C36, C90 | | **Consumed by** | P04 POS · P02 Guest App · KDS integration | ## How to read thi"
   },
   "games": {
    "tier": "satellite",
    "operations": 13,
-   "module": "9 \u2014 Games & F&B Integration",
+   "module": "9 — Games & F&B Integration",
    "title": "TICVAI Games & Redemption",
-   "tip": "## What this contract covers **Arcade play, game credits and prize redemption.** | | | |---|---| | **Tier** | satellite | | **Matrix domain** | 9 \u2014 Games & F&B Integration | | **Requirements** | ~25 | | **Capabilities** | C07, C28 | | **Consumed by** | P04 POS \u00b7 P06 Staff Ops App \u00b7 P08 Venue Back Office \u00b7 P02 Guest App \u00b7 Game readers \u00b7 Ticket-eater machines | ## How to read this file **This file i"
+   "tip": "## What this contract covers **Arcade play, game credits and prize redemption.** | | | |---|---| | **Tier** | satellite | | **Matrix domain** | 9 — Games & F&B Integration | | **Requirements** | ~25 | | **Capabilities** | C07, C28 | | **Consumed by** | P04 POS · P06 Staff Ops App · P08 Venue Back Office · P02 Guest App · Game readers · Ticket-eater machines | ## How to read this file **This file i"
   },
   "inventory": {
    "tier": "satellite",
    "operations": 39,
-   "module": "13 \u2014 Inventory Management",
+   "module": "13 — Inventory Management",
    "title": "TICVAI Inventory & Procurement",
-   "tip": "## What this contract covers **Stock is a ledger, not a number. Every change is a movement with a reason.** | | | |---|---| | **Tier** | satellite | | **Matrix domain** | 13 \u2014 Inventory Management | | **Requirements** | ~98 | | **Capabilities** | C13, C14 | | **Consumed by** | P06 Staff Ops App \u00b7 P08 Venue Back Office | ## How to read this file **This file is a contract.** It is hand-authored and "
+   "tip": "## What this contract covers **Stock is a ledger, not a number. Every change is a movement with a reason.** | | | |---|---| | **Tier** | satellite | | **Matrix domain** | 13 — Inventory Management | | **Requirements** | ~98 | | **Capabilities** | C13, C14 | | **Consumed by** | P06 Staff Ops App · P08 Venue Back Office | ## How to read this file **This file is a contract.** It is hand-authored and "
   },
   "maintenance": {
    "tier": "satellite",
    "operations": 29,
-   "module": "15 \u2014 Maintenance & Safety Management",
+   "module": "15 — Maintenance & Safety Management",
    "title": "TICVAI Maintenance & Safety",
-   "tip": "## What this contract covers **Assets, work orders, inspections and incidents. Photo-first, offline-capable.** | | | |---|---| | **Tier** | satellite | | **Matrix domain** | 15 \u2014 Maintenance & Safety Management | | **Requirements** | ~50 | | **Capabilities** | C11, C12, C94 | | **Consumed by** | P06 Staff Ops App \u00b7 P08 Venue Back Office | ## How to read this file **This file is a contract.** It is"
+   "tip": "## What this contract covers **Assets, work orders, inspections and incidents. Photo-first, offline-capable.** | | | |---|---| | **Tier** | satellite | | **Matrix domain** | 15 — Maintenance & Safety Management | | **Requirements** | ~50 | | **Capabilities** | C11, C12, C94 | | **Consumed by** | P06 Staff Ops App · P08 Venue Back Office | ## How to read this file **This file is a contract.** It is"
   },
   "marketing-crm": {
    "tier": "satellite",
    "operations": 49,
-   "module": "20 \u2014 Marketing & CRM",
+   "module": "20 — Marketing & CRM",
    "title": "TICVAI Marketing & CRM",
-   "tip": "## What this contract covers **Consent gates everything. A segment is a definition, not a list.** | | | |---|---| | **Tier** | satellite | | **Matrix domain** | 20 \u2014 Marketing & CRM | | **Requirements** | ~319 | | **Capabilities** | C32, C33, C59, C60, C61, C62, C63, C64, C65, C66, C93 | | **Consumed by** | P08 Venue Back Office \u00b7 P12 Support Console \u00b7 P02 Guest App | ## How to read this file **Th"
+   "tip": "## What this contract covers **Consent gates everything. A segment is a definition, not a list.** | | | |---|---| | **Tier** | satellite | | **Matrix domain** | 20 — Marketing & CRM | | **Requirements** | ~319 | | **Capabilities** | C32, C33, C59, C60, C61, C62, C63, C64, C65, C66, C93 | | **Consumed by** | P08 Venue Back Office · P12 Support Console · P02 Guest App | ## How to read this file **Th"
   },
   "platform-ops": {
    "tier": "satellite",
    "operations": 21,
-   "module": "Cross-cutting \u2014 Control Plane release and environment management",
+   "module": "Cross-cutting — Control Plane release and environment management",
    "title": "TICVAI Platform Operations",
-   "tip": "## What this contract covers **Releases, environments and the migration orchestrator.** | | | |---|---| | **Tier** | satellite \u2014 Control Plane | | **Matrix domain** | None. This scope arrived in the 30 July workshop and never reached the requirements matrix | | **Capabilities** | C96 | | **Consumed by** | P09 Platform Admin Console | ## Why this contract exists Thirteen screens in the Platform Adm"
+   "tip": "## What this contract covers **Releases, environments and the migration orchestrator.** | | | |---|---| | **Tier** | satellite — Control Plane | | **Matrix domain** | None. This scope arrived in the 30 July workshop and never reached the requirements matrix | | **Capabilities** | C96 | | **Consumed by** | P09 Platform Admin Console | ## Why this contract exists Thirteen screens in the Platform Adm"
   },
   "promotions": {
    "tier": "satellite",
    "operations": 31,
-   "module": "4 \u2014 Bundles and Promotions",
+   "module": "4 — Bundles and Promotions",
    "title": "TICVAI Promotions & Bundles",
-   "tip": "## What this contract covers **Discounts, coupons, bundles and revenue allocation.** | | | |---|---| | **Tier** | satellite | | **Matrix domain** | 4 \u2014 Bundles and Promotions | | **Requirements** | ~229 | | **Capabilities** | C05, C06, C07, C37, C86, C87, C88, C89, C90 | | **Consumed by** | P08 Venue Back Office \u00b7 P04 POS \u00b7 P01 Guest Web \u00b7 P02 Guest App | ## How to read this file **This file is a "
+   "tip": "## What this contract covers **Discounts, coupons, bundles and revenue allocation.** | | | |---|---| | **Tier** | satellite | | **Matrix domain** | 4 — Bundles and Promotions | | **Requirements** | ~229 | | **Capabilities** | C05, C06, C07, C37, C86, C87, C88, C89, C90 | | **Consumed by** | P08 Venue Back Office · P04 POS · P01 Guest Web · P02 Guest App | ## How to read this file **This file is a "
   },
   "queue": {
    "tier": "satellite",
    "operations": 21,
-   "module": "5 \u2014 F&B & Guest Management (Virtual Queue)",
+   "module": "5 — F&B & Guest Management (Virtual Queue)",
    "title": "TICVAI Virtual Queue",
-   "tip": "## What this contract covers **TICVAI builds the engine and the inbound API; the venue supplies the sensor feed.** | | | |---|---| | **Tier** | satellite | | **Matrix domain** | 5 \u2014 F&B & Guest Management (Virtual Queue) | | **Requirements** | ~46 | | **Capabilities** | C82, C99, C100 | | **Consumed by** | P02 Guest App \u00b7 P06 Staff Ops App \u00b7 Digital signage \u00b7 Sensor feeds | ## How to read this fil"
+   "tip": "## What this contract covers **TICVAI builds the engine and the inbound API; the venue supplies the sensor feed.** | | | |---|---| | **Tier** | satellite | | **Matrix domain** | 5 — F&B & Guest Management (Virtual Queue) | | **Requirements** | ~46 | | **Capabilities** | C82, C99, C100 | | **Consumed by** | P02 Guest App · P06 Staff Ops App · Digital signage · Sensor feeds | ## How to read this fil"
   },
   "reporting": {
    "tier": "satellite",
    "operations": 23,
-   "module": "8 \u2014 Unified Operations Dashboard  \u00b7  cross-cutting",
+   "module": "8 — Unified Operations Dashboard  ·  cross-cutting",
    "title": "TICVAI Reporting & Analytics",
-   "tip": "## What this contract covers **Reads a lag-tolerant replica, never the primary.** | | | |---|---| | **Tier** | satellite | | **Matrix domain** | 8 \u2014 Unified Operations Dashboard \u00b7 cross-cutting | | **Requirements** | ~332 | | **Capabilities** | C21, C97, AI-57 | | **Consumed by** | P08 Venue Back Office \u00b7 P09 Platform Admin Console | ## How to read this file **This file is a contract.** It is hand"
+   "tip": "## What this contract covers **Reads a lag-tolerant replica, never the primary.** | | | |---|---| | **Tier** | satellite | | **Matrix domain** | 8 — Unified Operations Dashboard · cross-cutting | | **Requirements** | ~332 | | **Capabilities** | C21, C97, AI-57 | | **Consumed by** | P08 Venue Back Office · P09 Platform Admin Console | ## How to read this file **This file is a contract.** It is hand"
   },
   "retail": {
    "tier": "satellite",
    "operations": 26,
-   "module": "6 \u2014 Retail POS",
+   "module": "6 — Retail POS",
    "title": "TICVAI Retail",
-   "tip": "## What this contract covers **Merchandise, returns and stored value. Blocked offline \u2014 stock depletes in real time.** | | | |---|---| | **Tier** | satellite | | **Matrix domain** | 6 \u2014 Retail POS | | **Requirements** | ~78 | | **Capabilities** | C08, C21, C37 | | **Consumed by** | P04 POS \u00b7 P02 Guest App | ## How to read this file **This file is a contract.** It is hand-authored and it is the sou"
+   "tip": "## What this contract covers **Merchandise, returns and stored value. Blocked offline — stock depletes in real time.** | | | |---|---| | **Tier** | satellite | | **Matrix domain** | 6 — Retail POS | | **Requirements** | ~78 | | **Capabilities** | C08, C21, C37 | | **Consumed by** | P04 POS · P02 Guest App | ## How to read this file **This file is a contract.** It is hand-authored and it is the sou"
   },
   "seating": {
    "tier": "satellite",
    "operations": 29,
-   "module": "19 \u2014 Seat Management & Venue Mapping",
+   "module": "19 — Seat Management & Venue Mapping",
    "title": "TICVAI Seating & Venue Mapping",
-   "tip": "## What this contract covers **Seat maps, holds and allocation. Seat categories are entitlement concepts.** | | | |---|---| | **Tier** | satellite | | **Matrix domain** | 19 \u2014 Seat Management & Venue Mapping | | **Requirements** | ~112 | | **Capabilities** | C51, C52, C53, C54, C55, C91 | | **Consumed by** | P08 Venue Back Office \u00b7 P04 POS \u00b7 P01 Guest Web \u00b7 P02 Guest App | ## How to read this file"
+   "tip": "## What this contract covers **Seat maps, holds and allocation. Seat categories are entitlement concepts.** | | | |---|---| | **Tier** | satellite | | **Matrix domain** | 19 — Seat Management & Venue Mapping | | **Requirements** | ~112 | | **Capabilities** | C51, C52, C53, C54, C55, C91 | | **Consumed by** | P08 Venue Back Office · P04 POS · P01 Guest Web · P02 Guest App | ## How to read this file"
   },
   "subscription": {
    "tier": "satellite",
    "operations": 36,
-   "module": "18 \u2014 Subscription & Licensing Management",
+   "module": "18 — Subscription & Licensing Management",
    "title": "TICVAI Subscription & Licensing",
-   "tip": "## What this contract covers **Control Plane. Runs outside any cell, because it provisions cells.** | | | |---|---| | **Tier** | satellite | | **Matrix domain** | 18 \u2014 Subscription & Licensing Management | | **Requirements** | ~59 | | **Capabilities** | C74, C75, C95, C96 | | **Consumed by** | P09 Platform Admin Console | ## How to read this file **This file is a contract.** It is hand-authored an"
+   "tip": "## What this contract covers **Control Plane. Runs outside any cell, because it provisions cells.** | | | |---|---| | **Tier** | satellite | | **Matrix domain** | 18 — Subscription & Licensing Management | | **Requirements** | ~59 | | **Capabilities** | C74, C75, C95, C96 | | **Consumed by** | P09 Platform Admin Console | ## How to read this file **This file is a contract.** It is hand-authored an"
   },
   "white-label": {
    "tier": "satellite",
    "operations": 41,
-   "module": "17 \u2014 Guest Mobile App & Branding (builder)",
+   "module": "17 — Guest Mobile App & Branding (builder)",
    "title": "TICVAI White Label Builder",
-   "tip": "## What this contract covers **How a tenant configures their branded guest app. A CMS plus an app builder.** | | | |---|---| | **Tier** | satellite | | **Matrix domain** | 17 \u2014 Guest Mobile App & Branding (builder) | | **Requirements** | ~107 | | **Capabilities** | C57, C105, C106 | | **Consumed by** | P13 White-Label CMS \u00b7 P08 Venue Back Office | ## How to read this file **This file is a contract"
+   "tip": "## What this contract covers **How a tenant configures their branded guest app. A CMS plus an app builder.** | | | |---|---| | **Tier** | satellite | | **Matrix domain** | 17 — Guest Mobile App & Branding (builder) | | **Requirements** | ~107 | | **Capabilities** | C57, C105, C106 | | **Consumed by** | P13 White-Label CMS · P08 Venue Back Office | ## How to read this file **This file is a contract"
   },
   "approvals": {
    "tier": "spine",
    "operations": 13,
-   "module": "11 \u2014 Approval Workflows and Governance",
-   "title": "TICVAI \u2014 Approvals",
+   "module": "11 — Approval Workflows and Governance",
+   "title": "TICVAI — Approvals",
    "tip": "One approval mechanism, not five. Refund thresholds, shift variance, release promotion and manual discount were four bespoke implementations; a fifth was about to be written for AI. Approval records an authorisation and never performs the action."
   },
   "ai": {
    "tier": "satellite",
    "operations": 22,
-   "module": "8 \u2014 Unified Operations Dashboard (AI)",
-   "title": "TICVAI \u2014 AI",
-   "tip": "Retrieval and inference over data the platform already holds. Nothing here needs a trained model \u2014 forecasting, fraud, dynamic pricing and recommendation are parked until there is a season of history. Two stores: Postgres for metadata, Qdrant for embeddings."
+   "module": "8 — Unified Operations Dashboard (AI)",
+   "title": "TICVAI — AI",
+   "tip": "Retrieval and inference over data the platform already holds. Nothing here needs a trained model — forecasting, fraud, dynamic pricing and recommendation are parked until there is a season of history. Two stores: Postgres for metadata, Qdrant for embeddings."
   },
   "workforce": {
    "tier": "satellite",
    "operations": 11,
-   "module": "18 \u2014 Employee Mobile App (workforce)",
-   "title": "TICVAI \u2014 Workforce",
-   "tip": "Rota, attendance and announcements \u2014 the three things the employee app needs that nothing owned. A rota assignment is not a shift: a shift is a cash session, and most people on a rota never touch a till."
+   "module": "18 — Employee Mobile App (workforce)",
+   "title": "TICVAI — Workforce",
+   "tip": "Rota, attendance and announcements — the three things the employee app needs that nothing owned. A rota assignment is not a shift: a shift is a cash session, and most people on a rota never touch a till."
   },
-  "venue-map": "The venue map \u2014 upload, extract, propose, place, publish (CF-123). **Not a seat map**: nothing on it is sold. Extraction is deterministic and lives here; the labelling assistant lives in `ai`, because ADR-0020 says only the AI contract writes AI tables.",
-  "resources": "The bookable-resource bounded context (CF-125). **A specific object checked out to a named guest and returned** \u2014 not a product with an availability envelope, which sells a slot.",
-  "public-api": "The developer-facing surface (CF-135) \u2014 registration, credentials, sandbox, webhooks, quotas, versioning, listings. **Not business capability**: 13.3 asks for ticketing and loyalty APIs and all of them already exist."
+  "venue-map": "The venue map — upload, extract, propose, place, publish (CF-123). **Not a seat map**: nothing on it is sold. Extraction is deterministic and lives here; the labelling assistant lives in `ai`, because ADR-0020 says only the AI contract writes AI tables.",
+  "resources": "The bookable-resource bounded context (CF-125). **A specific object checked out to a named guest and returned** — not a product with an availability envelope, which sells a slot.",
+  "public-api": "The developer-facing surface (CF-135) — registration, credentials, sandbox, webhooks, quotas, versioning, listings. **Not business capability**: 13.3 asks for ticketing and loyalty APIs and all of them already exist."
  },
  "modules": {
   "access": {
@@ -230,7 +230,7 @@
   },
   "pii": {
    "tables": 4,
-   "tip": "Personal data, separately erasable. The only place a subject_id joins back to a person \u2014 which is why reporting reads a replica without it."
+   "tip": "Personal data, separately erasable. The only place a subject_id joins back to a person — which is why reporting reads a replica without it."
   },
   "platform": {
    "tables": 18,
@@ -242,7 +242,7 @@
   },
   "queue": {
    "tables": 4,
-   "tip": "Virtual queues. Wait times come from a sensor, a vendor API, or a supervisor typing them \u2014 manual is a real adaptor."
+   "tip": "Virtual queues. Wait times come from a sensor, a vendor API, or a supervisor typing them — manual is a real adaptor."
   },
   "reporting": {
    "tables": 10,
@@ -275,96 +275,96 @@
  },
  "tables": {
   "access.access_point": {
-   "columns": 10,
-   "tip": "Derived from access.AccessPoint."
+   "columns": 12,
+   "tip": "**A place a credential is presented** — a gate, a turnstile, a door, a scanner position. Carries the rules it applies through `access.admission_rules`"
   },
-  "access.admission_profile": {
+  "access.admission_rules": {
    "columns": 9,
-   "tip": "Derived from access.AdmissionProfile."
+   "tip": "**What a gate checks before it opens** — how early, how late, how many times, and which credentials count. Renamed from `admission_rules`, because *profile* reads as a person"
   },
   "access.blacklist": {
    "columns": 5,
-   "tip": "Derived from access.BlacklistEntry."
+   "tip": "**Who may not be admitted**, and by whose authority"
   },
   "access.scan_event": {
    "columns": 15,
-   "tip": "Derived from access.ScanEvent."
+   "tip": "**Every presentation of a credential, admitted or not.** The highest-volume table in the platform"
   },
   "access.scan_event_unassigned": {
    "columns": 0,
    "tip": "default partition"
   },
   "assets.media_asset": {
-   "columns": 21,
-   "tip": "Derived from assets.MediaAsset."
+   "columns": 23,
+   "tip": "**An image, video or document with a licence and a lifecycle.** Referenced everywhere and owned by one service, so a takedown is one delete"
   },
   "assets.media_collection": {
    "columns": 7,
-   "tip": "Derived from assets.Collection."
+   "tip": "**A named group of assets**, so a gallery is one reference rather than forty"
   },
   "assets.media_upload": {
-   "columns": 6,
-   "tip": "Derived from assets.UploadTicket."
+   "columns": 7,
+   "tip": "**An upload in progress**, with the ticket a client uses to send bytes directly"
   },
   "assets.media_usage": {
-   "columns": 4,
-   "tip": "Derived from assets.MediaUsage."
+   "columns": 6,
+   "tip": "**Where an asset is used.** What a takedown has to check before deleting"
   },
   "catalogue.alternative_code": {
-   "columns": 5,
-   "tip": "Derived from catalogue.AlternativeCode."
+   "columns": 6,
+   "tip": "**Another way to name the same product** — a barcode, a supplier code, a legacy id"
   },
-  "catalogue.attribute_axis": {
+  "catalogue.variant_dimension": {
    "columns": 3,
-   "tip": "Derived from catalogue.AttributeAxis."
+   "tip": "**The axis a product varies along** — size, colour, session length. A t-shirt has one; a timed ticket has none. Renamed from `variant_dimension`"
   },
   "catalogue.channel_allocation": {
-   "columns": 3,
-   "tip": "Derived from catalogue.ChannelAllocation."
+   "columns": 8,
+   "tip": "**How much of a capacity each channel may sell.** Web cannot consume the counter’s share"
   },
   "catalogue.entitlement_template": {
-   "columns": 14,
-   "tip": "Derived from catalogue.EntitlementTemplate."
+   "columns": 33,
+   "tip": "**The rules a ticket carries before anybody buys one** — validity, entries allowed, transferability, what a gate does with it. `access.entitlement` is the issued instance"
   },
-  "catalogue.envelope": {
-   "columns": 10,
-   "tip": "Derived from catalogue.Envelope."
+  "catalogue.channel_capacity": {
+   "columns": 12,
+   "tip": "**How much of a performance each sales channel may sell.** Two hundred seats with eighty to the web, eighty to the box office and forty held back. Renamed from `envelope`, which was unguessable"
   },
   "catalogue.event": {
    "columns": 8,
-   "tip": "Derived from catalogue.Event."
+   "tip": "**A named thing on at a venue**, grouping performances. A concert is an event; each showing is a performance"
   },
-  "catalogue.inventory_lease": {
-   "columns": 14,
-   "tip": "Derived from catalogue.Lease."
+  "catalogue.inventory_hold": {
+   "columns": 15,
+   "tip": "**A short-lived claim on contended stock** while somebody decides. A seat in a basket is held, not sold — CF-115 settled that contended inventory is leased rather than reserved, and the hold expires on its own. Renamed f"
   },
   "catalogue.performance": {
-   "columns": 7,
-   "tip": "Derived from catalogue.Performance."
+   "columns": 10,
+   "tip": "**When a product happens** — a session, a showing, a timed entry slot. Capacity lives here and in `catalogue.channel_capacity`, never on the product"
   },
   "catalogue.price": {
-   "columns": 4,
-   "tip": "Derived from catalogue.Price."
+   "columns": 5,
+   "tip": "**What something costs on one price list.** A change here never rewrites what somebody already paid"
   },
   "catalogue.price_list": {
-   "columns": 10,
-   "tip": "Derived from catalogue.PriceList."
+   "columns": 7,
+   "tip": "**A named set of prices for a region and channel.** Region-scoped, because currency is (ADR-0018)"
   },
   "catalogue.product": {
-   "columns": 15,
-   "tip": "Derived from catalogue.Product."
+   "columns": 21,
+   "tip": "**What a venue sells** — admission, a session, a bundle, a membership, a locker. Not the instance: a product is the offer and `catalogue.performance` is the occasion"
   },
   "catalogue.published_bundle": {
    "columns": 9,
-   "tip": "Derived from catalogue.CatalogueBundle."
+   "tip": "**A catalogue snapshot a till can trade from offline** (ADR-0013). Published, versioned, and the reason a counter works with no network"
   },
   "catalogue.variant": {
    "columns": 5,
-   "tip": "Derived from catalogue.ProductVariant."
+   "tip": "**One sellable configuration of a product** — a size, a colour, a tier. Varies along the dimensions in `catalogue.variant_dimension`"
   },
   "control.cell": {
-   "columns": 13,
-   "tip": "Derived from subscription.Cell."
+   "columns": 20,
+   "tip": "**A deployment and a legal boundary at once** (ADR-0001). One per jurisdiction, carrying its cloud provider, region and endpoint. **Only `CrossRegionService` reaches another one**, and it moves a pseudonymous link rather"
   },
   "control.cell_cluster": {
    "columns": 0,
@@ -372,67 +372,67 @@
   },
   "control.cell_job": {
    "columns": 10,
-   "tip": "Derived from subscription.CellJob."
+   "tip": "**Work running against a cell** — provisioning, migration, decommission"
   },
   "control.environment": {
-   "columns": 8,
-   "tip": "Derived from platform-ops.Environment."
+   "columns": 9,
+   "tip": "**Dev, staging, production — and which cells are in each.** Promotion may require approval and a soak period"
   },
   "control.invoice": {
    "columns": 13,
-   "tip": "Derived from subscription.SubscriptionInvoice."
+   "tip": "**A bill to a tenant.** Lines are children"
   },
   "control.invoice_line": {
    "columns": 7,
-   "tip": "Derived from subscription.SubscriptionInvoice.lines[]."
+   "tip": "**One charge on a tenant invoice**, traced to the usage that produced it"
   },
   "control.licence_add_on": {
    "columns": 6,
-   "tip": "Derived from subscription.LicenceAddOn."
+   "tip": "**Something bought beyond the plan.** **Hangs off**: reaches `control.cell` through its keys; references `control.subscription_plan`. **Reached by**: 4 operations read it and 2 write it."
   },
   "control.migration": {
-   "columns": 10,
-   "tip": "Derived from platform-ops.Migration."
+   "columns": 11,
+   "tip": "**A schema change with a version.** Plans group them; runs record what happened per cell"
   },
   "control.migration_plan": {
    "columns": 7,
-   "tip": "Derived from platform-ops.MigrationPlan."
+   "tip": "**A set of migrations to apply together**, with the cells they target"
   },
   "control.migration_plan_cell": {
    "columns": 7,
-   "tip": "Derived from platform-ops.MigrationPlan.cells[]."
+   "tip": "**One cell in a plan**, and its own readiness"
   },
   "control.migration_run": {
-   "columns": 11,
-   "tip": "Derived from platform-ops.MigrationRun."
+   "columns": 10,
+   "tip": "**One execution of a plan.** Runs are append-only; a retry is a new run"
   },
-  "control.plan": {
-   "columns": 15,
-   "tip": "Derived from subscription.Plan."
+  "control.subscription_plan": {
+   "columns": 13,
+   "tip": "**What a tenant pays for** — the modules, the limits, the price. Renamed from `plan`, which sat beside `migration_plan` and `production_plan`"
   },
   "control.rollout": {
-   "columns": 12,
-   "tip": "Derived from platform-ops.Rollout."
+   "columns": 13,
+   "tip": "**One release reaching cells**, in waves, with a canary first"
   },
   "control.rollout_cell": {
    "columns": 12,
-   "tip": "Derived from platform-ops.RolloutCell."
+   "tip": "**One cell in a rollout** — its wave, whether it is the canary, and what version it moved between"
   },
   "control.subscription": {
    "columns": 10,
-   "tip": "Derived from subscription.Subscription."
+   "tip": "**What a tenant is paying for**, and which modules that licenses"
   },
   "control.support_notice": {
-   "columns": 6,
-   "tip": "Derived from platform-ops.SupportNotice."
+   "columns": 7,
+   "tip": "**Something the platform is telling tenants**, scheduled or in progress"
   },
   "control.tenant": {
-   "columns": 14,
-   "tip": "Derived from subscription.Tenant."
+   "columns": 16,
+   "tip": "**A customer of the platform** — the root of the org tree. `platform.tenant` is a one-column projection of this, so a cell can resolve its own tenant without reaching across a residency boundary"
   },
   "control.tenant_migration": {
    "columns": 0,
-   "tip": "a tenant moving between cells \u2014 shared to dedicated, or rebalancing"
+   "tip": "a tenant moving between cells — shared to dedicated, or rebalancing"
   },
   "control.tenant_migration_plan": {
    "columns": 0,
@@ -440,19 +440,19 @@
   },
   "control.upgrade_schedule": {
    "columns": 8,
-   "tip": "Derived from platform-ops.UpgradeSchedule."
+   "tip": "**When a tenant has agreed to be upgraded.** Not every tenant takes a release the day it ships"
   },
   "control.usage_record": {
    "columns": 6,
-   "tip": "Derived from subscription.UsageRecord."
+   "tip": "**What a tenant consumed**, which is what an invoice is computed from"
   },
   "fnb.bill_split": {
    "columns": 3,
-   "tip": "Derived from fnb.BillSplit."
+   "tip": "**How one table’s bill was divided.** A party of six paying separately is the ordinary case"
   },
   "fnb.delivery_location": {
    "columns": 11,
-   "tip": "Derived from fnb.DeliveryLocation."
+   "tip": "**Where food goes that is not a table** — a lounger, a cabana, a suite, a stand. Served by outlets through a join, because one kitchen serves several"
   },
   "fnb.delivery_location_outlet": {
    "columns": 0,
@@ -460,27 +460,27 @@
   },
   "fnb.fnb_order": {
    "columns": 14,
-   "tip": "Derived from fnb.FnbOrder."
+   "tip": "**Food and drink ordered**, wherever from — a counter, a table, a lounger, the app. The kitchen ticket is what the pass sees; this is what the guest bought"
   },
   "fnb.kitchen_station": {
    "columns": 7,
-   "tip": "Derived from fnb.KitchenStation."
+   "tip": "**Where a ticket is routed** — grill, cold, bar, pass"
   },
   "fnb.kitchen_ticket": {
-   "columns": 13,
-   "tip": "Derived from fnb.KitchenTicket."
+   "columns": 15,
+   "tip": "**What the pass sees.** One order can produce several, routed by station, and the clock on it is the kitchen’s rather than the counter’s"
   },
   "fnb.kitchen_ticket_line": {
    "columns": 10,
-   "tip": "Derived from fnb.KitchenTicket.lines[]."
+   "tip": "**One item the kitchen is making**, bumped independently"
   },
   "fnb.location_code": {
    "columns": 0,
    "tip": "rotating location codes, hashed and time-bounded"
   },
   "fnb.location_session": {
-   "columns": 9,
-   "tip": "Derived from fnb.LocationSession."
+   "columns": 10,
+   "tip": "**A guest claim on a delivery location** — a lounger, a cabana. The equivalent of a table session away from a table"
   },
   "fnb.menu": {
    "columns": 7,
@@ -488,19 +488,19 @@
   },
   "fnb.menu_item": {
    "columns": 13,
-   "tip": "Derived from fnb.MenuItem."
+   "tip": "**A product seen through a menu.** Catalogue owns whether it can be sold; F&B owns what a kitchen needs to make it — station, prep time, allergens, and the 86 flag"
   },
   "fnb.menu_section": {
    "columns": 4,
-   "tip": "Derived from fnb.MenuSection."
+   "tip": "**A run of items on a menu**, in the order the outlet set. Not alphabetical, or Desserts sits above Mains forever"
   },
   "fnb.modifier_group": {
    "columns": 5,
-   "tip": "Derived from fnb.ModifierGroup."
+   "tip": "**A choice attached to an item** — how it is cooked, what is on it. Attached to the item, not chosen per sale (CF-160)"
   },
   "fnb.modifier_option": {
    "columns": 6,
-   "tip": "Derived from fnb.ModifierGroup.options[]."
+   "tip": "**One choice within a group**, with its own price delta"
   },
   "fnb.recipe": {
    "columns": 3,
@@ -508,55 +508,55 @@
   },
   "fnb.recipe_ingredient": {
    "columns": 5,
-   "tip": "Derived from fnb.Recipe.ingredients[]."
+   "tip": "**One component of a recipe**, in its own unit"
   },
   "fnb.table": {
-   "columns": 6,
-   "tip": "Derived from fnb.TableDefinition."
+   "columns": 7,
+   "tip": "**A physical table with a capacity and a position.** What may combine with what is declared rather than inferred — a pillar or a service run means two adjacent tables sometimes cannot"
   },
   "fnb.table_session": {
    "columns": 9,
-   "tip": "Derived from fnb.TableSession."
+   "tip": "**A device claim on a table** — a QR scanned, an order opened. The hospitality event around it is a `table_visit`"
   },
   "fnb.table_visit": {
-   "columns": 14,
-   "tip": "Derived from fnb.TableVisit."
+   "columns": 13,
+   "tip": "**One party at one table, from seating to settling.** Distinct from `fnb.table_session`, which is the device claim: a QR scanned at the table opens a session, and the visit is the hospitality event around it"
   },
   "games.card": {
    "columns": 13,
-   "tip": "Derived from games.GameCard."
+   "tip": "**An arcade card holding credits.** The credit ledger is its history"
   },
   "games.game": {
    "columns": 15,
-   "tip": "An arcade or ride unit. Bound to a maintenance asset, so a game goes out of service when its asset does \u2014 and back only when verified."
+   "tip": "An arcade or ride unit. Bound to a maintenance asset, so a game goes out of service when its asset does — and back only when verified."
   },
   "games.play": {
    "columns": 9,
-   "tip": "Derived from games.PlayResult."
+   "tip": "**One game played**, what it cost and what it won"
   },
   "games.prize": {
    "columns": 11,
-   "tip": "Derived from games.Prize."
+   "tip": "**What credits can be redeemed for**, with its own stock"
   },
   "games.redemption": {
    "columns": 9,
-   "tip": "Derived from games.PrizeRedemption."
+   "tip": "**Credits exchanged for prizes.** Lines are children"
   },
   "games.redemption_line": {
    "columns": 5,
-   "tip": "Derived from games.PrizeRedemption.lines[]."
+   "tip": "**One prize taken**, drawn against its stock"
   },
   "identity.authz_audit": {
    "columns": 0,
    "tip": "written by the platform, read through reporting"
   },
-  "identity.grant": {
-   "columns": 10,
-   "tip": "Derived from identity.Grant."
+  "identity.delegated_access": {
+   "columns": 19,
+   "tip": "**One person acting for another, or for a scope they do not own.** A parent managing a child's membership, a manager covering another venue for a week. Renamed from `grant`, which is a verb, a subsidy and a permission de"
   },
   "identity.mfa_method": {
-   "columns": 8,
-   "tip": "Derived from identity.MfaMethod."
+   "columns": 9,
+   "tip": "**A second factor a principal has enrolled.** Guests may enrol too, from 26 August"
   },
   "identity.mfa_recovery_code": {
    "columns": 0,
@@ -564,107 +564,107 @@
   },
   "identity.principal": {
    "columns": 9,
-   "tip": "Derived from identity.Principal."
+   "tip": "**A person who can be authorised** — staff, partner, platform operator. The most referenced table in the package at 122 incoming columns, because almost everything records who did it. **Not a guest**: a guest is a `pii.s"
   },
   "identity.principal_credential": {
    "columns": 0,
    "tip": "a credential hash has no response it belongs in"
   },
   "identity.role": {
-   "columns": 6,
-   "tip": "Derived from identity.Role."
+   "columns": 8,
+   "tip": "**A named set of permissions**, inheritable. A principal holds roles at scopes; the resolution walks the org tree upward until something answers"
   },
   "identity.role_permission": {
    "columns": 0,
    "tip": "child of role, returned nested"
   },
   "identity.sso_group_mapping": {
-   "columns": 3,
-   "tip": "Derived from identity.SsoGroupMapping."
+   "columns": 6,
+   "tip": "**Which provider group becomes which role.** The join that stops SSO meaning manual role assignment"
   },
   "identity.sso_provider": {
-   "columns": 5,
-   "tip": "Derived from identity.SsoProvider."
+   "columns": 11,
+   "tip": "**A tenant’s own identity provider.** A guest arriving through UAE Pass is verified in a way an email never is"
   },
   "inventory.count": {
    "columns": 16,
-   "tip": "Derived from inventory.StockCount."
+   "tip": "**A stock take.** Its lines carry both the counted number and the recount, because two counts that agree is a different fact from one nobody checked"
   },
   "inventory.goods_receipt": {
    "columns": 11,
-   "tip": "Derived from inventory.GoodsReceipt."
+   "tip": "**Stock arriving against a purchase order.** Where a three-way match would begin"
   },
   "inventory.goods_receipt_line": {
    "columns": 9,
-   "tip": "Derived from inventory.GoodsReceipt.lines[]."
+   "tip": "**One line received**, which may differ from what was ordered"
   },
   "inventory.item": {
    "columns": 26,
-   "tip": "Derived from inventory.InventoryItem."
+   "tip": "**Something a venue stocks**, distinct from something it sells. A bottle of syrup is an item and never a product; a t-shirt is both, joined through `retail.merchandise`"
   },
   "inventory.location": {
    "columns": 7,
-   "tip": "Derived from inventory.StockLocation."
+   "tip": "**Where stock physically is** — a stockroom, a bar, a cellar"
   },
   "inventory.movement": {
    "columns": 17,
-   "tip": "Derived from inventory.StockMovement."
+   "tip": "**Every change in stock**, and the only truth about a level — `stock_level` is computed from these and never stored"
   },
   "inventory.purchase_order": {
-   "columns": 14,
-   "tip": "Derived from inventory.PurchaseOrder."
+   "columns": 20,
+   "tip": "**A commitment to buy**, priced in the supplier’s currency"
   },
   "inventory.purchase_order_line": {
    "columns": 9,
-   "tip": "Derived from inventory.PurchaseOrder.lines[]."
+   "tip": "**One item ordered**, at a unit price"
   },
   "inventory.quotation": {
    "columns": 11,
-   "tip": "Derived from inventory.Quotation."
+   "tip": "**A supplier’s price**, comparable against others"
   },
   "inventory.quotation_line": {
    "columns": 5,
-   "tip": "Derived from inventory.Quotation.lines[]."
+   "tip": "**One item quoted.** **Hangs off**: a child of `inventory.quotation`; reaches `inventory.item` through its keys; references `inventory.item`, `inventory.quotation`."
   },
   "inventory.requisition": {
    "columns": 12,
-   "tip": "Derived from inventory.Requisition."
+   "tip": "**A department asking for stock**, which becomes a movement when fulfilled. The line items are children"
   },
   "inventory.requisition_line": {
    "columns": 9,
-   "tip": "Derived from inventory.Requisition.lines[]."
+   "tip": "**One item asked for.** **Hangs off**: a child of `inventory.requisition`; reaches `inventory.item` through its keys; references `inventory.item`, `inventory.requisition`."
   },
   "inventory.supplier": {
    "columns": 12,
-   "tip": "Derived from inventory.Supplier."
+   "tip": "**Who a venue buys from**, invoicing in their own currency"
   },
   "inventory.transfer": {
    "columns": 9,
-   "tip": "Derived from inventory.StockTransfer."
+   "tip": "**Stock moving between locations.** In transit is a state, not a gap"
   },
   "inventory.transfer_line": {
    "columns": 7,
-   "tip": "Derived from inventory.StockTransfer.lines[]."
+   "tip": "**One item moving**, which is in neither location until it arrives"
   },
   "ledger.account": {
-   "columns": 11,
-   "tip": "Derived from finance.Account."
+   "columns": 15,
+   "tip": "**A line in the chart of accounts**, denominated in its own currency. One of four tables that genuinely differ from their region — a group consolidating across jurisdictions holds accounts in several"
   },
   "ledger.account_mapping": {
    "columns": 4,
-   "tip": "Derived from finance.AccountMapping."
+   "tip": "**Which account a kind of transaction posts to.** Configuration, not a posting"
   },
   "ledger.cost_center": {
    "columns": 6,
-   "tip": "Derived from finance.CostCenter."
+   "tip": "**Where a cost lands.** Referenced by seven tables and operated on by two, because it is written once and read constantly"
   },
-  "ledger.entry": {
+  "ledger.posting": {
    "columns": 12,
-   "tip": "Derived from finance.LedgerEntry."
+   "tip": "**One side of a double-entry movement.** Renamed from `entry`, which sat beside `journal_entry` and `journal_line` — **three things called entry in one schema is a schema nobody reads twice.** **Hangs off**: reaches `led"
   },
   "ledger.fiscal_period": {
    "columns": 8,
-   "tip": "Derived from finance.FiscalPeriod."
+   "tip": "**A window that closes.** Once closed, corrections post to the next one"
   },
   "ledger.fx_rate": {
    "columns": 0,
@@ -675,140 +675,140 @@
    "tip": "what one legal entity owes another after a cross-region redemption"
   },
   "ledger.journal_entry": {
-   "columns": 17,
-   "tip": "Derived from finance.JournalEntry."
+   "columns": 16,
+   "tip": "**A balanced set of postings.** Append-only: a correction is another entry, never an edit, which is what makes a period closeable"
   },
   "ledger.legal_entity": {
    "columns": 10,
-   "tip": "Derived from finance.LegalEntity."
+   "tip": "**Who the money belongs to.** A tenant may trade through several, which is why inter-entity rates exist"
   },
   "ledger.price_variance": {
    "columns": 15,
-   "tip": "Derived from finance.PriceVariance."
+   "tip": "**What was expected against what was invoiced.** Where a three-way match would post if it existed"
   },
   "ledger.recognition_schedule": {
-   "columns": 9,
-   "tip": "Derived from finance.RecognitionSchedule."
+   "columns": 15,
+   "tip": "**When deferred revenue becomes revenue** — a membership sold in March and earned across a year"
   },
   "ledger.settlement": {
    "columns": 15,
-   "tip": "Derived from finance.Settlement."
+   "tip": "**Money actually arriving from a provider**, matched against what was taken"
   },
   "ledger.settlement_exception": {
    "columns": 10,
-   "tip": "Derived from finance.SettlementException."
+   "tip": "**A settlement that did not match.** The queue somebody works, not an error log"
   },
   "ledger.tax_code": {
-   "columns": 11,
-   "tip": "Derived from finance.TaxCode."
+   "columns": 12,
+   "tip": "**A rate and its rules**, scoped to a region"
   },
   "ledger.tax_exemption": {
    "columns": 8,
-   "tip": "Derived from finance.TaxExemption."
+   "tip": "**Who does not pay, and on what evidence.** **Hangs off**: reaches `ledger.account` through its keys; references `ledger.tax_code`. **Reached by**: 2 operations read it and 1 write it."
   },
   "maintenance.asset": {
-   "columns": 24,
-   "tip": "Derived from maintenance.Asset."
+   "columns": 30,
+   "tip": "**A physical thing with a service history** — a lift, a chiller, a ride. Distinct from a resource, which is bookable: an asset is maintained and a resource is reserved"
   },
   "maintenance.incident": {
-   "columns": 18,
-   "tip": "Derived from maintenance.Incident."
+   "columns": 26,
+   "tip": "**Something that happened and needs recording** — distinct from a work order, which is something to do"
   },
   "maintenance.inspection": {
    "columns": 13,
-   "tip": "Derived from maintenance.Inspection."
+   "tip": "**A completed check against a template.** The responses are children"
   },
   "maintenance.inspection_template": {
    "columns": 8,
-   "tip": "Derived from maintenance.InspectionTemplate."
+   "tip": "**The questions an inspection asks.** Versioned, because changing them changes what past answers meant"
   },
   "maintenance.inspection_template_item": {
    "columns": 10,
-   "tip": "Derived from maintenance.InspectionTemplate.items[]."
+   "tip": "**One question**, with its expected range"
   },
   "maintenance.maintenance_plan": {
    "columns": 11,
-   "tip": "Derived from maintenance.MaintenancePlan."
+   "tip": "**What should be inspected, how often.** Generates work orders rather than being one"
   },
   "maintenance.work_order": {
-   "columns": 23,
-   "tip": "Derived from maintenance.WorkOrder."
+   "columns": 36,
+   "tip": "**Something that needs doing to an asset**, raised by a person, an inspection or a schedule. The evidence attaches here"
   },
   "marketing.campaign": {
-   "columns": 17,
-   "tip": "Derived from marketing-crm.Campaign."
+   "columns": 20,
+   "tip": "**A send with an audience and a schedule.** Every dispatch it produces is a `message_dispatch` row, which is where consent was checked"
   },
   "marketing.case": {
-   "columns": 17,
-   "tip": "Derived from marketing-crm.Case."
+   "columns": 19,
+   "tip": "**A guest problem with a lifecycle** — raised, assigned, answered, closed. The messages are children; the SLA is not yet modelled"
   },
   "marketing.case_message": {
-   "columns": 8,
-   "tip": "Derived from marketing-crm.CaseMessage."
+   "columns": 9,
+   "tip": "**One exchange in a case**, from either side"
   },
   "marketing.consent_purpose": {
    "columns": 7,
-   "tip": "Derived from marketing-crm.ConsentPurposeConfig."
+   "tip": "**What a tenant may ask consent for.** The question is the tenant’s; the answer is the guest’s"
   },
   "marketing.consent_record": {
-   "columns": 10,
-   "tip": "Derived from marketing-crm.ConsentRecord."
+   "columns": 9,
+   "tip": "**What a guest agreed to and when.** A merge takes the narrower of two (CF-160)"
   },
   "marketing.guest_device": {
    "columns": 13,
-   "tip": "Derived from marketing-crm.GuestDevice."
+   "tip": "**A phone or browser a guest has registered.** How they revoke an old one that still holds tickets"
   },
   "marketing.guest_profile": {
-   "columns": 12,
-   "tip": "Derived from marketing-crm.GuestProfile."
+   "columns": 22,
+   "tip": "**What a venue knows about a guest that is not their identity** — preferences, lifetime value, segments, consent. Twenty operations touch it and it references `pii.subject` rather than duplicating it"
   },
   "marketing.loyalty_position": {
    "columns": 9,
-   "tip": "Derived from marketing-crm.LoyaltyPosition."
+   "tip": "**Where a guest stands** — points, tier, progress. A balance, not a history"
   },
   "marketing.loyalty_programme": {
-   "columns": 8,
-   "tip": "Derived from marketing-crm.LoyaltyProgramme."
+   "columns": 7,
+   "tip": "**The rules of earning and burning.** Tiers are children"
   },
   "marketing.loyalty_tier": {
-   "columns": 6,
-   "tip": "Derived from marketing-crm.LoyaltyProgramme.tiers[]."
+   "columns": 5,
+   "tip": "**One level**, with its threshold and benefits"
   },
   "marketing.message_dispatch": {
    "columns": 10,
-   "tip": "Derived from marketing-crm.MessageDispatch."
+   "tip": "**One message to one person.** Consent was checked here, which is why it is a row and not a log line"
   },
   "marketing.message_template": {
-   "columns": 8,
-   "tip": "Derived from marketing-crm.MessageTemplate."
+   "columns": 10,
+   "tip": "**Reusable content for a channel**, with the variables a dispatch fills"
   },
   "marketing.review": {
    "columns": 13,
-   "tip": "Derived from marketing-crm.Review."
+   "tip": "**What a guest said afterwards**, with the venue’s response and whether it is public"
   },
   "marketing.segment": {
-   "columns": 10,
-   "tip": "Derived from marketing-crm.Segment."
+   "columns": 9,
+   "tip": "**A rule that selects an audience**, evaluated rather than stored as a list"
   },
   "marketing.segment_criterion": {
-   "columns": 4,
-   "tip": "Derived from marketing-crm.SegmentCriterion."
+   "columns": 5,
+   "tip": "**One condition in a segment rule.** **Hangs off**: a child of `marketing.segment`; reaches `marketing.guest_profile` through its keys; references `marketing.segment`. **Reached by**: 4 operations read it and 4 write it."
   },
   "marketing.suppression": {
-   "columns": 5,
-   "tip": "Derived from marketing-crm.Suppression."
+   "columns": 6,
+   "tip": "**Who must not be contacted**, whatever a campaign says"
   },
   "marketing.wishlist_item": {
    "columns": 12,
-   "tip": "Derived from marketing-crm.Wishlist.items[]."
+   "tip": "**Something a guest saved.** Per guest, synced across their devices"
   },
   "orders.b2b_credit": {
    "columns": 11,
-   "tip": "Derived from orders.CreditPosition."
+   "tip": "**A partner’s credit line**, drawn against and settled periodically"
   },
   "orders.cash_movement": {
    "columns": 11,
-   "tip": "Derived from shift.CashMovement."
+   "tip": "**Cash in or out of a drawer** — a float, a pickup, a drop, a payout. Denominated, and the audit trail behind a shift variance"
   },
   "orders.no_sale_event": {
    "columns": 0,
@@ -819,68 +819,68 @@
    "tip": "manual discount with reason and approver. Posts to a discount account, never as a price change"
   },
   "orders.order_line": {
-   "columns": 16,
-   "tip": "Derived from orders.OrderLine."
+   "columns": 18,
+   "tip": "**One thing bought on one order**, priced at the moment of sale. A price list changing afterwards does not change what somebody paid"
   },
   "orders.order_media_link": {
    "columns": 0,
    "tip": "links an order to the media its entitlements were issued onto. What makes append-to-existing possible without editing a paid order"
   },
   "orders.payment": {
-   "columns": 11,
-   "tip": "Derived from orders.Payment."
+   "columns": 16,
+   "tip": "**A tender against an order**, with the rate it converted at fixed on the row (CF-37). A payment reconciled next month is reconciled at the rate of the day it was taken"
   },
   "orders.payment_tip": {
    "columns": 0,
    "tip": "tips post to a liability, not to sales"
   },
   "orders.refund": {
-   "columns": 13,
-   "tip": "Derived from orders.Refund."
+   "columns": 17,
+   "tip": "**Money going back**, always against a payment and never editing it. The ledger posts both"
   },
   "orders.refund_policy": {
    "columns": 8,
-   "tip": "Derived from orders.RefundPolicy."
+   "tip": "**When a refund is allowed and what it costs.** Scoped, so a venue may be stricter than its tenant"
   },
   "orders.reservation": {
-   "columns": 7,
-   "tip": "Derived from orders.Reservation."
+   "columns": 6,
+   "tip": "**A held place that is not yet a sale** — a table, a cabana, a slot"
   },
   "orders.sales_order": {
-   "columns": 22,
-   "tip": "Derived from orders.Order."
+   "columns": 18,
+   "tip": "**The sale.** What was bought, by whom, through which channel, at what scope. Every payment, refund, entitlement and ledger posting reaches back to a row here"
   },
   "orders.sales_order_unassigned": {
    "columns": 0,
    "tip": "default partition"
   },
   "orders.shift": {
-   "columns": 22,
-   "tip": "Derived from shift.Shift."
+   "columns": 19,
+   "tip": "**A cash session at a workstation** — opened with a float, closed with a count and a variance. Moved to OrderService on 24 August because all its data is in `orders`"
   },
   "orders.ticket_transfer": {
    "columns": 11,
-   "tip": "Derived from orders.TicketTransfer."
+   "tip": "**A ticket moving between people.** Claimed by whoever holds the link, which is why it expires"
   },
   "pii.subject": {
    "columns": 13,
-   "tip": "Derived from storage only \u2014 no contract schema."
+   "tip": "**A guest, and the only table holding who they are.** Name, and through its children the contacts, documents and biometrics. **Isolated deliberately** — erasure is a delete here and a pseudonym everywhere else, which is "
   },
   "pii.subject_biometric": {
    "columns": 10,
-   "tip": "Derived from storage only \u2014 no contract schema."
+   "tip": "**A face template, and nothing else.** Separate from contact and document so consent and erasure differ per kind"
   },
   "pii.subject_contact": {
    "columns": 10,
-   "tip": "Derived from storage only \u2014 no contract schema."
+   "tip": "**An email, a phone.** The thing a marketing suppression matches on"
   },
   "pii.subject_document": {
    "columns": 10,
-   "tip": "Derived from storage only \u2014 no contract schema."
+   "tip": "**A passport or ID, and its verification state.** **Hangs off**: a child of `pii.subject`; reaches `pii.subject` through its keys; references `pii.subject`. **Reached by**: 0 operations read it and 1 write it."
   },
   "platform.device": {
-   "columns": 10,
-   "tip": "Derived from tenancy.RegisteredDevice."
+   "columns": 17,
+   "tip": "**A physical thing that authenticates and does not authorise** — a scanner, a printer, a kitchen display. It proves which device; the person proves what they may do"
   },
   "platform.device_heartbeat": {
    "columns": 0,
@@ -888,31 +888,31 @@
   },
   "platform.dsar_request": {
    "columns": 7,
-   "tip": "Derived from cross-cell.DsarRequest."
+   "tip": "**A data-subject request and its progress.** The reason `pii` is a schema of its own"
   },
   "platform.guest_link": {
-   "columns": 6,
-   "tip": "Derived from cross-cell.GuestLink."
+   "columns": 5,
+   "tip": "**A pseudonymous link between cells** (ADR-0010). Carries no personal data, which is the point"
   },
   "platform.outbox": {
    "columns": 0,
    "tip": "transactional outbox. Events have contracts; the row does not"
   },
   "platform.outlet": {
-   "columns": 10,
-   "tip": "Derived from tenancy.Outlet."
+   "columns": 9,
+   "tip": "**A commercial branch — a restaurant, a shop, a bar.** A sibling of department rather than a child (CF-138, ADR-0018): a department has requisitions and rotas, an outlet has a menu and stock, and modelling a restaurant a"
   },
-  "platform.redemption_right": {
-   "columns": 15,
-   "tip": "Derived from cross-cell.RedemptionRight."
+  "platform.cross_region_entitlement": {
+   "columns": 17,
+   "tip": "**Something bought in one jurisdiction and honoured in another.** ADR-0010: the guest does not move, a pseudonymous link does. Renamed from `cross_region_entitlement` — a right to redeem what, and where? **Hangs off**: r"
   },
   "platform.region_settings": {
-   "columns": 8,
-   "tip": "Derived from tenancy.RegionSettings."
+   "columns": 10,
+   "tip": "**Currency, scale, timezone, fiscal year.** Region-scoped and not overridable below"
   },
   "platform.sale_board": {
    "columns": 6,
-   "tip": "Derived from tenancy.SaleBoard."
+   "tip": "**What a till shows and in what order.** Configured by the venue, not by code"
   },
   "platform.sale_board_page": {
    "columns": 4,
@@ -926,9 +926,9 @@
    "columns": 0,
    "tip": "migration runner bookkeeping"
   },
-  "platform.scope_node": {
+  "platform.org_unit": {
    "columns": 8,
-   "tip": "Derived from tenancy.ScopeNode."
+   "tip": "**One unit of the venue structure** — a tenant, a brand, a region, a venue, a department, a sub-department, a workstation or an outlet. Every row has a level, a parent and a materialised `path`, and **configuration resol"
   },
   "platform.tenant": {
    "columns": 0,
@@ -939,252 +939,252 @@
    "tip": "read through composed tenancy operations"
   },
   "platform.wallet_authorisation": {
-   "columns": 10,
-   "tip": "Derived from cross-cell.WalletAuthorisation."
+   "columns": 24,
+   "tip": "**A hold on a balance held in another jurisdiction**, with the rate it converted at fixed on authorisation rather than capture"
   },
   "platform.workstation": {
    "columns": 18,
-   "tip": "Derived from tenancy.Workstation."
+   "tip": "**A till, a scanner, a kiosk — a place work happens.** The lowest organisational level. **Authority is the person’s, not the workstation’s** (ADR-0002), which is what makes a shared handheld safe"
   },
   "promotions.allocation_component": {
-   "columns": 7,
-   "tip": "Derived from promotions.AllocationComponent."
+   "columns": 9,
+   "tip": "**One component’s share**, fixed or proportional"
   },
   "promotions.allocation_split": {
-   "columns": 5,
-   "tip": "Derived from promotions.AllocationSplit."
+   "columns": 4,
+   "tip": "**How a bundle price divides across its components.** What the ledger posts against"
   },
   "promotions.bundle": {
-   "columns": 15,
-   "tip": "Derived from promotions.Bundle."
+   "columns": 14,
+   "tip": "**Several products sold as one**, with the components priced by allocation"
   },
   "promotions.bundle_component": {
-   "columns": 5,
-   "tip": "Derived from promotions.BundleComponent."
+   "columns": 7,
+   "tip": "**One product inside a bundle**, with its quantity"
   },
   "promotions.coupon_campaign": {
    "columns": 13,
-   "tip": "Derived from promotions.CouponCampaign."
+   "tip": "**A batch of codes with shared rules.** The codes are children"
   },
   "promotions.coupon_code": {
    "columns": 12,
-   "tip": "Derived from promotions.CouponCode."
+   "tip": "**One issued code**, with its own redemption state"
   },
   "promotions.promotion": {
    "columns": 20,
-   "tip": "Derived from promotions.Promotion."
+   "tip": "**A rule that changes a price**, with eligibility and a budget. Evaluated at the basket rather than stored on a product"
   },
   "promotions.upsell_rule": {
    "columns": 11,
-   "tip": "Derived from promotions.UpsellRule."
+   "tip": "**What to offer alongside what**, and where it may appear"
   },
   "promotions.voucher": {
    "columns": 6,
-   "tip": "Derived from promotions.Voucher."
+   "tip": "**A named value a guest can spend**, with its own balance and expiry"
   },
   "promotions.voucher_batch": {
    "columns": 12,
-   "tip": "Derived from promotions.VoucherBatch."
+   "tip": "**Vouchers issued together**, sharing rules and an expiry"
   },
-  "queue.entry": {
+  "queue.waiting_guest": {
    "columns": 18,
-   "tip": "Derived from queue.QueueEntry."
+   "tip": "**A person in a virtual queue**, with their position and their window. Renamed from `entry`: it is somebody waiting, not a row in a log"
   },
   "queue.feed": {
    "columns": 7,
-   "tip": "Derived from queue.QueueFeed."
+   "tip": "**Where readings come from** — an adaptor to a venue’s own system (ADR-0012)"
   },
   "queue.queue": {
-   "columns": 21,
-   "tip": "Derived from queue.Queue."
+   "columns": 31,
+   "tip": "**A line, physical or virtual.** The platform holds what a venue’s own queue system reports (ADR-0012) rather than trying to be one"
   },
   "queue.reading": {
-   "columns": 5,
-   "tip": "Derived from queue.QueueReading."
+   "columns": 6,
+   "tip": "**What a queue system reported at a moment.** The platform stores readings, not estimates"
   },
   "reporting.dashboard": {
-   "columns": 9,
-   "tip": "Derived from reporting.Dashboard."
+   "columns": 8,
+   "tip": "**An arrangement of tiles**, each resolving its own source"
   },
   "reporting.dashboard_tile": {
-   "columns": 7,
-   "tip": "Derived from reporting.DashboardTile."
+   "columns": 8,
+   "tip": "**One panel**, and the query behind it"
   },
   "reporting.execution": {
    "columns": 15,
-   "tip": "Derived from reporting.ReportExecution."
+   "tip": "**One run of a report definition.** The result set is cached in object storage, not here"
   },
   "reporting.export": {
    "columns": 11,
-   "tip": "Derived from reporting.ReportExport."
+   "tip": "**A file somebody asked for**, with an expiry"
   },
   "reporting.report_column": {
-   "columns": 6,
-   "tip": "Derived from reporting.ReportColumn."
+   "columns": 9,
+   "tip": "**One column of a definition**, with its aggregation"
   },
   "reporting.report_definition": {
-   "columns": 18,
-   "tip": "Derived from reporting.ReportDefinition."
+   "columns": 15,
+   "tip": "**A saved question, not its answer.** Columns, filters and parameters are children; a run is an `execution`, and the result set is cached in object storage rather than here"
   },
   "reporting.report_filter": {
-   "columns": 5,
-   "tip": "Derived from reporting.ReportFilter."
+   "columns": 8,
+   "tip": "**A condition applied before aggregation.** **Hangs off**: a child of `reporting.report_definition`; reaches `reporting.report_definition` through its keys; references `reporting.report_definition`. **Reached by**: 5 ope"
   },
   "reporting.report_parameter": {
-   "columns": 5,
-   "tip": "Derived from reporting.ReportParameter."
+   "columns": 6,
+   "tip": "**Something the reader supplies at run time.** **Hangs off**: reaches `reporting.report_definition` through its keys; references `reporting.report_definition`. **Reached by**: 5 operations read it and 3 write it."
   },
   "reporting.schedule": {
-   "columns": 16,
-   "tip": "Derived from reporting.ReportSchedule."
+   "columns": 15,
+   "tip": "**When a report runs and who receives it.** **Hangs off**: reaches `reporting.report_definition` through its keys; references `identity.principal`, `reporting.report_definition`. **Reached by**: 4 operations read it and "
   },
   "reporting.schedule_recipient": {
    "columns": 3,
-   "tip": "Derived from reporting.Recipient."
+   "tip": "**Who receives a scheduled report**, which is a consent question as well as a distribution one"
   },
   "retail.exchange": {
    "columns": 8,
-   "tip": "Derived from retail.RetailExchange."
+   "tip": "**Goods swapped rather than returned**, which settles differently"
   },
   "retail.gift_card": {
-   "columns": 9,
-   "tip": "Derived from retail.GiftCard."
+   "columns": 10,
+   "tip": "**Stored value somebody bought for somebody else.** Has a code, a face value, and can be blocked"
   },
   "retail.merchandise": {
    "columns": 15,
-   "tip": "Derived from retail.MerchandiseItem."
+   "tip": "**A product a venue sells as goods**, joined to the catalogue rather than duplicating it"
   },
   "retail.reservation": {
    "columns": 8,
-   "tip": "Derived from retail.MerchandiseReservation."
+   "tip": "**Merchandise held for collection.** **Hangs off**: reaches `retail.sale` through its keys; references `pii.subject`, `platform.outlet`. **Reached by**: 1 operations read it and 1 write it; 2 tables reference it."
   },
   "retail.reservation_line": {
    "columns": 4,
-   "tip": "Derived from retail.MerchandiseReservation.lines[]."
+   "tip": "**One item reserved.** **Hangs off**: a child of `retail.reservation`; reaches `retail.sale` through its keys; references `retail.merchandise`, `retail.reservation`."
   },
   "retail.return": {
    "columns": 12,
-   "tip": "Derived from retail.RetailReturn."
+   "tip": "**Goods coming back**, against the sale that produced them"
   },
   "retail.return_line": {
    "columns": 8,
-   "tip": "Derived from retail.RetailReturn.lines[]."
+   "tip": "**One item returned**, with its condition"
   },
   "retail.return_policy": {
    "columns": 9,
-   "tip": "Derived from retail.ReturnPolicy."
+   "tip": "**When goods may come back and in what state.** Outlet-scoped"
   },
   "retail.sale": {
    "columns": 13,
-   "tip": "Derived from retail.RetailSale."
+   "tip": "**A retail transaction**, distinct from an admission sale because it moves stock"
   },
   "retail.sale_line": {
    "columns": 12,
-   "tip": "Derived from retail.RetailSale.lines[]."
+   "tip": "**One item sold**, which produces a stock movement"
   },
   "retail.shop_and_drop": {
-   "columns": 13,
-   "tip": "Derived from retail.ShopAndDrop."
+   "columns": 15,
+   "tip": "**Bought now, collected later.** The reason a guest is not carrying it round the park"
   },
   "retail.shop_and_drop_line": {
-   "columns": 6,
-   "tip": "Derived from retail.ShopAndDrop.lines[]."
+   "columns": 7,
+   "tip": "**One item bought for later collection.** **Hangs off**: a child of `retail.shop_and_drop`; reaches `retail.sale` through its keys; references `retail.merchandise`, `retail.shop_and_drop`."
   },
   "retail.wallet": {
-   "columns": 8,
-   "tip": "Derived from retail.Wallet."
+   "columns": 9,
+   "tip": "**A guest balance**, holding money they paid in and bonus the venue gave them separately — the two refund differently"
   },
   "retail.wallet_transaction": {
-   "columns": 9,
-   "tip": "Derived from retail.WalletTransaction."
+   "columns": 10,
+   "tip": "**Every movement on a wallet**, with the balance after. Append-only"
   },
   "seating.import_job": {
-   "columns": 10,
-   "tip": "Derived from seating.ImportJob."
+   "columns": 11,
+   "tip": "**A seat map read from a plan or a manifest.** It proposes a draft; a person accepts it (ADR-0020)"
   },
   "seating.seat": {
-   "columns": 10,
-   "tip": "Derived from seating.Seat."
+   "columns": 11,
+   "tip": "**One seat, addressable and holdable.** 396 rows in the sample manifest is one amphitheatre"
   },
   "seating.seat_block": {
    "columns": 9,
-   "tip": "Derived from seating.SeatBlock."
+   "tip": "**Seats withheld from sale** — house seats, accessibility, production hold"
   },
   "seating.seat_category": {
    "columns": 7,
-   "tip": "Derived from seating.SeatCategory."
+   "tip": "**A price band or a physical class** — restricted view, accessible, premium"
   },
   "seating.seat_hold": {
-   "columns": 11,
-   "tip": "Derived from seating.SeatHold."
+   "columns": 12,
+   "tip": "**A temporary claim on a seat.** Expires, which is what stops two channels selling it"
   },
   "seating.seat_map": {
-   "columns": 8,
-   "tip": "Derived from seating.SeatMapSummary."
+   "columns": 12,
+   "tip": "**The plan of a room** — sections, rows, seats, and what may combine with what. Versioned, so `diffSeatMapVersions` can answer what changed between two layouts"
   },
   "seating.seat_map_template": {
-   "columns": 7,
-   "tip": "Derived from seating.SeatMapTemplate."
+   "columns": 8,
+   "tip": "**A known venue shape**, which raises the confidence of an import sharply"
   },
   "seating.seating_rules": {
-   "columns": 8,
-   "tip": "Derived from seating.SeatingRules."
+   "columns": 9,
+   "tip": "**How seats may be chosen** — best available, adjacency, party splitting"
   },
   "seating.section": {
-   "columns": 5,
-   "tip": "Derived from seating.Section."
+   "columns": 4,
+   "tip": "**A named part of a room**, holding rows"
   },
   "seating.section_row": {
    "columns": 4,
-   "tip": "Derived from seating.Section.rows[]."
+   "tip": "**A row within a section**, carrying its own numbering scheme"
   },
   "sync.rejection": {
    "columns": 9,
    "tip": "What an offline terminal sent that the server refused. The queue a supervisor works through after an outage, and the reason offline sync is not fire-and-forget."
   },
   "whitelabel.banner": {
-   "columns": 10,
-   "tip": "Derived from white-label.Banner."
+   "columns": 12,
+   "tip": "**A notice on a tenant storefront**, scheduled"
   },
   "whitelabel.config_version": {
-   "columns": 9,
-   "tip": "Derived from white-label.ConfigVersion."
+   "columns": 8,
+   "tip": "**One published version of a tenant’s configuration.** Rolling back is selecting an earlier one"
   },
   "whitelabel.content_page": {
-   "columns": 8,
-   "tip": "Derived from white-label.ContentPage."
+   "columns": 10,
+   "tip": "**A page a tenant writes** — about, directions, accessibility"
   },
   "whitelabel.faq_category": {
    "columns": 3,
-   "tip": "Derived from white-label.FaqCategory."
+   "tip": "**A grouping of FAQ entries.** **Hangs off**: reaches `whitelabel.tenant_config` through its keys. **Reached by**: 2 operations read it and 1 write it; 1 tables reference it."
   },
   "whitelabel.faq_entry": {
    "columns": 6,
-   "tip": "Derived from white-label.FaqCategory.entries[]."
+   "tip": "**One question and answer**, localised"
   },
   "whitelabel.feature_toggle": {
-   "columns": 4,
-   "tip": "Derived from white-label.FeatureToggle."
+   "columns": 6,
+   "tip": "**A switch a tenant may throw**, distinct from a module they have licensed"
   },
   "whitelabel.module_enablement": {
-   "columns": 4,
-   "tip": "Derived from white-label.ModuleEnablement."
+   "columns": 6,
+   "tip": "**Which modules a tenant has on.** The gate every `requiresModule` screen resolves against"
   },
   "whitelabel.navigation_item": {
-   "columns": 1,
-   "tip": "Derived from white-label.NavigationConfig."
+   "columns": 3,
+   "tip": "**One entry in a tenant’s own navigation.** **Hangs off**: reaches `whitelabel.tenant_config` through its keys; references `whitelabel.navigation_item`. **Reached by**: 4 operations read it and 2 write it; 2 tables refer"
   },
   "whitelabel.policy": {
    "columns": 7,
-   "tip": "Derived from white-label.Policy."
+   "tip": "**A tenant’s own terms, privacy and cookie text**, versioned because agreeing to one version is not agreeing to the next"
   },
   "whitelabel.promo_block": {
-   "columns": 9,
-   "tip": "Derived from white-label.PromoBlock."
+   "columns": 10,
+   "tip": "**A merchandising slot**, targeted and scheduled"
   },
   "whitelabel.tenant_config": {
-   "columns": 14,
-   "tip": "Derived from white-label.TenantConfig."
+   "columns": 16,
+   "tip": "**Everything a tenant has branded or switched on.** Versioned, published, and the reason a guest storefront looks like the venue rather than like TICVAI"
   },
   "approvals.request": {
    "columns": 0,
@@ -1192,7 +1192,7 @@
   },
   "approvals.decision": {
    "columns": 0,
-   "tip": "Every decision at every level. **Immutable once the request completes** \u2014 an approval is evidence"
+   "tip": "Every decision at every level. **Immutable once the request completes** — an approval is evidence"
   },
   "approvals.matrix": {
    "columns": 0,
@@ -1204,7 +1204,7 @@
   },
   "approvals.delegation": {
    "columns": 0,
-   "tip": "Standing in for an approver. Always time-bounded \u2014 an open-ended delegation is one nobody remembers"
+   "tip": "Standing in for an approver. Always time-bounded — an open-ended delegation is one nobody remembers"
   },
   "approvals.escalation": {
    "columns": 0,
@@ -1216,7 +1216,7 @@
   },
   "ai.conversation": {
    "columns": 0,
-   "tip": "A thread, scoped to a principal and a module. **Analytical store, not the transactional primary** (ADR-0020) \u2014 append-only with an analytical read pattern, and it must not compete with a gate scan for a connection."
+   "tip": "A thread, scoped to a principal and a module. **Analytical store, not the transactional primary** (ADR-0020) — append-only with an analytical read pattern, and it must not compete with a gate scan for a connection."
   },
   "ai.index_entry": {
    "columns": 0,
@@ -1224,19 +1224,19 @@
   },
   "ai.index_job": {
    "columns": 0,
-   "tip": "A build in flight. recordsFailed is the number to watch \u2014 a source failing on 3% of rows is a search missing 3% of answers"
+   "tip": "A build in flight. recordsFailed is the number to watch — a source failing on 3% of rows is a search missing 3% of answers"
   },
   "ai.index_source": {
    "columns": 0,
-   "tip": "One declaration per indexed table. The owning service does not know it exists \u2014 the AI service consumes the event that service already publishes"
+   "tip": "One declaration per indexed table. The owning service does not know it exists — the AI service consumes the event that service already publishes"
   },
   "ai.interaction": {
    "columns": 0,
-   "tip": "The audit record. **Retention is unresolved (CF-64)** \u2014 a prompt may carry personal data. **Analytical store, not the transactional primary** (ADR-0020) \u2014 append-only with an analytical read pattern, and it must not compete with a gate scan for a connection."
+   "tip": "The audit record. **Retention is unresolved (CF-64)** — a prompt may carry personal data. **Analytical store, not the transactional primary** (ADR-0020) — append-only with an analytical read pattern, and it must not compete with a gate scan for a connection."
   },
   "ai.knowledge_collection": {
    "columns": 0,
-   "tip": "A collection in the vector store. **One per embedding model** \u2014 a collection carries its own vector config and a shard cannot, so two models cannot share one (ADR-0021). Carries the shard key, which is the tenant boundary on shared placement"
+   "tip": "A collection in the vector store. **One per embedding model** — a collection carries its own vector config and a shard cannot, so two models cannot share one (ADR-0021). Carries the shard key, which is the tenant boundary on shared placement"
   },
   "ai.knowledge_document": {
    "columns": 0,
@@ -1244,7 +1244,7 @@
   },
   "ai.message": {
    "columns": 0,
-   "tip": "Prompt and response with sources, provider, model, tokens and latency. **Analytical store, not the transactional primary** (ADR-0020) \u2014 append-only with an analytical read pattern, and it must not compete with a gate scan for a connection."
+   "tip": "Prompt and response with sources, provider, model, tokens and latency. **Analytical store, not the transactional primary** (ADR-0020) — append-only with an analytical read pattern, and it must not compete with a gate scan for a connection."
   },
   "ai.policy": {
    "columns": 0,
@@ -1268,7 +1268,7 @@
   },
   "identity.guest_session": {
    "columns": 0,
-   "tip": "a guest session. Separate from staff \u2014 different lifetime, different auth"
+   "tip": "a guest session. Separate from staff — different lifetime, different auth"
   },
   "identity.mfa_challenge": {
    "columns": 0,
@@ -1303,12 +1303,12 @@
    "tip": "the fields a report definition may use. Retrievable, so a report can be found by what it answers"
   },
   "whitelabel.homepage_section": {
-   "columns": 7,
-   "tip": "Derived from white-label.HomepageLayout.sections[]."
+   "columns": 3,
+   "tip": "**A block on a tenant homepage**, ordered. A section naming a disabled module must not render at all"
   },
   "maintenance.work_order_attachment": {
    "columns": 0,
-   "tip": "Photo, video, document, note or signature against a work order. Evidence, not decoration \u2014 captured offline and queued"
+   "tip": "Photo, video, document, note or signature against a work order. Evidence, not decoration — captured offline and queued"
   },
   "workforce.announcement": {
    "columns": 0,
@@ -1320,11 +1320,11 @@
   },
   "workforce.attendance": {
    "columns": 0,
-   "tip": "Who actually turned up. **occurredAt and recordedAt are both kept** \u2014 a steward clocking in offline is not late because the sync was"
+   "tip": "Who actually turned up. **occurredAt and recordedAt are both kept** — a steward clocking in offline is not late because the sync was"
   },
   "workforce.rota_assignment": {
    "columns": 0,
-   "tip": "A person expected somewhere at a time. **Not a shift** \u2014 a shift is a cash session, and most people on a rota never touch a till"
+   "tip": "A person expected somewhere at a time. **Not a shift** — a shift is a cash session, and most people on a rota never touch a till"
   },
   "workforce.shift_swap": {
    "columns": 0,
@@ -1332,7 +1332,7 @@
   },
   "promotions.bundle_choice_group": {
    "columns": 0,
-   "tip": "Pick n from a set. The bundle price does not move with the choice (ADR-0019) \u2014 the allocation does"
+   "tip": "Pick n from a set. The bundle price does not move with the choice (ADR-0019) — the allocation does"
   },
   "platform.audit_read": {
    "columns": 0,
@@ -1340,15 +1340,15 @@
   },
   "platform.audit_record": {
    "columns": 0,
-   "tip": "One row per write. Who, what, when, from where, under which permission, and the before and after. **occurredAt and recordedAt are both kept** \u2014 an offline action happened when it happened"
+   "tip": "One row per write. Who, what, when, from where, under which permission, and the before and after. **occurredAt and recordedAt are both kept** — an offline action happened when it happened"
   },
   "catalogue.donation_campaign": {
    "columns": 0,
-   "tip": "Fixed, free or round-up. **Posts to a liability account, not revenue** \u2014 money collected for a charity is not the venue\u2019s to recognise"
+   "tip": "Fixed, free or round-up. **Posts to a liability account, not revenue** — money collected for a charity is not the venue’s to recognise"
   },
   "catalogue.waitlist_entry": {
    "columns": 0,
-   "tip": "Who asked to be told when a sold-out session frees up. **Not a queue** \u2014 a queue is people standing at a ride"
+   "tip": "Who asked to be told when a sold-out session frees up. **Not a queue** — a queue is people standing at a ride"
   },
   "fnb.table_reservation": {
    "columns": 0,
@@ -1368,7 +1368,7 @@
   },
   "access.parking_entitlement": {
    "columns": 0,
-   "tip": "A guest bought parking. Carries the plate where the mode is plateWhitelist \u2014 **personal data**, since a plate identifies a person"
+   "tip": "A guest bought parking. Carries the plate where the mode is plateWhitelist — **personal data**, since a plate identifies a person"
   },
   "access.parking_facility": {
    "columns": 0,
@@ -1376,39 +1376,39 @@
   },
   "control.partner_agreement": {
    "columns": 0,
-   "tip": "Net rate or commission, credit terms, validity. **Versioned** \u2014 an order placed last week used last week\u2019s rate"
+   "tip": "Net rate or commission, credit terms, validity. **Versioned** — an order placed last week used last week’s rate"
   },
   "ai.layout_draft": {
    "columns": 0,
-   "tip": "A generated seat layout awaiting review. **Ends at previewReady and writes nothing to the seat map** \u2014 the draft enters seating.import_job at its existing human commit step (ADR-0020)"
+   "tip": "A generated seat layout awaiting review. **Ends at previewReady and writes nothing to the seat map** — the draft enters seating.import_job at its existing human commit step (ADR-0020)"
   },
   "qdrant:knowledge": {
    "columns": 0,
-   "tip": "**One collection per embedding model** (ADR-0021) \u2014 a collection is the only Qdrant container that can carry its own vector configuration, and a shard cannot. Tenants sharing a model share this collection, separated by shard key and scope_path payload; a tenant forced onto a local model by residency"
+   "tip": "**One collection per embedding model** (ADR-0021) — a collection is the only Qdrant container that can carry its own vector configuration, and a shard cannot. Tenants sharing a model share this collection, separated by shard key and scope_path payload; a tenant forced onto a local model by residency"
   },
   "orders.deposit_box": {
    "columns": 0,
-   "tip": "A cashier\u2019s cash box. **Allocated to a person, not a workstation** \u2014 a cashier moving between tills takes their float, which is what makes a variance attributable. withdrawnTotal reduces the expected close: cash skimmed for banking is not a shortfall"
+   "tip": "A cashier’s cash box. **Allocated to a person, not a workstation** — a cashier moving between tills takes their float, which is what makes a variance attributable. withdrawnTotal reduces the expected close: cash skimmed for banking is not a shortfall"
   },
   "marketing.agent_availability": {
    "columns": 0,
-   "tip": "Available, busy, away or offline, with a concurrency limit. **Expires** \u2014 an agent who forgets to go offline is one conversations queue for"
+   "tip": "Available, busy, away or offline, with a concurrency limit. **Expires** — an agent who forgets to go offline is one conversations queue for"
   },
   "marketing.conversation": {
    "columns": 0,
-   "tip": "A live session with somebody waiting. **Not a case** \u2014 a case is a ticket measured in hours, this is measured in seconds. A conversation may create a case; it is not one"
+   "tip": "A live session with somebody waiting. **Not a case** — a case is a ticket measured in hours, this is measured in seconds. A conversation may create a case; it is not one"
   },
   "marketing.conversation_message": {
    "columns": 0,
-   "tip": "One message. The sender is resolved, never declared, and **the assistant is labelled as one** \u2014 a guest talking to a bot that presents as a person is a complaint waiting to happen"
+   "tip": "One message. The sender is resolved, never declared, and **the assistant is labelled as one** — a guest talking to a bot that presents as a person is a complaint waiting to happen"
   },
   "marketing.kiosk_assist_session": {
    "columns": 0,
-   "tip": "A staff member acting on a kiosk session remotely (2.1.25). **The guest can always see it and always end it** \u2014 assistance a guest cannot stop is surveillance"
+   "tip": "A staff member acting on a kiosk session remotely (2.1.25). **The guest can always see it and always end it** — assistance a guest cannot stop is surveillance"
   },
   "cache:answer": {
    "columns": 0,
-   "tip": "**Question, scope and locale to an answer.** The largest cost lever at a kiosk, where forty questions repeat thousands of times a day. **Invalidated by the same events that invalidate the index** \u2014 a cached answer that outlives a price change has misled a guest on the venue\u2019s behalf. **`scope_path` "
+   "tip": "**Question, scope and locale to an answer.** The largest cost lever at a kiosk, where forty questions repeat thousands of times a day. **Invalidated by the same events that invalidate the index** — a cached answer that outlives a price change has misled a guest on the venue’s behalf. **`scope_path` "
   },
   "cache:embedding": {
    "columns": 0,
@@ -1416,15 +1416,15 @@
   },
   "cache:idempotency": {
    "columns": 0,
-   "tip": "Seen idempotency keys. **Every write carries one as of 17 August and nothing said where the record lived or how long it was kept** \u2014 a key store that forgets too early lets a replay through, which is the defect the key exists to prevent. Retention must exceed the longest offline window (ADR-0013) **"
+   "tip": "Seen idempotency keys. **Every write carries one as of 17 August and nothing said where the record lived or how long it was kept** — a key store that forgets too early lets a replay through, which is the defect the key exists to prevent. Retention must exceed the longest offline window (ADR-0013) **"
   },
   "cache:resolution": {
    "columns": 0,
-   "tip": "Scope and permission resolution, tenant configuration, price lists. **Read on every request and changed rarely** \u2014 `resolvePermissions` reads five tables on every authorised call"
+   "tip": "Scope and permission resolution, tenant configuration, price lists. **Read on every request and changed rarely** — `resolvePermissions` reads five tables on every authorised call"
   },
   "orders.stored_value_authorisation": {
    "columns": 8,
-   "tip": "A hold against any stored-value instrument (CF-126). **Two-phase spend for all six**, where only the retail wallet had it \u2014 a guest with 200 game credits starting a play the machine then failed had no held balance"
+   "tip": "A hold against any stored-value instrument (CF-126). **Two-phase spend for all six**, where only the retail wallet had it — a guest with 200 game credits starting a play the machine then failed had no held balance"
   },
   "catalogue.import_job": {
    "columns": 6,
@@ -1440,7 +1440,7 @@
   },
   "orders.invitation": {
    "columns": 12,
-   "tip": "A complimentary entitlement issued outside the order path (8.1.3\u20138.1.5). **No payment is expected, so nothing waits for one.**"
+   "tip": "A complimentary entitlement issued outside the order path (8.1.3–8.1.5). **No payment is expected, so nothing waits for one.**"
   },
   "orders.invitation_allowance": {
    "columns": 7,
@@ -1448,7 +1448,7 @@
   },
   "marketing.journey": {
    "columns": 8,
-   "tip": "An automated multi-step journey (22.3.1b\u201322.3.10b, CF-137). **A MessageTrigger is one step of it** \u2014 a journey is what you need when the next message depends on what the guest did about the last."
+   "tip": "An automated multi-step journey (22.3.1b–22.3.10b, CF-137). **A MessageTrigger is one step of it** — a journey is what you need when the next message depends on what the guest did about the last."
   },
   "marketing.journey_entrant": {
    "columns": 0,
@@ -1456,15 +1456,15 @@
   },
   "venuemap.map": {
    "columns": 11,
-   "tip": "A park map or floor plan (19.2.55, CF-123). **Not a seat map** \u2014 nothing on it is sold. Published rather than saved, because editing a live map under a guest routes them into a wall."
+   "tip": "A park map or floor plan (19.2.55, CF-123). **Not a seat map** — nothing on it is sold. Published rather than saved, because editing a live map under a guest routes them into a wall."
   },
   "venuemap.point": {
    "columns": 13,
-   "tip": "What a venue places on the map (19.2.57\u201319.2.60) \u2014 rides, restaurants, toilets, exits. **`emergencyExit` is separate from `exit` on purpose.**"
+   "tip": "What a venue places on the map (19.2.57–19.2.60) — rides, restaurants, toilets, exits. **`emergencyExit` is separate from `exit` on purpose.**"
   },
   "venuemap.path": {
    "columns": 9,
-   "tip": "The navigation graph (19.2.56). **`isStepFree` is the most important attribute on it** \u2014 a wheelchair user routed up a staircase was failed by the map."
+   "tip": "The navigation graph (19.2.56). **`isStepFree` is the most important attribute on it** — a wheelchair user routed up a staircase was failed by the map."
   },
   "venuemap.import_job": {
    "columns": 7,
@@ -1472,7 +1472,7 @@
   },
   "resources.resource": {
    "columns": 15,
-   "tip": "A specific bookable object (CF-125, BL-039). **Not a quantity of interchangeable ones** \u2014 forty identical strollers are forty resources, because guest twelve returned stroller twelve."
+   "tip": "A specific bookable object (CF-125, BL-039). **Not a quantity of interchangeable ones** — forty identical strollers are forty resources, because guest twelve returned stroller twelve."
   },
   "resources.booking": {
    "columns": 14,
@@ -1484,19 +1484,19 @@
   },
   "resources.session_participant": {
    "columns": 8,
-   "tip": "Who is in a session, in what order (BL-045). **The running order is operational** \u2014 an instructor takes beginners first."
+   "tip": "Who is in a session, in what order (BL-045). **The running order is operational** — an instructor takes beginners first."
   },
   "ledger.deposit": {
    "columns": 10,
-   "tip": "Money taken before the sale is complete (BL-139). **Not deferred revenue** \u2014 that is a sold entitlement not yet consumed, and the sale happened."
+   "tip": "Money taken before the sale is complete (BL-139). **Not deferred revenue** — that is a sold entitlement not yet consumed, and the sale happened."
   },
   "orders.payment_provider": {
    "columns": 13,
-   "tip": "A configured gateway (BL-116, CF-131). **Two are confirmed for Phase 1, which is the number that forces an abstraction** \u2014 one can be hard-coded and two cannot. Credentials live in the vault."
+   "tip": "A configured gateway (BL-116, CF-131). **Two are confirmed for Phase 1, which is the number that forces an abstraction** — one can be hard-coded and two cannot. Credentials live in the vault."
   },
   "orders.payment_routing": {
    "columns": 5,
-   "tip": "Which provider takes a given payment (BL-116). **Ordered rules, first match wins, and a fallback that is not optional** \u2014 a gateway outage with no fallback is a venue that cannot sell."
+   "tip": "Which provider takes a given payment (BL-116). **Ordered rules, first match wins, and a fallback that is not optional** — a gateway outage with no fallback is a venue that cannot sell."
   },
   "orders.payment_token": {
    "columns": 9,
@@ -1504,11 +1504,11 @@
   },
   "orders.chargeback": {
    "columns": 11,
-   "tip": "A disputed transaction (BL-118, CF-144). **Not a refund** \u2014 a bank decides, on a clock the venue does not control, and a deadline missed is a case lost regardless of merit."
+   "tip": "A disputed transaction (BL-118, CF-144). **Not a refund** — a bank decides, on a clock the venue does not control, and a deadline missed is a case lost regardless of merit."
   },
   "orders.fraud_rule": {
    "columns": 6,
-   "tip": "Evaluated before the charge (BL-118). **It holds rather than refuses** \u2014 a rule that declines outright turns a false positive into a lost sale with an angry guest."
+   "tip": "Evaluated before the charge (BL-118). **It holds rather than refuses** — a rule that declines outright turns a false positive into a lost sale with an angry guest."
   },
   "control.partner_user": {
    "columns": 7,
@@ -1516,19 +1516,19 @@
   },
   "control.channel_listing": {
    "columns": 10,
-   "tip": "What is published to an OTA (BL-076). **An OTA pulls a feed, caches it and sells against the cache** \u2014 so the gap between pushes is the oversell window, and the allocation bounds it."
+   "tip": "What is published to an OTA (BL-076). **An OTA pulls a feed, caches it and sells against the cache** — so the gap between pushes is the oversell window, and the allocation bounds it."
   },
   "reporting.alert_rule": {
    "columns": 12,
-   "tip": "Raises an alert when a number leaves a range (BL-152, CF-134). **MessageTrigger seen from the operational side** \u2014 a message trigger fires on an event, this fires on a threshold."
+   "tip": "Raises an alert when a number leaves a range (BL-152, CF-134). **MessageTrigger seen from the operational side** — a message trigger fires on an event, this fires on a threshold."
   },
   "reporting.alert": {
    "columns": 11,
-   "tip": "A rule that fired. **Acknowledged rather than dismissed** \u2014 an alert that disappears when clicked leaves nobody accountable for what happened next."
+   "tip": "A rule that fired. **Acknowledged rather than dismissed** — an alert that disappears when clicked leaves nobody accountable for what happened next."
   },
   "marketing.lost_item": {
    "columns": 14,
-   "tip": "A reported or found item (BL-021). **The match between the two is the whole capability** \u2014 without both sides modelled, somebody searches a case list by hand."
+   "tip": "A reported or found item (BL-021). **The match between the two is the whole capability** — without both sides modelled, somebody searches a case list by hand."
   },
   "marketing.referral": {
    "columns": 9,
@@ -1536,7 +1536,7 @@
   },
   "marketing.touch_point": {
    "columns": 8,
-   "tip": "One marketing touch (BL-177). **The platform records touches and does not pick an attribution model** \u2014 hard-coding one would make every other unanswerable."
+   "tip": "One marketing touch (BL-177). **The platform records touches and does not pick an attribution model** — hard-coding one would make every other unanswerable."
   },
   "marketing.attribution_touch": {
    "columns": 8,
@@ -1544,19 +1544,19 @@
   },
   "fnb.production_run": {
    "columns": 9,
-   "tip": "A batch made for one outlet or several (BL-129). **Production is a stock movement in both directions at once** \u2014 ingredients out, sellable items in \u2014 and theoretical against actual is the whole point of recording it."
+   "tip": "A batch made for one outlet or several (BL-129). **Production is a stock movement in both directions at once** — ingredients out, sellable items in — and theoretical against actual is the whole point of recording it."
   },
   "fnb.waitlist_entry": {
    "columns": 9,
-   "tip": "A restaurant waitlist party (BL-130). **Distinct from queue, which is for rides** \u2014 this has a party size, a seating preference and a walk-away point."
+   "tip": "A restaurant waitlist party (BL-130). **Distinct from queue, which is for rides** — this has a party size, a seating preference and a walk-away point."
   },
   "seating.zone": {
    "columns": 9,
-   "tip": "Standing areas, suites, stages and obstructions (BL-166). **A standing zone is a capacity without individual seats** \u2014 modelling it as seats means inventing numbers nobody prints."
+   "tip": "Standing areas, suites, stages and obstructions (BL-166). **A standing zone is a capacity without individual seats** — modelling it as seats means inventing numbers nobody prints."
   },
   "orders.resale_listing": {
    "columns": 11,
-   "tip": "An entitlement listed for resale (BL-060). **A resale is a transfer with money attached and the venue stays in the middle** \u2014 the seller entitlement is voided and a new one issued, so the ticket that admits is always one the venue issued."
+   "tip": "An entitlement listed for resale (BL-060). **A resale is a transfer with money attached and the venue stays in the middle** — the seller entitlement is voided and a new one issued, so the ticket that admits is always one the venue issued."
   },
   "orders.ticket_template": {
    "columns": 8,
@@ -1568,11 +1568,11 @@
   },
   "control.content_block": {
    "columns": 11,
-   "tip": "Authored content with a schedule (BL-172). **The CMS modelled configuration and not authoring** \u2014 a marketer could choose between things a developer had built and could not write something new."
+   "tip": "Authored content with a schedule (BL-172). **The CMS modelled configuration and not authoring** — a marketer could choose between things a developer had built and could not write something new."
   },
   "control.onboarding_application": {
    "columns": 11,
-   "tip": "A prospect signing themselves up (BL-165). **Nothing is provisioned until verification passes** \u2014 an unverified application that provisions a cell is a cell somebody has to clean up."
+   "tip": "A prospect signing themselves up (BL-165). **Nothing is provisioned until verification passes** — an unverified application that provisions a cell is a cell somebody has to clean up."
   },
   "control.venue_type_template": {
    "columns": 7,
@@ -1580,7 +1580,7 @@
   },
   "inventory.stock_batch": {
    "columns": 10,
-   "tip": "The instance that actually expires (BL-122). **isPerishable and shelfLifeDays are on the item, so a shelf life was declared and never instantiated** \u2014 two deliveries a week apart were one stock level with one implied expiry."
+   "tip": "The instance that actually expires (BL-122). **isPerishable and shelfLifeDays are on the item, so a shelf life was declared and never instantiated** — two deliveries a week apart were one stock level with one implied expiry."
   },
   "orders.group_booking": {
    "columns": 10,
@@ -1588,15 +1588,15 @@
   },
   "orders.wallet_pass": {
    "columns": 8,
-   "tip": "An Apple or Google wallet pass (BL-029). **A live object, not a download** \u2014 a pass that cannot be pushed to is a screenshot with better rounding."
+   "tip": "An Apple or Google wallet pass (BL-029). **A live object, not a download** — a pass that cannot be pushed to is a screenshot with better rounding."
   },
   "marketing.challenge": {
    "columns": 12,
-   "tip": "A challenge, mission or streak (22.6, CF-137). **Gamification is not loyalty** \u2014 loyalty pays for spend, a challenge pays for behaviour spend does not produce."
+   "tip": "A challenge, mission or streak (22.6, CF-137). **Gamification is not loyalty** — loyalty pays for spend, a challenge pays for behaviour spend does not produce."
   },
   "marketing.challenge_progress": {
    "columns": 9,
-   "tip": "How far a guest is (22.6.15). **Progress is shown, not just the outcome** \u2014 a guest two visits from a reward behaves differently from one who does not know."
+   "tip": "How far a guest is (22.6.15). **Progress is shown, not just the outcome** — a guest two visits from a reward behaves differently from one who does not know."
   },
   "control.seo_metadata": {
    "columns": 14,
@@ -1608,7 +1608,7 @@
   },
   "marketing.form_definition": {
    "columns": 14,
-   "tip": "A waiver, survey or capture form (CF-129). **One mechanism, three uses** \u2014 three implementations would drift on the version rule first."
+   "tip": "A waiver, survey or capture form (CF-129). **One mechanism, three uses** — three implementations would drift on the version rule first."
   },
   "marketing.form_submission": {
    "columns": 11,
@@ -1616,19 +1616,19 @@
   },
   "marketing.guest_document": {
    "columns": 9,
-   "tip": "A guest photo, ID or signed document (BL-133). **Deliberately not assets** \u2014 a passport scan is not a marketing asset and has a different retention clock."
+   "tip": "A guest photo, ID or signed document (BL-133). **Deliberately not assets** — a passport scan is not a marketing asset and has a different retention clock."
   },
   "identity.password_policy": {
    "columns": 10,
-   "tip": "Length, breach check, lockout and step-up (BL-144). **Modelled on NIST SP 800-63B rather than habit** \u2014 length beats composition, and forced rotation makes passwords worse."
+   "tip": "Length, breach check, lockout and step-up (BL-144). **Modelled on NIST SP 800-63B rather than habit** — length beats composition, and forced rotation makes passwords worse."
   },
   "identity.segregation_rule": {
    "columns": 7,
-   "tip": "Which permissions may not be held together (BL-147, 3.3.31). **Checked at grant time, not use time** \u2014 discovering the conflict when somebody exercises it means it already existed."
+   "tip": "Which permissions may not be held together (BL-147, 3.3.31). **Checked at grant time, not use time** — discovering the conflict when somebody exercises it means it already existed."
   },
   "control.developer_account": {
    "columns": 8,
-   "tip": "A developer organisation (13.1.6\u201313.1.9). **An organisation, because an integration outlives the engineer who built it** \u2014 and not a tenant or a partner."
+   "tip": "A developer organisation (13.1.6–13.1.9). **An organisation, because an integration outlives the engineer who built it** — and not a tenant or a partner."
   },
   "control.api_client": {
    "columns": 10,
@@ -1636,7 +1636,7 @@
   },
   "control.sandbox": {
    "columns": 8,
-   "tip": "A developer sandbox (13.2.1, D2/D3). **Synthetic data only** \u2014 no cloning, no masking, which removes the PDPL and DESC exposure entirely."
+   "tip": "A developer sandbox (13.2.1, D2/D3). **Synthetic data only** — no cloning, no masking, which removes the PDPL and DESC exposure entirely."
   },
   "control.webhook_subscription": {
    "columns": 9,
@@ -1644,7 +1644,7 @@
   },
   "control.webhook_delivery": {
    "columns": 10,
-   "tip": "What was sent and what failed (13.1.30). **The log a developer needs most** \u2014 without it every question is a support ticket."
+   "tip": "What was sent and what failed (13.1.30). **The log a developer needs most** — without it every question is a support ticket."
   },
   "control.api_quota": {
    "columns": 6,
@@ -1652,19 +1652,19 @@
   },
   "control.api_version": {
    "columns": 8,
-   "tip": "API versions and sunset dates (13.1.31\u201335, ADR-0031). **With third parties a breaking change with no window breaks somebody else business.**"
+   "tip": "API versions and sunset dates (13.1.31–35, ADR-0031). **With third parties a breaking change with no window breaks somebody else business.**"
   },
   "control.integration_listing": {
    "columns": 11,
-   "tip": "A published third-party integration (13.1.50). **A listing, not an installation** \u2014 the code runs on the developer own infrastructure."
+   "tip": "A published third-party integration (13.1.50). **A listing, not an installation** — the code runs on the developer own infrastructure."
   },
   "control.api_licence": {
    "columns": 7,
-   "tip": "Which API modules a tenant licensed (13.3.24, D5). **Configuration, not code** \u2014 rates change without a release."
+   "tip": "Which API modules a tenant licensed (13.3.24, D5). **Configuration, not code** — rates change without a release."
   },
   "control.footer_config": {
    "columns": 4,
-   "tip": "Footer columns and legal links (BL-002). **A header is chrome and a footer is a link surface** \u2014 legal links are held separately so a tenant cannot remove the privacy notice by accident."
+   "tip": "Footer columns and legal links (BL-002). **A header is chrome and a footer is a link surface** — legal links are held separately so a tenant cannot remove the privacy notice by accident."
   },
   "marketing.invitation_campaign": {
    "columns": 10,
@@ -1676,27 +1676,27 @@
   },
   "marketing.privacy_incident": {
    "columns": 11,
-   "tip": "A personal-data breach (BL-176). **UAE PDPL gives 72 hours from discovery** \u2014 discoveredAt starts the clock, and a discovery nobody recorded is a deadline nobody is counting."
+   "tip": "A personal-data breach (BL-176). **UAE PDPL gives 72 hours from discovery** — discoveredAt starts the clock, and a discovery nobody recorded is a deadline nobody is counting."
   },
   "ledger.event_budget": {
    "columns": 8,
-   "tip": "What an event cost against what it earned (BL-049). **Profitability is revenue minus committed cost** \u2014 an event three weeks out with purchase orders raised has spent it."
+   "tip": "What an event cost against what it earned (BL-049). **Profitability is revenue minus committed cost** — an event three weeks out with purchase orders raised has spent it."
   },
   "access.entitlement": {
    "columns": 24,
-   "tip": "**What a guest actually holds** \u2014 found missing 18 August. The package sold products, defined EntitlementTemplate, recorded ScanEvent.ticketId, transferred ticket_ids and issued wallet passes against entitlementId: **five artefacts referring to a thing that did not exist.** validateAccess read the t"
+   "tip": "**What a guest actually holds** — found missing 18 August. The package sold products, defined EntitlementTemplate, recorded ScanEvent.ticketId, transferred ticket_ids and issued wallet passes against entitlementId: **five artefacts referring to a thing that did not exist.** validateAccess read the t"
   },
   "orders.payment_link": {
    "columns": 13,
-   "tip": "A link a guest opens to pay for a booking taken at a till (BL-072). **The link is the credential** \u2014 a guest holding one is anonymous, and a phone booking is exactly the case where they have not registered. **The expiry releases the hold, not just the link.**"
+   "tip": "A link a guest opens to pay for a booking taken at a till (BL-072). **The link is the credential** — a guest holding one is anonymous, and a phone booking is exactly the case where they have not registered. **The expiry releases the hold, not just the link.**"
   },
   "platform.configuration_profile": {
    "columns": 9,
-   "tip": "What a class of workstation is configured to be (client Board 1, 20 August). **A profile is what a venue changes; a version is what it deploys** \u2014 conflating them means a venue cannot roll back one fleet and leave another."
+   "tip": "What a class of workstation is configured to be (client Board 1, 20 August). **A profile is what a venue changes; a version is what it deploys** — conflating them means a venue cannot roll back one fleet and leave another."
   },
   "platform.profile_deployment": {
    "columns": 12,
-   "tip": "A profile version pushed to a fleet. **onNextIdle by default** \u2014 a profile landing mid-sale is a guest watching a till restart."
+   "tip": "A profile version pushed to a fleet. **onNextIdle by default** — a profile landing mid-sale is a guest watching a till restart."
   },
   "platform.offline_policy": {
    "columns": 8,
@@ -1708,72 +1708,96 @@
   },
   "inventory.serialised_item": {
    "columns": 9,
-   "tip": "Where an individual item is (Retail Board 4). **A lot number answers which delivery; a serial answers which one** \u2014 a warranty claim, a recall and a proof of purchase all start there."
+   "tip": "Where an individual item is (Retail Board 4). **A lot number answers which delivery; a serial answers which one** — a warranty claim, a recall and a proof of purchase all start there."
   },
   "catalogue.product_category": {
    "columns": 9,
-   "tip": "The merchandise hierarchy \u2014 categories, brands, collections (Retail Board 2, 20 August). **listSeatCategories existed and a product category did not.** One tree rather than four tables, because a brand under a department under a category is how a real hierarchy runs."
+   "tip": "The merchandise hierarchy — categories, brands, collections (Retail Board 2, 20 August). **listSeatCategories existed and a product category did not.** One tree rather than four tables, because a brand under a department under a category is how a real hierarchy runs."
   },
   "fnb.temperature_log": {
    "columns": 11,
-   "tip": "HACCP temperature checks (client board 5J, 20 August). **A regulatory obligation nothing in the package touched.** An out-of-range reading is kept, not refused \u2014 **deleting a bad reading is the one thing an inspector looks for.**"
+   "tip": "HACCP temperature checks (client board 5J, 20 August). **A regulatory obligation nothing in the package touched.** An out-of-range reading is kept, not refused — **deleting a bad reading is the one thing an inspector looks for.**"
   },
   "fnb.corrective_action": {
    "columns": 11,
-   "tip": "What was done about a finding and who signed it. **The signature is the record** \u2014 *discarded and reset* with nobody against it is not a corrective action."
+   "tip": "What was done about a finding and who signed it. **The signature is the record** — *discarded and reset* with nobody against it is not a corrective action."
   },
   "fnb.cold_chain_event": {
    "columns": 9,
-   "tip": "The temperature a delivery arrived at (board 5G). **Taken before the receipt is posted** \u2014 a claim against a supplier needs the reading that refused it."
+   "tip": "The temperature a delivery arrived at (board 5G). **Taken before the receipt is posted** — a claim against a supplier needs the reading that refused it."
   },
   "inventory.count_line": {
    "columns": 14,
-   "tip": "What was actually on the shelf (client board 5, 24 August). **A count could be opened and posted and nothing recorded what was counted.** The theoretical quantity is snapshotted at entry, not at post \u2014 **stock moves during a count**, and a variance computed at post time measures against a different "
+   "tip": "What was actually on the shelf (client board 5, 24 August). **A count could be opened and posted and nothing recorded what was counted.** The theoretical quantity is snapshotted at entry, not at post — **stock moves during a count**, and a variance computed at post time measures against a different "
   },
   "fnb.sub_bill": {
    "columns": 11,
-   "tip": "One bill from a split (client board 4, 24 August). **Tax and service charge recompute per bill rather than apportioning pro rata** \u2014 a split that divides VAT by percentage produces bills that do not sum to the original."
+   "tip": "One bill from a split (client board 4, 24 August). **Tax and service charge recompute per bill rather than apportioning pro rata** — a split that divides VAT by percentage produces bills that do not sum to the original."
   },
   "fnb.kitchen_exception": {
    "columns": 9,
-   "tip": "Something that cost the kitchen a service and left no other trace \u2014 equipment down, an item run out, a late delivery (client board 3, 24 August). **The reasons are the value**: a venue looking at a bad Saturday needs to know the fryer was down for forty minutes."
+   "tip": "Something that cost the kitchen a service and left no other trace — equipment down, an item run out, a late delivery (client board 3, 24 August). **The reasons are the value**: a venue looking at a bad Saturday needs to know the fryer was down for forty minutes."
   },
   "fnb.eighty_six_event": {
    "columns": 8,
-   "tip": "An item off the menu and back on (board 5J). **setItemAvailability kept the flag and not the history** \u2014 time off, time back, who called it, and what it cost in refused orders."
+   "tip": "An item off the menu and back on (board 5J). **setItemAvailability kept the flag and not the history** — time off, time back, who called it, and what it cost in refused orders."
   },
   "ai.suggestion": {
    "columns": 12,
-   "tip": "One answer to one question, with its basis and its reasoning (24 August). **Built so machine learning can be swapped in without touching a screen** \u2014 a heuristic today, a model when there is data, and the frontend never changes. **A suggestion is never an action.**"
+   "tip": "One answer to one question, with its basis and its reasoning (24 August). **Built so machine learning can be swapped in without touching a screen** — a heuristic today, a model when there is data, and the frontend never changes. **A suggestion is never an action.**"
   },
   "ai.suggestion_outcome": {
    "columns": 8,
-   "tip": "What the venue actually did. **The table that makes the swap possible at all** \u2014 a model needs labelled data and the only source of labels is whether the advice was taken and whether it worked. **A rejected suggestion is the more valuable record.**"
+   "tip": "What the venue actually did. **The table that makes the swap possible at all** — a model needs labelled data and the only source of labels is whether the advice was taken and whether it worked. **A rejected suggestion is the more valuable record.**"
   },
   "fnb.combo": {
    "columns": 7,
-   "tip": "A meal deal, priced as one thing (client board 2G). **A combo is one product with slots, not a bundle of products** \u2014 a model that prices by summing cannot express a deal."
+   "tip": "A meal deal, priced as one thing (client board 2G). **A combo is one product with slots, not a bundle of products** — a model that prices by summing cannot express a deal."
   },
   "fnb.combo_slot": {
    "columns": 6,
-   "tip": "One choice within a combo. **minSelect and maxSelect are what make it a slot rather than a line** \u2014 a main is exactly one, a sauce might be none or two."
+   "tip": "One choice within a combo. **minSelect and maxSelect are what make it a slot rather than a line** — a main is exactly one, a sauce might be none or two."
   },
   "fnb.substitution_rule": {
    "columns": 9,
-   "tip": "What may replace what, and under what conditions (board 2L, 24 August). **The rule exists so verifyAllergens has something to check against** \u2014 swapping butter for margarine removes dairy and may add soy."
+   "tip": "What may replace what, and under what conditions (board 2L, 24 August). **The rule exists so verifyAllergens has something to check against** — swapping butter for margarine removes dairy and may add soy."
   },
   "fnb.production_plan": {
    "columns": 6,
-   "tip": "A forecast turned into a prep list (board 2M). **A plan is not a production run** \u2014 a plan that creates runs as it is drafted creates runs nobody asked for."
+   "tip": "A forecast turned into a prep list (board 2M). **A plan is not a production run** — a plan that creates runs as it is drafted creates runs nobody asked for."
   },
   "whitelabel.custom_domain": {
    "columns": 10,
-   "tip": "A tenant's own hostname and its certificate (24 August). **No domain or certificate operation existed anywhere in 1,010** \u2014 and `ADM-017 Domain & Certificate Management` declared 41 operations, none of them about a domain. **Verification before issuance, always.**"
+   "tip": "A tenant's own hostname and its certificate (24 August). **No domain or certificate operation existed anywhere in 1,010** — and `ADM-017 Domain & Certificate Management` declared 41 operations, none of them about a domain. **Verification before issuance, always.**"
+  },
+  "control.migration_run_cell": {
+   "columns": 13,
+   "tip": "**What happened in one cell during one run.** Where a partial failure is named rather than counted"
+  },
+  "ledger.journal_line": {
+   "columns": 7,
+   "tip": "**One side of a posting.** Entries balance; lines do not"
+  },
+  "platform.denomination": {
+   "columns": 8,
+   "tip": "Cash denominations per region (Tanmay, review 20 August). **isActive is the field that makes this a table** — a note withdrawn from circulation is deactivated and stays in the count history, and a JSON blob cannot deacti"
+  },
+  "fnb.fnb_order_line": {
+   "columns": 11,
+   "tip": "**One item on a food order**, with its modifiers resolved at the moment of sale"
+  },
+  "control.release_component": {
+   "columns": 4,
+   "tip": "**One service and version inside a release.** A release is not a single artefact"
+  },
+  "fnb.guest_note": {
+   "columns": 0,
+   "tip": "What the floor needs to know about this table (board 4G). **isAllergy is separated from every other kind** — an allergy note buried among *likes the window table* is a note nobody reads."
   }
  },
  "platforms": {
   "P01": {
-   "name": "Guest Web \u2014 Storefront",
+   "name": "Guest Web — Storefront",
    "short": "Guest Web",
    "operator": "guest",
    "audience": "guest",
@@ -1781,10 +1805,10 @@
    "app": "guest-web",
    "screens": 29,
    "offline": false,
-   "tip": "Guest Web \u2014 Storefront. Operated by guest, guest on web, app `guest-web`."
+   "tip": "Guest Web — Storefront. Operated by guest, guest on web, app `guest-web`."
   },
   "P02": {
-   "name": "Guest App \u2014 Mobile",
+   "name": "Guest App — Mobile",
    "short": "Guest App",
    "operator": "guest",
    "audience": "guest",
@@ -1792,10 +1816,10 @@
    "app": "guest-app",
    "screens": 62,
    "offline": true,
-   "tip": "Guest App \u2014 Mobile. Operated by guest, guest on mobileApp, app `guest-app`. Offline-capable: it must work with no network."
+   "tip": "Guest App — Mobile. Operated by guest, guest on mobileApp, app `guest-app`. Offline-capable: it must work with no network."
   },
   "P04": {
-   "name": "Venue POS \u2014 Terminal and Tablet",
+   "name": "Venue POS — Terminal and Tablet",
    "short": "Venue POS",
    "operator": "venue",
    "audience": "staff",
@@ -1803,10 +1827,10 @@
    "app": "venue-pos",
    "screens": 10,
    "offline": true,
-   "tip": "Venue POS \u2014 Terminal and Tablet. Operated by venue, staff on posTerminal, app `venue-pos`. Offline-capable: it must work with no network."
+   "tip": "Venue POS — Terminal and Tablet. Operated by venue, staff on posTerminal, app `venue-pos`. Offline-capable: it must work with no network."
   },
   "P05": {
-   "name": "Guest Kiosk \u2014 Self-Service",
+   "name": "Guest Kiosk — Self-Service",
    "short": "Guest Kiosk",
    "operator": "guest",
    "audience": "guest",
@@ -1814,10 +1838,10 @@
    "app": "guest-app",
    "screens": 14,
    "offline": false,
-   "tip": "Guest Kiosk \u2014 Self-Service. Operated by guest, guest on kiosk, app `guest-app`."
+   "tip": "Guest Kiosk — Self-Service. Operated by guest, guest on kiosk, app `guest-app`."
   },
   "P06": {
-   "name": "Venue Staff App \u2014 Operations",
+   "name": "Venue Staff App — Operations",
    "short": "Venue Staff App",
    "operator": "venue",
    "audience": "staff",
@@ -1825,10 +1849,10 @@
    "app": "venue-staff-app",
    "screens": 50,
    "offline": true,
-   "tip": "Venue Staff App \u2014 Operations. Operated by venue, staff on mobileApp, app `venue-staff-app`. Offline-capable: it must work with no network."
+   "tip": "Venue Staff App — Operations. Operated by venue, staff on mobileApp, app `venue-staff-app`. Offline-capable: it must work with no network."
   },
   "P07": {
-   "name": "Venue Scanner \u2014 Access Control",
+   "name": "Venue Scanner — Access Control",
    "short": "Venue Scanner",
    "operator": "venue",
    "audience": "staff",
@@ -1836,10 +1860,10 @@
    "app": "venue-scanner",
    "screens": 16,
    "offline": true,
-   "tip": "Venue Scanner \u2014 Access Control. Operated by venue, staff on handheld, app `venue-scanner`. Offline-capable: it must work with no network."
+   "tip": "Venue Scanner — Access Control. Operated by venue, staff on handheld, app `venue-scanner`. Offline-capable: it must work with no network."
   },
   "P08": {
-   "name": "Venue Management \u2014 Back Office",
+   "name": "Venue Management — Back Office",
    "short": "Venue Management",
    "operator": "venue",
    "audience": "staff",
@@ -1847,10 +1871,10 @@
    "app": "venue-management-web",
    "screens": 73,
    "offline": false,
-   "tip": "Venue Management \u2014 Back Office. Operated by venue, staff on web, app `venue-management-web`."
+   "tip": "Venue Management — Back Office. Operated by venue, staff on web, app `venue-management-web`."
   },
   "P09": {
-   "name": "TICVAI Web \u2014 Platform Console",
+   "name": "TICVAI Web — Platform Console",
    "short": "TICVAI Web",
    "operator": "ticvai",
    "audience": "platformAdmin",
@@ -1858,10 +1882,10 @@
    "app": "ticvai-web",
    "screens": 36,
    "offline": false,
-   "tip": "TICVAI Web \u2014 Platform Console. Operated by ticvai, platformAdmin on web, app `ticvai-web`."
+   "tip": "TICVAI Web — Platform Console. Operated by ticvai, platformAdmin on web, app `ticvai-web`."
   },
   "P10": {
-   "name": "Partner Web \u2014 Reseller Portal",
+   "name": "Partner Web — Reseller Portal",
    "short": "Partner Web",
    "operator": "partner",
    "audience": "partner",
@@ -1869,10 +1893,10 @@
    "app": "partner-web",
    "screens": 21,
    "offline": false,
-   "tip": "Partner Web \u2014 Reseller Portal. Operated by partner, partner on web, app `partner-web`."
+   "tip": "Partner Web — Reseller Portal. Operated by partner, partner on web, app `partner-web`."
   },
   "P11": {
-   "name": "Accreditation Web \u2014 Applications",
+   "name": "Accreditation Web — Applications",
    "short": "Accreditation Web",
    "operator": "public",
    "audience": "public",
@@ -1880,10 +1904,10 @@
    "app": "accreditation-web",
    "screens": 8,
    "offline": false,
-   "tip": "Accreditation Web \u2014 Applications. Operated by public, public on web, app `accreditation-web`."
+   "tip": "Accreditation Web — Applications. Operated by public, public on web, app `accreditation-web`."
   },
   "P12": {
-   "name": "Venue Support \u2014 Agent Console",
+   "name": "Venue Support — Agent Console",
    "short": "Venue Support",
    "operator": "venue",
    "audience": "staff",
@@ -1891,10 +1915,10 @@
    "app": "venue-support-web",
    "screens": 8,
    "offline": false,
-   "tip": "Venue Support \u2014 Agent Console. Operated by venue, staff on web, app `venue-support-web`."
+   "tip": "Venue Support — Agent Console. Operated by venue, staff on web, app `venue-support-web`."
   },
   "P13": {
-   "name": "Venue CMS \u2014 White Label",
+   "name": "Venue CMS — White Label",
    "short": "Venue CMS",
    "operator": "venue",
    "audience": "staff",
@@ -1902,16 +1926,16 @@
    "app": "venue-management-web",
    "screens": 20,
    "offline": false,
-   "tip": "Venue CMS \u2014 White Label. Operated by venue, staff on web, app `venue-management-web`."
+   "tip": "Venue CMS — White Label. Operated by venue, staff on web, app `venue-management-web`."
   },
-  "P14": "The developer portal (CF-135). **The surface public-api needed and did not have** \u2014 21 of its 22 operations reached no screen. Renders artefacts that already exist: ADR-0024 makes the contract the deliverable and the 28 OpenAPI files are the schema documentation.",
-  "P15": "The kitchen display (client F&B board 3, 20 August). **Its own platform because a kitchen display is used standing, must survive the network going down, and nobody logs into it** \u2014 it is on when the kitchen is open and resolves its station from the device assignment. Dark theme only: a white screen at head height in a service window is a light source.",
-  "P16": "Cross-domain analytics (board 6 of every client set, 20 August). **26 board screens collapsed to nine with a domain selector** \u2014 six were duplicated across F&B and Retail, two word for word. **A domain is a filter on an analytics screen, not a copy of it.**"
+  "P14": "The developer portal (CF-135). **The surface public-api needed and did not have** — 21 of its 22 operations reached no screen. Renders artefacts that already exist: ADR-0024 makes the contract the deliverable and the 28 OpenAPI files are the schema documentation.",
+  "P15": "The kitchen display (client F&B board 3, 20 August). **Its own platform because a kitchen display is used standing, must survive the network going down, and nobody logs into it** — it is on when the kitchen is open and resolves its station from the device assignment. Dark theme only: a white screen at head height in a service window is a light source.",
+  "P16": "Cross-domain analytics (board 6 of every client set, 20 August). **26 board screens collapsed to nine with a domain selector** — six were duplicated across F&B and Retail, two word for word. **A domain is a filter on an analytics screen, not a copy of it.**"
  },
  "adrs": {
   "0001": {
-   "title": "Cell architecture \u2014 one tenant per jurisdiction",
-   "tip": "**Superseded** by ADR-0014 and ADR-0017. Kept for its Context and Alternatives. Do not cite its Decision section \u2014 reasoning from it produced a cross-tenant isolation defect on 17 August (CF-97)."
+   "title": "Cell architecture — one tenant per jurisdiction",
+   "tip": "**Superseded** by ADR-0014 and ADR-0017. Kept for its Context and Alternatives. Do not cite its Decision section — reasoning from it produced a cross-tenant isolation defect on 17 August (CF-97)."
   },
   "0002": {
    "title": "Authorisation is user-driven, not workstation-driven",
@@ -1919,7 +1943,7 @@
   },
   "0003": {
    "title": "Conditional role selection at login",
-   "tip": "**One role \u2192 direct login. Several roles \u2192 selection prompt.** Confirmed 12 Aug 2026 \u00a74 and corroborated by the reference system's own behaviour."
+   "tip": "**One role → direct login. Several roles → selection prompt.** Confirmed 12 Aug 2026 §4 and corroborated by the reference system's own behaviour."
   },
   "0004": {
    "title": "Single session per user",
@@ -1954,8 +1978,8 @@
    "tip": "**The hierarchy is binding. Only the example populating it was illustrative.**"
   },
   "0012": {
-   "title": "Queue Integration \u2014 Adaptor-First, Vendor Deferred",
-   "tip": "### Q1 Virtual Queue \u2014 build the adaptor layer, defer the vendor"
+   "title": "Queue Integration — Adaptor-First, Vendor Deferred",
+   "tip": "### Q1 Virtual Queue — build the adaptor layer, defer the vendor"
   },
   "0013": {
    "title": "Local-First Point of Sale",
@@ -1963,22 +1987,22 @@
   },
   "0014": {
    "title": "Cell Per Region",
-   "tip": "**Cell = Tenant \u00d7 Region.**"
+   "tip": "**Cell = Tenant × Region.**"
   },
   "0015": {
    "title": "Standards-First Device Drivers",
    "tip": "**Classify every device class by whether a standard exists, and treat the three tiers differently.**"
   },
   "0016": {
-   "title": "\u2014 Read and write paths are separated, and routing is declared per operation",
+   "title": "— Read and write paths are separated, and routing is declared per operation",
    "tip": "**Every operation declares which database it reads, in `x-ticvai-read-routing`.** Three values, and the routing layer refuses to serve an operation whose declaration it cannot satisfy."
   },
   "0017": {
-   "title": "\u2014 Deployment models",
+   "title": "— Deployment models",
    "tip": "**Four deployment models. One is the default; the others exist because a client asked or a law requires it.**"
   },
   "0018": {
-   "title": "\u2014 Configuration scope",
+   "title": "— Configuration scope",
    "tip": "**Configuration resolves up the scope tree. Nearest ancestor wins. There are three levels.**"
   },
   "0019": {
@@ -1990,16 +2014,16 @@
    "tip": "Retrieval and the index stay in the cell; inference is a call out and only the prompt leaves; the AI logs move off the transactional primary. ADR-0009 answered the legal question and never this one."
   },
   "0021": {
-   "title": "Qdrant \u2014 one collection per embedding model, tenant is the shard, scope is the filter",
-   "tip": "The split criterion is the embedding model, not the tenant \u2014 a shard inherits the collection vector config and cannot differ. Tenants share a collection, separated by shard and payload; residency-forced local models get their own."
+   "title": "Qdrant — one collection per embedding model, tenant is the shard, scope is the filter",
+   "tip": "The split criterion is the embedding model, not the tenant — a shard inherits the collection vector config and cannot differ. Tenants share a collection, separated by shard and payload; residency-forced local models get their own."
   },
   "0022": {
    "title": "Conflict policy is declared per operation, from a closed set of four",
-   "tip": "## Why this is written late **Every one of the 755 operations already carries `x-ticvai-conflict-policy`.** The decision was made in practice, applied consistently, and never recorded \u2014 so the taxonomy existed only as a "
+   "tip": "## Why this is written late **Every one of the 755 operations already carries `x-ticvai-conflict-policy`.** The decision was made in practice, applied consistently, and never recorded — so the taxonomy existed only as a "
   },
   "0023": {
    "title": "Personal data lives apart from the append-only ledger",
-   "tip": "## Why this is written late **The separation is built and complete.** Four `pii.*` tables, ten operations touching `ledger.entry`, fifteen touching `pii.*`, and \u2014 verified 17 August \u2014 **zero operations touching both.** I"
+   "tip": "## Why this is written late **The separation is built and complete.** Four `pii.*` tables, ten operations touching `ledger.posting`, fifteen touching `pii.*`, and — verified 17 August — **zero operations touching both.** I"
   },
   "0024": {
    "title": "The contract is the deliverable, and it is written before anything else",
@@ -2008,7 +2032,7 @@
  },
  "validators": {
   "check-screens": {
-   "tip": "Component vocabulary, operation ids, required states, navigation resolution, and platform naming \u2014 audience against surface, form factor against runtime. Fails a POS or handheld that is not offline-capable."
+   "tip": "Component vocabulary, operation ids, required states, navigation resolution, and platform naming — audience against surface, form factor against runtime. Fails a POS or handheld that is not offline-capable."
   },
   "check-frontend": {
    "tip": "App existence, route uniqueness, component path convention, and that offline-capable apps declare the offline-core package."
@@ -2017,7 +2041,7 @@
    "tip": "Every flow step names a screen that exists and an operation that exists, and the step sequence agrees with the declared navigation edges."
   },
   "check-states": {
-   "tip": "Every enum value is modelled, every state reachable, every state reaches a terminal one, every named operation exists, and every emitted event is catalogued. Also fails a path key declared twice \u2014 YAML keeps the last and drops the first, silently."
+   "tip": "Every enum value is modelled, every state reachable, every state reaches a terminal one, every named operation exists, and every emitted event is catalogued. Also fails a path key declared twice — YAML keeps the last and drops the first, silently."
   },
   "check-config-scope": {
    "tip": "Every configuration operation declares its level, nothing configures below venue, and a config scope never sits below the caller scope. ADR-0018."
@@ -2026,7 +2050,7 @@
    "tip": "Dormant while no DDL exists. RLS with FORCE, level-typed foreign keys, money types, rollback blocks, reference existence, and Postgres enums matching their contract counterparts."
   },
   "build-cf-index": {
-   "tip": "Regenerates the conflict index and the register summary from the rows, because a count kept by hand beside the thing it counts will drift \u2014 and did."
+   "tip": "Regenerates the conflict index and the register summary from the rows, because a count kept by hand beside the thing it counts will drift — and did."
   },
   "link-screens-contracts": {
    "tip": "Derives both directions: which screens consume an operation, and which operations a screen calls."
@@ -2040,7 +2064,7 @@
    "tip": "232 tables and 2,026 columns, derived from persistence markers on the contracts. Regenerated whenever contracts change. This is the working artefact while no DDL exists."
   },
   "storage-design": {
-   "tip": "The 30% of a migration that does not derive from the contracts \u2014 RLS, level-typed foreign keys, partitioning, indexes, constraints, functions."
+   "tip": "The 30% of a migration that does not derive from the contracts — RLS, level-typed foreign keys, partitioning, indexes, constraints, functions."
   },
   "screens": {
    "tip": "180 definitions across 8 platforms. Each carries purpose, capability, wave, API calls, layout regions, states including offline, navigation and implementation path."
@@ -2049,7 +2073,7 @@
    "tip": "20 state models. Enums declare what states exist; these declare which moves between them are legal."
   },
   "events": {
-   "tip": "16 domain events. What goes through platform.outbox \u2014 publisher, consumers, payload, and every consumer declaring its idempotency key."
+   "tip": "16 domain events. What goes through platform.outbox — publisher, consumers, payload, and every consumer declaring its idempotency key."
   },
   "flows": {
    "tip": "5 user journeys with their unhappy paths. Each one written has found a missing screen."
@@ -2061,24 +2085,24 @@
    "tip": "406 table relationships with an edge_kind: ambient points at a hub and says nothing about this table, child means this row belongs to that row, reference is a real relationship."
   },
   "audit-register": {
-   "tip": "Every write operation is auditable. The register says what is recorded by default and which subset needs more \u2014 money, access, PII, permissions, AI, approvals and configuration."
+   "tip": "Every write operation is auditable. The register says what is recorded by default and which subset needs more — money, access, PII, permissions, AI, approvals and configuration."
   },
   "notification-catalogue": {
    "tip": "Event to audience to channel to consent. The three silences are decisions, listed so a reader can tell decided-against from forgotten."
   },
   "ai-index": {
-   "tip": "Where every AI artefact lives. AI has no folder \u2014 the package is organised by artefact kind \u2014 so this is the index that replaces one."
+   "tip": "Where every AI artefact lives. AI has no folder — the package is organised by artefact kind — so this is the index that replaces one."
   },
   "ai-credentials": {
-   "tip": "One provider key per tenant, optionally per venue. No surface ever holds one \u2014 every surface calls TICVAI and TICVAI calls the provider."
+   "tip": "One provider key per tenant, optionally per venue. No surface ever holds one — every surface calls TICVAI and TICVAI calls the provider."
   }
  },
  "terms": {
   "cell": {
    "tip": "One isolated deployment. Four kinds: shared (many tenants, RLS), dedicated (one tenant), on-premise (the venue hardware) and the Control Plane. ADR-0017."
   },
-  "scope_node": {
-   "tip": "The hierarchy as one ltree table \u2014 tenant, brand, region, venue, department, sub-department, workstation. There is no separate venue table, deliberately."
+  "org_unit": {
+   "tip": "The hierarchy as one ltree table — tenant, brand, region, venue, department, sub-department, workstation. There is no separate venue table, deliberately."
   },
   "scope_path": {
    "tip": "An ltree column carried on scoped rows. The RLS predicate walks it, which is why every ltree column has a GiST index."
@@ -2087,13 +2111,13 @@
    "tip": "Without FORCE the table owner bypasses every policy. On a shared cell RLS is the only thing between two paying customers."
   },
   "lease": {
-   "tip": "Capacity allocated to a terminal so it can sell offline. Expires automatically \u2014 a terminal that dies must not strand its allocation."
+   "tip": "Capacity allocated to a terminal so it can sell offline. Expires automatically — a terminal that dies must not strand its allocation."
   },
   "entitlement": {
    "tip": "A right to admission, a meal, a locker. Issued by an order and appendable to media the guest already holds (CF-58)."
   },
   "media": {
-   "tip": "What the guest carries \u2014 QR, wristband, card. Several entitlements may share one, which is why appending is keyed on media rather than order."
+   "tip": "What the guest carries — QR, wristband, card. Several entitlements may share one, which is why appending is keyed on media rather than order."
   },
   "outbox": {
    "tip": "Events written in the same transaction as the state change, so a crash cannot leave an event unpublished for a change that happened."
@@ -2105,13 +2129,13 @@
    "tip": "The expected figure is withheld until the count is submitted. A counter who can see the expected total reconciles to it rather than to the drawer."
   },
   "spine and satellite": {
-   "tip": "A satellite may depend on the spine. A satellite never depends on another satellite \u2014 that rule is what stops the contract set becoming a graph nobody can reason about."
+   "tip": "A satellite may depend on the spine. A satellite never depends on another satellite — that rule is what stops the contract set becoming a graph nobody can reason about."
   },
   "wave": {
    "tip": "1 is the first release, 2 follows. A Wave 1 surface cannot wait on a Wave 2 dependency, which is what CF-41 and the Accreditation workshop are about."
   },
   "approval matrix": {
-   "tip": "Rules resolving up the scope tree \u2014 tenant default, region override, venue override. First match wins, and a venue may tighten a threshold and never loosen one."
+   "tip": "Rules resolving up the scope tree — tenant default, region override, venue override. First match wins, and a venue may tighten a threshold and never loosen one."
   },
   "segregation of duties": {
    "tip": "A requester may never approve their own request, and delegation does not create a way around it."
@@ -2182,7 +2206,7 @@
    "actor": "venueManager",
    "steps": 5,
    "branches": 8,
-   "tip": "A performance is cancelled \u2014 weather, a technical failure, an artist. Every ticket sold for it needs handling, and the guests need telling before they travel."
+   "tip": "A performance is cancelled — weather, a technical failure, an artist. Every ticket sold for it needs handling, and the guests need telling before they travel."
   },
   "F10": {
    "name": "Partner books, uses and settles",
@@ -2203,7 +2227,7 @@
    "actor": "technician",
    "steps": 5,
    "branches": 7,
-   "tip": "A ride stops. A technician is dispatched, works on it, and it returns to service \u2014 or does not. The guest app must stop advertising a queue for a ride nobody can board."
+   "tip": "A ride stops. A technician is dispatched, works on it, and it returns to service — or does not. The guest app must stop advertising a queue for a ride nobody can board."
   },
   "F13": {
    "name": "Month end closes",
@@ -2303,7 +2327,7 @@
    "contract": "ai",
    "states": 3,
    "transitions": 2,
-   "tip": "Deliberately short, and it ends at `previewReady` rather than at a seat map. **The generated layout is a proposal into `seating.import_job`**, which already has a human commit step \u2014 because a seat manifest is always wrong the first time in"
+   "tip": "Deliberately short, and it ends at `previewReady` rather than at a seat map. **The generated layout is a proposal into `seating.import_job`**, which already has a human commit step — because a seat manifest is always wrong the first time in"
   },
   "ProposedAction.status": {
    "entity": "AI proposed action",
@@ -2312,5 +2336,6 @@
    "transitions": 5,
    "tip": "`approved` is not terminal and must not be treated as done. `rejectionRate` in the usage report counts rejections against proposals, and it is the number that says whether the assistant is worth having. **No path back from `rejected`.** A r"
   }
- }
+ },
+ "note": "**`tables` tips are the first sentence of each table's description**, derived 31 August from `schema-reference.json`. They used to read *Derived from access.AccessPoint* — true, and it tells a reader nothing they did not have. **A tooltip is the one place a name gets explained without leaving the screen**, so it should say what the table is rather than where it came from."
 }

@@ -98,7 +98,7 @@ stateModels:
 - entity: API client
   contract: public-api
   owner: public-api
-  service: ControlService
+  service: PlatformService
   states: null
   transitions: 4
   initial:
@@ -236,7 +236,7 @@ stateModels:
 - entity: Cell cluster
   contract: subscription
   owner: subscription
-  service: ControlService
+  service: PlatformService
   states: null
   transitions: 4
   initial:
@@ -265,7 +265,7 @@ stateModels:
 - entity: Cell
   contract: subscription
   owner: control
-  service: ControlService
+  service: PlatformService
   states: null
   transitions: 9
   initial:
@@ -444,6 +444,24 @@ stateModels:
   - voidCouponCode
   guarded: 8
   ref: diagrams/lld/lifecycles/coupon.yaml
+- entity: CrossRegionEntitlement
+  contract: cross-cell
+  owner: CrossRegionService
+  service: CrossRegionService
+  states: null
+  transitions: 4
+  initial:
+  - active
+  terminal:
+  - exhausted
+  - revoked
+  - expired
+  operations:
+  - consumeCrossRegionEntitlement
+  - reconcileRedemptions
+  - revokeCrossRegionEntitlement
+  guarded: 4
+  ref: diagrams/lld/lifecycles/cross-region-entitlement.yaml
 - entity: CustomDomain
   contract: white-label
   owner: WhiteLabelService
@@ -513,7 +531,7 @@ stateModels:
 - entity: DSAR request
   contract: cross-cell
   owner: cross-cell
-  service: CrossCellService
+  service: CrossRegionService
   states: null
   transitions: 4
   initial:
@@ -707,7 +725,7 @@ stateModels:
 - entity: Integration listing
   contract: public-api
   owner: public-api
-  service: ControlService
+  service: PlatformService
   states: null
   transitions: 8
   initial:
@@ -768,7 +786,7 @@ stateModels:
 - entity: Invoice
   contract: subscription
   owner: control
-  service: ControlService
+  service: PlatformService
   states: null
   transitions: 9
   initial:
@@ -846,8 +864,8 @@ stateModels:
   - released
   - forceReleased
   operations:
-  - forceReleaseLease
-  - releaseLease
+  - forceReleaseInventoryHold
+  - releaseInventoryHold
   guarded: 3
   ref: diagrams/lld/lifecycles/lease.yaml
 - entity: Lost item
@@ -918,7 +936,7 @@ stateModels:
 - entity: Migration run
   contract: platform-ops
   owner: platform-ops
-  service: ControlService
+  service: PlatformService
   states: null
   transitions: 9
   initial:
@@ -937,7 +955,7 @@ stateModels:
 - entity: Onboarding application
   contract: subscription
   owner: subscription
-  service: ControlService
+  service: PlatformService
   states: null
   transitions: 7
   initial:
@@ -1206,8 +1224,8 @@ stateModels:
   operations:
   - callNextParties
   - leaveQueue
-  - overrideQueueEntry
-  - redeemQueueEntry
+  - overrideWaitingGuest
+  - redeemWaitingGuest
   - setQueueStatus
   guarded: 7
   ref: diagrams/lld/lifecycles/queue-entry.yaml
@@ -1225,24 +1243,6 @@ stateModels:
   - setQueueStatus
   guarded: 8
   ref: diagrams/lld/lifecycles/queue.yaml
-- entity: Cross-cell redemption right
-  contract: cross-cell
-  owner: cross-cell
-  service: CrossCellService
-  states: null
-  transitions: 4
-  initial:
-  - active
-  terminal:
-  - exhausted
-  - revoked
-  - expired
-  operations:
-  - consumeRedemptionRight
-  - reconcileRedemptions
-  - revokeRedemptionRight
-  guarded: 4
-  ref: diagrams/lld/lifecycles/redemption-right.yaml
 - entity: Referral
   contract: marketing-crm
   owner: marketing-crm
@@ -1292,7 +1292,7 @@ stateModels:
 - entity: Release
   contract: platform-ops
   owner: control
-  service: ControlService
+  service: PlatformService
   states: null
   transitions: 8
   initial:
@@ -1447,7 +1447,7 @@ stateModels:
 - entity: Rollout to a cell
   contract: platform-ops
   owner: platform-ops
-  service: ControlService
+  service: PlatformService
   states: null
   transitions: 7
   initial:
@@ -1466,7 +1466,7 @@ stateModels:
 - entity: Rollout
   contract: platform-ops
   owner: control
-  service: ControlService
+  service: PlatformService
   states: null
   transitions: 8
   initial:
@@ -1502,7 +1502,7 @@ stateModels:
 - entity: Sandbox
   contract: public-api
   owner: public-api
-  service: ControlService
+  service: PlatformService
   states: null
   transitions: 6
   initial:
@@ -1739,7 +1739,7 @@ stateModels:
 - entity: Tenant subscription
   contract: subscription
   owner: subscription
-  service: ControlService
+  service: PlatformService
   states: null
   transitions: 7
   initial:
@@ -1812,7 +1812,7 @@ stateModels:
 - entity: Tenant migration
   contract: subscription
   owner: control
-  service: ControlService
+  service: PlatformService
   states: null
   transitions: 8
   initial:
@@ -1829,7 +1829,7 @@ stateModels:
 - entity: Tenant
   contract: subscription
   owner: control
-  service: ControlService
+  service: PlatformService
   states: null
   transitions: 7
   initial:
@@ -1959,7 +1959,7 @@ stateModels:
 - entity: Cross-cell wallet authorisation
   contract: cross-cell
   owner: cross-cell
-  service: CrossCellService
+  service: CrossRegionService
   states: null
   transitions: 7
   initial:
@@ -2020,7 +2020,7 @@ stateModels:
 - entity: Webhook subscription
   contract: public-api
   owner: public-api
-  service: ControlService
+  service: PlatformService
   states: null
   transitions: 7
   initial:

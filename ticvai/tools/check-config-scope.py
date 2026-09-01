@@ -25,17 +25,6 @@ from pathlib import Path
 
 import yaml
 
-# A cp1252 console cannot encode the arrows and dashes this tool prints, and the
-# failure lands *after* the work is done — so the output is written, the summary
-# line raises UnicodeEncodeError, and a correct run exits 1. Reconfiguring at
-# import means anything importing this module gets it too, refresh.sh included.
-try:
-    sys.stdout.reconfigure(encoding="utf-8", errors="replace")
-    sys.stderr.reconfigure(encoding="utf-8", errors="replace")
-except Exception:      # a captured stream may not be reconfigurable; harmless
-    pass
-
-
 ROOT = Path(__file__).resolve().parents[1]
 # The shipped `contracts/` is authoritative. Until 17 August these pointed at a sibling repo
 # outside the package, so every validator passed for whoever had that repo checked out and read
@@ -64,7 +53,7 @@ MUST_BE_TENANT = re.compile(
 
 # An operation is configuration if it writes a **rule**, not a record.
 #
-# "Profile" means two things here and the distinction matters: an AdmissionProfile is a rule
+# "Profile" means two things here and the distinction matters: an AdmissionRules is a rule
 # that applies to many scans; a GuestProfile is one person's record. Matching both made a
 # cashier updating an email address look like a venue setting a tenant-wide default.
 IS_CONFIG = re.compile(
@@ -78,7 +67,7 @@ IS_CONFIG = re.compile(
     # skip branch reports anything tagged that these rules still miss, so a gap announces itself
     # rather than passing quietly.
     r"Config|Setting|Policy|Rule|Template|Toggle|Enablement|Mapping|Threshold|"
-    r"AdmissionProfile|WorkstationProfile|"
+    r"AdmissionRules|WorkstationProfile|"
     r"Layout|Board|Denomination|Programme|Definition|Dashboard|"
     # **Narrowed back on the same day it was widened.** `Campaign`, `Collection`, `Category` and
     # `Resource` caught content and records rather than configuration — a marketing campaign is a
@@ -94,17 +83,30 @@ IS_CONFIG = re.compile(
     #
     # **Then I dropped `create` from the verb list and made it worse**: 22 operations that
     # legitimately carry a scope tag stopped being examined, including `createMenu` and
-    # `createAdmissionProfile`. **Reverted.** The verb is not the discriminator; the noun is, and
+    # `createAdmissionRules`. **Reverted.** The verb is not the discriminator; the noun is, and
     # the skip branch now reports anything tagged that these rules still miss — so a gap
     # announces itself rather than passing quietly.
     r"Menu|Provider|Matrix|Quota|Licensing|Facility|CustomDomain|Footer|"
     r"Sla|Combination|ReaderProfile|ProductCategories|IndexSource|FxRate|"
-    r"MessageTrigger|DailyCount|KnowledgeCollection|CustomDomain",
+    r"MessageTrigger|DailyCount|KnowledgeCollection|CustomDomain|"
+    # **A guest configures things too, and every noun above came from a back office.** Consent,
+    # marketing preferences, language, registered devices, a wishlist — all settings, all owned by
+    # the person rather than the venue, and none of them had a word in these rules.
+    #
+    # **`subject` scope exists for exactly this** (26 August). It does not inherit down the tree and
+    # an operator cannot override it: CF-160 settled that a merge takes the narrower of two
+    # consents, which only makes sense if the guest owns the value.
+    r"GuestPreferences|Consent|Wishlist|GuestDevice|MyProfile",
     re.I)
 # **Authoring, not configuring.** A bookable resource, a venue map and a donation campaign are
 # records a venue creates and retires on their own lifecycle — they resolve *against* configuration
 # rather than being it, and demanding a scope on one is asking the wrong question.
-NOT_CONFIG = re.compile(r"GuestProfile|createResource|createVenueMap|createDonationCampaign", re.I)
+NOT_CONFIG = re.compile(
+    # **`recordQuotation` reaches these rules because it contains `Quotation`, and it configures
+    # nothing.** A supplier quotation is a commercial record with its own lifecycle — quoted,
+    # compared, awarded, or it lapses. The widened vocabulary that caught five real guest settings
+    # also caught this, which is the cost of a keyword list and worth paying.
+    r"GuestProfile|createResource|createVenueMap|createDonationCampaign|recordQuotation", re.I)
 WRITES = ("put", "post", "patch")
 
 
@@ -130,7 +132,12 @@ def main() -> int:
                 # skipped, so their tags were never checked — a silent exemption is worse than a
                 # missing one, because nothing reports it.
                 reached = IS_CONFIG.search(oid) and re.match(
-                    r"^(set|configure|update|publish|create|schedule|claim)", oid)
+                    # **A guest does not "set" or "configure" — they record, add, remove, register, revoke.**
+                    # The verb list came from a back office where every settings act begins with
+                    # `set`; five guest-owned settings operations were unreachable by it and their
+                    # scopes went unexamined.
+                    r"^(set|configure|update|publish|create|schedule|claim|record|add|remove|"
+                    r"register|revoke)", oid)
                 if not reached:
                     if op.get("x-ticvai-config-scope"):
                         ERRORS.append(
@@ -166,7 +173,25 @@ def main() -> int:
                 # client moved their configuration there on 18 August (CF-138). **Everywhere else
                 # venue is still the floor**, because the argument that produced that rule was
                 # about workstations, and a workstation is a device rather than a business.
-                allowed = VALID + (("outlet",) if f.stem in OUTLET_DOMAINS else ())
+                # **`subject` is not a level of the venue tree and is allowed anywhere.**
+                # A guest configures their own consent, preferences, language, devices and
+                # wishlist. Those resolve against the person, not against a scope node — they do
+                # not inherit down, and an operator cannot override them. CF-160 settled that a
+                # merge takes the *narrower* of two consents, a rule that only makes sense if the
+                # guest owns the value.
+                #
+                # **Guarded**: a `subject` scope on an operation no guest can call is a venue
+                # setting mislabelled as a personal one, and that is the direction this can go
+                # wrong.
+                allowed = VALID + (("outlet",) if f.stem in OUTLET_DOMAINS else ()) + ("subject",)
+                if scope == "subject":
+                    aud = set(op.get("x-ticvai-audience") or [])
+                    if not (aud & {"guest", "public", "anonymous"}):
+                        ERRORS.append(
+                            f"{f.stem}.{oid}: config scope 'subject' but the operation is "
+                            f"{sorted(aud) or 'unaudienced'} — subject scope is the guest's own "
+                            "setting, and a venue setting labelled personal is one nobody can "
+                            "administer")
                 if scope not in allowed:
                     if scope == "outlet":
                         ERRORS.append(f"{f.stem}.{oid}: config scope 'outlet' outside F&B and "
@@ -193,7 +218,7 @@ def main() -> int:
                                   "one app and one directory (ADR-0006)")
 
     print(f"configuration operations: {total}, tagged {tagged}")
-    for k in VALID + ("outlet",):
+    for k in VALID + ("outlet", "subject"):
         if by_scope.get(k):
             print(f"  {k:10}{by_scope[k]}")
     print()

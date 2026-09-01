@@ -83,11 +83,25 @@ contracts:
   - entitlement-issued
   - performance-cancelled
   ref: diagrams/lld/contracts/catalogue.yaml
+- contract: finance
+  tier: spine
+  operations: 56
+  holds: null
+  service: LedgerService
+  verbs:
+    POST: 28
+    GET: 23
+    PUT: 3
+    PATCH: 2
+  guestCallable: 1
+  offlineCapable: 4
+  events: null
+  ref: diagrams/lld/contracts/finance.yaml
 - contract: subscription
   tier: satellite
   operations: 55
   holds: null
-  service: ControlService
+  service: PlatformService
   verbs:
     POST: 28
     GET: 21
@@ -99,20 +113,6 @@ contracts:
   events:
   - tenant-suspended
   ref: diagrams/lld/contracts/subscription.yaml
-- contract: finance
-  tier: spine
-  operations: 54
-  holds: null
-  service: LedgerService
-  verbs:
-    POST: 27
-    GET: 23
-    PATCH: 2
-    PUT: 2
-  guestCallable: 1
-  offlineCapable: 4
-  events: null
-  ref: diagrams/lld/contracts/finance.yaml
 - contract: inventory
   tier: satellite
   operations: 50
@@ -287,7 +287,7 @@ contracts:
   tier: satellite
   operations: 25
   holds: null
-  service: ControlService
+  service: PlatformService
   verbs:
     POST: 14
     GET: 11
@@ -299,7 +299,7 @@ contracts:
   tier: satellite
   operations: 22
   holds: null
-  service: ControlService
+  service: PlatformService
   verbs:
     POST: 11
     GET: 7
@@ -341,7 +341,7 @@ contracts:
   tier: spine
   operations: 16
   holds: null
-  service: CrossCellService
+  service: CrossRegionService
   verbs:
     POST: 8
     GET: 5

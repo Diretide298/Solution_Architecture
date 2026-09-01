@@ -43,7 +43,7 @@ coverage:
 screens:
 - screen: SUP-001
   name: Agent Login
-  module: TODO
+  module: Access & Availability
   requiresModule: core
   wave: 3
   density: compact
@@ -75,7 +75,7 @@ screens:
   - F104 A platform operator signs in under MFA
 - screen: SUP-002
   name: Agent Dashboard
-  module: TODO
+  module: Overview
   requiresModule: marketing
   wave: 3
   density: compact
@@ -102,12 +102,12 @@ screens:
   - SUP-003
   - SUP-004
   boardFrames:
-  - sup-002
+  - Dashboards Board.dc.html#sup-002
   wireframe: wireframes/Dashboards Board.dc.html#sup-002
   inFlows: null
 - screen: SUP-003
   name: Availability & Routing Settings
-  module: TODO
+  module: Access & Availability
   requiresModule: marketing
   wave: 3
   density: compact
@@ -129,7 +129,7 @@ screens:
   inFlows: null
 - screen: SUP-004
   name: Conversation Queue
-  module: TODO
+  module: Conversations
   requiresModule: marketing
   wave: 2
   density: compact
@@ -166,7 +166,7 @@ screens:
   - F24 A guest asks the assistant and ends up with a person
 - screen: SUP-005
   name: Live Chat Workspace
-  module: TODO
+  module: Conversations
   requiresModule: marketing
   wave: 2
   density: compact
@@ -203,7 +203,7 @@ screens:
   - F24 A guest asks the assistant and ends up with a person
 - screen: SUP-006
   name: Knowledge Base Search
-  module: TODO
+  module: Knowledge & Responses
   requiresModule: core
   wave: 3
   density: compact
@@ -230,7 +230,7 @@ screens:
   inFlows: null
 - screen: SUP-007
   name: Canned Response Management
-  module: TODO
+  module: Knowledge & Responses
   requiresModule: marketing
   wave: 3
   density: compact
@@ -253,7 +253,7 @@ screens:
   inFlows: null
 - screen: SUP-008
   name: Agent Performance & SLA View
-  module: TODO
+  module: Overview
   requiresModule: analytics
   wave: 3
   density: compact

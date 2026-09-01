@@ -7,13 +7,13 @@
  "audience": "partner",
  "formFactor": "web",
  "offlineCapable": false,
- "generated": "2026-08-27",
+ "generated": "2026-09-01",
  "note": "Derived by tools/derive-platform.py. **The gaps section is the point** \u2014 a page listing what exists is a directory; one listing what is missing is a worklist.",
  "counts": {
   "screens": 21,
   "operations": 105,
   "contracts": 9,
-  "modules": 1,
+  "modules": 8,
   "undrawn": 0,
   "operationsWithNoScreen": 3
  },
@@ -23,10 +23,60 @@
  },
  "modules": [
   {
-   "module": "TODO",
-   "screens": 21,
+   "module": "Access & Account",
+   "screens": 5,
    "waves": [
     2,
+    3
+   ]
+  },
+  {
+   "module": "Booking & Quotes",
+   "screens": 4,
+   "waves": [
+    2,
+    3
+   ]
+  },
+  {
+   "module": "Inventory & Pricing",
+   "screens": 3,
+   "waves": [
+    2
+   ]
+  },
+  {
+   "module": "Reports & Settlement",
+   "screens": 3,
+   "waves": [
+    3
+   ]
+  },
+  {
+   "module": "Credit & Settlement",
+   "screens": 2,
+   "waves": [
+    2
+   ]
+  },
+  {
+   "module": "Orders & Fulfilment",
+   "screens": 2,
+   "waves": [
+    2
+   ]
+  },
+  {
+   "module": "Overview",
+   "screens": 1,
+   "waves": [
+    2
+   ]
+  },
+  {
+   "module": "Support",
+   "screens": 1,
+   "waves": [
     3
    ]
   }
@@ -73,7 +123,7 @@
   {
    "id": "PTR-001",
    "name": "Partner Login / MFA",
-   "module": "TODO",
+   "module": "Access & Account",
    "wave": 2,
    "route": "/general/partner-login-mfa",
    "operations": 12,
@@ -82,7 +132,7 @@
   {
    "id": "PTR-002",
    "name": "Partner Dashboard",
-   "module": "TODO",
+   "module": "Overview",
    "wave": 2,
    "route": "/general/partner-dashboard",
    "operations": 16,
@@ -91,7 +141,7 @@
   {
    "id": "PTR-003",
    "name": "Profile & Company Details",
-   "module": "TODO",
+   "module": "Access & Account",
    "wave": 2,
    "route": "/general/profile-and-company-details",
    "operations": 4,
@@ -100,7 +150,7 @@
   {
    "id": "PTR-004",
    "name": "Notifications",
-   "module": "TODO",
+   "module": "Access & Account",
    "wave": 3,
    "route": "/general/notifications",
    "operations": 2,
@@ -109,7 +159,7 @@
   {
    "id": "PTR-005",
    "name": "Inventory & Allocation View",
-   "module": "TODO",
+   "module": "Inventory & Pricing",
    "wave": 2,
    "route": "/general/inventory-and-allocation-view",
    "operations": 19,
@@ -118,7 +168,7 @@
   {
    "id": "PTR-006",
    "name": "Product Catalog (B2B Pricing)",
-   "module": "TODO",
+   "module": "Inventory & Pricing",
    "wave": 2,
    "route": "/general/product-catalog-b2b-pricing",
    "operations": 17,
@@ -127,7 +177,7 @@
   {
    "id": "PTR-007",
    "name": "Availability Search",
-   "module": "TODO",
+   "module": "Inventory & Pricing",
    "wave": 2,
    "route": "/general/availability-search",
    "operations": 1,
@@ -136,7 +186,7 @@
   {
    "id": "PTR-008",
    "name": "Booking Creation",
-   "module": "TODO",
+   "module": "Booking & Quotes",
    "wave": 2,
    "route": "/general/booking-creation",
    "operations": 14,
@@ -145,7 +195,7 @@
   {
    "id": "PTR-009",
    "name": "Group / Bulk Booking",
-   "module": "TODO",
+   "module": "Booking & Quotes",
    "wave": 3,
    "route": "/general/group-bulk-booking",
    "operations": 4,
@@ -154,7 +204,7 @@
   {
    "id": "PTR-010",
    "name": "Cart & Quote",
-   "module": "TODO",
+   "module": "Booking & Quotes",
    "wave": 3,
    "route": "/general/cart-and-quote",
    "operations": 16,
@@ -163,7 +213,7 @@
   {
    "id": "PTR-011",
    "name": "Quote Management",
-   "module": "TODO",
+   "module": "Booking & Quotes",
    "wave": 3,
    "route": "/general/quote-management",
    "operations": 2,
@@ -172,7 +222,7 @@
   {
    "id": "PTR-012",
    "name": "Checkout / Credit Purchase",
-   "module": "TODO",
+   "module": "Credit & Settlement",
    "wave": 2,
    "route": "/general/checkout-credit-purchase",
    "operations": 4,
@@ -181,7 +231,7 @@
   {
    "id": "PTR-013",
    "name": "Credit Limit & Balance",
-   "module": "TODO",
+   "module": "Credit & Settlement",
    "wave": 2,
    "route": "/general/credit-limit-and-balance",
    "operations": 3,
@@ -190,7 +240,7 @@
   {
    "id": "PTR-014",
    "name": "Settlement & Payment History",
-   "module": "TODO",
+   "module": "Reports & Settlement",
    "wave": 3,
    "route": "/general/settlement-and-payment-history",
    "operations": 5,
@@ -199,7 +249,7 @@
   {
    "id": "PTR-015",
    "name": "Order History",
-   "module": "TODO",
+   "module": "Orders & Fulfilment",
    "wave": 2,
    "route": "/general/order-history",
    "operations": 14,
@@ -208,7 +258,7 @@
   {
    "id": "PTR-016",
    "name": "Voucher / Ticket Download",
-   "module": "TODO",
+   "module": "Orders & Fulfilment",
    "wave": 2,
    "route": "/general/voucher-ticket-download",
    "operations": 13,
@@ -217,7 +267,7 @@
   {
    "id": "PTR-017",
    "name": "Commission Statement",
-   "module": "TODO",
+   "module": "Reports & Settlement",
    "wave": 3,
    "route": "/general/commission-statement",
    "operations": 2,
@@ -226,7 +276,7 @@
   {
    "id": "PTR-018",
    "name": "Reports & Sales Performance",
-   "module": "TODO",
+   "module": "Reports & Settlement",
    "wave": 3,
    "route": "/general/reports-and-sales-performance",
    "operations": 9,
@@ -235,7 +285,7 @@
   {
    "id": "PTR-019",
    "name": "API Credentials & Integration",
-   "module": "TODO",
+   "module": "Access & Account",
    "wave": 3,
    "route": "/general/api-credentials-and-integration",
    "operations": 0,
@@ -244,7 +294,7 @@
   {
    "id": "PTR-020",
    "name": "Sub-Agent Management",
-   "module": "TODO",
+   "module": "Access & Account",
    "wave": 3,
    "route": "/general/sub-agent-management",
    "operations": 3,
@@ -253,7 +303,7 @@
   {
    "id": "PTR-021",
    "name": "Support & Contact",
-   "module": "TODO",
+   "module": "Support",
    "wave": 3,
    "route": "/general/support-and-contact",
    "operations": 7,
@@ -283,7 +333,14 @@
   ],
   "modulesSplitAcrossWaves": [
    {
-    "module": "TODO",
+    "module": "Access & Account",
+    "waves": [
+     2,
+     3
+    ]
+   },
+   {
+    "module": "Booking & Quotes",
     "waves": [
      2,
      3

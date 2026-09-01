@@ -171,6 +171,7 @@ paths:
       operationId: listEntitlements
       x-ticvai-consumed-by:
         - "P01 WEB-018 My Tickets"
+        - "P02 GST-012 My Tickets"
       summary: Every entitlement this guest holds, including expired
       description: >
         **Raised in review 24 August** against `WEB-018`. `listMyEntitlements` returns what is
@@ -308,6 +309,7 @@ paths:
       operationId: getEntitlementCredential
       x-ticvai-consumed-by:
         - "P01 WEB-018 My Tickets"
+        - "P02 GST-012 My Tickets"
         - "P02 GST-013 Ticket Details"
       summary: The thing that gets scanned
       description: >
@@ -350,6 +352,7 @@ paths:
       operationId: getEntitlementHistory
       x-ticvai-consumed-by:
         - "P01 WEB-018 My Tickets"
+        - "P02 GST-012 My Tickets"
         - "P02 GST-013 Ticket Details"
       summary: Every scan, freeze, share and reissue against it
       description: >
@@ -522,7 +525,8 @@ paths:
     get:
       operationId: listParkingFacilities
       x-ticvai-consumed-by:
-        - "P01 WEB-041 Parking — Reserve & Pay"
+        - "P01 WEB-041 Parking – Reserve & Pay"
+        - "P02 GST-027 Parking – Reserve & Pay"
         - "P02 GST-028 Parking – Reservation Confirmed"
         - "P08 BO-006 Parking Configuration"
       x-ticvai-audience: [staff, guest]
@@ -593,7 +597,7 @@ paths:
     post:
       operationId: createParkingEntitlement
       x-ticvai-consumed-by:
-        - "P01 WEB-041 Parking — Reserve & Pay"
+        - "P01 WEB-041 Parking – Reserve & Pay"
         - "P02 GST-027 Parking – Reserve & Pay"
         - "P02 GST-028 Parking – Reservation Confirmed"
       x-ticvai-audience: [service, guest]
@@ -644,7 +648,7 @@ paths:
     patch:
       operationId: updateParkingEntitlement
       x-ticvai-consumed-by:
-        - "P01 WEB-041 Parking — Reserve & Pay"
+        - "P01 WEB-041 Parking – Reserve & Pay"
         - "P02 GST-027 Parking – Reserve & Pay"
       x-ticvai-audience: [guest]
       summary: Change the plate, or revoke
@@ -1132,9 +1136,9 @@ paths:
               schema: { $ref: '#/components/schemas/AccessPoint' }
         '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
 
-  /admission-profiles:
+  /admission-rules:
     get:
-      operationId: listAdmissionProfiles
+      operationId: listAdmissionRules
       x-ticvai-consumed-by:
         - "P08 BO-032 Admission Profiles"
       x-ticvai-audience: [staff]
@@ -1163,9 +1167,9 @@ paths:
                     properties:
                       items:
                         type: array
-                        items: { $ref: '#/components/schemas/AdmissionProfile' }
+                        items: { $ref: '#/components/schemas/AdmissionRules' }
     post:
-      operationId: createAdmissionProfile
+      operationId: createAdmissionRules
       x-ticvai-consumed-by:
         - "P08 BO-032 Admission Profiles"
       x-ticvai-audience: [staff]
@@ -1182,22 +1186,22 @@ paths:
         required: true
         content:
           application/json:
-            schema: { $ref: '#/components/schemas/AdmissionProfile' }
+            schema: { $ref: '#/components/schemas/AdmissionRules' }
       responses:
         '201':
           description: Created
           content:
             application/json:
-              schema: { $ref: '#/components/schemas/AdmissionProfile' }
+              schema: { $ref: '#/components/schemas/AdmissionRules' }
 
-  /admission-profiles/{profileId}:
+  /admission-rules/{profileId}:
     parameters:
       - name: profileId
         in: path
         required: true
         schema: { type: string, format: uuid }
     put:
-      operationId: updateAdmissionProfile
+      operationId: updateAdmissionRules
       x-ticvai-consumed-by:
         - "P08 BO-032 Admission Profiles"
       x-ticvai-audience: [staff]
@@ -1217,13 +1221,13 @@ paths:
         required: true
         content:
           application/json:
-            schema: { $ref: '#/components/schemas/AdmissionProfile' }
+            schema: { $ref: '#/components/schemas/AdmissionRules' }
       responses:
         '200':
           description: Updated
           content:
             application/json:
-              schema: { $ref: '#/components/schemas/AdmissionProfile' }
+              schema: { $ref: '#/components/schemas/AdmissionRules' }
         '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
 
   /blacklist:
@@ -1676,8 +1680,8 @@ components:
         validFrom: { type: string, format: date-time }
         validTo: { type: string, format: date-time }
 
-    AdmissionProfile:
-      x-ticvai-persistence: "access.admission_profile"
+    AdmissionRules:
+      x-ticvai-persistence: "access.admission_rules"
       type: object
       required: [id, code, name, openMinutesBefore, closeMinutesAfter]
       properties:
@@ -1865,7 +1869,7 @@ components:
           description: >
             Pseudonymous cross-cell guest reference. Present only on delegated rights.
             Carries no personal data.
-        admissionProfileId: { type: string, format: uuid }
+        admissionRulesId: { type: string, format: uuid }
         denyReason: { $ref: '#/components/schemas/DenyReason' }
 
     OfflineScan:
@@ -2047,7 +2051,7 @@ components:
               entriesAllowed: { type: integer, nullable: true }
               entriesUsed: { type: integer }
               reentryAllowed: { type: boolean }
-              admissionProfileId: { type: string, format: uuid }
+              admissionRulesId: { type: string, format: uuid }
         delegatedRights:
           type: array
           description: >
@@ -2069,12 +2073,12 @@ components:
               validTo: { type: string, format: date-time }
               entriesAllowed: { type: integer, nullable: true }
               entriesConsumed: { type: integer }
-              admissionProfileId: { type: string, format: uuid }
+              admissionRulesId: { type: string, format: uuid }
         blacklist:
           type: array
           items: { type: string }
           description: Media codes to deny outright regardless of entitlement state.
-        admissionProfiles:
+        admissionRules:
           type: array
           items:
             type: object

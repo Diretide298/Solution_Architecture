@@ -1302,15 +1302,15 @@ components:
 
         | Metric | Source |
         |---|---|
-        | `occupancy` | `catalogue.envelope.sold` and `leased` against `capacity` |
-        | `capacityUtilisation` | `catalogue.envelope.remaining` over the same window |
+        | `occupancy` | `catalogue.channel_capacity.sold` and `leased` against `capacity` |
+        | `capacityUtilisation` | `catalogue.channel_capacity.remaining` over the same window |
         | `admissionRate` | `access.scan_event.outcome`, in-direction |
         | `noShowRate` | Entitlements issued against scans that never arrived |
         | `conversion` | `orders.cart` against `orders.sales_order` |
         | `salesByOperator` | `orders.sales_order.principal_id` |
         | `salesByWorkstation` | The workstation on the shift that took it |
-        | `waitTime` | `queue.entry.estimated_call_at` against `called_at` |
-        | `throughput` | `queue.entry` completions per hour |
+        | `waitTime` | `queue.waiting_guest.estimated_call_at` against `called_at` |
+        | `throughput` | `queue.waiting_guest` completions per hour |
         | `abandonmentRate` | Queue entries that left before being called |
 
         **`salesByInstructor` is deliberately absent.** It needs the staff-assignment link that

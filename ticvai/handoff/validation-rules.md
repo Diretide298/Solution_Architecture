@@ -91,7 +91,7 @@ Not the most numerous — the ones where the refusal is the control.
 | `catalogue` | `setProductAttributes` | 409 | Regeneration would exceed the configured variant ceiling for this product. |
 | `catalogue` | `transitionProductLifecycle` | 403 | Approval attempted by the principal who submitted it. Segregation applies here as it does to journals. |
 | `catalogue` | `transitionProductLifecycle` | 409 | Transition not valid from the current state, or archiving attempted while unexpired entitlements exist. |
-| `catalogue` | `updateEnvelope` | 409 | Capacity reduced below units already sold |
+| `catalogue` | `updateChannelCapacity` | 409 | Capacity reduced below units already sold |
 | `catalogue` | `updatePerformance` | 409 | Timing change attempted on a performance with sold tickets |
 | `catalogue` | `updatePriceList` | 409 | Currency or scale change attempted after prices exist |
 | `cross-cell` | `authoriseWalletSpend` | 409 | Guest link severed, or the wallet is suspended |

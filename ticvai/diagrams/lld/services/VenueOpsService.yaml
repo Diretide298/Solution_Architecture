@@ -373,14 +373,6 @@ operationsByContract:
     offline: true
     reads: 1
     writes: 0
-  - operation: getQueueEntry
-    verb: GET
-    path: /queue-entries/{entryId}
-    scope: venue
-    permission: null
-    offline: false
-    reads: 1
-    writes: 0
   - operation: getQueueFeedHealth
     verb: GET
     path: /queue-feeds/{feedId}/health
@@ -413,9 +405,17 @@ operationsByContract:
     offline: true
     reads: 3
     writes: 0
+  - operation: getWaitingGuest
+    verb: GET
+    path: /waiting-guests/{entryId}
+    scope: venue
+    permission: null
+    offline: false
+    reads: 1
+    writes: 0
   - operation: joinQueue
     verb: POST
-    path: /queue-entries
+    path: /waiting-guests
     scope: venue
     permission: null
     offline: false
@@ -423,7 +423,7 @@ operationsByContract:
     writes: 2
   - operation: leaveQueue
     verb: DELETE
-    path: /queue-entries/{entryId}
+    path: /waiting-guests/{entryId}
     scope: venue
     permission: null
     offline: false
@@ -453,17 +453,17 @@ operationsByContract:
     offline: true
     reads: 1
     writes: 0
-  - operation: overrideQueueEntry
+  - operation: overrideWaitingGuest
     verb: POST
-    path: /queue-entries/{entryId}/override
+    path: /waiting-guests/{entryId}/override
     scope: venue
     permission: QUEUE_OVERRIDE
     offline: true
     reads: 2
     writes: 2
-  - operation: redeemQueueEntry
+  - operation: redeemWaitingGuest
     verb: POST
-    path: /queue-entries/{entryId}/redeem
+    path: /waiting-guests/{entryId}/redeem
     scope: workstation
     permission: QUEUE_REDEEM
     offline: true
@@ -980,14 +980,14 @@ tables:
   writtenBy: []
   foreignWriters: null
 - table: maintenance.asset
-  columns: 24
+  columns: 30
   store: postgres
   parent: null
   writtenBy:
   - maintenance
   foreignWriters: null
 - table: maintenance.incident
-  columns: 18
+  columns: 26
   store: postgres
   parent: null
   writtenBy:
@@ -1021,7 +1021,7 @@ tables:
   - maintenance
   foreignWriters: null
 - table: maintenance.work_order
-  columns: 28
+  columns: 36
   store: postgres
   parent: null
   writtenBy:
@@ -1034,13 +1034,6 @@ tables:
   writtenBy:
   - maintenance
   foreignWriters: null
-- table: queue.entry
-  columns: 18
-  store: postgres
-  parent: null
-  writtenBy:
-  - queue
-  foreignWriters: null
 - table: queue.feed
   columns: 7
   store: postgres
@@ -1049,7 +1042,7 @@ tables:
   - queue
   foreignWriters: null
 - table: queue.queue
-  columns: 21
+  columns: 31
   store: postgres
   parent: null
   writtenBy:
@@ -1057,6 +1050,13 @@ tables:
   foreignWriters: null
 - table: queue.reading
   columns: 6
+  store: postgres
+  parent: null
+  writtenBy:
+  - queue
+  foreignWriters: null
+- table: queue.waiting_guest
+  columns: 18
   store: postgres
   parent: null
   writtenBy:
@@ -1135,21 +1135,23 @@ writesOutside:
 - service: OrderService
   operations: 2
   why: '**The owner defines the row; this service may only append to it.**'
-- service: CrossCellService
+- service: CrossRegionService
   operations: 1
   why: '**The owner defines the row; this service may only append to it.**'
 - service: InventoryService
   operations: 1
   why: '**The owner defines the row; this service may only append to it.**'
 screens:
-- P01:WEB-015 Virtual Waiting Room
+- P01:WEB-002 Event & Attraction Listing
+- P01:WEB-004 Attraction Details
+- P01:WEB-015 Branded Queue / Waiting Room
 - P01:WEB-039 Venue Map & Wait Times
 - P01:WEB-040 Virtual Queue
-- P02:GST-003 Attractions List
+- P02:GST-003 Event & Attraction Listing
 - P02:GST-004 Attraction Details
 - P02:GST-021 Interactive Map
 - P02:GST-022 Attraction Wait Times
-- P02:GST-023 Virtual Queue / Join Queue
+- P02:GST-023 Virtual Queue
 - P02:GST-026 Retail / Merchandise
 - P02:GST-038 Digital Companion Mode
 - P02:GST-046 Branded Queue / Waiting Room

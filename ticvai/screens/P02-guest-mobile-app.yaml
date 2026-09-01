@@ -51,7 +51,7 @@ platform:
 screens:
 - id: GST-001
   name: Home – Default
-  module: TODO
+  module: Discovery & Browse
   purpose: The screen this app sits on. Everything else is entered from here and returns to it.
   wave: 1
   layout:
@@ -123,7 +123,7 @@ screens:
   statesDerived: true
 - id: GST-002
   name: Explore Categories
-  module: TODO
+  module: Discovery & Browse
   purpose: Find explore categories for this venue.
   wave: 1
   layout:
@@ -183,8 +183,8 @@ screens:
   requiresModule: ticketing
   statesDerived: true
 - id: GST-003
-  name: Attractions List
-  module: TODO
+  name: Event & Attraction Listing
+  module: Discovery & Browse
   purpose: Find the right one quickly, and act on it without opening it.
   wave: 1
   layout:
@@ -236,7 +236,11 @@ screens:
     derived from the screen name and its operations on 17 August, not from a requirement. **Cross-platform
     navigation removed 24 August**: BO-005. **A till does not navigate to a back office and a guest
     app does not navigate to either** — those are device handovers, and a flow declares them with `crossesDevice`
-    rather than a screen pretending there is a link.'
+    rather than a screen pretending there is a link. **Renamed 31 August** from *Attractions List*.
+    **A guest surface is one product with two renderings** — a screen named differently on web and app
+    is two screens to a developer and one journey to a guest. **Cross-surface parity, 31 August**: added
+    listPerformances, searchCatalogue. **A guest does not know which surface they are on** — the same
+    named screen on web and app now calls the same guest-callable operations.'
   apis:
   - operationId: listProducts
     contract: catalogue
@@ -246,12 +250,27 @@ screens:
     contract: queue
     purpose: Wait times across a venue
     trigger: onLoad
+  - operationId: listPerformances
+    contract: catalogue
+    purpose: List performances of an event
+    trigger: onLoad
+  - operationId: searchCatalogue
+    contract: catalogue
+    purpose: Find something by name
+    trigger: onLoad
   density: comfortable
   requiresModule: ticketing
   statesDerived: true
+  entryState:
+    params:
+    - name: eventId
+      from: deepLink
+    coldEntry: '**Named, expired or withdrawn — never a 404** (ADR-0030). A guest holding a link that
+      no longer resolves did nothing wrong; the screen says what happened and offers the list it came
+      from.'
 - id: GST-004
   name: Attraction Details
-  module: TODO
+  module: Discovery & Browse
   purpose: See attraction details for this venue.
   wave: 1
   layout:
@@ -295,8 +314,10 @@ screens:
     - GST-001
     - GST-002
     - GST-003
-  notes: States derived from the screen pattern on 17 August, not individually considered. Purpose derived
-    from the screen name and its operations on 17 August, not from a requirement.
+  notes: 'States derived from the screen pattern on 17 August, not individually considered. Purpose
+    derived from the screen name and its operations on 17 August, not from a requirement. **Cross-surface
+    parity, 31 August**: added listPerformances. **A guest does not know which surface they are on**
+    — the same named screen on web and app now calls the same guest-callable operations.'
   apis:
   - operationId: getProduct
     contract: catalogue
@@ -310,10 +331,16 @@ screens:
     contract: queue
     purpose: Wait times across a venue
     trigger: onLoad
+  - operationId: listPerformances
+    contract: catalogue
+    purpose: List performances of an event
+    trigger: onLoad
   density: comfortable
   entryState:
     params:
     - name: productId
+      from: deepLink
+    - name: eventId
       from: deepLink
     coldEntry: '**A shared product link after the product retired.** Shows what replaced it where a
       successor exists, and the catalogue where none does.'
@@ -321,7 +348,7 @@ screens:
   statesDerived: true
 - id: GST-005
   name: What's On
-  module: TODO
+  module: Discovery & Browse
   purpose: Find what's on for this venue.
   wave: 1
   layout:
@@ -352,8 +379,9 @@ screens:
     error: Could not load
     offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
   wireframe:
-    status: generated
-    board: wireframes/P02 Guest App.dc.html#gst-005
+    status: designed
+    board: wireframes/Guest Mobile Board 1.dc.html#gm-1b
+    generatedFallback: wireframes/P02 Guest App.dc.html#gst-005
   capability: C84
   implementation:
     app: guest-app
@@ -368,8 +396,13 @@ screens:
     - GST-001
     - GST-002
     - GST-003
-  notes: States derived from the screen pattern on 17 August, not individually considered. Purpose derived
-    from the screen name and its operations on 17 August, not from a requirement.
+  notes: 'States derived from the screen pattern on 17 August, not individually considered. Purpose
+    derived from the screen name and its operations on 17 August, not from a requirement. **Drawn 31
+    August** — `Guest Mobile Board 1.dc.html` frame `gm-1b`. **Matched on frame title against screen
+    name, constrained to this board’s platforms.** These packs label by board position (`GM-6C`) rather
+    than naming the screen, so the title is the only join — *What''s On* matched at 1.0. **A cross-platform
+    title match was refused**: `Outlet Management` scored 0.85 against a partner-portal screen, which
+    is how a mapping goes wrong quietly.'
   apis:
   - operationId: listPerformances
     contract: catalogue
@@ -391,9 +424,11 @@ screens:
       from.** Arrives with `eventId`.'
   requiresModule: ticketing
   statesDerived: true
+  boardFrames:
+  - Guest Mobile Board 1.dc.html#gm-1b
 - id: GST-006
   name: Event / Exhibition Details
-  module: TODO
+  module: Discovery & Browse
   purpose: See event / exhibition details for this venue.
   wave: 1
   layout:
@@ -462,7 +497,7 @@ screens:
   statesDerived: true
 - id: GST-007
   name: Select Date & Time
-  module: TODO
+  module: Booking & Selection
   purpose: See select date & time for this venue.
   wave: 1
   layout:
@@ -489,8 +524,8 @@ screens:
     board: wireframes/P02 Guest App.dc.html#gst-007
   capability: C02
   openQuestions:
-  - Inventory cites `GET /performances, POST /leases` — no matching operation. Written before the contracts
-    existed.
+  - Inventory cites `GET /performances, POST /inventory-holds` — no matching operation. Written before
+    the contracts existed.
   implementation:
     app: guest-app
     route: /general/select-date-and-time
@@ -529,7 +564,7 @@ screens:
   statesDerived: true
 - id: GST-008
   name: Tickets & Add-ons
-  module: TODO
+  module: Booking & Selection
   purpose: Find tickets & add-ons for this venue.
   wave: 1
   layout:
@@ -585,7 +620,7 @@ screens:
   statesDerived: true
 - id: GST-009
   name: Review & Payment
-  module: TODO
+  module: Cart & Checkout
   purpose: Check what you are buying and pay for it.
   wave: 1
   layout:
@@ -675,7 +710,7 @@ screens:
   statesDerived: true
 - id: GST-010
   name: Booking Confirmation
-  module: TODO
+  module: Cart & Checkout
   purpose: Confirm it worked, and give them what they need to prove it.
   wave: 1
   layout:
@@ -708,6 +743,10 @@ screens:
     contract: orders
     purpose: Read an order
     trigger: onLoad
+  - operationId: reprintOrder
+    contract: orders
+    purpose: Reprint or resend tickets
+    trigger: onAction
   implementation:
     app: guest-app
     route: /general/booking-confirmation
@@ -725,7 +764,8 @@ screens:
     derived from the screen name and its operations on 17 August, not from a requirement. **Wired 24
     August from review**: getOrder. **The operations existed and this screen could not call them** —
     reviewers reported them as missing APIs, which is what an unreachable operation looks like from
-    a wireframe.'
+    a wireframe. **Cross-surface parity, 31 August**: added reprintOrder. **A guest does not know which
+    surface they are on** — the same named screen on web and app now calls the same guest-callable operations.'
   density: comfortable
   entryState:
     params:
@@ -738,7 +778,7 @@ screens:
   statesDerived: true
 - id: GST-011
   name: Wallet Overview
-  module: TODO
+  module: Membership, Loyalty & Value
   purpose: The screen this app sits on. Everything else is entered from here and returns to it.
   wave: 2
   layout:
@@ -804,7 +844,7 @@ screens:
   statesDerived: true
 - id: GST-012
   name: My Tickets
-  module: TODO
+  module: Account & Self-Service
   purpose: Find my tickets for this venue.
   wave: 1
   layout:
@@ -854,10 +894,25 @@ screens:
     contract: orders
     purpose: Transfer tickets to another guest
     trigger: onAction
-  notes: States derived from the screen pattern on 17 August, not individually considered. Purpose derived
-    from the screen name and its operations on 17 August, not from a requirement. My Tickets. **Declared
-    only `transferOrderTickets` until 20 August** — a guest could give a ticket away and could not read
-    one. Raised by Pranay. **Rewired on the 20 August review.**
+  - operationId: getEntitlementCredential
+    contract: access
+    purpose: The thing that gets scanned
+    trigger: onLoad
+  - operationId: getEntitlementHistory
+    contract: access
+    purpose: Every scan, freeze, share and reissue against it
+    trigger: onLoad
+  - operationId: listEntitlements
+    contract: access
+    purpose: Every entitlement this guest holds, including expired
+    trigger: onLoad
+  notes: 'States derived from the screen pattern on 17 August, not individually considered. Purpose
+    derived from the screen name and its operations on 17 August, not from a requirement. My Tickets.
+    **Declared only `transferOrderTickets` until 20 August** — a guest could give a ticket away and
+    could not read one. Raised by Pranay. **Rewired on the 20 August review.** **Cross-surface parity,
+    31 August**: added getEntitlementCredential, getEntitlementHistory, listEntitlements. **The same
+    screen on web and app was calling different operations** — one side could do something the other
+    could not, and nothing recorded the difference as deliberate.'
   density: comfortable
   entryState:
     params:
@@ -873,7 +928,7 @@ screens:
   statesDerived: true
 - id: GST-013
   name: Ticket Details
-  module: TODO
+  module: Account & Self-Service
   purpose: Find ticket details for this venue.
   wave: 1
   layout:
@@ -942,7 +997,7 @@ screens:
   requiresModule: access
 - id: GST-014
   name: Ticket Transfer
-  module: TODO
+  module: Ticketing
   purpose: Work with ticket transfer for this venue.
   wave: 2
   layout:
@@ -977,8 +1032,10 @@ screens:
     - GST-001
     - GST-002
     - GST-003
-  notes: States derived from the screen pattern on 17 August, not individually considered. Purpose derived
-    from the screen name and its operations on 17 August, not from a requirement.
+  notes: 'States derived from the screen pattern on 17 August, not individually considered. Purpose
+    derived from the screen name and its operations on 17 August, not from a requirement. **Cross-surface
+    parity, 31 August**: added listOrders. **The same screen on web and app was calling different operations**
+    — one side could do something the other could not, and nothing recorded the difference as deliberate.'
   apis:
   - operationId: transferOrderTickets
     contract: orders
@@ -988,6 +1045,10 @@ screens:
     contract: orders
     purpose: Claim transferred tickets
     trigger: onAction
+  - operationId: listOrders
+    contract: orders
+    purpose: List orders
+    trigger: onLoad
   density: comfortable
   entryState:
     params:
@@ -1001,7 +1062,7 @@ screens:
   requiresModule: ticketing
 - id: GST-015
   name: Memberships
-  module: TODO
+  module: Membership, Loyalty & Value
   purpose: Find memberships for this venue.
   wave: 2
   layout:
@@ -1105,7 +1166,7 @@ screens:
   statesDerived: true
 - id: GST-016
   name: My Reservations
-  module: TODO
+  module: Ticketing
   purpose: Find my reservations for this venue.
   wave: 2
   layout:
@@ -1178,7 +1239,7 @@ screens:
   statesDerived: true
 - id: GST-017
   name: Reservation Details
-  module: TODO
+  module: Ticketing
   purpose: See reservation details for this venue.
   wave: 2
   layout:
@@ -1247,7 +1308,7 @@ screens:
   statesDerived: true
 - id: GST-018
   name: Add to Calendar / Reminders
-  module: TODO
+  module: Account & Self-Service
   purpose: Find add to calendar / reminders for this venue.
   wave: 3
   layout:
@@ -1321,8 +1382,8 @@ screens:
   requiresModule: ticketing
   statesDerived: true
 - id: GST-019
-  name: Order History (Wallet)
-  module: TODO
+  name: Order History
+  module: Account & Self-Service
   purpose: Find order history (wallet) for this venue.
   wave: 2
   layout:
@@ -1358,6 +1419,10 @@ screens:
     contract: orders
     purpose: The orders this guest placed
     trigger: onLoad
+  - operationId: transferOrderTickets
+    contract: orders
+    purpose: Transfer tickets to another guest
+    trigger: onAction
   implementation:
     app: guest-app
     route: /general/order-history-wallet
@@ -1371,12 +1436,16 @@ screens:
     - GST-001
     - GST-002
     - GST-003
-  notes: States derived from the screen pattern on 17 August, not individually considered. Purpose derived
-    from the screen name and its operations on 17 August, not from a requirement. Order History. **`transferOrderTickets`
-    was the only declared operation**, which is not history. Raised by Pranay. **Rewired on the 20 August
-    review.** **`listMyOrders` wired 24 August, raised in review.** The staff-scoped list was on this
-    guest screen — **a guest-facing list must be scoped to the caller, not filtered by a subject parameter**,
-    or a guest is one parameter away from somebody else’s.
+  notes: 'States derived from the screen pattern on 17 August, not individually considered. Purpose
+    derived from the screen name and its operations on 17 August, not from a requirement. Order History.
+    **`transferOrderTickets` was the only declared operation**, which is not history. Raised by Pranay.
+    **Rewired on the 20 August review.** **`listMyOrders` wired 24 August, raised in review.** The staff-scoped
+    list was on this guest screen — **a guest-facing list must be scoped to the caller, not filtered
+    by a subject parameter**, or a guest is one parameter away from somebody else’s. **Renamed 31 August**
+    from *Order History (Wallet)*. **A guest surface is one product with two renderings** — a screen
+    named differently on web and app is two screens to a developer and one journey to a guest. **Cross-surface
+    parity, 31 August**: added transferOrderTickets. **A guest does not know which surface they are
+    on** — the same named screen on web and app now calls the same guest-callable operations.'
   density: comfortable
   entryState:
     params:
@@ -1389,7 +1458,7 @@ screens:
   statesDerived: true
 - id: GST-020
   name: Saved Items / Wishlist
-  module: TODO
+  module: Account & Self-Service
   purpose: Find the right one quickly, and act on it without opening it.
   wave: 3
   layout:
@@ -1465,7 +1534,7 @@ screens:
   statesDerived: true
 - id: GST-021
   name: Interactive Map
-  module: TODO
+  module: In-venue Services
   purpose: See where things are in relation to each other.
   wave: 2
   layout:
@@ -1568,10 +1637,10 @@ screens:
   requiresModule: seating
   statesDerived: true
   boardFrames:
-  - seat-4b
+  - Seat Board 4.dc.html#seat-4b
 - id: GST-022
   name: Attraction Wait Times
-  module: TODO
+  module: In-venue Services
   purpose: See attraction wait times for this venue.
   wave: 2
   layout:
@@ -1624,8 +1693,8 @@ screens:
   requiresModule: queue
   statesDerived: true
 - id: GST-023
-  name: Virtual Queue / Join Queue
-  module: TODO
+  name: Virtual Queue
+  module: In-venue Services
   purpose: Find the right one quickly, and act on it without opening it.
   wave: 3
   layout:
@@ -1654,7 +1723,7 @@ screens:
     contract: queue
     purpose: from page inventory
     trigger: onLoad
-  - operationId: getQueueEntry
+  - operationId: getWaitingGuest
     contract: queue
     purpose: Read a queue entry
     trigger: onLoad
@@ -1662,6 +1731,10 @@ screens:
     contract: queue
     purpose: Leave a queue
     trigger: onAction
+  - operationId: getWaitTimes
+    contract: queue
+    purpose: Wait times across a venue
+    trigger: onLoad
   implementation:
     app: guest-app
     route: /general/virtual-queue-join-queue
@@ -1675,8 +1748,12 @@ screens:
     - GST-001
     - GST-002
     - GST-003
-  notes: States derived from the screen pattern on 17 August, not individually considered. Purpose derived
-    from the screen name and its operations on 17 August, not from a requirement.
+  notes: 'States derived from the screen pattern on 17 August, not individually considered. Purpose
+    derived from the screen name and its operations on 17 August, not from a requirement. **Renamed
+    31 August** from *Virtual Queue / Join Queue*. **A guest surface is one product with two renderings**
+    — a screen named differently on web and app is two screens to a developer and one journey to a guest.
+    **Cross-surface parity, 31 August**: added getWaitTimes. **A guest does not know which surface they
+    are on** — the same named screen on web and app now calls the same guest-callable operations.'
   density: comfortable
   entryState:
     params:
@@ -1691,7 +1768,7 @@ screens:
   statesDerived: true
 - id: GST-024
   name: F&B – Browse & Order
-  module: TODO
+  module: In-venue Services
   purpose: Order food to where the guest is sitting, or for collection.
   wave: 2
   layout:
@@ -1738,9 +1815,19 @@ screens:
     contract: fnb
     purpose: Where an order can be delivered
     trigger: onLoad
-  notes: The inventory cited `GET /menu`, which never existed. Now getGuestMenu. Ordering to a cabana
+  - operationId: claimTableSession
+    contract: fnb
+    purpose: Identify which table a guest is sitting at
+    trigger: onAction
+  - operationId: listModifierGroups
+    contract: fnb
+    purpose: List modifier groups
+    trigger: onLoad
+  notes: 'The inventory cited `GET /menu`, which never existed. Now getGuestMenu. Ordering to a cabana
     or a seat uses the same claimLocationSession as a table (4.6.26). States derived from the screen
-    pattern on 17 August, not individually considered.
+    pattern on 17 August, not individually considered. **Cross-surface parity, 31 August**: added claimTableSession,
+    listModifierGroups. **The same screen on web and app was calling different operations** — one side
+    could do something the other could not, and nothing recorded the difference as deliberate.'
   implementation:
     app: guest-app
     route: /general/fandb-browse-and-order
@@ -1772,7 +1859,7 @@ screens:
   statesDerived: true
 - id: GST-025
   name: F&B – Order Tracking
-  module: TODO
+  module: In-venue Services
   purpose: Track an order to the point it reaches the guest.
   wave: 2
   layout:
@@ -1838,7 +1925,7 @@ screens:
   requiresModule: fnb
 - id: GST-026
   name: Retail / Merchandise
-  module: TODO
+  module: Retail
   purpose: Find retail / merchandise for this venue.
   wave: 2
   layout:
@@ -1914,7 +2001,7 @@ screens:
   statesDerived: true
 - id: GST-027
   name: Parking – Reserve & Pay
-  module: TODO
+  module: In-venue Services
   purpose: Take the money, and be unambiguous about whether it worked.
   wave: 3
   layout:
@@ -1955,7 +2042,10 @@ screens:
     is declared `service` audience and this is a guest screen.** Either the guest calls it — in which
     case the audience is wrong — or a guest-scoped operation is missing and the screen is drawing an
     act it cannot perform. **Recorded 24 August rather than guessed**: `updateParkingEntitlement` is
-    already `guest`, which makes the asymmetry look like an omission rather than a design.'
+    already `guest`, which makes the asymmetry look like an omission rather than a design. **Cross-surface
+    parity, 31 August**: added listParkingFacilities. **The same screen on web and app was calling different
+    operations** — one side could do something the other could not, and nothing recorded the difference
+    as deliberate.'
   apis:
   - operationId: createParkingEntitlement
     contract: access
@@ -1965,6 +2055,10 @@ screens:
     contract: access
     purpose: Change the plate, or revoke
     trigger: onAction
+  - operationId: listParkingFacilities
+    contract: access
+    purpose: Car parks at a venue, and how each integrates
+    trigger: onLoad
   density: comfortable
   entryState:
     params:
@@ -1975,7 +2069,7 @@ screens:
   requiresModule: access
 - id: GST-028
   name: Parking – Reservation Confirmed
-  module: TODO
+  module: In-venue Services
   purpose: Confirm it worked, and give them what they need to prove it.
   wave: 3
   layout:
@@ -2042,7 +2136,7 @@ screens:
   statesDerived: true
 - id: GST-029
   name: Venue Info & Services
-  module: TODO
+  module: In-venue Services
   purpose: See venue info & services for this venue.
   wave: 2
   layout:
@@ -2102,7 +2196,7 @@ screens:
   statesDerived: true
 - id: GST-030
   name: In-Venue Notifications
-  module: TODO
+  module: Engagement & Support
   purpose: Work with in-venue notifications for this venue.
   wave: 2
   layout:
@@ -2155,7 +2249,7 @@ screens:
   statesDerived: true
 - id: GST-031
   name: AI Concierge – Home
-  module: TODO
+  module: Engagement & Support
   purpose: The screen this app sits on. Everything else is entered from here and returns to it.
   wave: 2
   layout:
@@ -2215,10 +2309,24 @@ screens:
     contract: ai
     purpose: Ask
     trigger: onAction
-  notes: States derived from the screen pattern on 17 August, not individually considered. Purpose derived
-    from the screen name and its operations on 17 August, not from a requirement. **Guest concierge
+  - operationId: createAiConversation
+    contract: ai
+    purpose: Open a conversation
+    trigger: onAction
+  - operationId: handoverToAgent
+    contract: marketing-crm
+    purpose: Pass an assistant conversation to a person
+    trigger: onAction
+  - operationId: requestSuggestion
+    contract: ai
+    purpose: requestSuggestion
+    trigger: onAction
+  notes: 'States derived from the screen pattern on 17 August, not individually considered. Purpose
+    derived from the screen name and its operations on 17 August, not from a requirement. **Guest concierge
     confirmed in Phase 1 on 17 August (CF-14), charged per token and bounded by `AiPolicy.guestCapabilityScope`.**
-    Still degrades to the manual planner rather than to an error.
+    Still degrades to the manual planner rather than to an error. **Cross-surface parity, 31 August**:
+    added createAiConversation, handoverToAgent, requestSuggestion. **A guest does not know which surface
+    they are on** — the same named screen on web and app now calls the same guest-callable operations.'
   density: comfortable
   entryState:
     params:
@@ -2232,7 +2340,7 @@ screens:
   statesDerived: true
 - id: GST-032
   name: AI Concierge – Chat
-  module: TODO
+  module: Engagement & Support
   purpose: Add ai concierge – chat for this venue.
   wave: 2
   layout:
@@ -2334,7 +2442,7 @@ screens:
   statesDerived: true
 - id: GST-033
   name: AI Concierge – Contextual Help
-  module: TODO
+  module: Engagement & Support
   purpose: Answer a question without needing a person.
   wave: 2
   layout:
@@ -2407,7 +2515,7 @@ screens:
   statesDerived: true
 - id: GST-034
   name: Lost & Found
-  module: TODO
+  module: Support
   purpose: See lost & found for this venue.
   wave: 2
   layout:
@@ -2489,7 +2597,7 @@ screens:
   statesDerived: true
 - id: GST-035
   name: Feedback & Ratings
-  module: TODO
+  module: Engagement & Support
   purpose: Work with feedback & ratings for this venue.
   wave: 3
   layout:
@@ -2548,7 +2656,7 @@ screens:
   statesDerived: true
 - id: GST-036
   name: Loyalty & Rewards
-  module: TODO
+  module: Membership, Loyalty & Value
   purpose: Your points, your tier, and what is within reach.
   wave: 2
   layout:
@@ -2589,9 +2697,12 @@ screens:
     - GST-001
     - GST-002
     - GST-003
-  notes: Merged with GST-064 on 18 August. **I created GST-064 in the parity sweep without noticing
+  notes: 'Merged with GST-064 on 18 August. **I created GST-064 in the parity sweep without noticing
     this screen existed** — same two operations, same capability, and the fuzzy match against the client
-    storyboard is what surfaced it. Board 6 panel 6 shows one Loyalty & Rewards screen, not two.
+    storyboard is what surfaced it. Board 6 panel 6 shows one Loyalty & Rewards screen, not two. **Cross-surface
+    parity, 31 August**: added evaluatePromotions, listPromotions. **The same screen on web and app
+    was calling different operations** — one side could do something the other could not, and nothing
+    recorded the difference as deliberate.'
   apis:
   - operationId: getLoyaltyPosition
     contract: marketing-crm
@@ -2601,12 +2712,20 @@ screens:
     contract: marketing-crm
     purpose: List loyalty programmes
     trigger: onLoad
+  - operationId: evaluatePromotions
+    contract: promotions
+    purpose: Evaluate promotions against a cart
+    trigger: onAction
+  - operationId: listPromotions
+    contract: promotions
+    purpose: List promotions
+    trigger: onLoad
   density: comfortable
   requiresModule: marketing
   statesDerived: true
 - id: GST-037
   name: Offers & Promotions
-  module: TODO
+  module: Promotions
   purpose: Find offers & promotions for this venue.
   wave: 2
   layout:
@@ -2681,7 +2800,7 @@ screens:
   statesDerived: true
 - id: GST-038
   name: Digital Companion Mode
-  module: TODO
+  module: In-venue Services
   purpose: 'The in-venue home: your tickets, the map, and what is near you.'
   wave: 3
   layout:
@@ -2747,7 +2866,7 @@ screens:
   statesDerived: true
 - id: GST-039
   name: Profile
-  module: TODO
+  module: Account & Self-Service
   purpose: What we hold about a guest, and what they can change.
   wave: 1
   layout:
@@ -2806,7 +2925,7 @@ screens:
   statesDerived: true
 - id: GST-040
   name: Help & Support
-  module: TODO
+  module: Engagement & Support
   purpose: Answer a question without needing a person.
   wave: 2
   layout:
@@ -2890,7 +3009,7 @@ screens:
   statesDerived: true
 - id: GST-041
   name: Checkout Entry
-  module: TODO
+  module: Cart & Checkout
   purpose: Take the money, and be unambiguous about whether it worked.
   wave: 1
   layout:
@@ -2945,7 +3064,7 @@ screens:
   requiresModule: ticketing
 - id: GST-042
   name: Simple Registration & OTP
-  module: TODO
+  module: Account & Self-Service
   purpose: Work with simple registration & otp for this venue.
   wave: 1
   layout:
@@ -3079,7 +3198,7 @@ screens:
   statesDerived: true
 - id: GST-043
   name: Arabic / RTL Experience
-  module: TODO
+  module: System States
   purpose: Arabic / RTL Experience — the screen a person opens when they need to deal with arabic /
     rtl experience.
   wave: 1
@@ -3126,7 +3245,7 @@ screens:
   statesDerived: true
 - id: GST-044
   name: Multi-Currency & Pricing
-  module: TODO
+  module: Ticketing
   purpose: See prices in your own currency, in the app, before and during the visit.
   wave: 2
   layout:
@@ -3193,7 +3312,7 @@ screens:
   statesDerived: true
 - id: GST-045
   name: Ticket Delivery & Sharing
-  module: TODO
+  module: Account & Self-Service
   purpose: Find ticket delivery & sharing for this venue.
   wave: 2
   layout:
@@ -3246,7 +3365,7 @@ screens:
   requiresModule: ticketing
 - id: GST-046
   name: Branded Queue / Waiting Room
-  module: TODO
+  module: High-Demand Access
   purpose: Find branded queue / waiting room for this venue.
   wave: 1
   layout:
@@ -3290,14 +3409,31 @@ screens:
     contract: queue
     purpose: Wait times across a venue
     trigger: onLoad
-  notes: States derived from the screen pattern on 17 August, not individually considered. Purpose derived
-    from the screen name and its operations on 17 August, not from a requirement.
+  - operationId: getWaitingGuest
+    contract: queue
+    purpose: Read a queue entry
+    trigger: onLoad
+  - operationId: joinQueue
+    contract: queue
+    purpose: Join a virtual queue
+    trigger: onAction
+  notes: 'States derived from the screen pattern on 17 August, not individually considered. Purpose
+    derived from the screen name and its operations on 17 August, not from a requirement. **Cross-surface
+    parity, 31 August**: added getWaitingGuest, joinQueue. **A guest does not know which surface they
+    are on** — the same named screen on web and app now calls the same guest-callable operations.'
   density: comfortable
   requiresModule: queue
   statesDerived: true
+  entryState:
+    params:
+    - name: entryId
+      from: deepLink
+    coldEntry: '**Named, expired or withdrawn — never a 404** (ADR-0030). A guest holding a link that
+      no longer resolves did nothing wrong; the screen says what happened and offers the list it came
+      from.'
 - id: GST-047
   name: Maintenance / Upgrade Page
-  module: TODO
+  module: System States
   purpose: Say what is wrong in a way that tells the person whether to wait or leave.
   wave: 1
   layout:
@@ -3347,7 +3483,7 @@ screens:
   statesDerived: true
 - id: GST-048
   name: Upsell / Cross-Sell
-  module: TODO
+  module: Booking & Selection
   purpose: See upsell / cross-sell for this venue.
   wave: 2
   layout:
@@ -3414,7 +3550,7 @@ screens:
   statesDerived: true
 - id: GST-049
   name: Interactive Seat Selection
-  module: TODO
+  module: Booking & Selection
   purpose: See interactive seat selection for this venue.
   wave: 2
   layout:
@@ -3432,11 +3568,6 @@ screens:
         impliedBy: createSeatHold
         label: Create seat hold
         notes: The act the screen exists for.
-      - kind: secondaryButton
-        label: Cancel
-        notes: '**A screen that can submit must be leaveable without submitting.**'
-        derived: true
-        impliedBy: createSeatHold
   states:
     loading: Availability is live, never cached
     emptyFirstRun: '**Sold out is a real answer.** Offers the next available rather than a dead end'
@@ -3496,10 +3627,10 @@ screens:
   requiresModule: seating
   statesDerived: true
   boardFrames:
-  - seat-4a
+  - Seat Board 4.dc.html#seat-4a
 - id: GST-050
   name: Resource Booking – Cabana
-  module: TODO
+  module: Booking & Selection
   purpose: Book a cabana or other capacity-based resource.
   wave: 3
   layout:
@@ -3574,7 +3705,7 @@ screens:
   statesDerived: true
 - id: GST-051
   name: Plan Your Adventure – Start
-  module: TODO
+  module: Engagement & Support
   purpose: Start a plan for the visit — which attractions, in what order — before arriving.
   wave: 3
   layout:
@@ -3637,7 +3768,7 @@ screens:
   statesDerived: true
 - id: GST-052
   name: Suggested Itineraries
-  module: TODO
+  module: Engagement & Support
   purpose: Curated plans a guest can take rather than build.
   wave: 3
   layout:
@@ -3716,7 +3847,7 @@ screens:
   statesDerived: true
 - id: GST-053
   name: Build Your Own Itinerary
-  module: TODO
+  module: Engagement & Support
   purpose: Choose the attractions and the order yourself.
   wave: 3
   layout:
@@ -3792,7 +3923,7 @@ screens:
   statesDerived: true
 - id: GST-054
   name: AI Optimized Itinerary
-  module: TODO
+  module: Engagement & Support
   purpose: Let the assistant order the day around waits and opening times.
   wave: 3
   layout:
@@ -3881,7 +4012,7 @@ screens:
   statesDerived: true
 - id: GST-055
   name: Dynamic QR Ticket
-  module: TODO
+  module: Account & Self-Service
   purpose: Find dynamic qr ticket for this venue.
   wave: 1
   layout:
@@ -3894,11 +4025,6 @@ screens:
         derived: true
         impliedBy: transferOrderTickets
         notes: The act the screen exists for.
-      - kind: secondaryButton
-        label: Cancel
-        notes: '**A screen that can submit must be leaveable without submitting.**'
-        derived: true
-        impliedBy: transferOrderTickets
   states:
     loading: Availability is live, never cached
     emptyFirstRun: '**Sold out is a real answer.** Offers the next available rather than a dead end'
@@ -3942,7 +4068,7 @@ screens:
   requiresModule: ticketing
 - id: GST-056
   name: Bundle Package
-  module: TODO
+  module: Booking & Selection
   purpose: See bundle package for this venue.
   wave: 2
   layout:
@@ -4016,7 +4142,7 @@ screens:
   statesDerived: true
 - id: GST-057
   name: Accessibility Information
-  module: TODO
+  module: Discovery & Browse
   purpose: Step-free routes, facilities and what to expect.
   wave: 2
   layout:
@@ -4071,7 +4197,7 @@ screens:
   statesDerived: true
 - id: GST-058
   name: Resource Availability (Cabana)
-  module: TODO
+  module: Booking & Selection
   purpose: See which cabanas are free, by area and date, before choosing one.
   wave: 3
   layout:
@@ -4136,7 +4262,7 @@ screens:
   statesDerived: true
 - id: GST-059
   name: Plan My Day – In Progress
-  module: TODO
+  module: Engagement & Support
   purpose: The plan while you are in the venue, against live waits.
   wave: 3
   layout:
@@ -4224,6 +4350,10 @@ screens:
     contract: fnb
     purpose: Item, modifiers and allergens
     trigger: onLoad
+  - operationId: listModifierGroups
+    contract: fnb
+    purpose: List modifier groups
+    trigger: onLoad
   layout:
     template: detail
     regions:
@@ -4245,7 +4375,10 @@ screens:
   wireframe:
     status: generated
     board: wireframes/P02 Guest App.dc.html#gst-061
-  notes: P02-019.1 in the client hierarchy. Absent from my page inventory until 14 August.
+  notes: 'P02-019.1 in the client hierarchy. Absent from my page inventory until 14 August. **Cross-surface
+    parity, 31 August**: added listModifierGroups. **The same screen on web and app was calling different
+    operations** — one side could do something the other could not, and nothing recorded the difference
+    as deliberate.'
   implementation:
     app: guest-app
     route: /in-venue-experience/menu-item-detail
@@ -4385,11 +4518,6 @@ screens:
         derived: true
         impliedBy: recordConsent
         notes: The act the screen exists for.
-      - kind: secondaryButton
-        label: Cancel
-        notes: '**A screen that can submit must be leaveable without submitting.**'
-        derived: true
-        impliedBy: recordConsent
   apis:
   - operationId: recordConsent
     contract: marketing-crm

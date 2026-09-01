@@ -122,7 +122,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
       <div id="pos-001" class="scr">
         <div>
           <div class="hdr"><span class="code">POS-001</span>
-            <span class="ttl">Begin Shift</span><span class="pill">client board</span><span class="pill off">offline</span><span class="pill">POS-2A, POS-3D</span></div>
+            <span class="ttl">Begin Shift</span><span class="pill">client board</span><span class="pill off">offline</span><span class="pill">POS Board 3.dc.html#pos-3d, TICVAI Boards v2.dc.html#pos-2a</span></div>
           <div class="pur">Count the opening float and open the till.</div>
         </div>
         <div class="frame">
@@ -150,7 +150,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
       <div id="pos-007" class="scr">
         <div>
           <div class="hdr"><span class="code">POS-007</span>
-            <span class="ttl">Close Shift</span><span class="pill">client board</span><span class="pill off">offline</span><span class="pill">POS-2F, POS-3F</span></div>
+            <span class="ttl">Close Shift</span><span class="pill">client board</span><span class="pill off">offline</span><span class="pill">POS Board 3.dc.html#pos-3f, TICVAI Boards v2.dc.html#pos-2f</span></div>
           <div class="pur">Count the drawer and close the till.</div>
         </div>
         <div class="frame">
@@ -178,7 +178,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
       <div id="pos-009" class="scr">
         <div>
           <div class="hdr"><span class="code">POS-009</span>
-            <span class="ttl">Staff Roster</span><span class="pill">client board</span><span class="pill off">offline</span><span class="pill">POS-3A</span></div>
+            <span class="ttl">Staff Roster</span><span class="pill">client board</span><span class="pill off">offline</span><span class="pill">POS Board 3.dc.html#pos-3a</span></div>
           <div class="pur">See who is on duty and on which terminal.</div>
         </div>
         <div class="frame">
@@ -206,7 +206,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
       <div id="pos-002" class="scr">
         <div>
           <div class="hdr"><span class="code">POS-002</span>
-            <span class="ttl">Sell — Ticket Catalogue</span><span class="pill">client board</span><span class="pill off">offline</span><span class="pill">RET-3B, RET-3C, RET-3D</span></div>
+            <span class="ttl">Sell — Ticket Catalogue</span><span class="pill">client board</span><span class="pill off">offline</span><span class="pill">Retail Board 3.dc.html#ret-3b, Retail Board 3.dc.html#ret-3c, Retail Board 3.dc.html#ret-3d</span></div>
           <div class="pur">Find a product and add it to the cart.</div>
         </div>
         <div class="frame">
@@ -220,7 +220,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
             <div class="strip">offline capable · works from the local journal</div>
             <div class="canvas">
               <div class="kpis"><div class="kpi"><b>Today</b><span>AED 48,210</span></div><div class="kpi"><b>Orders</b><span>312</span></div><div class="kpi"><b>Avg basket</b><span>AED 154</span></div><div class="kpi"><b>Refunds</b><span>4</span></div></div>
-              <div class="two"><div class="grow"><div class="panel"><b>Search events, tickets, customers</b><div class="chip">Search events, tickets, customers</div></div><div class="panel"><span class="kind">saleBoard</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">Category tiles then product cards. Layout is the sale board configured per workstation (ADR-0002), not a fixed grid</span></div><div class="panel"><b>Sort by</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div></div><div class="side"><div class="panel"><b>Filters</b><div class="chip">Filters</div></div></div></div>
+              <div class="two"><div class="grow"><div class="panel"><b>Search events, tickets, customers</b><div class="chip">Search events, tickets, customers</div></div><div class="panel"><span class="kind">saleBoard</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">Category tiles then product cards. Layout is the sale board configured per workstation (ADR-0002), not a fixed grid</span></div><div class="panel"><b>Sort by</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div></div><div class="side"><div class="panel"><b>Filters</b><div class="chip">Filters</div></div><div class="panel"><b>Confirm</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">**The consequence goes in the body, not the title.** *Cancel 3 orders worth AED 480* is a confirmation; *are you sure* is not — and a dialog that cannot name what it dest</span></div></div></div>
             </div>
           </div>
         </div>
@@ -253,16 +253,16 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; getAvailability · acquireLease · listProductVariants · getProduct +6</div>
+          <div><b>OPERATIONS</b> &middot; getAvailability · acquireInventoryHold · listProductVariants · getProduct +6</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · emptyFirstRun · emptyNoResults · emptyNoAccess · error · offline</span></div>
-          <div><b>ARRIVES WITH</b> &middot; leaseId&larr;deepLink, productId&larr;POS-002</div>
+          <div><b>ARRIVES WITH</b> &middot; inventoryHoldId&larr;deepLink, productId&larr;POS-002</div>
           <div><b>GOES TO</b> &middot; POS-001 · POS-002 · POS-004 · POS-005 · POS-006</div>
         </div>
       </div>
       <div id="pos-004" class="scr">
         <div>
           <div class="hdr"><span class="code">POS-004</span>
-            <span class="ttl">Sell — Seat Map</span><span class="pill off">offline</span><span class="pill">seat-3a</span></div>
+            <span class="ttl">Sell — Seat Map</span><span class="pill off">offline</span><span class="pill">Seat Board 3.dc.html#seat-3a</span></div>
           <div class="pur">Choose specific seats for a seated event.</div>
         </div>
         <div class="frame">
@@ -290,7 +290,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
       <div id="pos-006" class="scr">
         <div>
           <div class="hdr"><span class="code">POS-006</span>
-            <span class="ttl">Held Orders</span><span class="pill">client board</span><span class="pill off">offline</span><span class="pill">RET-3F</span></div>
+            <span class="ttl">Held Orders</span><span class="pill">client board</span><span class="pill off">offline</span><span class="pill">Retail Board 3.dc.html#ret-3f</span></div>
           <div class="pur">Find and resume a parked sale.</div>
         </div>
         <div class="frame">
@@ -346,7 +346,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
       <div id="pos-011" class="scr">
         <div>
           <div class="hdr"><span class="code">POS-011</span>
-            <span class="ttl">Returns, Refunds &amp; Exchanges</span><span class="pill">client board</span><span class="pill off">offline</span><span class="pill">POS-2B, RET-3G</span></div>
+            <span class="ttl">Returns, Refunds &amp; Exchanges</span><span class="pill">client board</span><span class="pill off">offline</span><span class="pill">POS Frontline Board 2.dc.html#pos-2b, Retail Board 3.dc.html#ret-3g</span></div>
           <div class="pur">Returns, Refunds &amp; Exchanges — from the client design board, 20 August.</div>
         </div>
         <div class="frame">
@@ -374,7 +374,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
       <div id="pos-012" class="scr">
         <div>
           <div class="hdr"><span class="code">POS-012</span>
-            <span class="ttl">Omnichannel Order &amp; Fulfilment Center</span><span class="pill named">named only</span><span class="pill off">offline</span><span class="pill">POS-2C, RET-3H</span></div>
+            <span class="ttl">Omnichannel Order &amp; Fulfilment Center</span><span class="pill named">named only</span><span class="pill off">offline</span><span class="pill">POS Frontline Board 2.dc.html#pos-2c, Retail Board 3.dc.html#ret-3h</span></div>
           <div class="pur">Omnichannel Order &amp; Fulfilment Center — from the client design board, 20 August.</div>
         </div>
         <div class="frame">
@@ -402,7 +402,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
       <div id="pos-013" class="scr">
         <div>
           <div class="hdr"><span class="code">POS-013</span>
-            <span class="ttl">Mobile POS, Event Sales &amp; Offline Operations</span><span class="pill named">named only</span><span class="pill off">offline</span><span class="pill">POS-2D, POS-2E</span></div>
+            <span class="ttl">Mobile POS, Event Sales &amp; Offline Operations</span><span class="pill named">named only</span><span class="pill off">offline</span><span class="pill">POS Frontline Board 2.dc.html#pos-2d, POS Frontline Board 2.dc.html#pos-2e</span></div>
           <div class="pur">Mobile POS, Event Sales &amp; Offline Operations — from the client design board, 20 August.</div>
         </div>
         <div class="frame">
@@ -486,7 +486,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
       <div id="pos-016" class="scr">
         <div>
           <div class="hdr"><span class="code">POS-016</span>
-            <span class="ttl">Till Configuration</span><span class="pill named">named only</span><span class="pill off">offline</span></div>
+            <span class="ttl">Till Configuration</span><span class="pill named">named only</span><span class="pill off">offline</span><span class="pill">POS Frontline Board 2.dc.html#pos-2b</span></div>
           <div class="pur">Till Configuration — from the client design board, 20 August.</div>
         </div>
         <div class="frame">
@@ -514,7 +514,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
       <div id="pos-017" class="scr">
         <div>
           <div class="hdr"><span class="code">POS-017</span>
-            <span class="ttl">Cash In / Cash Out Operations</span><span class="pill">client board</span><span class="pill off">offline</span></div>
+            <span class="ttl">Cash In / Cash Out Operations</span><span class="pill">client board</span><span class="pill off">offline</span><span class="pill">POS Frontline Board 2.dc.html#pos-2d</span></div>
           <div class="pur">Cash In / Cash Out Operations — from the client design board, 20 August.</div>
         </div>
         <div class="frame">
@@ -542,7 +542,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
       <div id="pos-018" class="scr">
         <div>
           <div class="hdr"><span class="code">POS-018</span>
-            <span class="ttl">Safe Drop &amp; Cash Transfer Management</span><span class="pill">client board</span><span class="pill off">offline</span><span class="pill">POS-3B</span></div>
+            <span class="ttl">Safe Drop &amp; Cash Transfer Management</span><span class="pill">client board</span><span class="pill off">offline</span><span class="pill">POS Board 3.dc.html#pos-3b</span></div>
           <div class="pur">Safe Drop &amp; Cash Transfer Management — from the client design board, 20 August.</div>
         </div>
         <div class="frame">
@@ -570,7 +570,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
       <div id="pos-019" class="scr">
         <div>
           <div class="hdr"><span class="code">POS-019</span>
-            <span class="ttl">Shift Templates &amp; Policies</span><span class="pill named">named only</span><span class="pill off">offline</span><span class="pill">POS-3C</span></div>
+            <span class="ttl">Shift Templates &amp; Policies</span><span class="pill named">named only</span><span class="pill off">offline</span><span class="pill">POS Board 3.dc.html#pos-3c</span></div>
           <div class="pur">Shift Templates &amp; Policies — from the client design board, 20 August.</div>
         </div>
         <div class="frame">
@@ -598,7 +598,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
       <div id="pos-020" class="scr">
         <div>
           <div class="hdr"><span class="code">POS-020</span>
-            <span class="ttl">Shift Exceptions &amp; Alerts</span><span class="pill">client board</span><span class="pill off">offline</span><span class="pill">POS-3E</span></div>
+            <span class="ttl">Shift Exceptions &amp; Alerts</span><span class="pill">client board</span><span class="pill off">offline</span><span class="pill">POS Board 3.dc.html#pos-3e</span></div>
           <div class="pur">Shift Exceptions &amp; Alerts — from the client design board, 20 August.</div>
         </div>
         <div class="frame">
@@ -738,7 +738,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
       <div id="pos-005" class="scr">
         <div>
           <div class="hdr"><span class="code">POS-005</span>
-            <span class="ttl">Payment</span><span class="pill">client board</span><span class="pill off">offline</span><span class="pill">RET-3E</span></div>
+            <span class="ttl">Payment</span><span class="pill">client board</span><span class="pill off">offline</span><span class="pill">Retail Board 3.dc.html#ret-3e</span></div>
           <div class="pur">Take payment and complete the sale.</div>
         </div>
         <div class="frame">
@@ -752,7 +752,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
             <div class="strip">offline capable · works from the local journal</div>
             <div class="canvas">
               <div class="kpis"><div class="kpi"><b>Total</b><span>1,248</span></div><div class="kpi"><b>Active</b><span>978</span></div><div class="kpi"><b>Attention</b><span>142</span></div><div class="kpi"><b>Offline</b><span>12</span></div></div>
-              <div class="two"><div class="grow"><div class="panel"><b>Payment method</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">Card, cash, digital wallet, gift card or voucher, online payment — the five in the design</span></div><div class="panel"><b>Amount received</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><span class="kind">detailPanel</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">Computed live. Quick-tender chips for exact, 250, 300</span></div></div><div class="side"><div class="panel"><span class="kind">paymentTerminal</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div></div></div>
+              <div class="two"><div class="grow"><div class="panel"><b>Payment method</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">Card, cash, digital wallet, gift card or voucher, online payment — the five in the design</span></div><div class="panel"><b>Amount received</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><span class="kind">detailPanel</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">Computed live. Quick-tender chips for exact, 250, 300</span></div></div><div class="side"><div class="panel"><span class="kind">paymentTerminal</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><b>Confirm</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">**The consequence goes in the body, not the title.** *Cancel 3 orders worth AED 480* is a confirmation; *are you sure* is not — and a dialog that cannot name what it dest</span></div></div></div>
             </div>
           </div>
         </div>

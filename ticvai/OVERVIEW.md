@@ -4,7 +4,7 @@ A multi-tenant platform for ticketing, access control, point of sale and venue o
 **This package is the design of it** — the contracts, the data model, the screens, the
 journeys through them, and the reasoning behind every decision that was not obvious.
 
-**1023 operations · 28 contracts · 379 tables · 492 screens · 122 state models · 94 flows · 30 ADRs**
+**1025 operations · 28 contracts · 380 tables · 492 screens · 122 state models · 94 flows · 30 ADRs**
 
 **Design 93% · Build 0%.**
 
@@ -33,12 +33,12 @@ package has been bitten by that three times.
 | | | |
 |---|---:|---|
 | Requirements contracted | **2,647** of 3,184 | **95% of what is in scope** |
-| Operations reaching a screen | 758 of 1023 | 74% |
+| Operations reaching a screen | 758 of 1025 | 74% |
 | Screens reachable from an entry point | 419 of 492 | 85% |
 | Screens drawn on a board | 492 of 492 | 100% |
 | Screens in a journey | 262 of 492 | 53% |
 | Conflicts | 148 closed | 12 open, none blocking |
-| **Tables written** | **0** of 379 | **build has not started** |
+| **Tables written** | **0** of 380 | **build has not started** |
 
 ---
 
@@ -104,7 +104,7 @@ cd viewer && npm start        →  http://localhost:4173
 
 **Put last on purpose.** A landing page that only lists what exists is a landing page that misleads.
 
-**Build is 0%.** 379 tables are designed and none is written. No migration has run, no service is scaffolded, and nothing has executed. **The design is 95% of in-scope requirements and the gap to build is the entire remaining risk.**
+**Build is 0%.** 380 tables are designed and none is written. No migration has run, no service is scaffolded, and nothing has executed. **The design is 95% of in-scope requirements and the gap to build is the entire remaining risk.**
 
 **94 journeys of a target 60.** Seventeen contracts have exactly one — `subscription` has one over 55 operations. **Every journey written so far has found a defect**, which is the argument for writing more.
 

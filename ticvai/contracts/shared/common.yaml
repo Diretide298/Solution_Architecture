@@ -179,7 +179,7 @@ components:
         levels plus `outlet`** — a commercial branch beside the organisational one (CF-138,
         ADR-0018). **A department has requisitions and rotas; an outlet has a menu and stock**, and
         modelling a restaurant as a department would put it in the staffing tree.
-      enum: [tenant, brand, region, venue, department, subDepartment, workstation, outlet]
+      enum: [tenant, brand, region, venue, department, subDepartment, workstation, outlet, subject]
 
     ScopeRef:
       type: object
@@ -190,7 +190,7 @@ components:
         **The path is materialised**, so a client can test containment with a prefix match rather
         than walking parents. That is what lets navigation filter locally: a client checks its
         scopes against a screen's requirement without a round trip, and
-        `platform.scope_node` — reached by 304 of 379 tables — never has to be queried to answer it.
+        `platform.org_unit` — reached by 304 of 379 tables — never has to be queried to answer it.
       required: [id, level, path]
       properties:
         id:

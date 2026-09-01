@@ -325,7 +325,7 @@ screens:
   requiresModule: queue
   statesDerived: true
   boardFrames:
-  - seat-2c
+  - Seat Board 2.dc.html#seat-2c
   notes: '**Drawn 26 August** — `Seat Board 2.dc.html` frame `seat-2c`. **The frame names this screen
     on its own face**, which is the first pack to do that: the earlier F&B, POS and Retail boards had
     to be hand-assigned by purpose after three derivation attempts produced nonsense. **A board that
@@ -576,7 +576,7 @@ screens:
       - kind: metricTile
         notes: Waiting, called, expired, average wait
       - kind: dataTable
-        bindsTo: QueueEntry[]
+        bindsTo: WaitingGuest[]
       - kind: chart
         notes: Wait over the day. Stale where the feed has gone quiet
     - name: actionBar
@@ -840,11 +840,6 @@ screens:
         impliedBy: createProduct
         label: Create product
         notes: The act the screen exists for.
-      - kind: secondaryButton
-        label: Cancel
-        notes: '**A screen that can submit must be leaveable without submitting.**'
-        derived: true
-        impliedBy: createProduct
   states:
     loading: List skeleton; the count renders first
     emptyFirstRun: Nothing matches. Distinguishes an empty filter from an empty dataset
@@ -959,9 +954,9 @@ screens:
   provenance: client board, specified
   requiresModule: ticketing
   boardFrames:
-  - FNB-2C
-  - RET-2A
-  - RET-2B
+  - FnB Board 2.dc.html#fnb-2c
+  - Retail Board 2.dc.html#ret-2a
+  - Retail Board 2.dc.html#ret-2b
   statesDerived: true
 - id: BO-008
   name: Product Detail & Variants
@@ -986,11 +981,6 @@ screens:
         impliedBy: setProductAttributes
         label: Save product attributes
         notes: The act the screen exists for.
-      - kind: secondaryButton
-        label: Cancel
-        notes: '**A screen that can submit must be leaveable without submitting.**'
-        derived: true
-        impliedBy: setProductAttributes
   states:
     loading: List skeleton; the count renders first
     emptyFirstRun: Nothing matches. Distinguishes an empty filter from an empty dataset
@@ -1062,8 +1052,8 @@ screens:
       retired.
   requiresModule: ticketing
   boardFrames:
-  - FNB-2D
-  - RET-2C
+  - FnB Board 2.dc.html#fnb-2d
+  - Retail Board 2.dc.html#ret-2c
   statesDerived: true
 - id: BO-009
   name: Pricing Rules
@@ -1088,11 +1078,6 @@ screens:
         impliedBy: createPriceList
         label: Create price list
         notes: The act the screen exists for.
-      - kind: secondaryButton
-        label: Cancel
-        notes: '**A screen that can submit must be leaveable without submitting.**'
-        derived: true
-        impliedBy: createPriceList
   states:
     loading: Current values, with the level each resolves from
     emptyFirstRun: Nothing set at this level — the inherited value is shown and labelled as inherited
@@ -1183,7 +1168,7 @@ screens:
   provenance: client board, specified
   requiresModule: ticketing
   boardFrames:
-  - RET-2F
+  - Retail Board 2.dc.html#ret-2f
   statesDerived: true
 - id: BO-010
   name: Promotions & Coupons
@@ -1214,11 +1199,19 @@ screens:
         label: Void coupon code
         notes: '**Always confirms, never the default focus.** The consequence goes in the body — *cancel
           3 orders worth AED 480* is a confirmation, *are you sure* is not.'
-      - kind: secondaryButton
-        label: Cancel
-        notes: '**A screen that can submit must be leaveable without submitting.**'
-        derived: true
-        impliedBy: createCouponCampaign
+      - kind: confirmDialog
+        label: Void this coupon code?
+        notes: '**The consequence goes in the body, not the title.** Written per operation on 1 September,
+          replacing one identical definition that had been pasted onto all 39 screens - the label read
+          *Confirm*, which is the *are you sure* the library entry rules out.
+
+
+          **Name the code, how many times it has been redeemed and how many holders still have it.**
+          Holders are not notified - no event is emitted - so they discover it at the till.
+
+
+          **State:** `Coupon code issued/assigned -> voided`.'
+        bindsTo: voidCouponCode
   states:
     loading: List skeleton; the count renders first
     emptyFirstRun: Nothing matches. Distinguishes an empty filter from an empty dataset
@@ -1368,11 +1361,11 @@ screens:
   provenance: client board, specified
   requiresModule: ticketing
   boardFrames:
-  - POS-4E
-  - RET-5A
-  - RET-5B
-  - RET-5C
-  - RET-5E
+  - POS Board 4.dc.html#pos-4e
+  - Retail Board 5.dc.html#ret-5a
+  - Retail Board 5.dc.html#ret-5b
+  - Retail Board 5.dc.html#ret-5c
+  - Retail Board 5.dc.html#ret-5e
   statesDerived: true
 - id: BO-011
   name: Packages & Bundles
@@ -1397,11 +1390,6 @@ screens:
         impliedBy: publishBundle
         label: Publish bundle
         notes: The act the screen exists for.
-      - kind: secondaryButton
-        label: Cancel
-        notes: '**A screen that can submit must be leaveable without submitting.**'
-        derived: true
-        impliedBy: publishBundle
   states:
     loading: List skeleton; the count renders first
     emptyFirstRun: Nothing matches. Distinguishes an empty filter from an empty dataset
@@ -1480,8 +1468,8 @@ screens:
   provenance: client board, specified
   requiresModule: ticketing
   boardFrames:
-  - FNB-2G
-  - RET-5H
+  - FnB Board 2.dc.html#fnb-2g
+  - Retail Board 5.dc.html#ret-5h
   statesDerived: true
 - id: BO-012
   name: Membership Products
@@ -1506,11 +1494,6 @@ screens:
         impliedBy: createEntitlementTemplate
         label: Create entitlement template
         notes: The act the screen exists for.
-      - kind: secondaryButton
-        label: Cancel
-        notes: '**A screen that can submit must be leaveable without submitting.**'
-        derived: true
-        impliedBy: createEntitlementTemplate
   states:
     loading: List skeleton; the count renders first
     emptyFirstRun: Nothing matches. Distinguishes an empty filter from an empty dataset
@@ -1629,14 +1612,9 @@ screens:
         notes: The act the screen exists for.
       - kind: dataTable
         derived: true
-        impliedBy: listEnvelopes
+        impliedBy: listChannelCapacities
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
-      - kind: secondaryButton
-        label: Cancel
-        notes: '**A screen that can submit must be leaveable without submitting.**'
-        derived: true
-        impliedBy: setChannelAllocations
   states:
     loading: Detail loads
     emptyFirstRun: Not found — it may have been deleted or moved out of scope
@@ -1695,11 +1673,11 @@ screens:
     contract: catalogue
     purpose: Allocate envelope capacity across channels
     trigger: onAction
-  - operationId: createEnvelope
+  - operationId: createChannelCapacity
     contract: catalogue
     purpose: Create a capacity envelope
     trigger: onAction
-  - operationId: listEnvelopes
+  - operationId: listChannelCapacities
     contract: catalogue
     purpose: List capacity envelopes
     trigger: onLoad
@@ -1707,7 +1685,7 @@ screens:
     contract: catalogue
     purpose: Return unsold channel allocation to the general pool
     trigger: onAction
-  - operationId: updateEnvelope
+  - operationId: updateChannelCapacity
     contract: catalogue
     purpose: Amend an envelope
     trigger: onAction
@@ -1730,17 +1708,17 @@ screens:
   density: compact
   entryState:
     params:
-    - name: envelopeId
+    - name: channelCapacityId
       from: deepLink
     coldEntry: '**A staff link opened cold resolves the thing or says plainly that it is gone.** No
       silent redirect — a supervisor following a link from an alert needs to know whether the record
       moved, closed or never existed, because those are three different next actions. **The scope is
       resolved from the session, never from the link**: a link cannot move somebody to a venue they
-      do not hold. Arrives with `envelopeId`.'
+      do not hold. Arrives with `channelCapacityId`.'
   provenance: client board, specified
   requiresModule: ticketing
   boardFrames:
-  - RET-5G
+  - Retail Board 5.dc.html#ret-5g
   statesDerived: true
 - id: BO-014
   name: Catalogue Publishing
@@ -1765,11 +1743,6 @@ screens:
         impliedBy: createProduct
         label: Create product
         notes: The act the screen exists for.
-      - kind: secondaryButton
-        label: Cancel
-        notes: '**A screen that can submit must be leaveable without submitting.**'
-        derived: true
-        impliedBy: createProduct
   states:
     loading: List skeleton; the count renders first
     emptyFirstRun: Nothing matches. Distinguishes an empty filter from an empty dataset
@@ -1885,8 +1858,8 @@ screens:
   provenance: client board, specified
   requiresModule: ticketing
   boardFrames:
-  - FNB-2H
-  - RET-2H
+  - FnB Board 2.dc.html#fnb-2h
+  - Retail Board 2.dc.html#ret-2h
   statesDerived: true
 - id: BO-015
   name: Session Calendar
@@ -1917,11 +1890,21 @@ screens:
         label: Cancel performance
         notes: '**Always confirms, never the default focus.** The consequence goes in the body — *cancel
           3 orders worth AED 480* is a confirmation, *are you sure* is not.'
-      - kind: secondaryButton
-        label: Cancel
-        notes: '**A screen that can submit must be leaveable without submitting.**'
-        derived: true
-        impliedBy: createPerformances
+      - kind: confirmDialog
+        label: Cancel this performance?
+        notes: '**The consequence goes in the body, not the title.** Written per operation on 1 September,
+          replacing one identical definition that had been pasted onto all 39 screens - the label read
+          *Confirm*, which is the *are you sure* the library entry rules out.
+
+
+          **Name the performance, the number of entitlements issued against it and their value.** Cascades
+          to `Entitlement issued -> cancelled`, which is **owned by orders, not catalogue**. Emits `performance.cancelled`
+          to 5 consumers, 2 critical - orders refunds every holder and access voids them at the gate.
+          **The entitlement count sizes the refund run and belongs in the body.**
+
+
+          **State:** `Performance scheduled/onSale/suspended -> cancelled`.'
+        bindsTo: cancelPerformance
   states:
     loading: List skeleton; the count renders first
     emptyFirstRun: Nothing matches. Distinguishes an empty filter from an empty dataset
@@ -2024,7 +2007,7 @@ screens:
   requiresModule: ticketing
   statesDerived: true
   boardFrames:
-  - seat-2a
+  - Seat Board 2.dc.html#seat-2a
 - id: BO-016
   name: Session Template
   module: Sell
@@ -2054,11 +2037,21 @@ screens:
         label: Cancel performance
         notes: '**Always confirms, never the default focus.** The consequence goes in the body — *cancel
           3 orders worth AED 480* is a confirmation, *are you sure* is not.'
-      - kind: secondaryButton
-        label: Cancel
-        notes: '**A screen that can submit must be leaveable without submitting.**'
-        derived: true
-        impliedBy: createPerformances
+      - kind: confirmDialog
+        label: Cancel this performance?
+        notes: '**The consequence goes in the body, not the title.** Written per operation on 1 September,
+          replacing one identical definition that had been pasted onto all 39 screens - the label read
+          *Confirm*, which is the *are you sure* the library entry rules out.
+
+
+          **Name the performance, the number of entitlements issued against it and their value.** Cascades
+          to `Entitlement issued -> cancelled`, which is **owned by orders, not catalogue**. Emits `performance.cancelled`
+          to 5 consumers, 2 critical - orders refunds every holder and access voids them at the gate.
+          **The entitlement count sizes the refund run and belongs in the body.**
+
+
+          **State:** `Performance scheduled/onSale/suspended -> cancelled`.'
+        bindsTo: cancelPerformance
   states:
     loading: Current values, with the level each resolves from
     emptyFirstRun: Nothing set at this level — the inherited value is shown and labelled as inherited
@@ -2163,7 +2156,7 @@ screens:
   requiresModule: ticketing
   statesDerived: true
   boardFrames:
-  - seat-2b
+  - Seat Board 2.dc.html#seat-2b
 - id: BO-017
   name: Capacity Management
   module: Sell
@@ -2179,19 +2172,14 @@ screens:
         notes: Structure from the wireframe board. Components not yet enumerated.
       - kind: dataTable
         derived: true
-        impliedBy: listEnvelopes
+        impliedBy: listChannelCapacities
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
       - kind: primaryButton
         derived: true
-        impliedBy: createEnvelope
+        impliedBy: createChannelCapacity
         label: Create envelope
         notes: The act the screen exists for.
-      - kind: secondaryButton
-        label: Cancel
-        notes: '**A screen that can submit must be leaveable without submitting.**'
-        derived: true
-        impliedBy: createEnvelope
   states:
     loading: Current values, with the level each resolves from
     emptyFirstRun: Nothing set at this level — the inherited value is shown and labelled as inherited
@@ -2235,7 +2223,7 @@ screens:
     at all. States derived from the screen pattern on 17 August, not individually considered — sound
     for a list, a form or a money screen, and worth revisiting where this screen is unusual.
   apis:
-  - operationId: listEnvelopes
+  - operationId: listChannelCapacities
     contract: catalogue
     purpose: List capacity envelopes
     trigger: onLoad
@@ -2243,7 +2231,7 @@ screens:
     contract: catalogue
     purpose: Capacity allocated to each channel
     trigger: onLoad
-  - operationId: createEnvelope
+  - operationId: createChannelCapacity
     contract: catalogue
     purpose: Create a capacity envelope
     trigger: onAction
@@ -2255,20 +2243,20 @@ screens:
     contract: catalogue
     purpose: Allocate envelope capacity across channels
     trigger: onAction
-  - operationId: updateEnvelope
+  - operationId: updateChannelCapacity
     contract: catalogue
     purpose: Amend an envelope
     trigger: onAction
   density: compact
   entryState:
     params:
-    - name: envelopeId
+    - name: channelCapacityId
       from: deepLink
     coldEntry: '**A staff link opened cold resolves the thing or says plainly that it is gone.** No
       silent redirect — a supervisor following a link from an alert needs to know whether the record
       moved, closed or never existed, because those are three different next actions. **The scope is
       resolved from the session, never from the link**: a link cannot move somebody to a venue they
-      do not hold. Arrives with `envelopeId`.'
+      do not hold. Arrives with `channelCapacityId`.'
   requiresModule: ticketing
   statesDerived: true
 - id: BO-018
@@ -2286,24 +2274,32 @@ screens:
         notes: Structure from the wireframe board. Components not yet enumerated.
       - kind: dataTable
         derived: true
-        impliedBy: listLeases
+        impliedBy: listInventoryHolds
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
       - kind: primaryButton
         derived: true
-        impliedBy: acquireLease
+        impliedBy: acquireInventoryHold
         notes: The act the screen exists for.
       - kind: destructiveButton
         derived: true
-        impliedBy: releaseLease
+        impliedBy: releaseInventoryHold
         label: Release lease
         notes: '**Always confirms, never the default focus.** The consequence goes in the body — *cancel
           3 orders worth AED 480* is a confirmation, *are you sure* is not.'
-      - kind: secondaryButton
-        label: Cancel
-        notes: '**A screen that can submit must be leaveable without submitting.**'
-        derived: true
-        impliedBy: acquireLease
+      - kind: confirmDialog
+        label: Release this hold?
+        notes: '**The consequence goes in the body, not the title.** Written per operation on 1 September,
+          replacing one identical definition that had been pasted onto all 39 screens - the label read
+          *Confirm*, which is the *are you sure* the library entry rules out.
+
+
+          **Name what is released and back to whom it goes on sale.** Released stock returns to general
+          availability immediately and cannot be re-held at the same price. No event is emitted.
+
+
+          **State:** `Inventory lease active -> released`.'
+        bindsTo: releaseInventoryHold
   states:
     loading: List skeleton; the count renders first
     emptyFirstRun: Nothing matches. Distinguishes an empty filter from an empty dataset
@@ -2345,36 +2341,36 @@ screens:
     at all. States derived from the screen pattern on 17 August, not individually considered — sound
     for a list, a form or a money screen, and worth revisiting where this screen is unusual.
   apis:
-  - operationId: listLeases
+  - operationId: listInventoryHolds
     contract: catalogue
     purpose: List leases
     trigger: onLoad
-  - operationId: acquireLease
+  - operationId: acquireInventoryHold
     contract: catalogue
     purpose: Acquire an inventory lease
     trigger: onAction
-  - operationId: forceReleaseLease
+  - operationId: forceReleaseInventoryHold
     contract: catalogue
     purpose: Reclaim a stranded lease
     trigger: onAction
-  - operationId: releaseLease
+  - operationId: releaseInventoryHold
     contract: catalogue
     purpose: Return unsold units
     trigger: onAction
-  - operationId: renewLease
+  - operationId: renewInventoryHold
     contract: catalogue
     purpose: Extend a lease TTL
     trigger: onAction
   density: compact
   entryState:
     params:
-    - name: leaseId
+    - name: inventoryHoldId
       from: deepLink
     coldEntry: '**A staff link opened cold resolves the thing or says plainly that it is gone.** No
       silent redirect — a supervisor following a link from an alert needs to know whether the record
       moved, closed or never existed, because those are three different next actions. **The scope is
       resolved from the session, never from the link**: a link cannot move somebody to a venue they
-      do not hold. Arrives with `leaseId`.'
+      do not hold. Arrives with `inventoryHoldId`.'
   requiresModule: ticketing
   statesDerived: true
 - id: BO-019
@@ -2406,11 +2402,21 @@ screens:
         impliedBy: createEvent
         label: Create event
         notes: The act the screen exists for.
-      - kind: secondaryButton
-        label: Cancel
-        notes: '**A screen that can submit must be leaveable without submitting.**'
-        derived: true
-        impliedBy: cancelPerformance
+      - kind: confirmDialog
+        label: Cancel this performance?
+        notes: '**The consequence goes in the body, not the title.** Written per operation on 1 September,
+          replacing one identical definition that had been pasted onto all 39 screens - the label read
+          *Confirm*, which is the *are you sure* the library entry rules out.
+
+
+          **Name the performance, the number of entitlements issued against it and their value.** Cascades
+          to `Entitlement issued -> cancelled`, which is **owned by orders, not catalogue**. Emits `performance.cancelled`
+          to 5 consumers, 2 critical - orders refunds every holder and access voids them at the gate.
+          **The entitlement count sizes the refund run and belongs in the body.**
+
+
+          **State:** `Performance scheduled/onSale/suspended -> cancelled`.'
+        bindsTo: cancelPerformance
   states:
     loading: List skeleton; the count renders first
     emptyFirstRun: Nothing matches. Distinguishes an empty filter from an empty dataset
@@ -2513,7 +2519,7 @@ screens:
   requiresModule: ticketing
   statesDerived: true
   boardFrames:
-  - seat-2d
+  - Seat Board 2.dc.html#seat-2d
 - id: BO-020
   name: F&B Order Management
   module: Food & Beverage
@@ -2607,11 +2613,21 @@ screens:
         derived: true
         impliedBy: getFnbOrder
         notes: One record, read-only.
-      - kind: secondaryButton
-        label: Cancel
-        notes: '**A screen that can submit must be leaveable without submitting.**'
-        derived: true
-        impliedBy: acceptFnbOrder
+      - kind: confirmDialog
+        label: Cancel this F&B order?
+        notes: '**The consequence goes in the body, not the title.** Written per operation on 1 September,
+          replacing one identical definition that had been pasted onto all 39 screens - the label read
+          *Confirm*, which is the *are you sure* the library entry rules out.
+
+
+          **Say whether the kitchen has started.** Cascades to `Kitchen ticket received/preparing ->
+          cancelled`, and **no event is emitted, so the kitchen display never learns** - food already
+          being cooked keeps cooking. Until `fnb.orderCancelled` exists the confirmation must tell the
+          operator to tell the pass.
+
+
+          **State:** `F&B order ordered/accepted -> cancelled`.'
+        bindsTo: cancelFnbOrder
   navigation:
     entryFrom:
     - BO-104
@@ -2680,11 +2696,6 @@ screens:
         derived: true
         impliedBy: getGuestOrderStatus
         notes: One record, read-only.
-      - kind: secondaryButton
-        label: Cancel
-        notes: '**A screen that can submit must be leaveable without submitting.**'
-        derived: true
-        impliedBy: recordOrderHandover
   navigation:
     entryFrom:
     - BO-104
@@ -2703,7 +2714,7 @@ screens:
   notes: Restored 20 August when the P15 build was rolled back.
   requiresModule: fnb
   boardFrames:
-  - RET-3A
+  - Retail Board 3.dc.html#ret-3a
   statesDerived: true
 - id: BO-022
   name: Order Detail
@@ -2734,11 +2745,21 @@ screens:
         label: Void order
         notes: '**Always confirms, never the default focus.** The consequence goes in the body — *cancel
           3 orders worth AED 480* is a confirmation, *are you sure* is not.'
-      - kind: secondaryButton
-        label: Cancel
-        notes: '**A screen that can submit must be leaveable without submitting.**'
-        derived: true
-        impliedBy: createOrder
+      - kind: confirmDialog
+        label: Void this order?
+        notes: '**The consequence goes in the body, not the title.** Written per operation on 1 September,
+          replacing one identical definition that had been pasted onto all 39 screens - the label read
+          *Confirm*, which is the *are you sure* the library entry rules out.
+
+
+          **Name the order, its line count and its value, and what happens to money already taken.**
+          Writes `orders.sales_order`, `orders.order_line` and `orders.payment`. **No event is emitted,
+          so the ledger is not told** - until `order.voided` exists this is a silent write and the confirmation
+          is the only place a person learns it.
+
+
+          **State:** `Order pending -> voided`.'
+        bindsTo: voidOrder
   states:
     loading: List skeleton; the count renders first
     emptyFirstRun: Nothing matches. Distinguishes an empty filter from an empty dataset
@@ -2873,11 +2894,21 @@ screens:
         label: Void order
         notes: '**Always confirms, never the default focus.** The consequence goes in the body — *cancel
           3 orders worth AED 480* is a confirmation, *are you sure* is not.'
-      - kind: secondaryButton
-        label: Cancel
-        notes: '**A screen that can submit must be leaveable without submitting.**'
-        derived: true
-        impliedBy: createRefund
+      - kind: confirmDialog
+        label: Void this order?
+        notes: '**The consequence goes in the body, not the title.** Written per operation on 1 September,
+          replacing one identical definition that had been pasted onto all 39 screens - the label read
+          *Confirm*, which is the *are you sure* the library entry rules out.
+
+
+          **Name the order, its line count and its value, and what happens to money already taken.**
+          Writes `orders.sales_order`, `orders.order_line` and `orders.payment`. **No event is emitted,
+          so the ledger is not told** - until `order.voided` exists this is a silent write and the confirmation
+          is the only place a person learns it.
+
+
+          **State:** `Order pending -> voided`.'
+        bindsTo: voidOrder
   states:
     loading: Figures load; the expected total renders last
     emptyFirstRun: Nothing in the period — reported as a result, not an empty screen
@@ -3012,11 +3043,6 @@ screens:
         impliedBy: createPayment
         label: Create payment
         notes: The act the screen exists for.
-      - kind: secondaryButton
-        label: Cancel
-        notes: '**A screen that can submit must be leaveable without submitting.**'
-        derived: true
-        impliedBy: createPayment
   states:
     loading: Figures load; the expected total renders last
     emptyFirstRun: Nothing in the period — reported as a result, not an empty screen
@@ -3096,7 +3122,7 @@ screens:
       do not hold. Arrives with `paymentId`, `depositId`.'
   requiresModule: ticketing
   boardFrames:
-  - RET-3K
+  - Retail Board 3.dc.html#ret-3k
   statesDerived: true
 - id: BO-025
   name: Chargebacks & Disputes
@@ -3120,11 +3146,6 @@ screens:
         derived: true
         impliedBy: resolveSettlementException
         notes: The act the screen exists for.
-      - kind: secondaryButton
-        label: Cancel
-        notes: '**A screen that can submit must be leaveable without submitting.**'
-        derived: true
-        impliedBy: resolveSettlementException
   states:
     loading: List skeleton; the count renders first
     emptyFirstRun: Nothing matches. Distinguishes an empty filter from an empty dataset
@@ -3221,11 +3242,21 @@ screens:
         label: Void order
         notes: '**Always confirms, never the default focus.** The consequence goes in the body — *cancel
           3 orders worth AED 480* is a confirmation, *are you sure* is not.'
-      - kind: secondaryButton
-        label: Cancel
-        notes: '**A screen that can submit must be leaveable without submitting.**'
-        derived: true
-        impliedBy: createOrder
+      - kind: confirmDialog
+        label: Void this order?
+        notes: '**The consequence goes in the body, not the title.** Written per operation on 1 September,
+          replacing one identical definition that had been pasted onto all 39 screens - the label read
+          *Confirm*, which is the *are you sure* the library entry rules out.
+
+
+          **Name the order, its line count and its value, and what happens to money already taken.**
+          Writes `orders.sales_order`, `orders.order_line` and `orders.payment`. **No event is emitted,
+          so the ledger is not told** - until `order.voided` exists this is a silent write and the confirmation
+          is the only place a person learns it.
+
+
+          **State:** `Order pending -> voided`.'
+        bindsTo: voidOrder
   states:
     loading: List skeleton; the count renders first
     emptyFirstRun: Nothing matches. Distinguishes an empty filter from an empty dataset
@@ -3259,11 +3290,17 @@ screens:
     component: apps/venue-management-web/src/routes/venue-operations/GroupBookingsDetail.tsx
     status: notStarted
   wireframe:
-    status: generated
-    board: wireframes/P08 Venue Management.dc.html#bo-026
-  notes: Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition
+    status: designed
+    board: wireframes/Seat Platform Board 7.dc.html#seatp-7e
+    generatedFallback: wireframes/P08 Venue Management.dc.html#bo-026
+  notes: 'Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition
     at all. States derived from the screen pattern on 17 August, not individually considered — sound
-    for a list, a form or a money screen, and worth revisiting where this screen is unusual.
+    for a list, a form or a money screen, and worth revisiting where this screen is unusual. **Drawn
+    31 August** — `Seat Platform Board 7.dc.html` frame `seatp-7e`. **Matched on frame title against
+    screen name, constrained to this board’s platforms.** These packs label by board position (`GM-6C`)
+    rather than naming the screen, so the title is the only join — *Group Booking* matched at 0.96.
+    **A cross-platform title match was refused**: `Outlet Management` scored 0.85 against a partner-portal
+    screen, which is how a mapping goes wrong quietly.'
   apis:
   - operationId: listOrders
     contract: orders
@@ -3331,6 +3368,8 @@ screens:
       an error.'
   requiresModule: ticketing
   statesDerived: true
+  boardFrames:
+  - Seat Platform Board 7.dc.html#seatp-7e
 - id: BO-027
   name: Reissue & Media Replacement
   module: Orders & Money
@@ -3348,11 +3387,6 @@ screens:
         derived: true
         impliedBy: appendEntitlementToMedia
         notes: The act the screen exists for.
-      - kind: secondaryButton
-        label: Cancel
-        notes: '**A screen that can submit must be leaveable without submitting.**'
-        derived: true
-        impliedBy: appendEntitlementToMedia
   states:
     loading: Detail loads
     emptyFirstRun: Not found — it may have been deleted or moved out of scope
@@ -3440,11 +3474,6 @@ screens:
         impliedBy: createRefundRequest
         label: Create refund request
         notes: The act the screen exists for.
-      - kind: secondaryButton
-        label: Cancel
-        notes: '**A screen that can submit must be leaveable without submitting.**'
-        derived: true
-        impliedBy: createRefundRequest
   states:
     loading: Figures load; the expected total renders last
     emptyFirstRun: Nothing in the period — reported as a result, not an empty screen
@@ -3504,11 +3533,20 @@ screens:
         label: Delete report
         notes: '**Always confirms, never the default focus.** The consequence goes in the body — *cancel
           3 orders worth AED 480* is a confirmation, *are you sure* is not.'
-      - kind: secondaryButton
-        label: Cancel
-        notes: '**A screen that can submit must be leaveable without submitting.**'
-        derived: true
-        impliedBy: createReport
+      - kind: confirmDialog
+        label: Delete this report definition?
+        notes: '**The consequence goes in the body, not the title.** Written per operation on 1 September,
+          replacing one identical definition that had been pasted onto all 39 screens - the label read
+          *Confirm*, which is the *are you sure* the library entry rules out.
+
+
+          **Name the report and every schedule that still points at it.** This is a hard delete with
+          **no state model** - there is no `archived`, so it cannot be undone and scheduled runs will
+          fail.
+
+
+          **`Report definition` has no state model** - nothing declares what the record becomes.'
+        bindsTo: deleteReport
   states:
     loading: List skeleton; the count renders first
     emptyFirstRun: Nothing matches. Distinguishes an empty filter from an empty dataset
@@ -3624,11 +3662,19 @@ screens:
         impliedBy: listWorkOrders
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
-      - kind: secondaryButton
-        label: Cancel
-        notes: '**A screen that can submit must be leaveable without submitting.**'
-        derived: true
-        impliedBy: verifyWorkOrder
+      - kind: confirmDialog
+        label: Cancel this work order?
+        notes: '**The consequence goes in the body, not the title.** Written per operation on 1 September,
+          replacing one identical definition that had been pasted onto all 39 screens - the label read
+          *Confirm*, which is the *are you sure* the library entry rules out.
+
+
+          **Name the work order, the asset and the assigned technician.** A cancelled work order on
+          an out-of-service asset leaves the asset out of service - say so. No event is emitted.
+
+
+          **State:** `Work order open/assigned -> cancelled`.'
+        bindsTo: cancelWorkOrder
   states:
     loading: List skeleton; the count renders first
     emptyFirstRun: Nothing matches. Distinguishes an empty filter from an empty dataset
@@ -3749,11 +3795,6 @@ screens:
         impliedBy: lookupAsset
         label: Search
         notes: A search that returns nothing must say so differently from a search not yet run.
-      - kind: secondaryButton
-        label: Cancel
-        notes: '**A screen that can submit must be leaveable without submitting.**'
-        derived: true
-        impliedBy: updateAsset
   states:
     loading: Current values, with the level each resolves from
     emptyFirstRun: Nothing set at this level — the inherited value is shown and labelled as inherited
@@ -3851,19 +3892,14 @@ screens:
         notes: Structure from the wireframe board. Components not yet enumerated.
       - kind: dataTable
         derived: true
-        impliedBy: listAdmissionProfiles
+        impliedBy: listAdmissionRules
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
       - kind: primaryButton
         derived: true
-        impliedBy: createAdmissionProfile
+        impliedBy: createAdmissionRules
         label: Create admission profile
         notes: The act the screen exists for.
-      - kind: secondaryButton
-        label: Cancel
-        notes: '**A screen that can submit must be leaveable without submitting.**'
-        derived: true
-        impliedBy: createAdmissionProfile
   states:
     loading: Current values, with the level each resolves from
     emptyFirstRun: Nothing set at this level — the inherited value is shown and labelled as inherited
@@ -3895,7 +3931,7 @@ screens:
     inferred: true
   implementation:
     app: venue-management-web
-    route: /venue-operations/admission-profiles
+    route: /venue-operations/admission-rules
     component: apps/venue-management-web/src/routes/venue-operations/AdmissionProfilesDetail.tsx
     status: notStarted
   wireframe:
@@ -3905,15 +3941,15 @@ screens:
     at all. States derived from the screen pattern on 17 August, not individually considered — sound
     for a list, a form or a money screen, and worth revisiting where this screen is unusual.
   apis:
-  - operationId: listAdmissionProfiles
+  - operationId: listAdmissionRules
     contract: access
     purpose: List admission profiles
     trigger: onLoad
-  - operationId: createAdmissionProfile
+  - operationId: createAdmissionRules
     contract: access
     purpose: Create an admission profile
     trigger: onAction
-  - operationId: updateAdmissionProfile
+  - operationId: updateAdmissionRules
     contract: access
     purpose: Update an admission profile
     trigger: onAction
@@ -3957,11 +3993,21 @@ screens:
         impliedBy: removeBlacklistEntry
         notes: '**Always confirms, never the default focus.** The consequence goes in the body — *cancel
           3 orders worth AED 480* is a confirmation, *are you sure* is not.'
-      - kind: secondaryButton
-        label: Cancel
-        notes: '**A screen that can submit must be leaveable without submitting.**'
-        derived: true
-        impliedBy: addBlacklistEntry
+        label: Remove blacklist entry
+      - kind: confirmDialog
+        label: Remove this blacklist entry?
+        notes: '**The consequence goes in the body, not the title.** Written per operation on 1 September,
+          replacing one identical definition that had been pasted onto all 39 screens - the label read
+          *Confirm*, which is the *are you sure* the library entry rules out.
+
+
+          **Name the media code and who barred it, and when.** This un-bars a guest at every gate. It
+          has **no state model and emits no event, so there is no audit trail** - a security act that
+          leaves no record is the finding, and the confirmation cannot substitute for one.
+
+
+          **`Blacklist entry` has no state model** - nothing declares what the record becomes.'
+        bindsTo: removeBlacklistEntry
   states:
     loading: Current values, with the level each resolves from
     emptyFirstRun: Nothing set at this level — the inherited value is shown and labelled as inherited
@@ -4055,11 +4101,6 @@ screens:
         derived: true
         impliedBy: overrideAccess
         notes: The act the screen exists for.
-      - kind: secondaryButton
-        label: Cancel
-        notes: '**A screen that can submit must be leaveable without submitting.**'
-        derived: true
-        impliedBy: syncScans
   states:
     loading: List skeleton; the count renders first
     emptyFirstRun: Nothing matches. Distinguishes an empty filter from an empty dataset
@@ -4163,11 +4204,6 @@ screens:
         impliedBy: listAuditRecords
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
-      - kind: secondaryButton
-        label: Cancel
-        notes: '**A screen that can submit must be leaveable without submitting.**'
-        derived: true
-        impliedBy: overrideAccess
   states:
     loading: List skeleton; the count renders first
     emptyFirstRun: Nothing matches. Distinguishes an empty filter from an empty dataset
@@ -4269,11 +4305,6 @@ screens:
         impliedBy: searchGuests
         label: Search
         notes: A search that returns nothing must say so differently from a search not yet run.
-      - kind: secondaryButton
-        label: Cancel
-        notes: '**A screen that can submit must be leaveable without submitting.**'
-        derived: true
-        impliedBy: registerDevice
   states:
     loading: List skeleton; the count renders first
     emptyFirstRun: Nothing matches. Distinguishes an empty filter from an empty dataset
@@ -4423,9 +4454,9 @@ screens:
   provenance: client board, specified
   requiresModule: marketing
   boardFrames:
-  - POS-1A
-  - POS-1B
-  - POS-1C
+  - POS Board 1.dc.html#pos-1a
+  - POS Board 1.dc.html#pos-1b
+  - POS Board 1.dc.html#pos-1c
   statesDerived: true
 - id: BO-037
   name: Offline Package Status
@@ -4450,11 +4481,6 @@ screens:
         impliedBy: publishBundle
         label: Publish bundle
         notes: The act the screen exists for.
-      - kind: secondaryButton
-        label: Cancel
-        notes: '**A screen that can submit must be leaveable without submitting.**'
-        derived: true
-        impliedBy: publishBundle
   states:
     loading: List skeleton; the count renders first
     emptyFirstRun: Nothing matches. Distinguishes an empty filter from an empty dataset
@@ -4553,9 +4579,9 @@ screens:
   provenance: client board, specified
   requiresModule: ticketing
   boardFrames:
-  - POS-5A
-  - POS-5C
-  - RET-3J
+  - POS Board 5.dc.html#pos-5a
+  - POS Board 5.dc.html#pos-5c
+  - Retail Board 3.dc.html#ret-3j
   statesDerived: true
 - id: BO-038
   name: Reconciliation Queue
@@ -4580,11 +4606,6 @@ screens:
         impliedBy: createQueue
         label: Create queue
         notes: The act the screen exists for.
-      - kind: secondaryButton
-        label: Cancel
-        notes: '**A screen that can submit must be leaveable without submitting.**'
-        derived: true
-        impliedBy: createQueue
   states:
     loading: Figures load; the expected total renders last
     emptyFirstRun: Nothing in the period — reported as a result, not an empty screen
@@ -4695,11 +4716,6 @@ screens:
         derived: true
         impliedBy: openShift
         notes: The act the screen exists for.
-      - kind: secondaryButton
-        label: Cancel
-        notes: '**A screen that can submit must be leaveable without submitting.**'
-        derived: true
-        impliedBy: openShift
   states:
     loading: List skeleton; the count renders first
     emptyFirstRun: Nothing matches. Distinguishes an empty filter from an empty dataset
@@ -4818,11 +4834,6 @@ screens:
         impliedBy: acceptShiftVariance
         label: Accept shift variance
         notes: The act the screen exists for.
-      - kind: secondaryButton
-        label: Cancel
-        notes: '**A screen that can submit must be leaveable without submitting.**'
-        derived: true
-        impliedBy: acceptShiftVariance
   states:
     loading: Figures load; the expected total renders last
     emptyFirstRun: Nothing in the period — reported as a result, not an empty screen
@@ -4944,11 +4955,6 @@ screens:
         impliedBy: createCashMovement
         label: Create cash movement
         notes: The act the screen exists for.
-      - kind: secondaryButton
-        label: Cancel
-        notes: '**A screen that can submit must be leaveable without submitting.**'
-        derived: true
-        impliedBy: createCashMovement
   states:
     loading: Figures load; the expected total renders last
     emptyFirstRun: Nothing in the period — reported as a result, not an empty screen
@@ -5068,11 +5074,6 @@ screens:
         impliedBy: acceptShiftVariance
         label: Accept shift variance
         notes: The act the screen exists for.
-      - kind: secondaryButton
-        label: Cancel
-        notes: '**A screen that can submit must be leaveable without submitting.**'
-        derived: true
-        impliedBy: acceptShiftVariance
   states:
     loading: Figures load; the expected total renders last
     emptyFirstRun: Nothing in the period — reported as a result, not an empty screen
@@ -5191,11 +5192,6 @@ screens:
         derived: true
         impliedBy: ingestSettlementFile
         notes: The act the screen exists for.
-      - kind: secondaryButton
-        label: Cancel
-        notes: '**A screen that can submit must be leaveable without submitting.**'
-        derived: true
-        impliedBy: ingestSettlementFile
   states:
     loading: Figures load; the expected total renders last
     emptyFirstRun: Nothing in the period — reported as a result, not an empty screen
@@ -5295,11 +5291,6 @@ screens:
         impliedBy: createOutlet
         label: Create outlet
         notes: The act the screen exists for.
-      - kind: secondaryButton
-        label: Cancel
-        notes: '**A screen that can submit must be leaveable without submitting.**'
-        derived: true
-        impliedBy: createOutlet
   states:
     loading: List skeleton; the count renders first
     emptyFirstRun: Nothing matches. Distinguishes an empty filter from an empty dataset
@@ -5434,24 +5425,24 @@ screens:
   provenance: client board, specified
   requiresModule: fnb
   boardFrames:
-  - FNB-1B
-  - FNB-1C
-  - FNB-1D
-  - FNB-1E
-  - FNB-1F
-  - FNB-1G
-  - FNB-1H
-  - FNB-1J
-  - FNB-1K
-  - RET-1B
-  - RET-1C
-  - RET-1D
-  - RET-1E
-  - RET-1F
-  - RET-1G
-  - RET-1H
-  - RET-1J
-  - RET-1K
+  - FnB Board 1.dc.html#fnb-1b
+  - FnB Board 1.dc.html#fnb-1c
+  - FnB Board 1.dc.html#fnb-1d
+  - FnB Board 1.dc.html#fnb-1e
+  - FnB Board 1.dc.html#fnb-1f
+  - FnB Board 1.dc.html#fnb-1g
+  - FnB Board 1.dc.html#fnb-1h
+  - FnB Board 1.dc.html#fnb-1j
+  - FnB Board 1.dc.html#fnb-1k
+  - Retail Board 1.dc.html#ret-1b
+  - Retail Board 1.dc.html#ret-1c
+  - Retail Board 1.dc.html#ret-1d
+  - Retail Board 1.dc.html#ret-1e
+  - Retail Board 1.dc.html#ret-1f
+  - Retail Board 1.dc.html#ret-1g
+  - Retail Board 1.dc.html#ret-1h
+  - Retail Board 1.dc.html#ret-1j
+  - Retail Board 1.dc.html#ret-1k
   statesDerived: true
 - id: BO-045
   name: Menu Management
@@ -5536,11 +5527,6 @@ screens:
         impliedBy: createMenu
         label: Create menu
         notes: The act the screen exists for.
-      - kind: secondaryButton
-        label: Cancel
-        notes: '**A screen that can submit must be leaveable without submitting.**'
-        derived: true
-        impliedBy: createMenu
   navigation:
     entryFrom:
     - BO-104
@@ -5561,11 +5547,11 @@ screens:
     reached 49% of screens.
   requiresModule: fnb
   boardFrames:
-  - FNB-2A
-  - FNB-2B
-  - FNB-2E
-  - FNB-2J
-  - FNB-2K
+  - FnB Board 2.dc.html#fnb-2a
+  - FnB Board 2.dc.html#fnb-2b
+  - FnB Board 2.dc.html#fnb-2e
+  - FnB Board 2.dc.html#fnb-2j
+  - FnB Board 2.dc.html#fnb-2k
   statesDerived: true
 - id: BO-046
   name: Kitchen Display
@@ -5623,11 +5609,6 @@ screens:
         impliedBy: setKitchenTicketStatus
         label: Save kitchen ticket status
         notes: The act the screen exists for.
-      - kind: secondaryButton
-        label: Cancel
-        notes: '**A screen that can submit must be leaveable without submitting.**'
-        derived: true
-        impliedBy: setKitchenTicketStatus
   navigation:
     entryFrom:
     - BO-104
@@ -5676,11 +5657,21 @@ screens:
         label: Void order
         notes: '**Always confirms, never the default focus.** The consequence goes in the body — *cancel
           3 orders worth AED 480* is a confirmation, *are you sure* is not.'
-      - kind: secondaryButton
-        label: Cancel
-        notes: '**A screen that can submit must be leaveable without submitting.**'
-        derived: true
-        impliedBy: createOrder
+      - kind: confirmDialog
+        label: Void this order?
+        notes: '**The consequence goes in the body, not the title.** Written per operation on 1 September,
+          replacing one identical definition that had been pasted onto all 39 screens - the label read
+          *Confirm*, which is the *are you sure* the library entry rules out.
+
+
+          **Name the order, its line count and its value, and what happens to money already taken.**
+          Writes `orders.sales_order`, `orders.order_line` and `orders.payment`. **No event is emitted,
+          so the ledger is not told** - until `order.voided` exists this is a silent write and the confirmation
+          is the only place a person learns it.
+
+
+          **State:** `Order pending -> voided`.'
+        bindsTo: voidOrder
   states:
     loading: Current values, with the level each resolves from
     emptyFirstRun: Nothing set at this level — the inherited value is shown and labelled as inherited
@@ -5816,11 +5807,6 @@ screens:
         impliedBy: createMerchandise
         label: Create merchandise
         notes: The act the screen exists for.
-      - kind: secondaryButton
-        label: Cancel
-        notes: '**A screen that can submit must be leaveable without submitting.**'
-        derived: true
-        impliedBy: createMerchandise
   states:
     loading: List skeleton; the count renders first
     emptyFirstRun: Nothing matches. Distinguishes an empty filter from an empty dataset
@@ -5915,11 +5901,6 @@ screens:
         impliedBy: listStockLocations
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
-      - kind: secondaryButton
-        label: Cancel
-        notes: '**A screen that can submit must be leaveable without submitting.**'
-        derived: true
-        impliedBy: setItemAvailability
   states:
     loading: Detail loads
     emptyFirstRun: Not found — it may have been deleted or moved out of scope
@@ -6004,10 +5985,10 @@ screens:
     coldEntry: An item opened from the catalogue.
   requiresModule: inventory
   boardFrames:
-  - FNB-5A
-  - FNB-5B
-  - RET-4A
-  - RET-4H
+  - FnB Board 5.dc.html#fnb-5a
+  - FnB Board 5.dc.html#fnb-5b
+  - Retail Board 4.dc.html#ret-4a
+  - Retail Board 4.dc.html#ret-4h
   statesDerived: true
 - id: BO-050
   name: Stock Position & Valuation
@@ -6102,11 +6083,21 @@ screens:
         label: Void order
         notes: '**Always confirms, never the default focus.** The consequence goes in the body — *cancel
           3 orders worth AED 480* is a confirmation, *are you sure* is not.'
-      - kind: secondaryButton
-        label: Cancel
-        notes: '**A screen that can submit must be leaveable without submitting.**'
-        derived: true
-        impliedBy: createOrder
+      - kind: confirmDialog
+        label: Void this order?
+        notes: '**The consequence goes in the body, not the title.** Written per operation on 1 September,
+          replacing one identical definition that had been pasted onto all 39 screens - the label read
+          *Confirm*, which is the *are you sure* the library entry rules out.
+
+
+          **Name the order, its line count and its value, and what happens to money already taken.**
+          Writes `orders.sales_order`, `orders.order_line` and `orders.payment`. **No event is emitted,
+          so the ledger is not told** - until `order.voided` exists this is a silent write and the confirmation
+          is the only place a person learns it.
+
+
+          **State:** `Order pending -> voided`.'
+        bindsTo: voidOrder
   states:
     loading: List skeleton; the count renders first
     emptyFirstRun: Nothing matches. Distinguishes an empty filter from an empty dataset
@@ -6239,11 +6230,19 @@ screens:
         label: Cancel purchase order
         notes: '**Always confirms, never the default focus.** The consequence goes in the body — *cancel
           3 orders worth AED 480* is a confirmation, *are you sure* is not.'
-      - kind: secondaryButton
-        label: Cancel
-        notes: '**A screen that can submit must be leaveable without submitting.**'
-        derived: true
-        impliedBy: createGoodsReceipt
+      - kind: confirmDialog
+        label: Cancel this purchase order?
+        notes: '**The consequence goes in the body, not the title.** Written per operation on 1 September,
+          replacing one identical definition that had been pasted onto all 39 screens - the label read
+          *Confirm*, which is the *are you sure* the library entry rules out.
+
+
+          **Name the supplier, the PO value and whether it has been sent.** A sent PO cancelled here
+          is not cancelled at the supplier - say who still has to be told. No event is emitted.
+
+
+          **State:** `Purchase order raised/sent -> cancelled`.'
+        bindsTo: cancelPurchaseOrder
   states:
     loading: List skeleton; the count renders first
     emptyFirstRun: Nothing matches. Distinguishes an empty filter from an empty dataset
@@ -6359,7 +6358,7 @@ screens:
       do not hold. Arrives with `purchaseOrderId`, `receiptId`, `transferId`.'
   requiresModule: inventory
   boardFrames:
-  - RET-4E
+  - Retail Board 4.dc.html#ret-4e
   statesDerived: true
 - id: BO-053
   name: Staff Directory
@@ -6384,11 +6383,6 @@ screens:
         impliedBy: createPrincipal
         label: Create principal
         notes: The act the screen exists for.
-      - kind: secondaryButton
-        label: Cancel
-        notes: '**A screen that can submit must be leaveable without submitting.**'
-        derived: true
-        impliedBy: createPrincipal
   states:
     loading: List skeleton; the count renders first
     emptyFirstRun: Nothing matches. Distinguishes an empty filter from an empty dataset
@@ -6417,11 +6411,14 @@ screens:
     component: apps/venue-management-web/src/routes/venue-operations/StaffDirectoryDetail.tsx
     status: notStarted
   wireframe:
-    status: generated
-    board: wireframes/P08 Venue Management.dc.html#bo-053
+    status: designed
+    board: wireframes/Marketing Board 1.dc.html#crm-1b
+    generatedFallback: wireframes/P08 Venue Management.dc.html#bo-053
   notes: Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition
     at all. States derived from the screen pattern on 17 August, not individually considered — sound
-    for a list, a form or a money screen, and worth revisiting where this screen is unusual.
+    for a list, a form or a money screen, and worth revisiting where this screen is unusual. **Drawn
+    31 August** — `Marketing Board 1.dc.html` frame `crm-1b` (*Guest Directory*), matched on title at
+    0.80 within this board’s platforms.
   apis:
   - operationId: listPrincipals
     contract: identity
@@ -6447,6 +6444,8 @@ screens:
     coldEntry: Resolves from the session; a cold arrival is the ordinary case.
   requiresModule: core
   statesDerived: true
+  boardFrames:
+  - Marketing Board 1.dc.html#crm-1b
 - id: BO-054
   name: Role Assignment
   module: People & Access Rights
@@ -6470,11 +6469,6 @@ screens:
         impliedBy: createRole
         label: Create role
         notes: The act the screen exists for.
-      - kind: secondaryButton
-        label: Cancel
-        notes: '**A screen that can submit must be leaveable without submitting.**'
-        derived: true
-        impliedBy: createRole
   states:
     loading: List skeleton; the count renders first
     emptyFirstRun: Nothing matches. Distinguishes an empty filter from an empty dataset
@@ -6543,11 +6537,6 @@ screens:
         impliedBy: createRotaAssignment
         label: Create rota assignment
         notes: The act the screen exists for.
-      - kind: secondaryButton
-        label: Cancel
-        notes: '**A screen that can submit must be leaveable without submitting.**'
-        derived: true
-        impliedBy: createRotaAssignment
   states:
     loading: List skeleton; the count renders first
     emptyFirstRun: Nothing matches. Distinguishes an empty filter from an empty dataset
@@ -6633,11 +6622,6 @@ screens:
         derived: true
         impliedBy: amendAttendance
         notes: The act the screen exists for.
-      - kind: secondaryButton
-        label: Cancel
-        notes: '**A screen that can submit must be leaveable without submitting.**'
-        derived: true
-        impliedBy: amendAttendance
   states:
     loading: List skeleton; the count renders first
     emptyFirstRun: Nothing matches. Distinguishes an empty filter from an empty dataset
@@ -6784,11 +6768,20 @@ screens:
         label: Delete report
         notes: '**Always confirms, never the default focus.** The consequence goes in the body — *cancel
           3 orders worth AED 480* is a confirmation, *are you sure* is not.'
-      - kind: secondaryButton
-        label: Cancel
-        notes: '**A screen that can submit must be leaveable without submitting.**'
-        derived: true
-        impliedBy: runReport
+      - kind: confirmDialog
+        label: Delete this report definition?
+        notes: '**The consequence goes in the body, not the title.** Written per operation on 1 September,
+          replacing one identical definition that had been pasted onto all 39 screens - the label read
+          *Confirm*, which is the *are you sure* the library entry rules out.
+
+
+          **Name the report and every schedule that still points at it.** This is a hard delete with
+          **no state model** - there is no `archived`, so it cannot be undone and scheduled runs will
+          fail.
+
+
+          **`Report definition` has no state model** - nothing declares what the record becomes.'
+        bindsTo: deleteReport
   states:
     loading: List skeleton; the count renders first
     emptyFirstRun: Nothing matches. Distinguishes an empty filter from an empty dataset
@@ -6892,7 +6885,7 @@ screens:
       and by whom.
   requiresModule: analytics
   boardFrames:
-  - RET-6H
+  - Retail Board 6.dc.html#ret-6h
   statesDerived: true
 - id: BO-059
   name: Sales Reports
@@ -6923,11 +6916,20 @@ screens:
         label: Delete report
         notes: '**Always confirms, never the default focus.** The consequence goes in the body — *cancel
           3 orders worth AED 480* is a confirmation, *are you sure* is not.'
-      - kind: secondaryButton
-        label: Cancel
-        notes: '**A screen that can submit must be leaveable without submitting.**'
-        derived: true
-        impliedBy: createReport
+      - kind: confirmDialog
+        label: Delete this report definition?
+        notes: '**The consequence goes in the body, not the title.** Written per operation on 1 September,
+          replacing one identical definition that had been pasted onto all 39 screens - the label read
+          *Confirm*, which is the *are you sure* the library entry rules out.
+
+
+          **Name the report and every schedule that still points at it.** This is a hard delete with
+          **no state model** - there is no `archived`, so it cannot be undone and scheduled runs will
+          fail.
+
+
+          **`Report definition` has no state model** - nothing declares what the record becomes.'
+        bindsTo: deleteReport
   states:
     loading: List skeleton; the count renders first
     emptyFirstRun: Nothing matches. Distinguishes an empty filter from an empty dataset
@@ -7053,11 +7055,20 @@ screens:
         impliedBy: lookupTicket
         label: Search
         notes: A search that returns nothing must say so differently from a search not yet run.
-      - kind: secondaryButton
-        label: Cancel
-        notes: '**A screen that can submit must be leaveable without submitting.**'
-        derived: true
-        impliedBy: runReport
+      - kind: confirmDialog
+        label: Delete this report definition?
+        notes: '**The consequence goes in the body, not the title.** Written per operation on 1 September,
+          replacing one identical definition that had been pasted onto all 39 screens - the label read
+          *Confirm*, which is the *are you sure* the library entry rules out.
+
+
+          **Name the report and every schedule that still points at it.** This is a hard delete with
+          **no state model** - there is no `archived`, so it cannot be undone and scheduled runs will
+          fail.
+
+
+          **`Report definition` has no state model** - nothing declares what the record becomes.'
+        bindsTo: deleteReport
   states:
     loading: List skeleton; the count renders first
     emptyFirstRun: Nothing matches. Distinguishes an empty filter from an empty dataset
@@ -7203,11 +7214,20 @@ screens:
         label: Delete report
         notes: '**Always confirms, never the default focus.** The consequence goes in the body — *cancel
           3 orders worth AED 480* is a confirmation, *are you sure* is not.'
-      - kind: secondaryButton
-        label: Cancel
-        notes: '**A screen that can submit must be leaveable without submitting.**'
-        derived: true
-        impliedBy: createReport
+      - kind: confirmDialog
+        label: Delete this report definition?
+        notes: '**The consequence goes in the body, not the title.** Written per operation on 1 September,
+          replacing one identical definition that had been pasted onto all 39 screens - the label read
+          *Confirm*, which is the *are you sure* the library entry rules out.
+
+
+          **Name the report and every schedule that still points at it.** This is a hard delete with
+          **no state model** - there is no `archived`, so it cannot be undone and scheduled runs will
+          fail.
+
+
+          **`Report definition` has no state model** - nothing declares what the record becomes.'
+        bindsTo: deleteReport
   states:
     loading: List skeleton; the count renders first
     emptyFirstRun: Nothing matches. Distinguishes an empty filter from an empty dataset
@@ -7317,11 +7337,6 @@ screens:
         impliedBy: setRefundPolicy
         label: Save refund policy
         notes: The act the screen exists for.
-      - kind: secondaryButton
-        label: Cancel
-        notes: '**A screen that can submit must be leaveable without submitting.**'
-        derived: true
-        impliedBy: setRefundPolicy
   states:
     loading: Current values, with the level each resolves from
     emptyFirstRun: Nothing set at this level — the inherited value is shown and labelled as inherited
@@ -7416,11 +7431,21 @@ screens:
         label: Cancel performance
         notes: '**Always confirms, never the default focus.** The consequence goes in the body — *cancel
           3 orders worth AED 480* is a confirmation, *are you sure* is not.'
-      - kind: secondaryButton
-        label: Cancel
-        notes: '**A screen that can submit must be leaveable without submitting.**'
-        derived: true
-        impliedBy: createPerformances
+      - kind: confirmDialog
+        label: Cancel this performance?
+        notes: '**The consequence goes in the body, not the title.** Written per operation on 1 September,
+          replacing one identical definition that had been pasted onto all 39 screens - the label read
+          *Confirm*, which is the *are you sure* the library entry rules out.
+
+
+          **Name the performance, the number of entitlements issued against it and their value.** Cascades
+          to `Entitlement issued -> cancelled`, which is **owned by orders, not catalogue**. Emits `performance.cancelled`
+          to 5 consumers, 2 critical - orders refunds every holder and access voids them at the gate.
+          **The entitlement count sizes the refund run and belongs in the body.**
+
+
+          **State:** `Performance scheduled/onSale/suspended -> cancelled`.'
+        bindsTo: cancelPerformance
   states:
     loading: List skeleton; the count renders first
     emptyFirstRun: Nothing matches. Distinguishes an empty filter from an empty dataset
@@ -7537,7 +7562,7 @@ screens:
   requiresModule: ticketing
   statesDerived: true
   boardFrames:
-  - seat-1c
+  - Seat Board 1.dc.html#seat-1c
 - id: BO-064
   name: Zones & Areas
   module: Venue Operations
@@ -7553,7 +7578,7 @@ screens:
         notes: Structure from the wireframe board. Components not yet enumerated.
       - kind: dataTable
         derived: true
-        impliedBy: listScopeNodes
+        impliedBy: listOrgUnits
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
       - kind: primaryButton
@@ -7561,11 +7586,6 @@ screens:
         impliedBy: createAccessPoint
         label: Create access point
         notes: The act the screen exists for.
-      - kind: secondaryButton
-        label: Cancel
-        notes: '**A screen that can submit must be leaveable without submitting.**'
-        derived: true
-        impliedBy: createAccessPoint
   states:
     loading: List skeleton; the count renders first
     emptyFirstRun: Nothing matches. Distinguishes an empty filter from an empty dataset
@@ -7607,7 +7627,7 @@ screens:
     at all. States derived from the screen pattern on 17 August, not individually considered — sound
     for a list, a form or a money screen, and worth revisiting where this screen is unusual.
   apis:
-  - operationId: listScopeNodes
+  - operationId: listOrgUnits
     contract: tenancy
     purpose: List scope nodes visible to the session
     trigger: onLoad
@@ -7619,7 +7639,7 @@ screens:
     contract: access
     purpose: Create an access point
     trigger: onAction
-  - operationId: createScopeNode
+  - operationId: createOrgUnit
     contract: tenancy
     purpose: Create a scope node
     trigger: onAction
@@ -7627,7 +7647,7 @@ screens:
     contract: access
     purpose: Read an access point
     trigger: onLoad
-  - operationId: getScopeNode
+  - operationId: getOrgUnit
     contract: tenancy
     purpose: Read a scope node
     trigger: onLoad
@@ -7643,7 +7663,7 @@ screens:
     contract: access
     purpose: Update an access point
     trigger: onAction
-  - operationId: updateScopeNode
+  - operationId: updateOrgUnit
     contract: tenancy
     purpose: Rename or deactivate a scope node
     trigger: onAction
@@ -7652,13 +7672,13 @@ screens:
     params:
     - name: accessPointId
       from: deepLink
-    - name: scopeNodeId
+    - name: orgUnitId
       from: deepLink
     coldEntry: '**A staff link opened cold resolves the thing or says plainly that it is gone.** No
       silent redirect — a supervisor following a link from an alert needs to know whether the record
       moved, closed or never existed, because those are three different next actions. **The scope is
       resolved from the session, never from the link**: a link cannot move somebody to a venue they
-      do not hold. Arrives with `accessPointId`, `scopeNodeId`.'
+      do not hold. Arrives with `accessPointId`, `orgUnitId`.'
   requiresModule: access
   statesDerived: true
 - id: BO-065
@@ -7684,11 +7704,6 @@ screens:
         impliedBy: setRefundPolicy
         label: Save refund policy
         notes: The act the screen exists for.
-      - kind: secondaryButton
-        label: Cancel
-        notes: '**A screen that can submit must be leaveable without submitting.**'
-        derived: true
-        impliedBy: setRefundPolicy
   states:
     loading: Current values, with the level each resolves from
     emptyFirstRun: Nothing set at this level — the inherited value is shown and labelled as inherited
@@ -7777,11 +7792,6 @@ screens:
         impliedBy: publishAnnouncement
         label: Publish announcement
         notes: The act the screen exists for.
-      - kind: secondaryButton
-        label: Cancel
-        notes: '**A screen that can submit must be leaveable without submitting.**'
-        derived: true
-        impliedBy: publishAnnouncement
   states:
     loading: Current values, with the level each resolves from
     emptyFirstRun: Nothing set at this level — the inherited value is shown and labelled as inherited
@@ -7879,13 +7889,21 @@ screens:
     component: apps/venue-management-web/src/routes/venue-operations/IntegrationsDetail.tsx
     status: notStarted
   wireframe:
-    status: generated
-    board: wireframes/P08 Venue Management.dc.html#bo-067
-  notes: Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition
+    status: designed
+    board: wireframes/Seat Platform Board 13.dc.html#seatp-13d
+    generatedFallback: wireframes/P08 Venue Management.dc.html#bo-067
+  notes: 'Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition
     at all. States derived from the screen pattern on 17 August, not individually considered — sound
-    for a list, a form or a money screen, and worth revisiting where this screen is unusual.
+    for a list, a form or a money screen, and worth revisiting where this screen is unusual. **Drawn
+    31 August** — `Seat Platform Board 13.dc.html` frame `seatp-13d`. **Matched on frame title against
+    screen name, constrained to this board’s platforms.** These packs label by board position (`GM-6C`)
+    rather than naming the screen, so the title is the only join — *Integrations* matched at 1.0. **A
+    cross-platform title match was refused**: `Outlet Management` scored 0.85 against a partner-portal
+    screen, which is how a mapping goes wrong quietly.'
   density: compact
   requiresModule: core
+  boardFrames:
+  - Seat Platform Board 13.dc.html#seatp-13d
 - id: BO-068
   name: Audit Log
   module: Guests & Marketing
@@ -7908,11 +7926,6 @@ screens:
         derived: true
         impliedBy: resolvePermissions
         notes: The act the screen exists for.
-      - kind: secondaryButton
-        label: Cancel
-        notes: '**A screen that can submit must be leaveable without submitting.**'
-        derived: true
-        impliedBy: resolvePermissions
   states:
     loading: Detail loads
     emptyFirstRun: Not found — it may have been deleted or moved out of scope
@@ -7966,7 +7979,7 @@ screens:
   density: compact
   requiresModule: core
   boardFrames:
-  - RET-6J
+  - Retail Board 6.dc.html#ret-6j
   statesDerived: true
 - id: BO-069
   name: Asset Register
@@ -7996,11 +8009,6 @@ screens:
         impliedBy: lookupAsset
         label: Search
         notes: A search that returns nothing must say so differently from a search not yet run.
-      - kind: secondaryButton
-        label: Cancel
-        notes: '**A screen that can submit must be leaveable without submitting.**'
-        derived: true
-        impliedBy: createAsset
   states:
     loading: List skeleton; the count renders first
     emptyFirstRun: Nothing matches. Distinguishes an empty filter from an empty dataset
@@ -8127,11 +8135,21 @@ screens:
         label: Void order
         notes: '**Always confirms, never the default focus.** The consequence goes in the body — *cancel
           3 orders worth AED 480* is a confirmation, *are you sure* is not.'
-      - kind: secondaryButton
-        label: Cancel
-        notes: '**A screen that can submit must be leaveable without submitting.**'
-        derived: true
-        impliedBy: createOrder
+      - kind: confirmDialog
+        label: Void this order?
+        notes: '**The consequence goes in the body, not the title.** Written per operation on 1 September,
+          replacing one identical definition that had been pasted onto all 39 screens - the label read
+          *Confirm*, which is the *are you sure* the library entry rules out.
+
+
+          **Name the order, its line count and its value, and what happens to money already taken.**
+          Writes `orders.sales_order`, `orders.order_line` and `orders.payment`. **No event is emitted,
+          so the ledger is not told** - until `order.voided` exists this is a silent write and the confirmation
+          is the only place a person learns it.
+
+
+          **State:** `Order pending -> voided`.'
+        bindsTo: voidOrder
   states:
     loading: List skeleton; the count renders first
     emptyFirstRun: Nothing matches. Distinguishes an empty filter from an empty dataset
@@ -8258,11 +8276,6 @@ screens:
         impliedBy: createMaintenancePlan
         label: Create maintenance plan
         notes: The act the screen exists for.
-      - kind: secondaryButton
-        label: Cancel
-        notes: '**A screen that can submit must be leaveable without submitting.**'
-        derived: true
-        impliedBy: createMaintenancePlan
   states:
     loading: Detail loads
     emptyFirstRun: Not found — it may have been deleted or moved out of scope
@@ -8349,11 +8362,6 @@ screens:
         derived: true
         impliedBy: reportIncident
         notes: The act the screen exists for.
-      - kind: secondaryButton
-        label: Cancel
-        notes: '**A screen that can submit must be leaveable without submitting.**'
-        derived: true
-        impliedBy: reportIncident
   states:
     loading: List skeleton; the count renders first
     emptyFirstRun: Nothing matches. Distinguishes an empty filter from an empty dataset
@@ -8447,11 +8455,6 @@ screens:
         derived: true
         impliedBy: matchLostItem
         notes: The act the screen exists for.
-      - kind: secondaryButton
-        label: Cancel
-        notes: '**A screen that can submit must be leaveable without submitting.**'
-        derived: true
-        impliedBy: matchLostItem
   states:
     loading: Detail loads
     emptyFirstRun: Not found — it may have been deleted or moved out of scope
@@ -8946,9 +8949,9 @@ screens:
   provenance: client board, specified
   requiresModule: inventory
   boardFrames:
-  - FNB-5F
-  - RET-4C
-  - RET-4K
+  - FnB Board 5.dc.html#fnb-5f
+  - Retail Board 4.dc.html#ret-4c
+  - Retail Board 4.dc.html#ret-4k
   statesDerived: true
 - id: BO-079
   name: Stock Count
@@ -9055,8 +9058,8 @@ screens:
   provenance: client board, specified
   requiresModule: inventory
   boardFrames:
-  - FNB-5H
-  - RET-4F
+  - FnB Board 5.dc.html#fnb-5h
+  - Retail Board 4.dc.html#ret-4f
   statesDerived: true
 - id: BO-080
   name: Stock Transfers
@@ -9152,7 +9155,7 @@ screens:
   provenance: client board, specified
   requiresModule: inventory
   boardFrames:
-  - RET-4D
+  - Retail Board 4.dc.html#ret-4d
   statesDerived: true
 - id: BO-081
   name: Inventory Items
@@ -9248,7 +9251,7 @@ screens:
       do not hold. Arrives with `itemId`.'
   requiresModule: inventory
   boardFrames:
-  - RET-4B
+  - Retail Board 4.dc.html#ret-4b
   statesDerived: true
 - id: BO-082
   name: Stock Movements
@@ -9326,7 +9329,7 @@ screens:
   density: compact
   requiresModule: inventory
   boardFrames:
-  - RET-4G
+  - Retail Board 4.dc.html#ret-4g
   statesDerived: true
 - id: BO-083
   name: Suppliers
@@ -9414,7 +9417,7 @@ screens:
       do not hold. Arrives with `supplierId`.'
   requiresModule: inventory
   boardFrames:
-  - RET-2G
+  - Retail Board 2.dc.html#ret-2g
   statesDerived: true
 - id: BO-084
   name: Approval Inbox
@@ -9944,11 +9947,6 @@ screens:
         impliedBy: setAiPolicy
         label: Save ai policy
         notes: The act the screen exists for.
-      - kind: secondaryButton
-        label: Cancel
-        notes: '**A screen that can submit must be leaveable without submitting.**'
-        derived: true
-        impliedBy: setAiPolicy
   apis:
   - operationId: getAiPolicy
     contract: ai
@@ -10068,13 +10066,8 @@ screens:
         impliedBy: createVenueMap
         label: Create venue map
         notes: The act the screen exists for.
-      - kind: secondaryButton
-        label: Cancel
-        notes: '**A screen that can submit must be leaveable without submitting.**'
-        derived: true
-        impliedBy: createVenueMap
   boardFrames:
-  - seat-2e
+  - Seat Board 2.dc.html#seat-2e
 - id: BO-093
   name: Map Import & Labelling
   module: Access & Venue
@@ -10154,13 +10147,8 @@ screens:
         impliedBy: importVenueGeometry
         label: Import venue geometry
         notes: The act the screen exists for.
-      - kind: secondaryButton
-        label: Cancel
-        notes: '**A screen that can submit must be leaveable without submitting.**'
-        derived: true
-        impliedBy: importVenueGeometry
   boardFrames:
-  - seat-1a
+  - Seat Board 1.dc.html#seat-1a
 - id: BO-094
   name: Map Editor & Publish
   module: Access & Venue
@@ -10259,13 +10247,8 @@ screens:
         impliedBy: setVenuePoint
         label: Save venue point
         notes: The act the screen exists for.
-      - kind: secondaryButton
-        label: Cancel
-        notes: '**A screen that can submit must be leaveable without submitting.**'
-        derived: true
-        impliedBy: setVenuePoint
   boardFrames:
-  - seat-1b
+  - Seat Board 1.dc.html#seat-1b
 - id: BO-095
   name: Resources
   module: Access & Venue
@@ -11246,13 +11229,20 @@ screens:
     component: apps/venue-management-web/src/routes/sell/MenuBuilderPosLayoutDesignerList.tsx
     status: notStarted
   wireframe:
-    status: generated
-    board: wireframes/P08 Venue Management.dc.html#bo-109
+    status: designed
+    board: wireframes/FnB Board 2.dc.html#fnb-2b
+    generatedFallback: wireframes/P08 Venue Management.dc.html#bo-109
   provenance: client board, specified
   notes: '**Added 20 August from the client design board.** The operations existed and no screen called
-    them.'
+    them. **Drawn 31 August** — `FnB Board 2.dc.html` frame `fnb-2b`. **Matched on frame title against
+    screen name, constrained to this board’s platforms.** These packs label by board position (`GM-6C`)
+    rather than naming the screen, so the title is the only join — *Menu Builder &amp; POS Layout Designer*
+    matched at 1.0. **A cross-platform title match was refused**: `Outlet Management` scored 0.85 against
+    a partner-portal screen, which is how a mapping goes wrong quietly.'
   requiresModule: fnb
   statesDerived: true
+  boardFrames:
+  - FnB Board 2.dc.html#fnb-2b
 - id: BO-110
   name: Recipe & BOM Management
   module: Sell
@@ -11384,7 +11374,7 @@ screens:
     them.'
   requiresModule: fnb
   boardFrames:
-  - FNB-2L
+  - FnB Board 2.dc.html#fnb-2l
   statesDerived: true
 - id: BO-112
   name: Production Planning & Production Sheets
@@ -11442,7 +11432,7 @@ screens:
     them.'
   requiresModule: fnb
   boardFrames:
-  - RET-2E
+  - Retail Board 2.dc.html#ret-2e
   statesDerived: true
 - id: BO-113
   name: Central Kitchen & Commissary Management
@@ -11506,7 +11496,7 @@ screens:
     them.'
   requiresModule: fnb
   boardFrames:
-  - RET-2D
+  - Retail Board 2.dc.html#ret-2d
   statesDerived: true
 - id: BO-114
   name: Variants, Attributes, Barcode & RFID Management
@@ -11569,7 +11559,7 @@ screens:
     is not.'
   requiresModule: inventory
   boardFrames:
-  - RET-4J
+  - Retail Board 4.dc.html#ret-4j
   statesDerived: true
 - id: BO-115
   name: Category, Brand & Merchandise Hierarchy
@@ -11650,7 +11640,7 @@ screens:
     nonsense, and a reader who trusts a bad table is worse off than one who has none.'
   requiresModule: ticketing
   boardFrames:
-  - POS-4A
+  - POS Board 4.dc.html#pos-4a
   statesDerived: true
 - id: BO-116
   name: Merchandising & Product Presentation
@@ -11743,7 +11733,7 @@ screens:
     nonsense, and a reader who trusts a bad table is worse off than one who has none.'
   requiresModule: retail
   boardFrames:
-  - POS-4B
+  - POS Board 4.dc.html#pos-4b
   statesDerived: true
 - id: BO-117
   name: Product Import, Governance & AI Configuration Assistant
@@ -11825,7 +11815,7 @@ screens:
     nonsense, and a reader who trusts a bad table is worse off than one who has none.'
   requiresModule: ticketing
   boardFrames:
-  - POS-4C
+  - POS Board 4.dc.html#pos-4c
   statesDerived: true
 - id: BO-118
   name: Campaign & Audience Management
@@ -11911,7 +11901,7 @@ screens:
     and a reader who trusts a bad table is worse off than one who has none.'
   requiresModule: marketing
   boardFrames:
-  - POS-4D
+  - POS Board 4.dc.html#pos-4d
   statesDerived: true
 - id: BO-119
   name: Cross-Sell, Upsell & Recommendation Rules
@@ -11974,7 +11964,7 @@ screens:
     is not.'
   requiresModule: ticketing
   boardFrames:
-  - RET-5D
+  - Retail Board 5.dc.html#ret-5d
   statesDerived: true
 - id: BO-120
   name: Omnichannel Commerce & Journey Configuration
@@ -12027,14 +12017,21 @@ screens:
     component: apps/venue-management-web/src/routes/sell/OmnichannelCommerceJourneyConfiguratioList.tsx
     status: notStarted
   wireframe:
-    status: generated
-    board: wireframes/P08 Venue Management.dc.html#bo-120
+    status: designed
+    board: wireframes/Retail Board 5.dc.html#ret-5g
+    generatedFallback: wireframes/P08 Venue Management.dc.html#bo-120
   provenance: client board, named only
   notes: '**Added 20 August from the client design board.** The operations existed and no screen called
     them. **Named in the board contents and not written up in it** — the operations are real, the layout
-    is not.'
+    is not. **Drawn 31 August** — `Retail Board 5.dc.html` frame `ret-5g`. **Matched on frame title
+    against screen name, constrained to this board’s platforms.** These packs label by board position
+    (`GM-6C`) rather than naming the screen, so the title is the only join — *Omnichannel Commerce &amp;
+    Journey Configuration* matched at 1.0. **A cross-platform title match was refused**: `Outlet Management`
+    scored 0.85 against a partner-portal screen, which is how a mapping goes wrong quietly.'
   requiresModule: marketing
   statesDerived: true
+  boardFrames:
+  - Retail Board 5.dc.html#ret-5g
 - id: BO-121
   name: Personalized Offers & Guest Engagement
   module: Sell
@@ -12095,7 +12092,7 @@ screens:
     them.'
   requiresModule: marketing
   boardFrames:
-  - RET-5F
+  - Retail Board 5.dc.html#ret-5f
   statesDerived: true
 - id: BO-122
   name: POS Experience Dashboard
@@ -12154,7 +12151,7 @@ screens:
     is not.'
   requiresModule: core
   boardFrames:
-  - RET-5J
+  - Retail Board 5.dc.html#ret-5j
   statesDerived: true
 - id: BO-123
   name: POS Profile Management
@@ -12302,7 +12299,7 @@ screens:
     nonsense, and a reader who trusts a bad table is worse off than one who has none.'
   requiresModule: core
   boardFrames:
-  - POS-1D
+  - POS Board 1.dc.html#pos-1d
   statesDerived: true
 - id: BO-125
   name: Product & Category Button Configuration
@@ -12392,7 +12389,7 @@ screens:
     nonsense, and a reader who trusts a bad table is worse off than one who has none.'
   requiresModule: ticketing
   boardFrames:
-  - POS-1E
+  - POS Board 1.dc.html#pos-1e
   statesDerived: true
 - id: BO-126
   name: Deployment, Preview & Audit
@@ -12487,8 +12484,8 @@ screens:
     nonsense, and a reader who trusts a bad table is worse off than one who has none.'
   requiresModule: core
   boardFrames:
-  - POS-1F
-  - POS-4F
+  - POS Board 1.dc.html#pos-1f
+  - POS Board 4.dc.html#pos-4f
   statesDerived: true
 - id: BO-127
   name: Hardware & Peripherals Management
@@ -12622,7 +12619,7 @@ screens:
     and a reader who trusts a bad table is worse off than one who has none.'
   requiresModule: core
   boardFrames:
-  - POS-5B
+  - POS Board 5.dc.html#pos-5b
   statesDerived: true
 - id: BO-129
   name: Software, Configuration & Version Management
@@ -12708,7 +12705,7 @@ screens:
     and a reader who trusts a bad table is worse off than one who has none.'
   requiresModule: core
   boardFrames:
-  - POS-5D
+  - POS Board 5.dc.html#pos-5d
   statesDerived: true
 - id: BO-130
   name: Offline Policy & Rules Configuration
@@ -12788,7 +12785,7 @@ screens:
     they have the access without the authority.**'
   requiresModule: core
   boardFrames:
-  - POS-5E
+  - POS Board 5.dc.html#pos-5e
   statesDerived: true
 - id: BO-131
   name: Connectivity & Auto-Switch Settings
@@ -12989,7 +12986,7 @@ screens:
     flow rather than let that ship.'
   requiresModule: ticketing
   boardFrames:
-  - POS-5F
+  - POS Board 5.dc.html#pos-5f
   statesDerived: true
 - id: BO-134
   name: Kitchen & Preparation Stations
@@ -13041,14 +13038,21 @@ screens:
     component: apps/venue-management-web/src/routes/ops/KitchenPreparationStationsList.tsx
     status: notStarted
   wireframe:
-    status: generated
-    board: wireframes/P08 Venue Management.dc.html#bo-134
+    status: designed
+    board: wireframes/FnB Board 1.dc.html#fnb-1h
+    generatedFallback: wireframes/P08 Venue Management.dc.html#bo-134
   provenance: client board, named only
   notes: '**Added 20 August from the client design board.** The operations existed and no screen called
     them. **Named in the board contents and not written up in it** — the operations are real, the layout
-    is not.'
+    is not. **Drawn 31 August** — `FnB Board 1.dc.html` frame `fnb-1h`. **Matched on frame title against
+    screen name, constrained to this board’s platforms.** These packs label by board position (`GM-6C`)
+    rather than naming the screen, so the title is the only join — *Kitchen &amp; Preparation Stations*
+    matched at 1.0. **A cross-platform title match was refused**: `Outlet Management` scored 0.85 against
+    a partner-portal screen, which is how a mapping goes wrong quietly.'
   requiresModule: fnb
   statesDerived: true
+  boardFrames:
+  - FnB Board 1.dc.html#fnb-1h
 - id: BO-135
   name: Order Routing & KDS/Printer Rules
   module: Food & Beverage
@@ -13099,14 +13103,21 @@ screens:
     component: apps/venue-management-web/src/routes/ops/OrderRoutingKdsPrinterRulesList.tsx
     status: notStarted
   wireframe:
-    status: generated
-    board: wireframes/P08 Venue Management.dc.html#bo-135
+    status: designed
+    board: wireframes/FnB Board 1.dc.html#fnb-1j
+    generatedFallback: wireframes/P08 Venue Management.dc.html#bo-135
   provenance: client board, named only
   notes: '**Added 20 August from the client design board.** The operations existed and no screen called
     them. **Named in the board contents and not written up in it** — the operations are real, the layout
-    is not.'
+    is not. **Drawn 31 August** — `FnB Board 1.dc.html` frame `fnb-1j`. **Matched on frame title against
+    screen name, constrained to this board’s platforms.** These packs label by board position (`GM-6C`)
+    rather than naming the screen, so the title is the only join — *Order Routing &amp; KDS / Printer
+    Rules* matched at 1.0. **A cross-platform title match was refused**: `Outlet Management` scored
+    0.85 against a partner-portal screen, which is how a mapping goes wrong quietly.'
   requiresModule: fnb
   statesDerived: true
+  boardFrames:
+  - FnB Board 1.dc.html#fnb-1j
 - id: BO-136
   name: F&B Global Settings & Controls
   module: Food & Beverage
@@ -13182,9 +13193,9 @@ screens:
     is not.'
   requiresModule: core
   boardFrames:
-  - FNB-2M
-  - FNB-2N
-  - FNB-5D
+  - FnB Board 2.dc.html#fnb-2m
+  - FnB Board 2.dc.html#fnb-2n
+  - FnB Board 5.dc.html#fnb-5d
   statesDerived: true
 - id: BO-137
   name: Recipe Consumption & Theoretical Inventory
@@ -13258,8 +13269,8 @@ screens:
     them.'
   requiresModule: fnb
   boardFrames:
-  - FNB-2F
-  - FNB-5C
+  - FnB Board 2.dc.html#fnb-2f
+  - FnB Board 5.dc.html#fnb-5c
   statesDerived: true
 - id: BO-138
   name: Production Execution & Batch Management
@@ -13553,14 +13564,21 @@ screens:
     component: apps/venue-management-web/src/routes/ops/StoreRulesControlsPermissionsList.tsx
     status: notStarted
   wireframe:
-    status: generated
-    board: wireframes/P08 Venue Management.dc.html#bo-142
+    status: designed
+    board: wireframes/Retail Board 1.dc.html#ret-1j
+    generatedFallback: wireframes/P08 Venue Management.dc.html#bo-142
   provenance: client board, named only
   notes: '**Added 20 August from the client design board.** The operations existed and no screen called
     them. **Named in the board contents and not written up in it** — the operations are real, the layout
-    is not.'
+    is not. **Drawn 31 August** — `Retail Board 1.dc.html` frame `ret-1j`. **Matched on frame title
+    against screen name, constrained to this board’s platforms.** These packs label by board position
+    (`GM-6C`) rather than naming the screen, so the title is the only join — *Store Rules, Controls
+    &amp; Permissions* matched at 1.0. **A cross-platform title match was refused**: `Outlet Management`
+    scored 0.85 against a partner-portal screen, which is how a mapping goes wrong quietly.'
   requiresModule: core
   statesDerived: true
+  boardFrames:
+  - Retail Board 1.dc.html#ret-1j
 - id: BO-143
   name: Retail Global Settings & Controls
   module: Sell
@@ -13611,11 +13629,18 @@ screens:
     component: apps/venue-management-web/src/routes/ops/RetailGlobalSettingsControlsList.tsx
     status: notStarted
   wireframe:
-    status: generated
-    board: wireframes/P08 Venue Management.dc.html#bo-143
+    status: designed
+    board: wireframes/Retail Board 1.dc.html#ret-1k
+    generatedFallback: wireframes/P08 Venue Management.dc.html#bo-143
   provenance: client board, named only
   notes: '**Added 20 August from the client design board.** The operations existed and no screen called
     them. **Named in the board contents and not written up in it** — the operations are real, the layout
-    is not.'
+    is not. **Drawn 31 August** — `Retail Board 1.dc.html` frame `ret-1k`. **Matched on frame title
+    against screen name, constrained to this board’s platforms.** These packs label by board position
+    (`GM-6C`) rather than naming the screen, so the title is the only join — *Retail Global Settings
+    &amp; Controls* matched at 1.0. **A cross-platform title match was refused**: `Outlet Management`
+    scored 0.85 against a partner-portal screen, which is how a mapping goes wrong quietly.'
   requiresModule: core
   statesDerived: true
+  boardFrames:
+  - Retail Board 1.dc.html#ret-1k

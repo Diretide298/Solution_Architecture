@@ -200,6 +200,10 @@ screens:
     contract: catalogue
     purpose: Find something by name
     trigger: onLoad
+  - operationId: getWaitTimes
+    contract: queue
+    purpose: Wait times across a venue
+    trigger: onLoad
   density: compact
   entryState:
     params:
@@ -212,6 +216,8 @@ screens:
       from.** Arrives with `eventId`.'
   requiresModule: ticketing
   statesDerived: true
+  notes: '**Cross-surface parity, 31 August**: added getWaitTimes. **A guest does not know which surface
+    they are on** — the same named screen on web and app now calls the same guest-callable operations.'
 - id: WEB-003
   name: Search Results
   module: Discovery & Browse
@@ -270,7 +276,7 @@ screens:
   requiresModule: ticketing
   statesDerived: true
 - id: WEB-004
-  name: Event / Attraction Detail
+  name: Attraction Details
   module: Discovery & Browse
   purpose: Decide whether to book this.
   wave: 1
@@ -329,6 +335,14 @@ screens:
     contract: catalogue
     purpose: List performances of an event
     trigger: onLoad
+  - operationId: getAvailability
+    contract: catalogue
+    purpose: Live remaining capacity
+    trigger: onLoad
+  - operationId: getWaitTimes
+    contract: queue
+    purpose: Wait times across a venue
+    trigger: onLoad
   density: compact
   entryState:
     params:
@@ -339,6 +353,11 @@ screens:
     coldEntry: Resolves from the session; a cold arrival is the ordinary case.
   requiresModule: ticketing
   statesDerived: true
+  notes: '**Renamed 31 August** from *Event / Attraction Detail*. **A guest surface is one product with
+    two renderings** — a screen named differently on web and app is two screens to a developer and one
+    journey to a guest. **Cross-surface parity, 31 August**: added getAvailability, getWaitTimes. **A
+    guest does not know which surface they are on** — the same named screen on web and app now calls
+    the same guest-callable operations.'
 - id: WEB-005
   name: Ticket Type Selection
   module: Booking & Selection
@@ -458,9 +477,9 @@ screens:
     - WEB-010
   notes: 'Availability is read live and never cached beyond a few seconds. A guest selecting a session
     that filled while they were reading is a worse outcome than a slightly slower screen. **Wired 24
-    August from review**: acquireLease. **The operations existed and this screen could not call them**
-    — reviewers reported them as missing APIs, which is what an unreachable operation looks like from
-    a wireframe.'
+    August from review**: acquireInventoryHold. **The operations existed and this screen could not call
+    them** — reviewers reported them as missing APIs, which is what an unreachable operation looks like
+    from a wireframe.'
   implementation:
     app: guest-web
     route: /booking-and-selection/date-and-session-selection
@@ -471,7 +490,7 @@ screens:
     contract: catalogue
     purpose: Live remaining capacity
     trigger: onLoad
-  - operationId: acquireLease
+  - operationId: acquireInventoryHold
     contract: catalogue
     purpose: Acquire an inventory lease
     trigger: onAction
@@ -479,7 +498,7 @@ screens:
   requiresModule: ticketing
   statesDerived: true
 - id: WEB-007
-  name: Seat Map Selection
+  name: Interactive Seat Selection
   module: Booking & Selection
   purpose: Choose specific seats.
   wave: 2
@@ -531,7 +550,11 @@ screens:
     **Drawn 26 August** — `Seat Board 3.dc.html` frame `seat-3b`. **The frame names this screen on its
     own face**, which is the first pack to do that: the earlier F&B, POS and Retail boards had to be
     hand-assigned by purpose after three derivation attempts produced nonsense. **A board that says
-    what it draws removes the guess entirely.**'
+    what it draws removes the guess entirely.** **Renamed 31 August** from *Seat Map Selection*. **A
+    guest surface is one product with two renderings** — a screen named differently on web and app is
+    two screens to a developer and one journey to a guest. **Cross-surface parity, 31 August**: added
+    recommendSeats. **A guest does not know which surface they are on** — the same named screen on web
+    and app now calls the same guest-callable operations.'
   implementation:
     app: guest-web
     route: /booking-and-selection/seat-map-selection
@@ -546,6 +569,10 @@ screens:
     contract: seating
     purpose: Seat status for a performance
     trigger: onLoad
+  - operationId: recommendSeats
+    contract: seating
+    purpose: Recommend seats for a party
+    trigger: onAction
   density: compact
   entryState:
     params:
@@ -556,7 +583,7 @@ screens:
   requiresModule: seating
   statesDerived: true
   boardFrames:
-  - seat-3b
+  - Seat Board 3.dc.html#seat-3b
 - id: WEB-008
   name: Add-ons & Upsell
   module: Booking & Selection
@@ -573,11 +600,6 @@ screens:
         impliedBy: addCartLine
         label: Add cart line
         notes: The act the screen exists for.
-      - kind: secondaryButton
-        label: Cancel
-        notes: '**A screen that can submit must be leaveable without submitting.**'
-        derived: true
-        impliedBy: addCartLine
   states:
     loading: Upsells resolve after the cart is priced
     emptyFirstRun: No add-ons for this product — the step is skipped entirely rather than shown empty
@@ -648,11 +670,20 @@ screens:
         impliedBy: removeFromWishlist
         notes: '**Always confirms, never the default focus.** The consequence goes in the body — *cancel
           3 orders worth AED 480* is a confirmation, *are you sure* is not.'
-      - kind: secondaryButton
-        label: Cancel
-        notes: '**A screen that can submit must be leaveable without submitting.**'
-        derived: true
-        impliedBy: addToWishlist
+        label: Remove from wishlist
+      - kind: confirmDialog
+        label: Remove from wishlist?
+        notes: '**The consequence goes in the body, not the title.** Written per operation on 1 September,
+          replacing one identical definition that had been pasted onto all 39 screens - the label read
+          *Confirm*, which is the *are you sure* the library entry rules out.
+
+
+          **Name the item.** Low consequence and reversible by re-adding - prefer an undo toast to a
+          blocking dialog on a guest surface.
+
+
+          **`Wishlist entry` has no state model** - nothing declares what the record becomes.'
+        bindsTo: removeFromWishlist
   states:
     loading: Saved items load
     emptyFirstRun: Nothing saved — explains what the list is for
@@ -959,7 +990,27 @@ screens:
       **Also reached when `ticketing` is not licensed.** The tenant has not bought this module, which
       is a commercial answer and not a permission one — say which, because the person to ask is different.'
     error: Declined, with the reason where it is safe to show, and a retry that reuses the same idempotency
-      key.
+      key. **This is the clean decline only** - the issuer answered and refused. An unanswered terminal
+      is `unknown`, not this.
+    unknown: '**The card may have been charged and the gateway did not say.** `Payment.status pendingConfirmation`
+      - entered by a timer when the gateway stops answering after the authorisation, and left only by
+      `inquirePaymentStatus`, which resolves it to `captured`, `declined` or `failed`.
+
+
+      **Offer the inquiry, never a retry.** A retry here is how a guest is charged twice, and the component
+      library names this the normal failure rather than the exotic one. Voiding the order is refused
+      while this state holds - there is nothing to void until the inquiry answers.
+
+
+      **Transcribed from `states/payment.yaml` on 1 September.** The state model has carried this since
+      the contracts were written; the screen declared only a clean decline.
+
+
+      **A guest cannot be asked to sort this out.** The page holds the order, shows the reference and
+      says someone will confirm - it must not offer Pay again.'
+    inquiryFailed: '**The inquiry itself could not resolve it.** `pendingConfirmation -> failed` - the
+      gateway answered and still cannot say what happened to the money. This escalates to a person:
+      it is not a state the screen can clear, and the guest must leave with a reference, not a receipt.'
   wireframe:
     status: generated
     board: wireframes/P01 Guest Web.dc.html#web-012
@@ -1000,6 +1051,10 @@ screens:
   openQuestions:
   - Sandbox credentials for Stripe and Network International are outstanding. The recovery paths cannot
     be tested without them.
+  - '**`createPayment` is `offline: true` in the lineage and `inquirePaymentStatus` is `offline: false`,
+    and `states/payment.yaml` declares no `offlineReachable`.** A card can therefore be taken offline
+    and not resolved offline, which is the double-charge path. Raised 1 September - this is a contract
+    question, not a screen one.'
   implementation:
     app: guest-web
     route: /cart-and-checkout/checkout-payment
@@ -1016,7 +1071,7 @@ screens:
   requiresModule: ticketing
   statesDerived: true
 - id: WEB-013
-  name: Order Confirmation
+  name: Booking Confirmation
   module: Cart & Checkout
   purpose: Confirm the purchase and deliver the tickets.
   wave: 1
@@ -1084,6 +1139,9 @@ screens:
     coldEntry: Resolves from the session; a cold arrival is the ordinary case.
   requiresModule: ticketing
   statesDerived: true
+  notes: '**Renamed 31 August** from *Order Confirmation*. **A guest surface is one product with two
+    renderings** — a screen named differently on web and app is two screens to a developer and one journey
+    to a guest.'
 - id: WEB-014
   name: Pay for a Booking
   module: Cart & Checkout
@@ -1158,7 +1216,7 @@ screens:
       somebody their booking does not exist when it expired is how a support call starts.'
   requiresModule: ticketing
 - id: WEB-015
-  name: Virtual Waiting Room
+  name: Branded Queue / Waiting Room
   module: High-Demand Access
   purpose: Virtual Waiting Room — the screen a person opens when they need to deal with virtual waiting
     room.
@@ -1173,11 +1231,6 @@ screens:
         derived: true
         impliedBy: joinQueue
         notes: The act the screen exists for.
-      - kind: secondaryButton
-        label: Cancel
-        notes: '**A screen that can submit must be leaveable without submitting.**'
-        derived: true
-        impliedBy: joinQueue
   states:
     loading: Position in the queue, updating
     emptyFirstRun: —
@@ -1202,12 +1255,14 @@ screens:
     exitTo:
     - WEB-001
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
+    **Renamed 31 August** from *Virtual Waiting Room*. **A guest surface is one product with two renderings**
+    — a screen named differently on web and app is two screens to a developer and one journey to a guest.
   apis:
   - operationId: joinQueue
     contract: queue
     purpose: Join a virtual queue
     trigger: onAction
-  - operationId: getQueueEntry
+  - operationId: getWaitingGuest
     contract: queue
     purpose: Read a queue entry
     trigger: onLoad
@@ -1448,7 +1503,7 @@ screens:
       from.** Arrives with `deviceId`, `itemId`.'
   requiresModule: marketing
   boardFrames:
-  - web-017
+  - Dashboards Board.dc.html#web-017
 - id: WEB-018
   name: My Tickets
   module: Account & Self-Service
@@ -1477,12 +1532,15 @@ screens:
     status: generated
     board: wireframes/P01 Guest Web.dc.html#web-018
   capability: C09
-  notes: Dynamic QR with a visible countdown. Anti-screenshot, per the guest boards. Purpose derived
+  notes: 'Dynamic QR with a visible countdown. Anti-screenshot, per the guest boards. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement. The read surface Deep
     asked for. **All four were missing and the table itself did not exist until 18 August.** **Rewired
     on the 20 August review.** **`listEntitlements` wired 24 August, raised in review.** The staff-scoped
     list was on this guest screen — **a guest-facing list must be scoped to the caller, not filtered
-    by a subject parameter**, or a guest is one parameter away from somebody else’s.
+    by a subject parameter**, or a guest is one parameter away from somebody else’s. **Cross-surface
+    parity, 31 August**: added transferOrderTickets. **The same screen on web and app was calling different
+    operations** — one side could do something the other could not, and nothing recorded the difference
+    as deliberate.'
   apis:
   - operationId: listMyEntitlements
     contract: access
@@ -1504,6 +1562,10 @@ screens:
     contract: access
     purpose: Every entitlement this guest holds, including expired
     trigger: onLoad
+  - operationId: transferOrderTickets
+    contract: orders
+    purpose: Transfer tickets to another guest
+    trigger: onAction
   implementation:
     app: guest-web
     route: /account-and-self-service/my-tickets
@@ -1522,6 +1584,8 @@ screens:
   entryState:
     params:
     - name: entitlementId
+      from: deepLink
+    - name: orderId
       from: deepLink
     coldEntry: '**A ticket link opened after the event.** Shows the entitlement with its status — expired,
       used, transferred — because *not found* to somebody holding a ticket is the wrong answer.'
@@ -1558,6 +1622,14 @@ screens:
     contract: orders
     purpose: The orders this guest placed
     trigger: onLoad
+  - operationId: getOrder
+    contract: orders
+    purpose: Read an order
+    trigger: onLoad
+  - operationId: listOrders
+    contract: orders
+    purpose: List orders
+    trigger: onLoad
   implementation:
     app: guest-web
     route: /account-and-self-service/order-history
@@ -1572,10 +1644,12 @@ screens:
     - WEB-016
     - WEB-017
     - WEB-018
-  notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
+  notes: 'Purpose derived from the screen name and its operations on 17 August, not from a requirement.
     **`listMyOrders` wired 24 August, raised in review.** The staff-scoped list was on this guest screen
     — **a guest-facing list must be scoped to the caller, not filtered by a subject parameter**, or
-    a guest is one parameter away from somebody else’s.
+    a guest is one parameter away from somebody else’s. **Cross-surface parity, 31 August**: added getOrder,
+    listOrders. **A guest does not know which surface they are on** — the same named screen on web and
+    app now calls the same guest-callable operations.'
   density: compact
   entryState:
     params:
@@ -1607,11 +1681,6 @@ screens:
         impliedBy: listConsentPurposes
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
-      - kind: secondaryButton
-        label: Cancel
-        notes: '**A screen that can submit must be leaveable without submitting.**'
-        derived: true
-        impliedBy: updateMyProfile
   states:
     loading: Profile and consents
     emptyFirstRun: —
@@ -1887,7 +1956,7 @@ screens:
       an error.'
   requiresModule: ticketing
 - id: WEB-024
-  name: Loyalty & Rewards
+  name: Devices, Wishlist & Consent
   module: Membership, Loyalty & Value
   purpose: See loyalty & rewards for this venue.
   wave: 3
@@ -1912,11 +1981,20 @@ screens:
         impliedBy: removeFromWishlist
         notes: '**Always confirms, never the default focus.** The consequence goes in the body — *cancel
           3 orders worth AED 480* is a confirmation, *are you sure* is not.'
-      - kind: secondaryButton
-        label: Cancel
-        notes: '**A screen that can submit must be leaveable without submitting.**'
-        derived: true
-        impliedBy: addToWishlist
+        label: Remove from wishlist
+      - kind: confirmDialog
+        label: Remove from wishlist?
+        notes: '**The consequence goes in the body, not the title.** Written per operation on 1 September,
+          replacing one identical definition that had been pasted onto all 39 screens - the label read
+          *Confirm*, which is the *are you sure* the library entry rules out.
+
+
+          **Name the item.** Low consequence and reversible by re-adding - prefer an undo toast to a
+          blocking dialog on a guest surface.
+
+
+          **`Wishlist entry` has no state model** - nothing declares what the record becomes.'
+        bindsTo: removeFromWishlist
   states:
     loading: Points and rewards
     emptyFirstRun: No points yet — explains how they accrue
@@ -1973,6 +2051,8 @@ screens:
     - WEB-023
     inferred: true
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
+    **Renamed 31 August** from *Loyalty & Rewards*. **A guest surface is one product with two renderings**
+    — a screen named differently on web and app is two screens to a developer and one journey to a guest.
   density: compact
   entryState:
     params:
@@ -2046,11 +2126,6 @@ screens:
         impliedBy: submitReview
         label: Submit review
         notes: The act the screen exists for.
-      - kind: secondaryButton
-        label: Cancel
-        notes: '**A screen that can submit must be leaveable without submitting.**'
-        derived: true
-        impliedBy: submitReview
   states:
     loading: Survey loads
     emptyFirstRun: —
@@ -2101,16 +2176,6 @@ screens:
         impliedBy: listGuestDevices
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
-      - kind: destructiveButton
-        derived: true
-        impliedBy: removeFromWishlist
-        notes: '**Always confirms, never the default focus.** The consequence goes in the body — *cancel
-          3 orders worth AED 480* is a confirmation, *are you sure* is not.'
-      - kind: secondaryButton
-        label: Cancel
-        notes: '**A screen that can submit must be leaveable without submitting.**'
-        derived: true
-        impliedBy: recordConsent
   states:
     loading: —
     emptyFirstRun: —
@@ -2183,6 +2248,11 @@ screens:
       screen names the thing, says it is expired, cancelled or withdrawn, and offers the list it came
       from.** Arrives with `deviceId`, `itemId`.'
   requiresModule: marketing
+  openQuestions:
+  - '**`removeFromWishlist` and `listGuestDevices` are on this screen''s `apis` and belong to neither
+    newsletter nor consent.** The derived components followed them and produced a *Remove from wishlist*
+    button beside a device table. Raised 1 September - the api list is what needs correcting, not the
+    components.'
 - id: WEB-028
   name: Contact & Venue Information
   module: Engagement & Support
@@ -2282,11 +2352,6 @@ screens:
         derived: true
         impliedBy: transferOrderTickets
         notes: The act the screen exists for.
-      - kind: secondaryButton
-        label: Cancel
-        notes: '**A screen that can submit must be leaveable without submitting.**'
-        derived: true
-        impliedBy: transferOrderTickets
   apis:
   - operationId: transferOrderTickets
     contract: orders
@@ -2364,11 +2429,19 @@ screens:
         label: Cancel reservation
         notes: '**Always confirms, never the default focus.** The consequence goes in the body — *cancel
           3 orders worth AED 480* is a confirmation, *are you sure* is not.'
-      - kind: secondaryButton
-        label: Cancel
-        notes: '**A screen that can submit must be leaveable without submitting.**'
-        derived: true
-        impliedBy: cancelReservation
+      - kind: confirmDialog
+        label: Cancel this reservation?
+        notes: '**The consequence goes in the body, not the title.** Written per operation on 1 September,
+          replacing one identical definition that had been pasted onto all 39 screens - the label read
+          *Confirm*, which is the *are you sure* the library entry rules out.
+
+
+          **Name the party, the time and the resource released.** No event is emitted, so nothing re-offers
+          the slot automatically.
+
+
+          **State:** `Reservation held -> cancelled`.'
+        bindsTo: cancelReservation
   apis:
   - operationId: listReservations
     contract: orders
@@ -2443,11 +2516,6 @@ screens:
         derived: true
         impliedBy: evaluatePromotions
         notes: The act the screen exists for.
-      - kind: secondaryButton
-        label: Cancel
-        notes: '**A screen that can submit must be leaveable without submitting.**'
-        derived: true
-        impliedBy: evaluatePromotions
   apis:
   - operationId: listPromotions
     contract: promotions
@@ -2521,11 +2589,6 @@ screens:
         derived: true
         impliedBy: reserveMerchandise
         notes: The act the screen exists for.
-      - kind: secondaryButton
-        label: Cancel
-        notes: '**A screen that can submit must be leaveable without submitting.**'
-        derived: true
-        impliedBy: reserveMerchandise
   apis:
   - operationId: listMerchandise
     contract: retail
@@ -2601,11 +2664,6 @@ screens:
         derived: true
         impliedBy: raiseMyCase
         notes: The act the screen exists for.
-      - kind: secondaryButton
-        label: Cancel
-        notes: '**A screen that can submit must be leaveable without submitting.**'
-        derived: true
-        impliedBy: raiseMyCase
   apis:
   - operationId: listMyCases
     contract: marketing-crm
@@ -2722,7 +2780,7 @@ screens:
   requiresModule: ticketing
   statesDerived: true
 - id: WEB-036
-  name: F&B — Browse & Order
+  name: F&B – Browse & Order
   module: In-venue Services
   wave: 2
   requiresModule: fnb
@@ -2757,6 +2815,10 @@ screens:
     contract: fnb
     purpose: Where an order can be delivered
     trigger: onLoad
+  - operationId: getGuestOrderStatus
+    contract: fnb
+    purpose: Track an order
+    trigger: onLoad
   states:
     loading: Content resolves in place.
     emptyFirstRun: '**Nothing here yet for this venue.** Names what turns it on rather than showing
@@ -2770,6 +2832,8 @@ screens:
       from: deepLink
     - name: venueId
       from: session
+    - name: orderId
+      from: deepLink
     coldEntry: '**A guest arriving cold on a link that no longer resolves is shown what happened and
       one way onward — never a 404.** A shared link, a scanned code and a forwarded confirmation all
       land here, and the person holding it did nothing wrong. Arrives with `outletId`.'
@@ -2802,7 +2866,11 @@ screens:
   notes: '**A guest scans a QR on a table and lands in a browser.** That is the single most common F&B
     ordering pattern anywhere, and until 24 August it was the one thing this surface could not do —
     `claimTableSession` and `claimLocationSession` were app-only. **Nobody installs an app to order
-    a coffee.**'
+    a coffee.** **Renamed 31 August** from *F&B — Browse & Order*. **A guest surface is one product
+    with two renderings** — a screen named differently on web and app is two screens to a developer
+    and one journey to a guest. **Cross-surface parity, 31 August**: added getGuestOrderStatus. **The
+    same screen on web and app was calling different operations** — one side could do something the
+    other could not, and nothing recorded the difference as deliberate.'
 - id: WEB-037
   name: Menu Item Detail
   module: In-venue Services
@@ -2862,7 +2930,7 @@ screens:
   notes: '**Allergens are read here more often than anywhere else in the platform**, and a guest checking
     one on a phone browser is the ordinary case rather than the exception.'
 - id: WEB-038
-  name: F&B — Order Tracking
+  name: F&B – Order Tracking
   module: In-venue Services
   wave: 2
   requiresModule: fnb
@@ -2926,7 +2994,9 @@ screens:
     board: wireframes/P01 Guest Web.dc.html#web-038
   provenance: parity gap found 24 August — the web could not do what the app could, and a browser can
   notes: '**Order to ready is the kitchen''s number; ready to collected is the counter''s.** A guest
-    watching a status that never changes walks to the counter.'
+    watching a status that never changes walks to the counter. **Renamed 31 August** from *F&B — Order
+    Tracking*. **A guest surface is one product with two renderings** — a screen named differently on
+    web and app is two screens to a developer and one journey to a guest.'
 - id: WEB-039
   name: Venue Map & Wait Times
   module: In-venue Services
@@ -3000,7 +3070,7 @@ screens:
     POS and Retail boards had to be hand-assigned by purpose after three derivation attempts produced
     nonsense. **A board that says what it draws removes the guess entirely.**'
   boardFrames:
-  - seat-3c
+  - Seat Board 3.dc.html#seat-3c
 - id: WEB-040
   name: Virtual Queue
   module: In-venue Services
@@ -3013,7 +3083,7 @@ screens:
     contract: queue
     purpose: Join a virtual queue
     trigger: onAction
-  - operationId: getQueueEntry
+  - operationId: getWaitingGuest
     contract: queue
     purpose: Read a queue entry
     trigger: onLoad
@@ -3068,7 +3138,7 @@ screens:
   notes: '**The point of a virtual queue is that the guest walks away** — which works the same in a
     browser tab as in an app.'
 - id: WEB-041
-  name: Parking — Reserve & Pay
+  name: Parking – Reserve & Pay
   module: In-venue Services
   wave: 2
   requiresModule: access
@@ -3130,7 +3200,9 @@ screens:
     board: wireframes/P01 Guest Web.dc.html#web-041
   provenance: parity gap found 24 August — the web could not do what the app could, and a browser can
   notes: '**A guest reserves parking on the drive, from whatever is open on their phone.** Requiring
-    an install for a car park is requiring an install to arrive.'
+    an install for a car park is requiring an install to arrive. **Renamed 31 August** from *Parking
+    — Reserve & Pay*. **A guest surface is one product with two renderings** — a screen named differently
+    on web and app is two screens to a developer and one journey to a guest.'
 - id: WEB-042
   name: Retail & Shop and Drop
   module: Retail
@@ -3263,7 +3335,7 @@ screens:
   notes: '**P01 Board 3 drew *Membership* with nothing behind it.** `getLoyaltyPosition` and `listLoyaltyProgrammes`
     were app-only — **the surface a guest checks their points on between visits is the web one.**'
 - id: WEB-044
-  name: AI Concierge
+  name: AI Concierge – Home
   module: Engagement & Support
   wave: 2
   requiresModule: ai
@@ -3286,6 +3358,10 @@ screens:
     contract: ai
     purpose: requestSuggestion
     trigger: onAction
+  - operationId: getGuestMenu
+    contract: fnb
+    purpose: The menu a guest sees
+    trigger: onLoad
   states:
     loading: Content resolves in place.
     emptyFirstRun: '**Nothing here yet for this venue.** Names what turns it on rather than showing
@@ -3297,6 +3373,8 @@ screens:
     params:
     - name: conversationId
       from: deepLink
+    - name: outletId
+      from: session
     coldEntry: '**A guest arriving cold on a link that no longer resolves is shown what happened and
       one way onward — never a 404.** A shared link, a scanned code and a forwarded confirmation all
       land here, and the person holding it did nothing wrong. Arrives with `conversationId`.'
@@ -3327,7 +3405,11 @@ screens:
     board: wireframes/P01 Guest Web.dc.html#web-044
   provenance: parity gap found 24 August — the web could not do what the app could, and a browser can
   notes: '**A concierge in a browser is a concierge.** ADR-0020 keeps it read-only against the transactional
-    core regardless of surface.'
+    core regardless of surface. **Renamed 31 August** from *AI Concierge*. **A guest surface is one
+    product with two renderings** — a screen named differently on web and app is two screens to a developer
+    and one journey to a guest. **Cross-surface parity, 31 August**: added getGuestMenu. **A guest does
+    not know which surface they are on** — the same named screen on web and app now calls the same guest-callable
+    operations.'
 - id: WEB-045
   name: Help Centre & Accessibility
   module: Support

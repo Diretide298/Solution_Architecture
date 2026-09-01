@@ -3064,7 +3064,7 @@ paths:
     get:
       operationId: listDiningOutlets
       x-ticvai-consumed-by:
-        - "P01 WEB-036 F&B — Browse & Order"
+        - "P01 WEB-036 F&B – Browse & Order"
         - "P02 GST-024 F&B – Browse & Order"
         - "P02 GST-029 Venue Info & Services"
         - "P06 EMP-030 Venue map"
@@ -3124,8 +3124,9 @@ paths:
     get:
       operationId: getGuestMenu
       x-ticvai-consumed-by:
-        - "P01 WEB-036 F&B — Browse & Order"
+        - "P01 WEB-036 F&B – Browse & Order"
         - "P01 WEB-037 Menu Item Detail"
+        - "P01 WEB-044 AI Concierge – Home"
         - "P02 GST-024 F&B – Browse & Order"
         - "P02 GST-031 AI Concierge – Home"
         - "P02 GST-061 Menu Item Detail"
@@ -3191,7 +3192,7 @@ paths:
     get:
       operationId: listDeliveryLocations
       x-ticvai-consumed-by:
-        - "P01 WEB-036 F&B — Browse & Order"
+        - "P01 WEB-036 F&B – Browse & Order"
         - "P02 GST-024 F&B – Browse & Order"
         - "P02 GST-029 Venue Info & Services"
         - "P06 EMP-030 Venue map"
@@ -3244,7 +3245,7 @@ paths:
     post:
       operationId: claimLocationSession
       x-ticvai-consumed-by:
-        - "P01 WEB-036 F&B — Browse & Order"
+        - "P01 WEB-036 F&B – Browse & Order"
         - "P01 WEB-046 In-Venue Notifications"
         - "P02 GST-024 F&B – Browse & Order"
         - "P02 GST-030 In-Venue Notifications"
@@ -3402,8 +3403,9 @@ paths:
     post:
       operationId: claimTableSession
       x-ticvai-consumed-by:
-        - "P01 WEB-036 F&B — Browse & Order"
-        - "P01 WEB-038 F&B — Order Tracking"
+        - "P01 WEB-036 F&B – Browse & Order"
+        - "P01 WEB-038 F&B – Order Tracking"
+        - "P02 GST-024 F&B – Browse & Order"
         - "P02 GST-025 F&B – Order Tracking"
       x-ticvai-audience:
       - guest
@@ -3464,7 +3466,7 @@ paths:
     post:
       operationId: createGuestFnbOrder
       x-ticvai-consumed-by:
-        - "P01 WEB-036 F&B — Browse & Order"
+        - "P01 WEB-036 F&B – Browse & Order"
         - "P02 GST-024 F&B – Browse & Order"
         - "P02 GST-032 AI Concierge – Chat"
         - "P05 KSK-016 Order Food"
@@ -3532,7 +3534,8 @@ paths:
     get:
       operationId: getGuestOrderStatus
       x-ticvai-consumed-by:
-        - "P01 WEB-038 F&B — Order Tracking"
+        - "P01 WEB-036 F&B – Browse & Order"
+        - "P01 WEB-038 F&B – Order Tracking"
         - "P02 GST-024 F&B – Browse & Order"
         - "P02 GST-025 F&B – Order Tracking"
         - "P02 GST-032 AI Concierge – Chat"
@@ -3577,7 +3580,7 @@ paths:
     get:
       operationId: getGuestBill
       x-ticvai-consumed-by:
-        - "P01 WEB-038 F&B — Order Tracking"
+        - "P01 WEB-038 F&B – Order Tracking"
         - "P02 GST-025 F&B – Order Tracking"
       x-ticvai-audience:
       - guest
@@ -3879,8 +3882,10 @@ paths:
     get:
       operationId: listModifierGroups
       x-ticvai-consumed-by:
-        - "P01 WEB-036 F&B — Browse & Order"
+        - "P01 WEB-036 F&B – Browse & Order"
         - "P01 WEB-037 Menu Item Detail"
+        - "P02 GST-024 F&B – Browse & Order"
+        - "P02 GST-061 Menu Item Detail"
         - "P04 POS-021 Sell — Food & Drink"
       x-ticvai-audience:
       - staff

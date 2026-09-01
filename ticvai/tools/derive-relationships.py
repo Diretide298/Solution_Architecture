@@ -23,17 +23,6 @@ import json
 import sys
 from pathlib import Path
 
-# A cp1252 console cannot encode the arrows and dashes this tool prints, and the
-# failure lands *after* the work is done — so the output is written, the summary
-# line raises UnicodeEncodeError, and a correct run exits 1. Reconfiguring at
-# import means anything importing this module gets it too, refresh.sh included.
-try:
-    sys.stdout.reconfigure(encoding="utf-8", errors="replace")
-    sys.stderr.reconfigure(encoding="utf-8", errors="replace")
-except Exception:      # a captured stream may not be reconfigurable; harmless
-    pass
-
-
 ROOT = Path(__file__).resolve().parent.parent
 HANDOFF = ROOT / "handoff"
 
@@ -180,7 +169,7 @@ def main() -> int:
 
     # `handoff/relationships.csv` is what the viewer's ER diagram draws from, and it was
     # hand-maintained: **515 rows against this graph's 846**, and it marked
-    # `identity.grant.principal_id` as `ambient` where the graph has it declared.
+    # `identity.delegated_access.principal_id` as `ambient` where the graph has it declared.
     #
     # The viewer hides ambient edges by default — `principal_id` is a real foreign key and it was
     # **drawn as nothing**, which is what a reviewer saw. **A stale copy that downgrades an edge is

@@ -14,7 +14,7 @@ why: '**The transactional core.** 96 operations, 34 tables, and the highest writ
 
 
   **What decides the service is who owns the tables.** A shift holds cash, `orders.deposit_box` reconciles
-  against payments, and `orders.cash_movement` posts to `ledger.entry` at close. **A till''s takings
+  against payments, and `orders.cash_movement` posts to `ledger.posting` at close. **A till''s takings
   and a till''s drawer are the same money counted twice** — separating them makes every settlement a
   distributed join.'
 scale: Write-heavy, spiky, latency-critical. **The one that autoscales.**
@@ -844,7 +844,7 @@ tables:
   - orders
   foreignWriters: null
 - table: orders.cart_line
-  columns: 15
+  columns: 16
   store: postgres
   parent: orders.cart
   writtenBy:
@@ -934,9 +934,9 @@ tables:
   foreignWriters:
   - fnb
 - table: orders.order_line
-  columns: 17
+  columns: 18
   store: postgres
-  parent: null
+  parent: orders.sales_order
   writtenBy:
   - fnb
   - orders
@@ -1100,9 +1100,10 @@ screens:
 - P01:WEB-008 Add-ons & Upsell
 - P01:WEB-010 Shopping Cart
 - P01:WEB-012 Checkout — Payment
-- P01:WEB-013 Order Confirmation
+- P01:WEB-013 Booking Confirmation
 - P01:WEB-014 Pay for a Booking
 - P01:WEB-016 Login / Register
+- P01:WEB-018 My Tickets
 - P01:WEB-019 Order History
 - P01:WEB-023 Membership Management
 - P01:WEB-030 Ticket Transfer
@@ -1117,7 +1118,7 @@ screens:
 - P02:GST-016 My Reservations
 - P02:GST-017 Reservation Details
 - P02:GST-018 Add to Calendar / Reminders
-- P02:GST-019 Order History (Wallet)
+- P02:GST-019 Order History
 - P02:GST-032 AI Concierge – Chat
 - P02:GST-041 Checkout Entry
 - P02:GST-045 Ticket Delivery & Sharing
@@ -1153,6 +1154,7 @@ screens:
 - P05:KSK-010 Print failure
 - P05:KSK-011 Collect a booking
 - P05:KSK-012 Booking found
+- P05:KSK-017 Shop
 - P06:EMP-003 Home — on duty
 - P06:EMP-008 Shift summary
 - P06:EMP-009 End shift

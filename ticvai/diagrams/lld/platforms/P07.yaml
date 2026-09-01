@@ -30,7 +30,7 @@ servicesCalled:
   operationCalls: 7
 - service: OrderService
   operationCalls: 3
-- service: CrossCellService
+- service: CrossRegionService
   operationCalls: 3
 coverage:
   screens: 11
@@ -109,7 +109,7 @@ screens:
   wave: 1
   density: comfortable
   operations:
-  - consumeRedemptionRight
+  - consumeCrossRegionEntitlement
   - getOfflinePackage
   - listBlacklist
   - listScans
@@ -246,8 +246,8 @@ screens:
   wave: 1
   density: comfortable
   operations:
-  - consumeRedemptionRight
-  - getRedemptionRight
+  - consumeCrossRegionEntitlement
+  - getCrossRegionEntitlement
   states:
   - emptyFirstRun
   - emptyNoAccess

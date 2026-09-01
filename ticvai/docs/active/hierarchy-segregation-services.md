@@ -34,7 +34,7 @@ and eleven venues has settings belonging at four different heights.** Flattening
 of two failures: every venue configures everything from scratch, or one change at the top breaks a
 venue that needed to differ.
 
-`platform.scope_node` is the answer, and **it is reached by 304 of 379 tables** — the tenancy spine.
+`platform.org_unit` is the answer, and **it is reached by 304 of 379 tables** — the tenancy spine.
 A node has a `level`, a `parent_id` and a materialised `path`; configuration resolves by walking
 that path upward until something answers.
 
@@ -132,7 +132,7 @@ and a deletion request answerable.
 **`ledger` is append-only.** Never updated, never deleted — a different discipline from everything
 around it, and one that should not share a schema with tables that mutate.
 
-**`platform` holds the spine.** `scope_node`, reached by 289 tables.
+**`platform` holds the spine.** `org_unit`, reached by 289 tables.
 
 **`inventory.stock_level` is derived and never stored.** Four operations wrote it directly and were
 found on 20 August. **A stored level and a movement ledger that disagree is a stock count nobody can
@@ -146,7 +146,7 @@ in a single week.
 **22 tables are written by more than one contract, and all 22 are correct.**
 
 **The rule: the owner defines the row; a foreign writer may only append to it.** A till closing
-posts to `ledger.entry` because settling a shift *is* a ledger act. `orders` writes
+posts to `ledger.posting` because settling a shift *is* a ledger act. `orders` writes
 `access.entitlement` because a sale issues a ticket.
 
 ---
@@ -210,7 +210,7 @@ is unwalked rather than under-documented**: its defects are still in it.
 The other eight are what they look like — a domain with its own schema, its own scaling profile and
 its own licence. **These eight are not.**
 
-**Tenancy** — **`platform.scope_node` is reached by 304 of 379 tables** — the tenancy spine. Workforce and approvals are folded in because each is small, both read `scope_node` constantly and write it rarely, and splitting them means three services doing the same joins.
+**Tenancy** — **`platform.org_unit` is reached by 304 of 379 tables** — the tenancy spine. Workforce and approvals are folded in because each is small, both read `org_unit` constantly and write it rarely, and splitting them means three services doing the same joins.
 
 **`shift` was folded in here on 24 August and moved to OrderService the same day.** The reasoning was that a shift owns no tables of its own — which is true — and the conclusion was wrong. **A service with no data belongs where its data is**, and a shift's data is entirely in `orders`: `orders.shift`, `orders.deposit_box`, `orders.cash_movement`, `orders.cash_count_line`.
 
@@ -222,7 +222,7 @@ its own licence. **These eight are not.**
 
 **`shift` belongs here and not in Tenancy.** A shift is venue-scoped, which is what made it look like a tenancy concern — but **venue scope is the platform's default rather than a service boundary**: 675 of 1,014 operations are venue-scoped.
 
-**What decides the service is who owns the tables.** A shift holds cash, `orders.deposit_box` reconciles against payments, and `orders.cash_movement` posts to `ledger.entry` at close. **A till's takings and a till's drawer are the same money counted twice** — separating them makes every settlement a distributed join.
+**What decides the service is who owns the tables.** A shift holds cash, `orders.deposit_box` reconciles against payments, and `orders.cash_movement` posts to `ledger.posting` at close. **A till's takings and a till's drawer are the same money counted twice** — separating them makes every settlement a distributed join.
 
 *Scale.* Write-heavy, spiky, latency-critical. **The one that autoscales.** *If it is down.* **Down means no sales.** Highest availability target in the platform.
 
@@ -261,7 +261,7 @@ It moves a pseudonymous guest link rather than a guest, which is the whole desig
 ## 5. Consequences
 
 **Deploy order is the tier order.** Foundation first and alone — twelve contracts read Identity, and
-289 tables anchor on `platform.scope_node`.
+289 tables anchor on `platform.org_unit`.
 
 **Four services can be down without stopping a sale**: Marketing, AI, Reporting, CrossCell. **A
 deliberate property that should be tested rather than assumed.**
@@ -299,7 +299,7 @@ different write patterns.
 can be.
 
 **Flow coverage is 53%** across 93 flows, up from 21% on the same day. **Coverage is uneven and the
-spread is the useful number**: `InventoryService` at 96%, `CrossCellService` at 31%.
+spread is the useful number**: `InventoryService` at 96%, `CrossRegionService` at 31%.
 
 ---
 

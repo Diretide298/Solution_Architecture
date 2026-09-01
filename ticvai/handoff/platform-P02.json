@@ -7,13 +7,13 @@
  "audience": "guest",
  "formFactor": "mobileApp",
  "offlineCapable": true,
- "generated": "2026-08-27",
+ "generated": "2026-09-01",
  "note": "Derived by tools/derive-platform.py. **The gaps section is the point** \u2014 a page listing what exists is a directory; one listing what is missing is a worklist.",
  "counts": {
   "screens": 63,
-  "operations": 97,
+  "operations": 101,
   "contracts": 15,
-  "modules": 4,
+  "modules": 16,
   "undrawn": 0,
   "operationsWithNoScreen": 28
  },
@@ -24,12 +24,73 @@
  },
  "modules": [
   {
-   "module": "TODO",
-   "screens": 59,
+   "module": "Engagement & Support",
+   "screens": 11,
+   "waves": [
+    2,
+    3
+   ]
+  },
+  {
+   "module": "Account & Self-Service",
+   "screens": 9,
    "waves": [
     1,
     2,
     3
+   ]
+  },
+  {
+   "module": "In-venue Services",
+   "screens": 9,
+   "waves": [
+    2,
+    3
+   ]
+  },
+  {
+   "module": "Discovery & Browse",
+   "screens": 7,
+   "waves": [
+    1,
+    2
+   ]
+  },
+  {
+   "module": "Booking & Selection",
+   "screens": 7,
+   "waves": [
+    1,
+    2,
+    3
+   ]
+  },
+  {
+   "module": "Ticketing",
+   "screens": 4,
+   "waves": [
+    2
+   ]
+  },
+  {
+   "module": "Cart & Checkout",
+   "screens": 3,
+   "waves": [
+    1
+   ]
+  },
+  {
+   "module": "Membership, Loyalty & Value",
+   "screens": 3,
+   "waves": [
+    2
+   ]
+  },
+  {
+   "module": "System States",
+   "screens": 2,
+   "waves": [
+    1
    ]
   },
   {
@@ -38,6 +99,34 @@
    "waves": [
     2,
     3
+   ]
+  },
+  {
+   "module": "Retail",
+   "screens": 1,
+   "waves": [
+    2
+   ]
+  },
+  {
+   "module": "Support",
+   "screens": 1,
+   "waves": [
+    2
+   ]
+  },
+  {
+   "module": "Promotions",
+   "screens": 1,
+   "waves": [
+    2
+   ]
+  },
+  {
+   "module": "High-Demand Access",
+   "screens": 1,
+   "waves": [
+    1
    ]
   },
   {
@@ -62,39 +151,35 @@
   },
   {
    "contract": "orders",
-   "operations": 14
+   "operations": 15
   },
   {
    "contract": "marketing-crm",
    "operations": 14
   },
   {
+   "contract": "fnb",
+   "operations": 9
+  },
+  {
    "contract": "catalogue",
    "operations": 9
   },
   {
-   "contract": "fnb",
-   "operations": 8
-  },
-  {
    "contract": "access",
-   "operations": 7
+   "operations": 8
   },
   {
    "contract": "promotions",
    "operations": 5
   },
   {
-   "contract": "queue",
-   "operations": 4
-  },
-  {
    "contract": "retail",
    "operations": 4
   },
   {
-   "contract": "white-label",
-   "operations": 3
+   "contract": "queue",
+   "operations": 4
   },
   {
    "contract": "seating",
@@ -102,7 +187,11 @@
   },
   {
    "contract": "ai",
-   "operations": 2
+   "operations": 3
+  },
+  {
+   "contract": "white-label",
+   "operations": 3
   },
   {
    "contract": "venue-map",
@@ -121,7 +210,7 @@
   {
    "id": "GST-001",
    "name": "Home \u2013 Default",
-   "module": "TODO",
+   "module": "Discovery & Browse",
    "wave": 1,
    "route": "/general/home-default",
    "operations": 4,
@@ -130,7 +219,7 @@
   {
    "id": "GST-002",
    "name": "Explore Categories",
-   "module": "TODO",
+   "module": "Discovery & Browse",
    "wave": 1,
    "route": "/general/explore-categories",
    "operations": 1,
@@ -138,26 +227,26 @@
   },
   {
    "id": "GST-003",
-   "name": "Attractions List",
-   "module": "TODO",
+   "name": "Event & Attraction Listing",
+   "module": "Discovery & Browse",
    "wave": 1,
    "route": "/general/attractions-list",
-   "operations": 2,
+   "operations": 4,
    "drawn": true
   },
   {
    "id": "GST-004",
    "name": "Attraction Details",
-   "module": "TODO",
+   "module": "Discovery & Browse",
    "wave": 1,
    "route": "/general/attraction-details",
-   "operations": 3,
+   "operations": 4,
    "drawn": true
   },
   {
    "id": "GST-005",
    "name": "What's On",
-   "module": "TODO",
+   "module": "Discovery & Browse",
    "wave": 1,
    "route": "/general/whats-on",
    "operations": 2,
@@ -166,7 +255,7 @@
   {
    "id": "GST-006",
    "name": "Event / Exhibition Details",
-   "module": "TODO",
+   "module": "Discovery & Browse",
    "wave": 1,
    "route": "/general/event-exhibition-details",
    "operations": 2,
@@ -175,7 +264,7 @@
   {
    "id": "GST-007",
    "name": "Select Date & Time",
-   "module": "TODO",
+   "module": "Booking & Selection",
    "wave": 1,
    "route": "/general/select-date-and-time",
    "operations": 2,
@@ -184,7 +273,7 @@
   {
    "id": "GST-008",
    "name": "Tickets & Add-ons",
-   "module": "TODO",
+   "module": "Booking & Selection",
    "wave": 1,
    "route": "/general/tickets-and-add-ons",
    "operations": 1,
@@ -193,7 +282,7 @@
   {
    "id": "GST-009",
    "name": "Review & Payment",
-   "module": "TODO",
+   "module": "Cart & Checkout",
    "wave": 1,
    "route": "/general/review-and-payment",
    "operations": 5,
@@ -202,16 +291,16 @@
   {
    "id": "GST-010",
    "name": "Booking Confirmation",
-   "module": "TODO",
+   "module": "Cart & Checkout",
    "wave": 1,
    "route": "/general/booking-confirmation",
-   "operations": 2,
+   "operations": 3,
    "drawn": true
   },
   {
    "id": "GST-011",
    "name": "Wallet Overview",
-   "module": "TODO",
+   "module": "Membership, Loyalty & Value",
    "wave": 2,
    "route": "/general/wallet-overview",
    "operations": 2,
@@ -220,16 +309,16 @@
   {
    "id": "GST-012",
    "name": "My Tickets",
-   "module": "TODO",
+   "module": "Account & Self-Service",
    "wave": 1,
    "route": "/general/my-tickets",
-   "operations": 3,
+   "operations": 6,
    "drawn": true
   },
   {
    "id": "GST-013",
    "name": "Ticket Details",
-   "module": "TODO",
+   "module": "Account & Self-Service",
    "wave": 1,
    "route": "/general/ticket-details",
    "operations": 4,
@@ -238,16 +327,16 @@
   {
    "id": "GST-014",
    "name": "Ticket Transfer",
-   "module": "TODO",
+   "module": "Ticketing",
    "wave": 2,
    "route": "/general/ticket-transfer",
-   "operations": 2,
+   "operations": 3,
    "drawn": true
   },
   {
    "id": "GST-015",
    "name": "Memberships",
-   "module": "TODO",
+   "module": "Membership, Loyalty & Value",
    "wave": 2,
    "route": "/general/memberships",
    "operations": 5,
@@ -256,7 +345,7 @@
   {
    "id": "GST-016",
    "name": "My Reservations",
-   "module": "TODO",
+   "module": "Ticketing",
    "wave": 2,
    "route": "/general/my-reservations",
    "operations": 3,
@@ -265,7 +354,7 @@
   {
    "id": "GST-017",
    "name": "Reservation Details",
-   "module": "TODO",
+   "module": "Ticketing",
    "wave": 2,
    "route": "/general/reservation-details",
    "operations": 2,
@@ -274,7 +363,7 @@
   {
    "id": "GST-018",
    "name": "Add to Calendar / Reminders",
-   "module": "TODO",
+   "module": "Account & Self-Service",
    "wave": 3,
    "route": "/general/add-to-calendar-reminders",
    "operations": 3,
@@ -282,17 +371,17 @@
   },
   {
    "id": "GST-019",
-   "name": "Order History (Wallet)",
-   "module": "TODO",
+   "name": "Order History",
+   "module": "Account & Self-Service",
    "wave": 2,
    "route": "/general/order-history-wallet",
-   "operations": 3,
+   "operations": 4,
    "drawn": true
   },
   {
    "id": "GST-020",
    "name": "Saved Items / Wishlist",
-   "module": "TODO",
+   "module": "Account & Self-Service",
    "wave": 3,
    "route": "/general/saved-items-wishlist",
    "operations": 3,
@@ -301,7 +390,7 @@
   {
    "id": "GST-021",
    "name": "Interactive Map",
-   "module": "TODO",
+   "module": "In-venue Services",
    "wave": 2,
    "route": "/general/interactive-map",
    "operations": 4,
@@ -310,7 +399,7 @@
   {
    "id": "GST-022",
    "name": "Attraction Wait Times",
-   "module": "TODO",
+   "module": "In-venue Services",
    "wave": 2,
    "route": "/general/attraction-wait-times",
    "operations": 1,
@@ -318,26 +407,26 @@
   },
   {
    "id": "GST-023",
-   "name": "Virtual Queue / Join Queue",
-   "module": "TODO",
+   "name": "Virtual Queue",
+   "module": "In-venue Services",
    "wave": 3,
    "route": "/general/virtual-queue-join-queue",
-   "operations": 3,
+   "operations": 4,
    "drawn": true
   },
   {
    "id": "GST-024",
    "name": "F&B \u2013 Browse & Order",
-   "module": "TODO",
+   "module": "In-venue Services",
    "wave": 2,
    "route": "/general/fandb-browse-and-order",
-   "operations": 6,
+   "operations": 8,
    "drawn": true
   },
   {
    "id": "GST-025",
    "name": "F&B \u2013 Order Tracking",
-   "module": "TODO",
+   "module": "In-venue Services",
    "wave": 2,
    "route": "/general/fandb-order-tracking",
    "operations": 3,
@@ -346,7 +435,7 @@
   {
    "id": "GST-026",
    "name": "Retail / Merchandise",
-   "module": "TODO",
+   "module": "Retail",
    "wave": 2,
    "route": "/general/retail-merchandise",
    "operations": 2,
@@ -355,16 +444,16 @@
   {
    "id": "GST-027",
    "name": "Parking \u2013 Reserve & Pay",
-   "module": "TODO",
+   "module": "In-venue Services",
    "wave": 3,
    "route": "/general/parking-reserve-and-pay",
-   "operations": 2,
+   "operations": 3,
    "drawn": true
   },
   {
    "id": "GST-028",
    "name": "Parking \u2013 Reservation Confirmed",
-   "module": "TODO",
+   "module": "In-venue Services",
    "wave": 3,
    "route": "/general/parking-reservation-confirmed",
    "operations": 2,
@@ -373,7 +462,7 @@
   {
    "id": "GST-029",
    "name": "Venue Info & Services",
-   "module": "TODO",
+   "module": "In-venue Services",
    "wave": 2,
    "route": "/general/venue-info-and-services",
    "operations": 2,
@@ -382,7 +471,7 @@
   {
    "id": "GST-030",
    "name": "In-Venue Notifications",
-   "module": "TODO",
+   "module": "Engagement & Support",
    "wave": 2,
    "route": "/general/in-venue-notifications",
    "operations": 1,
@@ -391,16 +480,16 @@
   {
    "id": "GST-031",
    "name": "AI Concierge \u2013 Home",
-   "module": "TODO",
+   "module": "Engagement & Support",
    "wave": 2,
    "route": "/general/ai-concierge-home",
-   "operations": 2,
+   "operations": 5,
    "drawn": true
   },
   {
    "id": "GST-032",
    "name": "AI Concierge \u2013 Chat",
-   "module": "TODO",
+   "module": "Engagement & Support",
    "wave": 2,
    "route": "/general/ai-concierge-chat",
    "operations": 8,
@@ -409,7 +498,7 @@
   {
    "id": "GST-033",
    "name": "AI Concierge \u2013 Contextual Help",
-   "module": "TODO",
+   "module": "Engagement & Support",
    "wave": 2,
    "route": "/general/ai-concierge-contextual-help",
    "operations": 1,
@@ -418,7 +507,7 @@
   {
    "id": "GST-034",
    "name": "Lost & Found",
-   "module": "TODO",
+   "module": "Support",
    "wave": 2,
    "route": "/general/lost-and-found",
    "operations": 3,
@@ -427,7 +516,7 @@
   {
    "id": "GST-035",
    "name": "Feedback & Ratings",
-   "module": "TODO",
+   "module": "Engagement & Support",
    "wave": 3,
    "route": "/general/feedback-and-ratings",
    "operations": 2,
@@ -436,16 +525,16 @@
   {
    "id": "GST-036",
    "name": "Loyalty & Rewards",
-   "module": "TODO",
+   "module": "Membership, Loyalty & Value",
    "wave": 2,
    "route": "/loyalty-rewards",
-   "operations": 2,
+   "operations": 4,
    "drawn": true
   },
   {
    "id": "GST-037",
    "name": "Offers & Promotions",
-   "module": "TODO",
+   "module": "Promotions",
    "wave": 2,
    "route": "/general/offers-and-promotions",
    "operations": 3,
@@ -454,7 +543,7 @@
   {
    "id": "GST-038",
    "name": "Digital Companion Mode",
-   "module": "TODO",
+   "module": "In-venue Services",
    "wave": 3,
    "route": "/general/digital-companion-mode",
    "operations": 3,
@@ -463,7 +552,7 @@
   {
    "id": "GST-039",
    "name": "Profile",
-   "module": "TODO",
+   "module": "Account & Self-Service",
    "wave": 1,
    "route": "/general/profile",
    "operations": 1,
@@ -472,7 +561,7 @@
   {
    "id": "GST-040",
    "name": "Help & Support",
-   "module": "TODO",
+   "module": "Engagement & Support",
    "wave": 2,
    "route": "/general/help-and-support",
    "operations": 5,
@@ -481,7 +570,7 @@
   {
    "id": "GST-041",
    "name": "Checkout Entry",
-   "module": "TODO",
+   "module": "Cart & Checkout",
    "wave": 1,
    "route": "/general/checkout-entry",
    "operations": 2,
@@ -490,7 +579,7 @@
   {
    "id": "GST-042",
    "name": "Simple Registration & OTP",
-   "module": "TODO",
+   "module": "Account & Self-Service",
    "wave": 1,
    "route": "/general/simple-registration-and-otp",
    "operations": 18,
@@ -499,7 +588,7 @@
   {
    "id": "GST-043",
    "name": "Arabic / RTL Experience",
-   "module": "TODO",
+   "module": "System States",
    "wave": 1,
    "route": "/general/arabic-rtl-experience",
    "operations": 0,
@@ -508,7 +597,7 @@
   {
    "id": "GST-044",
    "name": "Multi-Currency & Pricing",
-   "module": "TODO",
+   "module": "Ticketing",
    "wave": 2,
    "route": "/general/multi-currency-and-pricing",
    "operations": 2,
@@ -517,7 +606,7 @@
   {
    "id": "GST-045",
    "name": "Ticket Delivery & Sharing",
-   "module": "TODO",
+   "module": "Account & Self-Service",
    "wave": 2,
    "route": "/general/ticket-delivery-and-sharing",
    "operations": 1,
@@ -526,16 +615,16 @@
   {
    "id": "GST-046",
    "name": "Branded Queue / Waiting Room",
-   "module": "TODO",
+   "module": "High-Demand Access",
    "wave": 1,
    "route": "/general/branded-queue-waiting-room",
-   "operations": 1,
+   "operations": 3,
    "drawn": true
   },
   {
    "id": "GST-047",
    "name": "Maintenance / Upgrade Page",
-   "module": "TODO",
+   "module": "System States",
    "wave": 1,
    "route": "/general/maintenance-page",
    "operations": 1,
@@ -544,7 +633,7 @@
   {
    "id": "GST-048",
    "name": "Upsell / Cross-Sell",
-   "module": "TODO",
+   "module": "Booking & Selection",
    "wave": 2,
    "route": "/general/upsell-cross-sell",
    "operations": 2,
@@ -553,7 +642,7 @@
   {
    "id": "GST-049",
    "name": "Interactive Seat Selection",
-   "module": "TODO",
+   "module": "Booking & Selection",
    "wave": 2,
    "route": "/general/interactive-seat-selection",
    "operations": 3,
@@ -562,7 +651,7 @@
   {
    "id": "GST-050",
    "name": "Resource Booking \u2013 Cabana",
-   "module": "TODO",
+   "module": "Booking & Selection",
    "wave": 3,
    "route": "/general/resource-booking-cabana",
    "operations": 3,
@@ -571,7 +660,7 @@
   {
    "id": "GST-051",
    "name": "Plan Your Adventure \u2013 Start",
-   "module": "TODO",
+   "module": "Engagement & Support",
    "wave": 3,
    "route": "/general/plan-your-adventure-start",
    "operations": 2,
@@ -580,7 +669,7 @@
   {
    "id": "GST-052",
    "name": "Suggested Itineraries",
-   "module": "TODO",
+   "module": "Engagement & Support",
    "wave": 3,
    "route": "/general/suggested-itineraries",
    "operations": 3,
@@ -589,7 +678,7 @@
   {
    "id": "GST-053",
    "name": "Build Your Own Itinerary",
-   "module": "TODO",
+   "module": "Engagement & Support",
    "wave": 3,
    "route": "/general/build-your-own-itinerary",
    "operations": 4,
@@ -598,7 +687,7 @@
   {
    "id": "GST-054",
    "name": "AI Optimized Itinerary",
-   "module": "TODO",
+   "module": "Engagement & Support",
    "wave": 3,
    "route": "/general/ai-optimized-itinerary",
    "operations": 4,
@@ -607,7 +696,7 @@
   {
    "id": "GST-055",
    "name": "Dynamic QR Ticket",
-   "module": "TODO",
+   "module": "Account & Self-Service",
    "wave": 1,
    "route": "/general/dynamic-qr-ticket",
    "operations": 1,
@@ -616,7 +705,7 @@
   {
    "id": "GST-056",
    "name": "Bundle Package",
-   "module": "TODO",
+   "module": "Booking & Selection",
    "wave": 2,
    "route": "/general/bundle-package",
    "operations": 3,
@@ -625,7 +714,7 @@
   {
    "id": "GST-057",
    "name": "Accessibility Information",
-   "module": "TODO",
+   "module": "Discovery & Browse",
    "wave": 2,
    "route": "/general/accessibility-information",
    "operations": 1,
@@ -634,7 +723,7 @@
   {
    "id": "GST-058",
    "name": "Resource Availability (Cabana)",
-   "module": "TODO",
+   "module": "Booking & Selection",
    "wave": 3,
    "route": "/general/resource-availability-cabana",
    "operations": 2,
@@ -643,7 +732,7 @@
   {
    "id": "GST-059",
    "name": "Plan My Day \u2013 In Progress",
-   "module": "TODO",
+   "module": "Engagement & Support",
    "wave": 3,
    "route": "/general/plan-my-day-in-progress",
    "operations": 3,
@@ -655,7 +744,7 @@
    "module": "In-Venue Experience",
    "wave": 2,
    "route": "/in-venue-experience/menu-item-detail",
-   "operations": 1,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -859,6 +948,36 @@
   ],
   "modulesSplitAcrossWaves": [
    {
+    "module": "Account & Self-Service",
+    "waves": [
+     1,
+     2,
+     3
+    ]
+   },
+   {
+    "module": "Booking & Selection",
+    "waves": [
+     1,
+     2,
+     3
+    ]
+   },
+   {
+    "module": "Discovery & Browse",
+    "waves": [
+     1,
+     2
+    ]
+   },
+   {
+    "module": "Engagement & Support",
+    "waves": [
+     2,
+     3
+    ]
+   },
+   {
     "module": "In-Venue Experience",
     "waves": [
      2,
@@ -866,9 +985,8 @@
     ]
    },
    {
-    "module": "TODO",
+    "module": "In-venue Services",
     "waves": [
-     1,
      2,
      3
     ]

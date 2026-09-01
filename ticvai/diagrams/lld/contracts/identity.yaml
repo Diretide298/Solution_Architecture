@@ -20,9 +20,9 @@ operations:
   writes:
   - cache:idempotency
   - identity.session
-- operation: createGrant
+- operation: createDelegatedAccess
   verb: POST
-  path: /grants
+  path: /delegated-access
   scope: venue
   permission: PERMISSION_GRANT
   audience:
@@ -31,11 +31,11 @@ operations:
   offline: false
   reads:
   - cache:idempotency
-  - identity.grant
+  - identity.delegated_access
   writes:
   - cache:idempotency
   - cache:resolution
-  - identity.grant
+  - identity.delegated_access
 - operation: createMfaChallenge
   verb: POST
   path: /auth/mfa/challenge
@@ -82,9 +82,9 @@ operations:
   - cache:idempotency
   - cache:resolution
   - identity.role
-- operation: deleteGrant
+- operation: deleteDelegatedAccess
   verb: DELETE
-  path: /grants/{grantId}
+  path: /delegated-access/{delegatedAccessId}
   scope: venue
   permission: PERMISSION_GRANT
   audience:
@@ -93,11 +93,11 @@ operations:
   offline: false
   reads:
   - cache:idempotency
-  - identity.grant
+  - identity.delegated_access
   writes:
   - cache:idempotency
   - cache:resolution
-  - identity.grant
+  - identity.delegated_access
 - operation: deleteGuestAccount
   verb: DELETE
   path: /auth/guest/account
@@ -177,7 +177,7 @@ operations:
   offline: true
   reads:
   - cache:resolution
-  - identity.grant
+  - identity.delegated_access
   - identity.principal
   - identity.role
   - identity.session
@@ -231,11 +231,11 @@ operations:
   offline: false
   reads:
   - cache:idempotency
-  - identity.grant
+  - identity.delegated_access
   - pii.subject
   writes:
   - cache:idempotency
-  - identity.grant
+  - identity.delegated_access
 - operation: guestLogout
   verb: DELETE
   path: /auth/guest/session
@@ -308,6 +308,18 @@ operations:
   - identity.principal
   - identity.session
   writes: []
+- operation: listDelegatedAccess
+  verb: GET
+  path: /delegated-access
+  scope: venue
+  permission: PERMISSION_VIEW
+  audience:
+  - staff
+  - partner
+  offline: false
+  reads:
+  - identity.delegated_access
+  writes: []
 - operation: listDelegations
   verb: GET
   path: /guests/{subjectId}/delegations
@@ -318,21 +330,9 @@ operations:
   - guest
   offline: false
   reads:
-  - identity.grant
+  - identity.delegated_access
   - marketing.guest_profile
   - pii.subject
-  writes: []
-- operation: listGrants
-  verb: GET
-  path: /grants
-  scope: venue
-  permission: PERMISSION_VIEW
-  audience:
-  - staff
-  - partner
-  offline: false
-  reads:
-  - identity.grant
   writes: []
 - operation: listMfaMethods
   verb: GET
@@ -393,7 +393,7 @@ operations:
   offline: false
   reads:
   - cache:idempotency
-  - identity.grant
+  - identity.delegated_access
   - identity.principal
   - identity.principal_credential
   - identity.role
@@ -487,11 +487,11 @@ operations:
   reads:
   - cache:idempotency
   - cache:resolution
-  - identity.grant
+  - identity.delegated_access
   - identity.principal
   - identity.role
   - identity.role_permission
-  - platform.scope_node
+  - platform.org_unit
   writes:
   - cache:idempotency
   - cache:resolution
@@ -520,7 +520,7 @@ operations:
   offline: false
   reads:
   - cache:idempotency
-  - identity.grant
+  - identity.delegated_access
   - identity.role
   - identity.session
   writes:
@@ -550,7 +550,7 @@ operations:
   offline: false
   reads:
   - cache:idempotency
-  - identity.grant
+  - identity.delegated_access
   - identity.segregation_rule
   writes:
   - cache:idempotency

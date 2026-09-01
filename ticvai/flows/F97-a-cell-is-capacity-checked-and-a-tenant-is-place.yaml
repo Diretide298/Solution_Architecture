@@ -64,5 +64,5 @@ exitStates:
 - state: refused
   description: '**Stopped at a permission or a licence boundary**, with the reason named.'
 notes: '**ADR-0001 puts one cell per jurisdiction and ADR-0010 keeps entitlements crossing them pseudonymously.**
-  CrossCellService sits at 31% and **placement had never been walked.**'
+  CrossRegionService sits at 31% and **placement had never been walked.**'
 openQuestions: null

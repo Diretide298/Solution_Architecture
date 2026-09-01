@@ -122,7 +122,7 @@
 
 **`postgres`** — 40
 
-`ai.chunk_ref` · `ai.index_entry` · `ai.index_job` · `ai.index_source` · `ai.knowledge_collection` · `ai.knowledge_document` · `ai.layout_draft` · `ai.policy` · `ai.proposed_action` · `ai.provider` · `assets.media_asset` · `catalogue.attribute_axis` · `catalogue.entitlement_template` · `catalogue.envelope` · `catalogue.event` · `catalogue.performance` · `catalogue.price` · `catalogue.price_list` · `catalogue.product` · `control.content_block` · `fnb.menu_item` · `maintenance.inspection_template` · `marketing.case` · `marketing.loyalty_programme` · `platform.region_settings` · `platform.scope_node` · `promotions.promotion` · `reporting.report_definition` · `retail.merchandise` · `seating.seat` · `seating.seat_category` · `seating.seat_map` · `seating.seating_rules` · `seating.section` · `venuemap.import_job` · `venuemap.map` · `venuemap.point` · `whitelabel.content_page` · `whitelabel.faq_entry` · `whitelabel.policy`
+`ai.chunk_ref` · `ai.index_entry` · `ai.index_job` · `ai.index_source` · `ai.knowledge_collection` · `ai.knowledge_document` · `ai.layout_draft` · `ai.policy` · `ai.proposed_action` · `ai.provider` · `assets.media_asset` · `catalogue.channel_capacity` · `catalogue.entitlement_template` · `catalogue.event` · `catalogue.performance` · `catalogue.price` · `catalogue.price_list` · `catalogue.product` · `catalogue.variant_dimension` · `control.content_block` · `fnb.menu_item` · `maintenance.inspection_template` · `marketing.case` · `marketing.loyalty_programme` · `platform.org_unit` · `platform.region_settings` · `promotions.promotion` · `reporting.report_definition` · `retail.merchandise` · `seating.seat` · `seating.seat_category` · `seating.seat_map` · `seating.seating_rules` · `seating.section` · `venuemap.import_job` · `venuemap.map` · `venuemap.point` · `whitelabel.content_page` · `whitelabel.faq_entry` · `whitelabel.policy`
 
 **`postgres-analytical`** — 5
 
@@ -140,11 +140,11 @@
 
 **P01 Guest Web**
 
-- `WEB-044` AI Concierge — wave 2, 3 operations
+- `WEB-044` AI Concierge – Home — wave 2, 3 operations
 
 **P02 Guest App**
 
-- `GST-031` AI Concierge – Home — wave 2, 1 operation
+- `GST-031` AI Concierge – Home — wave 2, 3 operations
 - `GST-032` AI Concierge – Chat — wave 2, 1 operation
 - `GST-033` AI Concierge – Contextual Help — wave 2, 1 operation
 - `GST-052` Suggested Itineraries — wave 3, 1 operation

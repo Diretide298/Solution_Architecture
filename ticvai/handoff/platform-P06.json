@@ -7,7 +7,7 @@
  "audience": "staff",
  "formFactor": "mobileApp",
  "offlineCapable": true,
- "generated": "2026-08-27",
+ "generated": "2026-09-01",
  "note": "Derived by tools/derive-platform.py. **The gaps section is the point** \u2014 a page listing what exists is a directory; one listing what is missing is a worklist.",
  "counts": {
   "screens": 66,
@@ -77,11 +77,11 @@
    "operations": 9
   },
   {
-   "contract": "identity",
+   "contract": "marketing-crm",
    "operations": 8
   },
   {
-   "contract": "marketing-crm",
+   "contract": "identity",
    "operations": 8
   },
   {
@@ -97,11 +97,7 @@
    "operations": 4
   },
   {
-   "contract": "retail",
-   "operations": 2
-  },
-  {
-   "contract": "reporting",
+   "contract": "venue-map",
    "operations": 2
   },
   {
@@ -109,7 +105,11 @@
    "operations": 2
   },
   {
-   "contract": "venue-map",
+   "contract": "retail",
+   "operations": 2
+  },
+  {
+   "contract": "reporting",
    "operations": 2
   },
   {
@@ -1382,13 +1382,13 @@
     "summary": "Release an authorisation before it is captured"
    },
    {
-    "operation": "overrideQueueEntry",
+    "operation": "overrideWaitingGuest",
     "contract": "queue",
     "verb": "POST",
     "summary": "Admit against a failed redemption"
    },
    {
-    "operation": "redeemQueueEntry",
+    "operation": "redeemWaitingGuest",
     "contract": "queue",
     "verb": "POST",
     "summary": "Admit a party at the ride"

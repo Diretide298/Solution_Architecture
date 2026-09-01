@@ -65,17 +65,17 @@ operations:
   - ai.policy
   - ai.provider
   - cache:idempotency
-  - catalogue.attribute_axis
+  - catalogue.channel_capacity
   - catalogue.entitlement_template
-  - catalogue.envelope
   - catalogue.event
   - catalogue.performance
   - catalogue.price
   - catalogue.price_list
   - catalogue.product
+  - catalogue.variant_dimension
   - marketing.loyalty_programme
+  - platform.org_unit
   - platform.region_settings
-  - platform.scope_node
   - promotions.promotion
   - qdrant:knowledge
   - seating.seat

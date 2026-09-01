@@ -64,10 +64,12 @@
   "operations": [
    "listProducts",
    "listPerformances",
-   "searchCatalogue"
+   "searchCatalogue",
+   "getWaitTimes"
   ],
   "services": [
-   "CatalogueService"
+   "CatalogueService",
+   "VenueOpsService"
   ],
   "stores": [
    "postgres"
@@ -76,7 +78,10 @@
    "catalogue.event",
    "catalogue.performance",
    "catalogue.product",
-   "catalogue.variant"
+   "catalogue.variant",
+   "queue.queue",
+   "queue.reading",
+   "queue.waiting_guest"
   ],
   "writes": [],
   "storedProcedures": [],
@@ -123,7 +128,7 @@
   ]
  },
  "WEB-004": {
-  "name": "Event / Attraction Detail",
+  "name": "Attraction Details",
   "platform": "P01",
   "platformName": "Guest Web",
   "operator": "guest",
@@ -131,17 +136,25 @@
   "route": "/discovery-and-browse/event-attraction-detail",
   "operations": [
    "getProduct",
-   "listPerformances"
+   "listPerformances",
+   "getAvailability",
+   "getWaitTimes"
   ],
   "services": [
-   "CatalogueService"
+   "CatalogueService",
+   "VenueOpsService"
   ],
   "stores": [
    "postgres"
   ],
   "reads": [
+   "catalogue.channel_capacity",
+   "catalogue.inventory_hold",
    "catalogue.performance",
-   "catalogue.product"
+   "catalogue.product",
+   "queue.queue",
+   "queue.reading",
+   "queue.waiting_guest"
   ],
   "writes": [],
   "storedProcedures": [],
@@ -203,7 +216,7 @@
   "route": "/booking-and-selection/date-and-session-selection",
   "operations": [
    "getAvailability",
-   "acquireLease"
+   "acquireInventoryHold"
   ],
   "services": [
    "CatalogueService"
@@ -214,14 +227,14 @@
   ],
   "reads": [
    "cache:idempotency",
-   "catalogue.envelope",
-   "catalogue.inventory_lease",
+   "catalogue.channel_capacity",
+   "catalogue.inventory_hold",
    "catalogue.performance",
    "platform.workstation"
   ],
   "writes": [
    "cache:idempotency",
-   "catalogue.inventory_lease"
+   "catalogue.inventory_hold"
   ],
   "storedProcedures": [],
   "wave": 1,
@@ -236,7 +249,7 @@
   ]
  },
  "WEB-007": {
-  "name": "Seat Map Selection",
+  "name": "Interactive Seat Selection",
   "platform": "P01",
   "platformName": "Guest Web",
   "operator": "guest",
@@ -244,7 +257,8 @@
   "route": "/booking-and-selection/seat-map-selection",
   "operations": [
    "createSeatHold",
-   "getSeatAvailability"
+   "getSeatAvailability",
+   "recommendSeats"
   ],
   "services": [
    "CatalogueService"
@@ -255,6 +269,7 @@
   ],
   "reads": [
    "cache:idempotency",
+   "catalogue.performance",
    "seating.seat",
    "seating.seat_category",
    "seating.seat_hold"
@@ -296,7 +311,7 @@
   ],
   "reads": [
    "cache:idempotency",
-   "catalogue.envelope",
+   "catalogue.channel_capacity",
    "catalogue.performance",
    "catalogue.product",
    "catalogue.variant",
@@ -304,7 +319,7 @@
   ],
   "writes": [
    "cache:idempotency",
-   "catalogue.inventory_lease",
+   "catalogue.inventory_hold",
    "orders.cart",
    "orders.cart_line"
   ],
@@ -387,8 +402,8 @@
   ],
   "reads": [
    "cache:idempotency",
-   "catalogue.envelope",
-   "catalogue.inventory_lease",
+   "catalogue.channel_capacity",
+   "catalogue.inventory_hold",
    "catalogue.performance",
    "catalogue.price_list",
    "catalogue.variant",
@@ -399,7 +414,7 @@
   ],
   "writes": [
    "cache:idempotency",
-   "catalogue.inventory_lease",
+   "catalogue.inventory_hold",
    "orders.cart",
    "orders.cart_line",
    "orders.order_line",
@@ -505,8 +520,8 @@
   "writes": [
    "access.entitlement",
    "cache:idempotency",
-   "ledger.entry",
    "ledger.journal_entry",
+   "ledger.posting",
    "orders.order_line",
    "orders.payment",
    "orders.sales_order",
@@ -524,7 +539,7 @@
   ]
  },
  "WEB-013": {
-  "name": "Order Confirmation",
+  "name": "Booking Confirmation",
   "platform": "P01",
   "platformName": "Guest Web",
   "operator": "guest",
@@ -593,7 +608,7 @@
    "orders.payment_provider",
    "orders.reservation",
    "orders.sales_order",
-   "platform.scope_node"
+   "platform.org_unit"
   ],
   "writes": [
    "access.entitlement",
@@ -612,7 +627,7 @@
   ]
  },
  "WEB-015": {
-  "name": "Virtual Waiting Room",
+  "name": "Branded Queue / Waiting Room",
   "platform": "P01",
   "platformName": "Guest Web",
   "operator": "guest",
@@ -620,7 +635,7 @@
   "route": "/high-demand-access/virtual-waiting-room",
   "operations": [
    "joinQueue",
-   "getQueueEntry",
+   "getWaitingGuest",
    "getWaitTimes"
   ],
   "services": [
@@ -632,13 +647,13 @@
   ],
   "reads": [
    "cache:idempotency",
-   "queue.entry",
    "queue.queue",
-   "queue.reading"
+   "queue.reading",
+   "queue.waiting_guest"
   ],
   "writes": [
    "cache:idempotency",
-   "queue.entry"
+   "queue.waiting_guest"
   ],
   "storedProcedures": [],
   "wave": 2,
@@ -686,7 +701,7 @@
   ],
   "reads": [
    "cache:idempotency",
-   "identity.grant",
+   "identity.delegated_access",
    "identity.guest_session",
    "identity.mfa_challenge",
    "identity.mfa_method",
@@ -786,24 +801,31 @@
    "getEntitlement",
    "getEntitlementCredential",
    "getEntitlementHistory",
-   "listEntitlements"
+   "listEntitlements",
+   "transferOrderTickets"
   ],
   "services": [
-   "AccessService"
+   "AccessService",
+   "OrderService"
   ],
   "stores": [
-   "postgres"
+   "postgres",
+   "redis"
   ],
   "reads": [
-   "access.admission_profile",
+   "access.admission_rules",
    "access.entitlement",
    "access.scan_event",
+   "cache:idempotency",
    "catalogue.entitlement_template",
    "catalogue.product",
-   "identity.grant"
+   "identity.delegated_access",
+   "orders.ticket_transfer"
   ],
   "writes": [
-   "access.entitlement"
+   "access.entitlement",
+   "cache:idempotency",
+   "orders.ticket_transfer"
   ],
   "storedProcedures": [],
   "wave": 1,
@@ -825,7 +847,9 @@
   "route": "/account-and-self-service/order-history",
   "operations": [
    "transferOrderTickets",
-   "listMyOrders"
+   "listMyOrders",
+   "getOrder",
+   "listOrders"
   ],
   "services": [
    "OrderService"
@@ -838,6 +862,7 @@
    "access.entitlement",
    "cache:idempotency",
    "orders.order_line",
+   "orders.payment",
    "orders.sales_order",
    "orders.ticket_transfer",
    "pii.subject"
@@ -1029,7 +1054,7 @@
   ]
  },
  "WEB-024": {
-  "name": "Loyalty & Rewards",
+  "name": "Devices, Wishlist & Consent",
   "platform": "P01",
   "platformName": "Guest Web",
   "operator": "guest",
@@ -1385,7 +1410,7 @@
   ],
   "reads": [
    "cache:idempotency",
-   "catalogue.envelope",
+   "catalogue.channel_capacity",
    "catalogue.performance",
    "catalogue.variant",
    "retail.merchandise",
@@ -1393,7 +1418,7 @@
   ],
   "writes": [
    "cache:idempotency",
-   "catalogue.inventory_lease",
+   "catalogue.inventory_hold",
    "orders.cart",
    "orders.cart_line",
    "retail.reservation"
@@ -1477,7 +1502,7 @@
   ]
  },
  "WEB-036": {
-  "name": "F&B \u2014 Browse & Order",
+  "name": "F&B \u2013 Browse & Order",
   "platform": "P01",
   "platformName": "Guest Web",
   "operator": "guest",
@@ -1490,7 +1515,8 @@
    "claimLocationSession",
    "claimTableSession",
    "createGuestFnbOrder",
-   "listDeliveryLocations"
+   "listDeliveryLocations",
+   "getGuestOrderStatus"
   ],
   "services": [
    "FnbService"
@@ -1504,6 +1530,7 @@
    "cache:idempotency",
    "fnb.delivery_location",
    "fnb.fnb_order",
+   "fnb.kitchen_ticket",
    "fnb.location_session",
    "fnb.menu",
    "fnb.menu_item",
@@ -1557,7 +1584,7 @@
   ]
  },
  "WEB-038": {
-  "name": "F&B \u2014 Order Tracking",
+  "name": "F&B \u2013 Order Tracking",
   "platform": "P01",
   "platformName": "Guest Web",
   "operator": "guest",
@@ -1618,9 +1645,9 @@
   "reads": [
    "assets.media_asset",
    "cache:resolution",
-   "queue.entry",
    "queue.queue",
    "queue.reading",
+   "queue.waiting_guest",
    "venuemap.map",
    "venuemap.path",
    "venuemap.point"
@@ -1645,7 +1672,7 @@
   "route": "/virtual-queue",
   "operations": [
    "joinQueue",
-   "getQueueEntry",
+   "getWaitingGuest",
    "leaveQueue",
    "getWaitTimes"
   ],
@@ -1658,13 +1685,13 @@
   ],
   "reads": [
    "cache:idempotency",
-   "queue.entry",
    "queue.queue",
-   "queue.reading"
+   "queue.reading",
+   "queue.waiting_guest"
   ],
   "writes": [
    "cache:idempotency",
-   "queue.entry"
+   "queue.waiting_guest"
   ],
   "storedProcedures": [],
   "wave": 2,
@@ -1675,7 +1702,7 @@
   ]
  },
  "WEB-041": {
-  "name": "Parking \u2014 Reserve & Pay",
+  "name": "Parking \u2013 Reserve & Pay",
   "platform": "P01",
   "platformName": "Guest Web",
   "operator": "guest",
@@ -1788,7 +1815,7 @@
   ]
  },
  "WEB-044": {
-  "name": "AI Concierge",
+  "name": "AI Concierge \u2013 Home",
   "platform": "P01",
   "platformName": "Guest Web",
   "operator": "guest",
@@ -1798,10 +1825,12 @@
    "createAiConversation",
    "sendAiMessage",
    "handoverToAgent",
-   "requestSuggestion"
+   "requestSuggestion",
+   "getGuestMenu"
   ],
   "services": [
    "AiService",
+   "FnbService",
    "MarketingService"
   ],
   "stores": [
@@ -1821,6 +1850,7 @@
    "ai.suggestion",
    "cache:answer",
    "cache:idempotency",
+   "fnb.modifier_group",
    "marketing.agent_availability",
    "marketing.conversation",
    "qdrant:knowledge"
@@ -1935,7 +1965,7 @@
    "catalogue.event",
    "catalogue.product",
    "catalogue.variant",
-   "identity.grant",
+   "identity.delegated_access",
    "marketing.consent_record",
    "marketing.guest_profile",
    "marketing.loyalty_position",
@@ -1986,7 +2016,7 @@
   ]
  },
  "GST-003": {
-  "name": "Attractions List",
+  "name": "Event & Attraction Listing",
   "platform": "P02",
   "platformName": "Guest App",
   "operator": "guest",
@@ -1994,7 +2024,9 @@
   "route": "/general/attractions-list",
   "operations": [
    "listProducts",
-   "getWaitTimes"
+   "getWaitTimes",
+   "listPerformances",
+   "searchCatalogue"
   ],
   "services": [
    "CatalogueService",
@@ -2004,10 +2036,13 @@
    "postgres"
   ],
   "reads": [
+   "catalogue.event",
+   "catalogue.performance",
    "catalogue.product",
-   "queue.entry",
+   "catalogue.variant",
    "queue.queue",
-   "queue.reading"
+   "queue.reading",
+   "queue.waiting_guest"
   ],
   "writes": [],
   "storedProcedures": [],
@@ -2030,7 +2065,8 @@
   "operations": [
    "getProduct",
    "getAvailability",
-   "getWaitTimes"
+   "getWaitTimes",
+   "listPerformances"
   ],
   "services": [
    "CatalogueService",
@@ -2040,13 +2076,13 @@
    "postgres"
   ],
   "reads": [
-   "catalogue.envelope",
-   "catalogue.inventory_lease",
+   "catalogue.channel_capacity",
+   "catalogue.inventory_hold",
    "catalogue.performance",
    "catalogue.product",
-   "queue.entry",
    "queue.queue",
-   "queue.reading"
+   "queue.reading",
+   "queue.waiting_guest"
   ],
   "writes": [],
   "storedProcedures": [],
@@ -2141,8 +2177,8 @@
    "postgres"
   ],
   "reads": [
-   "catalogue.envelope",
-   "catalogue.inventory_lease",
+   "catalogue.channel_capacity",
+   "catalogue.inventory_hold",
    "catalogue.performance"
   ],
   "writes": [],
@@ -2217,8 +2253,8 @@
   "reads": [
    "access.entitlement",
    "cache:idempotency",
-   "catalogue.envelope",
-   "catalogue.inventory_lease",
+   "catalogue.channel_capacity",
+   "catalogue.inventory_hold",
    "ledger.fx_rate",
    "orders.cart",
    "orders.cart_line",
@@ -2230,8 +2266,8 @@
   "writes": [
    "access.entitlement",
    "cache:idempotency",
-   "ledger.entry",
    "ledger.journal_entry",
+   "ledger.posting",
    "orders.cart",
    "orders.order_line",
    "orders.payment",
@@ -2257,7 +2293,8 @@
   "route": "/general/booking-confirmation",
   "operations": [
    "transferOrderTickets",
-   "getOrder"
+   "getOrder",
+   "reprintOrder"
   ],
   "services": [
    "OrderService"
@@ -2277,6 +2314,7 @@
   "writes": [
    "access.entitlement",
    "cache:idempotency",
+   "orders.sales_order",
    "orders.ticket_transfer"
   ],
   "storedProcedures": [],
@@ -2331,7 +2369,10 @@
   "operations": [
    "listMyEntitlements",
    "getEntitlement",
-   "transferOrderTickets"
+   "transferOrderTickets",
+   "getEntitlementCredential",
+   "getEntitlementHistory",
+   "listEntitlements"
   ],
   "services": [
    "AccessService",
@@ -2342,11 +2383,13 @@
    "redis"
   ],
   "reads": [
+   "access.admission_rules",
    "access.entitlement",
+   "access.scan_event",
    "cache:idempotency",
    "catalogue.entitlement_template",
    "catalogue.product",
-   "identity.grant",
+   "identity.delegated_access",
    "orders.ticket_transfer"
   ],
   "writes": [
@@ -2390,7 +2433,7 @@
    "access.scan_event",
    "cache:idempotency",
    "catalogue.entitlement_template",
-   "identity.grant",
+   "identity.delegated_access",
    "orders.ticket_transfer"
   ],
   "writes": [
@@ -2417,7 +2460,8 @@
   "route": "/general/ticket-transfer",
   "operations": [
    "transferOrderTickets",
-   "claimTicketTransfer"
+   "claimTicketTransfer",
+   "listOrders"
   ],
   "services": [
    "OrderService"
@@ -2429,6 +2473,8 @@
   "reads": [
    "access.entitlement",
    "cache:idempotency",
+   "orders.order_line",
+   "orders.sales_order",
    "orders.ticket_transfer"
   ],
   "writes": [
@@ -2473,7 +2519,7 @@
    "cache:idempotency",
    "catalogue.entitlement_template",
    "catalogue.product",
-   "identity.grant",
+   "identity.delegated_access",
    "marketing.guest_profile",
    "marketing.loyalty_position",
    "orders.sales_order",
@@ -2481,7 +2527,7 @@
   ],
   "writes": [
    "cache:idempotency",
-   "identity.grant"
+   "identity.delegated_access"
   ],
   "storedProcedures": [],
   "wave": 2,
@@ -2608,7 +2654,7 @@
   ]
  },
  "GST-019": {
-  "name": "Order History (Wallet)",
+  "name": "Order History",
   "platform": "P02",
   "platformName": "Guest App",
   "operator": "guest",
@@ -2617,21 +2663,30 @@
   "operations": [
    "listOrders",
    "getOrder",
-   "listMyOrders"
+   "listMyOrders",
+   "transferOrderTickets"
   ],
   "services": [
    "OrderService"
   ],
   "stores": [
-   "postgres"
+   "postgres",
+   "redis"
   ],
   "reads": [
+   "access.entitlement",
+   "cache:idempotency",
    "orders.order_line",
    "orders.payment",
    "orders.sales_order",
+   "orders.ticket_transfer",
    "pii.subject"
   ],
-  "writes": [],
+  "writes": [
+   "access.entitlement",
+   "cache:idempotency",
+   "orders.ticket_transfer"
+  ],
   "storedProcedures": [],
   "wave": 2,
   "offline": true,
@@ -2706,9 +2761,9 @@
    "assets.media_asset",
    "cache:resolution",
    "catalogue.product",
-   "queue.entry",
    "queue.queue",
    "queue.reading",
+   "queue.waiting_guest",
    "venuemap.map",
    "venuemap.path",
    "venuemap.point"
@@ -2743,9 +2798,9 @@
    "postgres"
   ],
   "reads": [
-   "queue.entry",
    "queue.queue",
-   "queue.reading"
+   "queue.reading",
+   "queue.waiting_guest"
   ],
   "writes": [],
   "storedProcedures": [],
@@ -2760,7 +2815,7 @@
   ]
  },
  "GST-023": {
-  "name": "Virtual Queue / Join Queue",
+  "name": "Virtual Queue",
   "platform": "P02",
   "platformName": "Guest App",
   "operator": "guest",
@@ -2768,8 +2823,9 @@
   "route": "/general/virtual-queue-join-queue",
   "operations": [
    "joinQueue",
-   "getQueueEntry",
-   "leaveQueue"
+   "getWaitingGuest",
+   "leaveQueue",
+   "getWaitTimes"
   ],
   "services": [
    "VenueOpsService"
@@ -2780,11 +2836,13 @@
   ],
   "reads": [
    "cache:idempotency",
-   "queue.entry"
+   "queue.queue",
+   "queue.reading",
+   "queue.waiting_guest"
   ],
   "writes": [
    "cache:idempotency",
-   "queue.entry"
+   "queue.waiting_guest"
   ],
   "storedProcedures": [],
   "wave": 3,
@@ -2809,7 +2867,9 @@
    "claimLocationSession",
    "createGuestFnbOrder",
    "getGuestOrderStatus",
-   "listDeliveryLocations"
+   "listDeliveryLocations",
+   "claimTableSession",
+   "listModifierGroups"
   ],
   "services": [
    "FnbService"
@@ -2828,6 +2888,7 @@
    "fnb.menu",
    "fnb.menu_item",
    "fnb.modifier_group",
+   "fnb.table_session",
    "inventory.stock_level",
    "platform.outlet"
   ],
@@ -2835,7 +2896,8 @@
    "cache:idempotency",
    "fnb.fnb_order",
    "fnb.kitchen_ticket",
-   "fnb.location_session"
+   "fnb.location_session",
+   "fnb.table_session"
   ],
   "storedProcedures": [],
   "wave": 2,
@@ -2932,7 +2994,8 @@
   "route": "/general/parking-reserve-and-pay",
   "operations": [
    "createParkingEntitlement",
-   "updateParkingEntitlement"
+   "updateParkingEntitlement",
+   "listParkingFacilities"
   ],
   "services": [
    "AccessService"
@@ -3077,11 +3140,15 @@
   "route": "/general/ai-concierge-home",
   "operations": [
    "getGuestMenu",
-   "sendAiMessage"
+   "sendAiMessage",
+   "createAiConversation",
+   "handoverToAgent",
+   "requestSuggestion"
   ],
   "services": [
    "AiService",
-   "FnbService"
+   "FnbService",
+   "MarketingService"
   ],
   "stores": [
    "postgres",
@@ -3097,17 +3164,23 @@
    "ai.policy",
    "ai.proposed_action",
    "ai.provider",
+   "ai.suggestion",
    "cache:answer",
    "cache:idempotency",
    "fnb.modifier_group",
+   "marketing.agent_availability",
+   "marketing.conversation",
    "qdrant:knowledge"
   ],
   "writes": [
+   "ai.conversation",
    "ai.interaction",
    "ai.message",
    "ai.proposed_action",
+   "ai.suggestion",
    "cache:answer",
    "cache:idempotency",
+   "marketing.conversation",
    "qdrant:knowledge"
   ],
   "storedProcedures": [],
@@ -3161,8 +3234,8 @@
    "ai.provider",
    "cache:answer",
    "cache:idempotency",
-   "catalogue.envelope",
-   "catalogue.inventory_lease",
+   "catalogue.channel_capacity",
+   "catalogue.inventory_hold",
    "catalogue.performance",
    "catalogue.variant",
    "fnb.delivery_location",
@@ -3184,7 +3257,7 @@
    "ai.proposed_action",
    "cache:answer",
    "cache:idempotency",
-   "catalogue.inventory_lease",
+   "catalogue.inventory_hold",
    "fnb.fnb_order",
    "fnb.kitchen_ticket",
    "marketing.conversation",
@@ -3341,18 +3414,27 @@
   "route": "/loyalty-rewards",
   "operations": [
    "getLoyaltyPosition",
-   "listLoyaltyProgrammes"
+   "listLoyaltyProgrammes",
+   "evaluatePromotions",
+   "listPromotions"
   ],
   "services": [
+   "CatalogueService",
    "MarketingService"
   ],
   "stores": [
-   "postgres"
+   "postgres",
+   "redis"
   ],
   "reads": [
-   "marketing.loyalty_programme"
+   "cache:idempotency",
+   "catalogue.price_list",
+   "marketing.loyalty_programme",
+   "promotions.promotion"
   ],
-  "writes": [],
+  "writes": [
+   "cache:idempotency"
+  ],
   "storedProcedures": [],
   "wave": 2,
   "offline": true,
@@ -3422,9 +3504,9 @@
   ],
   "reads": [
    "catalogue.product",
-   "queue.entry",
    "queue.queue",
    "queue.reading",
+   "queue.waiting_guest",
    "whitelabel.config_version",
    "whitelabel.tenant_config"
   ],
@@ -3538,8 +3620,8 @@
   ],
   "reads": [
    "cache:idempotency",
-   "catalogue.envelope",
-   "catalogue.inventory_lease",
+   "catalogue.channel_capacity",
+   "catalogue.inventory_hold",
    "orders.cart",
    "orders.cart_line",
    "promotions.promotion"
@@ -3596,7 +3678,7 @@
   ],
   "reads": [
    "cache:idempotency",
-   "identity.grant",
+   "identity.delegated_access",
    "identity.guest_session",
    "identity.mfa_challenge",
    "identity.mfa_method",
@@ -3734,20 +3816,27 @@
   "app": "guest-app",
   "route": "/general/branded-queue-waiting-room",
   "operations": [
-   "getWaitTimes"
+   "getWaitTimes",
+   "getWaitingGuest",
+   "joinQueue"
   ],
   "services": [
    "VenueOpsService"
   ],
   "stores": [
-   "postgres"
+   "postgres",
+   "redis"
   ],
   "reads": [
-   "queue.entry",
+   "cache:idempotency",
    "queue.queue",
-   "queue.reading"
+   "queue.reading",
+   "queue.waiting_guest"
   ],
-  "writes": [],
+  "writes": [
+   "cache:idempotency",
+   "queue.waiting_guest"
+  ],
   "storedProcedures": [],
   "wave": 1,
   "offline": true,
@@ -3810,7 +3899,7 @@
   ],
   "reads": [
    "cache:idempotency",
-   "catalogue.envelope",
+   "catalogue.channel_capacity",
    "catalogue.performance",
    "catalogue.product",
    "catalogue.variant",
@@ -3818,7 +3907,7 @@
   ],
   "writes": [
    "cache:idempotency",
-   "catalogue.inventory_lease",
+   "catalogue.inventory_hold",
    "orders.cart",
    "orders.cart_line"
   ],
@@ -3894,15 +3983,15 @@
   ],
   "reads": [
    "cache:idempotency",
-   "catalogue.envelope",
-   "catalogue.inventory_lease",
+   "catalogue.channel_capacity",
+   "catalogue.inventory_hold",
    "catalogue.performance",
    "catalogue.product",
    "catalogue.variant"
   ],
   "writes": [
    "cache:idempotency",
-   "catalogue.inventory_lease",
+   "catalogue.inventory_hold",
    "orders.cart",
    "orders.cart_line"
   ],
@@ -3936,9 +4025,9 @@
   ],
   "reads": [
    "catalogue.product",
-   "queue.entry",
    "queue.queue",
-   "queue.reading"
+   "queue.reading",
+   "queue.waiting_guest"
   ],
   "writes": [],
   "storedProcedures": [],
@@ -4019,21 +4108,21 @@
   ],
   "reads": [
    "cache:idempotency",
-   "catalogue.envelope",
-   "catalogue.inventory_lease",
+   "catalogue.channel_capacity",
+   "catalogue.inventory_hold",
    "catalogue.performance",
    "catalogue.product",
    "catalogue.variant",
    "orders.cart",
    "orders.cart_line",
    "promotions.promotion",
-   "queue.entry",
    "queue.queue",
-   "queue.reading"
+   "queue.reading",
+   "queue.waiting_guest"
   ],
   "writes": [
    "cache:idempotency",
-   "catalogue.inventory_lease",
+   "catalogue.inventory_hold",
    "orders.cart",
    "orders.cart_line"
   ],
@@ -4084,9 +4173,9 @@
    "cache:idempotency",
    "catalogue.product",
    "qdrant:knowledge",
-   "queue.entry",
    "queue.queue",
-   "queue.reading"
+   "queue.reading",
+   "queue.waiting_guest"
   ],
   "writes": [
    "ai.interaction",
@@ -4166,7 +4255,7 @@
   ],
   "reads": [
    "cache:idempotency",
-   "catalogue.envelope",
+   "catalogue.channel_capacity",
    "catalogue.performance",
    "catalogue.product",
    "catalogue.published_bundle",
@@ -4177,7 +4266,7 @@
   ],
   "writes": [
    "cache:idempotency",
-   "catalogue.inventory_lease",
+   "catalogue.inventory_hold",
    "orders.cart",
    "orders.cart_line"
   ],
@@ -4239,8 +4328,8 @@
    "postgres"
   ],
   "reads": [
-   "catalogue.envelope",
-   "catalogue.inventory_lease",
+   "catalogue.channel_capacity",
+   "catalogue.inventory_hold",
    "catalogue.performance",
    "catalogue.product"
   ],
@@ -4283,9 +4372,9 @@
    "ai.suggestion",
    "cache:idempotency",
    "catalogue.product",
-   "queue.entry",
    "queue.queue",
-   "queue.reading"
+   "queue.reading",
+   "queue.waiting_guest"
   ],
   "writes": [
    "ai.interaction",
@@ -4310,7 +4399,8 @@
   "app": "guest-app",
   "route": "/in-venue-experience/menu-item-detail",
   "operations": [
-   "getGuestMenu"
+   "getGuestMenu",
+   "listModifierGroups"
   ],
   "services": [
    "FnbService"
@@ -4464,7 +4554,7 @@
   ],
   "reads": [
    "cache:idempotency",
-   "identity.grant",
+   "identity.delegated_access",
    "identity.principal",
    "identity.role",
    "identity.session",
@@ -4577,18 +4667,18 @@
    "approvals.rule",
    "cache:idempotency",
    "catalogue.alternative_code",
+   "catalogue.channel_capacity",
    "catalogue.entitlement_template",
-   "catalogue.envelope",
    "catalogue.performance",
    "catalogue.price_list",
    "catalogue.product",
    "catalogue.published_bundle",
    "catalogue.variant",
    "games.card",
-   "identity.grant",
+   "identity.delegated_access",
    "identity.principal",
-   "ledger.entry",
    "ledger.fx_rate",
+   "ledger.posting",
    "marketing.guest_profile",
    "marketing.loyalty_position",
    "marketing.loyalty_programme",
@@ -4597,8 +4687,8 @@
    "orders.refund",
    "orders.sales_order",
    "pii.subject",
+   "platform.org_unit",
    "platform.sale_board",
-   "platform.scope_node",
    "promotions.promotion",
    "retail.merchandise",
    "retail.return",
@@ -4607,10 +4697,10 @@
   "writes": [
    "approvals.request",
    "cache:idempotency",
-   "catalogue.inventory_lease",
+   "catalogue.inventory_hold",
    "games.card",
-   "ledger.entry",
    "ledger.journal_entry",
+   "ledger.posting",
    "marketing.loyalty_position",
    "orders.cart",
    "orders.cart_line",
@@ -4648,14 +4738,14 @@
   "route": "/sell/sell-timed-entry",
   "operations": [
    "getAvailability",
-   "acquireLease",
+   "acquireInventoryHold",
    "listProductVariants",
    "getProduct",
    "listAlternativeCodes",
-   "listLeases",
+   "listInventoryHolds",
    "listProducts",
-   "releaseLease",
-   "renewLease",
+   "releaseInventoryHold",
+   "renewInventoryHold",
    "resolveProductByCode"
   ],
   "services": [
@@ -4668,8 +4758,8 @@
   "reads": [
    "cache:idempotency",
    "catalogue.alternative_code",
-   "catalogue.envelope",
-   "catalogue.inventory_lease",
+   "catalogue.channel_capacity",
+   "catalogue.inventory_hold",
    "catalogue.performance",
    "catalogue.product",
    "catalogue.variant",
@@ -4677,7 +4767,7 @@
   ],
   "writes": [
    "cache:idempotency",
-   "catalogue.inventory_lease"
+   "catalogue.inventory_hold"
   ],
   "storedProcedures": [],
   "wave": 1,
@@ -4726,12 +4816,12 @@
    "approvals.rule",
    "cache:idempotency",
    "catalogue.performance",
-   "identity.grant",
+   "identity.delegated_access",
    "ledger.fx_rate",
    "orders.order_line",
    "orders.payment",
    "orders.sales_order",
-   "platform.scope_node",
+   "platform.org_unit",
    "seating.seat",
    "seating.seat_category",
    "seating.seat_hold"
@@ -4739,8 +4829,8 @@
   "writes": [
    "cache:idempotency",
    "catalogue.performance",
-   "ledger.entry",
    "ledger.journal_entry",
+   "ledger.posting",
    "orders.order_line",
    "orders.payment",
    "orders.sales_order",
@@ -4799,8 +4889,8 @@
   ],
   "writes": [
    "cache:idempotency",
-   "ledger.entry",
    "ledger.journal_entry",
+   "ledger.posting",
    "marketing.loyalty_position",
    "orders.order_line",
    "orders.payment",
@@ -4853,7 +4943,7 @@
   ],
   "reads": [
    "cache:idempotency",
-   "ledger.entry",
+   "ledger.posting",
    "orders.order_line",
    "orders.payment",
    "orders.refund",
@@ -4861,8 +4951,8 @@
   ],
   "writes": [
    "cache:idempotency",
-   "ledger.entry",
    "ledger.journal_entry",
+   "ledger.posting",
    "orders.order_line",
    "orders.payment",
    "orders.refund",
@@ -4931,8 +5021,8 @@
   ],
   "writes": [
    "cache:idempotency",
-   "ledger.entry",
    "ledger.journal_entry",
+   "ledger.posting",
    "orders.cash_count_line",
    "orders.cash_movement",
    "orders.deposit_box",
@@ -4980,9 +5070,9 @@
    "ai.provider",
    "cache:idempotency",
    "ledger.account",
-   "ledger.entry",
    "ledger.event_budget",
    "ledger.fiscal_period",
+   "ledger.posting",
    "reporting.execution",
    "reporting.report_column",
    "reporting.report_definition",
@@ -5043,7 +5133,7 @@
   ],
   "reads": [
    "cache:idempotency",
-   "identity.grant",
+   "identity.delegated_access",
    "identity.principal",
    "ledger.fx_rate",
    "orders.cash_count_line",
@@ -5104,9 +5194,9 @@
    "assets.media_asset",
    "assets.media_usage",
    "cache:idempotency",
+   "catalogue.channel_capacity",
    "catalogue.entitlement_template",
-   "catalogue.envelope",
-   "catalogue.inventory_lease",
+   "catalogue.inventory_hold",
    "orders.cart",
    "orders.cart_line",
    "orders.order_line",
@@ -5183,8 +5273,8 @@
   "writes": [
    "cache:idempotency",
    "cache:resolution",
-   "ledger.entry",
    "ledger.journal_entry",
+   "ledger.posting",
    "orders.cash_movement",
    "orders.deposit_box",
    "orders.refund",
@@ -5282,7 +5372,7 @@
   ],
   "reads": [
    "access.access_point",
-   "access.admission_profile",
+   "access.admission_rules",
    "access.blacklist",
    "cache:idempotency",
    "cache:resolution",
@@ -5484,7 +5574,7 @@
   ],
   "reads": [
    "cache:idempotency",
-   "identity.grant",
+   "identity.delegated_access",
    "identity.principal",
    "orders.cash_count_line",
    "orders.cash_movement",
@@ -5622,7 +5712,7 @@
   ],
   "reads": [
    "cache:idempotency",
-   "catalogue.envelope",
+   "catalogue.channel_capacity",
    "catalogue.performance",
    "catalogue.price_list",
    "catalogue.variant",
@@ -5634,7 +5724,7 @@
   ],
   "writes": [
    "cache:idempotency",
-   "catalogue.inventory_lease",
+   "catalogue.inventory_hold",
    "fnb.menu_item",
    "orders.cart",
    "orders.cart_line"
@@ -5712,7 +5802,7 @@
   ],
   "reads": [
    "cache:idempotency",
-   "catalogue.envelope",
+   "catalogue.channel_capacity",
    "catalogue.performance",
    "catalogue.price_list",
    "catalogue.variant",
@@ -5722,7 +5812,7 @@
   ],
   "writes": [
    "cache:idempotency",
-   "catalogue.inventory_lease",
+   "catalogue.inventory_hold",
    "orders.cart",
    "orders.cart_line",
    "retail.sale"
@@ -5891,8 +5981,8 @@
    "postgres"
   ],
   "reads": [
-   "catalogue.envelope",
-   "catalogue.inventory_lease",
+   "catalogue.channel_capacity",
+   "catalogue.inventory_hold",
    "catalogue.performance",
    "catalogue.variant"
   ],
@@ -5916,7 +6006,7 @@
   "app": "guest-app",
   "route": "/sell/choose-a-session",
   "operations": [
-   "acquireLease",
+   "acquireInventoryHold",
    "getAvailability"
   ],
   "services": [
@@ -5928,14 +6018,14 @@
   ],
   "reads": [
    "cache:idempotency",
-   "catalogue.envelope",
-   "catalogue.inventory_lease",
+   "catalogue.channel_capacity",
+   "catalogue.inventory_hold",
    "catalogue.performance",
    "platform.workstation"
   ],
   "writes": [
    "cache:idempotency",
-   "catalogue.inventory_lease"
+   "catalogue.inventory_hold"
   ],
   "storedProcedures": [],
   "wave": 2,
@@ -5971,8 +6061,8 @@
   ],
   "reads": [
    "cache:idempotency",
-   "catalogue.envelope",
-   "catalogue.inventory_lease",
+   "catalogue.channel_capacity",
+   "catalogue.inventory_hold",
    "catalogue.performance",
    "catalogue.price_list",
    "catalogue.variant",
@@ -5982,7 +6072,7 @@
   ],
   "writes": [
    "cache:idempotency",
-   "catalogue.inventory_lease",
+   "catalogue.inventory_hold",
    "orders.cart",
    "orders.cart_line",
    "orders.order_line",
@@ -6024,8 +6114,8 @@
   ],
   "writes": [
    "cache:idempotency",
-   "ledger.entry",
    "ledger.journal_entry",
+   "ledger.posting",
    "orders.payment"
   ],
   "storedProcedures": [],
@@ -6316,8 +6406,8 @@
    "ai.provider",
    "cache:answer",
    "cache:idempotency",
-   "catalogue.envelope",
-   "catalogue.inventory_lease",
+   "catalogue.channel_capacity",
+   "catalogue.inventory_hold",
    "catalogue.performance",
    "catalogue.product",
    "marketing.agent_availability",
@@ -6389,9 +6479,12 @@
   "route": "/sell/shop",
   "operations": [
    "listMerchandise",
-   "reserveMerchandise"
+   "reserveMerchandise",
+   "addCartLine",
+   "lookupMerchandise"
   ],
   "services": [
+   "OrderService",
    "RetailService"
   ],
   "stores": [
@@ -6400,11 +6493,17 @@
   ],
   "reads": [
    "cache:idempotency",
+   "catalogue.channel_capacity",
+   "catalogue.performance",
+   "catalogue.variant",
    "retail.merchandise",
    "retail.reservation"
   ],
   "writes": [
    "cache:idempotency",
+   "catalogue.inventory_hold",
+   "orders.cart",
+   "orders.cart_line",
    "retail.reservation"
   ],
   "storedProcedures": [],
@@ -6437,7 +6536,7 @@
   "reads": [
    "cache:idempotency",
    "cache:resolution",
-   "identity.grant",
+   "identity.delegated_access",
    "identity.guest_session",
    "identity.mfa_method",
    "identity.principal",
@@ -6487,7 +6586,7 @@
   "reads": [
    "cache:idempotency",
    "cache:resolution",
-   "identity.grant",
+   "identity.delegated_access",
    "identity.guest_session",
    "identity.mfa_method",
    "identity.principal",
@@ -6721,7 +6820,7 @@
   ],
   "reads": [
    "access.access_point",
-   "access.admission_profile",
+   "access.admission_rules",
    "access.blacklist",
    "access.entitlement",
    "access.scan_event",
@@ -6783,7 +6882,7 @@
   ],
   "reads": [
    "cache:idempotency",
-   "ledger.entry",
+   "ledger.posting",
    "orders.order_line",
    "orders.payment",
    "orders.refund",
@@ -6791,8 +6890,8 @@
   ],
   "writes": [
    "cache:idempotency",
-   "ledger.entry",
    "ledger.journal_entry",
+   "ledger.posting",
    "orders.order_line",
    "orders.payment",
    "orders.refund",
@@ -6833,7 +6932,7 @@
   ],
   "reads": [
    "access.access_point",
-   "access.admission_profile",
+   "access.admission_rules",
    "access.blacklist",
    "access.entitlement",
    "access.scan_event",
@@ -6891,7 +6990,7 @@
   ],
   "reads": [
    "access.access_point",
-   "access.admission_profile",
+   "access.admission_rules",
    "access.blacklist",
    "access.entitlement",
    "access.scan_event",
@@ -7147,7 +7246,7 @@
    "cache:idempotency",
    "identity.principal",
    "identity.role",
-   "platform.scope_node",
+   "platform.org_unit",
    "workforce.announcement",
    "workforce.announcement_receipt",
    "workforce.rota_assignment"
@@ -7338,9 +7437,9 @@
   ],
   "reads": [
    "cache:idempotency",
-   "queue.entry",
    "queue.queue",
-   "queue.reading"
+   "queue.reading",
+   "queue.waiting_guest"
   ],
   "writes": [
    "cache:idempotency",
@@ -7379,9 +7478,9 @@
   ],
   "reads": [
    "cache:idempotency",
-   "queue.entry",
    "queue.queue",
-   "queue.reading"
+   "queue.reading",
+   "queue.waiting_guest"
   ],
   "writes": [
    "cache:idempotency",
@@ -7405,12 +7504,12 @@
   "app": "venue-staff-app",
   "route": "/operations/capacity-view",
   "operations": [
-   "listEnvelopes",
+   "listChannelCapacities",
    "getChannelAllocations",
-   "createEnvelope",
+   "createChannelCapacity",
    "releaseChannelAllocation",
    "setChannelAllocations",
-   "updateEnvelope"
+   "updateChannelCapacity"
   ],
   "services": [
    "CatalogueService"
@@ -7422,12 +7521,12 @@
   "reads": [
    "cache:idempotency",
    "catalogue.channel_allocation",
-   "catalogue.envelope"
+   "catalogue.channel_capacity"
   ],
   "writes": [
    "cache:idempotency",
    "catalogue.channel_allocation",
-   "catalogue.envelope"
+   "catalogue.channel_capacity"
   ],
   "storedProcedures": [],
   "wave": 2,
@@ -7481,10 +7580,10 @@
   "reads": [
    "cache:idempotency",
    "catalogue.alternative_code",
-   "catalogue.attribute_axis",
    "catalogue.product",
    "catalogue.variant",
-   "ledger.entry",
+   "catalogue.variant_dimension",
+   "ledger.posting",
    "orders.order_line",
    "orders.payment",
    "orders.refund",
@@ -7493,10 +7592,10 @@
   "writes": [
    "cache:idempotency",
    "catalogue.alternative_code",
-   "catalogue.attribute_axis",
    "catalogue.product",
-   "ledger.entry",
+   "catalogue.variant_dimension",
    "ledger.journal_entry",
+   "ledger.posting",
    "orders.order_line",
    "orders.payment",
    "orders.refund",
@@ -7540,8 +7639,8 @@
   ],
   "writes": [
    "cache:idempotency",
-   "ledger.entry",
    "ledger.journal_entry",
+   "ledger.posting",
    "orders.payment"
   ],
   "storedProcedures": [],
@@ -7627,7 +7726,7 @@
    "cache:idempotency",
    "identity.principal",
    "identity.role",
-   "platform.scope_node",
+   "platform.org_unit",
    "workforce.announcement",
    "workforce.announcement_receipt",
    "workforce.rota_assignment"
@@ -7671,7 +7770,7 @@
    "cache:idempotency",
    "identity.principal",
    "identity.role",
-   "platform.scope_node",
+   "platform.org_unit",
    "workforce.announcement",
    "workforce.announcement_receipt",
    "workforce.rota_assignment"
@@ -7715,7 +7814,7 @@
    "cache:idempotency",
    "identity.principal",
    "identity.role",
-   "platform.scope_node",
+   "platform.org_unit",
    "workforce.announcement",
    "workforce.announcement_receipt",
    "workforce.rota_assignment"
@@ -8162,7 +8261,7 @@
    "fnb.fnb_order",
    "fnb.menu",
    "platform.outlet",
-   "queue.entry",
+   "queue.waiting_guest",
    "venuemap.map",
    "venuemap.path",
    "venuemap.point"
@@ -8202,7 +8301,7 @@
    "cache:idempotency",
    "identity.principal",
    "identity.role",
-   "platform.scope_node",
+   "platform.org_unit",
    "workforce.announcement",
    "workforce.announcement_receipt",
    "workforce.rota_assignment"
@@ -8332,7 +8431,7 @@
   ],
   "reads": [
    "cache:resolution",
-   "identity.grant",
+   "identity.delegated_access",
    "identity.guest_session",
    "identity.mfa_method",
    "identity.principal",
@@ -8824,8 +8923,8 @@
    "fnb.bill_split",
    "fnb.fnb_order",
    "fnb.table_visit",
-   "ledger.entry",
    "ledger.journal_entry",
+   "ledger.posting",
    "orders.order_discount",
    "orders.order_line",
    "orders.payment"
@@ -8928,7 +9027,7 @@
    "inventory.item",
    "inventory.location",
    "inventory.stock_level",
-   "platform.scope_node"
+   "platform.org_unit"
   ],
   "writes": [
    "cache:idempotency",
@@ -9116,8 +9215,8 @@
    "fnb.temperature_log",
    "identity.principal",
    "inventory.movement",
-   "platform.outlet",
-   "platform.scope_node"
+   "platform.org_unit",
+   "platform.outlet"
   ],
   "writes": [
    "cache:idempotency",
@@ -9265,7 +9364,7 @@
   "reads": [
    "cache:idempotency",
    "cache:resolution",
-   "identity.grant",
+   "identity.delegated_access",
    "identity.guest_session",
    "identity.mfa_method",
    "identity.principal",
@@ -9276,7 +9375,7 @@
    "identity.sso_provider",
    "orders.shift",
    "pii.subject",
-   "platform.scope_node"
+   "platform.org_unit"
   ],
   "writes": [
    "cache:idempotency",
@@ -9344,12 +9443,12 @@
    "overrideAccess",
    "validateAccess",
    "validateGroupAccess",
-   "consumeRedemptionRight",
+   "consumeCrossRegionEntitlement",
    "listBlacklist"
   ],
   "services": [
    "AccessService",
-   "CrossCellService"
+   "CrossRegionService"
   ],
   "stores": [
    "postgres",
@@ -9357,7 +9456,7 @@
   ],
   "reads": [
    "access.access_point",
-   "access.admission_profile",
+   "access.admission_rules",
    "access.blacklist",
    "access.entitlement",
    "access.scan_event",
@@ -9367,7 +9466,7 @@
    "identity.principal",
    "orders.sales_order",
    "pii.subject",
-   "platform.redemption_right",
+   "platform.cross_region_entitlement",
    "venuemap.map",
    "venuemap.path",
    "venuemap.point"
@@ -9376,7 +9475,7 @@
    "access.scan_event",
    "cache:idempotency",
    "cache:resolution",
-   "platform.redemption_right",
+   "platform.cross_region_entitlement",
    "sync.rejection"
   ],
   "storedProcedures": [],
@@ -9414,7 +9513,7 @@
   ],
   "reads": [
    "access.access_point",
-   "access.admission_profile",
+   "access.admission_rules",
    "access.blacklist",
    "access.entitlement",
    "access.scan_event",
@@ -9469,7 +9568,7 @@
   ],
   "reads": [
    "access.access_point",
-   "access.admission_profile",
+   "access.admission_rules",
    "access.blacklist",
    "access.entitlement",
    "access.scan_event",
@@ -9524,7 +9623,7 @@
   ],
   "reads": [
    "access.access_point",
-   "access.admission_profile",
+   "access.admission_rules",
    "access.blacklist",
    "access.entitlement",
    "access.scan_event",
@@ -9562,11 +9661,11 @@
   "app": "venue-scanner",
   "route": "/access/delegated-right",
   "operations": [
-   "getRedemptionRight",
-   "consumeRedemptionRight"
+   "getCrossRegionEntitlement",
+   "consumeCrossRegionEntitlement"
   ],
   "services": [
-   "CrossCellService"
+   "CrossRegionService"
   ],
   "stores": [
    "postgres",
@@ -9574,11 +9673,11 @@
   ],
   "reads": [
    "cache:idempotency",
-   "platform.redemption_right"
+   "platform.cross_region_entitlement"
   ],
   "writes": [
    "cache:idempotency",
-   "platform.redemption_right"
+   "platform.cross_region_entitlement"
   ],
   "storedProcedures": [],
   "wave": 1,
@@ -9615,7 +9714,7 @@
   ],
   "reads": [
    "access.access_point",
-   "access.admission_profile",
+   "access.admission_rules",
    "access.blacklist",
    "access.entitlement",
    "access.scan_event",
@@ -9673,7 +9772,7 @@
   ],
   "reads": [
    "access.access_point",
-   "access.admission_profile",
+   "access.admission_rules",
    "access.blacklist",
    "access.entitlement",
    "access.scan_event",
@@ -9730,7 +9829,7 @@
   ],
   "reads": [
    "access.access_point",
-   "access.admission_profile",
+   "access.admission_rules",
    "access.blacklist",
    "access.entitlement",
    "access.scan_event",
@@ -9837,10 +9936,10 @@
    "cache:idempotency",
    "catalogue.event",
    "catalogue.performance",
-   "queue.entry",
    "queue.feed",
    "queue.queue",
-   "queue.reading"
+   "queue.reading",
+   "queue.waiting_guest"
   ],
   "writes": [
    "cache:idempotency",
@@ -9895,9 +9994,9 @@
   "reads": [
    "cache:idempotency",
    "catalogue.performance",
-   "queue.entry",
    "queue.queue",
    "queue.reading",
+   "queue.waiting_guest",
    "seating.seat",
    "seating.seat_category",
    "seating.seat_hold"
@@ -9988,9 +10087,9 @@
   "reads": [
    "cache:idempotency",
    "orders.refund",
-   "queue.entry",
    "queue.queue",
-   "queue.reading"
+   "queue.reading",
+   "queue.waiting_guest"
   ],
   "writes": [
    "cache:idempotency",
@@ -10050,9 +10149,9 @@
    "marketing.campaign",
    "marketing.message_delivery",
    "marketing.segment_criterion",
-   "queue.entry",
    "queue.queue",
-   "queue.reading"
+   "queue.reading",
+   "queue.waiting_guest"
   ],
   "writes": [
    "cache:idempotency",
@@ -10144,10 +10243,10 @@
   "reads": [
    "cache:idempotency",
    "catalogue.alternative_code",
-   "catalogue.attribute_axis",
    "catalogue.price",
    "catalogue.product",
    "catalogue.variant",
+   "catalogue.variant_dimension",
    "fnb.menu",
    "fnb.menu_section",
    "inventory.item",
@@ -10157,9 +10256,9 @@
    "cache:idempotency",
    "cache:resolution",
    "catalogue.alternative_code",
-   "catalogue.attribute_axis",
    "catalogue.price",
    "catalogue.product",
+   "catalogue.variant_dimension",
    "inventory.item",
    "retail.merchandise"
   ],
@@ -10196,14 +10295,14 @@
   ],
   "reads": [
    "cache:idempotency",
-   "catalogue.attribute_axis",
    "catalogue.product",
-   "catalogue.variant"
+   "catalogue.variant",
+   "catalogue.variant_dimension"
   ],
   "writes": [
    "cache:idempotency",
-   "catalogue.attribute_axis",
-   "catalogue.product"
+   "catalogue.product",
+   "catalogue.variant_dimension"
   ],
   "storedProcedures": [],
   "wave": 1,
@@ -10408,17 +10507,17 @@
   "reads": [
    "cache:idempotency",
    "catalogue.alternative_code",
-   "catalogue.attribute_axis",
    "catalogue.entitlement_template",
    "catalogue.product",
-   "catalogue.variant"
+   "catalogue.variant",
+   "catalogue.variant_dimension"
   ],
   "writes": [
    "cache:idempotency",
    "catalogue.alternative_code",
-   "catalogue.attribute_axis",
    "catalogue.entitlement_template",
-   "catalogue.product"
+   "catalogue.product",
+   "catalogue.variant_dimension"
   ],
   "storedProcedures": [],
   "wave": 2,
@@ -10441,10 +10540,10 @@
   "operations": [
    "getChannelAllocations",
    "setChannelAllocations",
-   "createEnvelope",
-   "listEnvelopes",
+   "createChannelCapacity",
+   "listChannelCapacities",
    "releaseChannelAllocation",
-   "updateEnvelope",
+   "updateChannelCapacity",
    "listChannelListings",
    "listProducts",
    "publishBundle",
@@ -10452,7 +10551,7 @@
   ],
   "services": [
    "CatalogueService",
-   "ControlService"
+   "PlatformService"
   ],
   "stores": [
    "postgres",
@@ -10461,7 +10560,7 @@
   "reads": [
    "cache:idempotency",
    "catalogue.channel_allocation",
-   "catalogue.envelope",
+   "catalogue.channel_capacity",
    "catalogue.price_list",
    "catalogue.product",
    "catalogue.published_bundle",
@@ -10470,7 +10569,7 @@
   "writes": [
    "cache:idempotency",
    "catalogue.channel_allocation",
-   "catalogue.envelope",
+   "catalogue.channel_capacity",
    "catalogue.published_bundle",
    "control.channel_listing"
   ],
@@ -10519,20 +10618,20 @@
    "cache:idempotency",
    "cache:resolution",
    "catalogue.alternative_code",
-   "catalogue.attribute_axis",
    "catalogue.price",
    "catalogue.product",
    "catalogue.published_bundle",
    "catalogue.variant",
+   "catalogue.variant_dimension",
    "fnb.menu_item"
   ],
   "writes": [
    "cache:idempotency",
    "cache:resolution",
    "catalogue.alternative_code",
-   "catalogue.attribute_axis",
    "catalogue.product",
    "catalogue.published_bundle",
+   "catalogue.variant_dimension",
    "fnb.menu_item"
   ],
   "storedProcedures": [],
@@ -10656,12 +10755,12 @@
   "app": "venue-management-web",
   "route": "/venue-operations/capacity-management",
   "operations": [
-   "listEnvelopes",
+   "listChannelCapacities",
    "getChannelAllocations",
-   "createEnvelope",
+   "createChannelCapacity",
    "releaseChannelAllocation",
    "setChannelAllocations",
-   "updateEnvelope"
+   "updateChannelCapacity"
   ],
   "services": [
    "CatalogueService"
@@ -10673,12 +10772,12 @@
   "reads": [
    "cache:idempotency",
    "catalogue.channel_allocation",
-   "catalogue.envelope"
+   "catalogue.channel_capacity"
   ],
   "writes": [
    "cache:idempotency",
    "catalogue.channel_allocation",
-   "catalogue.envelope"
+   "catalogue.channel_capacity"
   ],
   "storedProcedures": [],
   "wave": 1,
@@ -10699,11 +10798,11 @@
   "app": "venue-management-web",
   "route": "/venue-operations/allocation-holds",
   "operations": [
-   "listLeases",
-   "acquireLease",
-   "forceReleaseLease",
-   "releaseLease",
-   "renewLease"
+   "listInventoryHolds",
+   "acquireInventoryHold",
+   "forceReleaseInventoryHold",
+   "releaseInventoryHold",
+   "renewInventoryHold"
   ],
   "services": [
    "CatalogueService"
@@ -10714,13 +10813,13 @@
   ],
   "reads": [
    "cache:idempotency",
-   "catalogue.envelope",
-   "catalogue.inventory_lease",
+   "catalogue.channel_capacity",
+   "catalogue.inventory_hold",
    "platform.workstation"
   ],
   "writes": [
    "cache:idempotency",
-   "catalogue.inventory_lease"
+   "catalogue.inventory_hold"
   ],
   "storedProcedures": [],
   "wave": 2,
@@ -10895,7 +10994,7 @@
   ],
   "reads": [
    "cache:idempotency",
-   "ledger.entry",
+   "ledger.posting",
    "orders.order_line",
    "orders.payment",
    "orders.refund",
@@ -10903,8 +11002,8 @@
   ],
   "writes": [
    "cache:idempotency",
-   "ledger.entry",
    "ledger.journal_entry",
+   "ledger.posting",
    "orders.order_line",
    "orders.payment",
    "orders.refund",
@@ -10955,7 +11054,7 @@
   "reads": [
    "cache:idempotency",
    "cache:resolution",
-   "ledger.entry",
+   "ledger.posting",
    "orders.order_line",
    "orders.payment",
    "orders.refund",
@@ -10965,8 +11064,8 @@
   "writes": [
    "cache:idempotency",
    "cache:resolution",
-   "ledger.entry",
    "ledger.journal_entry",
+   "ledger.posting",
    "orders.order_line",
    "orders.payment",
    "orders.refund",
@@ -11019,8 +11118,8 @@
   "writes": [
    "cache:idempotency",
    "ledger.deposit",
-   "ledger.entry",
    "ledger.journal_entry",
+   "ledger.posting",
    "orders.deposit_box",
    "orders.payment"
   ],
@@ -11109,7 +11208,7 @@
   ],
   "reads": [
    "cache:idempotency",
-   "ledger.entry",
+   "ledger.posting",
    "orders.order_line",
    "orders.payment",
    "orders.refund",
@@ -11117,8 +11216,8 @@
   ],
   "writes": [
    "cache:idempotency",
-   "ledger.entry",
    "ledger.journal_entry",
+   "ledger.posting",
    "orders.order_line",
    "orders.payment",
    "orders.refund",
@@ -11256,9 +11355,9 @@
    "ai.provider",
    "cache:idempotency",
    "ledger.account",
-   "ledger.entry",
    "ledger.event_budget",
    "ledger.fiscal_period",
+   "ledger.posting",
    "reporting.execution",
    "reporting.report_column",
    "reporting.report_definition",
@@ -11383,11 +11482,11 @@
   "platformName": "Venue Management",
   "operator": "venue",
   "app": "venue-management-web",
-  "route": "/venue-operations/admission-profiles",
+  "route": "/venue-operations/admission-rules",
   "operations": [
-   "listAdmissionProfiles",
-   "createAdmissionProfile",
-   "updateAdmissionProfile"
+   "listAdmissionRules",
+   "createAdmissionRules",
+   "updateAdmissionRules"
   ],
   "services": [
    "AccessService"
@@ -11397,11 +11496,11 @@
    "redis"
   ],
   "reads": [
-   "access.admission_profile",
+   "access.admission_rules",
    "cache:idempotency"
   ],
   "writes": [
-   "access.admission_profile",
+   "access.admission_rules",
    "cache:idempotency"
   ],
   "storedProcedures": [],
@@ -11478,7 +11577,7 @@
   ],
   "reads": [
    "access.access_point",
-   "access.admission_profile",
+   "access.admission_rules",
    "access.blacklist",
    "access.entitlement",
    "access.scan_event",
@@ -11536,7 +11635,7 @@
   ],
   "reads": [
    "access.access_point",
-   "access.admission_profile",
+   "access.admission_rules",
    "access.blacklist",
    "access.entitlement",
    "access.scan_event",
@@ -11547,7 +11646,7 @@
    "orders.sales_order",
    "pii.subject",
    "platform.audit_record",
-   "platform.scope_node",
+   "platform.org_unit",
    "venuemap.map",
    "venuemap.path",
    "venuemap.point"
@@ -11623,7 +11722,7 @@
    "platform.configuration_profile",
    "platform.device",
    "platform.device_heartbeat",
-   "platform.scope_node",
+   "platform.org_unit",
    "platform.workstation",
    "reporting.alert",
    "reporting.alert_rule"
@@ -11678,7 +11777,7 @@
   ],
   "reads": [
    "access.access_point",
-   "access.admission_profile",
+   "access.admission_rules",
    "access.blacklist",
    "cache:idempotency",
    "cache:resolution",
@@ -11740,9 +11839,9 @@
   ],
   "reads": [
    "cache:idempotency",
-   "queue.entry",
    "queue.queue",
-   "queue.reading"
+   "queue.reading",
+   "queue.waiting_guest"
   ],
   "writes": [
    "cache:idempotency",
@@ -12026,9 +12125,9 @@
   "reads": [
    "cache:idempotency",
    "ledger.account",
-   "ledger.entry",
    "ledger.event_budget",
    "ledger.fiscal_period",
+   "ledger.posting",
    "ledger.settlement",
    "ledger.settlement_exception"
   ],
@@ -12238,7 +12337,7 @@
   ],
   "reads": [
    "cache:idempotency",
-   "ledger.entry",
+   "ledger.posting",
    "orders.order_line",
    "orders.payment",
    "orders.refund",
@@ -12246,8 +12345,8 @@
   ],
   "writes": [
    "cache:idempotency",
-   "ledger.entry",
    "ledger.journal_entry",
+   "ledger.posting",
    "orders.order_line",
    "orders.payment",
    "orders.refund",
@@ -12424,7 +12523,7 @@
   ],
   "reads": [
    "cache:idempotency",
-   "ledger.entry",
+   "ledger.posting",
    "orders.order_line",
    "orders.payment",
    "orders.refund",
@@ -12600,7 +12699,7 @@
   ],
   "reads": [
    "cache:idempotency",
-   "identity.grant",
+   "identity.delegated_access",
    "identity.principal",
    "platform.workstation",
    "workforce.rota_assignment"
@@ -12727,9 +12826,9 @@
    "ai.provider",
    "cache:idempotency",
    "ledger.account",
-   "ledger.entry",
    "ledger.event_budget",
    "ledger.fiscal_period",
+   "ledger.posting",
    "reporting.execution",
    "reporting.report_column",
    "reporting.report_definition",
@@ -12792,9 +12891,9 @@
    "ai.provider",
    "cache:idempotency",
    "ledger.account",
-   "ledger.entry",
    "ledger.event_budget",
    "ledger.fiscal_period",
+   "ledger.posting",
    "reporting.execution",
    "reporting.report_column",
    "reporting.report_definition",
@@ -12858,7 +12957,7 @@
   ],
   "reads": [
    "access.access_point",
-   "access.admission_profile",
+   "access.admission_rules",
    "access.blacklist",
    "access.entitlement",
    "access.scan_event",
@@ -12869,9 +12968,9 @@
    "catalogue.entitlement_template",
    "identity.principal",
    "ledger.account",
-   "ledger.entry",
    "ledger.event_budget",
    "ledger.fiscal_period",
+   "ledger.posting",
    "orders.sales_order",
    "pii.subject",
    "reporting.execution",
@@ -12938,9 +13037,9 @@
    "ai.provider",
    "cache:idempotency",
    "ledger.account",
-   "ledger.entry",
    "ledger.event_budget",
    "ledger.fiscal_period",
+   "ledger.posting",
    "reporting.execution",
    "reporting.report_column",
    "reporting.report_definition",
@@ -13079,16 +13178,16 @@
   "app": "venue-management-web",
   "route": "/venue-operations/zones-areas",
   "operations": [
-   "listScopeNodes",
+   "listOrgUnits",
    "listAccessPoints",
    "createAccessPoint",
-   "createScopeNode",
+   "createOrgUnit",
    "getAccessPoint",
-   "getScopeNode",
+   "getOrgUnit",
    "setAccessPointGeofence",
    "setTurnstileMode",
    "updateAccessPoint",
-   "updateScopeNode"
+   "updateOrgUnit"
   ],
   "services": [
    "AccessService",
@@ -13102,13 +13201,13 @@
    "access.access_point",
    "cache:idempotency",
    "cache:resolution",
-   "platform.scope_node"
+   "platform.org_unit"
   ],
   "writes": [
    "access.access_point",
    "cache:idempotency",
    "cache:resolution",
-   "platform.scope_node"
+   "platform.org_unit"
   ],
   "storedProcedures": [],
   "wave": 1,
@@ -13191,7 +13290,7 @@
    "cache:idempotency",
    "identity.principal",
    "identity.role",
-   "platform.scope_node",
+   "platform.org_unit",
    "workforce.announcement",
    "workforce.announcement_receipt",
    "workforce.rota_assignment"
@@ -13257,12 +13356,12 @@
   "reads": [
    "cache:idempotency",
    "cache:resolution",
-   "identity.grant",
+   "identity.delegated_access",
    "identity.principal",
    "identity.role",
    "identity.role_permission",
    "platform.audit_record",
-   "platform.scope_node"
+   "platform.org_unit"
   ],
   "writes": [
    "cache:idempotency",
@@ -13366,7 +13465,7 @@
   ],
   "reads": [
    "cache:idempotency",
-   "ledger.entry",
+   "ledger.posting",
    "orders.order_line",
    "orders.payment",
    "orders.refund",
@@ -13631,15 +13730,15 @@
   "reads": [
    "cache:idempotency",
    "ledger.account",
-   "ledger.entry",
    "ledger.fiscal_period",
+   "ledger.posting",
    "ledger.recognition_schedule",
    "orders.sales_order"
   ],
   "writes": [
    "cache:idempotency",
-   "ledger.entry",
    "ledger.journal_entry",
+   "ledger.posting",
    "ledger.recognition_schedule"
   ],
   "storedProcedures": [],
@@ -14043,9 +14142,9 @@
    "approvals.request",
    "approvals.rule",
    "cache:idempotency",
-   "identity.grant",
+   "identity.delegated_access",
    "identity.principal",
-   "platform.scope_node"
+   "platform.org_unit"
   ],
   "writes": [
    "approvals.decision",
@@ -14124,7 +14223,7 @@
   "reads": [
    "approvals.delegation",
    "cache:idempotency",
-   "identity.grant",
+   "identity.delegated_access",
    "identity.principal"
   ],
   "writes": [
@@ -14245,9 +14344,9 @@
   "reads": [
    "cache:idempotency",
    "ledger.account",
-   "ledger.entry",
    "ledger.event_budget",
-   "ledger.fiscal_period"
+   "ledger.fiscal_period",
+   "ledger.posting"
   ],
   "writes": [
    "cache:idempotency",
@@ -14323,7 +14422,7 @@
   "reads": [
    "assets.media_asset",
    "cache:idempotency",
-   "platform.scope_node",
+   "platform.org_unit",
    "venuemap.map"
   ],
   "writes": [
@@ -14456,7 +14555,7 @@
   ],
   "reads": [
    "cache:idempotency",
-   "platform.scope_node",
+   "platform.org_unit",
    "resources.resource"
   ],
   "writes": [
@@ -15375,18 +15474,18 @@
    "ai.provider",
    "ai.suggestion",
    "cache:idempotency",
-   "catalogue.attribute_axis",
+   "catalogue.channel_capacity",
    "catalogue.entitlement_template",
-   "catalogue.envelope",
    "catalogue.event",
    "catalogue.performance",
    "catalogue.price",
    "catalogue.price_list",
    "catalogue.product",
+   "catalogue.variant_dimension",
    "marketing.loyalty_programme",
+   "platform.org_unit",
    "platform.region_settings",
    "platform.sale_board",
-   "platform.scope_node",
    "promotions.promotion",
    "qdrant:knowledge",
    "seating.seat",
@@ -15477,7 +15576,7 @@
   ],
   "reads": [
    "cache:idempotency",
-   "catalogue.envelope",
+   "catalogue.channel_capacity",
    "catalogue.product",
    "marketing.guest_profile",
    "orders.cart",
@@ -15649,8 +15748,8 @@
    "platform.audit_record",
    "platform.configuration_profile",
    "platform.device",
+   "platform.org_unit",
    "platform.sale_board",
-   "platform.scope_node",
    "platform.workstation"
   ],
   "writes": [
@@ -15732,7 +15831,7 @@
    "startRollout"
   ],
   "services": [
-   "ControlService",
+   "PlatformService",
    "ReportingService",
    "TenancyService"
   ],
@@ -15747,8 +15846,8 @@
    "platform.audit_record",
    "platform.configuration_profile",
    "platform.device",
+   "platform.org_unit",
    "platform.sale_board",
-   "platform.scope_node",
    "platform.workstation",
    "reporting.execution",
    "reporting.report_definition",
@@ -16020,7 +16119,7 @@
    "identity.principal",
    "identity.role",
    "platform.audit_record",
-   "platform.scope_node",
+   "platform.org_unit",
    "reporting.alert",
    "reporting.alert_rule",
    "reporting.execution",
@@ -16429,7 +16528,7 @@
   "reads": [
    "cache:idempotency",
    "cache:resolution",
-   "identity.grant",
+   "identity.delegated_access",
    "identity.guest_session",
    "identity.mfa_method",
    "identity.principal",
@@ -16470,8 +16569,8 @@
    "listTenantCells"
   ],
   "services": [
-   "ControlService",
-   "IdentityService"
+   "IdentityService",
+   "PlatformService"
   ],
   "stores": [
    "postgres"
@@ -16480,8 +16579,8 @@
    "access.entitlement",
    "control.cell",
    "control.licence_add_on",
-   "control.plan",
    "control.subscription",
+   "control.subscription_plan",
    "control.tenant",
    "control.usage_record",
    "identity.sso_group_mapping",
@@ -16518,13 +16617,13 @@
    "getCellCapacity",
    "listCellJobs",
    "updateCellTier",
-   "propagateRedemptionRight",
-   "getRedemptionRight",
+   "propagateCrossRegionEntitlement",
+   "getCrossRegionEntitlement",
    "reconcileRedemptions"
   ],
   "services": [
-   "ControlService",
-   "CrossCellService"
+   "CrossRegionService",
+   "PlatformService"
   ],
   "stores": [
    "postgres",
@@ -16535,13 +16634,13 @@
    "cache:idempotency",
    "control.cell",
    "control.cell_job",
-   "platform.redemption_right"
+   "platform.cross_region_entitlement"
   ],
   "writes": [
    "cache:idempotency",
    "control.cell",
    "control.cell_job",
-   "platform.redemption_right"
+   "platform.cross_region_entitlement"
   ],
   "storedProcedures": [],
   "wave": 2,
@@ -16608,8 +16707,8 @@
    "updateTenant"
   ],
   "services": [
-   "ControlService",
-   "IdentityService"
+   "IdentityService",
+   "PlatformService"
   ],
   "stores": [
    "postgres",
@@ -16620,8 +16719,8 @@
    "cache:idempotency",
    "control.cell",
    "control.licence_add_on",
-   "control.plan",
    "control.subscription",
+   "control.subscription_plan",
    "control.tenant",
    "control.usage_record",
    "identity.sso_group_mapping",
@@ -16662,12 +16761,12 @@
    "getTenantLicences",
    "listTenantCells",
    "updateTenant",
-   "listScopeNodes",
-   "createScopeNode"
+   "listOrgUnits",
+   "createOrgUnit"
   ],
   "services": [
-   "ControlService",
    "IdentityService",
+   "PlatformService",
    "TenancyService"
   ],
   "stores": [
@@ -16680,19 +16779,19 @@
    "cache:resolution",
    "control.cell",
    "control.licence_add_on",
-   "control.plan",
    "control.subscription",
+   "control.subscription_plan",
    "control.tenant",
    "control.usage_record",
    "identity.sso_group_mapping",
    "identity.sso_provider",
-   "platform.scope_node"
+   "platform.org_unit"
   ],
   "writes": [
    "cache:idempotency",
    "cache:resolution",
    "control.tenant",
-   "platform.scope_node"
+   "platform.org_unit"
   ],
   "storedProcedures": [],
   "wave": 1,
@@ -16724,8 +16823,8 @@
    "removeLicenceAddOn"
   ],
   "services": [
-   "ControlService",
-   "IdentityService"
+   "IdentityService",
+   "PlatformService"
   ],
   "stores": [
    "postgres",
@@ -16736,8 +16835,8 @@
    "cache:idempotency",
    "control.cell",
    "control.licence_add_on",
-   "control.plan",
    "control.subscription",
+   "control.subscription_plan",
    "control.tenant",
    "control.usage_record",
    "identity.sso_group_mapping",
@@ -16787,8 +16886,8 @@
    "updatePartnerAgreement"
   ],
   "services": [
-   "ControlService",
-   "IdentityService"
+   "IdentityService",
+   "PlatformService"
   ],
   "stores": [
    "postgres",
@@ -16801,8 +16900,8 @@
    "control.invoice",
    "control.licence_add_on",
    "control.partner_agreement",
-   "control.plan",
    "control.subscription",
+   "control.subscription_plan",
    "control.tenant",
    "control.usage_record",
    "identity.sso_group_mapping",
@@ -16815,8 +16914,8 @@
    "cache:idempotency",
    "control.invoice",
    "control.partner_agreement",
-   "control.plan",
-   "control.subscription"
+   "control.subscription",
+   "control.subscription_plan"
   ],
   "storedProcedures": [],
   "wave": 1,
@@ -16847,8 +16946,8 @@
    "listTenants"
   ],
   "services": [
-   "ControlService",
-   "IdentityService"
+   "IdentityService",
+   "PlatformService"
   ],
   "stores": [
    "postgres",
@@ -16860,8 +16959,8 @@
    "control.cell",
    "control.invoice",
    "control.licence_add_on",
-   "control.plan",
    "control.subscription",
+   "control.subscription_plan",
    "control.tenant",
    "control.usage_record",
    "identity.sso_group_mapping",
@@ -16898,8 +16997,8 @@
    "listTenants"
   ],
   "services": [
-   "ControlService",
-   "IdentityService"
+   "IdentityService",
+   "PlatformService"
   ],
   "stores": [
    "postgres"
@@ -16908,8 +17007,8 @@
    "access.entitlement",
    "control.cell",
    "control.licence_add_on",
-   "control.plan",
    "control.subscription",
+   "control.subscription_plan",
    "control.tenant",
    "control.usage_record",
    "identity.sso_group_mapping",
@@ -16947,8 +17046,8 @@
    "setSubscription"
   ],
   "services": [
-   "ControlService",
-   "IdentityService"
+   "IdentityService",
+   "PlatformService"
   ],
   "stores": [
    "postgres",
@@ -16959,8 +17058,8 @@
    "cache:idempotency",
    "control.cell",
    "control.licence_add_on",
-   "control.plan",
    "control.subscription",
+   "control.subscription_plan",
    "control.tenant",
    "control.usage_record",
    "identity.sso_group_mapping",
@@ -17000,8 +17099,8 @@
    "getCellCapacity"
   ],
   "services": [
-   "ControlService",
-   "IdentityService"
+   "IdentityService",
+   "PlatformService"
   ],
   "stores": [
    "postgres",
@@ -17012,8 +17111,8 @@
    "cache:idempotency",
    "control.cell",
    "control.licence_add_on",
-   "control.plan",
    "control.subscription",
+   "control.subscription_plan",
    "control.tenant",
    "control.usage_record",
    "identity.sso_group_mapping",
@@ -17051,7 +17150,7 @@
    "updateCellTier"
   ],
   "services": [
-   "ControlService"
+   "PlatformService"
   ],
   "stores": [
    "postgres",
@@ -17094,7 +17193,7 @@
    "updateCellTier"
   ],
   "services": [
-   "ControlService"
+   "PlatformService"
   ],
   "stores": [
    "postgres",
@@ -17139,8 +17238,8 @@
    "listApiClients"
   ],
   "services": [
-   "ControlService",
-   "IdentityService"
+   "IdentityService",
+   "PlatformService"
   ],
   "stores": [
    "postgres",
@@ -17152,8 +17251,8 @@
    "control.api_client",
    "control.cell",
    "control.licence_add_on",
-   "control.plan",
    "control.subscription",
+   "control.subscription_plan",
    "control.tenant",
    "control.usage_record",
    "identity.sso_group_mapping",
@@ -17329,7 +17428,7 @@
    "getPlan"
   ],
   "services": [
-   "ControlService"
+   "PlatformService"
   ],
   "stores": [
    "postgres",
@@ -17337,11 +17436,11 @@
   ],
   "reads": [
    "cache:idempotency",
-   "control.plan"
+   "control.subscription_plan"
   ],
   "writes": [
    "cache:idempotency",
-   "control.plan"
+   "control.subscription_plan"
   ],
   "storedProcedures": [],
   "wave": 2,
@@ -17445,7 +17544,7 @@
    "withdrawRelease"
   ],
   "services": [
-   "ControlService"
+   "PlatformService"
   ],
   "stores": [
    "postgres",
@@ -17489,7 +17588,7 @@
    "withdrawRelease"
   ],
   "services": [
-   "ControlService"
+   "PlatformService"
   ],
   "stores": [
    "postgres",
@@ -17528,7 +17627,7 @@
    "listSupportNotices"
   ],
   "services": [
-   "ControlService"
+   "PlatformService"
   ],
   "stores": [
    "postgres",
@@ -17564,7 +17663,7 @@
    "scheduleTenantUpgrade"
   ],
   "services": [
-   "ControlService"
+   "PlatformService"
   ],
   "stores": [
    "postgres",
@@ -17600,7 +17699,7 @@
    "publishSupportNotice"
   ],
   "services": [
-   "ControlService"
+   "PlatformService"
   ],
   "stores": [
    "postgres",
@@ -17640,7 +17739,7 @@
    "rollbackMigrationRun"
   ],
   "services": [
-   "ControlService"
+   "PlatformService"
   ],
   "stores": [
    "postgres",
@@ -17682,7 +17781,7 @@
    "registerEnvironment"
   ],
   "services": [
-   "ControlService"
+   "PlatformService"
   ],
   "stores": [
    "postgres",
@@ -17728,7 +17827,7 @@
    "updateCellTier"
   ],
   "services": [
-   "ControlService"
+   "PlatformService"
   ],
   "stores": [
    "postgres",
@@ -17775,7 +17874,7 @@
    "updateCellTier"
   ],
   "services": [
-   "ControlService"
+   "PlatformService"
   ],
   "stores": [
    "postgres",
@@ -17858,7 +17957,7 @@
    "updateCellTier"
   ],
   "services": [
-   "ControlService"
+   "PlatformService"
   ],
   "stores": [
    "postgres",
@@ -17901,7 +18000,7 @@
    "updateCellTier"
   ],
   "services": [
-   "ControlService"
+   "PlatformService"
   ],
   "stores": [
    "postgres",
@@ -17944,7 +18043,7 @@
    "updateCellTier"
   ],
   "services": [
-   "ControlService"
+   "PlatformService"
   ],
   "stores": [
    "postgres",
@@ -17982,7 +18081,7 @@
    "publishSupportNotice"
   ],
   "services": [
-   "ControlService"
+   "PlatformService"
   ],
   "stores": [
    "postgres",
@@ -18018,7 +18117,7 @@
    "listSupportNotices"
   ],
   "services": [
-   "ControlService"
+   "PlatformService"
   ],
   "stores": [
    "postgres",
@@ -18102,9 +18201,9 @@
    "listPartnerAgreements"
   ],
   "services": [
-   "ControlService",
    "IdentityService",
-   "OrderService"
+   "OrderService",
+   "PlatformService"
   ],
   "stores": [
    "postgres",
@@ -18114,7 +18213,7 @@
    "cache:idempotency",
    "cache:resolution",
    "control.partner_agreement",
-   "identity.grant",
+   "identity.delegated_access",
    "identity.guest_session",
    "identity.mfa_method",
    "identity.principal",
@@ -18178,7 +18277,7 @@
   ],
   "reads": [
    "cache:idempotency",
-   "ledger.entry",
+   "ledger.posting",
    "orders.b2b_credit",
    "orders.credit_override",
    "orders.order_line",
@@ -18290,12 +18389,12 @@
    "getChannelAllocations",
    "createOrder",
    "applyManualDiscount",
-   "createEnvelope",
+   "createChannelCapacity",
    "exchangeOrderLines",
    "getOrder",
    "getOrderStatement",
    "holdOrder",
-   "listEnvelopes",
+   "listChannelCapacities",
    "listOrderRefunds",
    "listOrders",
    "modifyOrder",
@@ -18304,7 +18403,7 @@
    "rescheduleOrder",
    "resumeOrder",
    "setChannelAllocations",
-   "updateEnvelope",
+   "updateChannelCapacity",
    "voidOrder"
   ],
   "services": [
@@ -18318,8 +18417,8 @@
   "reads": [
    "cache:idempotency",
    "catalogue.channel_allocation",
-   "catalogue.envelope",
-   "ledger.entry",
+   "catalogue.channel_capacity",
+   "ledger.posting",
    "orders.order_line",
    "orders.payment",
    "orders.refund",
@@ -18328,7 +18427,7 @@
   "writes": [
    "cache:idempotency",
    "catalogue.channel_allocation",
-   "catalogue.envelope",
+   "catalogue.channel_capacity",
    "orders.order_line",
    "orders.payment",
    "orders.sales_order"
@@ -18381,19 +18480,19 @@
    "cache:idempotency",
    "cache:resolution",
    "catalogue.alternative_code",
-   "catalogue.attribute_axis",
    "catalogue.price",
    "catalogue.price_list",
    "catalogue.product",
-   "catalogue.variant"
+   "catalogue.variant",
+   "catalogue.variant_dimension"
   ],
   "writes": [
    "cache:idempotency",
    "cache:resolution",
    "catalogue.alternative_code",
-   "catalogue.attribute_axis",
    "catalogue.price_list",
-   "catalogue.product"
+   "catalogue.product",
+   "catalogue.variant_dimension"
   ],
   "storedProcedures": [],
   "wave": 2,
@@ -18422,8 +18521,8 @@
    "postgres"
   ],
   "reads": [
-   "catalogue.envelope",
-   "catalogue.inventory_lease",
+   "catalogue.channel_capacity",
+   "catalogue.inventory_hold",
    "catalogue.performance"
   ],
   "writes": [],
@@ -18470,7 +18569,7 @@
   ],
   "reads": [
    "cache:idempotency",
-   "ledger.entry",
+   "ledger.posting",
    "orders.order_line",
    "orders.payment",
    "orders.refund",
@@ -18478,8 +18577,8 @@
   ],
   "writes": [
    "cache:idempotency",
-   "ledger.entry",
    "ledger.journal_entry",
+   "ledger.posting",
    "orders.order_line",
    "orders.payment",
    "orders.refund",
@@ -18571,8 +18670,8 @@
   ],
   "reads": [
    "cache:idempotency",
-   "catalogue.envelope",
-   "catalogue.inventory_lease",
+   "catalogue.channel_capacity",
+   "catalogue.inventory_hold",
    "catalogue.performance",
    "catalogue.price_list",
    "catalogue.variant",
@@ -18582,7 +18681,7 @@
   ],
   "writes": [
    "cache:idempotency",
-   "catalogue.inventory_lease",
+   "catalogue.inventory_hold",
    "orders.cart",
    "orders.cart_line",
    "orders.order_line",
@@ -18611,7 +18710,7 @@
    "getCommissionStatement"
   ],
   "services": [
-   "ControlService"
+   "PlatformService"
   ],
   "stores": [
    "postgres"
@@ -18661,8 +18760,8 @@
   ],
   "writes": [
    "cache:idempotency",
-   "ledger.entry",
    "ledger.journal_entry",
+   "ledger.posting",
    "orders.payment"
   ],
   "storedProcedures": [],
@@ -18787,7 +18886,7 @@
   ],
   "reads": [
    "cache:idempotency",
-   "ledger.entry",
+   "ledger.posting",
    "orders.order_line",
    "orders.payment",
    "orders.refund",
@@ -18795,8 +18894,8 @@
   ],
   "writes": [
    "cache:idempotency",
-   "ledger.entry",
    "ledger.journal_entry",
+   "ledger.posting",
    "orders.order_line",
    "orders.payment",
    "orders.refund",
@@ -18843,7 +18942,7 @@
   ],
   "reads": [
    "cache:idempotency",
-   "ledger.entry",
+   "ledger.posting",
    "orders.order_line",
    "orders.payment",
    "orders.refund",
@@ -18877,7 +18976,7 @@
    "listPartnerAgreements"
   ],
   "services": [
-   "ControlService"
+   "PlatformService"
   ],
   "stores": [
    "postgres"
@@ -18931,9 +19030,9 @@
    "ai.provider",
    "cache:idempotency",
    "ledger.account",
-   "ledger.entry",
    "ledger.event_budget",
    "ledger.fiscal_period",
+   "ledger.posting",
    "reporting.execution",
    "reporting.report_column",
    "reporting.report_definition",
@@ -18989,9 +19088,9 @@
   "app": "partner-web",
   "route": "/general/sub-agent-management",
   "operations": [
-   "createGrant",
-   "deleteGrant",
-   "listGrants"
+   "createDelegatedAccess",
+   "deleteDelegatedAccess",
+   "listDelegatedAccess"
   ],
   "services": [
    "IdentityService"
@@ -19002,12 +19101,12 @@
   ],
   "reads": [
    "cache:idempotency",
-   "identity.grant"
+   "identity.delegated_access"
   ],
   "writes": [
    "cache:idempotency",
    "cache:resolution",
-   "identity.grant"
+   "identity.delegated_access"
   ],
   "storedProcedures": [],
   "wave": 3,
@@ -19208,9 +19307,9 @@
    "postgres"
   ],
   "reads": [
-   "queue.entry",
    "queue.queue",
-   "queue.reading"
+   "queue.reading",
+   "queue.waiting_guest"
   ],
   "writes": [],
   "storedProcedures": [],
@@ -19313,7 +19412,7 @@
   "reads": [
    "cache:idempotency",
    "cache:resolution",
-   "identity.grant",
+   "identity.delegated_access",
    "identity.guest_session",
    "identity.mfa_method",
    "identity.principal",
@@ -19619,9 +19718,9 @@
    "cache:idempotency",
    "identity.principal",
    "ledger.account",
-   "ledger.entry",
    "ledger.event_budget",
    "ledger.fiscal_period",
+   "ledger.posting",
    "marketing.conversation",
    "reporting.execution",
    "reporting.report_column",
@@ -19679,8 +19778,8 @@
    "updateTenant"
   ],
   "services": [
-   "ControlService",
-   "IdentityService"
+   "IdentityService",
+   "PlatformService"
   ],
   "stores": [
    "postgres",
@@ -19692,8 +19791,8 @@
    "control.cell",
    "control.invoice",
    "control.licence_add_on",
-   "control.plan",
    "control.subscription",
+   "control.subscription_plan",
    "control.tenant",
    "control.usage_record",
    "identity.sso_group_mapping",
@@ -20486,7 +20585,7 @@
    "listApiVersions"
   ],
   "services": [
-   "ControlService"
+   "PlatformService"
   ],
   "stores": [
    "postgres"
@@ -20516,7 +20615,7 @@
    "setDeveloperMembers"
   ],
   "services": [
-   "ControlService"
+   "PlatformService"
   ],
   "stores": [
    "postgres",
@@ -20530,7 +20629,7 @@
   "writes": [
    "cache:idempotency",
    "control.developer_account",
-   "identity.grant"
+   "identity.delegated_access"
   ],
   "storedProcedures": [],
   "wave": 2,
@@ -20554,7 +20653,7 @@
    "revokeApiCredential"
   ],
   "services": [
-   "ControlService"
+   "PlatformService"
   ],
   "stores": [
    "postgres",
@@ -20592,7 +20691,7 @@
    "resetSandbox"
   ],
   "services": [
-   "ControlService"
+   "PlatformService"
   ],
   "stores": [
    "postgres",
@@ -20629,7 +20728,7 @@
    "replayEvents"
   ],
   "services": [
-   "ControlService"
+   "PlatformService"
   ],
   "stores": [
    "postgres",
@@ -20666,7 +20765,7 @@
    "getApiUsage"
   ],
   "services": [
-   "ControlService"
+   "PlatformService"
   ],
   "stores": [
    "postgres"
@@ -20695,7 +20794,7 @@
    "submitIntegrationListing"
   ],
   "services": [
-   "ControlService"
+   "PlatformService"
   ],
   "stores": [
    "postgres",
@@ -20730,7 +20829,7 @@
    "deprecateApiVersion"
   ],
   "services": [
-   "ControlService"
+   "PlatformService"
   ],
   "stores": [
    "postgres",

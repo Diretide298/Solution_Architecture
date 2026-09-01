@@ -92,7 +92,7 @@ steps:
     action: The supervisor reviews the shift and the deposit reconciles.
     operations: [closeDepositBoxes, settleDeposit]
     outcome: >
-      Cash to the safe, shift `closed`, and the ledger posted. **`shift` writes `ledger.entry`
+      Cash to the safe, shift `closed`, and the ledger posted. **`shift` writes `ledger.posting`
       here** — a till closing is a ledger act, which is why that cross-contract write is correct.
 
 branches:

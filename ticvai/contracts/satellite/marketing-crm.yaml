@@ -387,7 +387,13 @@ paths:
       x-ticvai-permission: GUEST_MANAGE
       x-ticvai-guest-callable: true
       x-ticvai-audience: [staff, guest]
-      x-ticvai-scope-level: tenant
+      x-ticvai-scope-level: subject
+      x-ticvai-config-scope: subject
+      x-ticvai-config-scope-note: >
+        26 August: **`subject` — the guest's own setting, not the venue's.** It does not inherit dow
+        n the scope tree and an operator cannot override it. `updateGuestPreferences` declared `tena
+        nt` and `recordConsent` declared `venue` while both write the same guest profile row; **neit
+        her was right, because the value belongs to the person.**
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: lastWriterWins
       parameters:
@@ -1277,7 +1283,13 @@ paths:
       x-ticvai-permission: GUEST_VIEW
       x-ticvai-guest-callable: true
       x-ticvai-audience: [guest]
-      x-ticvai-scope-level: venue
+      x-ticvai-scope-level: subject
+      x-ticvai-config-scope: subject
+      x-ticvai-config-scope-note: >
+        26 August: **`subject` — the guest's own setting, not the venue's.** It does not inherit dow
+        n the scope tree and an operator cannot override it. `updateGuestPreferences` declared `tena
+        nt` and `recordConsent` declared `venue` while both write the same guest profile row; **neit
+        her was right, because the value belongs to the person.**
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: lastWriterWins
       parameters:
@@ -1541,7 +1553,8 @@ paths:
     post:
       operationId: handoverToAgent
       x-ticvai-consumed-by:
-        - "P01 WEB-044 AI Concierge"
+        - "P01 WEB-044 AI Concierge – Home"
+        - "P02 GST-031 AI Concierge – Home"
         - "P02 GST-032 AI Concierge – Chat"
         - "P05 KSK-015 Assistant"
       x-ticvai-audience: [guest]
@@ -2077,7 +2090,7 @@ paths:
         - "P01 WEB-011 Guest Details & Attendee Forms"
         - "P01 WEB-017 My Account Dashboard"
         - "P01 WEB-020 Profile & Preferences"
-        - "P01 WEB-024 Loyalty & Rewards"
+        - "P01 WEB-024 Devices, Wishlist & Consent"
         - "P01 WEB-027 Newsletter Subscription"
         - "P02 GST-039 Profile"
         - "P02 GST-065 Newsletter & Preferences"
@@ -2102,7 +2115,13 @@ paths:
         `recordedByPrincipalId` — consent captured by proxy has to be attributable.
       tags: [consent]
       x-ticvai-permission: null   # a guest session. Reads and writes the guest’s own data only
-      x-ticvai-scope-level: venue
+      x-ticvai-scope-level: subject
+      x-ticvai-config-scope: subject
+      x-ticvai-config-scope-note: >
+        26 August: **`subject` — the guest's own setting, not the venue's.** It does not inherit dow
+        n the scope tree and an operator cannot override it. `updateGuestPreferences` declared `tena
+        nt` and `recordConsent` declared `venue` while both write the same guest profile row; **neit
+        her was right, because the value belongs to the person.**
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: append
       parameters:
@@ -2198,6 +2217,12 @@ paths:
         existing guests — they are asked.
       tags: [consent]
       x-ticvai-permission: GUEST_MANAGE
+      x-ticvai-config-scope: tenant
+      x-ticvai-config-scope-note: >
+        26 August: **tenant, not subject.** The tenant defines which consent purposes exist; the gue
+              st consents to them. `recordConsent` is `subject` because the answer is the guest's; the que
+              stion is the tenant's, and CF-160 depends on that split — a merge takes the narrower answer 
+              against a fixed set of questions.
       x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
@@ -2297,7 +2322,7 @@ paths:
         - "P01 WEB-009 Wishlist"
         - "P01 WEB-011 Guest Details & Attendee Forms"
         - "P01 WEB-017 My Account Dashboard"
-        - "P01 WEB-024 Loyalty & Rewards"
+        - "P01 WEB-024 Devices, Wishlist & Consent"
         - "P01 WEB-027 Newsletter Subscription"
         - "P02 GST-020 Saved Items / Wishlist"
         - "P08 BO-036 Device Registry"
@@ -2315,7 +2340,13 @@ paths:
         feature is broken.
       tags: [guest]
       x-ticvai-permission: null   # a guest session. Reads and writes the guest’s own data only
-      x-ticvai-scope-level: venue
+      x-ticvai-scope-level: subject
+      x-ticvai-config-scope: subject
+      x-ticvai-config-scope-note: >
+        26 August: **`subject` — the guest's own setting, not the venue's.** It does not inherit dow
+        n the scope tree and an operator cannot override it. `updateGuestPreferences` declared `tena
+        nt` and `recordConsent` declared `venue` while both write the same guest profile row; **neit
+        her was right, because the value belongs to the person.**
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
       x-ticvai-self-scoped: subject
@@ -2336,7 +2367,7 @@ paths:
         - "P01 WEB-009 Wishlist"
         - "P01 WEB-011 Guest Details & Attendee Forms"
         - "P01 WEB-017 My Account Dashboard"
-        - "P01 WEB-024 Loyalty & Rewards"
+        - "P01 WEB-024 Devices, Wishlist & Consent"
         - "P01 WEB-027 Newsletter Subscription"
         - "P02 GST-020 Saved Items / Wishlist"
       x-ticvai-audience: [guest]
@@ -2346,7 +2377,13 @@ paths:
         the guest and to demand signals, so a double tap must not inflate it.
       tags: [guest]
       x-ticvai-permission: null   # a guest session. Reads and writes the guest’s own data only
-      x-ticvai-scope-level: venue
+      x-ticvai-scope-level: subject
+      x-ticvai-config-scope: subject
+      x-ticvai-config-scope-note: >
+        26 August: **`subject` — the guest's own setting, not the venue's.** It does not inherit dow
+        n the scope tree and an operator cannot override it. `updateGuestPreferences` declared `tena
+        nt` and `recordConsent` declared `venue` while both write the same guest profile row; **neit
+        her was right, because the value belongs to the person.**
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
       x-ticvai-self-scoped: subject
@@ -2397,14 +2434,20 @@ paths:
         - "P01 WEB-009 Wishlist"
         - "P01 WEB-011 Guest Details & Attendee Forms"
         - "P01 WEB-017 My Account Dashboard"
-        - "P01 WEB-024 Loyalty & Rewards"
+        - "P01 WEB-024 Devices, Wishlist & Consent"
         - "P01 WEB-027 Newsletter Subscription"
         - "P02 GST-020 Saved Items / Wishlist"
       x-ticvai-audience: [guest]
       summary: Remove a saved item
       tags: [guest]
       x-ticvai-permission: null   # a guest session. Reads and writes the guest’s own data only
-      x-ticvai-scope-level: venue
+      x-ticvai-scope-level: subject
+      x-ticvai-config-scope: subject
+      x-ticvai-config-scope-note: >
+        26 August: **`subject` — the guest's own setting, not the venue's.** It does not inherit dow
+        n the scope tree and an operator cannot override it. `updateGuestPreferences` declared `tena
+        nt` and `recordConsent` declared `venue` while both write the same guest profile row; **neit
+        her was right, because the value belongs to the person.**
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
       x-ticvai-self-scoped: subject
@@ -2427,7 +2470,7 @@ paths:
       x-ticvai-consumed-by:
         - "P01 WEB-011 Guest Details & Attendee Forms"
         - "P01 WEB-017 My Account Dashboard"
-        - "P01 WEB-024 Loyalty & Rewards"
+        - "P01 WEB-024 Devices, Wishlist & Consent"
         - "P01 WEB-027 Newsletter Subscription"
         - "P08 BO-036 Device Registry"
         - "P13 CMS-018 Consent & Legal"
@@ -2443,7 +2486,13 @@ paths:
         - $ref: '../shared/common.yaml#/components/parameters/PageSize'
         - $ref: '../shared/common.yaml#/components/parameters/PageCursor'
       x-ticvai-permission: null   # a guest session. Reads and writes the guest’s own data only
-      x-ticvai-scope-level: tenant
+      x-ticvai-scope-level: subject
+      x-ticvai-config-scope: subject
+      x-ticvai-config-scope-note: >
+        26 August: **`subject` — the guest's own setting, not the venue's.** It does not inherit dow
+        n the scope tree and an operator cannot override it. `updateGuestPreferences` declared `tena
+        nt` and `recordConsent` declared `venue` while both write the same guest profile row; **neit
+        her was right, because the value belongs to the person.**
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
       x-ticvai-read-routing: replica
@@ -2465,7 +2514,7 @@ paths:
       x-ticvai-consumed-by:
         - "P01 WEB-011 Guest Details & Attendee Forms"
         - "P01 WEB-017 My Account Dashboard"
-        - "P01 WEB-024 Loyalty & Rewards"
+        - "P01 WEB-024 Devices, Wishlist & Consent"
         - "P01 WEB-027 Newsletter Subscription"
       x-ticvai-audience: [guest]
       summary: Register a device for push
@@ -2478,7 +2527,13 @@ paths:
         for the purpose; this only records where a message could go.
       tags: [guest]
       x-ticvai-permission: null   # a guest session. Reads and writes the guest’s own data only
-      x-ticvai-scope-level: tenant
+      x-ticvai-scope-level: subject
+      x-ticvai-config-scope: subject
+      x-ticvai-config-scope-note: >
+        26 August: **`subject` — the guest's own setting, not the venue's.** It does not inherit dow
+        n the scope tree and an operator cannot override it. `updateGuestPreferences` declared `tena
+        nt` and `recordConsent` declared `venue` while both write the same guest profile row; **neit
+        her was right, because the value belongs to the person.**
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
       x-ticvai-self-scoped: subject
@@ -2524,7 +2579,7 @@ paths:
       x-ticvai-consumed-by:
         - "P01 WEB-011 Guest Details & Attendee Forms"
         - "P01 WEB-017 My Account Dashboard"
-        - "P01 WEB-024 Loyalty & Rewards"
+        - "P01 WEB-024 Devices, Wishlist & Consent"
         - "P01 WEB-027 Newsletter Subscription"
       x-ticvai-audience: [guest]
       summary: Revoke a device registration
@@ -2534,7 +2589,13 @@ paths:
         dead token gets retried indefinitely.
       tags: [guest]
       x-ticvai-permission: null   # a guest session. Reads and writes the guest’s own data only
-      x-ticvai-scope-level: tenant
+      x-ticvai-scope-level: subject
+      x-ticvai-config-scope: subject
+      x-ticvai-config-scope-note: >
+        26 August: **`subject` — the guest's own setting, not the venue's.** It does not inherit dow
+        n the scope tree and an operator cannot override it. `updateGuestPreferences` declared `tena
+        nt` and `recordConsent` declared `venue` while both write the same guest profile row; **neit
+        her was right, because the value belongs to the person.**
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
       x-ticvai-self-scoped: subject
@@ -4930,7 +4991,7 @@ components:
             about to expire unspent is a guest about to be disappointed and a venue about to book
             breakage**, and only one of those is worth a message.
 
-            `portfolioScope` aggregates across a `Grant` delegation (CF-132) and **must not message
+            `portfolioScope` aggregates across a `DelegatedAccess` delegation (CF-132) and **must not message
             every member about a household total** — that is how a venue tells a teenager what
             their parent spends.
         operator:

@@ -513,7 +513,7 @@
    "contract": "identity",
    "note": "No family or dependent portfolio structure. access.FacePassEnrolment.guardianSubjectId exists but is biometric consent for a minor, not a household. 5.5.5B requires a primary account holder over dependents. **Refiled to `identity` 18 August** \u2014 the capability landed there, and the row was filed against the contract that would have consumed it. **Contracted by BL-013 \u2014 `Grant`.**",
    "backlog": "BL-013",
-   "evidence": "Grant"
+   "evidence": "DelegatedAccess"
   },
   {
    "packageRef": "19.2.9",
@@ -825,7 +825,7 @@
    "domain": "Guest Mobile App & Branding",
    "verdict": "CONTRACTED",
    "contract": "queue",
-   "evidence": "getQueueEntry",
+   "evidence": "getWaitingGuest",
    "note": "Position and state"
   },
   {
@@ -1400,7 +1400,7 @@
    "domain": "Ticketing Catalogue",
    "verdict": "CONTRACTED",
    "contract": "catalogue",
-   "evidence": "createEnvelope",
+   "evidence": "createChannelCapacity",
    "note": "timedAdmission with Envelope capacity per performance"
   },
   {
@@ -1490,7 +1490,7 @@
    "verdict": "CONTRACTED",
    "contract": "catalogue",
    "evidence": "createEntitlementTemplate",
-   "note": "entriesAllowed and reentryAllowed, admissionProfileId for areas"
+   "note": "entriesAllowed and reentryAllowed, admissionRulesId for areas"
   },
   {
    "packageRef": "1.1.12",
@@ -1501,7 +1501,7 @@
    "verdict": "CONTRACTED",
    "contract": "catalogue",
    "evidence": "setProductAttributes",
-   "note": "AttributeAxis with variant axis values"
+   "note": "VariantDimension with variant axis values"
   },
   {
    "packageRef": "1.1.13",
@@ -1692,7 +1692,7 @@
    "contract": "identity",
    "note": "Family ticket products with composition rules and age restrictions. No family or household model anywhere \u2014 same gap as BL-013. **BL-013 closed 18 August and this row is scoped to `catalogue` rather than to that entry's contract**, so it is not answered here. Left open deliberately. **Refiled to `identity` 18 August** \u2014 the capability landed there, and the row was filed against the contract that would have consumed it. **Contracted by BL-013 \u2014 `Grant`.**",
    "backlog": "BL-013",
-   "evidence": "Grant"
+   "evidence": "DelegatedAccess"
   },
   {
    "packageRef": "1.1.30",
@@ -1794,7 +1794,7 @@
    "verdict": "CONTRACTED",
    "contract": "catalogue",
    "evidence": "createEntitlementTemplate",
-   "note": "admissionProfileId and isNameBound cover part. No age, height, residency, nationality or loyalty-status eligibility rule on a product. **Closed 18 August by BL-027** \u2014 EntitlementTemplate.purchaseEligibility \u2014 age, height, residency, nationality, loyalty tier, with requiresVerification. **Evaluated at add-to-cart, no",
+   "note": "admissionRulesId and isNameBound cover part. No age, height, residency, nationality or loyalty-status eligibility rule on a product. **Closed 18 August by BL-027** \u2014 EntitlementTemplate.purchaseEligibility \u2014 age, height, residency, nationality, loyalty tier, with requiresVerification. **Evaluated at add-to-cart, no",
    "backlog": "BL-027"
   },
   {
@@ -1839,7 +1839,7 @@
    "verdict": "CONTRACTED",
    "contract": "catalogue",
    "evidence": "createProduct",
-   "note": "Unlimited products; categories via AttributeAxis"
+   "note": "Unlimited products; categories via VariantDimension"
   },
   {
    "packageRef": "1.1.43",
@@ -1872,7 +1872,7 @@
    "verdict": "CONTRACTED",
    "contract": "catalogue",
    "evidence": "setProductAttributes",
-   "note": "AttributeAxis and dataMaskValues"
+   "note": "VariantDimension and dataMaskValues"
   },
   {
    "packageRef": "1.1.46",
@@ -1939,8 +1939,8 @@
    "domain": "Ticketing Catalogue",
    "verdict": "CONTRACTED",
    "contract": "access",
-   "evidence": "createAdmissionProfile",
-   "note": "AdmissionProfile bound to the entitlement template"
+   "evidence": "createAdmissionRules",
+   "note": "AdmissionRules bound to the entitlement template"
   },
   {
    "packageRef": "1.1.52",
@@ -2356,7 +2356,7 @@
    "contract": "identity",
    "note": "Family memberships. No household model \u2014 BL-013. **BL-013 closed 18 August and this row is scoped to `catalogue` rather than to that entry's contract**, so it is not answered here. Left open deliberately. **Refiled to `identity` 18 August** \u2014 the capability landed there, and the row was filed against the contract that would have consumed it. **Contracted by BL-013 \u2014 `Grant`.**",
    "backlog": "BL-013",
-   "evidence": "Grant"
+   "evidence": "DelegatedAccess"
   },
   {
    "packageRef": "1.1.102",
@@ -2528,7 +2528,7 @@
    "contract": "identity",
    "note": "Family ticket management. BL-013. **BL-013 closed 18 August and this row is scoped to `catalogue` rather than to that entry's contract**, so it is not answered here. Left open deliberately. **Refiled to `identity` 18 August** \u2014 the capability landed there, and the row was filed against the contract that would have consumed it. **Contracted by BL-013 \u2014 `Grant`.**",
    "backlog": "BL-013",
-   "evidence": "Grant"
+   "evidence": "DelegatedAccess"
   },
   {
    "packageRef": "1.1.117",
@@ -3791,7 +3791,7 @@
    "verdict": "CONTRACTED",
    "contract": "catalogue",
    "evidence": "createPerformances",
-   "note": "Performance carries startsAt, endsAt, admissionProfileId and seatMapId; the request carries a recurrence object."
+   "note": "Performance carries startsAt, endsAt, admissionRulesId and seatMapId; the request carries a recurrence object."
   },
   {
    "packageRef": "1.3.3",
@@ -3802,7 +3802,7 @@
    "verdict": "CONTRACTED",
    "contract": "catalogue",
    "evidence": "createPerformances",
-   "note": "Performance carries startsAt, endsAt, admissionProfileId and seatMapId; the request carries a recurrence object."
+   "note": "Performance carries startsAt, endsAt, admissionRulesId and seatMapId; the request carries a recurrence object."
   },
   {
    "packageRef": "1.3.4",
@@ -3919,7 +3919,7 @@
    "contract": "catalogue",
    "note": "Deliberate oversell for free events. An envelope may be increased freely and reducing below sold is refused; overselling is not modelled. **Contracted by BL-046 \u2014 `Envelope`.**",
    "backlog": "BL-046",
-   "evidence": "Envelope"
+   "evidence": "ChannelCapacity"
   },
   {
    "packageRef": "1.3.14",
@@ -4138,7 +4138,7 @@
    "verdict": "CONTRACTED",
    "contract": "catalogue",
    "evidence": "listProductVariants",
-   "note": "Duration is a variant axis on ProductVariant.axisValues; the gate enforces it through access.AdmissionProfile.maxDurationMinutes. A multi-session package is entitlementsAllowed on the entitlement, and topping up is selling more. No separate balance is required \u2014 a time-based ticket is redeemed at the session."
+   "note": "Duration is a variant axis on ProductVariant.axisValues; the gate enforces it through access.AdmissionRules.maxDurationMinutes. A multi-session package is entitlementsAllowed on the entitlement, and topping up is selling more. No separate balance is required \u2014 a time-based ticket is redeemed at the session."
   },
   {
    "packageRef": "1.3.33",
@@ -4149,7 +4149,7 @@
    "verdict": "CONTRACTED",
    "contract": "catalogue",
    "evidence": "listProductVariants",
-   "note": "Duration is a variant axis on ProductVariant.axisValues; the gate enforces it through access.AdmissionProfile.maxDurationMinutes. A multi-session package is entitlementsAllowed on the entitlement, and topping up is selling more. No separate balance is required \u2014 a time-based ticket is redeemed at the session."
+   "note": "Duration is a variant axis on ProductVariant.axisValues; the gate enforces it through access.AdmissionRules.maxDurationMinutes. A multi-session package is entitlementsAllowed on the entitlement, and topping up is selling more. No separate balance is required \u2014 a time-based ticket is redeemed at the session."
   },
   {
    "packageRef": "1.3.34",
@@ -4160,7 +4160,7 @@
    "verdict": "CONTRACTED",
    "contract": "catalogue",
    "evidence": "listProductVariants",
-   "note": "Duration is a variant axis on ProductVariant.axisValues; the gate enforces it through access.AdmissionProfile.maxDurationMinutes. A multi-session package is entitlementsAllowed on the entitlement, and topping up is selling more. No separate balance is required \u2014 a time-based ticket is redeemed at the session."
+   "note": "Duration is a variant axis on ProductVariant.axisValues; the gate enforces it through access.AdmissionRules.maxDurationMinutes. A multi-session package is entitlementsAllowed on the entitlement, and topping up is selling more. No separate balance is required \u2014 a time-based ticket is redeemed at the session."
   },
   {
    "packageRef": "1.3.35",
@@ -4195,7 +4195,7 @@
    "verdict": "CONTRACTED",
    "contract": "catalogue",
    "evidence": "listProductVariants",
-   "note": "Duration is a variant axis on ProductVariant.axisValues; the gate enforces it through access.AdmissionProfile.maxDurationMinutes. A multi-session package is entitlementsAllowed on the entitlement, and topping up is selling more. No separate balance is required \u2014 a time-based ticket is redeemed at the session."
+   "note": "Duration is a variant axis on ProductVariant.axisValues; the gate enforces it through access.AdmissionRules.maxDurationMinutes. A multi-session package is entitlementsAllowed on the entitlement, and topping up is selling more. No separate balance is required \u2014 a time-based ticket is redeemed at the session."
   },
   {
    "packageRef": "1.3.38",
@@ -4206,7 +4206,7 @@
    "verdict": "CONTRACTED",
    "contract": "catalogue",
    "evidence": "listProductVariants",
-   "note": "Duration is a variant axis on ProductVariant.axisValues; the gate enforces it through access.AdmissionProfile.maxDurationMinutes. A multi-session package is entitlementsAllowed on the entitlement, and topping up is selling more. No separate balance is required \u2014 a time-based ticket is redeemed at the session."
+   "note": "Duration is a variant axis on ProductVariant.axisValues; the gate enforces it through access.AdmissionRules.maxDurationMinutes. A multi-session package is entitlementsAllowed on the entitlement, and topping up is selling more. No separate balance is required \u2014 a time-based ticket is redeemed at the session."
   },
   {
    "packageRef": "1.3.39",
@@ -4217,7 +4217,7 @@
    "verdict": "CONTRACTED",
    "contract": "catalogue",
    "evidence": "listProductVariants",
-   "note": "Duration is a variant axis on ProductVariant.axisValues; the gate enforces it through access.AdmissionProfile.maxDurationMinutes. A multi-session package is entitlementsAllowed on the entitlement, and topping up is selling more. No separate balance is required \u2014 a time-based ticket is redeemed at the session."
+   "note": "Duration is a variant axis on ProductVariant.axisValues; the gate enforces it through access.AdmissionRules.maxDurationMinutes. A multi-session package is entitlementsAllowed on the entitlement, and topping up is selling more. No separate balance is required \u2014 a time-based ticket is redeemed at the session."
   },
   {
    "packageRef": "1.3.40",
@@ -4228,7 +4228,7 @@
    "verdict": "CONTRACTED",
    "contract": "catalogue",
    "evidence": "listProductVariants",
-   "note": "Duration is a variant axis on ProductVariant.axisValues; the gate enforces it through access.AdmissionProfile.maxDurationMinutes. A multi-session package is entitlementsAllowed on the entitlement, and topping up is selling more. No separate balance is required \u2014 a time-based ticket is redeemed at the session."
+   "note": "Duration is a variant axis on ProductVariant.axisValues; the gate enforces it through access.AdmissionRules.maxDurationMinutes. A multi-session package is entitlementsAllowed on the entitlement, and topping up is selling more. No separate balance is required \u2014 a time-based ticket is redeemed at the session."
   },
   {
    "packageRef": "1.3.41",
@@ -4756,8 +4756,8 @@
    "domain": "Ticketing Catalogue",
    "verdict": "CONTRACTED",
    "contract": "access",
-   "evidence": "AdmissionProfile",
-   "note": "AdmissionProfile covers usage rules \u2014 validation window, max duration, re-entry limits, permitted access points. Rules governing *transactions* on a ticket type \u2014 refund, exchange and transfer eligibility per product \u2014 are not there; getRefundPolicy is venue-scoped, not product-scoped. **Contracted 18 August by BL-059.**",
+   "evidence": "AdmissionRules",
+   "note": "AdmissionRules covers usage rules \u2014 validation window, max duration, re-entry limits, permitted access points. Rules governing *transactions* on a ticket type \u2014 refund, exchange and transfer eligibility per product \u2014 are not there; getRefundPolicy is venue-scoped, not product-scoped. **Contracted 18 August by BL-059.**",
    "backlog": "BL-059"
   },
   {
@@ -5969,7 +5969,7 @@
    "contract": "identity",
    "note": "One account managing family and friends, assigning tickets, memberships, passes and wallet. **Third appearance** \u2014 BL-013 at 19.2 and 5.5.5B. **Refiled to `identity` 18 August** \u2014 the capability landed there, and the row was filed against the contract that would have consumed it. **Contracted by BL-013 \u2014 `Grant`.**",
    "backlog": "BL-013",
-   "evidence": "Grant"
+   "evidence": "DelegatedAccess"
   },
   {
    "packageRef": "2.6.48",
@@ -7437,7 +7437,7 @@
    "domain": "Ticketing Sales",
    "verdict": "CONTRACTED",
    "contract": "catalogue",
-   "evidence": "acquireLease",
+   "evidence": "acquireInventoryHold",
    "note": "A lease holds envelope capacity for a TTL and releases on expiry; extendCart lengthens it within a cap."
   },
   {
@@ -8235,7 +8235,7 @@
    "domain": "Ticketing Sales",
    "verdict": "CONTRACTED",
    "contract": "catalogue",
-   "evidence": "listEnvelopes",
+   "evidence": "listChannelCapacities",
    "note": "Envelope capacity and channel allocation, surfaced on EMP-033 Capacity view."
   },
   {
@@ -8257,7 +8257,7 @@
    "domain": "Ticketing Sales",
    "verdict": "CONTRACTED",
    "contract": "identity",
-   "evidence": "Grant",
+   "evidence": "DelegatedAccess",
    "note": "Group sales ride a multi-line order. A family or group structure with a lead booker and assignable members is **the fourth appearance** of BL-013. **Refiled to `identity` 18 August** \u2014 the capability landed there, and the row was filed against the contract that would have consumed it. **Contracted by BL-013 \u2014 `Grant`.**",
    "backlog": "BL-013"
   },
@@ -8384,7 +8384,7 @@
    "domain": "Ticketing Sales",
    "verdict": "CONTRACTED",
    "contract": "identity",
-   "evidence": "Grant",
+   "evidence": "DelegatedAccess",
    "note": "Annual, season and VIP are product kinds with entitlement templates. **Family and corporate are structures the package does not have** \u2014 BL-013 and BL-035. **BL-013 closed 18 August and this row is scoped to `catalogue` rather than to that entry's contract**, so it is not answered here. Left open deliberately. **Refiled to `identity` 18 August** \u2014 the capability landed there, and the row was filed against the contract that would have consumed it. **Contracted by BL-013 \u2014 `Grant`.**",
    "backlog": "BL-013"
   },
@@ -8409,7 +8409,7 @@
    "verdict": "CONTRACTED",
    "contract": "access",
    "evidence": "Entitlement",
-   "note": "entriesAllowed, validFromOffsetDays, validForDays, reentryAllowed and admissionProfileId carry balance and usage limits. **Repointed 18 August** \u2014 contracted against `EntitlementTemplate`, which is the definition. This row is about what a guest holds, and `access.Entitlement` is the row that holds it."
+   "note": "entriesAllowed, validFromOffsetDays, validForDays, reentryAllowed and admissionRulesId carry balance and usage limits. **Repointed 18 August** \u2014 contracted against `EntitlementTemplate`, which is the definition. This row is about what a guest holds, and `access.Entitlement` is the row that holds it."
   },
   {
    "packageRef": "2.14.11",
@@ -8456,7 +8456,7 @@
    "contract": "identity",
    "note": "No primary member and dependent relationship. **Fifth appearance** of the family gap after 19.2.8, 5.5.5B, 2.6.47 and 2.13.42. **Refiled to `identity` 18 August** \u2014 the capability landed there, and the row was filed against the contract that would have consumed it. **Contracted by BL-013 \u2014 `Grant`.**",
    "backlog": "BL-013",
-   "evidence": "Grant"
+   "evidence": "DelegatedAccess"
   },
   {
    "packageRef": "2.14.15",
@@ -8808,7 +8808,7 @@
    "domain": "Ticketing Sales",
    "verdict": "CONTRACTED",
    "contract": "identity",
-   "evidence": "Grant",
+   "evidence": "DelegatedAccess",
    "note": "MediaEntitlements.canAcceptMore and appendEntitlementToMedia give one code carrying several entitlements. A single group ticket admitting N people in one scan is not distinguished from N entitlements on one medium. **Refiled to `identity` 18 August** \u2014 the capability landed there, and the row was filed against the contract that would have consumed it. **Contracted by BL-013 \u2014 `Grant`.**",
    "backlog": "BL-013"
   },
@@ -9114,7 +9114,7 @@
    "domain": "Admission and Access",
    "verdict": "CONTRACTED",
    "contract": "access",
-   "evidence": "listAdmissionProfiles",
+   "evidence": "listAdmissionRules",
    "note": "openMinutesBefore, closeMinutesAfter, maxDurationMinutes, maxReentries, requiresExitBeforeReentry and allowedAccessPointIds."
   },
   {
@@ -9148,7 +9148,7 @@
    "domain": "Admission and Access",
    "verdict": "CONTRACTED",
    "contract": "access",
-   "evidence": "listAdmissionProfiles",
+   "evidence": "listAdmissionRules",
    "note": "maxDurationMinutes expires an unused admission window."
   },
   {
@@ -9413,7 +9413,7 @@
    "domain": "Admission and Access",
    "verdict": "CONTRACTED",
    "contract": "access",
-   "evidence": "updateAdmissionProfile",
+   "evidence": "updateAdmissionRules",
    "note": "A profile is referenced by the entitlement, so amending it changes rules on issued tickets."
   },
   {
@@ -9548,7 +9548,7 @@
    "domain": "Admission and Access",
    "verdict": "CONTRACTED",
    "contract": "tenancy",
-   "note": "**Contracted by a different mechanism than asked, 18 August (CF-130).** Ladies Night restricts on the **entitlement**, not the face: a Ladies Night ticket is already gendered at the point of sale, so the gate checks what the platform issued. `admissionProfile` enforces the window and `VenueSettings.segregatedAccess.schedule` carries the event. **These events are staffed** \u2014 a steward is making the judgment anyway, and a classifier that overrules somebody who can see more than it can is a machine and a human disagreeing while a guest waits.",
+   "note": "**Contracted by a different mechanism than asked, 18 August (CF-130).** Ladies Night restricts on the **entitlement**, not the face: a Ladies Night ticket is already gendered at the point of sale, so the gate checks what the platform issued. `admissionRules` enforces the window and `VenueSettings.segregatedAccess.schedule` carries the event. **These events are staffed** \u2014 a steward is making the judgment anyway, and a classifier that overrules somebody who can see more than it can is a machine and a human disagreeing while a guest waits.",
    "cf": "CF-130",
    "evidence": "VenueSettings"
   },
@@ -9696,7 +9696,7 @@
    "domain": "Admission and Access",
    "verdict": "CONTRACTED",
    "contract": "access",
-   "evidence": "listAdmissionProfiles",
+   "evidence": "listAdmissionRules",
    "note": "reentryAllowed and maxReentries on the profile; DenyReason.reentryLimitReached."
   },
   {
@@ -9731,7 +9731,7 @@
    "domain": "Admission and Access",
    "verdict": "CONTRACTED",
    "contract": "access",
-   "evidence": "updateAdmissionProfile",
+   "evidence": "updateAdmissionRules",
    "note": "Profiles and access-point modes are configured per date and event; free-entry days ride freeRotation."
   },
   {
@@ -9822,7 +9822,7 @@
    "domain": "Admission and Access",
    "verdict": "CONTRACTED",
    "contract": "access",
-   "evidence": "listAdmissionProfiles",
+   "evidence": "listAdmissionRules",
    "note": "allowedAccessPointIds and scopePath support multi-park access on one entitlement; cross-cell rights propagate under ADR-0010."
   },
   {
@@ -9833,7 +9833,7 @@
    "domain": "Admission and Access",
    "verdict": "CONTRACTED",
    "contract": "access",
-   "evidence": "updateAdmissionProfile",
+   "evidence": "updateAdmissionRules",
    "note": "Profiles and access-point modes are configured per date and event; free-entry days ride freeRotation."
   },
   {
@@ -9844,7 +9844,7 @@
    "domain": "Admission and Access",
    "verdict": "CONTRACTED",
    "contract": "identity",
-   "evidence": "Grant",
+   "evidence": "DelegatedAccess",
    "note": "Group access validates in one scan. A group product with a leader and named members is BL-013. **BL-013 closed 18 August and this row is scoped to `catalogue` rather than to that entry's contract**, so it is not answered here. Left open deliberately. **Refiled to `identity` 18 August** \u2014 the capability landed there, and the row was filed against the contract that would have consumed it. **Contracted by BL-013 \u2014 `Grant`.**",
    "backlog": "BL-013"
   },
@@ -10280,7 +10280,7 @@
    "domain": "Admission and Access",
    "verdict": "CONTRACTED",
    "contract": "identity",
-   "evidence": "createGrant",
+   "evidence": "createDelegatedAccess",
    "note": "Grants are explicit, scoped and time-bounded; nothing is implicit."
   },
   {
@@ -10291,7 +10291,7 @@
    "domain": "Admission and Access",
    "verdict": "CONTRACTED",
    "contract": "identity",
-   "evidence": "createGrant",
+   "evidence": "createDelegatedAccess",
    "note": "Grant.validFrom and validTo give temporary access that expires without being revoked."
   },
   {
@@ -10302,7 +10302,7 @@
    "domain": "Admission and Access",
    "verdict": "CONTRACTED",
    "contract": "identity",
-   "evidence": "createGrant",
+   "evidence": "createDelegatedAccess",
    "note": "Grant.validFrom and validTo give temporary access that expires without being revoked."
   },
   {
@@ -10325,7 +10325,7 @@
    "domain": "Admission and Access",
    "verdict": "CONTRACTED",
    "contract": "identity",
-   "evidence": "listGrants",
+   "evidence": "listDelegatedAccess",
    "note": "identity.authz_audit records policy changes and access decisions."
   },
   {
@@ -10336,7 +10336,7 @@
    "domain": "Admission and Access",
    "verdict": "CONTRACTED",
    "contract": "identity",
-   "evidence": "listGrants",
+   "evidence": "listDelegatedAccess",
    "note": "identity.authz_audit records policy changes and access decisions."
   },
   {
@@ -10383,7 +10383,7 @@
    "domain": "Admission and Access",
    "verdict": "CONTRACTED",
    "contract": "tenancy",
-   "evidence": "listScopeNodes",
+   "evidence": "listOrgUnits",
    "note": "ADR-0018 \u2014 configuration and permission resolve up the scope tree, nearest ancestor wins."
   },
   {
@@ -10406,7 +10406,7 @@
    "domain": "Admission and Access",
    "verdict": "CONTRACTED",
    "contract": "tenancy",
-   "evidence": "listScopeNodes",
+   "evidence": "listOrgUnits",
    "note": "ADR-0018 \u2014 configuration and permission resolve up the scope tree, nearest ancestor wins."
   },
   {
@@ -11901,7 +11901,7 @@
    "domain": "Bundles and Promotions",
    "verdict": "CONTRACTED",
    "contract": "identity",
-   "evidence": "Grant",
+   "evidence": "DelegatedAccess",
    "note": "Individual registration exists. **Family or group registration is the sixth appearance of BL-013.**. **Contracted 18 August by BL-013.**",
    "backlog": "BL-013"
   },
@@ -12075,7 +12075,7 @@
    "contract": "identity",
    "note": "No shared family wallet and no corporate spending wallet. `Wallet.subjectId` is one guest, so a shared balance has no owner and no spend rules. Seventh appearance of BL-013 and second of BL-035. **BL-013 closed 18 August and this row is scoped to `retail` rather than to that entry's contract**, so it is not answered here. Left open deliberately. **Refiled to `identity` 18 August** \u2014 the capability landed there, and the row was filed against the contract that would have consumed it. **Contracted by BL-013 \u2014 `Grant`.**",
    "backlog": "BL-013",
-   "evidence": "Grant"
+   "evidence": "DelegatedAccess"
   },
   {
    "packageRef": "4.3.27",
@@ -12087,7 +12087,7 @@
    "contract": "identity",
    "note": "No shared family wallet and no corporate spending wallet. `Wallet.subjectId` is one guest, so a shared balance has no owner and no spend rules. Seventh appearance of BL-013 and second of BL-035. **BL-013 closed 18 August and this row is scoped to `retail` rather than to that entry's contract**, so it is not answered here. Left open deliberately. **Refiled to `identity` 18 August** \u2014 the capability landed there, and the row was filed against the contract that would have consumed it. **Contracted by BL-013 \u2014 `Grant`.**",
    "backlog": "BL-013",
-   "evidence": "Grant"
+   "evidence": "DelegatedAccess"
   },
   {
    "packageRef": "4.3.28",
@@ -14164,7 +14164,7 @@
    "contract": "identity",
    "note": "Household and family profiles with dependants, and relationship mapping to corporate, school and agency groups. **Eighth appearance of BL-013.**. **Refiled to `identity` 18 August** \u2014 the capability landed there, and the row was filed against the contract that would have consumed it. **Contracted by BL-013 \u2014 `Grant`.**",
    "backlog": "BL-013",
-   "evidence": "Grant"
+   "evidence": "DelegatedAccess"
   },
   {
    "packageRef": "5.3.15",
@@ -14304,7 +14304,7 @@
    "contract": "identity",
    "note": "Household and family profiles with dependants, and relationship mapping to corporate, school and agency groups. **Eighth appearance of BL-013.**. **Refiled to `identity` 18 August** \u2014 the capability landed there, and the row was filed against the contract that would have consumed it. **Contracted by BL-013 \u2014 `Grant`.**",
    "backlog": "BL-013",
-   "evidence": "Grant"
+   "evidence": "DelegatedAccess"
   },
   {
    "packageRef": "5.3.27",
@@ -14597,7 +14597,7 @@
    "contract": "identity",
    "note": "Pooled family loyalty and corporate programmes. Ninth appearance of BL-013 and third of BL-035. **Refiled to `identity` 18 August** \u2014 the capability landed there, and the row was filed against the contract that would have consumed it. **Contracted by BL-013 \u2014 `Grant`.**",
    "backlog": "BL-013",
-   "evidence": "Grant"
+   "evidence": "DelegatedAccess"
   },
   {
    "packageRef": "5.4.17",
@@ -14609,7 +14609,7 @@
    "contract": "identity",
    "note": "Pooled family loyalty and corporate programmes. Ninth appearance of BL-013 and third of BL-035. **Refiled to `identity` 18 August** \u2014 the capability landed there, and the row was filed against the contract that would have consumed it. **Contracted by BL-013 \u2014 `Grant`.**",
    "backlog": "BL-013",
-   "evidence": "Grant"
+   "evidence": "DelegatedAccess"
   },
   {
    "packageRef": "5.4.18",
@@ -14808,7 +14808,7 @@
    "contract": "identity",
    "note": "Multiple portfolios under one account. Superseded by 5.5.2b. **No portfolio entity exists** \u2014 BL-013. **Refiled to `identity` 18 August** \u2014 the capability landed there, and the row was filed against the contract that would have consumed it. **Contracted by BL-013 \u2014 `Grant`.**",
    "backlog": "BL-013",
-   "evidence": "Grant"
+   "evidence": "DelegatedAccess"
   },
   {
    "packageRef": "5.5.3",
@@ -14841,7 +14841,7 @@
    "domain": "F&B & Guest Management",
    "verdict": "CONTRACTED",
    "contract": "identity",
-   "evidence": "Grant",
+   "evidence": "DelegatedAccess",
    "note": "Tickets, passes, memberships and entitlements held and consumed under one subject. **A portfolio as a container distinct from the subject does not exist.**. **Refiled to `identity` 18 August** \u2014 the capability landed there, and the row was filed against the contract that would have consumed it. **Contracted by BL-013 \u2014 `Grant`.**",
    "backlog": "BL-013"
   },
@@ -14856,7 +14856,7 @@
    "note": "**No portfolio entity.** Searching portfolio, accountHolder and linkedAccount returns nothing anywhere. Multiple portfolios per account representing dependants, employees or students; a primary holder managing them; sharing, merging and assignment of entitlements to members. **Tenth appearance of BL-013 and the place the matrix specifies it most fully.**. **Refiled to `identity` 18 August** \u2014 the capability landed there, and the row was filed against the contract that would have consumed it. **Contracted by BL-013 \u2014 `Grant`.**",
    "backlog": "BL-013",
    "cf": "CF-132",
-   "evidence": "Grant"
+   "evidence": "DelegatedAccess"
   },
   {
    "packageRef": "5.5.5b",
@@ -14869,7 +14869,7 @@
    "note": "**No portfolio entity.** Searching portfolio, accountHolder and linkedAccount returns nothing anywhere. Multiple portfolios per account representing dependants, employees or students; a primary holder managing them; sharing, merging and assignment of entitlements to members. **Tenth appearance of BL-013 and the place the matrix specifies it most fully.**. **Refiled to `identity` 18 August** \u2014 the capability landed there, and the row was filed against the contract that would have consumed it. **Contracted by BL-013 \u2014 `Grant`.**",
    "backlog": "BL-013",
    "cf": "CF-132",
-   "evidence": "Grant"
+   "evidence": "DelegatedAccess"
   },
   {
    "packageRef": "5.5.13b",
@@ -14882,7 +14882,7 @@
    "note": "**No portfolio entity.** Searching portfolio, accountHolder and linkedAccount returns nothing anywhere. Multiple portfolios per account representing dependants, employees or students; a primary holder managing them; sharing, merging and assignment of entitlements to members. **Tenth appearance of BL-013 and the place the matrix specifies it most fully.**. **Refiled to `identity` 18 August** \u2014 the capability landed there, and the row was filed against the contract that would have consumed it. **Contracted by BL-013 \u2014 `Grant`.**",
    "backlog": "BL-013",
    "cf": "CF-132",
-   "evidence": "Grant"
+   "evidence": "DelegatedAccess"
   },
   {
    "packageRef": "5.5.14b",
@@ -14895,7 +14895,7 @@
    "note": "**No portfolio entity.** Searching portfolio, accountHolder and linkedAccount returns nothing anywhere. Multiple portfolios per account representing dependants, employees or students; a primary holder managing them; sharing, merging and assignment of entitlements to members. **Tenth appearance of BL-013 and the place the matrix specifies it most fully.**. **Refiled to `identity` 18 August** \u2014 the capability landed there, and the row was filed against the contract that would have consumed it. **Contracted by BL-013 \u2014 `Grant`.**",
    "backlog": "BL-013",
    "cf": "CF-132",
-   "evidence": "Grant"
+   "evidence": "DelegatedAccess"
   },
   {
    "packageRef": "5.5.19b",
@@ -14908,7 +14908,7 @@
    "note": "**No portfolio entity.** Searching portfolio, accountHolder and linkedAccount returns nothing anywhere. Multiple portfolios per account representing dependants, employees or students; a primary holder managing them; sharing, merging and assignment of entitlements to members. **Tenth appearance of BL-013 and the place the matrix specifies it most fully.**. **Refiled to `identity` 18 August** \u2014 the capability landed there, and the row was filed against the contract that would have consumed it. **Contracted by BL-013 \u2014 `Grant`.**",
    "backlog": "BL-013",
    "cf": "CF-132",
-   "evidence": "Grant"
+   "evidence": "DelegatedAccess"
   },
   {
    "packageRef": "5.5.3b",
@@ -14955,7 +14955,7 @@
    "domain": "F&B & Guest Management",
    "verdict": "CONTRACTED",
    "contract": "identity",
-   "evidence": "Grant",
+   "evidence": "DelegatedAccess",
    "note": "Per-ticket transfer with claim exists between subjects. Transfer between portfolios of one account is BL-013. **Refiled to `identity` 18 August** \u2014 the capability landed there, and the row was filed against the contract that would have consumed it. **Contracted by BL-013 \u2014 `Grant`.**",
    "backlog": "BL-013"
   },
@@ -15087,7 +15087,7 @@
    "domain": "F&B & Guest Management",
    "verdict": "CONTRACTED",
    "contract": "catalogue",
-   "evidence": "acquireLease",
+   "evidence": "acquireInventoryHold",
    "note": "A lease reserves capacity with a TTL and releases automatically when unused."
   },
   {
@@ -15177,7 +15177,7 @@
    "domain": "F&B & Guest Management",
    "verdict": "CONTRACTED",
    "contract": "identity",
-   "evidence": "Grant",
+   "evidence": "DelegatedAccess",
    "note": "Permissions are principal-scoped. **A guest delegating management of their portfolio to another guest is not a staff permission** and has no model. **Contracted 18 August by BL-013.**",
    "backlog": "BL-013"
   },
@@ -15222,7 +15222,7 @@
    "domain": "F&B & Guest Management",
    "verdict": "CONTRACTED",
    "contract": "queue",
-   "evidence": "overrideQueueEntry",
+   "evidence": "overrideWaitingGuest",
    "note": "Staff move, reassign or override an entry, with the principal recorded."
   },
   {
@@ -15234,7 +15234,7 @@
    "verdict": "CONTRACTED",
    "contract": "queue",
    "evidence": "createQueue",
-   "note": "fastPassAllocationPercent reserves capacity for priority guests; QueueEntry.isFastPass marks them."
+   "note": "fastPassAllocationPercent reserves capacity for priority guests; WaitingGuest.isFastPass marks them."
   },
   {
    "packageRef": "5.6.5",
@@ -15269,7 +15269,7 @@
    "verdict": "CONTRACTED",
    "contract": "queue",
    "evidence": "getWaitTimes",
-   "note": "WaitTime carries waitMinutes, source, isStale and asOf; QueueEntry gives estimatedCallAt."
+   "note": "WaitTime carries waitMinutes, source, isStale and asOf; WaitingGuest gives estimatedCallAt."
   },
   {
    "packageRef": "5.6.8",
@@ -15362,7 +15362,7 @@
    "domain": "F&B & Guest Management",
    "verdict": "CONTRACTED",
    "contract": "queue",
-   "evidence": "overrideQueueEntry",
+   "evidence": "overrideWaitingGuest",
    "note": "Add, remove, move, prioritise and reassign under permission."
   },
   {
@@ -15421,7 +15421,7 @@
    "domain": "F&B & Guest Management",
    "verdict": "CONTRACTED",
    "contract": "queue",
-   "evidence": "redeemQueueEntry",
+   "evidence": "redeemWaitingGuest",
    "note": "Redemption through the access path \u2014 QR, RFID, NFC, app or biometric media all validate identically."
   },
   {
@@ -15516,7 +15516,7 @@
    "note": "No group or family queueing. `partySize` puts several people in one entry and **linked profiles reserving and managing positions together is the portfolio gap** \u2014 CF-132. **BL-013 closed 18 August and this row is scoped to `queue` rather than to that entry's contract**, so it is not answered here. Left open deliberately. **Refiled to `identity` 18 August** \u2014 the capability landed there, and the row was filed against the contract that would have consumed it. **Contracted by BL-013 \u2014 `Grant`.**",
    "backlog": "BL-013",
    "cf": "CF-132",
-   "evidence": "Grant"
+   "evidence": "DelegatedAccess"
   },
   {
    "packageRef": "5.6.19",
@@ -15529,7 +15529,7 @@
    "note": "No group or family queueing. `partySize` puts several people in one entry and **linked profiles reserving and managing positions together is the portfolio gap** \u2014 CF-132. **BL-013 closed 18 August and this row is scoped to `queue` rather than to that entry's contract**, so it is not answered here. Left open deliberately. **Refiled to `identity` 18 August** \u2014 the capability landed there, and the row was filed against the contract that would have consumed it. **Contracted by BL-013 \u2014 `Grant`.**",
    "backlog": "BL-013",
    "cf": "CF-132",
-   "evidence": "Grant"
+   "evidence": "DelegatedAccess"
   },
   {
    "packageRef": "5.6.20",
@@ -15563,7 +15563,7 @@
    "domain": "F&B & Guest Management",
    "verdict": "CONTRACTED",
    "contract": "queue",
-   "evidence": "overrideQueueEntry",
+   "evidence": "overrideWaitingGuest",
    "note": "Transfer between queues with the principal recorded."
   },
   {
@@ -19446,7 +19446,7 @@
    "domain": "F&B POS",
    "verdict": "CONTRACTED",
    "contract": "identity",
-   "evidence": "createGrant",
+   "evidence": "createDelegatedAccess",
    "note": "Roles group permissions; a grant may be to a role or directly to a principal, so individual rights sit over group rights."
   },
   {
@@ -19457,7 +19457,7 @@
    "domain": "F&B POS",
    "verdict": "CONTRACTED",
    "contract": "identity",
-   "evidence": "createGrant",
+   "evidence": "createDelegatedAccess",
    "note": "Roles group permissions; a grant may be to a role or directly to a principal, so individual rights sit over group rights."
   },
   {
@@ -19468,7 +19468,7 @@
    "domain": "F&B POS",
    "verdict": "CONTRACTED",
    "contract": "identity",
-   "evidence": "createGrant",
+   "evidence": "createDelegatedAccess",
    "note": "Roles group permissions; a grant may be to a role or directly to a principal, so individual rights sit over group rights."
   },
   {
@@ -19490,7 +19490,7 @@
    "domain": "F&B POS",
    "verdict": "CONTRACTED",
    "contract": "identity",
-   "evidence": "listGrants",
+   "evidence": "listDelegatedAccess",
    "note": "`identity.authz_audit` records every grant change and authorisation decision with principal, resource and result; every operation carries an acting principal."
   },
   {
@@ -19560,7 +19560,7 @@
    "domain": "F&B POS",
    "verdict": "CONTRACTED",
    "contract": "identity",
-   "evidence": "listGrants",
+   "evidence": "listDelegatedAccess",
    "note": "`identity.authz_audit` records every grant change and authorisation decision with principal, resource and result; every operation carries an acting principal."
   },
   {
@@ -19571,7 +19571,7 @@
    "domain": "F&B POS",
    "verdict": "CONTRACTED",
    "contract": "identity",
-   "evidence": "createGrant",
+   "evidence": "createDelegatedAccess",
    "note": "Roles group permissions; a grant may be to a role or directly to a principal, so individual rights sit over group rights."
   },
   {
@@ -19582,7 +19582,7 @@
    "domain": "F&B POS",
    "verdict": "CONTRACTED",
    "contract": "tenancy",
-   "evidence": "listScopeNodes",
+   "evidence": "listOrgUnits",
    "note": "ADR-0018 \u2014 permissions resolve up the scope tree, nearest ancestor wins, across company, region and venue."
   },
   {
@@ -19593,7 +19593,7 @@
    "domain": "F&B POS",
    "verdict": "CONTRACTED",
    "contract": "tenancy",
-   "evidence": "getScopeNode",
+   "evidence": "getOrgUnit",
    "note": "ADR-0001 and ADR-0005 \u2014 tenant isolation by cell and venue isolation by partition."
   },
   {
@@ -19742,7 +19742,7 @@
    "domain": "F&B POS",
    "verdict": "CONTRACTED",
    "contract": "tenancy",
-   "evidence": "listScopeNodes",
+   "evidence": "listOrgUnits",
    "note": "ADR-0018 \u2014 permissions resolve up the scope tree, nearest ancestor wins, across company, region and venue."
   },
   {
@@ -19765,7 +19765,7 @@
    "domain": "F&B POS",
    "verdict": "CONTRACTED",
    "contract": "identity",
-   "evidence": "listGrants",
+   "evidence": "listDelegatedAccess",
    "note": "`identity.authz_audit` records every grant change and authorisation decision with principal, resource and result; every operation carries an acting principal."
   },
   {
@@ -19776,7 +19776,7 @@
    "domain": "F&B POS",
    "verdict": "CONTRACTED",
    "contract": "identity",
-   "evidence": "createGrant",
+   "evidence": "createDelegatedAccess",
    "note": "Every operation declares a permission or an explicit auth mode; check 8 in check-package enforces it."
   },
   {
@@ -19856,7 +19856,7 @@
    "domain": "F&B POS",
    "verdict": "CONTRACTED",
    "contract": "tenancy",
-   "evidence": "listScopeNodes",
+   "evidence": "listOrgUnits",
    "note": "ADR-0018 \u2014 permissions resolve up the scope tree, nearest ancestor wins, across company, region and venue."
   },
   {
@@ -19867,7 +19867,7 @@
    "domain": "F&B POS",
    "verdict": "CONTRACTED",
    "contract": "identity",
-   "evidence": "createGrant",
+   "evidence": "createDelegatedAccess",
    "note": "Grant.validFrom and validTo \u2014 temporary permission expiring without revocation."
   },
   {
@@ -19902,7 +19902,7 @@
    "domain": "F&B POS",
    "verdict": "CONTRACTED",
    "contract": "identity",
-   "evidence": "createGrant",
+   "evidence": "createDelegatedAccess",
    "note": "Grant.validFrom and validTo \u2014 temporary permission expiring without revocation."
   },
   {
@@ -19913,7 +19913,7 @@
    "domain": "F&B POS",
    "verdict": "CONTRACTED",
    "contract": "identity",
-   "evidence": "createGrant",
+   "evidence": "createDelegatedAccess",
    "note": "Grant.validFrom and validTo \u2014 temporary permission expiring without revocation."
   },
   {
@@ -19996,7 +19996,7 @@
    "domain": "F&B POS",
    "verdict": "CONTRACTED",
    "contract": "identity",
-   "evidence": "createGrant",
+   "evidence": "createDelegatedAccess",
    "note": "Grants are explicit and scoped; nothing is implicit."
   },
   {
@@ -20029,7 +20029,7 @@
    "domain": "F&B POS",
    "verdict": "CONTRACTED",
    "contract": "tenancy",
-   "evidence": "listScopeNodes",
+   "evidence": "listOrgUnits",
    "note": "ADR-0018 \u2014 permissions resolve up the scope tree, nearest ancestor wins, across company, region and venue."
   },
   {
@@ -20040,7 +20040,7 @@
    "domain": "F&B POS",
    "verdict": "CONTRACTED",
    "contract": "tenancy",
-   "evidence": "getScopeNode",
+   "evidence": "getOrgUnit",
    "note": "ADR-0001 and ADR-0005 \u2014 tenant isolation by cell and venue isolation by partition."
   },
   {
@@ -20081,7 +20081,7 @@
    "domain": "F&B POS",
    "verdict": "CONTRACTED",
    "contract": "identity",
-   "evidence": "listGrants",
+   "evidence": "listDelegatedAccess",
    "note": "`identity.authz_audit` records every grant change and authorisation decision with principal, resource and result; every operation carries an acting principal."
   },
   {
@@ -20092,7 +20092,7 @@
    "domain": "F&B POS",
    "verdict": "CONTRACTED",
    "contract": "identity",
-   "evidence": "listGrants",
+   "evidence": "listDelegatedAccess",
    "note": "`identity.authz_audit` records every grant change and authorisation decision with principal, resource and result; every operation carries an acting principal."
   },
   {
@@ -20127,7 +20127,7 @@
    "domain": "F&B POS",
    "verdict": "CONTRACTED",
    "contract": "identity",
-   "evidence": "listGrants",
+   "evidence": "listDelegatedAccess",
    "note": "`identity.authz_audit` records every grant change and authorisation decision with principal, resource and result; every operation carries an acting principal."
   },
   {
@@ -20138,7 +20138,7 @@
    "domain": "F&B POS",
    "verdict": "CONTRACTED",
    "contract": "identity",
-   "evidence": "listGrants",
+   "evidence": "listDelegatedAccess",
    "note": "`identity.authz_audit` records every grant change and authorisation decision with principal, resource and result; every operation carries an acting principal."
   },
   {
@@ -20173,7 +20173,7 @@
    "domain": "F&B POS",
    "verdict": "CONTRACTED",
    "contract": "tenancy",
-   "evidence": "getScopeNode",
+   "evidence": "getOrgUnit",
    "note": "Multi-tenant transaction handling by cell and partition."
   },
   {
@@ -20184,7 +20184,7 @@
    "domain": "F&B POS",
    "verdict": "CONTRACTED",
    "contract": "catalogue",
-   "evidence": "createEnvelope",
+   "evidence": "createChannelCapacity",
    "note": "Envelopes carry capacity per park and performance."
   },
   {
@@ -20256,7 +20256,7 @@
    "note": "Primary account holder with linked family members purchasing on their behalf. **CF-132.**. **Refiled to `identity` 18 August** \u2014 the capability landed there, and the row was filed against the contract that would have consumed it. **Contracted by BL-013 \u2014 `Grant`.**",
    "backlog": "BL-013",
    "cf": "CF-132",
-   "evidence": "Grant"
+   "evidence": "DelegatedAccess"
   },
   {
    "packageRef": "7.3.9",
@@ -20373,7 +20373,7 @@
    "note": "A family pass. **CF-132** \u2014 a pass admitting a defined household needs the portfolio. **BL-013 closed 18 August and this row is scoped to `catalogue` rather than to that entry's contract**, so it is not answered here. Left open deliberately. **Refiled to `identity` 18 August** \u2014 the capability landed there, and the row was filed against the contract that would have consumed it. **Contracted by BL-013 \u2014 `Grant`.**",
    "backlog": "BL-013",
    "cf": "CF-132",
-   "evidence": "Grant"
+   "evidence": "DelegatedAccess"
   },
   {
    "packageRef": "7.4.9",
@@ -20531,7 +20531,7 @@
    "domain": "F&B POS",
    "verdict": "CONTRACTED",
    "contract": "access",
-   "evidence": "listAdmissionProfiles",
+   "evidence": "listAdmissionRules",
    "note": "**DenyReason.accompanimentRequired enforces a companion rule at the gate.** Restricting a product to a group of people at purchase is BL-027. **Closed 18 August by BL-027** \u2014 EntitlementTemplate.purchaseEligibility \u2014 age, height, residency, nationality, loyalty tier, with requiresVerification. **Evaluated at add-to-cart, no",
    "backlog": "BL-027"
   },
@@ -20565,7 +20565,7 @@
    "domain": "F&B POS",
    "verdict": "CONTRACTED",
    "contract": "access",
-   "evidence": "listAdmissionProfiles",
+   "evidence": "listAdmissionRules",
    "note": "allowedAccessPointIds restricts an entitlement to zones and attractions."
   },
   {
@@ -20815,7 +20815,7 @@
    "domain": "F&B POS",
    "verdict": "CONTRACTED",
    "contract": "catalogue",
-   "evidence": "acquireLease",
+   "evidence": "acquireInventoryHold",
    "note": "A lease holds capacity for a TTL and releases automatically."
   },
   {
@@ -24600,7 +24600,7 @@
    "domain": "Unified Operations Dashboard",
    "verdict": "CONTRACTED",
    "contract": "catalogue",
-   "evidence": "listEnvelopes",
+   "evidence": "listChannelCapacities",
    "note": "Attendance and occupancy from scans against envelope capacity; EMP-033 is the capacity view."
   },
   {
@@ -27107,7 +27107,7 @@
    "domain": "Developer & API Management",
    "verdict": "CONTRACTED",
    "contract": "tenancy",
-   "evidence": "getScopeNode",
+   "evidence": "getOrgUnit",
    "note": "ADR-0001 cell isolation and ADR-0005 venue partitioning \u2014 every operation is tenant-scoped."
   },
   {
@@ -27300,7 +27300,7 @@
    "domain": "Developer & API Management",
    "verdict": "CONTRACTED",
    "contract": "tenancy",
-   "evidence": "getScopeNode",
+   "evidence": "getOrgUnit",
    "note": "ADR-0001 \u2014 a cell is the isolation boundary, so an environment on its own cell isolates by construction."
   },
   {
@@ -28696,7 +28696,7 @@
    "domain": "Inventory Management",
    "verdict": "CONTRACTED",
    "contract": "tenancy",
-   "evidence": "getScopeNode",
+   "evidence": "getOrgUnit",
    "note": "ADR-0001 cell isolation, ADR-0005 venue partitioning; stock locations carry venueId."
   },
   {
@@ -28707,7 +28707,7 @@
    "domain": "Inventory Management",
    "verdict": "CONTRACTED",
    "contract": "tenancy",
-   "evidence": "getScopeNode",
+   "evidence": "getOrgUnit",
    "note": "ADR-0001 cell isolation, ADR-0005 venue partitioning; stock locations carry venueId."
   },
   {
@@ -29411,7 +29411,7 @@
    "domain": "Device Management",
    "verdict": "CONTRACTED",
    "contract": "tenancy",
-   "evidence": "getScopeNode",
+   "evidence": "getOrgUnit",
    "note": "Devices carry a workstation and venue; ADR-0001 isolates by cell."
   },
   {
@@ -29422,7 +29422,7 @@
    "domain": "Device Management",
    "verdict": "CONTRACTED",
    "contract": "tenancy",
-   "evidence": "getScopeNode",
+   "evidence": "getOrgUnit",
    "note": "Devices carry a workstation and venue; ADR-0001 isolates by cell."
   },
   {
@@ -32288,7 +32288,7 @@
    "domain": "Seat Management & Venue Mapping",
    "verdict": "CONTRACTED",
    "contract": "identity",
-   "evidence": "Grant",
+   "evidence": "DelegatedAccess",
    "note": "Allocation works. **A school or tour group as an entity with a leader and members is CF-132.**. **BL-013 closed 18 August and this row is scoped to `seating` rather than to that entry's contract**, so it is not answered here. Left open deliberately. **Refiled to `identity` 18 August** \u2014 the capability landed there, and the row was filed against the contract that would have consumed it. **Contracted by BL-013 \u2014 `Grant`.**",
    "backlog": "BL-013",
    "cf": "CF-132"
@@ -32301,7 +32301,7 @@
    "domain": "Seat Management & Venue Mapping",
    "verdict": "CONTRACTED",
    "contract": "identity",
-   "evidence": "Grant",
+   "evidence": "DelegatedAccess",
    "note": "Allocation works. **A school or tour group as an entity with a leader and members is CF-132.**. **BL-013 closed 18 August and this row is scoped to `seating` rather than to that entry's contract**, so it is not answered here. Left open deliberately. **Refiled to `identity` 18 August** \u2014 the capability landed there, and the row was filed against the contract that would have consumed it. **Contracted by BL-013 \u2014 `Grant`.**",
    "backlog": "BL-013",
    "cf": "CF-132"
@@ -32358,7 +32358,7 @@
    "domain": "Seat Management & Venue Mapping",
    "verdict": "CONTRACTED",
    "contract": "identity",
-   "evidence": "Grant",
+   "evidence": "DelegatedAccess",
    "note": "Contiguous groups with `allowSplitAcrossRows` serve a family. **Family as a known relationship is CF-132.**. **BL-013 closed 18 August and this row is scoped to `seating` rather than to that entry's contract**, so it is not answered here. Left open deliberately. **Refiled to `identity` 18 August** \u2014 the capability landed there, and the row was filed against the contract that would have consumed it. **Contracted by BL-013 \u2014 `Grant`.**",
    "backlog": "BL-013",
    "cf": "CF-132"
@@ -32527,7 +32527,7 @@
    "domain": "Seat Management & Venue Mapping",
    "verdict": "CONTRACTED",
    "contract": "tenancy",
-   "evidence": "getScopeNode",
+   "evidence": "getOrgUnit",
    "note": "Seat maps carry venueId; ADR-0001 isolates by cell."
   },
   {
@@ -32538,7 +32538,7 @@
    "domain": "Seat Management & Venue Mapping",
    "verdict": "CONTRACTED",
    "contract": "tenancy",
-   "evidence": "getScopeNode",
+   "evidence": "getOrgUnit",
    "note": "Seat maps carry venueId; ADR-0001 isolates by cell."
   },
   {
@@ -32901,7 +32901,7 @@
    "note": "Household, family, corporate and group relationships. **CF-132 \u2014 eleventh appearance, and 22.2 is where the CRM expects them to live.**. **Refiled to `identity` 18 August** \u2014 the capability landed there, and the row was filed against the contract that would have consumed it. **Contracted by BL-013 \u2014 `Grant`.**",
    "backlog": "BL-013",
    "cf": "CF-132",
-   "evidence": "Grant"
+   "evidence": "DelegatedAccess"
   },
   {
    "packageRef": "22.2.7",
@@ -32914,7 +32914,7 @@
    "note": "Household, family, corporate and group relationships. **CF-132 \u2014 eleventh appearance, and 22.2 is where the CRM expects them to live.**. **Refiled to `identity` 18 August** \u2014 the capability landed there, and the row was filed against the contract that would have consumed it. **Contracted by BL-013 \u2014 `Grant`.**",
    "backlog": "BL-013",
    "cf": "CF-132",
-   "evidence": "Grant"
+   "evidence": "DelegatedAccess"
   },
   {
    "packageRef": "22.2.8",

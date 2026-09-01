@@ -5,7 +5,7 @@
 | | |
 |---|---|
 | Screens | 17 |
-| Operations | 22 |
+| Operations | 23 |
 | Contracts | 8 |
 | Modules | 2 |
 | Undrawn | 0 |
@@ -69,5 +69,5 @@
 | `KSK-014` | Out of service | Sell | 2 | 0 | yes |
 | `KSK-015` | Assistant | AI | 2 | 4 | yes |
 | `KSK-016` | Order Food | Sell | 2 | 2 | yes |
-| `KSK-017` | Shop | Sell | 2 | 2 | yes |
+| `KSK-017` | Shop | Sell | 2 | 4 | yes |
 

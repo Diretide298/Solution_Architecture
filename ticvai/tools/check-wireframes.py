@@ -22,22 +22,12 @@ Checks:
 
 Run: python3 tools/check-wireframes.py
 """
+import json
 import re
 import sys
 from pathlib import Path
 
 import yaml
-
-# A cp1252 console cannot encode the arrows and dashes this tool prints, and the
-# failure lands *after* the work is done — so the output is written, the summary
-# line raises UnicodeEncodeError, and a correct run exits 1. Reconfiguring at
-# import means anything importing this module gets it too, refresh.sh included.
-try:
-    sys.stdout.reconfigure(encoding="utf-8", errors="replace")
-    sys.stderr.reconfigure(encoding="utf-8", errors="replace")
-except Exception:      # a captured stream may not be reconfigurable; harmless
-    pass
-
 
 ROOT = Path(__file__).resolve().parents[1]
 SCREENS = ROOT / "screens"
@@ -79,7 +69,11 @@ def main() -> int:
         return 0
 
     files = {f.name: f for f in BOARDS.glob("*.html")}
-    anchors = {n: set(re.findall(r'<div id="([a-z0-9-]+)"', f.read_text(errors="replace")))
+    # **Case- and element-agnostic.** The pattern was `<div id="[a-z0-9-]+"` — lowercase, and only
+    # on a div. The Kiosk pack arrived 31 August anchoring on `KSK-001` in uppercase, and every one
+    # of its nine frames read as a click that does nothing. **The board was right and the check was
+    # wrong**, which is the worse of the two failures because it sends somebody to fix a good file.
+    anchors = {n: set(re.findall(r'(?<![-\\w])id="([A-Za-z0-9_-]+)"', f.read_text(errors="replace")))
                for n, f in files.items()}
     screen_anchors = {n: {a.upper() for a in v if re.fullmatch(r"[a-z]{2,5}-\d{3}", a)}
                       for n, v in anchors.items()}
@@ -230,11 +224,27 @@ def main() -> int:
                 if _owner:
                     referenced.add(_owner)
 
+    # **The manifest is what tells a stranger from a client pack.** Read once, above both loops:
+    # the orphan check needs it to skip, and the unrecognised check needs it to report.
+    _mf = BOARDS / "manifest.json"
+    _known: set = set()
+    _m: dict = {}
+    if _mf.exists():
+        _m = json.loads(_mf.read_text(encoding="utf-8"))
+        _known = (set(_m.get("generated") or []) | set(_m.get("clientPacks") or [])
+                  | set(_m.get("indexes") or []))
+
+    # **An index points at boards and nothing points at it — that is what an index is.**
+    # Exempting by filename missed `TICVAI Wireframe Boards.dc.html`, which is the generated
+    # index and carries no frames of its own. **The role is the test, not the name**: a file
+    # with links out and no anchors in is a contents page.
+    #
+    # **A board the manifest cannot account for is skipped here.** It gets its own warning saying
+    # it is a stranger, and reporting it twice — once as unreferenced, once as unrecognised —
+    # buries the stronger message under the weaker one.
     for _f in sorted(BOARDS.glob("*.dc.html")):
-        # **An index points at boards and nothing points at it — that is what an index is.**
-        # Exempting by filename missed `TICVAI Wireframe Boards.dc.html`, which is the generated
-        # index and carries no frames of its own. **The role is the test, not the name**: a file
-        # with links out and no anchors in is a contents page.
+        if _mf.exists() and _f.name not in _known:
+            continue
         _txt = _f.read_text(encoding="utf-8")
         _is_index = not set(re.findall(r'id="([^"]+)"', _txt)) and 'href=' in _txt
         if _f.name not in referenced and "Index" not in _f.name and not _is_index:
@@ -293,7 +303,36 @@ def main() -> int:
                     "was renamed or removed after this screen was repointed at a drawn one")
 
 
-    for w in WARNINGS[:20]:
+    # **A board this package cannot account for is a board somebody will count.** On 31 August a
+    # consumer reported 811 unclaimed frames against a real 359 — the gap was eight boards
+    # superseded by a rename on the 26th and nine belonging to other products entirely. **A
+    # worklist wrong by 55% is worse than none**, because it gets planned against.
+    #
+    # **Reported, never deleted.** `derive-wireframes.py` removes only boards it wrote itself; a
+    # stranger might be a client pack arriving before its screens, and deleting somebody else's
+    # file to make a count tidy is the wrong trade.
+    # **Read the manifest's own `unrecognised` list rather than inferring from absence.** Inferring
+    # meant a board added after the last `derive-wireframes.py` run counted as known, which is the
+    # opposite of what this check is for — the newest file is the one most likely to be a stranger.
+    _strangers = set(_m.get("unrecognised") or []) if _mf.exists() else set()
+    if _strangers:
+        for _f in sorted(BOARDS.glob("*.dc.html")):
+            if _f.name not in _strangers:
+                continue
+            _n = len(re.findall(r'(?<![-\w])id="([A-Za-z0-9_-]+)"',
+                                _f.read_text(encoding="utf-8", errors="replace")))
+            WARNINGS.append(
+                f"{_f.name}: not generated by this package and not a known client pack "
+                f"({_n} anchors). **Anything counting this folder will count it** — most often a "
+                "board superseded by a rename, or one belonging to another product")
+
+
+    # **Show the strangers first, then the rest.** Truncating at 20 buried the one warning that
+    # says a file does not belong under nineteen saying a board is unreferenced — and the buried
+    # one is why a consumer counted 811 frames against a real 359.
+    _first = [w for w in WARNINGS if "known client pack" in w]
+    _rest = [w for w in WARNINGS if w not in _first]
+    for w in (_first + _rest)[:20]:
         print(f"  WARN  {w}")
     for e in ERRORS:
         print(f"  FAIL  {e}")

@@ -71,11 +71,6 @@ screens:
         impliedBy: listMfaMethods
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
-      - kind: secondaryButton
-        label: Cancel
-        notes: '**A screen that can submit must be leaveable without submitting.**'
-        derived: true
-        impliedBy: login
   states:
     loading: Session check against the local store, then the server if reachable
     emptyFirstRun: Not applicable
@@ -188,11 +183,6 @@ screens:
         impliedBy: setTurnstileMode
         label: Save turnstile mode
         notes: The act the screen exists for.
-      - kind: secondaryButton
-        label: Cancel
-        notes: '**A screen that can submit must be leaveable without submitting.**'
-        derived: true
-        impliedBy: setTurnstileMode
   states:
     loading: Access points from the bundle
     emptyFirstRun: No access points configured for this venue — a configuration error, shown as one
@@ -292,11 +282,6 @@ screens:
         impliedBy: listBlacklist
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
-      - kind: secondaryButton
-        label: Cancel
-        notes: '**A screen that can submit must be leaveable without submitting.**'
-        derived: true
-        impliedBy: syncScans
   states:
     loading: Instant. This screen must never wait
     emptyFirstRun: Not applicable
@@ -386,7 +371,7 @@ screens:
     contract: access
     purpose: Admit a group on one read
     trigger: onAction
-  - operationId: consumeRedemptionRight
+  - operationId: consumeCrossRegionEntitlement
     contract: cross-cell
     purpose: Consume entries against a right, locally authoritative
     trigger: onAction
@@ -436,11 +421,6 @@ screens:
         impliedBy: lookupTicket
         label: Search
         notes: A search that returns nothing must say so differently from a search not yet run.
-      - kind: secondaryButton
-        label: Cancel
-        notes: '**A screen that can submit must be leaveable without submitting.**'
-        derived: true
-        impliedBy: validateGroupAccess
   states:
     loading: Party resolution from the bundle
     emptyFirstRun: Party of one — falls through to a normal scan
@@ -538,11 +518,6 @@ screens:
         derived: true
         impliedBy: overrideAccess
         notes: The act the screen exists for.
-      - kind: secondaryButton
-        label: Cancel
-        notes: '**A screen that can submit must be leaveable without submitting.**'
-        derived: true
-        impliedBy: overrideAccess
   states:
     loading: Reference lookup, local first
     emptyFirstRun: No match for that reference
@@ -641,11 +616,6 @@ screens:
         derived: true
         impliedBy: overrideAccess
         notes: The act the screen exists for.
-      - kind: secondaryButton
-        label: Cancel
-        notes: '**A screen that can submit must be leaveable without submitting.**'
-        derived: true
-        impliedBy: overrideAccess
   states:
     loading: Name search across the bundle
     emptyFirstRun: No match
@@ -730,13 +700,8 @@ screens:
         notes: Structure from the wireframe board. Components not yet enumerated.
       - kind: primaryButton
         derived: true
-        impliedBy: consumeRedemptionRight
+        impliedBy: consumeCrossRegionEntitlement
         notes: The act the screen exists for.
-      - kind: secondaryButton
-        label: Cancel
-        notes: '**A screen that can submit must be leaveable without submitting.**'
-        derived: true
-        impliedBy: consumeRedemptionRight
   states:
     loading: Right resolution, which may cross cells
     emptyFirstRun: No delegated right on this media
@@ -768,11 +733,11 @@ screens:
     component: apps/venue-scanner/src/routes/access/DelegatedRightDetail.tsx
     status: notStarted
   apis:
-  - operationId: getRedemptionRight
+  - operationId: getCrossRegionEntitlement
     contract: cross-cell
     purpose: From the flow it appears in
     trigger: onLoad
-  - operationId: consumeRedemptionRight
+  - operationId: consumeCrossRegionEntitlement
     contract: cross-cell
     purpose: Consume entries against a right, locally authoritative
     trigger: onAction
@@ -816,11 +781,6 @@ screens:
         derived: true
         impliedBy: overrideAccess
         notes: The act the screen exists for.
-      - kind: secondaryButton
-        label: Cancel
-        notes: '**A screen that can submit must be leaveable without submitting.**'
-        derived: true
-        impliedBy: overrideAccess
   states:
     loading: Journal loads locally
     emptyFirstRun: Nothing journalled
@@ -923,11 +883,6 @@ screens:
         derived: true
         impliedBy: overrideAccess
         notes: The act the screen exists for.
-      - kind: secondaryButton
-        label: Cancel
-        notes: '**A screen that can submit must be leaveable without submitting.**'
-        derived: true
-        impliedBy: syncScans
   states:
     loading: Sync in progress, with a count
     emptyFirstRun: Nothing to sync
@@ -1036,11 +991,6 @@ screens:
         derived: true
         impliedBy: overrideAccess
         notes: The act the screen exists for.
-      - kind: secondaryButton
-        label: Cancel
-        notes: '**A screen that can submit must be leaveable without submitting.**'
-        derived: true
-        impliedBy: overrideAccess
   states:
     loading: Downloading. Size and progress shown
     emptyFirstRun: Not applicable
@@ -1134,11 +1084,6 @@ screens:
         impliedBy: listAccessPoints
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
-      - kind: secondaryButton
-        label: Cancel
-        notes: '**A screen that can submit must be leaveable without submitting.**'
-        derived: true
-        impliedBy: setTurnstileMode
   states:
     loading: Current mode from the device
     emptyFirstRun: Not applicable

@@ -53,7 +53,7 @@ the split safe.
 else writes them except by appending through a path the owner published.
 
 **22 tables have two writing contracts and all are correct.** A till closing posts to
-`ledger.entry` because settling a shift *is* a ledger act. `orders` writes `access.entitlement`
+`ledger.posting` because settling a shift *is* a ledger act. `orders` writes `access.entitlement`
 because a sale issues a ticket. **The owner defines the row; a foreign writer may only append to
 it.**
 
@@ -78,7 +78,7 @@ it.**
 
 **A service with no data is not a service; it is a set of operations**, and they belong with the
 scope they resolve against. Folded into TenancyService alongside `workforce` and `approvals`, all
-three of which read `platform.scope_node` constantly and write it rarely — **splitting them means
+three of which read `platform.org_unit` constantly and write it rarely — **splitting them means
 four services doing the same joins.**
 
 ### Subscription, platform-ops and public-api are one service

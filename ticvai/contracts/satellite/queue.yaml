@@ -312,13 +312,14 @@ paths:
               schema: { $ref: '#/components/schemas/QueueStatusResult' }
 
   # ---------------------------------------------------------------- entries
-  /queue-entries:
+  /waiting-guests:
     post:
       operationId: joinQueue
       x-ticvai-consumed-by:
-        - "P01 WEB-015 Virtual Waiting Room"
+        - "P01 WEB-015 Branded Queue / Waiting Room"
         - "P01 WEB-040 Virtual Queue"
-        - "P02 GST-023 Virtual Queue / Join Queue"
+        - "P02 GST-023 Virtual Queue"
+        - "P02 GST-046 Branded Queue / Waiting Room"
       x-ticvai-audience: [guest]
       summary: Join a virtual queue
       description: >
@@ -351,7 +352,7 @@ paths:
           description: Joined
           content:
             application/json:
-              schema: { $ref: '#/components/schemas/QueueEntry' }
+              schema: { $ref: '#/components/schemas/WaitingGuest' }
         '409':
           description: >
             Already in this queue, at the cross-queue limit, party exceeds the maximum, queue
@@ -361,18 +362,19 @@ paths:
               schema: { $ref: '#/components/schemas/QueueJoinProblem' }
         '429': { $ref: '../shared/common.yaml#/components/responses/TooManyRequests' }
 
-  /queue-entries/{entryId}:
+  /waiting-guests/{entryId}:
     parameters:
       - name: entryId
         in: path
         required: true
         schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
     get:
-      operationId: getQueueEntry
+      operationId: getWaitingGuest
       x-ticvai-consumed-by:
-        - "P01 WEB-015 Virtual Waiting Room"
+        - "P01 WEB-015 Branded Queue / Waiting Room"
         - "P01 WEB-040 Virtual Queue"
-        - "P02 GST-023 Virtual Queue / Join Queue"
+        - "P02 GST-023 Virtual Queue"
+        - "P02 GST-046 Branded Queue / Waiting Room"
       x-ticvai-audience: [guest]
       x-ticvai-read-routing: primary
       summary: Read a queue entry
@@ -394,14 +396,14 @@ paths:
           description: Entry
           content:
             application/json:
-              schema: { $ref: '#/components/schemas/QueueEntry' }
+              schema: { $ref: '#/components/schemas/WaitingGuest' }
         '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
 
     delete:
       operationId: leaveQueue
       x-ticvai-consumed-by:
         - "P01 WEB-040 Virtual Queue"
-        - "P02 GST-023 Virtual Queue / Join Queue"
+        - "P02 GST-023 Virtual Queue"
       x-ticvai-audience: [guest]
       summary: Leave a queue
       tags: [entry]
@@ -423,14 +425,14 @@ paths:
             application/problem+json:
               schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
 
-  /queue-entries/{entryId}/redeem:
+  /waiting-guests/{entryId}/redeem:
     parameters:
       - name: entryId
         in: path
         required: true
         schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
     post:
-      operationId: redeemQueueEntry
+      operationId: redeemWaitingGuest
       x-ticvai-audience: [staff]
       summary: Admit a party at the ride
       description: >
@@ -470,14 +472,14 @@ paths:
               schema: { $ref: '#/components/schemas/QueueRedemptionResult' }
         '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
 
-  /queue-entries/{entryId}/override:
+  /waiting-guests/{entryId}/override:
     parameters:
       - name: entryId
         in: path
         required: true
         schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
     post:
-      operationId: overrideQueueEntry
+      operationId: overrideWaitingGuest
       x-ticvai-audience: [staff]
       summary: Admit against a failed redemption
       description: >
@@ -606,20 +608,23 @@ paths:
                     properties:
                       items:
                         type: array
-                        items: { $ref: '#/components/schemas/QueueEntry' }
+                        items: { $ref: '#/components/schemas/WaitingGuest' }
 
   # ---------------------------------------------------------------- wait times
   /queues/wait-times:
     get:
       operationId: getWaitTimes
       x-ticvai-consumed-by:
-        - "P01 WEB-015 Virtual Waiting Room"
+        - "P01 WEB-002 Event & Attraction Listing"
+        - "P01 WEB-004 Attraction Details"
+        - "P01 WEB-015 Branded Queue / Waiting Room"
         - "P01 WEB-039 Venue Map & Wait Times"
         - "P01 WEB-040 Virtual Queue"
-        - "P02 GST-003 Attractions List"
+        - "P02 GST-003 Event & Attraction Listing"
         - "P02 GST-004 Attraction Details"
         - "P02 GST-021 Interactive Map"
         - "P02 GST-022 Attraction Wait Times"
+        - "P02 GST-023 Virtual Queue"
         - "P02 GST-038 Digital Companion Mode"
         - "P02 GST-046 Branded Queue / Waiting Room"
         - "P02 GST-051 Plan Your Adventure – Start"
@@ -1177,8 +1182,8 @@ components:
             crossQueueLimit: { type: integer }
             heightRequirementCm: { type: integer, nullable: true }
 
-    QueueEntry:
-      x-ticvai-persistence: "queue.entry"
+    WaitingGuest:
+      x-ticvai-persistence: "queue.waiting_guest"
       type: object
       required: [id, queueId, partyNumber, partySize, status, joinedAt]
       properties:

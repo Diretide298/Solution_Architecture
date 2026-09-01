@@ -79,7 +79,7 @@ operations:
   - orders.deposit_box
   writes:
   - cache:idempotency
-  - ledger.entry
+  - ledger.posting
   - orders.deposit_box
 - operation: closeShift
   verb: POST

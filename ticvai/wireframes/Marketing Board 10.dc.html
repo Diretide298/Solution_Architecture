@@ -1,0 +1,882 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+html,body{margin:0;padding:0;background:#EEF1F6;-webkit-font-smoothing:antialiased}
+*{box-sizing:border-box}
+a{color:#0D6EFD;text-decoration:none}a:hover{color:#0A55C7}
+</style>
+</helmet>
+
+<div style="font-family:Manrope,system-ui,sans-serif;color:#0B1324;padding:26px 34px 90px;max-width:1420px;margin:0 auto">
+
+  <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:24px;padding-bottom:14px;border-bottom:2px solid #0B1324">
+    <div>
+      <div style="font-size:12px;font-weight:800;letter-spacing:.18em;background:linear-gradient(90deg,#0D6EFD,#00B8FF);-webkit-background-clip:text;background-clip:text;color:transparent">TICVAI</div>
+      <h1 style="font-size:21px;font-weight:800;letter-spacing:-.02em;margin:5px 0 0">Marketing &amp; CRM · Board 10 — Gamification &amp; Loyalty Engagement <span style="font-weight:600;color:#6B7280">(10 screens)</span></h1>
+    </div>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#6B7280;text-align:right;line-height:1.7">
+      <div>staff · earning, not buying</div>
+      <div>1280 × 700 · <a href="TICVAI%20All%20Boards%20Index.dc.html">board index</a></div>
+    </div>
+  </div>
+
+  <p style="font-size:12.5px;color:#5A6577;max-width:82ch;margin:16px 0 0;line-height:1.65;text-wrap:pretty">Points and badges are easy to add and hard to remove, so two rules hold this board together. A reward that does not change what someone does is just a discount with extra steps, and nothing here may make a guest feel watched — the moment a challenge reads as surveillance it costs more than it earns.</p>
+
+  <div style="display:flex;flex-direction:column;gap:52px;margin-top:40px">
+
+    <div id="crm-10a" data-screen-label="CRM-10A" data-screen-id="CRM-10A" data-screen-id-origin="board" style="display:flex;flex-direction:column;gap:13px;scroll-margin-top:24px">
+      <div>
+        <div style="display:flex;align-items:baseline;gap:9px"><span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#8494A8">CRM-10A</span><span style="font-size:16.5px;font-weight:800;letter-spacing:-.015em">Gamification Command Center</span><span style="font-size:9px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:2px 7px;border-radius:5px;background:#FFF6E5;color:#7A5C00">2 challenges changed nothing</span></div>
+        <div style="font-size:12px;color:#6B7280;margin-top:3px">Every live mechanic with the behaviour it was meant to change and whether it did. Participation is context; the lift against a held-back group is the verdict.</div>
+      </div>
+      <div style="width:1280px;height:700px;display:flex;background:#F7F9FC;border:1px solid #E3E8F0;border-radius:14px;overflow:hidden;box-shadow:0 16px 38px rgba(12,35,64,.09)">
+        <aside style="flex:none;width:180px;background:#0B1324;display:flex;flex-direction:column;position:relative">
+          <div style="position:absolute;inset:0;background:radial-gradient(300px 200px at 0% 4%,rgba(0,184,255,.20),transparent 70%);pointer-events:none"></div>
+          <div style="position:relative;padding:15px 14px 13px;border-bottom:1px solid rgba(255,255,255,.08)"><img src="assets/ticvai-light-logo.png" alt="TICVAI" style="display:block;height:24px;width:auto"><div style="font-size:9.5px;color:#7FA3C9;margin-top:5px">Engagement &amp; Loyalty</div></div>
+          <nav style="position:relative;display:flex;flex-direction:column;gap:2px;padding:11px 9px">
+            <div style="padding:8px 10px;border-radius:9px;background:linear-gradient(90deg,rgba(13,110,253,.30),rgba(0,184,255,.10));color:#fff;font-size:11.5px;font-weight:700;box-shadow:inset 2px 0 0 #00B8FF">Overview</div>
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Challenges</div>
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Badges</div>
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Points</div>
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Rewards</div>
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Guest hub</div>
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Analytics</div>
+          </nav>
+          <div style="position:relative;margin-top:auto;padding:12px;border-top:1px solid rgba(255,255,255,.08);font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#7FA3C9;line-height:1.7">9 live<br>2 to retire</div>
+        </aside>
+        <div style="flex:1;display:flex;flex-direction:column;min-width:0">
+          <header style="flex:none;height:54px;display:flex;align-items:center;gap:12px;padding:0 18px;background:#fff;border-bottom:1px solid #E8ECF3">
+            <div><div style="font-size:13.5px;font-weight:800;letter-spacing:-.01em">Engagement mechanics</div><div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#9AA5B6">9 live · 41 200 members enrolled · 18.4m points outstanding · £96 400 of liability</div></div>
+            <div style="margin-left:auto;display:flex;gap:6px"><div style="height:32px;display:flex;align-items:center;gap:6px;padding:0 11px;border:1px solid #E3E8F0;border-radius:8px;font-size:11px;font-weight:700;color:#5A6577">Quarter<span style="color:#9AA5B6">▾</span></div><div style="height:32px;display:flex;align-items:center;padding:0 12px;border-radius:8px;background:#0D6EFD;color:#fff;font-size:11px;font-weight:700">Retire the two</div></div>
+          </header>
+          <div style="flex:1;display:flex;flex-direction:column;gap:12px;padding:14px 16px;min-height:0">
+            <div style="flex:none;display:grid;grid-template-columns:repeat(4,1fr);gap:11px">
+              <div style="background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:4px"><span style="font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#94A0B4">Enrolled</span><span style="font-family:'IBM Plex Mono',monospace;font-size:20px;font-weight:600">41 200</span><span style="font-size:10.5px;color:#5A6577">62% of contactable members</span></div>
+              <div style="background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:4px"><span style="font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#94A0B4">Active in 90 days</span><span style="font-family:'IBM Plex Mono',monospace;font-size:20px;font-weight:600">14 800</span><span style="font-size:10.5px;color:#5A6577">36% of those enrolled</span></div>
+              <div style="background:#fff;border:1px solid #CBE8DA;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:4px"><span style="font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#0B7A55">Extra visits attributed</span><span style="font-family:'IBM Plex Mono',monospace;font-size:20px;font-weight:600;color:#0B5B41">+0.4</span><span style="font-size:10.5px;color:#0B7A55">per active member per year</span></div>
+              <div style="background:#fff;border:1.5px solid #F2DFB8;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:4px"><span style="font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#8A6D00">Points liability</span><span style="font-family:'IBM Plex Mono',monospace;font-size:20px;font-weight:600;color:#8A6D00">£96 400</span><span style="font-size:10.5px;color:#8A6D00">18.4m points · 41% older than a year</span></div>
+            </div>
+            <div style="flex:1;display:grid;grid-template-columns:1.35fr 1fr;gap:12px;min-height:0">
+              <div style="background:#fff;border:1px solid #E8ECF3;border-radius:12px;display:flex;flex-direction:column;overflow:hidden;min-height:0">
+                <div style="flex:none;display:flex;align-items:center;gap:8px;padding:11px 14px 10px;border-bottom:1px solid #EDF1F6"><div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Did it change behaviour</div><span style="margin-left:auto;font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#9AA5B6">taking part · lift against holdout · cost</span></div>
+                <div style="flex:none;display:grid;grid-template-columns:1.5fr 78px 84px 78px 1fr;padding:8px 14px;font-size:9px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:#94A0B4;border-bottom:1px solid #EDF1F6"><div>Mechanic</div><div style="text-align:right">Taking part</div><div style="text-align:right">Lift</div><div style="text-align:right">Cost</div><div>Verdict</div></div>
+                <div style="display:grid;grid-template-columns:1.5fr 78px 84px 78px 1fr;align-items:center;padding:10px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA;background:#F3FBF7"><div style="font-weight:700;color:#0B5B41">Bring someone new</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">2 140</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;font-weight:700;color:#0B5B41">+18%</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">£18 200</div><div style="font-size:10.5px;color:#0B7A55">keep · best on the board</div></div>
+                <div style="display:grid;grid-template-columns:1.5fr 78px 84px 78px 1fr;align-items:center;padding:10px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA"><div style="font-weight:600">Midweek visit challenge</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">4 880</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#0B5B41">+11%</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">£9 400</div><div style="font-size:10.5px;color:#0B7A55">keep · fills empty seats</div></div>
+                <div style="display:grid;grid-template-columns:1.5fr 78px 84px 78px 1fr;align-items:center;padding:10px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA"><div style="font-weight:600">Try something new · genre badge</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">3 210</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#0B5B41">+7%</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">£2 100</div><div style="font-size:10.5px;color:#0B7A55">keep · cheap</div></div>
+                <div style="display:grid;grid-template-columns:1.5fr 78px 84px 78px 1fr;align-items:center;padding:10px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA"><div style="font-weight:600">Season streak · 3 in a row</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">1 940</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#0B5B41">+6%</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">£6 800</div><div style="font-size:10.5px;color:#5A6577">keep · watch the cost</div></div>
+                <div style="display:grid;grid-template-columns:1.5fr 78px 84px 78px 1fr;align-items:center;padding:10px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA"><div style="font-weight:600">Family challenge · four visits</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">880</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#0B5B41">+9%</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">£3 200</div><div style="font-size:10.5px;color:#0B7A55">keep · small but real</div></div>
+                <div style="display:grid;grid-template-columns:1.5fr 78px 84px 78px 1fr;align-items:center;padding:10px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA;background:#FFFBF4"><div style="font-weight:700;color:#7A5C00">Points for every purchase</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#7A5C00">38 400</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;font-weight:700;color:#7A5C00">+1%</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#7A5C00">£44 100</div><div style="font-size:10.5px;color:#8A2020">this is a discount</div></div>
+                <div style="display:grid;grid-template-columns:1.5fr 78px 84px 78px 1fr;align-items:center;padding:10px 14px;font-size:11.5px;background:#FFFBF4"><div style="font-weight:700;color:#7A5C00">Check in on arrival · daily badge</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#7A5C00">6 100</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;font-weight:700;color:#7A5C00">0%</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#7A5C00">£1 400</div><div style="font-size:10.5px;color:#8A2020">retire · noise</div></div>
+                <div style="margin-top:auto;flex:none;padding:11px 14px;border-top:1px solid #EDF1F6;background:#FFFBF4;display:flex;gap:11px"><span style="width:3px;border-radius:2px;background:#F0B429;flex:none"></span><div style="flex:1;font-size:11px;color:#7A5C00;line-height:1.55">Points on every purchase cost £44 100 for one point of lift, and the arrival check-in badge changed nothing at all. The two mechanics with the highest participation are the two doing the least work.</div></div>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:12px;min-height:0">
+                <div style="flex:none;background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:8px">
+                  <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Who actually engages</div>
+                  <div style="display:flex;align-items:center;gap:9px"><span style="font-size:11px;color:#5A6577;width:104px;flex:none">Members, 6+ visits</span><div style="flex:1;height:9px;border-radius:5px;background:#EEF2F7;overflow:hidden"><span style="display:block;width:71%;height:9px;background:#0D6EFD"></span></div><span style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#5A6577;width:26px;text-align:right">71%</span></div>
+                  <div style="display:flex;align-items:center;gap:9px"><span style="font-size:11px;color:#5A6577;width:104px;flex:none">Members, 2–5 visits</span><div style="flex:1;height:9px;border-radius:5px;background:#EEF2F7;overflow:hidden"><span style="display:block;width:38%;height:9px;background:#00B8FF"></span></div><span style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#5A6577;width:26px;text-align:right">38%</span></div>
+                  <div style="display:flex;align-items:center;gap:9px"><span style="font-size:11px;color:#5A6577;width:104px;flex:none">Members, 1 visit</span><div style="flex:1;height:9px;border-radius:5px;background:#EEF2F7;overflow:hidden"><span style="display:block;width:9%;height:9px;background:#F0B429"></span></div><span style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#5A6577;width:26px;text-align:right">9%</span></div>
+                  <div style="font-size:10.5px;color:#5A6577;line-height:1.5">Engagement follows loyalty rather than creating it. The people playing are mostly the people who were coming anyway, which is why lift against a holdout is the only honest measure here.</div>
+                </div>
+                <div style="flex:none;background:#fff;border:1.5px solid #F2DFB8;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:8px">
+                  <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em;color:#8A6D00">£96 400 of points nobody will spend</div>
+                  <div style="font-size:10.5px;color:#5A6577;line-height:1.5">41% of outstanding points are over a year old and held by members who have not visited since. The liability sits there either way.</div>
+                  <div style="display:flex;flex-direction:column;gap:5px;font-size:11px;color:#5A6577">
+                    <div style="display:flex;justify-content:space-between"><span>Redeemed within 90 days</span><span style="font-family:'IBM Plex Mono',monospace;color:#0B1324">31%</span></div>
+                    <div style="display:flex;justify-content:space-between"><span>Never redeemed</span><span style="font-family:'IBM Plex Mono',monospace;color:#8A6D00">44%</span></div>
+                  </div>
+                  <div style="height:30px;border-radius:9px;border:1px solid #C9D6E8;color:#0A4FB8;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700">Open the points rules</div>
+                </div>
+                <div style="flex:1;min-height:0"></div>
+                <div style="flex:none;background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:7px">
+                  <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Lift against a holdout, or nothing</div>
+                  <div style="font-size:10.5px;color:#5A6577;line-height:1.55">Five per cent of eligible members are held out of every mechanic. Without them, participation numbers would justify anything on this board indefinitely.</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;line-height:1.85;color:#7C8899">
+        <div><b style="color:#4A5566;font-weight:600">OPERATIONS</b> · getEngagementSummary · getMechanicPerformance · getHoldoutLift · getPointsLiability · retireMechanic</div>
+        <div><b style="color:#4A5566;font-weight:600">STATES</b> · loading · <b style="color:#8A6D00">zeroLiftMechanic — a mechanic with no measurable lift is flagged for retirement on its own row</b> · holdoutTooSmall · liabilityRising · error</div>
+        <div><b style="color:#4A5566;font-weight:600">ARRIVES WITH</b> · tenantId←context · period←picker</div>
+        <div><b style="color:#4A5566;font-weight:600">GOES TO</b> · <a href="#crm-10b">challenge builder</a> · <a href="#crm-10d">points rules</a> · <a href="#crm-10j">analytics</a></div>
+      </div>
+    </div>
+
+    <div id="crm-10b" data-screen-label="CRM-10B" data-screen-id="CRM-10B" data-screen-id-origin="board" style="display:flex;flex-direction:column;gap:13px;scroll-margin-top:24px">
+      <div>
+        <div style="display:flex;align-items:baseline;gap:9px"><span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#8494A8">CRM-10B</span><span style="font-size:16.5px;font-weight:800;letter-spacing:-.015em">Challenge Builder</span><span style="font-size:9px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:2px 7px;border-radius:5px;background:#EDF3FF;color:#0A4FB8">holdout required to publish</span></div>
+        <div style="font-size:12px;color:#6B7280;margin-top:3px">Building a challenge. The form asks what behaviour should change before it asks what the reward is, and it will not publish without a named holdout and an end date.</div>
+      </div>
+      <div style="width:1280px;height:700px;display:flex;background:#F7F9FC;border:1px solid #E3E8F0;border-radius:14px;overflow:hidden;box-shadow:0 16px 38px rgba(12,35,64,.09)">
+        <aside style="flex:none;width:180px;background:#0B1324;display:flex;flex-direction:column;position:relative">
+          <div style="position:absolute;inset:0;background:radial-gradient(300px 200px at 0% 4%,rgba(0,184,255,.20),transparent 70%);pointer-events:none"></div>
+          <div style="position:relative;padding:15px 14px 13px;border-bottom:1px solid rgba(255,255,255,.08)"><img src="assets/ticvai-light-logo.png" alt="TICVAI" style="display:block;height:24px;width:auto"><div style="font-size:9.5px;color:#7FA3C9;margin-top:5px">Engagement &amp; Loyalty</div></div>
+          <nav style="position:relative;display:flex;flex-direction:column;gap:2px;padding:11px 9px">
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Overview</div>
+            <div style="padding:8px 10px;border-radius:9px;background:linear-gradient(90deg,rgba(13,110,253,.30),rgba(0,184,255,.10));color:#fff;font-size:11.5px;font-weight:700;box-shadow:inset 2px 0 0 #00B8FF">Challenges</div>
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Badges</div>
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Points</div>
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Rewards</div>
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Guest hub</div>
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Analytics</div>
+          </nav>
+          <div style="position:relative;margin-top:auto;padding:12px;border-top:1px solid rgba(255,255,255,.08);font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#7FA3C9;line-height:1.7">draft<br>Autumn midweek</div>
+        </aside>
+        <div style="flex:1;display:flex;flex-direction:column;min-width:0">
+          <header style="flex:none;height:54px;display:flex;align-items:center;gap:12px;padding:0 18px;background:#fff;border-bottom:1px solid #E8ECF3">
+            <div><div style="font-size:13.5px;font-weight:800;letter-spacing:-.01em">New challenge · Autumn midweek</div><div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#9AA5B6">draft · eligible 18 400 · holdout 920 · runs 1 Sep to 30 Nov</div></div>
+            <div style="margin-left:auto;display:flex;gap:6px"><div style="height:32px;display:flex;align-items:center;padding:0 11px;border:1px solid #E3E8F0;border-radius:8px;font-size:11px;font-weight:700;color:#5A6577">Preview as guest</div><div style="height:32px;display:flex;align-items:center;padding:0 12px;border-radius:8px;background:#0D6EFD;color:#fff;font-size:11px;font-weight:700">Publish</div></div>
+          </header>
+          <div style="flex:1;display:grid;grid-template-columns:1fr 320px;gap:12px;padding:14px 16px;min-height:0">
+            <div style="background:#fff;border:1px solid #E8ECF3;border-radius:12px;display:flex;flex-direction:column;gap:11px;padding:14px 16px;overflow:hidden">
+              <div style="display:flex;flex-direction:column;gap:5px">
+                <span style="font-size:9px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:#94A0B4">What behaviour should change</span>
+                <div style="height:34px;display:flex;align-items:center;padding:0 11px;border:1px solid #C9D6E8;border-radius:9px;font-size:12px;font-weight:600">Move some weekend demand into Tuesday and Wednesday<span style="margin-left:auto;color:#9AA5B6">▾</span></div>
+                <span style="font-size:10px;color:#5A6577">Midweek runs at 54% capacity against 91% at weekends. This is a yield problem before it is a loyalty one.</span>
+              </div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:11px">
+                <div style="display:flex;flex-direction:column;gap:5px"><span style="font-size:9px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:#94A0B4">Who is eligible</span><div style="height:34px;display:flex;align-items:center;padding:0 11px;border:1px solid #C9D6E8;border-radius:9px;font-size:12px;font-weight:600">Members with 2+ visits<span style="margin-left:auto;color:#9AA5B6">▾</span></div><span style="font-size:10px;color:#5A6577">18 400 people</span></div>
+                <div style="display:flex;flex-direction:column;gap:5px"><span style="font-size:9px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:#94A0B4">Held back for measurement</span><div style="height:34px;display:flex;align-items:center;padding:0 11px;border:1px solid #C9D6E8;border-radius:9px;font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:600">5% · 920 people</div><span style="font-size:10px;color:#0A4FB8">required · they see nothing</span></div>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:6px">
+                <span style="font-size:9px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:#94A0B4">What the guest has to do</span>
+                <div style="display:flex;flex-direction:column;gap:6px">
+                  <div style="display:flex;align-items:center;gap:9px;padding:9px 11px;border-radius:10px;border:1px solid #E3E8F0"><span style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#0A4FB8;flex:none">1</span><span style="font-size:11.5px;flex:1">Attend any Tuesday or Wednesday event</span><span style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#5A6577">×2 needed</span></div>
+                  <div style="display:flex;align-items:center;gap:9px;padding:9px 11px;border-radius:10px;border:1px dashed #DCE3ED;background:#F7F9FC"><span style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#9AA5B6;flex:none">+</span><span style="font-size:11.5px;flex:1;color:#9AA5B6">Add a step</span></div>
+                </div>
+                <span style="font-size:10px;color:#5A6577">Two steps is the ceiling. Beyond that, completion falls faster than the reward can compensate.</span>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:6px">
+                <span style="font-size:9px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:#94A0B4">What they get</span>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:11px">
+                  <div style="padding:10px 11px;border-radius:10px;border:1.5px solid #C9D6E8;background:#F7FAFF;display:flex;flex-direction:column;gap:3px"><span style="font-size:11.5px;font-weight:700;color:#0A4FB8">A seat upgrade on the third visit</span><span style="font-size:10px;color:#5A6577">costs £4.10 on average · not cash</span></div>
+                  <div style="padding:10px 11px;border-radius:10px;border:1px solid #E3E8F0;display:flex;flex-direction:column;gap:3px"><span style="font-size:11.5px;font-weight:600;color:#5A6577">£10 off the next booking</span><span style="font-size:10px;color:#8A2020">reads as a discount, trains price sensitivity</span></div>
+                </div>
+              </div>
+              <div style="margin-top:auto;display:flex;gap:11px;padding:11px 12px;border-radius:10px;background:#F3FBF7;border:1px solid #CBE8DA">
+                <span style="flex:none;width:3px;border-radius:2px;background:#0B7A55"></span>
+                <div style="flex:1;font-size:11px;color:#0B5B41;line-height:1.55">An upgrade uses inventory that would otherwise go empty and does not teach the guest to wait for a discount. Estimated £4.10 a head against £10 in cash for the same completion rate.</div>
+              </div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:12px;min-height:0">
+              <div style="flex:none;background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:8px">
+                <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Forecast</div>
+                <div style="display:flex;flex-direction:column;gap:5px;font-size:11px;color:#5A6577">
+                  <div style="display:flex;justify-content:space-between"><span>Eligible</span><span style="font-family:'IBM Plex Mono',monospace;color:#0B1324">18 400</span></div>
+                  <div style="display:flex;justify-content:space-between"><span>Expected to start</span><span style="font-family:'IBM Plex Mono',monospace;color:#0B1324">4 100</span></div>
+                  <div style="display:flex;justify-content:space-between"><span>Expected to finish</span><span style="font-family:'IBM Plex Mono',monospace;color:#0B1324">1 640</span></div>
+                  <div style="display:flex;justify-content:space-between"><span>Midweek seats filled</span><span style="font-family:'IBM Plex Mono',monospace;color:#0B5B41">+2 900</span></div>
+                  <div style="display:flex;justify-content:space-between"><span>Cost of rewards</span><span style="font-family:'IBM Plex Mono',monospace;color:#0B1324">£6 720</span></div>
+                </div>
+                <div style="font-size:10.5px;color:#5A6577;line-height:1.5">Based on the spring midweek challenge, which had the same steps and a similar audience.</div>
+              </div>
+              <div style="flex:none;background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:8px">
+                <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Before it can publish</div>
+                <div style="display:flex;flex-direction:column;gap:6px;font-size:11px">
+                  <div style="display:flex;align-items:center;gap:8px"><span style="color:#0B7A55;font-weight:700">✓</span><span style="color:#3E4A5C">Behaviour named</span></div>
+                  <div style="display:flex;align-items:center;gap:8px"><span style="color:#0B7A55;font-weight:700">✓</span><span style="color:#3E4A5C">Holdout of at least 5%</span></div>
+                  <div style="display:flex;align-items:center;gap:8px"><span style="color:#0B7A55;font-weight:700">✓</span><span style="color:#3E4A5C">End date set</span></div>
+                  <div style="display:flex;align-items:center;gap:8px"><span style="color:#0B7A55;font-weight:700">✓</span><span style="color:#3E4A5C">Two steps or fewer</span></div>
+                  <div style="display:flex;align-items:center;gap:8px"><span style="color:#8A6D00;font-weight:700">!</span><span style="color:#7A5C00">Review date not set · 90 days after launch</span></div>
+                </div>
+              </div>
+              <div style="flex:1;min-height:0"></div>
+              <div style="flex:none;background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:7px">
+                <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Behaviour first, reward second</div>
+                <div style="font-size:10.5px;color:#5A6577;line-height:1.55">A challenge designed around its prize ends up rewarding what people already do. Naming the behaviour first is what makes the reward answerable to something.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;line-height:1.85;color:#7C8899">
+        <div><b style="color:#4A5566;font-weight:600">OPERATIONS</b> · createChallenge · setChallengeSteps · setEligibility · setHoldout · forecastChallenge · publishChallenge</div>
+        <div><b style="color:#4A5566;font-weight:600">STATES</b> · draft · <b style="color:#8A6D00">publishBlockedNoHoldout — a challenge cannot go live without a holdout, an end date and a review date</b> · forecasting · tooManySteps · publishing · error</div>
+        <div><b style="color:#4A5566;font-weight:600">ARRIVES WITH</b> · challengeId←list · segmentId←audience</div>
+        <div><b style="color:#4A5566;font-weight:600">GOES TO</b> · <a href="#crm-10e">reward rules</a> · <a href="#crm-10h">guest hub</a> · <a href="#crm-10a">overview</a></div>
+      </div>
+    </div>
+
+
+    <div id="crm-10c" data-screen-label="CRM-10C" data-screen-id="CRM-10C" data-screen-id-origin="board" style="display:flex;flex-direction:column;gap:13px;scroll-margin-top:24px">
+      <div>
+        <div style="display:flex;align-items:baseline;gap:9px"><span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#8494A8">CRM-10C</span><span style="font-size:16.5px;font-weight:800;letter-spacing:-.015em">Achievement &amp; Badge Engine</span><span style="font-size:9px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:2px 7px;border-radius:5px;background:#EDF3FF;color:#0A4FB8">14 badges · 3 hidden</span></div>
+        <div style="font-size:12px;color:#6B7280;margin-top:3px">Badges and what earns them. A badge costs nothing to award and everything to explain, so each one has to describe something a guest would be pleased to be told about themselves.</div>
+      </div>
+      <div style="width:1280px;height:700px;display:flex;background:#F7F9FC;border:1px solid #E3E8F0;border-radius:14px;overflow:hidden;box-shadow:0 16px 38px rgba(12,35,64,.09)">
+        <aside style="flex:none;width:180px;background:#0B1324;display:flex;flex-direction:column;position:relative">
+          <div style="position:absolute;inset:0;background:radial-gradient(300px 200px at 0% 4%,rgba(0,184,255,.20),transparent 70%);pointer-events:none"></div>
+          <div style="position:relative;padding:15px 14px 13px;border-bottom:1px solid rgba(255,255,255,.08)"><img src="assets/ticvai-light-logo.png" alt="TICVAI" style="display:block;height:24px;width:auto"><div style="font-size:9.5px;color:#7FA3C9;margin-top:5px">Engagement &amp; Loyalty</div></div>
+          <nav style="position:relative;display:flex;flex-direction:column;gap:2px;padding:11px 9px">
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Overview</div>
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Challenges</div>
+            <div style="padding:8px 10px;border-radius:9px;background:linear-gradient(90deg,rgba(13,110,253,.30),rgba(0,184,255,.10));color:#fff;font-size:11.5px;font-weight:700;box-shadow:inset 2px 0 0 #00B8FF">Badges</div>
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Points</div>
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Rewards</div>
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Guest hub</div>
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Analytics</div>
+          </nav>
+          <div style="position:relative;margin-top:auto;padding:12px;border-top:1px solid rgba(255,255,255,.08);font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#7FA3C9;line-height:1.7">14 badges<br>2 under review</div>
+        </aside>
+        <div style="flex:1;display:flex;flex-direction:column;min-width:0">
+          <header style="flex:none;height:54px;display:flex;align-items:center;gap:12px;padding:0 18px;background:#fff;border-bottom:1px solid #E8ECF3">
+            <div><div style="font-size:13.5px;font-weight:800;letter-spacing:-.01em">Badges</div><div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#9AA5B6">14 live · 3 hidden until earned · 88 400 awarded all time · 2 under review</div></div>
+            <div style="margin-left:auto;display:flex;gap:6px"><div style="height:32px;display:flex;align-items:center;padding:0 11px;border:1px solid #E3E8F0;border-radius:8px;font-size:11px;font-weight:700;color:#5A6577">New badge</div><div style="height:32px;display:flex;align-items:center;padding:0 12px;border-radius:8px;background:#0D6EFD;color:#fff;font-size:11px;font-weight:700">Save</div></div>
+          </header>
+          <div style="flex:1;display:grid;grid-template-columns:1fr 350px;gap:12px;padding:14px 16px;min-height:0">
+            <div style="background:#fff;border:1px solid #E8ECF3;border-radius:12px;display:flex;flex-direction:column;overflow:hidden;min-height:0">
+              <div style="flex:none;display:grid;grid-template-columns:1.5fr 1.3fr 82px 80px;padding:9px 14px;font-size:9px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:#94A0B4;border-bottom:1px solid #EDF1F6"><div>Badge</div><div>Earned by</div><div style="text-align:right">Awarded</div><div>Visible</div></div>
+              <div style="display:grid;grid-template-columns:1.5fr 1.3fr 82px 80px;align-items:center;padding:10px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA;background:#F7FAFF"><div style="font-weight:700;color:#0A4FB8">First night</div><div style="font-size:10.5px;color:#5A6577">first event attended</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">28 400</div><div style="font-size:10px;color:#5A6577">always</div></div>
+              <div style="display:grid;grid-template-columns:1.5fr 1.3fr 82px 80px;align-items:center;padding:10px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA"><div style="font-weight:600">Season regular</div><div style="font-size:10.5px;color:#5A6577">4 events in one season</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">6 210</div><div style="font-size:10px;color:#5A6577">always</div></div>
+              <div style="display:grid;grid-template-columns:1.5fr 1.3fr 82px 80px;align-items:center;padding:10px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA"><div style="font-weight:600">Wide taste</div><div style="font-size:10.5px;color:#5A6577">3 different genres in a year</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">3 940</div><div style="font-size:10px;color:#5A6577">always</div></div>
+              <div style="display:grid;grid-template-columns:1.5fr 1.3fr 82px 80px;align-items:center;padding:10px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA"><div style="font-weight:600">Brought a friend</div><div style="font-size:10.5px;color:#5A6577">a referred guest attended</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">2 140</div><div style="font-size:10px;color:#5A6577">always</div></div>
+              <div style="display:grid;grid-template-columns:1.5fr 1.3fr 82px 80px;align-items:center;padding:10px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA"><div style="font-weight:600">Opening night</div><div style="font-size:10.5px;color:#5A6577">attended a run's first night</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">1 880</div><div style="font-size:10px;color:#0A4FB8">hidden</div></div>
+              <div style="display:grid;grid-template-columns:1.5fr 1.3fr 82px 80px;align-items:center;padding:10px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA"><div style="font-weight:600">Ten years</div><div style="font-size:10.5px;color:#5A6577">a decade of membership</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">412</div><div style="font-size:10px;color:#0A4FB8">hidden</div></div>
+              <div style="display:grid;grid-template-columns:1.5fr 1.3fr 82px 80px;align-items:center;padding:10px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA;background:#FFFBF4"><div style="font-weight:700;color:#7A5C00">Big spender</div><div style="font-size:10.5px;color:#8A2020">£500 in a year</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#7A5C00">1 240</div><div style="font-size:10px;color:#7A5C00">under review</div></div>
+              <div style="display:grid;grid-template-columns:1.5fr 1.3fr 82px 80px;align-items:center;padding:10px 14px;font-size:11.5px"><div style="font-weight:700;color:#7A5C00">Never misses a Friday</div><div style="font-size:10.5px;color:#8A2020">4 consecutive Fridays</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#7A5C00">308</div><div style="font-size:10px;color:#7A5C00">under review</div></div>
+              <div style="margin-top:auto;flex:none;padding:11px 14px;border-top:1px solid #EDF1F6;background:#FFFBF4;display:flex;gap:11px"><span style="width:3px;border-radius:2px;background:#F0B429;flex:none"></span><div style="flex:1;font-size:11px;color:#7A5C00;line-height:1.55">Two badges are under review for the same reason: they tell the guest what we have noticed about their money or their habits. "Big spender" and "never misses a Friday" both read as being watched rather than being welcomed.</div></div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:12px;min-height:0">
+              <div style="flex:none;background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:13px 15px;display:flex;flex-direction:column;gap:9px">
+                <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Editing: Wide taste</div>
+                <div style="display:flex;flex-direction:column;gap:5px"><span style="font-size:9px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:#94A0B4">Name shown to the guest</span><div style="height:32px;display:flex;align-items:center;padding:0 10px;border:1px solid #C9D6E8;border-radius:9px;font-size:11.5px;font-weight:600">Wide taste</div></div>
+                <div style="display:flex;flex-direction:column;gap:5px"><span style="font-size:9px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:#94A0B4">How it is described</span><div style="border:1px solid #C9D6E8;border-radius:9px;padding:9px 10px;font-size:11px;line-height:1.55;color:#26303F">You have been to three different kinds of night this year. Here are two more you might like.</div></div>
+                <div style="display:flex;flex-direction:column;gap:5px"><span style="font-size:9px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:#94A0B4">Awarded when</span><div style="height:32px;display:flex;align-items:center;padding:0 10px;border:1px solid #E3E8F0;border-radius:9px;background:#F7F9FC;font-size:11.5px;color:#5A6577">3 distinct genres in 12 months</div></div>
+                <div style="display:flex;align-items:center;gap:8px;font-size:11px"><span style="width:26px;height:15px;border-radius:9px;background:#0D6EFD;position:relative;flex:none"><span style="position:absolute;top:2px;right:2px;width:11px;height:11px;border-radius:50%;background:#fff"></span></span><span style="color:#3E4A5C">carries a recommendation with it</span></div>
+                <div style="font-size:10.5px;color:#5A6577;line-height:1.5">The badge is a doorway, not a trophy. It ends with something to do next.</div>
+              </div>
+              <div style="flex:none;background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:7px">
+                <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Rules for a badge</div>
+                <div style="display:flex;flex-direction:column;gap:5px;font-size:11px;color:#3E4A5C">
+                  <div style="display:flex;gap:8px"><span style="color:#0B7A55;font-weight:700">✓</span><span>Describes something the guest chose to do</span></div>
+                  <div style="display:flex;gap:8px"><span style="color:#0B7A55;font-weight:700">✓</span><span>Can be explained in one sentence</span></div>
+                  <div style="display:flex;gap:8px"><span style="color:#8A2020;font-weight:700">×</span><span>Never about how much they spent</span></div>
+                  <div style="display:flex;gap:8px"><span style="color:#8A2020;font-weight:700">×</span><span>Never about a pattern they did not mention</span></div>
+                </div>
+              </div>
+              <div style="flex:1;min-height:0"></div>
+              <div style="flex:none;background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:7px">
+                <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Free to award, expensive to explain</div>
+                <div style="font-size:10.5px;color:#5A6577;line-height:1.55">Fourteen badges is close to the limit. Past that, guests stop reading them and the hub becomes a wall of shapes nobody can rank.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;line-height:1.85;color:#7C8899">
+        <div><b style="color:#4A5566;font-weight:600">OPERATIONS</b> · listBadges · upsertBadge · setBadgeCriteria · setBadgeVisibility · getBadgeAwardCounts · retireBadge</div>
+        <div><b style="color:#4A5566;font-weight:600">STATES</b> · viewing · editing · <b style="color:#8A6D00">spendBasedBadgeFlagged — criteria built on money or unstated habits are held for review</b> · retireKeepsAwarded · saving · error</div>
+        <div><b style="color:#4A5566;font-weight:600">ARRIVES WITH</b> · badgeId←list · tenantId←context</div>
+        <div><b style="color:#4A5566;font-weight:600">GOES TO</b> · <a href="#crm-10h">guest hub</a> · <a href="#crm-10e">reward rules</a> · <a href="#crm-10j">audit</a></div>
+      </div>
+    </div>
+
+    <div id="crm-10d" data-screen-label="CRM-10D" data-screen-id="CRM-10D" data-screen-id-origin="board" style="display:flex;flex-direction:column;gap:13px;scroll-margin-top:24px">
+      <div>
+        <div style="display:flex;align-items:baseline;gap:9px"><span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#8494A8">CRM-10D</span><span style="font-size:16.5px;font-weight:800;letter-spacing:-.015em">Points &amp; Activity Rules</span><span style="font-size:9px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:2px 7px;border-radius:5px;background:#FFF6E5;color:#7A5C00">£96 400 liability · 44% never spent</span></div>
+        <div style="font-size:12px;color:#6B7280;margin-top:3px">What earns points, what they are worth, and when they expire. Every rate here is a promise with a cash value attached, so the liability sits on the same screen as the rules.</div>
+      </div>
+      <div style="width:1280px;height:700px;display:flex;background:#F7F9FC;border:1px solid #E3E8F0;border-radius:14px;overflow:hidden;box-shadow:0 16px 38px rgba(12,35,64,.09)">
+        <aside style="flex:none;width:180px;background:#0B1324;display:flex;flex-direction:column;position:relative">
+          <div style="position:absolute;inset:0;background:radial-gradient(300px 200px at 0% 4%,rgba(0,184,255,.20),transparent 70%);pointer-events:none"></div>
+          <div style="position:relative;padding:15px 14px 13px;border-bottom:1px solid rgba(255,255,255,.08)"><img src="assets/ticvai-light-logo.png" alt="TICVAI" style="display:block;height:24px;width:auto"><div style="font-size:9.5px;color:#7FA3C9;margin-top:5px">Engagement &amp; Loyalty</div></div>
+          <nav style="position:relative;display:flex;flex-direction:column;gap:2px;padding:11px 9px">
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Overview</div>
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Challenges</div>
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Badges</div>
+            <div style="padding:8px 10px;border-radius:9px;background:linear-gradient(90deg,rgba(13,110,253,.30),rgba(0,184,255,.10));color:#fff;font-size:11.5px;font-weight:700;box-shadow:inset 2px 0 0 #00B8FF">Points</div>
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Rewards</div>
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Guest hub</div>
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Analytics</div>
+          </nav>
+          <div style="position:relative;margin-top:auto;padding:12px;border-top:1px solid rgba(255,255,255,.08);font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#7FA3C9;line-height:1.7">18.4m out<br>£96 400</div>
+        </aside>
+        <div style="flex:1;display:flex;flex-direction:column;min-width:0">
+          <header style="flex:none;height:54px;display:flex;align-items:center;gap:12px;padding:0 18px;background:#fff;border-bottom:1px solid #E8ECF3">
+            <div><div style="font-size:13.5px;font-weight:800;letter-spacing:-.01em">Points rules</div><div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#9AA5B6">1 point = £0.005 on redemption · 18.4m outstanding · 41% older than a year · no expiry today</div></div>
+            <div style="margin-left:auto;display:flex;gap:6px"><div style="height:32px;display:flex;align-items:center;padding:0 11px;border:1px solid #E3E8F0;border-radius:8px;font-size:11px;font-weight:700;color:#5A6577">Model a change</div><div style="height:32px;display:flex;align-items:center;padding:0 12px;border-radius:8px;background:#0D6EFD;color:#fff;font-size:11px;font-weight:700">Save</div></div>
+          </header>
+          <div style="flex:1;display:grid;grid-template-columns:1fr 360px;gap:12px;padding:14px 16px;min-height:0">
+            <div style="background:#fff;border:1px solid #E8ECF3;border-radius:12px;display:flex;flex-direction:column;overflow:hidden;min-height:0">
+              <div style="flex:none;display:grid;grid-template-columns:1.5fr 96px 1fr 92px;padding:9px 14px;font-size:9px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:#94A0B4;border-bottom:1px solid #EDF1F6"><div>Earning event</div><div style="text-align:right">Points</div><div>Cap</div><div style="text-align:right">Cost a month</div></div>
+              <div style="display:grid;grid-template-columns:1.5fr 96px 1fr 92px;align-items:center;padding:10px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA;background:#FFFBF4"><div style="font-weight:700;color:#7A5C00">£1 spent, anything</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#7A5C00">5</div><div style="font-size:10.5px;color:#5A6577">none</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#7A5C00">£3 675</div></div>
+              <div style="display:grid;grid-template-columns:1.5fr 96px 1fr 92px;align-items:center;padding:10px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA"><div style="font-weight:600">Attended an event</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">200</div><div style="font-size:10.5px;color:#5A6577">1 per event</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">£1 240</div></div>
+              <div style="display:grid;grid-template-columns:1.5fr 96px 1fr 92px;align-items:center;padding:10px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA;background:#F3FBF7"><div style="font-weight:700;color:#0B5B41">Attended midweek</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;font-weight:700;color:#0B5B41">600</div><div style="font-size:10.5px;color:#5A6577">1 per event</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">£880</div></div>
+              <div style="display:grid;grid-template-columns:1.5fr 96px 1fr 92px;align-items:center;padding:10px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA"><div style="font-weight:600">Answered a survey</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">100</div><div style="font-size:10.5px;color:#5A6577">1 per 30 days</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">£206</div></div>
+              <div style="display:grid;grid-template-columns:1.5fr 96px 1fr 92px;align-items:center;padding:10px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA"><div style="font-weight:600">A referred guest attended</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">1 000</div><div style="font-size:10.5px;color:#5A6577">4 a year</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">£1 070</div></div>
+              <div style="display:grid;grid-template-columns:1.5fr 96px 1fr 92px;align-items:center;padding:10px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA"><div style="font-weight:600">Tried a new genre</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">400</div><div style="font-size:10.5px;color:#5A6577">3 a year</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">£420</div></div>
+              <div style="display:grid;grid-template-columns:1.5fr 96px 1fr 92px;align-items:center;padding:10px 14px;font-size:11.5px"><div style="font-weight:600">Completed a waiver before arrival</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">50</div><div style="font-size:10.5px;color:#5A6577">1 per visit</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">£88</div></div>
+              <div style="margin-top:auto;flex:none;padding:11px 14px;border-top:1px solid #EDF1F6;background:#FFFBF4;display:flex;gap:11px"><span style="width:3px;border-radius:2px;background:#F0B429;flex:none"></span><div style="flex:1;font-size:11px;color:#7A5C00;line-height:1.55">Spend-based earning is half the monthly cost and produced one point of lift. Midweek attendance costs a quarter as much and moves seats that would otherwise sit empty.</div></div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:12px;min-height:0">
+              <div style="flex:none;background:#fff;border:1.5px solid #F2DFB8;border-radius:12px;padding:13px 15px;display:flex;flex-direction:column;gap:9px">
+                <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em;color:#8A6D00">Expiry · the decision nobody wants</div>
+                <div style="display:flex;flex-direction:column;gap:6px;font-size:11px">
+                  <div style="display:flex;align-items:center;gap:8px"><span style="width:26px;height:15px;border-radius:9px;background:#DFE5EE;position:relative;flex:none"><span style="position:absolute;top:2px;left:2px;width:11px;height:11px;border-radius:50%;background:#fff"></span></span><span style="color:#3E4A5C;flex:1">Points expire after 24 months</span></div>
+                  <div style="display:flex;align-items:center;gap:8px"><span style="width:26px;height:15px;border-radius:9px;background:#DFE5EE;position:relative;flex:none"><span style="position:absolute;top:2px;left:2px;width:11px;height:11px;border-radius:50%;background:#fff"></span></span><span style="color:#3E4A5C;flex:1">Expire after 12 months of no activity</span></div>
+                </div>
+                <div style="display:flex;flex-direction:column;gap:5px;font-size:11px;color:#5A6577;padding-top:8px;border-top:1px solid #EDF1F6">
+                  <div style="display:flex;justify-content:space-between"><span>Liability released by 24-month expiry</span><span style="font-family:'IBM Plex Mono',monospace;color:#0B1324">£39 500</span></div>
+                  <div style="display:flex;justify-content:space-between"><span>Members affected</span><span style="font-family:'IBM Plex Mono',monospace;color:#8A2020">11 400</span></div>
+                  <div style="display:flex;justify-content:space-between"><span>Of those, active in the last year</span><span style="font-family:'IBM Plex Mono',monospace;color:#8A2020">1 900</span></div>
+                </div>
+                <div style="font-size:10.5px;color:#8A2020;line-height:1.5">Expiry would clear £39 500 and take points from 1 900 people who are still coming. Both consequences shown, because only one of them appears in the finance report.</div>
+              </div>
+              <div style="flex:none;background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:8px">
+                <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">What a point is worth</div>
+                <div style="display:flex;flex-direction:column;gap:5px;font-size:11px;color:#5A6577">
+                  <div style="display:flex;justify-content:space-between"><span>Against a ticket</span><span style="font-family:'IBM Plex Mono',monospace;color:#0B1324">£0.005</span></div>
+                  <div style="display:flex;justify-content:space-between"><span>Against food and drink</span><span style="font-family:'IBM Plex Mono',monospace;color:#0B1324">£0.005</span></div>
+                  <div style="display:flex;justify-content:space-between"><span>Against a seat upgrade</span><span style="font-family:'IBM Plex Mono',monospace;color:#0B5B41">£0.011</span></div>
+                  <div style="display:flex;justify-content:space-between"><span>Cash out</span><span style="font-family:'IBM Plex Mono',monospace;color:#8A2020">not permitted</span></div>
+                </div>
+                <div style="font-size:10.5px;color:#5A6577;line-height:1.5">Upgrades are worth double because they cost us less than the guest values them at. That is the only honest arbitrage in a loyalty scheme.</div>
+              </div>
+              <div style="flex:1;min-height:0"></div>
+              <div style="flex:none;background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:7px">
+                <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Every rate is a cash promise</div>
+                <div style="font-size:10.5px;color:#5A6577;line-height:1.55">The monthly cost column is not a report; it is part of the rule. Changing an earning rate without seeing it is how a scheme quietly acquires a hundred thousand pounds of liability.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;line-height:1.85;color:#7C8899">
+        <div><b style="color:#4A5566;font-weight:600">OPERATIONS</b> · listEarningRules · upsertEarningRule · setPointValue · setExpiryPolicy · modelLiabilityChange · getOutstandingPoints</div>
+        <div><b style="color:#4A5566;font-weight:600">STATES</b> · viewing · editing · <b style="color:#8A6D00">expiryImpactShown — an expiry change displays members affected alongside liability released</b> · liabilityWarning · modelling · saving · error</div>
+        <div><b style="color:#4A5566;font-weight:600">ARRIVES WITH</b> · tenantId←context · ruleId←row</div>
+        <div><b style="color:#4A5566;font-weight:600">GOES TO</b> · <a href="#crm-10e">reward rules</a> · <a href="#crm-10j">analytics</a> · <a href="#crm-10a">overview</a></div>
+      </div>
+    </div>
+
+    <div id="crm-10e" data-screen-label="CRM-10E" data-screen-id="CRM-10E" data-screen-id-origin="board" style="display:flex;flex-direction:column;gap:13px;scroll-margin-top:24px">
+      <div>
+        <div style="display:flex;align-items:baseline;gap:9px"><span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#8494A8">CRM-10E</span><span style="font-size:16.5px;font-weight:800;letter-spacing:-.015em">Milestones &amp; Reward Rules</span><span style="font-size:9px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:2px 7px;border-radius:5px;background:#EDF3FF;color:#0A4FB8">6 milestones · inventory, not cash</span></div>
+        <div style="font-size:12px;color:#6B7280;margin-top:3px">Milestones and what they unlock. Rewards are drawn from unsold inventory and access wherever possible, because those cost the least and mean the most.</div>
+      </div>
+      <div style="width:1280px;height:700px;display:flex;background:#F7F9FC;border:1px solid #E3E8F0;border-radius:14px;overflow:hidden;box-shadow:0 16px 38px rgba(12,35,64,.09)">
+        <aside style="flex:none;width:180px;background:#0B1324;display:flex;flex-direction:column;position:relative">
+          <div style="position:absolute;inset:0;background:radial-gradient(300px 200px at 0% 4%,rgba(0,184,255,.20),transparent 70%);pointer-events:none"></div>
+          <div style="position:relative;padding:15px 14px 13px;border-bottom:1px solid rgba(255,255,255,.08)"><img src="assets/ticvai-light-logo.png" alt="TICVAI" style="display:block;height:24px;width:auto"><div style="font-size:9.5px;color:#7FA3C9;margin-top:5px">Engagement &amp; Loyalty</div></div>
+          <nav style="position:relative;display:flex;flex-direction:column;gap:2px;padding:11px 9px">
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Overview</div>
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Challenges</div>
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Badges</div>
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Points</div>
+            <div style="padding:8px 10px;border-radius:9px;background:linear-gradient(90deg,rgba(13,110,253,.30),rgba(0,184,255,.10));color:#fff;font-size:11.5px;font-weight:700;box-shadow:inset 2px 0 0 #00B8FF">Rewards</div>
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Guest hub</div>
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Analytics</div>
+          </nav>
+          <div style="position:relative;margin-top:auto;padding:12px;border-top:1px solid rgba(255,255,255,.08);font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#7FA3C9;line-height:1.7">6 milestones<br>£4.10 avg</div>
+        </aside>
+        <div style="flex:1;display:flex;flex-direction:column;min-width:0">
+          <header style="flex:none;height:54px;display:flex;align-items:center;gap:12px;padding:0 18px;background:#fff;border-bottom:1px solid #E8ECF3">
+            <div><div style="font-size:13.5px;font-weight:800;letter-spacing:-.01em">Milestones and rewards</div><div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#9AA5B6">6 milestones · average cost to us £4.10 · average value to the guest £14 · 71% claimed</div></div>
+            <div style="margin-left:auto;display:flex;gap:6px"><div style="height:32px;display:flex;align-items:center;padding:0 11px;border:1px solid #E3E8F0;border-radius:8px;font-size:11px;font-weight:700;color:#5A6577">Add milestone</div><div style="height:32px;display:flex;align-items:center;padding:0 12px;border-radius:8px;background:#0D6EFD;color:#fff;font-size:11px;font-weight:700">Save</div></div>
+          </header>
+          <div style="flex:1;display:grid;grid-template-columns:1fr 340px;gap:12px;padding:14px 16px;min-height:0">
+            <div style="background:#fff;border:1px solid #E8ECF3;border-radius:12px;display:flex;flex-direction:column;overflow:hidden;min-height:0">
+              <div style="flex:none;display:grid;grid-template-columns:1.1fr 1.5fr 76px 76px 74px;padding:9px 14px;font-size:9px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:#94A0B4;border-bottom:1px solid #EDF1F6"><div>Milestone</div><div>Unlocks</div><div style="text-align:right">Costs us</div><div style="text-align:right">Worth</div><div style="text-align:right">Claimed</div></div>
+              <div style="display:grid;grid-template-columns:1.1fr 1.5fr 76px 76px 74px;align-items:center;padding:10px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA"><div style="font-weight:600">2nd visit</div><div style="font-size:10.5px;color:#5A6577">Free programme, collected at the door</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">£0.80</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">£4</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#0B7A55">84%</div></div>
+              <div style="display:grid;grid-template-columns:1.1fr 1.5fr 76px 76px 74px;align-items:center;padding:10px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA;background:#F3FBF7"><div style="font-weight:700;color:#0B5B41">4th visit</div><div style="font-size:10.5px;color:#5A6577">Seat upgrade if better seats are unsold at 24 h</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#0B5B41">£4.10</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;font-weight:700;color:#0B5B41">£22</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#0B7A55">91%</div></div>
+              <div style="display:grid;grid-template-columns:1.1fr 1.5fr 76px 76px 74px;align-items:center;padding:10px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA"><div style="font-weight:600">6th visit</div><div style="font-size:10.5px;color:#5A6577">Early booking window, 48 h before general sale</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">£0</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">£18</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#0B7A55">76%</div></div>
+              <div style="display:grid;grid-template-columns:1.1fr 1.5fr 76px 76px 74px;align-items:center;padding:10px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA"><div style="font-weight:600">10th visit</div><div style="font-size:10.5px;color:#5A6577">Bring a guest free on a midweek night</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">£6.20</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">£28</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#0B7A55">88%</div></div>
+              <div style="display:grid;grid-template-columns:1.1fr 1.5fr 76px 76px 74px;align-items:center;padding:10px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA;background:#FFFBF4"><div style="font-weight:700;color:#7A5C00">3 years a member</div><div style="font-size:10.5px;color:#5A6577">£20 credit on the account</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#7A5C00">£20</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#7A5C00">£20</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#7A5C00">42%</div></div>
+              <div style="display:grid;grid-template-columns:1.1fr 1.5fr 76px 76px 74px;align-items:center;padding:10px 14px;font-size:11.5px"><div style="font-weight:600">10 years a member</div><div style="font-size:10.5px;color:#5A6577">Backstage visit on a night of their choosing</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">£11</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">£90</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#0B7A55">96%</div></div>
+              <div style="margin-top:auto;flex:none;padding:11px 14px;border-top:1px solid #EDF1F6;background:#F3FBF7;display:flex;gap:11px"><span style="width:3px;border-radius:2px;background:#0B7A55;flex:none"></span><div style="flex:1;font-size:11px;color:#0B5B41;line-height:1.55">The only cash reward on the board is claimed by 42% of the people who earn it. The backstage visit costs £11 and is claimed by 96%. Access beats money at every level of this table.</div></div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:12px;min-height:0">
+              <div style="flex:none;background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:13px 15px;display:flex;flex-direction:column;gap:9px">
+                <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Editing: 4th visit upgrade</div>
+                <div style="display:flex;flex-direction:column;gap:5px"><span style="font-size:9px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:#94A0B4">Reward</span><div style="height:32px;display:flex;align-items:center;padding:0 10px;border:1px solid #C9D6E8;border-radius:9px;font-size:11.5px;font-weight:600">Seat upgrade from unsold inventory<span style="margin-left:auto;color:#9AA5B6">▾</span></div></div>
+                <div style="display:flex;flex-direction:column;gap:5px"><span style="font-size:9px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:#94A0B4">Released when</span><div style="height:32px;display:flex;align-items:center;padding:0 10px;border:1px solid #C9D6E8;border-radius:9px;font-size:11.5px;font-weight:600">24 hours before doors</div><span style="font-size:10px;color:#5A6577">late enough that it never displaces a paying booking</span></div>
+                <div style="display:flex;flex-direction:column;gap:6px">
+                  <span style="font-size:9px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:#94A0B4">Guard rails</span>
+                  <div style="display:flex;align-items:center;gap:8px;font-size:11px"><span style="width:26px;height:15px;border-radius:9px;background:#0D6EFD;position:relative;flex:none"><span style="position:absolute;top:2px;right:2px;width:11px;height:11px;border-radius:50%;background:#fff"></span></span><span style="color:#3E4A5C">never take an accessible seat</span></div>
+                  <div style="display:flex;align-items:center;gap:8px;font-size:11px"><span style="width:26px;height:15px;border-radius:9px;background:#0D6EFD;position:relative;flex:none"><span style="position:absolute;top:2px;right:2px;width:11px;height:11px;border-radius:50%;background:#fff"></span></span><span style="color:#3E4A5C">keep the group together</span></div>
+                  <div style="display:flex;align-items:center;gap:8px;font-size:11px"><span style="width:26px;height:15px;border-radius:9px;background:#0D6EFD;position:relative;flex:none"><span style="position:absolute;top:2px;right:2px;width:11px;height:11px;border-radius:50%;background:#fff"></span></span><span style="color:#3E4A5C">tell the guest before they travel</span></div>
+                </div>
+                <div style="font-size:10.5px;color:#8A2020;line-height:1.5">The third rule exists because of Board 8: an unannounced seat change is the largest single source of complaints on this platform, even when it is an upgrade.</div>
+              </div>
+              <div style="flex:none;background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:8px">
+                <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Reward types, ranked by what they cost</div>
+                <div style="display:flex;flex-direction:column;gap:5px;font-size:11px;color:#5A6577">
+                  <div style="display:flex;justify-content:space-between"><span>Early access</span><span style="font-family:'IBM Plex Mono',monospace;color:#0B5B41">£0</span></div>
+                  <div style="display:flex;justify-content:space-between"><span>Unsold seat upgrade</span><span style="font-family:'IBM Plex Mono',monospace;color:#0B5B41">marginal</span></div>
+                  <div style="display:flex;justify-content:space-between"><span>Behind the scenes access</span><span style="font-family:'IBM Plex Mono',monospace;color:#0B1324">staff time</span></div>
+                  <div style="display:flex;justify-content:space-between"><span>Physical item</span><span style="font-family:'IBM Plex Mono',monospace;color:#0B1324">cost of goods</span></div>
+                  <div style="display:flex;justify-content:space-between"><span>Account credit</span><span style="font-family:'IBM Plex Mono',monospace;color:#8A2020">full face value</span></div>
+                </div>
+              </div>
+              <div style="flex:1;min-height:0"></div>
+              <div style="flex:none;background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:7px">
+                <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Spend inventory, not margin</div>
+                <div style="font-size:10.5px;color:#5A6577;line-height:1.55">An empty better seat is worth nothing at 24 hours out and £22 to the person sitting in it. That gap is where a loyalty scheme should live.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;line-height:1.85;color:#7C8899">
+        <div><b style="color:#4A5566;font-weight:600">OPERATIONS</b> · listMilestones · upsertMilestone · setRewardType · setRewardGuardRails · getClaimRates · getRewardCost</div>
+        <div><b style="color:#4A5566;font-weight:600">STATES</b> · viewing · editing · <b style="color:#8A6D00">upgradeNotifiesGuest — an inventory reward cannot be issued without telling the guest before travel</b> · inventoryUnavailable · lowClaimRate · saving · error</div>
+        <div><b style="color:#4A5566;font-weight:600">ARRIVES WITH</b> · milestoneId←list · tenantId←context</div>
+        <div><b style="color:#4A5566;font-weight:600">GOES TO</b> · <a href="#crm-10h">guest hub</a> · <a href="#crm-10d">points rules</a> · <a href="#crm-10j">analytics</a></div>
+      </div>
+    </div>
+
+    <div id="crm-10f" data-screen-label="CRM-10F" data-screen-id="CRM-10F" data-screen-id-origin="board" style="display:flex;flex-direction:column;gap:13px;scroll-margin-top:24px">
+      <div>
+        <div style="display:flex;align-items:baseline;gap:9px"><span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#8494A8">CRM-10F</span><span style="font-size:16.5px;font-weight:800;letter-spacing:-.015em">Family, Team &amp; Event Challenges</span><span style="font-size:9px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:2px 7px;border-radius:5px;background:#EDF3FF;color:#0A4FB8">groups · shared progress</span></div>
+        <div style="font-size:12px;color:#6B7280;margin-top:3px">Challenges where progress belongs to a group rather than a person. The hard part is not the maths but the etiquette: no member of a family should be able to see another's spending.</div>
+      </div>
+      <div style="width:1280px;height:700px;display:flex;background:#F7F9FC;border:1px solid #E3E8F0;border-radius:14px;overflow:hidden;box-shadow:0 16px 38px rgba(12,35,64,.09)">
+        <aside style="flex:none;width:180px;background:#0B1324;display:flex;flex-direction:column;position:relative">
+          <div style="position:absolute;inset:0;background:radial-gradient(300px 200px at 0% 4%,rgba(0,184,255,.20),transparent 70%);pointer-events:none"></div>
+          <div style="position:relative;padding:15px 14px 13px;border-bottom:1px solid rgba(255,255,255,.08)"><img src="assets/ticvai-light-logo.png" alt="TICVAI" style="display:block;height:24px;width:auto"><div style="font-size:9.5px;color:#7FA3C9;margin-top:5px">Engagement &amp; Loyalty</div></div>
+          <nav style="position:relative;display:flex;flex-direction:column;gap:2px;padding:11px 9px">
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Overview</div>
+            <div style="padding:8px 10px;border-radius:9px;background:linear-gradient(90deg,rgba(13,110,253,.30),rgba(0,184,255,.10));color:#fff;font-size:11.5px;font-weight:700;box-shadow:inset 2px 0 0 #00B8FF">Challenges</div>
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Badges</div>
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Points</div>
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Rewards</div>
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Guest hub</div>
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Analytics</div>
+          </nav>
+          <div style="position:relative;margin-top:auto;padding:12px;border-top:1px solid rgba(255,255,255,.08);font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#7FA3C9;line-height:1.7">880 families<br>34 corporate</div>
+        </aside>
+        <div style="flex:1;display:flex;flex-direction:column;min-width:0">
+          <header style="flex:none;height:54px;display:flex;align-items:center;gap:12px;padding:0 18px;background:#fff;border-bottom:1px solid #E8ECF3">
+            <div><div style="font-size:13.5px;font-weight:800;letter-spacing:-.01em">Group challenges</div><div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#9AA5B6">880 family groups · 34 corporate teams · 12 event-night challenges run this season</div></div>
+            <div style="margin-left:auto;display:flex;gap:6px"><div style="height:32px;display:flex;align-items:center;padding:0 11px;border:1px solid #E3E8F0;border-radius:8px;font-size:11px;font-weight:700;color:#5A6577">New group challenge</div><div style="height:32px;display:flex;align-items:center;padding:0 12px;border-radius:8px;background:#0D6EFD;color:#fff;font-size:11px;font-weight:700">Save</div></div>
+          </header>
+          <div style="flex:1;display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:14px 16px;min-height:0">
+            <div style="display:flex;flex-direction:column;gap:12px;min-height:0">
+              <div style="flex:none;background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:13px 15px;display:flex;flex-direction:column;gap:10px">
+                <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Three kinds of group</div>
+                <div style="display:flex;flex-direction:column;gap:8px">
+                  <div style="padding:10px 11px;border-radius:10px;border:1.5px solid #C9D6E8;background:#F7FAFF;display:flex;flex-direction:column;gap:4px"><div style="display:flex;align-items:baseline;gap:7px"><span style="font-size:11.5px;font-weight:700;color:#0A4FB8">Family</span><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#0A4FB8">880 live · avg 3.4 people</span></div><div style="font-size:10.5px;color:#5A6577;line-height:1.5">Linked from Board 1 guardianship. Progress is shared, spending is not visible between members.</div></div>
+                  <div style="padding:10px 11px;border-radius:10px;border:1px solid #E3E8F0;display:flex;flex-direction:column;gap:4px"><div style="display:flex;align-items:baseline;gap:7px"><span style="font-size:11.5px;font-weight:700">Corporate team</span><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#9AA5B6">34 live · avg 22 people</span></div><div style="font-size:10.5px;color:#5A6577;line-height:1.5">The account manager sees a total. Individual attendance is never shown to the employer.</div></div>
+                  <div style="padding:10px 11px;border-radius:10px;border:1px solid #E3E8F0;display:flex;flex-direction:column;gap:4px"><div style="display:flex;align-items:baseline;gap:7px"><span style="font-size:11.5px;font-weight:700">Event night</span><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#9AA5B6">12 this season · anyone attending</span></div><div style="font-size:10.5px;color:#5A6577;line-height:1.5">Everyone in the building on one night works towards one number. Anonymous by design.</div></div>
+                </div>
+              </div>
+              <div style="flex:1;background:#fff;border:1px solid #E8ECF3;border-radius:12px;display:flex;flex-direction:column;overflow:hidden;min-height:0">
+                <div style="flex:none;display:flex;align-items:center;gap:8px;padding:11px 14px 10px;border-bottom:1px solid #EDF1F6"><div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Family challenge · four visits together</div><span style="margin-left:auto;font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#9AA5B6">880 groups</span></div>
+                <div style="display:grid;grid-template-columns:1.3fr 74px 1fr 82px;padding:8px 14px;font-size:9px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:#94A0B4;border-bottom:1px solid #EDF1F6"><div>Group</div><div style="text-align:right">People</div><div>Progress</div><div style="text-align:right">Reward</div></div>
+                <div style="display:grid;grid-template-columns:1.3fr 74px 1fr 82px;align-items:center;padding:10px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA"><div style="font-weight:600">Hartley household</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">4</div><div style="display:flex;align-items:center;gap:7px"><div style="flex:1;height:8px;border-radius:5px;background:#EEF2F7;overflow:hidden"><span style="display:block;width:75%;height:8px;background:#0D6EFD"></span></div><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#5A6577">3/4</span></div><div style="font-size:10px;color:#5A6577;text-align:right">pending</div></div>
+                <div style="display:grid;grid-template-columns:1.3fr 74px 1fr 82px;align-items:center;padding:10px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA"><div style="font-weight:600">Doyle household</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">3</div><div style="display:flex;align-items:center;gap:7px"><div style="flex:1;height:8px;border-radius:5px;background:#EEF2F7;overflow:hidden"><span style="display:block;width:100%;height:8px;background:#0B7A55"></span></div><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#0B7A55">4/4</span></div><div style="font-size:10px;color:#0B7A55;text-align:right">claimed</div></div>
+                <div style="display:grid;grid-template-columns:1.3fr 74px 1fr 82px;align-items:center;padding:10px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA"><div style="font-weight:600">Almeida household</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">2</div><div style="display:flex;align-items:center;gap:7px"><div style="flex:1;height:8px;border-radius:5px;background:#EEF2F7;overflow:hidden"><span style="display:block;width:50%;height:8px;background:#0D6EFD"></span></div><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#5A6577">2/4</span></div><div style="font-size:10px;color:#5A6577;text-align:right">pending</div></div>
+                <div style="display:grid;grid-template-columns:1.3fr 74px 1fr 82px;align-items:center;padding:10px 14px;font-size:11.5px"><div style="font-weight:600">Fairhurst household</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">5</div><div style="display:flex;align-items:center;gap:7px"><div style="flex:1;height:8px;border-radius:5px;background:#EEF2F7;overflow:hidden"><span style="display:block;width:25%;height:8px;background:#F0B429"></span></div><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#5A6577">1/4</span></div><div style="font-size:10px;color:#5A6577;text-align:right">pending</div></div>
+                <div style="margin-top:auto;flex:none;padding:11px 14px;border-top:1px solid #EDF1F6;background:#F7F9FC;display:flex;flex-direction:column;gap:4px"><div style="font-size:11px;font-weight:700">Any member's visit counts</div><div style="font-size:10.5px;color:#5A6577;line-height:1.55">Four visits by one person completes it as surely as one each. Requiring everyone to attend punishes the household with a shift worker in it.</div></div>
+              </div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:12px;min-height:0">
+              <div style="flex:none;background:#fff;border:1.5px solid #C9D6E8;border-radius:12px;padding:13px 15px;display:flex;flex-direction:column;gap:9px">
+                <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">What group members can see about each other</div>
+                <div style="display:flex;flex-direction:column;gap:6px;font-size:11px">
+                  <div style="display:flex;align-items:center;gap:8px"><span style="color:#0B7A55;font-weight:700">✓</span><span style="color:#3E4A5C">Shared progress towards the goal</span></div>
+                  <div style="display:flex;align-items:center;gap:8px"><span style="color:#0B7A55;font-weight:700">✓</span><span style="color:#3E4A5C">That a visit happened, and the event name</span></div>
+                  <div style="display:flex;align-items:center;gap:8px"><span style="color:#8A2020;font-weight:700">×</span><span style="color:#5A6577">What anyone paid</span></div>
+                  <div style="display:flex;align-items:center;gap:8px"><span style="color:#8A2020;font-weight:700">×</span><span style="color:#5A6577">Which seats anyone chose</span></div>
+                  <div style="display:flex;align-items:center;gap:8px"><span style="color:#8A2020;font-weight:700">×</span><span style="color:#5A6577">Anything a member under 18 attended alone</span></div>
+                </div>
+                <div style="font-size:10.5px;color:#5A6577;line-height:1.5">A teenager's night out does not appear on a parent's progress feed. The visit counts towards the group total without being itemised.</div>
+              </div>
+              <div style="flex:none;background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:8px">
+                <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Event night · last Saturday</div>
+                <div style="display:flex;align-items:center;gap:10px">
+                  <div style="flex:1;height:12px;border-radius:6px;background:#EEF2F7;overflow:hidden"><span style="display:block;width:82%;height:12px;background:linear-gradient(90deg,#0D6EFD,#00B8FF)"></span></div>
+                  <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600">1 640 / 2 000</span>
+                </div>
+                <div style="font-size:10.5px;color:#5A6577;line-height:1.5">"If 2 000 of us complete our waivers before arrival tonight, doors open fifteen minutes early." Completed at 82%, doors opened ten minutes early.</div>
+                <div style="display:flex;flex-direction:column;gap:5px;font-size:11px;color:#5A6577;padding-top:8px;border-top:1px solid #EDF1F6">
+                  <div style="display:flex;justify-content:space-between"><span>Pre-arrival waivers, normal night</span><span style="font-family:'IBM Plex Mono',monospace;color:#0B1324">44%</span></div>
+                  <div style="display:flex;justify-content:space-between"><span>On the challenge night</span><span style="font-family:'IBM Plex Mono',monospace;color:#0B5B41">82%</span></div>
+                  <div style="display:flex;justify-content:space-between"><span>Queue at doors</span><span style="font-family:'IBM Plex Mono',monospace;color:#0B5B41">−9 min median</span></div>
+                </div>
+              </div>
+              <div style="flex:1;min-height:0"></div>
+              <div style="flex:none;background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:7px">
+                <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">A shared goal beats an individual prize</div>
+                <div style="font-size:10.5px;color:#5A6577;line-height:1.55">The event-night challenge cost nothing, doubled pre-arrival waiver completion, and shortened the queue for everyone including the people who ignored it.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;line-height:1.85;color:#7C8899">
+        <div><b style="color:#4A5566;font-weight:600">OPERATIONS</b> · listGroupChallenges · createGroupChallenge · getGroupProgress · setGroupVisibilityRules · getEventNightProgress</div>
+        <div><b style="color:#4A5566;font-weight:600">STATES</b> · viewing · <b style="color:#8A6D00">minorActivityHidden — a member under 18 contributes to the total without their visit being itemised</b> · groupIncomplete · challengeClosed · saving · error</div>
+        <div><b style="color:#4A5566;font-weight:600">ARRIVES WITH</b> · groupId←directory · challengeId←list · eventId←schedule</div>
+        <div><b style="color:#4A5566;font-weight:600">GOES TO</b> · <a href="#crm-10h">guest hub</a> · <a href="#crm-10b">challenge builder</a> · <a href="#crm-10j">analytics</a></div>
+      </div>
+    </div>
+
+    <div id="crm-10g" data-screen-label="CRM-10G" data-screen-id="CRM-10G" data-screen-id-origin="board" style="display:flex;flex-direction:column;gap:13px;scroll-margin-top:24px">
+      <div>
+        <div style="display:flex;align-items:baseline;gap:9px"><span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#8494A8">CRM-10G</span><span style="font-size:16.5px;font-weight:800;letter-spacing:-.015em">Referral &amp; Streak Management</span><span style="font-size:9px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:2px 7px;border-radius:5px;background:#F3FBF7;color:#0B5B41">referral: +18% lift, best on the board</span></div>
+        <div style="font-size:12px;color:#6B7280;margin-top:3px">The two mechanics that carry the most weight and the most risk. Referral pays only when the new guest actually attends, and a streak has to be forgiving enough not to punish illness.</div>
+      </div>
+      <div style="width:1280px;height:700px;display:flex;background:#F7F9FC;border:1px solid #E3E8F0;border-radius:14px;overflow:hidden;box-shadow:0 16px 38px rgba(12,35,64,.09)">
+        <aside style="flex:none;width:180px;background:#0B1324;display:flex;flex-direction:column;position:relative">
+          <div style="position:absolute;inset:0;background:radial-gradient(300px 200px at 0% 4%,rgba(0,184,255,.20),transparent 70%);pointer-events:none"></div>
+          <div style="position:relative;padding:15px 14px 13px;border-bottom:1px solid rgba(255,255,255,.08)"><img src="assets/ticvai-light-logo.png" alt="TICVAI" style="display:block;height:24px;width:auto"><div style="font-size:9.5px;color:#7FA3C9;margin-top:5px">Engagement &amp; Loyalty</div></div>
+          <nav style="position:relative;display:flex;flex-direction:column;gap:2px;padding:11px 9px">
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Overview</div>
+            <div style="padding:8px 10px;border-radius:9px;background:linear-gradient(90deg,rgba(13,110,253,.30),rgba(0,184,255,.10));color:#fff;font-size:11.5px;font-weight:700;box-shadow:inset 2px 0 0 #00B8FF">Challenges</div>
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Badges</div>
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Points</div>
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Rewards</div>
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Guest hub</div>
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Analytics</div>
+          </nav>
+          <div style="position:relative;margin-top:auto;padding:12px;border-top:1px solid rgba(255,255,255,.08);font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#7FA3C9;line-height:1.7">2 140 referrals<br>1 940 streaks</div>
+        </aside>
+        <div style="flex:1;display:flex;flex-direction:column;min-width:0">
+          <header style="flex:none;height:54px;display:flex;align-items:center;gap:12px;padding:0 18px;background:#fff;border-bottom:1px solid #E8ECF3">
+            <div><div style="font-size:13.5px;font-weight:800;letter-spacing:-.01em">Referrals and streaks</div><div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#9AA5B6">2 140 referrals sent · 1 284 attended · 1 940 live streaks · 41 abuse flags this month</div></div>
+            <div style="margin-left:auto;display:flex;gap:6px"><div style="height:32px;display:flex;align-items:center;padding:0 11px;border:1px solid #E3E8F0;border-radius:8px;font-size:11px;font-weight:700;color:#5A6577">Abuse queue 41</div><div style="height:32px;display:flex;align-items:center;padding:0 12px;border-radius:8px;background:#0D6EFD;color:#fff;font-size:11px;font-weight:700">Save</div></div>
+          </header>
+          <div style="flex:1;display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:14px 16px;min-height:0">
+            <div style="display:flex;flex-direction:column;gap:12px;min-height:0">
+              <div style="flex:none;background:#fff;border:1.5px solid #CBE8DA;border-radius:12px;padding:13px 15px;display:flex;flex-direction:column;gap:10px">
+                <div style="display:flex;align-items:baseline;gap:8px"><span style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Referral</span><span style="margin-left:auto;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#0B5B41">+18% lift · £18 200 a year</span></div>
+                <div style="display:flex;align-items:center;gap:6px">
+                  <div style="flex:1;padding:9px 10px;border-radius:9px;background:#F7F9FC;border:1px solid #EDF1F6;display:flex;flex-direction:column;gap:2px"><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#9AA5B6">sent</span><span style="font-family:'IBM Plex Mono',monospace;font-size:14px;font-weight:600">2 140</span></div>
+                  <span style="color:#C6D0DE;font-size:13px">→</span>
+                  <div style="flex:1;padding:9px 10px;border-radius:9px;background:#F7F9FC;border:1px solid #EDF1F6;display:flex;flex-direction:column;gap:2px"><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#9AA5B6">booked</span><span style="font-family:'IBM Plex Mono',monospace;font-size:14px;font-weight:600">1 402</span></div>
+                  <span style="color:#C6D0DE;font-size:13px">→</span>
+                  <div style="flex:1;padding:9px 10px;border-radius:9px;background:#F3FBF7;border:1px solid #CBE8DA;display:flex;flex-direction:column;gap:2px"><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#0B7A55">attended · paid here</span><span style="font-family:'IBM Plex Mono',monospace;font-size:14px;font-weight:600;color:#0B5B41">1 284</span></div>
+                </div>
+                <div style="display:flex;flex-direction:column;gap:5px;font-size:11px;color:#5A6577">
+                  <div style="display:flex;justify-content:space-between"><span>Referrer receives</span><span style="font-family:'IBM Plex Mono',monospace;color:#0B1324">1 000 points · on attendance</span></div>
+                  <div style="display:flex;justify-content:space-between"><span>New guest receives</span><span style="font-family:'IBM Plex Mono',monospace;color:#0B1324">free programme · at the door</span></div>
+                  <div style="display:flex;justify-content:space-between"><span>Referred guests who came back</span><span style="font-family:'IBM Plex Mono',monospace;color:#0B5B41">61%</span></div>
+                  <div style="display:flex;justify-content:space-between"><span>Cap per referrer</span><span style="font-family:'IBM Plex Mono',monospace;color:#0B1324">4 a year</span></div>
+                </div>
+                <div style="font-size:10.5px;color:#0B5B41;line-height:1.5">Nothing is paid at the point of sending, so a bulk-mailed link earns nothing. The reward lands when a person walks through a door.</div>
+              </div>
+              <div style="flex:1;background:#fff;border:1px solid #E8ECF3;border-radius:12px;display:flex;flex-direction:column;overflow:hidden;min-height:0">
+                <div style="flex:none;display:flex;align-items:center;gap:8px;padding:11px 14px 10px;border-bottom:1px solid #EDF1F6"><div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Abuse queue · 41 flags</div><span style="margin-left:auto;font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#9AA5B6">nothing paid while flagged</span></div>
+                <div style="display:grid;grid-template-columns:1.3fr 1fr 82px;padding:8px 14px;font-size:9px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:#94A0B4;border-bottom:1px solid #EDF1F6"><div>Pattern</div><div>Why it is suspicious</div><div style="text-align:right">Accounts</div></div>
+                <div style="display:grid;grid-template-columns:1.3fr 1fr 82px;align-items:center;padding:10px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA;background:#FDF5F5"><div style="font-weight:700;color:#8A2020">Same card, 6 new accounts</div><div style="font-size:10.5px;color:#8A2020">one person referring themselves</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#8A2020">6</div></div>
+                <div style="display:grid;grid-template-columns:1.3fr 1fr 82px;align-items:center;padding:10px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA"><div style="font-weight:600">Referral ring, 11 accounts</div><div style="font-size:10.5px;color:#5A6577">mutual referrals, no attendance</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">11</div></div>
+                <div style="display:grid;grid-template-columns:1.3fr 1fr 82px;align-items:center;padding:10px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA"><div style="font-weight:600">Sequential email addresses</div><div style="font-size:10.5px;color:#5A6577">created within four minutes</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">18</div></div>
+                <div style="display:grid;grid-template-columns:1.3fr 1fr 82px;align-items:center;padding:10px 14px;font-size:11.5px"><div style="font-weight:600">Reseller behaviour</div><div style="font-size:10.5px;color:#5A6577">referrals all resold on partner sites</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">6</div></div>
+                <div style="margin-top:auto;flex:none;padding:11px 14px;border-top:1px solid #EDF1F6;background:#F7F9FC;display:flex;flex-direction:column;gap:4px"><div style="font-size:11px;font-weight:700">Flagged, not blocked</div><div style="font-size:10.5px;color:#5A6577;line-height:1.55">A flag pauses the reward and asks a person to look. Automatic account closure on a pattern match catches families sharing a card.</div></div>
+              </div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:12px;min-height:0">
+              <div style="flex:none;background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:13px 15px;display:flex;flex-direction:column;gap:10px">
+                <div style="display:flex;align-items:baseline;gap:8px"><span style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Streaks</span><span style="margin-left:auto;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#5A6577">1 940 live · +6% lift</span></div>
+                <div style="display:flex;flex-direction:column;gap:5px"><span style="font-size:9px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:#94A0B4">Counts as continuing the streak</span><div style="height:32px;display:flex;align-items:center;padding:0 10px;border:1px solid #C9D6E8;border-radius:9px;font-size:11.5px;font-weight:600">Any event within 10 weeks</div></div>
+                <div style="display:flex;flex-direction:column;gap:6px">
+                  <span style="font-size:9px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:#94A0B4">Forgiveness</span>
+                  <div style="display:flex;align-items:center;gap:8px;font-size:11px"><span style="width:26px;height:15px;border-radius:9px;background:#0D6EFD;position:relative;flex:none"><span style="position:absolute;top:2px;right:2px;width:11px;height:11px;border-radius:50%;background:#fff"></span></span><span style="color:#3E4A5C">one missed window a year is forgiven silently</span></div>
+                  <div style="display:flex;align-items:center;gap:8px;font-size:11px"><span style="width:26px;height:15px;border-radius:9px;background:#0D6EFD;position:relative;flex:none"><span style="position:absolute;top:2px;right:2px;width:11px;height:11px;border-radius:50%;background:#fff"></span></span><span style="color:#3E4A5C">a cancelled event never breaks a streak</span></div>
+                  <div style="display:flex;align-items:center;gap:8px;font-size:11px"><span style="width:26px;height:15px;border-radius:9px;background:#0D6EFD;position:relative;flex:none"><span style="position:absolute;top:2px;right:2px;width:11px;height:11px;border-radius:50%;background:#fff"></span></span><span style="color:#3E4A5C">no reminder that a streak is about to end</span></div>
+                </div>
+                <div style="display:flex;gap:11px;padding:10px 11px;border-radius:10px;background:#F7F9FC;border:1px solid #EDF1F6"><span style="flex:none;width:3px;border-radius:2px;background:#0D6EFD"></span><div style="flex:1;font-size:10.5px;color:#3E4A5C;line-height:1.5">"Your streak ends in three days" is the most effective message on this board and the one most likely to be resented. It is switched off deliberately.</div></div>
+              </div>
+              <div style="flex:none;background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:8px">
+                <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Streak length distribution</div>
+                <div style="display:flex;align-items:flex-end;gap:6px;height:76px">
+                  <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px"><div style="width:100%;height:76px;border-radius:5px 5px 0 0;background:#0D6EFD"></div><span style="font-family:'IBM Plex Mono',monospace;font-size:9px;color:#9AA5B6">2</span></div>
+                  <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px"><div style="width:100%;height:48px;border-radius:5px 5px 0 0;background:#4E9BFF"></div><span style="font-family:'IBM Plex Mono',monospace;font-size:9px;color:#9AA5B6">3</span></div>
+                  <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px"><div style="width:100%;height:28px;border-radius:5px 5px 0 0;background:#4E9BFF"></div><span style="font-family:'IBM Plex Mono',monospace;font-size:9px;color:#9AA5B6">4</span></div>
+                  <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px"><div style="width:100%;height:16px;border-radius:5px 5px 0 0;background:#7BE0B8"></div><span style="font-family:'IBM Plex Mono',monospace;font-size:9px;color:#9AA5B6">5</span></div>
+                  <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px"><div style="width:100%;height:9px;border-radius:5px 5px 0 0;background:#7BE0B8"></div><span style="font-family:'IBM Plex Mono',monospace;font-size:9px;color:#9AA5B6">6+</span></div>
+                </div>
+                <div style="font-size:10.5px;color:#5A6577;line-height:1.5">Most streaks die at two. The reward sits at three, which is the first point where the guest has changed their pattern rather than simply come twice.</div>
+              </div>
+              <div style="flex:1;min-height:0"></div>
+              <div style="flex:none;background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:7px">
+                <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Pay on arrival, forgive by default</div>
+                <div style="font-size:10.5px;color:#5A6577;line-height:1.55">Referral pays when someone attends, which makes fraud pointless. Streaks forgive a missed window, which makes them survivable. Both rules cost a little lift and buy a lot of goodwill.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;line-height:1.85;color:#7C8899">
+        <div><b style="color:#4A5566;font-weight:600">OPERATIONS</b> · getReferralFunnel · setReferralRules · listAbuseFlags · resolveAbuseFlag · setStreakRules · getStreakDistribution</div>
+        <div><b style="color:#4A5566;font-weight:600">STATES</b> · viewing · editing · <b style="color:#8A6D00">rewardHeldPendingReview — a flagged referral pauses payment and waits for a person, never auto-closes the account</b> · streakForgiven · capReached · saving · error</div>
+        <div><b style="color:#4A5566;font-weight:600">ARRIVES WITH</b> · tenantId←context · flagId←queue</div>
+        <div><b style="color:#4A5566;font-weight:600">GOES TO</b> · <a href="#crm-10h">guest hub</a> · <a href="#crm-10d">points rules</a> · <a href="#crm-10j">audit</a></div>
+      </div>
+    </div>
+
+    <div id="crm-10h" data-screen-label="CRM-10H" data-screen-id="CRM-10H" data-screen-id-origin="board" style="display:flex;flex-direction:column;gap:13px;scroll-margin-top:24px">
+      <div>
+        <div style="display:flex;align-items:baseline;gap:9px"><span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#8494A8">CRM-10H</span><span style="font-size:16.5px;font-weight:800;letter-spacing:-.015em">Progress, Leaderboards &amp; Hub</span><span style="font-size:9px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:2px 7px;border-radius:5px;background:#EDF3FF;color:#0A4FB8">guest-facing · no public ranking</span></div>
+        <div style="font-size:12px;color:#6B7280;margin-top:3px">What the guest sees. One screen, in their own app, showing where they are and what is available next. Leaderboards exist only where a group opted into one.</div>
+      </div>
+      <div style="width:1280px;height:700px;display:flex;background:#F7F9FC;border:1px solid #E3E8F0;border-radius:14px;overflow:hidden;box-shadow:0 16px 38px rgba(12,35,64,.09)">
+        <div style="flex:1;display:flex;flex-direction:column;min-width:0">
+          <header style="flex:none;height:54px;display:flex;align-items:center;gap:12px;padding:0 18px;background:#fff;border-bottom:1px solid #E8ECF3">
+            <div><div style="font-size:13.5px;font-weight:800;letter-spacing:-.01em">Guest hub · staff preview</div><div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#9AA5B6">viewing as Joanne Hartley · gold · 6 400 points · 3 badges · 1 group challenge</div></div>
+            <div style="margin-left:auto;display:flex;gap:6px"><div style="height:32px;display:flex;align-items:center;padding:0 11px;border:1px solid #E3E8F0;border-radius:8px;font-size:11px;font-weight:700;color:#5A6577">Phone</div><div style="height:32px;display:flex;align-items:center;padding:0 11px;border:1px solid #C9D6E8;border-radius:8px;font-size:11px;font-weight:700;color:#0A4FB8">Web</div></div>
+          </header>
+          <div style="flex:1;display:grid;grid-template-columns:400px 1fr;gap:18px;padding:18px 20px;min-height:0;background:#EEF1F6">
+            <div style="background:#0B1324;border-radius:22px;padding:12px;display:flex;flex-direction:column;min-height:0">
+              <div style="flex:1;background:#fff;border-radius:16px;display:flex;flex-direction:column;overflow:hidden;min-height:0">
+                <div style="flex:none;padding:16px 16px 13px;background:linear-gradient(135deg,#0B1324,#123A6B);color:#fff">
+                  <div style="font-size:9px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#8FB6E0">Riverside Arena</div>
+                  <div style="font-size:18px;font-weight:800;letter-spacing:-.02em;margin-top:5px">Good evening, Joanne</div>
+                  <div style="font-size:11.5px;color:#B9D2EC;margin-top:3px">Eleven nights with us this year</div>
+                </div>
+                <div style="flex:1;display:flex;flex-direction:column;gap:12px;padding:14px 16px;min-height:0;overflow:hidden">
+                  <div style="border:1.5px solid #C9D6E8;border-radius:13px;padding:12px 13px;display:flex;flex-direction:column;gap:8px;background:#F7FAFF">
+                    <div style="display:flex;align-items:baseline;gap:8px"><span style="font-size:12px;font-weight:800">One more midweek night</span><span style="margin-left:auto;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#0A4FB8">1 of 2</span></div>
+                    <div style="height:10px;border-radius:6px;background:#E3EBF6;overflow:hidden"><span style="display:block;width:50%;height:10px;background:linear-gradient(90deg,#0D6EFD,#00B8FF)"></span></div>
+                    <div style="font-size:11px;color:#3E4A5C;line-height:1.55">Then we will move you to the best unsold seats on your next visit. Tuesdays and Wednesdays count.</div>
+                    <div style="height:32px;border-radius:9px;background:#0D6EFD;color:#fff;display:flex;align-items:center;justify-content:center;font-size:11.5px;font-weight:700">See midweek nights</div>
+                  </div>
+                  <div style="display:flex;flex-direction:column;gap:7px">
+                    <div style="font-size:11.5px;font-weight:800">Yours</div>
+                    <div style="display:flex;gap:7px">
+                      <div style="flex:1;padding:10px;border-radius:11px;border:1px solid #EDF1F6;display:flex;flex-direction:column;gap:2px"><span style="font-family:'IBM Plex Mono',monospace;font-size:14px;font-weight:600">6 400</span><span style="font-size:9.5px;color:#5A6577">points · worth £32</span></div>
+                      <div style="flex:1;padding:10px;border-radius:11px;border:1px solid #EDF1F6;display:flex;flex-direction:column;gap:2px"><span style="font-family:'IBM Plex Mono',monospace;font-size:14px;font-weight:600">3</span><span style="font-size:9.5px;color:#5A6577">badges</span></div>
+                      <div style="flex:1;padding:10px;border-radius:11px;border:1px solid #EDF1F6;display:flex;flex-direction:column;gap:2px"><span style="font-family:'IBM Plex Mono',monospace;font-size:14px;font-weight:600">7 yr</span><span style="font-size:9.5px;color:#5A6577">a member</span></div>
+                    </div>
+                  </div>
+                  <div style="display:flex;flex-direction:column;gap:7px">
+                    <div style="font-size:11.5px;font-weight:800">What you can use now</div>
+                    <div style="display:flex;align-items:center;gap:9px;padding:9px 10px;border-radius:10px;border:1px solid #EDF1F6"><span style="flex:1;font-size:11px">Early booking, 48 hours ahead</span><span style="font-size:10px;font-weight:700;color:#0B7A55">ready</span></div>
+                    <div style="display:flex;align-items:center;gap:9px;padding:9px 10px;border-radius:10px;border:1px solid #EDF1F6"><span style="flex:1;font-size:11px">Bring a guest free, midweek</span><span style="font-size:10px;font-weight:700;color:#0B7A55">ready</span></div>
+                    <div style="display:flex;align-items:center;gap:9px;padding:9px 10px;border-radius:10px;border:1px solid #EDF1F6;opacity:.6"><span style="flex:1;font-size:11px;color:#5A6577">Backstage visit · at ten years</span><span style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#9AA5B6">3 yr</span></div>
+                  </div>
+                  <div style="margin-top:auto;font-size:10px;color:#9AA5B6;line-height:1.5">Family progress: Hartley household, 3 of 4 visits together.</div>
+                </div>
+              </div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:12px;min-height:0">
+              <div style="flex:none;background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:13px 15px;display:flex;flex-direction:column;gap:9px">
+                <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Rules for this screen</div>
+                <div style="display:flex;flex-direction:column;gap:6px;font-size:11px">
+                  <div style="display:flex;gap:8px"><span style="color:#0B7A55;font-weight:700">✓</span><span style="color:#3E4A5C">One thing to do next, at the top</span></div>
+                  <div style="display:flex;gap:8px"><span style="color:#0B7A55;font-weight:700">✓</span><span style="color:#3E4A5C">Points shown with their cash value, always</span></div>
+                  <div style="display:flex;gap:8px"><span style="color:#0B7A55;font-weight:700">✓</span><span style="color:#3E4A5C">Rewards they can use today, listed first</span></div>
+                  <div style="display:flex;gap:8px"><span style="color:#8A2020;font-weight:700">×</span><span style="color:#5A6577">No countdown timers or expiry warnings</span></div>
+                  <div style="display:flex;gap:8px"><span style="color:#8A2020;font-weight:700">×</span><span style="color:#5A6577">No public ranking against other guests</span></div>
+                  <div style="display:flex;gap:8px"><span style="color:#8A2020;font-weight:700">×</span><span style="color:#5A6577">No badge shelf longer than the screen</span></div>
+                </div>
+              </div>
+              <div style="flex:none;background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:13px 15px;display:flex;flex-direction:column;gap:9px">
+                <div style="display:flex;align-items:baseline;gap:8px"><div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Leaderboards</div><span style="margin-left:auto;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#9AA5B6">34 corporate teams only</span></div>
+                <div style="display:flex;flex-direction:column;gap:6px">
+                  <div style="display:grid;grid-template-columns:22px 1fr 62px;align-items:center;gap:8px;padding:8px 10px;border-radius:9px;background:#F7FAFF;border:1px solid #C9D6E8"><span style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#0A4FB8">1</span><span style="font-size:11px;font-weight:700">Hexley Ltd</span><span style="font-family:'IBM Plex Mono',monospace;font-size:10px;text-align:right;color:#0A4FB8">142 visits</span></div>
+                  <div style="display:grid;grid-template-columns:22px 1fr 62px;align-items:center;gap:8px;padding:8px 10px;border-radius:9px;border:1px solid #EDF1F6"><span style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#9AA5B6">2</span><span style="font-size:11px">Aldermoor Group</span><span style="font-family:'IBM Plex Mono',monospace;font-size:10px;text-align:right;color:#5A6577">118 visits</span></div>
+                  <div style="display:grid;grid-template-columns:22px 1fr 62px;align-items:center;gap:8px;padding:8px 10px;border-radius:9px;border:1px solid #EDF1F6"><span style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#9AA5B6">3</span><span style="font-size:11px">Northgate Partners</span><span style="font-family:'IBM Plex Mono',monospace;font-size:10px;text-align:right;color:#5A6577">96 visits</span></div>
+                </div>
+                <div style="font-size:10.5px;color:#5A6577;line-height:1.5">Teams that signed up to compete, counted by visits and never by spend. Individuals are never ranked against each other, at any tier.</div>
+              </div>
+              <div style="flex:1;min-height:0"></div>
+              <div style="flex:none;background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:7px">
+                <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">A hub, not a dashboard</div>
+                <div style="font-size:10.5px;color:#5A6577;line-height:1.55">The guest gets one action and three numbers. Everything else on this board exists to make that one action worth taking.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;line-height:1.85;color:#7C8899">
+        <div><b style="color:#4A5566;font-weight:600">OPERATIONS</b> · getGuestHub · getNextBestAction · getClaimableRewards · getGroupProgress · getTeamLeaderboard · claimReward</div>
+        <div><b style="color:#4A5566;font-weight:600">STATES</b> · loading · <b style="color:#8A6D00">noRankingForIndividuals — leaderboards render only for groups that opted in</b> · nothingClaimable · notEnrolled · claiming · error</div>
+        <div><b style="color:#4A5566;font-weight:600">ARRIVES WITH</b> · guestId←session · deviceType←context</div>
+        <div><b style="color:#4A5566;font-weight:600">GOES TO</b> · <a href="#crm-10e">reward rules</a> · <a href="#crm-10f">group challenges</a> · <a href="#crm-10i">optimisation</a></div>
+      </div>
+    </div>
+
+    <div id="crm-10i" data-screen-label="CRM-10I" data-screen-id="CRM-10I" data-screen-id-origin="board" style="display:flex;flex-direction:column;gap:13px;scroll-margin-top:24px">
+      <div>
+        <div style="display:flex;align-items:baseline;gap:9px"><span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#8494A8">CRM-10I</span><span style="font-size:16.5px;font-weight:800;letter-spacing:-.015em">AI Engagement Optimization</span><span style="font-size:9px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:2px 7px;border-radius:5px;background:#EDF3FF;color:#0A4FB8">proposes · a person approves</span></div>
+        <div style="font-size:12px;color:#6B7280;margin-top:3px">Suggestions about which mechanic suits which member, each with the evidence behind it and an estimated cost. Nothing here applies itself.</div>
+      </div>
+      <div style="width:1280px;height:700px;display:flex;background:#F7F9FC;border:1px solid #E3E8F0;border-radius:14px;overflow:hidden;box-shadow:0 16px 38px rgba(12,35,64,.09)">
+        <aside style="flex:none;width:180px;background:#0B1324;display:flex;flex-direction:column;position:relative">
+          <div style="position:absolute;inset:0;background:radial-gradient(300px 200px at 0% 4%,rgba(0,184,255,.20),transparent 70%);pointer-events:none"></div>
+          <div style="position:relative;padding:15px 14px 13px;border-bottom:1px solid rgba(255,255,255,.08)"><img src="assets/ticvai-light-logo.png" alt="TICVAI" style="display:block;height:24px;width:auto"><div style="font-size:9.5px;color:#7FA3C9;margin-top:5px">Engagement &amp; Loyalty</div></div>
+          <nav style="position:relative;display:flex;flex-direction:column;gap:2px;padding:11px 9px">
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Overview</div>
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Challenges</div>
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Badges</div>
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Points</div>
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Rewards</div>
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Guest hub</div>
+            <div style="padding:8px 10px;border-radius:9px;background:linear-gradient(90deg,rgba(13,110,253,.30),rgba(0,184,255,.10));color:#fff;font-size:11.5px;font-weight:700;box-shadow:inset 2px 0 0 #00B8FF">Analytics</div>
+          </nav>
+          <div style="position:relative;margin-top:auto;padding:12px;border-top:1px solid rgba(255,255,255,.08);font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#7FA3C9;line-height:1.7">5 proposals<br>none applied</div>
+        </aside>
+        <div style="flex:1;display:flex;flex-direction:column;min-width:0">
+          <header style="flex:none;height:54px;display:flex;align-items:center;gap:12px;padding:0 18px;background:#fff;border-bottom:1px solid #E8ECF3">
+            <div><div style="font-size:13.5px;font-weight:800;letter-spacing:-.01em">Proposals</div><div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#9AA5B6">5 open · 18 accepted this year · 6 rejected · every one measured against a holdout</div></div>
+            <div style="margin-left:auto;display:flex;gap:6px"><div style="height:32px;display:flex;align-items:center;padding:0 11px;border:1px solid #E3E8F0;border-radius:8px;font-size:11px;font-weight:700;color:#5A6577">How this works</div><div style="height:32px;display:flex;align-items:center;padding:0 12px;border-radius:8px;background:#0D6EFD;color:#fff;font-size:11px;font-weight:700">Accept selected</div></div>
+          </header>
+          <div style="flex:1;display:grid;grid-template-columns:1fr 340px;gap:12px;padding:14px 16px;min-height:0">
+            <div style="background:#fff;border:1px solid #E8ECF3;border-radius:12px;display:flex;flex-direction:column;overflow:hidden;min-height:0">
+              <div style="flex:1;min-height:0;overflow:hidden;display:flex;flex-direction:column;gap:9px;padding:12px 14px">
+                <div style="border:1.5px solid #C9D6E8;border-radius:11px;padding:11px 12px;display:flex;flex-direction:column;gap:6px;background:#F7FAFF">
+                  <div style="display:flex;align-items:baseline;gap:8px"><span style="font-size:12px;font-weight:700;color:#0A4FB8">Stop showing points to 8 400 members</span><span style="margin-left:auto;font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#0A4FB8">est. +£0 · removes noise</span></div>
+                  <div style="font-size:11px;color:#3E4A5C;line-height:1.55">These members have earned points for two years and redeemed none. They respond to early access and ignore the balance entirely. Showing them a number they never use costs attention on the hub.</div>
+                  <div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#5A6577">evidence · 0 redemptions in 24 months · 71% used early access in the same period</div>
+                  <div style="display:flex;gap:6px"><span style="height:26px;display:flex;align-items:center;padding:0 10px;border-radius:8px;background:#0D6EFD;color:#fff;font-size:10.5px;font-weight:700">Accept</span><span style="height:26px;display:flex;align-items:center;padding:0 10px;border-radius:8px;border:1px solid #E3E8F0;font-size:10.5px;font-weight:700;color:#5A6577">Reject</span><span style="height:26px;display:flex;align-items:center;padding:0 10px;border-radius:8px;border:1px solid #E3E8F0;font-size:10.5px;font-weight:700;color:#5A6577">See the 8 400</span></div>
+                </div>
+                <div style="border:1px solid #E3E8F0;border-radius:11px;padding:11px 12px;display:flex;flex-direction:column;gap:6px">
+                  <div style="display:flex;align-items:baseline;gap:8px"><span style="font-size:12px;font-weight:700">Offer the midweek challenge to 2 100 weekend-only members</span><span style="margin-left:auto;font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#5A6577">est. +740 midweek seats</span></div>
+                  <div style="font-size:11px;color:#3E4A5C;line-height:1.55">They live within 8 miles and have never attended midweek. The spring cohort with the same profile converted at 34%.</div>
+                  <div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#5A6577">evidence · spring cohort n=1 880 · holdout lift +11%</div>
+                </div>
+                <div style="border:1px solid #E3E8F0;border-radius:11px;padding:11px 12px;display:flex;flex-direction:column;gap:6px">
+                  <div style="display:flex;align-items:baseline;gap:8px"><span style="font-size:12px;font-weight:700">Move the referral reward from 1 000 points to a free programme pair</span><span style="margin-left:auto;font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#5A6577">est. −£4 100 cost</span></div>
+                  <div style="font-size:11px;color:#3E4A5C;line-height:1.55">Referrers with points balances they never spend still refer. The reward is not what motivates them, so a cheaper one should hold the same rate. Worth a test on 20%.</div>
+                  <div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#5A6577">evidence · 61% of referrers have unredeemed balances over 5 000</div>
+                </div>
+                <div style="border:1px solid #F2DFB8;border-radius:11px;padding:11px 12px;display:flex;flex-direction:column;gap:6px;background:#FFFBF4">
+                  <div style="display:flex;align-items:baseline;gap:8px"><span style="font-size:12px;font-weight:700;color:#7A5C00">Send a streak reminder three days before it lapses</span><span style="margin-left:auto;font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#7A5C00">est. +410 visits</span></div>
+                  <div style="font-size:11px;color:#3E4A5C;line-height:1.55">Strongest single lift the model found. It is also the one thing this board has decided not to do, and the proposal is kept visible with that reason attached rather than filtered out.</div>
+                  <div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#8A2020">rejected by S. Iyer · 12 Aug · "we do not use loss to drive visits"</div>
+                </div>
+              </div>
+              <div style="margin-top:auto;flex:none;padding:11px 14px;border-top:1px solid #EDF1F6;background:#F7F9FC;display:flex;gap:11px"><span style="width:3px;border-radius:2px;background:#0D6EFD;flex:none"></span><div style="flex:1;font-size:11px;color:#3E4A5C;line-height:1.55">A rejected proposal stays on the screen with the reason and the name. Otherwise the same suggestion returns every quarter and eventually somebody approves it without knowing it was refused.</div></div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:12px;min-height:0">
+              <div style="flex:none;background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:13px 15px;display:flex;flex-direction:column;gap:9px">
+                <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">What the model may and may not use</div>
+                <div style="display:flex;flex-direction:column;gap:6px;font-size:11px">
+                  <div style="display:flex;gap:8px"><span style="color:#0B7A55;font-weight:700">✓</span><span style="color:#3E4A5C">Attendance history and genre</span></div>
+                  <div style="display:flex;gap:8px"><span style="color:#0B7A55;font-weight:700">✓</span><span style="color:#3E4A5C">Distance from the venue</span></div>
+                  <div style="display:flex;gap:8px"><span style="color:#0B7A55;font-weight:700">✓</span><span style="color:#3E4A5C">Redemption behaviour</span></div>
+                  <div style="display:flex;gap:8px"><span style="color:#8A2020;font-weight:700">×</span><span style="color:#5A6577">Anything inferred about health or beliefs</span></div>
+                  <div style="display:flex;gap:8px"><span style="color:#8A2020;font-weight:700">×</span><span style="color:#5A6577">Accessibility requirements</span></div>
+                  <div style="display:flex;gap:8px"><span style="color:#8A2020;font-weight:700">×</span><span style="color:#5A6577">Age, except to exclude under-18s</span></div>
+                </div>
+                <div style="font-size:10.5px;color:#5A6577;line-height:1.5">A wheelchair user is not a segment. Access data exists to seat people correctly and is not available to this model.</div>
+              </div>
+              <div style="flex:none;background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:8px">
+                <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Track record</div>
+                <div style="display:flex;flex-direction:column;gap:5px;font-size:11px;color:#5A6577">
+                  <div style="display:flex;justify-content:space-between"><span>Accepted this year</span><span style="font-family:'IBM Plex Mono',monospace;color:#0B1324">18</span></div>
+                  <div style="display:flex;justify-content:space-between"><span>Beat their forecast</span><span style="font-family:'IBM Plex Mono',monospace;color:#0B5B41">11</span></div>
+                  <div style="display:flex;justify-content:space-between"><span>Missed it</span><span style="font-family:'IBM Plex Mono',monospace;color:#7A5C00">7</span></div>
+                  <div style="display:flex;justify-content:space-between"><span>Rejected</span><span style="font-family:'IBM Plex Mono',monospace;color:#0B1324">6</span></div>
+                </div>
+                <div style="font-size:10.5px;color:#5A6577;line-height:1.5">Eleven of eighteen beat forecast. Publishing the misses is what makes the forecasts worth reading.</div>
+              </div>
+              <div style="flex:1;min-height:0"></div>
+              <div style="flex:none;background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:7px">
+                <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Evidence on every row</div>
+                <div style="font-size:10.5px;color:#5A6577;line-height:1.55">Each proposal names its sample and its comparison group. A suggestion without those is a hunch with a percentage attached to it.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;line-height:1.85;color:#7C8899">
+        <div><b style="color:#4A5566;font-weight:600">OPERATIONS</b> · getProposals · getProposalEvidence · acceptProposal · rejectProposal · getProposalTrackRecord · getModelInputs</div>
+        <div><b style="color:#4A5566;font-weight:600">STATES</b> · loading · <b style="color:#8A6D00">rejectionRetained — a refused proposal stays visible with its reason and the name of who refused it</b> · lowConfidence · restrictedInput · applying · error</div>
+        <div><b style="color:#4A5566;font-weight:600">ARRIVES WITH</b> · tenantId←context · proposalId←row</div>
+        <div><b style="color:#4A5566;font-weight:600">GOES TO</b> · <a href="#crm-10b">challenge builder</a> · <a href="#crm-10h">guest hub</a> · <a href="#crm-10j">analytics</a></div>
+      </div>
+    </div>
+
+    <div id="crm-10j" data-screen-label="CRM-10J" data-screen-id="CRM-10J" data-screen-id-origin="board" style="display:flex;flex-direction:column;gap:13px;scroll-margin-top:24px">
+      <div>
+        <div style="display:flex;align-items:baseline;gap:9px"><span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#8494A8">CRM-10J</span><span style="font-size:16.5px;font-weight:800;letter-spacing:-.015em">Gamification Analytics &amp; Audit</span><span style="font-size:9px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:2px 7px;border-radius:5px;background:#EDF3FF;color:#0A4FB8">cost against lift · every award logged</span></div>
+        <div style="font-size:12px;color:#6B7280;margin-top:3px">What the whole scheme costs, what it moved, and the record of every point awarded, adjusted or removed by hand.</div>
+      </div>
+      <div style="width:1280px;height:700px;display:flex;background:#F7F9FC;border:1px solid #E3E8F0;border-radius:14px;overflow:hidden;box-shadow:0 16px 38px rgba(12,35,64,.09)">
+        <aside style="flex:none;width:180px;background:#0B1324;display:flex;flex-direction:column;position:relative">
+          <div style="position:absolute;inset:0;background:radial-gradient(300px 200px at 0% 4%,rgba(0,184,255,.20),transparent 70%);pointer-events:none"></div>
+          <div style="position:relative;padding:15px 14px 13px;border-bottom:1px solid rgba(255,255,255,.08)"><img src="assets/ticvai-light-logo.png" alt="TICVAI" style="display:block;height:24px;width:auto"><div style="font-size:9.5px;color:#7FA3C9;margin-top:5px">Engagement &amp; Loyalty</div></div>
+          <nav style="position:relative;display:flex;flex-direction:column;gap:2px;padding:11px 9px">
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Overview</div>
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Challenges</div>
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Badges</div>
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Points</div>
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Rewards</div>
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Guest hub</div>
+            <div style="padding:8px 10px;border-radius:9px;background:linear-gradient(90deg,rgba(13,110,253,.30),rgba(0,184,255,.10));color:#fff;font-size:11.5px;font-weight:700;box-shadow:inset 2px 0 0 #00B8FF">Analytics</div>
+          </nav>
+          <div style="position:relative;margin-top:auto;padding:12px;border-top:1px solid rgba(255,255,255,.08);font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#7FA3C9;line-height:1.7">FY to date<br>£81 200 cost</div>
+        </aside>
+        <div style="flex:1;display:flex;flex-direction:column;min-width:0">
+          <header style="flex:none;height:54px;display:flex;align-items:center;gap:12px;padding:0 18px;background:#fff;border-bottom:1px solid #E8ECF3">
+            <div><div style="font-size:13.5px;font-weight:800;letter-spacing:-.01em">Scheme performance · year to date</div><div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#9AA5B6">£81 200 spent · £214 000 attributed revenue · 2.6× · 41 manual adjustments</div></div>
+            <div style="margin-left:auto;display:flex;gap:6px"><div style="height:32px;display:flex;align-items:center;gap:6px;padding:0 11px;border:1px solid #E3E8F0;border-radius:8px;font-size:11px;font-weight:700;color:#5A6577">FY to date<span style="color:#9AA5B6">▾</span></div><div style="height:32px;display:flex;align-items:center;padding:0 11px;border:1px solid #E3E8F0;border-radius:8px;font-size:11px;font-weight:700;color:#5A6577">Export audit</div></div>
+          </header>
+          <div style="flex:1;display:flex;flex-direction:column;gap:12px;padding:14px 16px;min-height:0">
+            <div style="flex:none;display:grid;grid-template-columns:repeat(4,1fr);gap:11px">
+              <div style="background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:4px"><span style="font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#94A0B4">Cost of the scheme</span><span style="font-family:'IBM Plex Mono',monospace;font-size:20px;font-weight:600">£81 200</span><span style="font-size:10.5px;color:#5A6577">rewards, points and staff time</span></div>
+              <div style="background:#fff;border:1px solid #CBE8DA;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:4px"><span style="font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#0B7A55">Attributed against holdout</span><span style="font-family:'IBM Plex Mono',monospace;font-size:20px;font-weight:600;color:#0B5B41">£214 000</span><span style="font-size:10.5px;color:#0B7A55">2.6× · was 2.1× last year</span></div>
+              <div style="background:#fff;border:1.5px solid #F2DFB8;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:4px"><span style="font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#8A6D00">Outstanding liability</span><span style="font-family:'IBM Plex Mono',monospace;font-size:20px;font-weight:600;color:#8A6D00">£96 400</span><span style="font-size:10.5px;color:#8A6D00">larger than the annual cost</span></div>
+              <div style="background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:4px"><span style="font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#94A0B4">Manual adjustments</span><span style="font-family:'IBM Plex Mono',monospace;font-size:20px;font-weight:600">41</span><span style="font-size:10.5px;color:#5A6577">all with a reason and a name</span></div>
+            </div>
+            <div style="flex:1;display:grid;grid-template-columns:1.1fr 1fr;gap:12px;min-height:0">
+              <div style="background:#fff;border:1px solid #E8ECF3;border-radius:12px;display:flex;flex-direction:column;overflow:hidden;min-height:0">
+                <div style="flex:none;display:flex;align-items:center;gap:8px;padding:11px 14px 10px;border-bottom:1px solid #EDF1F6"><div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Cost against lift, by mechanic</div><span style="margin-left:auto;font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#9AA5B6">return per pound</span></div>
+                <div style="flex:none;display:grid;grid-template-columns:1.5fr 84px 90px 74px;padding:8px 14px;font-size:9px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:#94A0B4;border-bottom:1px solid #EDF1F6"><div>Mechanic</div><div style="text-align:right">Cost</div><div style="text-align:right">Attributed</div><div style="text-align:right">Return</div></div>
+                <div style="display:grid;grid-template-columns:1.5fr 84px 90px 74px;align-items:center;padding:10px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA;background:#F3FBF7"><div style="font-weight:700;color:#0B5B41">Bring someone new</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">£18 200</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#0B5B41">£112 000</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;font-weight:700;color:#0B5B41">6.2×</div></div>
+                <div style="display:grid;grid-template-columns:1.5fr 84px 90px 74px;align-items:center;padding:10px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA"><div style="font-weight:600">Midweek challenge</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">£9 400</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#0B5B41">£48 100</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#0B5B41">5.1×</div></div>
+                <div style="display:grid;grid-template-columns:1.5fr 84px 90px 74px;align-items:center;padding:10px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA"><div style="font-weight:600">Try something new</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">£2 100</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#0B5B41">£14 800</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#0B5B41">7.0×</div></div>
+                <div style="display:grid;grid-template-columns:1.5fr 84px 90px 74px;align-items:center;padding:10px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA"><div style="font-weight:600">Season streak</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">£6 800</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">£19 400</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">2.9×</div></div>
+                <div style="display:grid;grid-template-columns:1.5fr 84px 90px 74px;align-items:center;padding:10px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA"><div style="font-weight:600">Family challenge</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">£3 200</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">£12 600</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">3.9×</div></div>
+                <div style="display:grid;grid-template-columns:1.5fr 84px 90px 74px;align-items:center;padding:10px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA;background:#FDF5F5"><div style="font-weight:700;color:#8A2020">Points on every purchase</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#8A2020">£44 100</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#8A2020">£7 100</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;font-weight:700;color:#8A2020">0.2×</div></div>
+                <div style="display:grid;grid-template-columns:1.5fr 84px 90px 74px;align-items:center;padding:10px 14px;font-size:11.5px"><div style="font-weight:600;color:#8A2020">Arrival check-in badge</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#8A2020">£1 400</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#8A2020">£0</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#8A2020">0×</div></div>
+                <div style="margin-top:auto;flex:none;padding:11px 14px;border-top:1px solid #EDF1F6;background:#FDF5F5;display:flex;gap:11px"><span style="width:3px;border-radius:2px;background:#DC2626;flex:none"></span><div style="flex:1;font-size:11px;color:#8A2020;line-height:1.55">One mechanic consumes 54% of the budget and returns 20p in the pound. Retiring it and moving half its spend to referral and midweek would roughly double the scheme's return without adding anything new.</div></div>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:12px;min-height:0">
+                <div style="flex:none;background:#fff;border:1px solid #E8ECF3;border-radius:12px;display:flex;flex-direction:column;overflow:hidden">
+                  <div style="flex:none;display:flex;align-items:center;gap:8px;padding:11px 14px 10px;border-bottom:1px solid #EDF1F6"><div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Audit trail</div><span style="margin-left:auto;font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#9AA5B6">append only</span></div>
+                  <div style="display:grid;grid-template-columns:84px 1fr;gap:9px;padding:8px 14px;font-size:10.5px;border-bottom:1px solid #F4F6FA"><span style="font-family:'IBM Plex Mono',monospace;color:#9AA5B6">04 Aug 09:12</span><span style="color:#3E4A5C">Midweek earning rate 400 → 600 points · S. Iyer · liability +£4 200 modelled</span></div>
+                  <div style="display:grid;grid-template-columns:84px 1fr;gap:9px;padding:8px 14px;font-size:10.5px;border-bottom:1px solid #F4F6FA"><span style="font-family:'IBM Plex Mono',monospace;color:#9AA5B6">07 Aug 14:41</span><span style="color:#3E4A5C">6 400 points granted to J. Hartley · goodwill, case C-2214 · R. Sayeed</span></div>
+                  <div style="display:grid;grid-template-columns:84px 1fr;gap:9px;padding:8px 14px;font-size:10.5px;border-bottom:1px solid #F4F6FA"><span style="font-family:'IBM Plex Mono',monospace;color:#9AA5B6">11 Aug 10:06</span><span style="color:#3E4A5C">17 referral rewards paused · abuse flag, same card · automatic</span></div>
+                  <div style="display:grid;grid-template-columns:84px 1fr;gap:9px;padding:8px 14px;font-size:10.5px;border-bottom:1px solid #F4F6FA"><span style="font-family:'IBM Plex Mono',monospace;color:#9AA5B6">12 Aug 16:30</span><span style="color:#8A2020">Streak reminder proposal rejected · "we do not use loss to drive visits" · S. Iyer</span></div>
+                  <div style="display:grid;grid-template-columns:84px 1fr;gap:9px;padding:8px 14px;font-size:10.5px;border-bottom:1px solid #F4F6FA"><span style="font-family:'IBM Plex Mono',monospace;color:#9AA5B6">18 Aug 11:22</span><span style="color:#3E4A5C">"Big spender" badge held for review · spend-based criteria · A. Rahim</span></div>
+                  <div style="display:grid;grid-template-columns:84px 1fr;gap:9px;padding:8px 14px;font-size:10.5px"><span style="font-family:'IBM Plex Mono',monospace;color:#9AA5B6">22 Aug 08:55</span><span style="color:#3E4A5C">Points expiry proposal opened · £39 500 released, 1 900 active members affected · no decision</span></div>
+                </div>
+                <div style="flex:none;background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:8px">
+                  <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Manual adjustments, 41 this year</div>
+                  <div style="display:flex;flex-direction:column;gap:5px;font-size:11px;color:#5A6577">
+                    <div style="display:flex;justify-content:space-between"><span>Goodwill after a case</span><span style="font-family:'IBM Plex Mono',monospace;color:#0B1324">28</span></div>
+                    <div style="display:flex;justify-content:space-between"><span>Correcting a missed award</span><span style="font-family:'IBM Plex Mono',monospace;color:#0B1324">9</span></div>
+                    <div style="display:flex;justify-content:space-between"><span>Removing fraudulent points</span><span style="font-family:'IBM Plex Mono',monospace;color:#0B1324">4</span></div>
+                    <div style="display:flex;justify-content:space-between"><span>Largest single grant</span><span style="font-family:'IBM Plex Mono',monospace;color:#0B1324">6 400 · £32</span></div>
+                  </div>
+                  <div style="font-size:10.5px;color:#5A6577;line-height:1.5">Nine corrections in a year means the earning rules fire reliably. If that number grew, the rules would be the problem, not the staff.</div>
+                </div>
+                <div style="flex:1;min-height:0"></div>
+                <div style="flex:none;background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:7px">
+                  <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Liability is bigger than the budget</div>
+                  <div style="font-size:10.5px;color:#5A6577;line-height:1.55">£96 400 of promises against £81 200 of annual spend. That ratio, not participation, is the number this board should be judged on next year.</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;line-height:1.85;color:#7C8899">
+        <div><b style="color:#4A5566;font-weight:600">OPERATIONS</b> · getSchemePerformance · getMechanicReturn · getPointsLedger · getAdjustmentLog · getGamificationAuditTrail · exportAudit</div>
+        <div><b style="color:#4A5566;font-weight:600">STATES</b> · loading · <b style="color:#8A6D00">negativeReturnMechanic — a mechanic returning under 1× is flagged with the reallocation it would fund</b> · liabilityExceedsSpend · exporting · error</div>
+        <div><b style="color:#4A5566;font-weight:600">ARRIVES WITH</b> · period←picker · tenantId←context</div>
+        <div><b style="color:#4A5566;font-weight:600">GOES TO</b> · <a href="#crm-10a">overview</a> · <a href="#crm-10d">points rules</a> · <a href="#crm-10i">proposals</a></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+</x-dc>
+</body>
+</html>

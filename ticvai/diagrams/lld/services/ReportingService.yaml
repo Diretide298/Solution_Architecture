@@ -20,7 +20,7 @@ schemas:
   stores:
   - derived
   - postgres
-  largestTable: reporting.report_definition
+  largestTable: reporting.schedule
 operationsByContract:
 - contract: reporting
   count: 29
@@ -280,16 +280,16 @@ tables:
   - reporting
   foreignWriters: null
 - table: reporting.dashboard
-  columns: 9
+  columns: 8
   store: postgres
   parent: null
   writtenBy:
   - reporting
   foreignWriters: null
 - table: reporting.dashboard_tile
-  columns: 7
+  columns: 8
   store: postgres
-  parent: null
+  parent: reporting.dashboard
   writtenBy:
   - reporting
   foreignWriters: null
@@ -308,14 +308,14 @@ tables:
   - reporting
   foreignWriters: null
 - table: reporting.report_column
-  columns: 8
+  columns: 9
   store: postgres
-  parent: null
+  parent: reporting.report_definition
   writtenBy:
   - reporting
   foreignWriters: null
 - table: reporting.report_definition
-  columns: 18
+  columns: 15
   store: postgres
   parent: null
   writtenBy:
@@ -328,9 +328,9 @@ tables:
   writtenBy: []
   foreignWriters: null
 - table: reporting.report_filter
-  columns: 7
+  columns: 8
   store: postgres
-  parent: null
+  parent: reporting.report_definition
   writtenBy:
   - reporting
   foreignWriters: null
@@ -342,7 +342,7 @@ tables:
   - reporting
   foreignWriters: null
 - table: reporting.schedule
-  columns: 16
+  columns: 15
   store: postgres
   parent: null
   writtenBy:

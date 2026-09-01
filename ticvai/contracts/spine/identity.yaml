@@ -350,8 +350,8 @@ paths:
               schema:
                 type: object
                 properties:
-                  heldByThisGuest: { type: array, items: { $ref: '#/components/schemas/Grant' } }
-                  heldOverThisGuest: { type: array, items: { $ref: '#/components/schemas/Grant' } }
+                  heldByThisGuest: { type: array, items: { $ref: '#/components/schemas/DelegatedAccess' } }
+                  heldOverThisGuest: { type: array, items: { $ref: '#/components/schemas/DelegatedAccess' } }
 
     post:
       operationId: grantDelegation
@@ -400,7 +400,7 @@ paths:
           description: Granted
           content:
             application/json:
-              schema: { $ref: '#/components/schemas/Grant' }
+              schema: { $ref: '#/components/schemas/DelegatedAccess' }
         '409':
           description: >
             **A cycle, or a minor granting authority over an adult.** Both are refused — a delegation
@@ -788,9 +788,9 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/Role' }
 
-  /grants:
+  /delegated-access:
     get:
-      operationId: listGrants
+      operationId: listDelegatedAccess
       x-ticvai-consumed-by:
         - "P10 PTR-020 Sub-Agent Management"
       x-ticvai-audience: [staff, partner]
@@ -822,9 +822,9 @@ paths:
                     properties:
                       items:
                         type: array
-                        items: { $ref: '#/components/schemas/Grant' }
+                        items: { $ref: '#/components/schemas/DelegatedAccess' }
     post:
-      operationId: createGrant
+      operationId: createDelegatedAccess
       x-ticvai-consumed-by:
         - "P10 PTR-020 Sub-Agent Management"
       x-ticvai-audience: [staff, partner]
@@ -853,21 +853,21 @@ paths:
           description: Granted. Takes effect at next login unless it is a revocation.
           content:
             application/json:
-              schema: { $ref: '#/components/schemas/Grant' }
+              schema: { $ref: '#/components/schemas/DelegatedAccess' }
         '400':
           description: Wildcard on an ALLOW, or scope outside the caller's own grants
           content:
             application/problem+json:
               schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
 
-  /grants/{grantId}:
+  /delegated-access/{delegatedAccessId}:
     parameters:
-      - name: grantId
+      - name: delegatedAccessId
         in: path
         required: true
         schema: { type: string, format: uuid }
     delete:
-      operationId: deleteGrant
+      operationId: deleteDelegatedAccess
       x-ticvai-consumed-by:
         - "P10 PTR-020 Sub-Agent Management"
       x-ticvai-audience: [staff, partner]
@@ -2295,8 +2295,8 @@ components:
             **Revoked rather than deleted.** A permission that vanishes from the table takes its
             history with it, and *who could do this last Tuesday* is the question an incident asks.
 
-    Grant:
-      x-ticvai-persistence: "identity.grant"
+    DelegatedAccess:
+      x-ticvai-persistence: "identity.delegated_access"
       type: object
       required: [id, permission, scopePath, effect]
       properties:

@@ -75,9 +75,9 @@ The **selling cell owns the order and the entitlement.** Consuming cells receive
 *redemption right* — a narrow projection carrying only what a gate needs:
 
 ```
-RedemptionRight {
+CrossRegionEntitlement {
   rightId, guestLinkId, ticketId
-  validFrom, validTo, admissionProfileId
+  validFrom, validTo, admissionRulesId
   entriesAllowed, entriesConsumed
   issuingCellId
 }

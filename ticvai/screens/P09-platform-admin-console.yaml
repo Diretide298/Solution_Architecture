@@ -46,7 +46,7 @@ platform:
 screens:
 - id: ADM-001
   name: Platform Login / MFA
-  module: TODO
+  module: Access & Identity
   purpose: Get someone into the app, fast, on a device that may be shared.
   wave: 1
   layout:
@@ -132,7 +132,7 @@ screens:
   statesDerived: true
 - id: ADM-002
   name: Platform Dashboard
-  module: TODO
+  module: Overview & Health
   purpose: The screen this app sits on. Everything else is entered from here and returns to it.
   wave: 1
   layout:
@@ -226,10 +226,10 @@ screens:
   requiresModule: membership
   statesDerived: true
   boardFrames:
-  - adm-002
+  - Dashboards Board.dc.html#adm-002
 - id: ADM-003
   name: Cross-Tenant Health Dashboard
-  module: TODO
+  module: Overview & Health
   purpose: The screen this app sits on. Everything else is entered from here and returns to it.
   wave: 2
   layout:
@@ -290,11 +290,11 @@ screens:
     contract: subscription
     purpose: Change a cell's tier
     trigger: onAction
-  - operationId: propagateRedemptionRight
+  - operationId: propagateCrossRegionEntitlement
     contract: cross-cell
     purpose: Propagate a right from the issuing cell to a consuming cell
     trigger: onAction
-  - operationId: getRedemptionRight
+  - operationId: getCrossRegionEntitlement
     contract: cross-cell
     purpose: Read a redemption right
     trigger: onLoad
@@ -337,10 +337,10 @@ screens:
   requiresModule: membership
   statesDerived: true
   boardFrames:
-  - adm-003
+  - Dashboards Board.dc.html#adm-003
 - id: ADM-004
   name: Platform Audit Log
-  module: TODO
+  module: Overview & Health
   purpose: Find platform audit log for this venue.
   wave: 2
   layout:
@@ -399,7 +399,7 @@ screens:
   statesDerived: true
 - id: ADM-005
   name: Tenant Directory
-  module: TODO
+  module: Tenants & Licensing
   purpose: Find the right one quickly, and act on it without opening it.
   wave: 1
   layout:
@@ -524,7 +524,7 @@ screens:
   statesDerived: true
 - id: ADM-006
   name: Tenant Hierarchy Explorer
-  module: TODO
+  module: Tenants & Licensing
   purpose: See tenant hierarchy explorer for this venue.
   wave: 1
   layout:
@@ -601,11 +601,11 @@ screens:
     contract: subscription
     purpose: Amend tenant details
     trigger: onAction
-  - operationId: listScopeNodes
+  - operationId: listOrgUnits
     contract: tenancy
     purpose: List scope nodes visible to the session
     trigger: onLoad
-  - operationId: createScopeNode
+  - operationId: createOrgUnit
     contract: tenancy
     purpose: Create a scope node
     trigger: onAction
@@ -628,7 +628,7 @@ screens:
   statesDerived: true
 - id: ADM-007
   name: Module & Feature Entitlement
-  module: TODO
+  module: Tenants & Licensing
   purpose: See module & feature entitlement for this venue.
   wave: 1
   layout:
@@ -652,11 +652,21 @@ screens:
         impliedBy: removeLicenceAddOn
         notes: '**Always confirms, never the default focus.** The consequence goes in the body — *cancel
           3 orders worth AED 480* is a confirmation, *are you sure* is not.'
-      - kind: secondaryButton
-        label: Cancel
-        notes: '**A screen that can submit must be leaveable without submitting.**'
-        derived: true
-        impliedBy: addLicenceAddOn
+        label: Remove licence add on
+      - kind: confirmDialog
+        label: Remove this licence add-on?
+        notes: '**The consequence goes in the body, not the title.** Written per operation on 1 September,
+          replacing one identical definition that had been pasted onto all 39 screens - the label read
+          *Confirm*, which is the *are you sure* the library entry rules out.
+
+
+          **Name the tenant, the module and every screen the tenant loses.** Writes `control.subscription`,
+          so **entitlement changes mid-session for users already signed in**. No state model, no event
+          - nothing tells the tenant.
+
+
+          **`Licence add-on` has no state model** - nothing declares what the record becomes.'
+        bindsTo: removeLicenceAddOn
   states:
     loading: Entitlements resolve against the plan
     emptyFirstRun: All modules enabled — the maximum plan
@@ -755,7 +765,7 @@ screens:
   statesDerived: true
 - id: ADM-008
   name: Subscription & Plan Management
-  module: TODO
+  module: Tenants & Licensing
   purpose: Find subscription & plan management for this venue.
   wave: 1
   layout:
@@ -897,7 +907,7 @@ screens:
   statesDerived: true
 - id: ADM-009
   name: Tenant Billing & Invoicing
-  module: TODO
+  module: Tenants & Licensing
   purpose: Find tenant billing & invoicing for this venue.
   wave: 2
   layout:
@@ -915,11 +925,6 @@ screens:
         derived: true
         impliedBy: generateInvoice
         notes: The act the screen exists for.
-      - kind: secondaryButton
-        label: Cancel
-        notes: '**A screen that can submit must be leaveable without submitting.**'
-        derived: true
-        impliedBy: generateInvoice
   states:
     loading: Invoices, newest first
     emptyFirstRun: No invoices — a tenant inside its first period
@@ -1014,7 +1019,7 @@ screens:
   statesDerived: true
 - id: ADM-010
   name: Usage Metering
-  module: TODO
+  module: Tenants & Licensing
   purpose: See usage metering for this venue.
   wave: 2
   layout:
@@ -1113,7 +1118,7 @@ screens:
   statesDerived: true
 - id: ADM-011
   name: Licence & Seat Management
-  module: TODO
+  module: Tenants & Licensing
   purpose: See licence & seat management for this venue.
   wave: 2
   layout:
@@ -1220,7 +1225,7 @@ screens:
   statesDerived: true
 - id: ADM-012
   name: Tenant Isolation & Resource Pool
-  module: TODO
+  module: Tenants & Licensing
   purpose: Work with tenant isolation & resource pool for this venue.
   wave: 1
   layout:
@@ -1238,11 +1243,6 @@ screens:
         impliedBy: listTenantCells
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
-      - kind: secondaryButton
-        label: Cancel
-        notes: '**A screen that can submit must be leaveable without submitting.**'
-        derived: true
-        impliedBy: provisionCell
   states:
     loading: Cell and pool state
     emptyFirstRun: —
@@ -1340,7 +1340,7 @@ screens:
   statesDerived: true
 - id: ADM-013
   name: Tenant Performance Monitor
-  module: TODO
+  module: Overview & Health
   purpose: See tenant performance monitor for this venue.
   wave: 2
   layout:
@@ -1427,7 +1427,7 @@ screens:
   statesDerived: true
 - id: ADM-014
   name: Auto-Scaling Configuration
-  module: TODO
+  module: Infrastructure & Resilience
   purpose: Change how auto-scaling behaves here, and see which level the current value came from.
   wave: 3
   layout:
@@ -1515,7 +1515,7 @@ screens:
   statesDerived: true
 - id: ADM-015
   name: API Rate Limit & Quota Management
-  module: TODO
+  module: Tenants & Licensing
   purpose: See api rate limit & quota management for this venue.
   wave: 3
   layout:
@@ -1619,7 +1619,7 @@ screens:
   statesDerived: true
 - id: ADM-016
   name: White-Label Branding Management
-  module: TODO
+  module: Branding & Localisation
   purpose: See white-label branding management for this venue.
   wave: 2
   layout:
@@ -1727,7 +1727,7 @@ screens:
   statesDerived: true
 - id: ADM-017
   name: Domain & Certificate Management
-  module: TODO
+  module: Branding & Localisation
   purpose: See domain & certificate management for this venue.
   wave: 2
   layout:
@@ -1816,7 +1816,7 @@ screens:
   statesDerived: true
 - id: ADM-018
   name: Localisation & Language Pack
-  module: TODO
+  module: Branding & Localisation
   purpose: Configure localisation & language pack for this venue.
   wave: 2
   layout:
@@ -1835,11 +1835,6 @@ screens:
         impliedBy: listFaqs
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
-      - kind: secondaryButton
-        label: Cancel
-        notes: '**A screen that can submit must be leaveable without submitting.**'
-        derived: true
-        impliedBy: setLanguages
   states:
     loading: Language packs and completeness
     emptyFirstRun: One language
@@ -1918,7 +1913,7 @@ screens:
   statesDerived: true
 - id: ADM-019
   name: Global Configuration & Defaults
-  module: TODO
+  module: Branding & Localisation
   purpose: Change how global behaves here, and see which level the current value came from.
   wave: 2
   layout:
@@ -1995,7 +1990,7 @@ screens:
   statesDerived: true
 - id: ADM-020
   name: Platform User Directory
-  module: TODO
+  module: Access & Identity
   purpose: Find the right one quickly, and act on it without opening it.
   wave: 1
   layout:
@@ -2064,7 +2059,7 @@ screens:
   statesDerived: true
 - id: ADM-021
   name: Platform Role Management
-  module: TODO
+  module: Access & Identity
   purpose: Find platform role management for this venue.
   wave: 1
   layout:
@@ -2117,7 +2112,7 @@ screens:
   statesDerived: true
 - id: ADM-022
   name: Release & Version Management
-  module: TODO
+  module: Releases & Environments
   purpose: Find release & version management for this venue.
   wave: 2
   layout:
@@ -2193,17 +2188,17 @@ screens:
   density: compact
   entryState:
     params:
-    - name: releaseId
+    - name: reinventoryHoldId
       from: deepLink
     coldEntry: '**A platform-admin link resolves against the tenant in the link and refuses if the operator
       does not hold that tenant.** A link is not authorisation. If the target is gone the screen says
       so and returns to the directory — **an admin console that silently shows the wrong tenant is worse
-      than one that shows nothing.** Arrives with `releaseId`.'
+      than one that shows nothing.** Arrives with `reinventoryHoldId`.'
   requiresModule: core
   statesDerived: true
 - id: ADM-023
   name: Staging Promotion & Approval
-  module: TODO
+  module: Releases & Environments
   purpose: Work with staging promotion & approval for this venue.
   wave: 2
   layout:
@@ -2281,17 +2276,17 @@ screens:
   density: compact
   entryState:
     params:
-    - name: releaseId
+    - name: reinventoryHoldId
       from: deepLink
     coldEntry: '**A platform-admin link resolves against the tenant in the link and refuses if the operator
       does not hold that tenant.** A link is not authorisation. If the target is gone the screen says
       so and returns to the directory — **an admin console that silently shows the wrong tenant is worse
-      than one that shows nothing.** Arrives with `releaseId`.'
+      than one that shows nothing.** Arrives with `reinventoryHoldId`.'
   requiresModule: core
   statesDerived: true
 - id: ADM-024
   name: Release Notification Composer
-  module: TODO
+  module: Releases & Environments
   purpose: Push live release notification composer for this venue.
   wave: 3
   layout:
@@ -2347,7 +2342,7 @@ screens:
   statesDerived: true
 - id: ADM-025
   name: Tenant Upgrade Scheduler
-  module: TODO
+  module: Releases & Environments
   purpose: Find tenant upgrade scheduler for this venue.
   wave: 2
   layout:
@@ -2403,7 +2398,7 @@ screens:
   statesDerived: true
 - id: ADM-026
   name: End-of-Support Notice Management
-  module: TODO
+  module: Releases & Environments
   purpose: Answer a question without needing a person.
   wave: 3
   layout:
@@ -2459,7 +2454,7 @@ screens:
   statesDerived: true
 - id: ADM-027
   name: Database Migration Console
-  module: TODO
+  module: Releases & Environments
   purpose: Find database migration console for this venue.
   wave: 1
   layout:
@@ -2477,11 +2472,6 @@ screens:
         derived: true
         impliedBy: planMigration
         notes: The act the screen exists for.
-      - kind: secondaryButton
-        label: Cancel
-        notes: '**A screen that can submit must be leaveable without submitting.**'
-        derived: true
-        impliedBy: planMigration
   states:
     loading: Migration plan and per-cell state
     emptyFirstRun: No migrations pending — every cell is at the current schema
@@ -2560,7 +2550,7 @@ screens:
   statesDerived: true
 - id: ADM-028
   name: Environment Registry
-  module: TODO
+  module: Releases & Environments
   purpose: Find environment registry for this venue.
   wave: 2
   layout:
@@ -2578,11 +2568,6 @@ screens:
         derived: true
         impliedBy: registerEnvironment
         notes: The act the screen exists for.
-      - kind: secondaryButton
-        label: Cancel
-        notes: '**A screen that can submit must be leaveable without submitting.**'
-        derived: true
-        impliedBy: registerEnvironment
   states:
     loading: Environments and their cells
     emptyFirstRun: No environments registered
@@ -2633,7 +2618,7 @@ screens:
   statesDerived: true
 - id: ADM-029
   name: Deployment Monitor
-  module: TODO
+  module: Overview & Health
   purpose: Find deployment monitor for this venue.
   wave: 2
   layout:
@@ -2743,7 +2728,7 @@ screens:
   statesDerived: true
 - id: ADM-030
   name: Infrastructure Sizing & Scaling Policy
-  module: TODO
+  module: Infrastructure & Resilience
   purpose: See infrastructure sizing & scaling policy for this venue.
   wave: 3
   layout:
@@ -2831,7 +2816,7 @@ screens:
   statesDerived: true
 - id: ADM-031
   name: Security & Compliance Dashboard
-  module: TODO
+  module: Security & Compliance
   purpose: The screen this app sits on. Everything else is entered from here and returns to it.
   wave: 3
   layout:
@@ -2907,7 +2892,7 @@ screens:
   statesDerived: true
 - id: ADM-032
   name: WAF & Security Policy View
-  module: TODO
+  module: Security & Compliance
   purpose: See waf & security policy view for this venue.
   wave: 3
   layout:
@@ -2995,7 +2980,7 @@ screens:
   statesDerived: true
 - id: ADM-033
   name: Backup & DR Status
-  module: TODO
+  module: Infrastructure & Resilience
   purpose: See backup & dr status for this venue.
   wave: 2
   layout:
@@ -3082,7 +3067,7 @@ screens:
   statesDerived: true
 - id: ADM-034
   name: Archival Job Monitor
-  module: TODO
+  module: Infrastructure & Resilience
   purpose: Find archival job monitor for this venue.
   wave: 3
   layout:
@@ -3170,7 +3155,7 @@ screens:
   statesDerived: true
 - id: ADM-035
   name: Support & Escalation Console
-  module: TODO
+  module: Support & Communications
   purpose: Answer a question without needing a person.
   wave: 3
   layout:
@@ -3189,11 +3174,6 @@ screens:
         impliedBy: publishSupportNotice
         label: Publish support notice
         notes: The act the screen exists for.
-      - kind: secondaryButton
-        label: Cancel
-        notes: '**A screen that can submit must be leaveable without submitting.**'
-        derived: true
-        impliedBy: publishSupportNotice
   states:
     loading: Open escalations
     emptyFirstRun: Nothing open
@@ -3243,7 +3223,7 @@ screens:
   statesDerived: true
 - id: ADM-036
   name: Platform Notification Broadcast
-  module: TODO
+  module: Support & Communications
   purpose: Push live platform notification broadcast for this venue.
   wave: 3
   layout:
@@ -3320,11 +3300,6 @@ screens:
         impliedBy: setAiProvider
         label: Save ai provider
         notes: The act the screen exists for.
-      - kind: secondaryButton
-        label: Cancel
-        notes: '**A screen that can submit must be leaveable without submitting.**'
-        derived: true
-        impliedBy: setAiProvider
   apis:
   - operationId: listAiProviders
     contract: ai

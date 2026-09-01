@@ -7,7 +7,7 @@
  "audience": "staff",
  "formFactor": "web",
  "offlineCapable": false,
- "generated": "2026-08-27",
+ "generated": "2026-09-01",
  "note": "Derived by tools/derive-platform.py. **The gaps section is the point** \u2014 a page listing what exists is a directory; one listing what is missing is a worklist.",
  "counts": {
   "screens": 143,
@@ -15,7 +15,7 @@
   "contracts": 25,
   "modules": 8,
   "undrawn": 0,
-  "operationsWithNoScreen": 218
+  "operationsWithNoScreen": 220
  },
  "waves": {
   "wave1": 60,
@@ -101,11 +101,11 @@
    "operations": 46
   },
   {
-   "contract": "fnb",
+   "contract": "finance",
    "operations": 43
   },
   {
-   "contract": "finance",
+   "contract": "fnb",
    "operations": 43
   },
   {
@@ -165,11 +165,11 @@
    "operations": 8
   },
   {
-   "contract": "identity",
+   "contract": "ai",
    "operations": 7
   },
   {
-   "contract": "ai",
+   "contract": "identity",
    "operations": 7
   },
   {
@@ -177,15 +177,15 @@
    "operations": 4
   },
   {
-   "contract": "subscription",
-   "operations": 2
-  },
-  {
    "contract": "seating",
    "operations": 2
   },
   {
    "contract": "assets",
+   "operations": 2
+  },
+  {
+   "contract": "subscription",
    "operations": 2
   },
   {
@@ -478,7 +478,7 @@
    "name": "Admission Profiles",
    "module": "Access & Venue",
    "wave": 1,
-   "route": "/venue-operations/admission-profiles",
+   "route": "/venue-operations/admission-rules",
    "operations": 3,
    "drawn": true
   },
@@ -1677,6 +1677,12 @@
     "summary": "Every money source against the ledger, in one view"
    },
    {
+    "operation": "ingestFxRates",
+    "contract": "finance",
+    "verb": "POST",
+    "summary": "Pull rates from the configured provider"
+   },
+   {
     "operation": "listInterEntityObligations",
     "contract": "finance",
     "verb": "GET",
@@ -1711,6 +1717,12 @@
     "contract": "finance",
     "verb": "POST",
     "summary": "Revalue monetary balances at close"
+   },
+   {
+    "operation": "setFxProvider",
+    "contract": "finance",
+    "verb": "PUT",
+    "summary": "Which provider serves which purpose"
    },
    {
     "operation": "validateRecognitionSchedules",
@@ -2343,13 +2355,13 @@
     "summary": "Cancel a voucher"
    },
    {
-    "operation": "overrideQueueEntry",
+    "operation": "overrideWaitingGuest",
     "contract": "queue",
     "verb": "POST",
     "summary": "Admit against a failed redemption"
    },
    {
-    "operation": "redeemQueueEntry",
+    "operation": "redeemWaitingGuest",
     "contract": "queue",
     "verb": "POST",
     "summary": "Admit a party at the ride"

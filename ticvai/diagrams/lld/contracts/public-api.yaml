@@ -3,7 +3,7 @@ title: public-api — 22 operations
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/03-contracts.yaml
 tier: satellite
-service: ControlService
+service: PlatformService
 operations:
 - operation: certifyIntegration
   verb: POST
@@ -299,7 +299,7 @@ operations:
   writes:
   - cache:idempotency
   - control.developer_account
-  - identity.grant
+  - identity.delegated_access
 - operation: submitIntegrationListing
   verb: POST
   path: /listings

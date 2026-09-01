@@ -55,7 +55,7 @@ platform:
 screens:
 - id: SUP-001
   name: Agent Login
-  module: TODO
+  module: Access & Availability
   purpose: Get someone into the app, fast, on a device that may be shared.
   wave: 3
   layout:
@@ -142,7 +142,7 @@ screens:
   statesDerived: true
 - id: SUP-002
   name: Agent Dashboard
-  module: TODO
+  module: Overview
   purpose: The screen this app sits on. Everything else is entered from here and returns to it.
   wave: 3
   layout:
@@ -242,10 +242,10 @@ screens:
   requiresModule: marketing
   statesDerived: true
   boardFrames:
-  - sup-002
+  - Dashboards Board.dc.html#sup-002
 - id: SUP-003
   name: Availability & Routing Settings
-  module: TODO
+  module: Access & Availability
   purpose: Change how availability behaves here, and see which level the current value came from.
   wave: 3
   layout:
@@ -303,7 +303,7 @@ screens:
   statesDerived: true
 - id: SUP-004
   name: Conversation Queue
-  module: TODO
+  module: Conversations
   purpose: Find the right one quickly, and act on it without opening it.
   wave: 2
   layout:
@@ -409,7 +409,7 @@ screens:
   statesDerived: true
 - id: SUP-005
   name: Live Chat Workspace
-  module: TODO
+  module: Conversations
   purpose: Work with live chat workspace for this venue.
   wave: 2
   layout:
@@ -428,11 +428,6 @@ screens:
         impliedBy: listCases
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
-      - kind: secondaryButton
-        label: Cancel
-        notes: '**A screen that can submit must be leaveable without submitting.**'
-        derived: true
-        impliedBy: addCaseMessage
   states:
     loading: Detail loads
     emptyFirstRun: Not found — it may have been deleted or moved out of scope
@@ -535,7 +530,7 @@ screens:
   statesDerived: true
 - id: SUP-006
   name: Knowledge Base Search
-  module: TODO
+  module: Knowledge & Responses
   purpose: Find something when the guest does not know what it is called.
   wave: 3
   layout:
@@ -600,7 +595,7 @@ screens:
   statesDerived: true
 - id: SUP-007
   name: Canned Response Management
-  module: TODO
+  module: Knowledge & Responses
   purpose: Find canned response management for this venue.
   wave: 3
   layout:
@@ -662,7 +657,7 @@ screens:
   statesDerived: true
 - id: SUP-008
   name: Agent Performance & SLA View
-  module: TODO
+  module: Overview
   purpose: Produce agent performance & sla view for this venue.
   wave: 3
   layout:

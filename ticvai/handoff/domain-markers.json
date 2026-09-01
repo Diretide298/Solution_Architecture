@@ -366,7 +366,7 @@
   "ai:calls 1"
  ],
  "screen:GST-031": [
-  "ai:calls 1"
+  "ai:calls 3"
  ],
  "screen:GST-032": [
   "ai:calls 1"
@@ -494,13 +494,10 @@
  "table:cache:resolution": [
   "ai:read or written"
  ],
- "table:catalogue.attribute_axis": [
+ "table:catalogue.channel_capacity": [
   "ai:read or written"
  ],
  "table:catalogue.entitlement_template": [
-  "ai:read or written"
- ],
- "table:catalogue.envelope": [
   "ai:read or written"
  ],
  "table:catalogue.event": [
@@ -518,6 +515,9 @@
  "table:catalogue.product": [
   "ai:read or written"
  ],
+ "table:catalogue.variant_dimension": [
+  "ai:read or written"
+ ],
  "table:control.content_block": [
   "ai:read or written"
  ],
@@ -533,10 +533,10 @@
  "table:marketing.loyalty_programme": [
   "ai:read or written"
  ],
- "table:platform.region_settings": [
+ "table:platform.org_unit": [
   "ai:read or written"
  ],
- "table:platform.scope_node": [
+ "table:platform.region_settings": [
   "ai:read or written"
  ],
  "table:promotions.promotion": [

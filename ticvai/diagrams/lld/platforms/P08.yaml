@@ -72,7 +72,7 @@ servicesCalled:
   operationCalls: 9
 - service: AiService
   operationCalls: 8
-- service: ControlService
+- service: PlatformService
   operationCalls: 3
 coverage:
   screens: 143
@@ -162,7 +162,7 @@ screens:
   - BO-003
   - BO-004
   boardFrames:
-  - seat-2c
+  - Seat Board 2.dc.html#seat-2c
   wireframe: wireframes/Seat Board 2.dc.html#seat-2c
   inFlows:
   - F09 Event is cancelled and refunded
@@ -337,9 +337,9 @@ screens:
   - BO-009
   - BO-010
   boardFrames:
-  - FNB-2C
-  - RET-2A
-  - RET-2B
+  - FnB Board 2.dc.html#fnb-2c
+  - Retail Board 2.dc.html#ret-2a
+  - Retail Board 2.dc.html#ret-2b
   wireframe: wireframes/Retail Board 2.dc.html#ret-2a
   inFlows:
   - F78 A supplier is set up and a catalogue is priced and published
@@ -372,8 +372,8 @@ screens:
   - BO-009
   - BO-010
   boardFrames:
-  - FNB-2D
-  - RET-2C
+  - FnB Board 2.dc.html#fnb-2d
+  - Retail Board 2.dc.html#ret-2c
   wireframe: wireframes/Retail Board 2.dc.html#ret-2c
   inFlows:
   - F10 Partner books, uses and settles
@@ -408,7 +408,7 @@ screens:
   - BO-008
   - BO-010
   boardFrames:
-  - RET-2F
+  - Retail Board 2.dc.html#ret-2f
   wireframe: wireframes/Retail Board 2.dc.html#ret-2f
   inFlows:
   - F78 A supplier is set up and a catalogue is priced and published
@@ -458,11 +458,11 @@ screens:
   - BO-008
   - BO-009
   boardFrames:
-  - POS-4E
-  - RET-5A
-  - RET-5B
-  - RET-5C
-  - RET-5E
+  - POS Board 4.dc.html#pos-4e
+  - Retail Board 5.dc.html#ret-5a
+  - Retail Board 5.dc.html#ret-5b
+  - Retail Board 5.dc.html#ret-5c
+  - Retail Board 5.dc.html#ret-5e
   wireframe: wireframes/POS Board 4.dc.html#pos-4e
   inFlows:
   - F77 A promotion is built, bundled, published and measured
@@ -494,8 +494,8 @@ screens:
   - BO-008
   - BO-009
   boardFrames:
-  - FNB-2G
-  - RET-5H
+  - FnB Board 2.dc.html#fnb-2g
+  - Retail Board 5.dc.html#ret-5h
   wireframe: wireframes/Retail Board 5.dc.html#ret-5h
   inFlows:
   - F77 A promotion is built, bundled, published and measured
@@ -542,16 +542,16 @@ screens:
   wave: 2
   density: compact
   operations:
-  - createEnvelope
+  - createChannelCapacity
   - getChannelAllocations
+  - listChannelCapacities
   - listChannelListings
-  - listEnvelopes
   - listProducts
   - publishBundle
   - releaseChannelAllocation
   - setChannelAllocations
   - setChannelListing
-  - updateEnvelope
+  - updateChannelCapacity
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -560,14 +560,14 @@ screens:
   - loading
   offlineState: false
   entryParams:
-  - envelopeId<-deepLink
+  - channelCapacityId<-deepLink
   goesTo:
   - BO-001
   - BO-007
   - BO-008
   - BO-009
   boardFrames:
-  - RET-5G
+  - Retail Board 5.dc.html#ret-5g
   wireframe: wireframes/Retail Board 5.dc.html#ret-5g
   inFlows:
   - F77 A promotion is built, bundled, published and measured
@@ -609,8 +609,8 @@ screens:
   - BO-008
   - BO-009
   boardFrames:
-  - FNB-2H
-  - RET-2H
+  - FnB Board 2.dc.html#fnb-2h
+  - Retail Board 2.dc.html#ret-2h
   wireframe: wireframes/Retail Board 2.dc.html#ret-2h
   inFlows: null
 - screen: BO-015
@@ -647,7 +647,7 @@ screens:
   - BO-008
   - BO-009
   boardFrames:
-  - seat-2a
+  - Seat Board 2.dc.html#seat-2a
   wireframe: wireframes/Seat Board 2.dc.html#seat-2a
   inFlows: null
 - screen: BO-016
@@ -684,7 +684,7 @@ screens:
   - BO-008
   - BO-009
   boardFrames:
-  - seat-2b
+  - Seat Board 2.dc.html#seat-2b
   wireframe: wireframes/Seat Board 2.dc.html#seat-2b
   inFlows: null
 - screen: BO-017
@@ -694,12 +694,12 @@ screens:
   wave: 1
   density: compact
   operations:
-  - createEnvelope
+  - createChannelCapacity
   - getChannelAllocations
-  - listEnvelopes
+  - listChannelCapacities
   - releaseChannelAllocation
   - setChannelAllocations
-  - updateEnvelope
+  - updateChannelCapacity
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -708,7 +708,7 @@ screens:
   - loading
   offlineState: false
   entryParams:
-  - envelopeId<-deepLink
+  - channelCapacityId<-deepLink
   goesTo:
   - BO-001
   - BO-007
@@ -724,11 +724,11 @@ screens:
   wave: 2
   density: compact
   operations:
-  - acquireLease
-  - forceReleaseLease
-  - listLeases
-  - releaseLease
-  - renewLease
+  - acquireInventoryHold
+  - forceReleaseInventoryHold
+  - listInventoryHolds
+  - releaseInventoryHold
+  - renewInventoryHold
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -737,7 +737,7 @@ screens:
   - loading
   offlineState: false
   entryParams:
-  - leaseId<-deepLink
+  - inventoryHoldId<-deepLink
   goesTo:
   - BO-001
   - BO-007
@@ -780,7 +780,7 @@ screens:
   - BO-008
   - BO-009
   boardFrames:
-  - seat-2d
+  - Seat Board 2.dc.html#seat-2d
   wireframe: wireframes/Seat Board 2.dc.html#seat-2d
   inFlows: null
 - screen: BO-020
@@ -838,7 +838,7 @@ screens:
   - orderId<-deepLink
   goesTo: []
   boardFrames:
-  - RET-3A
+  - Retail Board 3.dc.html#ret-3a
   wireframe: wireframes/Retail Board 3.dc.html#ret-3a
   inFlows:
   - F11 Guest orders food to a lounger
@@ -950,7 +950,7 @@ screens:
   - BO-008
   - BO-009
   boardFrames:
-  - RET-3K
+  - Retail Board 3.dc.html#ret-3k
   wireframe: wireframes/Retail Board 3.dc.html#ret-3k
   inFlows:
   - F32 A till opens, trades and settles
@@ -1020,8 +1020,9 @@ screens:
   - BO-007
   - BO-008
   - BO-009
-  boardFrames: null
-  wireframe: wireframes/P08 Venue Management.dc.html#bo-026
+  boardFrames:
+  - Seat Platform Board 7.dc.html#seatp-7e
+  wireframe: wireframes/Seat Platform Board 7.dc.html#seatp-7e
   inFlows: null
 - screen: BO-027
   name: Reissue & Media Replacement
@@ -1183,9 +1184,9 @@ screens:
   wave: 1
   density: compact
   operations:
-  - createAdmissionProfile
-  - listAdmissionProfiles
-  - updateAdmissionProfile
+  - createAdmissionRules
+  - listAdmissionRules
+  - updateAdmissionRules
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -1337,9 +1338,9 @@ screens:
   - BO-008
   - BO-009
   boardFrames:
-  - POS-1A
-  - POS-1B
-  - POS-1C
+  - POS Board 1.dc.html#pos-1a
+  - POS Board 1.dc.html#pos-1b
+  - POS Board 1.dc.html#pos-1c
   wireframe: wireframes/POS Board 1.dc.html#pos-1a
   inFlows:
   - F79 A workstation is registered, configured and rolled out
@@ -1375,9 +1376,9 @@ screens:
   - BO-008
   - BO-009
   boardFrames:
-  - POS-5A
-  - POS-5C
-  - RET-3J
+  - POS Board 5.dc.html#pos-5a
+  - POS Board 5.dc.html#pos-5c
+  - Retail Board 3.dc.html#ret-3j
   wireframe: wireframes/POS Board 5.dc.html#pos-5a
   inFlows:
   - F89 Offline policy is set, cached, monitored and reconciled
@@ -1634,24 +1635,24 @@ screens:
   - BO-008
   - BO-009
   boardFrames:
-  - FNB-1B
-  - FNB-1C
-  - FNB-1D
-  - FNB-1E
-  - FNB-1F
-  - FNB-1G
-  - FNB-1H
-  - FNB-1J
-  - FNB-1K
-  - RET-1B
-  - RET-1C
-  - RET-1D
-  - RET-1E
-  - RET-1F
-  - RET-1G
-  - RET-1H
-  - RET-1J
-  - RET-1K
+  - FnB Board 1.dc.html#fnb-1b
+  - FnB Board 1.dc.html#fnb-1c
+  - FnB Board 1.dc.html#fnb-1d
+  - FnB Board 1.dc.html#fnb-1e
+  - FnB Board 1.dc.html#fnb-1f
+  - FnB Board 1.dc.html#fnb-1g
+  - FnB Board 1.dc.html#fnb-1h
+  - FnB Board 1.dc.html#fnb-1j
+  - FnB Board 1.dc.html#fnb-1k
+  - Retail Board 1.dc.html#ret-1b
+  - Retail Board 1.dc.html#ret-1c
+  - Retail Board 1.dc.html#ret-1d
+  - Retail Board 1.dc.html#ret-1e
+  - Retail Board 1.dc.html#ret-1f
+  - Retail Board 1.dc.html#ret-1g
+  - Retail Board 1.dc.html#ret-1h
+  - Retail Board 1.dc.html#ret-1j
+  - Retail Board 1.dc.html#ret-1k
   wireframe: wireframes/Retail Board 1.dc.html#ret-1b
   inFlows:
   - F28 A temperature excursion is caught and signed off
@@ -1685,11 +1686,11 @@ screens:
   - menuItemId<-deepLink
   goesTo: []
   boardFrames:
-  - FNB-2A
-  - FNB-2B
-  - FNB-2E
-  - FNB-2J
-  - FNB-2K
+  - FnB Board 2.dc.html#fnb-2a
+  - FnB Board 2.dc.html#fnb-2b
+  - FnB Board 2.dc.html#fnb-2e
+  - FnB Board 2.dc.html#fnb-2j
+  - FnB Board 2.dc.html#fnb-2k
   wireframe: wireframes/FnB Board 2.dc.html#fnb-2a
   inFlows:
   - F31 A menu is drafted, scheduled and rolled back
@@ -1820,10 +1821,10 @@ screens:
   - BO-080
   - BO-082
   boardFrames:
-  - FNB-5A
-  - FNB-5B
-  - RET-4A
-  - RET-4H
+  - FnB Board 5.dc.html#fnb-5a
+  - FnB Board 5.dc.html#fnb-5b
+  - Retail Board 4.dc.html#ret-4a
+  - Retail Board 4.dc.html#ret-4h
   wireframe: wireframes/Retail Board 4.dc.html#ret-4a
   inFlows:
   - F35 Stock arrives short and an oversell is resolved
@@ -1926,7 +1927,7 @@ screens:
   - BO-009
   - BO-049
   boardFrames:
-  - RET-4E
+  - Retail Board 4.dc.html#ret-4e
   wireframe: wireframes/Retail Board 4.dc.html#ret-4e
   inFlows:
   - F15 A part is needed and ordered
@@ -1958,8 +1959,9 @@ screens:
   - BO-007
   - BO-008
   - BO-009
-  boardFrames: null
-  wireframe: wireframes/P08 Venue Management.dc.html#bo-053
+  boardFrames:
+  - Marketing Board 1.dc.html#crm-1b
+  wireframe: wireframes/Marketing Board 1.dc.html#crm-1b
   inFlows: null
 - screen: BO-054
   name: Role Assignment
@@ -2099,7 +2101,7 @@ screens:
   - BO-008
   - BO-009
   boardFrames:
-  - RET-6H
+  - Retail Board 6.dc.html#ret-6h
   wireframe: wireframes/Retail Board 6.dc.html#ret-6h
   inFlows:
   - F107 A report is defined, scheduled and delivered
@@ -2282,7 +2284,7 @@ screens:
   - BO-008
   - BO-009
   boardFrames:
-  - seat-1c
+  - Seat Board 1.dc.html#seat-1c
   wireframe: wireframes/Seat Board 1.dc.html#seat-1c
   inFlows: null
 - screen: BO-064
@@ -2293,15 +2295,15 @@ screens:
   density: compact
   operations:
   - createAccessPoint
-  - createScopeNode
+  - createOrgUnit
   - getAccessPoint
-  - getScopeNode
+  - getOrgUnit
   - listAccessPoints
-  - listScopeNodes
+  - listOrgUnits
   - setAccessPointGeofence
   - setTurnstileMode
   - updateAccessPoint
-  - updateScopeNode
+  - updateOrgUnit
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -2311,7 +2313,7 @@ screens:
   offlineState: false
   entryParams:
   - accessPointId<-deepLink
-  - scopeNodeId<-deepLink
+  - orgUnitId<-deepLink
   goesTo:
   - BO-001
   - BO-007
@@ -2394,8 +2396,9 @@ screens:
   - BO-007
   - BO-008
   - BO-009
-  boardFrames: null
-  wireframe: wireframes/P08 Venue Management.dc.html#bo-067
+  boardFrames:
+  - Seat Platform Board 13.dc.html#seatp-13d
+  wireframe: wireframes/Seat Platform Board 13.dc.html#seatp-13d
   inFlows: null
 - screen: BO-068
   name: Audit Log
@@ -2420,7 +2423,7 @@ screens:
   - BO-008
   - BO-009
   boardFrames:
-  - RET-6J
+  - Retail Board 6.dc.html#ret-6j
   wireframe: wireframes/Retail Board 6.dc.html#ret-6j
   inFlows:
   - F106 A security dashboard surfaces something and it is investigated
@@ -2738,9 +2741,9 @@ screens:
   - BO-081
   - BO-084
   boardFrames:
-  - FNB-5F
-  - RET-4C
-  - RET-4K
+  - FnB Board 5.dc.html#fnb-5f
+  - Retail Board 4.dc.html#ret-4c
+  - Retail Board 4.dc.html#ret-4k
   wireframe: wireframes/Retail Board 4.dc.html#ret-4c
   inFlows:
   - F15 A part is needed and ordered
@@ -2777,8 +2780,8 @@ screens:
   - BO-080
   - BO-081
   boardFrames:
-  - FNB-5H
-  - RET-4F
+  - FnB Board 5.dc.html#fnb-5h
+  - Retail Board 4.dc.html#ret-4f
   wireframe: wireframes/Retail Board 4.dc.html#ret-4f
   inFlows:
   - F30 A count is entered, varied and posted
@@ -2812,7 +2815,7 @@ screens:
   - BO-079
   - BO-081
   boardFrames:
-  - RET-4D
+  - Retail Board 4.dc.html#ret-4d
   wireframe: wireframes/Retail Board 4.dc.html#ret-4d
   inFlows:
   - F76 Stock is counted, requested, transferred and received
@@ -2846,7 +2849,7 @@ screens:
   - BO-079
   - BO-080
   boardFrames:
-  - RET-4B
+  - Retail Board 4.dc.html#ret-4b
   wireframe: wireframes/Retail Board 4.dc.html#ret-4b
   inFlows:
   - F76 Stock is counted, requested, transferred and received
@@ -2876,7 +2879,7 @@ screens:
   - BO-079
   - BO-080
   boardFrames:
-  - RET-4G
+  - Retail Board 4.dc.html#ret-4g
   wireframe: wireframes/Retail Board 4.dc.html#ret-4g
   inFlows:
   - F34 A retail sale, from scan to return
@@ -2908,7 +2911,7 @@ screens:
   - BO-079
   - BO-080
   boardFrames:
-  - RET-2G
+  - Retail Board 2.dc.html#ret-2g
   wireframe: wireframes/Retail Board 2.dc.html#ret-2g
   inFlows:
   - F78 A supplier is set up and a catalogue is priced and published
@@ -3157,7 +3160,7 @@ screens:
   - BO-093
   - BO-094
   boardFrames:
-  - seat-2e
+  - Seat Board 2.dc.html#seat-2e
   wireframe: wireframes/Seat Board 2.dc.html#seat-2e
   inFlows:
   - F26 A venue maps its site
@@ -3183,7 +3186,7 @@ screens:
   - BO-092
   - BO-094
   boardFrames:
-  - seat-1a
+  - Seat Board 1.dc.html#seat-1a
   wireframe: wireframes/Seat Board 1.dc.html#seat-1a
   inFlows:
   - F26 A venue maps its site
@@ -3212,7 +3215,7 @@ screens:
   goesTo:
   - BO-092
   boardFrames:
-  - seat-1b
+  - Seat Board 1.dc.html#seat-1b
   wireframe: wireframes/Seat Board 1.dc.html#seat-1b
   inFlows:
   - F26 A venue maps its site
@@ -3690,8 +3693,9 @@ screens:
   - menuId<-deepLink
   - saleBoardId<-deepLink
   goesTo: []
-  boardFrames: null
-  wireframe: wireframes/P08 Venue Management.dc.html#bo-109
+  boardFrames:
+  - FnB Board 2.dc.html#fnb-2b
+  wireframe: wireframes/FnB Board 2.dc.html#fnb-2b
   inFlows: null
 - screen: BO-110
   name: Recipe & BOM Management
@@ -3739,7 +3743,7 @@ screens:
   - menuItemId<-deepLink
   goesTo: []
   boardFrames:
-  - FNB-2L
+  - FnB Board 2.dc.html#fnb-2l
   wireframe: wireframes/FnB Board 2.dc.html#fnb-2l
   inFlows:
   - F31 A menu is drafted, scheduled and rolled back
@@ -3763,7 +3767,7 @@ screens:
   - venueId<-session
   goesTo: []
   boardFrames:
-  - RET-2E
+  - Retail Board 2.dc.html#ret-2e
   wireframe: wireframes/Retail Board 2.dc.html#ret-2e
   inFlows:
   - F78 A supplier is set up and a catalogue is priced and published
@@ -3788,7 +3792,7 @@ screens:
   - runId<-deepLink
   goesTo: []
   boardFrames:
-  - RET-2D
+  - Retail Board 2.dc.html#ret-2d
   wireframe: wireframes/Retail Board 2.dc.html#ret-2d
   inFlows: null
 - screen: BO-114
@@ -3811,7 +3815,7 @@ screens:
   - venueId<-session
   goesTo: []
   boardFrames:
-  - RET-4J
+  - Retail Board 4.dc.html#ret-4j
   wireframe: wireframes/Retail Board 4.dc.html#ret-4j
   inFlows: null
 - screen: BO-115
@@ -3838,7 +3842,7 @@ screens:
   - reportId<-deepLink
   goesTo: []
   boardFrames:
-  - POS-4A
+  - POS Board 4.dc.html#pos-4a
   wireframe: wireframes/POS Board 4.dc.html#pos-4a
   inFlows:
   - F86 A POS layout is designed, previewed and deployed
@@ -3870,7 +3874,7 @@ screens:
   - saleBoardId<-deepLink
   goesTo: []
   boardFrames:
-  - POS-4B
+  - POS Board 4.dc.html#pos-4b
   wireframe: wireframes/POS Board 4.dc.html#pos-4b
   inFlows:
   - F86 A POS layout is designed, previewed and deployed
@@ -3898,7 +3902,7 @@ screens:
   - saleBoardId<-deepLink
   goesTo: []
   boardFrames:
-  - POS-4C
+  - POS Board 4.dc.html#pos-4c
   wireframe: wireframes/POS Board 4.dc.html#pos-4c
   inFlows:
   - F86 A POS layout is designed, previewed and deployed
@@ -3928,7 +3932,7 @@ screens:
   - saleBoardId<-deepLink
   goesTo: []
   boardFrames:
-  - POS-4D
+  - POS Board 4.dc.html#pos-4d
   wireframe: wireframes/POS Board 4.dc.html#pos-4d
   inFlows:
   - F86 A POS layout is designed, previewed and deployed
@@ -3952,7 +3956,7 @@ screens:
   - venueId<-session
   goesTo: []
   boardFrames:
-  - RET-5D
+  - Retail Board 5.dc.html#ret-5d
   wireframe: wireframes/Retail Board 5.dc.html#ret-5d
   inFlows:
   - F90 An audience is built, offered to, and the result is judged
@@ -3975,8 +3979,9 @@ screens:
   entryParams:
   - venueId<-session
   goesTo: []
-  boardFrames: null
-  wireframe: wireframes/P08 Venue Management.dc.html#bo-120
+  boardFrames:
+  - Retail Board 5.dc.html#ret-5g
+  wireframe: wireframes/Retail Board 5.dc.html#ret-5g
   inFlows: null
 - screen: BO-121
   name: Personalized Offers & Guest Engagement
@@ -3998,7 +4003,7 @@ screens:
   - venueId<-session
   goesTo: []
   boardFrames:
-  - RET-5F
+  - Retail Board 5.dc.html#ret-5f
   wireframe: wireframes/Retail Board 5.dc.html#ret-5f
   inFlows: null
 - screen: BO-122
@@ -4020,7 +4025,7 @@ screens:
   - venueId<-session
   goesTo: []
   boardFrames:
-  - RET-5J
+  - Retail Board 5.dc.html#ret-5j
   wireframe: wireframes/Retail Board 5.dc.html#ret-5j
   inFlows: null
 - screen: BO-123
@@ -4072,7 +4077,7 @@ screens:
   - profileId<-deepLink
   goesTo: []
   boardFrames:
-  - POS-1D
+  - POS Board 1.dc.html#pos-1d
   wireframe: wireframes/POS Board 1.dc.html#pos-1d
   inFlows:
   - F79 A workstation is registered, configured and rolled out
@@ -4104,7 +4109,7 @@ screens:
   - workstationId<-deepLink
   goesTo: []
   boardFrames:
-  - POS-1E
+  - POS Board 1.dc.html#pos-1e
   wireframe: wireframes/POS Board 1.dc.html#pos-1e
   inFlows:
   - F95 A fleet is watched, a fault is found, and a station is fixed
@@ -4137,8 +4142,8 @@ screens:
   - rolloutId<-deepLink
   goesTo: []
   boardFrames:
-  - POS-1F
-  - POS-4F
+  - POS Board 1.dc.html#pos-1f
+  - POS Board 4.dc.html#pos-4f
   wireframe: wireframes/POS Board 1.dc.html#pos-1f
   inFlows:
   - F79 A workstation is registered, configured and rolled out
@@ -4189,7 +4194,7 @@ screens:
   - workstationId<-deepLink
   goesTo: []
   boardFrames:
-  - POS-5B
+  - POS Board 5.dc.html#pos-5b
   wireframe: wireframes/POS Board 5.dc.html#pos-5b
   inFlows:
   - F89 Offline policy is set, cached, monitored and reconciled
@@ -4219,7 +4224,7 @@ screens:
   - workstationId<-deepLink
   goesTo: []
   boardFrames:
-  - POS-5D
+  - POS Board 5.dc.html#pos-5d
   wireframe: wireframes/POS Board 5.dc.html#pos-5d
   inFlows:
   - F89 Offline policy is set, cached, monitored and reconciled
@@ -4245,7 +4250,7 @@ screens:
   - venueId<-session
   goesTo: []
   boardFrames:
-  - POS-5E
+  - POS Board 5.dc.html#pos-5e
   wireframe: wireframes/POS Board 5.dc.html#pos-5e
   inFlows:
   - F33 A till goes offline and comes back
@@ -4319,7 +4324,7 @@ screens:
   - requestId<-deepLink
   goesTo: []
   boardFrames:
-  - POS-5F
+  - POS Board 5.dc.html#pos-5f
   wireframe: wireframes/POS Board 5.dc.html#pos-5f
   inFlows:
   - F33 A till goes offline and comes back
@@ -4342,8 +4347,9 @@ screens:
   entryParams:
   - venueId<-session
   goesTo: []
-  boardFrames: null
-  wireframe: wireframes/P08 Venue Management.dc.html#bo-134
+  boardFrames:
+  - FnB Board 1.dc.html#fnb-1h
+  wireframe: wireframes/FnB Board 1.dc.html#fnb-1h
   inFlows: null
 - screen: BO-135
   name: Order Routing & KDS/Printer Rules
@@ -4364,8 +4370,9 @@ screens:
   entryParams:
   - venueId<-session
   goesTo: []
-  boardFrames: null
-  wireframe: wireframes/P08 Venue Management.dc.html#bo-135
+  boardFrames:
+  - FnB Board 1.dc.html#fnb-1j
+  wireframe: wireframes/FnB Board 1.dc.html#fnb-1j
   inFlows: null
 - screen: BO-136
   name: F&B Global Settings & Controls
@@ -4391,9 +4398,9 @@ screens:
   - planId<-deepLink
   goesTo: []
   boardFrames:
-  - FNB-2M
-  - FNB-2N
-  - FNB-5D
+  - FnB Board 2.dc.html#fnb-2m
+  - FnB Board 2.dc.html#fnb-2n
+  - FnB Board 5.dc.html#fnb-5d
   wireframe: wireframes/FnB Board 2.dc.html#fnb-2m
   inFlows:
   - F85 Production is planned, costed and released
@@ -4421,8 +4428,8 @@ screens:
   - runId<-deepLink
   goesTo: []
   boardFrames:
-  - FNB-2F
-  - FNB-5C
+  - FnB Board 2.dc.html#fnb-2f
+  - FnB Board 5.dc.html#fnb-5c
   wireframe: wireframes/FnB Board 2.dc.html#fnb-2f
   inFlows:
   - F30 A count is entered, varied and posted
@@ -4539,8 +4546,9 @@ screens:
   entryParams:
   - venueId<-session
   goesTo: []
-  boardFrames: null
-  wireframe: wireframes/P08 Venue Management.dc.html#bo-142
+  boardFrames:
+  - Retail Board 1.dc.html#ret-1j
+  wireframe: wireframes/Retail Board 1.dc.html#ret-1j
   inFlows: null
 - screen: BO-143
   name: Retail Global Settings & Controls
@@ -4561,6 +4569,7 @@ screens:
   entryParams:
   - venueId<-session
   goesTo: []
-  boardFrames: null
-  wireframe: wireframes/P08 Venue Management.dc.html#bo-143
+  boardFrames:
+  - Retail Board 1.dc.html#ret-1k
+  wireframe: wireframes/Retail Board 1.dc.html#ret-1k
   inFlows: null

@@ -55,17 +55,6 @@ from pathlib import Path
 
 import yaml
 
-# A cp1252 console cannot encode the arrows and dashes this tool prints, and the
-# failure lands *after* the work is done — so the output is written, the summary
-# line raises UnicodeEncodeError, and a correct run exits 1. Reconfiguring at
-# import means anything importing this module gets it too, refresh.sh included.
-try:
-    sys.stdout.reconfigure(encoding="utf-8", errors="replace")
-    sys.stderr.reconfigure(encoding="utf-8", errors="replace")
-except Exception:      # a captured stream may not be reconfigurable; harmless
-    pass
-
-
 ROOT = Path(__file__).resolve().parents[1]
 if not (ROOT / "contracts").exists():
     ROOT = ROOT.parent / "ticvai-full"
@@ -99,6 +88,18 @@ def _norm(s: str) -> str:
 def snake_table(name: str) -> str:
     """`StockPosition` -> `stock_position`, to compare a schema name against a table name."""
     return re.sub(r"(?<!^)(?=[A-Z])", "_", name).lower()
+
+
+
+def _scope_levels() -> list:
+    """The scope vocabulary, read from `common.ScopeLevel` rather than typed twice."""
+    p = ROOT / "contracts" / "shared" / "common.yaml"
+    try:
+        d = yaml.safe_load(p.read_text(encoding="utf-8"))
+        return list(((d.get("components") or {}).get("schemas") or {})
+                    .get("ScopeLevel", {}).get("enum") or [])
+    except Exception:
+        return []
 
 
 def main() -> int:
@@ -756,14 +757,42 @@ def main() -> int:
                     f"have (kind {_r.get('how') or _r.get('kind')}) — a lineage edge names an "
                     "operation and belongs in viaOperation")
 
+    # 38. **A table with no description is a table only its author can read.** 200 of 369 carried
+    # a note saying no description had been written — honest, generated, and useless: a reader
+    # opening `platform.outlet` learned that it held nine columns.
+    #
+    # **The name is not enough.** `catalogue.envelope` was capacity across sales channels;
+    # `identity.grant` was delegated access; `platform.scope_node` was the org tree. Three of those
+    # were renamed on 26 August because the name was actively misleading, and the other 366 still
+    # needed a sentence.
+    #
+    # **Written where it is derived**, in `tools/derive-table-notes.py`, so a hand-edit cannot
+    # drift from the table it describes.
+    if _schema.exists():
+        _st = (json.loads(_schema.read_text(encoding="utf-8")).get("storage") or {})
+        _missing = [t for t, n in sorted(_st.items())
+                    if "." in t and ":" not in t
+                    and ("No description has been written" in str(n) or not str(n).strip())]
+        for _t in _missing:
+            WARNINGS.append(
+                f"{_t}: no description — the name is the only thing saying what it is. Add it to "
+                "WHAT in tools/derive-table-notes.py")
+
     # 13. The x-ticvai-* vocabularies are closed sets. `lastWriteWins` and `lastWriterWins` were
     # both in use on 17 August — one policy, two spellings, ten operations split between them, and
     # every checker passed because each value was individually plausible.
     VOCAB = {
         "x-ticvai-conflict-policy": {"serverWins", "lastWriterWins", "append", "manualMerge"},
-        # Sourced from tenancy.ScopeLevel plus `platform`, which is above the tenant tree.
-        "x-ticvai-scope-level": {"platform", "tenant", "brand", "region", "venue", "department",
-                                 "subDepartment", "workstation"},
+        # **Derived from `common.ScopeLevel`, not typed here.** This list was hand-maintained and
+        # **had already lost `outlet`**, a real scope since 18 August (CF-138) — so a correctly
+        # tagged operation would have been reported as using a value outside the closed set, and
+        # the check would have been wrong rather than the contract.
+        #
+        # Same failure as `platform-deployment.md` at twelve rows against fifteen platforms and the
+        # viewer at 654 operations against 1,023: **a vocabulary typed once is correct once.**
+        # `platform` is added because it sits above the tenant tree and is not a scope node;
+        # `subject` because a guest's own setting is not a level of the venue hierarchy at all.
+        "x-ticvai-scope-level": set(_scope_levels()) | {"platform"},
         "x-ticvai-read-routing": {"primary", "replica", "analytical"},
         # A partner and an external reviewer hold real permissions and are neither staff nor guests.
         # Omitting them is what let P11 be treated as a guest surface on 17 August.

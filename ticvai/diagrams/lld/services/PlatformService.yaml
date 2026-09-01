@@ -1,5 +1,5 @@
-id: LLD-ControlService
-title: ControlService — 102 operations, 41 tables
+id: LLD-PlatformService
+title: PlatformService — 102 operations, 42 tables
 generatedBy: tools/derive-diagrams.py
 tier: platform
 index: diagrams/hld/02-services.yaml
@@ -20,7 +20,7 @@ coverage:
     unwalked rather than under-documented.'
 schemas:
 - schema: control
-  tables: 41
+  tables: 42
   stores:
   - postgres
   largestTable: control.partner_agreement
@@ -497,7 +497,7 @@ operationsByContract:
     writes: 0
   - operation: getRelease
     verb: GET
-    path: /releases/{releaseId}
+    path: /releases/{reinventoryHoldId}
     scope: tenant
     permission: PLATFORM_RELEASE_VIEW
     offline: false
@@ -505,7 +505,7 @@ operationsByContract:
     writes: 0
   - operation: getReleaseReadiness
     verb: GET
-    path: /releases/{releaseId}/readiness
+    path: /releases/{reinventoryHoldId}/readiness
     scope: tenant
     permission: PLATFORM_RELEASE_VIEW
     offline: false
@@ -593,7 +593,7 @@ operationsByContract:
     writes: 2
   - operation: promoteRelease
     verb: POST
-    path: /releases/{releaseId}/promote
+    path: /releases/{reinventoryHoldId}/promote
     scope: tenant
     permission: PLATFORM_RELEASE_PROMOTE
     offline: false
@@ -617,7 +617,7 @@ operationsByContract:
     writes: 2
   - operation: rejectRelease
     verb: POST
-    path: /releases/{releaseId}/reject
+    path: /releases/{reinventoryHoldId}/reject
     scope: tenant
     permission: PLATFORM_RELEASE_PROMOTE
     offline: false
@@ -665,7 +665,7 @@ operationsByContract:
     writes: 2
   - operation: withdrawRelease
     verb: POST
-    path: /releases/{releaseId}/withdraw
+    path: /releases/{reinventoryHoldId}/withdraw
     scope: tenant
     permission: PLATFORM_RELEASE_MANAGE
     offline: false
@@ -894,7 +894,7 @@ tables:
   - public-api
   foreignWriters: null
 - table: control.cell
-  columns: 19
+  columns: 20
   store: postgres
   parent: null
   writtenBy:
@@ -1031,22 +1031,21 @@ tables:
   writtenBy:
   - subscription
   foreignWriters: null
-- table: control.plan
-  columns: 15
+- table: control.release
+  columns: 11
   store: postgres
   parent: null
   writtenBy:
-  - subscription
-  foreignWriters: null
-- table: control.release
-  columns: 1
-  store: postgres
-  parent: control.plan
-  writtenBy:
   - platform-ops
   foreignWriters: null
+- table: control.release_component
+  columns: 4
+  store: postgres
+  parent: control.release
+  writtenBy: []
+  foreignWriters: null
 - table: control.rollout
-  columns: 12
+  columns: 13
   store: postgres
   parent: null
   writtenBy:
@@ -1081,6 +1080,13 @@ tables:
   writtenBy:
   - subscription
   foreignWriters: null
+- table: control.subscription_plan
+  columns: 13
+  store: postgres
+  parent: null
+  writtenBy:
+  - subscription
+  foreignWriters: null
 - table: control.support_notice
   columns: 7
   store: postgres
@@ -1089,7 +1095,7 @@ tables:
   - platform-ops
   foreignWriters: null
 - table: control.tenant
-  columns: 14
+  columns: 16
   store: postgres
   parent: null
   writtenBy:

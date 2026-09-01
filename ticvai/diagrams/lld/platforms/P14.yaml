@@ -31,7 +31,7 @@ modulesUsed:
 - module: developerApi
   screens: 8
 servicesCalled:
-- service: ControlService
+- service: PlatformService
   operationCalls: 21
 coverage:
   screens: 8

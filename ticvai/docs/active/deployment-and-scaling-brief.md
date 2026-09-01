@@ -141,7 +141,7 @@ Not produced.
 
 | Tier | Services | What it means for deployment |
 |---|---|---|
-| **Foundation** | Identity, Tenancy | **First and alone.** 304 of 379 tables anchor on `platform.scope_node`; twelve contracts read Identity. A restart here is an outage everywhere |
+| **Foundation** | Identity, Tenancy | **First and alone.** 304 of 379 tables anchor on `platform.org_unit`; twelve contracts read Identity. A restart here is an outage everywhere |
 | **Commerce** | Catalogue, Order, Access, Ledger | The sale path. **Order autoscales; nothing else needs to** |
 | **Operations** | Inventory, F&B, Retail, VenueOps | **Licensed per module** — a venue that bought none runs none |
 | **Engagement** | Marketing, AI | **Nothing that takes money depends on these** |
@@ -175,7 +175,7 @@ stock count nobody can reconcile.
 **One cell per jurisdiction** (ADR-0001) — a deployment and a legal boundary at once. **UAE data
 residency is required.**
 
-**Only CrossCellService reaches another region**, and it moves a pseudonymous guest link rather than
+**Only CrossRegionService reaches another region**, and it moves a pseudonymous guest link rather than
 a guest (ADR-0010) — which is what lets a membership work in another country without moving personal
 data.
 

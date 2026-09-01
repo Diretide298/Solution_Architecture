@@ -71,6 +71,33 @@ IMPLIES = [
 CANCEL = {"kind": "secondaryButton", "label": "Cancel",
           "notes": "**A screen that can submit must be leaveable without submitting.**"}
 
+# **But only a screen that submits.** Until 1 September this fired on any screen with a write
+# operation, and put a bare `Cancel` on **178 screens — 177 of which had no input field at all**.
+# 162 were `detail` and 10 were `list`: there was nothing to abandon and no dialog to dismiss, so
+# the button did nothing. On 11 of them it sat beside `Cancel performance`, `Cancel work order` or
+# `Cancel purchase order` — **two adjacent buttons whose labels start with the same word, one
+# destructive and one inert**, which is the pair that produces the incident.
+#
+# A write operation is not a form. The test is whether the screen has something a person has
+# started filling in, and that is a component question, not an operation one.
+SUBMIT_TEMPLATES = {"form", "wizard"}
+INPUT_KINDS = {"textField", "numberField", "selectField", "multiSelect", "datePicker",
+               "toggle", "fileUpload", "signaturePad"}
+
+
+def submits(screen: dict, proposed: list[dict]) -> bool:
+    """Whether there is genuinely something to abandon.
+
+    `searchField` is deliberately not an input here — a search box is not a form, and a screen
+    whose only field is a filter has nothing half-written to throw away.
+    """
+    if ((screen.get("layout") or {}).get("template")) in SUBMIT_TEMPLATES:
+        return True
+    kinds = {c.get("kind") for r in ((screen.get("layout") or {}).get("regions") or [])
+             for c in (r.get("components") or [])}
+    kinds |= {c.get("kind") for c in proposed}
+    return bool(kinds & INPUT_KINDS)
+
 VERB_LABEL = {
     "create": "Create", "add": "Add", "update": "Save", "set": "Save", "publish": "Publish",
     "approve": "Approve", "reject": "Reject", "submit": "Submit", "accept": "Accept",
@@ -129,8 +156,25 @@ def propose(screen: dict, lin: dict, density: str) -> list[dict]:
             break
 
     writes = [o for o in ops if lin[o]["verb"] in ("POST", "PUT", "PATCH", "DELETE")]
-    if writes and "secondaryButton" not in seen:
+    if writes and "secondaryButton" not in seen and submits(screen, out):
         out.append({**CANCEL, "derived": True, "impliedBy": writes[0]})
+
+    # **A destructive button is not finished until something asks.** The library entry reads
+    # *always requires confirmation*, and a `confirmDialog` proposed here is deliberately left
+    # without a body: **the consequence is two layers down** — in the operation's write set, the
+    # state transition it drives and the event it fans out to — and a generator that guesses it
+    # produces one string for every screen. That is exactly what happened on 31 August, when 39
+    # identical dialogs labelled *Confirm* were pasted in to satisfy a presence check.
+    #
+    # So this marks the gap rather than filling it, and `check-screens.py` fails on the marker.
+    if any(c["kind"] == "destructiveButton" for c in out) and "confirmDialog" not in seen:
+        op = next(c["impliedBy"] for c in out if c["kind"] == "destructiveButton")
+        out.append({"kind": "confirmDialog", "derived": True, "impliedBy": op,
+                    "label": None,
+                    "notes": "**Body not written.** The consequence must name what `%s` destroys — "
+                             "its write set, the state transition it drives and the consumers of any "
+                             "event it emits. **Do not fill this in from the operation name**; read "
+                             "`handoff/api-data-lineage.json`, `states/` and `events/` for it." % op})
 
     return out
 

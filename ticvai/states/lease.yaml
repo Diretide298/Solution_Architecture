@@ -17,7 +17,7 @@ terminal:
 transitions:
 - from: active
   to: released
-  operation: releaseLease
+  operation: releaseInventoryHold
   trigger: operation
   guard: Terminal returned what it did not sell
 - from: active
@@ -27,7 +27,7 @@ transitions:
     a lease must not strand its allocation
 - from: active
   to: forceReleased
-  operation: forceReleaseLease
+  operation: forceReleaseInventoryHold
   trigger: operation
   guard: A supervisor reclaimed it from an unreachable terminal. Recorded separately because it may
     double-sell what the terminal already sold offline

@@ -1656,6 +1656,11 @@ paths:
         Quotations are compared before a purchase order is raised (10 Aug §5.4). Recording
         them is what makes the comparison auditable — a decision without the alternatives on
         record is not a comparison.
+      x-ticvai-not-config: true
+      x-ticvai-not-config-note: >
+        **Not configuration.** A supplier quotation is a commercial record with its own lifecycle — 
+              it is quoted, compared, awarded or lapses. The naming rules reach it because it contains `Qu
+              otation`, and the honest answer is that it configures nothing.
       tags: [supplier]
       x-ticvai-permission: PRODUCT_CONFIGURE
       x-ticvai-scope-level: venue

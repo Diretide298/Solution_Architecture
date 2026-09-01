@@ -7,11 +7,11 @@
  "audience": "guest",
  "formFactor": "web",
  "offlineCapable": false,
- "generated": "2026-08-27",
+ "generated": "2026-09-01",
  "note": "Derived by tools/derive-platform.py. **The gaps section is the point** \u2014 a page listing what exists is a directory; one listing what is missing is a worklist.",
  "counts": {
   "screens": 46,
-  "operations": 112,
+  "operations": 113,
   "contracts": 14,
   "modules": 13,
   "undrawn": 0,
@@ -136,11 +136,11 @@
    "operations": 17
   },
   {
-   "contract": "catalogue",
+   "contract": "fnb",
    "operations": 9
   },
   {
-   "contract": "fnb",
+   "contract": "catalogue",
    "operations": 9
   },
   {
@@ -164,15 +164,15 @@
    "operations": 4
   },
   {
+   "contract": "seating",
+   "operations": 3
+  },
+  {
    "contract": "ai",
    "operations": 3
   },
   {
    "contract": "venue-map",
-   "operations": 2
-  },
-  {
-   "contract": "seating",
    "operations": 2
   },
   {
@@ -196,7 +196,7 @@
    "module": "Discovery & Browse",
    "wave": 1,
    "route": "/discovery-and-browse/event-and-attraction-listing",
-   "operations": 3,
+   "operations": 4,
    "drawn": true
   },
   {
@@ -210,11 +210,11 @@
   },
   {
    "id": "WEB-004",
-   "name": "Event / Attraction Detail",
+   "name": "Attraction Details",
    "module": "Discovery & Browse",
    "wave": 1,
    "route": "/discovery-and-browse/event-attraction-detail",
-   "operations": 2,
+   "operations": 4,
    "drawn": true
   },
   {
@@ -237,11 +237,11 @@
   },
   {
    "id": "WEB-007",
-   "name": "Seat Map Selection",
+   "name": "Interactive Seat Selection",
    "module": "Booking & Selection",
    "wave": 2,
    "route": "/booking-and-selection/seat-map-selection",
-   "operations": 2,
+   "operations": 3,
    "drawn": true
   },
   {
@@ -291,7 +291,7 @@
   },
   {
    "id": "WEB-013",
-   "name": "Order Confirmation",
+   "name": "Booking Confirmation",
    "module": "Cart & Checkout",
    "wave": 1,
    "route": "/cart-and-checkout/order-confirmation",
@@ -309,7 +309,7 @@
   },
   {
    "id": "WEB-015",
-   "name": "Virtual Waiting Room",
+   "name": "Branded Queue / Waiting Room",
    "module": "High-Demand Access",
    "wave": 2,
    "route": "/high-demand-access/virtual-waiting-room",
@@ -340,7 +340,7 @@
    "module": "Account & Self-Service",
    "wave": 1,
    "route": "/account-and-self-service/my-tickets",
-   "operations": 5,
+   "operations": 6,
    "drawn": true
   },
   {
@@ -349,7 +349,7 @@
    "module": "Account & Self-Service",
    "wave": 1,
    "route": "/account-and-self-service/order-history",
-   "operations": 2,
+   "operations": 4,
    "drawn": true
   },
   {
@@ -390,7 +390,7 @@
   },
   {
    "id": "WEB-024",
-   "name": "Loyalty & Rewards",
+   "name": "Devices, Wishlist & Consent",
    "module": "Membership, Loyalty & Value",
    "wave": 3,
    "route": "/membership-loyalty-and-value/loyalty-and-rewards",
@@ -498,11 +498,11 @@
   },
   {
    "id": "WEB-036",
-   "name": "F&B \u2014 Browse & Order",
+   "name": "F&B \u2013 Browse & Order",
    "module": "In-venue Services",
    "wave": 2,
    "route": "/fandb--browse-and-order",
-   "operations": 7,
+   "operations": 8,
    "drawn": true
   },
   {
@@ -516,7 +516,7 @@
   },
   {
    "id": "WEB-038",
-   "name": "F&B \u2014 Order Tracking",
+   "name": "F&B \u2013 Order Tracking",
    "module": "In-venue Services",
    "wave": 2,
    "route": "/fandb--order-tracking",
@@ -543,7 +543,7 @@
   },
   {
    "id": "WEB-041",
-   "name": "Parking \u2014 Reserve & Pay",
+   "name": "Parking \u2013 Reserve & Pay",
    "module": "In-venue Services",
    "wave": 2,
    "route": "/parking--reserve-and-pay",
@@ -570,11 +570,11 @@
   },
   {
    "id": "WEB-044",
-   "name": "AI Concierge",
+   "name": "AI Concierge \u2013 Home",
    "module": "Engagement & Support",
    "wave": 2,
    "route": "/ai-concierge",
-   "operations": 4,
+   "operations": 5,
    "drawn": true
   },
   {

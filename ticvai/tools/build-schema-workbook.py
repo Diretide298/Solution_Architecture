@@ -30,18 +30,6 @@ from collections import defaultdict
 from openpyxl import Workbook
 from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
 from openpyxl.utils import get_column_letter
-import sys
-
-# A cp1252 console cannot encode the arrows and dashes this tool prints, and the
-# failure lands *after* the work is done — so the output is written, the summary
-# line raises UnicodeEncodeError, and a correct run exits 1. Reconfiguring at
-# import means anything importing this module gets it too, refresh.sh included.
-try:
-    sys.stdout.reconfigure(encoding="utf-8", errors="replace")
-    sys.stderr.reconfigure(encoding="utf-8", errors="replace")
-except Exception:      # a captured stream may not be reconfigurable; harmless
-    pass
-
 D=json.load(open(_pkg('schema-reference.json','schema_v4.json'), encoding='utf-8')); L=(json.load(open(_pkg('links.json'), encoding='utf-8')) if _pkg('links.json') else {})
 cols=D['cols']; nomap=D['nomap']; origin=D['origin']; storage=D['storage']
 # **Where each table hangs, on the table's own row.** schema-roots.md answers it in prose and a
@@ -58,40 +46,14 @@ MIG={'platform':'V0001 / V0003 / V0003a','identity':'V0002','pii':'V0001a','sync
 # No migrations are written as of 14 August — the workbook is the working artefact and DDL
 # resumes when the design settles. The Written column stays in the sheet so it means something
 # again the moment a migration lands.
-def _globbed(pattern, what):
-    """glob, and refuse to be silent about finding nothing.
-
-    **Both of these used to point at `/home/claude/...`** — a path on the
-    machine the tool was written on. `glob.glob` on a directory that is not
-    there returns `[]` and raises nothing, so the workbook built, every sheet
-    appeared, and two of them were empty:
-
-      * `Scaling` shipped a header and one row reading `TOTAL 0 0 0 0`, which
-        took Backend › Routing in the viewer from 25 contracts and 776 routed
-        operations to a blank page
-      * the `Written` column went blank for every table, which is why
-        `module.written` read as false everywhere and every schema drew amber
-
-    Same class as the JSON inputs this file's docstring already describes, in
-    the same file, missed because a `glob` fails quietly where an `open` does
-    not. So it says so now.
-    """
-    hits = sorted(glob.glob(pattern))
-    if not hits:
-        print(f"  WARN  no {what} matched {pattern} — the sheets built from it "
-              f"will be empty, and they will not say so themselves")
-    return hits
-
-
-# DDL is read from the package's own `backend/`, which is where the .sql lives.
 written=set()
-for f in _globbed(str(_ROOT / 'backend' / 'V*.sql'), 'migrations'):
-    s=open(f, encoding='utf-8').read(); m=re.search(r"^-- =+\n-- ROLLBACK",s,re.M)
+for f in glob.glob('/home/claude/ticvai/ticvai-backend/src/Ticvai.Migrations/Scripts/V*.sql'):
+    s=open(f).read(); m=re.search(r"^-- =+\n-- ROLLBACK",s,re.M)
     written.update(re.findall(r'CREATE TABLE (?:IF NOT EXISTS )?([\w.]+)', s[:m.start() if m else len(s)]))
-C=str(_ROOT / 'contracts')
+C='/home/claude/ticvai/ticvai-contracts/openapi'
 routing=defaultdict(lambda: defaultdict(int))
-for f in _globbed(f'{C}/spine/*.yaml', 'spine contracts')+_globbed(f'{C}/satellite/*.yaml', 'satellite contracts'):
-    d=yaml.safe_load(open(f, encoding='utf-8')); ctx=os.path.basename(f)[:-5]
+for f in glob.glob(f'{C}/spine/*.yaml')+glob.glob(f'{C}/satellite/*.yaml'):
+    d=yaml.safe_load(open(f)); ctx=os.path.basename(f)[:-5]
     for p,i in (d.get('paths') or {}).items():
         for v,o in i.items():
             if not isinstance(o,dict) or v not in ('get','post','put','patch','delete'): continue
@@ -205,24 +167,11 @@ for t_ in ['Out is how many foreign keys leave the module; In is how many point 
 #
 # The join is one lookup: a table's schema is its prefix, and the decomposition maps every
 # schema to exactly one owner.
-# The third `/home/claude/...` in this file, and the only one that was not a
-# glob — so it failed the other way: `open` raised, `except Exception` caught it,
-# and `_D` became `{}`. Every one of the 379 rows on the Tables sheet showed `—`
-# for Service, which is precisely the column the paragraph above says a backend
-# engineer needs before writing DDL. `Foreign writers` is built from the same
-# object and was empty for the same reason.
-#
-# `_pkg` is the helper the rest of this file already uses to find a handoff
-# file; the decomposition has been sitting in `handoff/` the whole time. The
-# bare `except` is kept for a package that genuinely lacks the file, but it says
-# so now rather than shipping a column of dashes that looks like an answer.
-_svc_path = _pkg('service-decomposition.json')
-if _svc_path is None:
-    print("  WARN  no service-decomposition.json in handoff/ — the Service and "
-          "Foreign writers columns will read as '—' for every table")
+try:
+    _D = json.load(open('/home/claude/ticvai-pkg/handoff/service-decomposition.json',
+                        encoding='utf-8'))['services']
+except Exception:
     _D = {}
-else:
-    _D = json.load(open(_svc_path, encoding='utf-8'))['services']
 SVC_OF_SCHEMA = {sch: name for name, v in _D.items() for sch in v.get('schemas', [])}
 SVC_CONTRACTS = {name: set(v.get('contracts') or []) for name, v in _D.items()}
 # **Loaded here rather than reusing LIN**, which is read 150 lines further down for the lineage
@@ -238,7 +187,7 @@ def foreign_writers(table):
     """**Contracts that write this table and do not belong to its owner.**
 
     22 tables have one. The rule is that the owner defines the row and a foreign writer may
-    only append to it — a till closing posts to `ledger.entry` because settling a shift *is*
+    only append to it — a till closing posts to `ledger.posting` because settling a shift *is*
     a ledger act. Worth seeing on the row rather than in a separate book.
     """
     own = SVC_CONTRACTS.get(svc_of(table), set())
@@ -247,8 +196,15 @@ def foreign_writers(table):
 
 ws=wb.create_sheet('Tables'); ws.cell(1,1,f'All {tot} tables').font=T
 ws.cell(2,1,'Blue is new on 14 August. Pink is personal data.').font=SUB
-hdr(ws,['Module','Table','Service','Columns','Written','New','PII','Foreign writers','Parent','Anchors on','Derived from','Migration'],
-    [12,32,17,9,8,6,6,20,26,30,26,20])
+# **`What it is` added 31 August.** 369 tables had a description in
+# `schema-reference.json` and not one column of this workbook showed it — the sheet a backend
+# engineer opens listed a name, a column count and a service, and left them to guess what
+# `catalogue.channel_capacity` holds.
+#
+# **Same shape as the Modules sheet reading `module.written` before that column existed**: the
+# data was derived, the sheet read a different field, and nothing compared them.
+hdr(ws,['Module','Table','What it is','Service','Columns','Written','New','PII','Foreign writers','Parent','Anchors on','Derived from','Migration'],
+    [12,32,74,17,9,8,6,6,20,26,30,26,20])
 r=5
 for t in sorted(set(cols)|set(storage)):
     m=t.split('.')[0]; cs=cols.get(t,[])
@@ -259,14 +215,20 @@ for t in sorted(set(cols)|set(storage)):
     anchtxt=('itself — nothing above it' if L.get('isAnchor')
              else ', '.join(a.split('.')[1] for a in anch[:3]) + ('…' if len(anch)>3 else ''))
     fw=foreign_writers(t)
-    for i,v in enumerate([m,t,svc_of(t).replace('Service',''),len(cs) or '—',
+    # **The first sentence only.** The full note carries what it hangs off and what reaches it,
+    # which the Parent and Anchors columns already say — repeating them in a cell nobody can read
+    # is how a wide column becomes an ignored one.
+    what=str(storage.get(t) or '').split('. **Hangs off**')[0].split('**Reaches**')[0].strip()
+    if len(what)>300: what=what[:297]+'…'
+    for i,v in enumerate([m,t,what or '—',svc_of(t).replace('Service',''),len(cs) or '—',
                           'yes' if t in written else '',
                           'yes' if t in NEW else '','yes' if t in PII else '',
                           ', '.join(fw) or '',
                           (L.get('parent') or '—'), anchtxt or '—',
                           src,MIG.get(m,'unassigned')],1):
         c=ws.cell(r,i,v); c.font=M if i==2 else B; c.border=BOX
-        if i in (4,5,6,7): c.alignment=Alignment(horizontal='center')
+        if i==3: c.alignment=Alignment(wrap_text=True,vertical='top')
+        if i in (5,6,7,8): c.alignment=Alignment(horizontal='center')
         # **Amber where a contract outside the owning service writes it.** Correct in all 22
         # cases and still the thing to look at first when a boundary is questioned.
         if i==8 and fw: c.fill=AMBER
@@ -275,7 +237,7 @@ for t in sorted(set(cols)|set(storage)):
         elif t in written: c.fill=GREEN
         elif t in storage: c.fill=GREY
     r+=1
-ws.auto_filter.ref=f"A4:L{r-1}"
+ws.auto_filter.ref=f"A4:M{r-1}"
 
 ws=wb.create_sheet('Columns'); ws.cell(1,1,'Every column').font=T
 ws.cell(2,1,f"{sum(len(v) for v in cols.values())} columns. **References says where a column points; "
@@ -311,17 +273,31 @@ ws.auto_filter.ref=f"A4:C{r-1}"
 ws=wb.create_sheet('Relationships')
 res=[x for x in rels if x['to']]; gaps=[x for x in rels if not x['to']]
 ws.cell(1,1,'Table relationships').font=T
-ws.cell(2,1,f'{len(res)} resolved, {len(gaps)} needing a decision. Cross-module amber, parent-child green.').font=SUB
-hdr(ws,['From table','Column','References','Kind','Cross-module','Required'],[32,28,32,20,13,10])
+ws.cell(2,1,f'{len(res)} resolved, {len(gaps)} needing a decision. Cross-module amber, parent-child green, lineage grey — a lineage edge is a reach through an operation, not a foreign key.').font=SUB
+# **`Via operation` added 26 August.** The sheet carried two kinds — `anchor` and `reference` —
+# and the relationship graph has three. **185 `lineage` edges were absent**: a lineage edge is not
+# a foreign key, it says *this table reaches that one through an operation*, and those are exactly
+# the joins a reader cannot find in the DDL.
+#
+# **The difference the column makes**: `anchor` and `reference` are what the database enforces;
+# `lineage` is what the system actually does. A table with no foreign key to another and 40
+# operations joining them is coupled, and only this column says so.
+hdr(ws,['From table','Column','References','Kind','Via operation','Cross-module','Required'],
+    [32,28,32,14,26,13,10])
 r=5
-for x in sorted(res,key=lambda z:(z['frm'],z['col'])):
-    for i,v in enumerate([x['frm'],x['col'],x['to'],x['how'],x['cross'],x['required']],1):
+for x in sorted(res,key=lambda z:(z['frm'],z['col'] or '')):
+    for i,v in enumerate([x['frm'],x['col'],x['to'],x['how'],x.get('viaOperation') or '',
+                          x['cross'],x['required']],1):
         c=ws.cell(r,i,v); c.font=M if i in (1,2,3) else B; c.border=BOX
-        if i in (5,6): c.alignment=Alignment(horizontal='center')
+        if i in (6,7): c.alignment=Alignment(horizontal='center')
         if x['cross']: c.fill=AMBER
         if x['how']=='child': c.fill=GREEN
+        # **A lineage edge is grey, not amber.** It is not a defect and not a foreign key — it is
+        # a reach the schema does not record, and colouring it like a cross-module reference would
+        # imply the database enforces something it does not.
+        if x['how']=='lineage': c.fill=GREY
     r+=1
-ws.auto_filter.ref=f"A4:F{r-1}"
+ws.auto_filter.ref=f"A4:G{r-1}"
 r+=1; ws.cell(r,1,'References with no resolved target').font=BD; r+=1
 for i,h in enumerate(['From table','Column','Why unresolved'],1):
     c=ws.cell(r,i,h); c.font=HDR; c.fill=HF; c.border=BOX
@@ -375,13 +351,13 @@ import json as _j
 LIN=_j.load(open(_pkg('api-data-lineage.json','lineage.json'), encoding='utf-8'))
 SERVICE={'tenancy':'TenancyService','identity':'IdentityService','catalogue':'CatalogueService',
  'orders':'OrderService','shift':'ShiftService','access':'AccessService','finance':'LedgerService',
- 'cross-cell':'CrossCellService','fnb':'FnbService','retail':'RetailService','inventory':'InventoryService',
+ 'cross-cell':'CrossRegionService','fnb':'FnbService','retail':'RetailService','inventory':'InventoryService',
  'seating':'SeatingService','promotions':'PromotionsService','marketing-crm':'MarketingService',
  'maintenance':'MaintenanceService','queue':'QueueService','white-label':'WhiteLabelService',
  'subscription':'SubscriptionService','platform-ops':'PlatformOpsService','reporting':'ReportingService',
  'assets':'AssetsService','games':'GamesService'}
 SP={'createPayment':'orders.sp_capture_payment','createRefund':'orders.sp_post_refund',
- 'validateAccess':'access.sp_validate_and_record','acquireLease':'catalogue.sp_acquire_lease',
+ 'validateAccess':'access.sp_validate_and_record','acquireInventoryHold':'catalogue.sp_acquire_lease',
  'createSeatHold':'seating.sp_hold_seats','closeShift':'orders.sp_close_shift',
  'syncScans':'access.sp_sync_scan_batch','postStockCount':'inventory.sp_post_movement'}
 ws=wb.create_sheet('Data lineage')
@@ -421,21 +397,9 @@ for t_ in ['Blue rows are the eight stored procedures. Amber were hand-mapped be
            'which is the argument for the outbox rather than direct cross-service writes.',
            '',
            'A read only to check a permission or resolve a scope is not shown. Under RLS every scoped',
-           'read also touches scope_node, and listing that on 755 rows would say nothing.']:
+           'read also touches org_unit, and listing that on 755 rows would say nothing.']:
     ws.cell(r,1,t_).font=B; r+=1
 
 
-# Written to both copies the package carries, by absolute path.
-#
-# This was a bare relative name, so the workbook landed in whatever directory
-# the script happened to be run from — the output with the same fault the
-# docstring describes in the inputs. The package keeps a copy at the root and
-# one in `handoff/`, **and the viewer reads the `handoff/` one**, so a rebuild
-# from the root left the copy that is actually read a day stale with no sign of
-# it anywhere.
-_targets = [_ROOT / 'TICVAI_Schema_Reference.xlsx', _H / 'TICVAI_Schema_Reference.xlsx']
-for _t in _targets:
-    _t.parent.mkdir(parents=True, exist_ok=True)
-    wb.save(_t)
+wb.save('TICVAI_Schema_Reference.xlsx')
 print(f"{tot} tables | {len(written)} written | {len(PII)} PII | {len(NEW)} new")
-print("  wrote " + " and ".join(str(t.relative_to(_ROOT)) for t in _targets))

@@ -28,18 +28,6 @@ import re
 from pathlib import Path
 
 import yaml
-import sys
-
-# A cp1252 console cannot encode the arrows and dashes this tool prints, and the
-# failure lands *after* the work is done — so the output is written, the summary
-# line raises UnicodeEncodeError, and a correct run exits 1. Reconfiguring at
-# import means anything importing this module gets it too, refresh.sh included.
-try:
-    sys.stdout.reconfigure(encoding="utf-8", errors="replace")
-    sys.stderr.reconfigure(encoding="utf-8", errors="replace")
-except Exception:      # a captured stream may not be reconfigurable; harmless
-    pass
-
 
 ROOT = Path(__file__).resolve().parents[1]
 CONTRACTS = ROOT / "contracts"
@@ -128,6 +116,64 @@ def resolve_type(spec: dict, schemas: dict, persisted: dict) -> tuple[str, str |
     return TYPE_MAP.get((t, spec.get("format")), TYPE_MAP.get((t, None), "text")), None
 
 
+
+def persistence_of(body) -> str | None:
+    """The persistence tag, wherever it sits.
+
+    **A schema composed with `allOf` carries its tag on the branch that adds the stored fields**,
+    not at the top level — `Release` is `CreateReleaseRequest` plus an object holding `id`,
+    `status` and `createdAt`, and the tag naming `control.release + control.release_component`
+    lives on that second branch.
+
+    Reading only the top level gave `control.release` **one column**, in the middle of the
+    deployment surface, while every other parent-and-child pair in the package derived correctly.
+    **It was the only broken one**, which is why it read as a stub rather than as a bug.
+    """
+    if not isinstance(body, dict):
+        return None
+    t = body.get("x-ticvai-persistence")
+    if isinstance(t, str):
+        return t
+    for branch in (body.get("allOf") or []):
+        if isinstance(branch, dict) and isinstance(branch.get("x-ticvai-persistence"), str):
+            return branch["x-ticvai-persistence"]
+    return None
+
+
+
+def properties_of(body, schemas: dict | None = None, _seen=None) -> dict:
+    """Properties, flattened across `allOf`.
+
+    **`Release` is `CreateReleaseRequest` plus an object.** Its own `properties` at the top level
+    is empty, so reading only there gave `control.release` one column while every other
+    parent-and-child pair in the package derived correctly — it was the only broken one, which is
+    why it read as a stub rather than as a bug.
+
+    **Later branches win.** An `allOf` that redeclares a field is narrowing it, and the narrower
+    statement is the one that should reach the column.
+    """
+    if not isinstance(body, dict):
+        return {}
+    _seen = _seen or set()
+    out = dict(body.get("properties") or {})
+    for branch in (body.get("allOf") or []):
+        if not isinstance(branch, dict):
+            continue
+        # **A branch may be a `$ref` to the base schema, and that is where the key lives.**
+        # `StockMovement` is `CreateStockMovementRequest` plus an object of derived fields —
+        # flattening only the inline branch gave eleven columns and no `id`, so `check-package`
+        # reported a row nothing can address. **The check was right and the flattening was half
+        # done.**
+        ref = branch.get("$ref")
+        if ref and schemas is not None:
+            name = ref.split("/")[-1]
+            if name not in _seen:
+                out.update(properties_of(schemas.get(name), schemas, _seen | {name}))
+            continue
+        out.update(properties_of(branch, schemas, _seen))
+    return out
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     ap.add_argument("--dry-run", action="store_true")
@@ -141,7 +187,7 @@ def main() -> int:
         for sname, body in ((doc.get("components") or {}).get("schemas") or {}).items():
             all_schemas.setdefault(sname, body)
             if isinstance(body, dict):
-                table = body.get("x-ticvai-persistence")
+                table = persistence_of(body)
                 if isinstance(table, str) and "." in table and "—" not in table:
                     # A schema may name a parent and a child — `fnb.fnb_order + fnb.fnb_order_line`.
                     # **The properties belong to the parent**; the child comes from the nested array,
@@ -184,7 +230,7 @@ def main() -> int:
     child_of: dict[str, tuple[str, str]] = {}
     for name, (_, doc) in contracts.items():
         for sname, body in ((doc.get("components") or {}).get("schemas") or {}).items():
-            raw = isinstance(body, dict) and body.get("x-ticvai-persistence")
+            raw = persistence_of(body)
             if not isinstance(raw, str) or "+" not in raw or "—" in raw:
                 continue
             parts = [x.strip() for x in raw.split("+")]
@@ -218,7 +264,7 @@ def main() -> int:
                 continue
             tail = name[len(short) + 1:]
             body = all_schemas.get(sname) or {}
-            for prop, spec in (body.get("properties") or {}).items():
+            for prop, spec in properties_of(body, all_schemas).items():
                 if not (isinstance(spec, dict) and spec.get("type") == "array"):
                     continue
                 if snake(prop).rstrip("s") != tail.rstrip("s"):
@@ -234,7 +280,7 @@ def main() -> int:
     for child, (parent_schema, parent_table) in sorted(child_of.items()):
         body = all_schemas.get(parent_schema) or {}
         # the array of objects on the parent — the rows of the child
-        arrays = [(k, v) for k, v in (body.get("properties") or {}).items()
+        arrays = [(k, v) for k, v in properties_of(body, all_schemas).items()
                   if isinstance(v, dict) and v.get("type") == "array"
                   and isinstance(v.get("items"), dict)]
         if not arrays:
@@ -330,7 +376,7 @@ def main() -> int:
         body = all_schemas.get(sname) or {}
         required = set(body.get("required") or [])
         cols = []
-        for prop, spec in (body.get("properties") or {}).items():
+        for prop, spec in properties_of(body, all_schemas).items():
             # **`x-ticvai-persisted: false` is a field that travels and is not stored.** 24 August:
             # `currency` and `currencyScale` sat on `orders.shift`, `orders.sales_order`,
             # `platform.workstation` and `catalogue.price_list` — four tables whose value can only

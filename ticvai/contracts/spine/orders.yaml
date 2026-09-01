@@ -161,7 +161,7 @@ paths:
       operationId: listMyOrders
       x-ticvai-consumed-by:
         - "P01 WEB-019 Order History"
-        - "P02 GST-019 Order History (Wallet)"
+        - "P02 GST-019 Order History"
       summary: The orders this guest placed
       description: >
         **Raised in review 24 August** against `GST-019` and `WEB-019`. `listOrders` was on both
@@ -1443,6 +1443,7 @@ paths:
         - "P04 POS-021 Sell — Food & Drink"
         - "P04 POS-023 Sell — Merchandise"
         - "P05 KSK-006 Review"
+        - "P05 KSK-017 Shop"
         - "P10 PTR-010 Cart & Quote"
       x-ticvai-audience: [guest, partner]
       summary: Add something
@@ -1775,9 +1776,11 @@ paths:
     get:
       operationId: listOrders
       x-ticvai-consumed-by:
+        - "P01 WEB-019 Order History"
         - "P01 WEB-030 Ticket Transfer"
+        - "P02 GST-014 Ticket Transfer"
         - "P02 GST-018 Add to Calendar / Reminders"
-        - "P02 GST-019 Order History (Wallet)"
+        - "P02 GST-019 Order History"
         - "P04 POS-002 Sell — Ticket Catalogue"
         - "P04 POS-006 Held Orders"
         - "P04 POS-012 Omnichannel Order & Fulfilment Center"
@@ -1919,10 +1922,11 @@ paths:
       operationId: getOrder
       x-ticvai-consumed-by:
         - "P01 WEB-012 Checkout — Payment"
-        - "P01 WEB-013 Order Confirmation"
+        - "P01 WEB-013 Booking Confirmation"
+        - "P01 WEB-019 Order History"
         - "P02 GST-010 Booking Confirmation"
         - "P02 GST-018 Add to Calendar / Reminders"
-        - "P02 GST-019 Order History (Wallet)"
+        - "P02 GST-019 Order History"
         - "P04 POS-002 Sell — Ticket Catalogue"
         - "P04 POS-006 Held Orders"
         - "P05 KSK-009 Ticket issued"
@@ -3110,7 +3114,8 @@ paths:
     post:
       operationId: reprintOrder
       x-ticvai-consumed-by:
-        - "P01 WEB-013 Order Confirmation"
+        - "P01 WEB-013 Booking Confirmation"
+        - "P02 GST-010 Booking Confirmation"
         - "P04 POS-002 Sell — Ticket Catalogue"
         - "P04 POS-006 Held Orders"
         - "P06 EMP-014 Ticket lookup"
@@ -3180,7 +3185,8 @@ paths:
       operationId: transferOrderTickets
       x-ticvai-consumed-by:
         - "P01 WEB-012 Checkout — Payment"
-        - "P01 WEB-013 Order Confirmation"
+        - "P01 WEB-013 Booking Confirmation"
+        - "P01 WEB-018 My Tickets"
         - "P01 WEB-019 Order History"
         - "P01 WEB-023 Membership Management"
         - "P01 WEB-030 Ticket Transfer"
@@ -3190,6 +3196,7 @@ paths:
         - "P02 GST-012 My Tickets"
         - "P02 GST-013 Ticket Details"
         - "P02 GST-014 Ticket Transfer"
+        - "P02 GST-019 Order History"
         - "P02 GST-045 Ticket Delivery & Sharing"
         - "P02 GST-055 Dynamic QR Ticket"
         - "P05 KSK-009 Ticket issued"
@@ -4587,7 +4594,7 @@ components:
         id: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
         variantId: { type: string, format: uuid }
         performanceId: { type: string, format: uuid }
-        leaseId:
+        inventoryHoldId:
           type: string
           nullable: true
           description: Lease the units were drawn from. Absent for uncontended products.
@@ -4677,7 +4684,7 @@ components:
             fee is usually the one thing not refunded**, which only works if it is its own line.
         unitPrice: { $ref: '../shared/common.yaml#/components/schemas/Money' }
         lineTotal: { $ref: '../shared/common.yaml#/components/schemas/Money' }
-        leaseId:
+        inventoryHoldId:
           type: string
           format: uuid
           nullable: true

@@ -1,5 +1,5 @@
 id: LLD-finance
-title: finance — 54 operations
+title: finance — 56 operations
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/03-contracts.yaml
 tier: spine
@@ -208,7 +208,7 @@ operations:
   offline: false
   reads:
   - ledger.account
-  - ledger.entry
+  - ledger.posting
   - orders.sales_order
   writes: []
 - operation: getFinancialReport
@@ -222,9 +222,9 @@ operations:
   offline: false
   reads:
   - ledger.account
-  - ledger.entry
   - ledger.event_budget
   - ledger.fiscal_period
+  - ledger.posting
   writes: []
 - operation: getForeignTenderReport
   verb: GET
@@ -272,9 +272,9 @@ operations:
   offline: false
   reads:
   - ledger.account
-  - ledger.entry
   - ledger.event_budget
   - ledger.fiscal_period
+  - ledger.posting
   writes: []
 - operation: getUnifiedReconciliation
   verb: GET
@@ -285,11 +285,26 @@ operations:
   - staff
   offline: false
   reads:
-  - ledger.entry
+  - ledger.posting
   - ledger.settlement
   - orders.payment
   - retail.wallet_transaction
   writes: []
+- operation: ingestFxRates
+  verb: POST
+  path: /fx-rates/ingest
+  scope: region
+  permission: LEDGER_APPROVE
+  audience:
+  - staff
+  - service
+  offline: false
+  reads:
+  - ledger.fx_rate
+  - platform.region_settings
+  writes:
+  - cache:idempotency
+  - ledger.fx_rate
 - operation: ingestSettlementFile
   verb: POST
   path: /settlements
@@ -392,7 +407,7 @@ operations:
   - staff
   offline: false
   reads:
-  - ledger.entry
+  - ledger.posting
   writes: []
 - operation: listLegalEntities
   verb: GET
@@ -489,7 +504,7 @@ operations:
   writes:
   - cache:idempotency
   - ledger.deposit
-  - ledger.entry
+  - ledger.posting
 - operation: recordSettlement
   verb: POST
   path: /inter-entity-obligations/{obligationId}/settle
@@ -504,8 +519,8 @@ operations:
   - ledger.inter_entity_obligation
   writes:
   - cache:idempotency
-  - ledger.entry
   - ledger.inter_entity_obligation
+  - ledger.posting
 - operation: recordWriteOff
   verb: POST
   path: /write-offs
@@ -520,7 +535,7 @@ operations:
   - ledger.account
   writes:
   - cache:idempotency
-  - ledger.entry
+  - ledger.posting
 - operation: rejectJournal
   verb: POST
   path: /journal-entries/{entryId}/reject
@@ -621,8 +636,8 @@ operations:
   - ledger.inter_entity_obligation
   writes:
   - cache:idempotency
-  - ledger.entry
   - ledger.journal_entry
+  - ledger.posting
 - operation: runRecognition
   verb: POST
   path: /recognition/run
@@ -638,8 +653,8 @@ operations:
   - orders.sales_order
   writes:
   - cache:idempotency
-  - ledger.entry
   - ledger.journal_entry
+  - ledger.posting
 - operation: setAccountMappings
   verb: PUT
   path: /account-mappings
@@ -654,6 +669,19 @@ operations:
   writes:
   - cache:idempotency
   - ledger.account_mapping
+- operation: setFxProvider
+  verb: PUT
+  path: /fx-rates/providers
+  scope: region
+  permission: LEDGER_APPROVE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - platform.region_settings
+  writes:
+  - cache:idempotency
+  - platform.region_settings
 - operation: setFxRate
   verb: PUT
   path: /fx-rates
@@ -684,7 +712,7 @@ operations:
   writes:
   - cache:idempotency
   - ledger.deposit
-  - ledger.entry
+  - ledger.posting
 - operation: updateAccount
   verb: PATCH
   path: /accounts/{accountId}

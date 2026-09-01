@@ -103,9 +103,9 @@ tags:
   - name: workstation
 
 paths:
-  /scope-nodes:
+  /org-units:
     get:
-      operationId: listScopeNodes
+      operationId: listOrgUnits
       x-ticvai-consumed-by:
         - "P08 BO-064 Zones & Areas"
         - "P09 ADM-006 Tenant Hierarchy Explorer"
@@ -142,12 +142,12 @@ paths:
                     properties:
                       items:
                         type: array
-                        items: { $ref: '#/components/schemas/ScopeNode' }
+                        items: { $ref: '#/components/schemas/OrgUnit' }
         '401': { $ref: '../shared/common.yaml#/components/responses/Unauthorized' }
         '403': { $ref: '../shared/common.yaml#/components/responses/Forbidden' }
 
     post:
-      operationId: createScopeNode
+      operationId: createOrgUnit
       x-ticvai-consumed-by:
         - "P08 BO-064 Zones & Areas"
         - "P09 ADM-006 Tenant Hierarchy Explorer"
@@ -170,7 +170,7 @@ paths:
           description: Created
           content:
             application/json:
-              schema: { $ref: '#/components/schemas/ScopeNode' }
+              schema: { $ref: '#/components/schemas/OrgUnit' }
           headers:
             X-Consistency-Token:
               schema: { type: string }
@@ -212,7 +212,7 @@ paths:
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
       parameters:
-        - name: scopeNodeId
+        - name: orgUnitId
           in: query
           schema: { type: string, format: uuid }
         - name: principalId
@@ -590,14 +590,14 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/VenueSettings' }
 
-  /scope-nodes/{scopeNodeId}:
+  /org-units/{orgUnitId}:
     parameters:
-      - name: scopeNodeId
+      - name: orgUnitId
         in: path
         required: true
         schema: { type: string, format: uuid }
     get:
-      operationId: getScopeNode
+      operationId: getOrgUnit
       x-ticvai-consumed-by:
         - "P08 BO-064 Zones & Areas"
       x-ticvai-audience: [staff]
@@ -613,11 +613,11 @@ paths:
           description: Found
           content:
             application/json:
-              schema: { $ref: '#/components/schemas/ScopeNode' }
+              schema: { $ref: '#/components/schemas/OrgUnit' }
         '403': { $ref: '../shared/common.yaml#/components/responses/Forbidden' }
         '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
     patch:
-      operationId: updateScopeNode
+      operationId: updateOrgUnit
       x-ticvai-consumed-by:
         - "P08 BO-064 Zones & Areas"
       x-ticvai-audience: [staff]
@@ -647,7 +647,7 @@ paths:
           description: Updated
           content:
             application/json:
-              schema: { $ref: '#/components/schemas/ScopeNode' }
+              schema: { $ref: '#/components/schemas/OrgUnit' }
         '403': { $ref: '../shared/common.yaml#/components/responses/Forbidden' }
         '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
 
@@ -1481,8 +1481,8 @@ components:
         its path and resolves from venue exactly as before.
       enum: [tenant, brand, region, venue, department, subDepartment, workstation, outlet]
 
-    ScopeNode:
-      x-ticvai-persistence: "platform.scope_node"
+    OrgUnit:
+      x-ticvai-persistence: "platform.org_unit"
       type: object
       required: [id, level, path, code, name, isActive]
       properties:
@@ -1578,7 +1578,7 @@ components:
 
             **A Ladies Night ticket is already gendered at the point of sale**, so the gate checks
             the entitlement the platform issued rather than the face in front of it — deterministic,
-            auditable, and already contracted through `admissionProfile`.
+            auditable, and already contracted through `admissionRules`.
 
             **And these events are staffed.** A steward at the entrance is making the judgment
             anyway, and a classifier that overrules a person who can see more than it can is a

@@ -7,15 +7,15 @@
  "audience": "staff",
  "formFactor": "web",
  "offlineCapable": false,
- "generated": "2026-08-27",
+ "generated": "2026-09-01",
  "note": "Derived by tools/derive-platform.py. **The gaps section is the point** \u2014 a page listing what exists is a directory; one listing what is missing is a worklist.",
  "counts": {
   "screens": 8,
   "operations": 33,
   "contracts": 4,
-  "modules": 1,
+  "modules": 4,
   "undrawn": 0,
-  "operationsWithNoScreen": 57
+  "operationsWithNoScreen": 59
  },
  "waves": {
   "wave2": 2,
@@ -23,10 +23,30 @@
  },
  "modules": [
   {
-   "module": "TODO",
-   "screens": 8,
+   "module": "Access & Availability",
+   "screens": 2,
    "waves": [
-    2,
+    3
+   ]
+  },
+  {
+   "module": "Overview",
+   "screens": 2,
+   "waves": [
+    3
+   ]
+  },
+  {
+   "module": "Conversations",
+   "screens": 2,
+   "waves": [
+    2
+   ]
+  },
+  {
+   "module": "Knowledge & Responses",
+   "screens": 2,
+   "waves": [
     3
    ]
   }
@@ -37,11 +57,11 @@
    "operations": 16
   },
   {
-   "contract": "identity",
+   "contract": "reporting",
    "operations": 8
   },
   {
-   "contract": "reporting",
+   "contract": "identity",
    "operations": 8
   },
   {
@@ -53,7 +73,7 @@
   {
    "id": "SUP-001",
    "name": "Agent Login",
-   "module": "TODO",
+   "module": "Access & Availability",
    "wave": 3,
    "route": "/general/agent-login",
    "operations": 8,
@@ -62,7 +82,7 @@
   {
    "id": "SUP-002",
    "name": "Agent Dashboard",
-   "module": "TODO",
+   "module": "Overview",
    "wave": 3,
    "route": "/general/agent-dashboard",
    "operations": 9,
@@ -71,7 +91,7 @@
   {
    "id": "SUP-003",
    "name": "Availability & Routing Settings",
-   "module": "TODO",
+   "module": "Access & Availability",
    "wave": 3,
    "route": "/general/availability-and-routing-settings",
    "operations": 1,
@@ -80,7 +100,7 @@
   {
    "id": "SUP-004",
    "name": "Conversation Queue",
-   "module": "TODO",
+   "module": "Conversations",
    "wave": 2,
    "route": "/general/conversation-queue",
    "operations": 10,
@@ -89,7 +109,7 @@
   {
    "id": "SUP-005",
    "name": "Live Chat Workspace",
-   "module": "TODO",
+   "module": "Conversations",
    "wave": 2,
    "route": "/general/live-chat-workspace",
    "operations": 11,
@@ -98,7 +118,7 @@
   {
    "id": "SUP-006",
    "name": "Knowledge Base Search",
-   "module": "TODO",
+   "module": "Knowledge & Responses",
    "wave": 3,
    "route": "/general/knowledge-base-search",
    "operations": 0,
@@ -107,7 +127,7 @@
   {
    "id": "SUP-007",
    "name": "Canned Response Management",
-   "module": "TODO",
+   "module": "Knowledge & Responses",
    "wave": 3,
    "route": "/general/canned-response-management",
    "operations": 2,
@@ -116,7 +136,7 @@
   {
    "id": "SUP-008",
    "name": "Agent Performance & SLA View",
-   "module": "TODO",
+   "module": "Overview",
    "wave": 3,
    "route": "/general/agent-performance-and-sla-view",
    "operations": 10,
@@ -148,6 +168,12 @@
     "contract": "finance",
     "verb": "GET",
     "summary": "Every money source against the ledger, in one view"
+   },
+   {
+    "operation": "ingestFxRates",
+    "contract": "finance",
+    "verb": "POST",
+    "summary": "Pull rates from the configured provider"
    },
    {
     "operation": "listInterEntityObligations",
@@ -184,6 +210,12 @@
     "contract": "finance",
     "verb": "POST",
     "summary": "Revalue monetary balances at close"
+   },
+   {
+    "operation": "setFxProvider",
+    "contract": "finance",
+    "verb": "PUT",
+    "summary": "Which provider serves which purpose"
    },
    {
     "operation": "validateRecognitionSchedules",
@@ -468,15 +500,7 @@
     "summary": "Amend, pause or resume a schedule"
    }
   ],
-  "modulesSplitAcrossWaves": [
-   {
-    "module": "TODO",
-    "waves": [
-     2,
-     3
-    ]
-   }
-  ],
+  "modulesSplitAcrossWaves": [],
   "screensNotDrawn": [],
   "flowsNamingAMissingScreen": []
  }

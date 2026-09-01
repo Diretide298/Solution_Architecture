@@ -109,11 +109,11 @@
   "path": "/products/{productId}/attributes",
   "reads": [
    "cache:idempotency",
-   "catalogue.attribute_axis"
+   "catalogue.variant_dimension"
   ],
   "writes": [
    "cache:idempotency",
-   "catalogue.attribute_axis"
+   "catalogue.variant_dimension"
   ],
   "routing": "",
   "scope": "venue",
@@ -361,12 +361,12 @@
    "staff"
   ]
  },
- "listEnvelopes": {
+ "listChannelCapacities": {
   "contract": "catalogue",
   "verb": "GET",
-  "path": "/envelopes",
+  "path": "/channel-capacities",
   "reads": [
-   "catalogue.envelope"
+   "catalogue.channel_capacity"
   ],
   "writes": [],
   "routing": "replica",
@@ -384,17 +384,17 @@
    "partner"
   ]
  },
- "createEnvelope": {
+ "createChannelCapacity": {
   "contract": "catalogue",
   "verb": "POST",
-  "path": "/envelopes",
+  "path": "/channel-capacities",
   "reads": [
    "cache:idempotency",
-   "catalogue.envelope"
+   "catalogue.channel_capacity"
   ],
   "writes": [
    "cache:idempotency",
-   "catalogue.envelope"
+   "catalogue.channel_capacity"
   ],
   "routing": "",
   "scope": "venue",
@@ -415,7 +415,7 @@
  "getChannelAllocations": {
   "contract": "catalogue",
   "verb": "GET",
-  "path": "/envelopes/{envelopeId}/channel-allocations",
+  "path": "/channel-capacities/{channelCapacityId}/channel-allocations",
   "reads": [
    "catalogue.channel_allocation"
   ],
@@ -438,7 +438,7 @@
  "setChannelAllocations": {
   "contract": "catalogue",
   "verb": "PUT",
-  "path": "/envelopes/{envelopeId}/channel-allocations",
+  "path": "/channel-capacities/{channelCapacityId}/channel-allocations",
   "reads": [
    "cache:idempotency",
    "catalogue.channel_allocation"
@@ -466,7 +466,7 @@
  "releaseChannelAllocation": {
   "contract": "catalogue",
   "verb": "POST",
-  "path": "/envelopes/{envelopeId}/channel-allocations/release",
+  "path": "/channel-capacities/{channelCapacityId}/channel-allocations/release",
   "reads": [
    "cache:idempotency",
    "catalogue.channel_allocation"
@@ -591,12 +591,12 @@
    "staff"
   ]
  },
- "listLeases": {
+ "listInventoryHolds": {
   "contract": "catalogue",
   "verb": "GET",
-  "path": "/leases",
+  "path": "/inventory-holds",
   "reads": [
-   "catalogue.inventory_lease"
+   "catalogue.inventory_hold"
   ],
   "writes": [],
   "routing": "primary",
@@ -613,19 +613,19 @@
    "staff"
   ]
  },
- "acquireLease": {
+ "acquireInventoryHold": {
   "contract": "catalogue",
   "verb": "POST",
-  "path": "/leases",
+  "path": "/inventory-holds",
   "reads": [
    "cache:idempotency",
-   "catalogue.envelope",
-   "catalogue.inventory_lease",
+   "catalogue.channel_capacity",
+   "catalogue.inventory_hold",
    "platform.workstation"
   ],
   "writes": [
    "cache:idempotency",
-   "catalogue.inventory_lease"
+   "catalogue.inventory_hold"
   ],
   "routing": "",
   "scope": "workstation",
@@ -644,17 +644,17 @@
    "guest"
   ]
  },
- "releaseLease": {
+ "releaseInventoryHold": {
   "contract": "catalogue",
   "verb": "DELETE",
-  "path": "/leases/{leaseId}",
+  "path": "/inventory-holds/{inventoryHoldId}",
   "reads": [
    "cache:idempotency",
-   "catalogue.inventory_lease"
+   "catalogue.inventory_hold"
   ],
   "writes": [
    "cache:idempotency",
-   "catalogue.inventory_lease"
+   "catalogue.inventory_hold"
   ],
   "routing": "",
   "scope": "workstation",
@@ -671,17 +671,17 @@
    "staff"
   ]
  },
- "renewLease": {
+ "renewInventoryHold": {
   "contract": "catalogue",
   "verb": "POST",
-  "path": "/leases/{leaseId}/renew",
+  "path": "/inventory-holds/{inventoryHoldId}/renew",
   "reads": [
    "cache:idempotency",
-   "catalogue.inventory_lease"
+   "catalogue.inventory_hold"
   ],
   "writes": [
    "cache:idempotency",
-   "catalogue.inventory_lease"
+   "catalogue.inventory_hold"
   ],
   "routing": "",
   "scope": "workstation",
@@ -698,17 +698,17 @@
    "staff"
   ]
  },
- "forceReleaseLease": {
+ "forceReleaseInventoryHold": {
   "contract": "catalogue",
   "verb": "POST",
-  "path": "/leases/{leaseId}/force-release",
+  "path": "/inventory-holds/{inventoryHoldId}/force-release",
   "reads": [
    "cache:idempotency",
-   "catalogue.inventory_lease"
+   "catalogue.inventory_hold"
   ],
   "writes": [
    "cache:idempotency",
-   "catalogue.inventory_lease"
+   "catalogue.inventory_hold"
   ],
   "routing": "",
   "scope": "venue",
@@ -730,8 +730,8 @@
   "verb": "GET",
   "path": "/availability",
   "reads": [
-   "catalogue.envelope",
-   "catalogue.inventory_lease",
+   "catalogue.channel_capacity",
+   "catalogue.inventory_hold",
    "catalogue.performance"
   ],
   "writes": [],
@@ -1058,17 +1058,17 @@
    "staff"
   ]
  },
- "updateEnvelope": {
+ "updateChannelCapacity": {
   "contract": "catalogue",
   "verb": "PATCH",
-  "path": "/envelopes/{envelopeId}",
+  "path": "/channel-capacities/{channelCapacityId}",
   "reads": [
    "cache:idempotency",
-   "catalogue.envelope"
+   "catalogue.channel_capacity"
   ],
   "writes": [
    "cache:idempotency",
-   "catalogue.envelope"
+   "catalogue.channel_capacity"
   ],
   "routing": "",
   "scope": "venue",
@@ -1163,13 +1163,13 @@
    "staff"
   ]
  },
- "listScopeNodes": {
+ "listOrgUnits": {
   "contract": "tenancy",
   "verb": "GET",
-  "path": "/scope-nodes",
+  "path": "/org-units",
   "reads": [
    "cache:resolution",
-   "platform.scope_node"
+   "platform.org_unit"
   ],
   "writes": [
    "cache:resolution"
@@ -1189,18 +1189,18 @@
    "staff"
   ]
  },
- "createScopeNode": {
+ "createOrgUnit": {
   "contract": "tenancy",
   "verb": "POST",
-  "path": "/scope-nodes",
+  "path": "/org-units",
   "reads": [
    "cache:idempotency",
-   "platform.scope_node"
+   "platform.org_unit"
   ],
   "writes": [
    "cache:idempotency",
    "cache:resolution",
-   "platform.scope_node"
+   "platform.org_unit"
   ],
   "routing": "",
   "scope": "brand",
@@ -1217,13 +1217,13 @@
    "staff"
   ]
  },
- "getScopeNode": {
+ "getOrgUnit": {
   "contract": "tenancy",
   "verb": "GET",
-  "path": "/scope-nodes/{scopeNodeId}",
+  "path": "/org-units/{orgUnitId}",
   "reads": [
    "cache:resolution",
-   "platform.scope_node"
+   "platform.org_unit"
   ],
   "writes": [
    "cache:resolution"
@@ -1243,18 +1243,18 @@
    "staff"
   ]
  },
- "updateScopeNode": {
+ "updateOrgUnit": {
   "contract": "tenancy",
   "verb": "PATCH",
-  "path": "/scope-nodes/{scopeNodeId}",
+  "path": "/org-units/{orgUnitId}",
   "reads": [
    "cache:idempotency",
-   "platform.scope_node"
+   "platform.org_unit"
   ],
   "writes": [
    "cache:idempotency",
    "cache:resolution",
-   "platform.scope_node"
+   "platform.org_unit"
   ],
   "routing": "",
   "scope": "brand",
@@ -1872,7 +1872,7 @@
   ],
   "writes": [
    "cache:idempotency",
-   "ledger.entry",
+   "ledger.posting",
    "ledger.journal_entry",
    "orders.refund"
   ],
@@ -2041,7 +2041,7 @@
   ],
   "writes": [
    "cache:idempotency",
-   "ledger.entry",
+   "ledger.posting",
    "ledger.journal_entry",
    "orders.payment"
   ],
@@ -2465,7 +2465,7 @@
   "verb": "GET",
   "path": "/orders/{orderId}/statement",
   "reads": [
-   "ledger.entry",
+   "ledger.posting",
    "orders.payment",
    "orders.refund",
    "orders.sales_order"
@@ -2701,7 +2701,7 @@
   "path": "/access/validate",
   "reads": [
    "access.access_point",
-   "access.admission_profile",
+   "access.admission_rules",
    "access.blacklist",
    "access.entitlement",
    "cache:idempotency",
@@ -2835,7 +2835,7 @@
   "path": "/access/offline-package",
   "reads": [
    "access.access_point",
-   "access.admission_profile",
+   "access.admission_rules",
    "access.blacklist",
    "cache:resolution",
    "catalogue.entitlement_template",
@@ -2987,12 +2987,12 @@
    "staff"
   ]
  },
- "listAdmissionProfiles": {
+ "listAdmissionRules": {
   "contract": "access",
   "verb": "GET",
-  "path": "/admission-profiles",
+  "path": "/admission-rules",
   "reads": [
-   "access.admission_profile"
+   "access.admission_rules"
   ],
   "writes": [],
   "routing": "replica",
@@ -3009,16 +3009,16 @@
    "staff"
   ]
  },
- "createAdmissionProfile": {
+ "createAdmissionRules": {
   "contract": "access",
   "verb": "POST",
-  "path": "/admission-profiles",
+  "path": "/admission-rules",
   "reads": [
-   "access.admission_profile",
+   "access.admission_rules",
    "cache:idempotency"
   ],
   "writes": [
-   "access.admission_profile",
+   "access.admission_rules",
    "cache:idempotency"
   ],
   "routing": "",
@@ -3036,16 +3036,16 @@
    "staff"
   ]
  },
- "updateAdmissionProfile": {
+ "updateAdmissionRules": {
   "contract": "access",
   "verb": "PUT",
-  "path": "/admission-profiles/{profileId}",
+  "path": "/admission-rules/{profileId}",
   "reads": [
-   "access.admission_profile",
+   "access.admission_rules",
    "cache:idempotency"
   ],
   "writes": [
-   "access.admission_profile",
+   "access.admission_rules",
    "cache:idempotency"
   ],
   "routing": "",
@@ -3145,7 +3145,7 @@
   "path": "/access/group-validate",
   "reads": [
    "access.access_point",
-   "access.admission_profile",
+   "access.admission_rules",
    "cache:idempotency",
    "catalogue.entitlement_template"
   ],
@@ -3560,7 +3560,7 @@
   "offline": false,
   "summary": "Link a guest's records across cells",
   "source": "derived",
-  "service": "CrossCellService",
+  "service": "CrossRegionService",
   "stores": [
    "postgres",
    "redis"
@@ -3583,7 +3583,7 @@
   "offline": false,
   "summary": "Read a guest link",
   "source": "derived",
-  "service": "CrossCellService",
+  "service": "CrossRegionService",
   "stores": [
    "postgres"
   ],
@@ -3609,7 +3609,7 @@
   "offline": false,
   "summary": "Sever a link on consent withdrawal",
   "source": "hand-mapped",
-  "service": "CrossCellService",
+  "service": "CrossRegionService",
   "stores": [
    "postgres",
    "redis"
@@ -3632,7 +3632,7 @@
   "offline": false,
   "summary": "Find the link for a local subject",
   "source": "derived",
-  "service": "CrossCellService",
+  "service": "CrossRegionService",
   "stores": [
    "postgres"
   ],
@@ -3640,17 +3640,17 @@
    "service"
   ]
  },
- "propagateRedemptionRight": {
+ "propagateCrossRegionEntitlement": {
   "contract": "cross-cell",
   "verb": "POST",
-  "path": "/redemption-rights",
+  "path": "/cross-region-entitlements",
   "reads": [
    "cache:idempotency",
-   "platform.redemption_right"
+   "platform.cross_region_entitlement"
   ],
   "writes": [
    "cache:idempotency",
-   "platform.redemption_right"
+   "platform.cross_region_entitlement"
   ],
   "routing": "",
   "scope": "tenant",
@@ -3658,7 +3658,7 @@
   "offline": false,
   "summary": "Propagate a right from the issuing cell to a consuming cell",
   "source": "derived",
-  "service": "CrossCellService",
+  "service": "CrossRegionService",
   "stores": [
    "postgres",
    "redis"
@@ -3667,12 +3667,12 @@
    "service"
   ]
  },
- "getRedemptionRight": {
+ "getCrossRegionEntitlement": {
   "contract": "cross-cell",
   "verb": "GET",
-  "path": "/redemption-rights/{rightId}",
+  "path": "/cross-region-entitlements/{rightId}",
   "reads": [
-   "platform.redemption_right"
+   "platform.cross_region_entitlement"
   ],
   "writes": [],
   "routing": "replica",
@@ -3681,7 +3681,7 @@
   "offline": true,
   "summary": "Read a redemption right",
   "source": "derived",
-  "service": "CrossCellService",
+  "service": "CrossRegionService",
   "stores": [
    "postgres"
   ],
@@ -3689,17 +3689,17 @@
    "staff"
   ]
  },
- "revokeRedemptionRight": {
+ "revokeCrossRegionEntitlement": {
   "contract": "cross-cell",
   "verb": "DELETE",
-  "path": "/redemption-rights/{rightId}",
+  "path": "/cross-region-entitlements/{rightId}",
   "reads": [
    "cache:idempotency",
-   "platform.redemption_right"
+   "platform.cross_region_entitlement"
   ],
   "writes": [
    "cache:idempotency",
-   "platform.redemption_right"
+   "platform.cross_region_entitlement"
   ],
   "routing": "",
   "scope": "tenant",
@@ -3707,7 +3707,7 @@
   "offline": false,
   "summary": "Revoke a right",
   "source": "hand-mapped",
-  "service": "CrossCellService",
+  "service": "CrossRegionService",
   "stores": [
    "postgres",
    "redis"
@@ -3716,17 +3716,17 @@
    "service"
   ]
  },
- "consumeRedemptionRight": {
+ "consumeCrossRegionEntitlement": {
   "contract": "cross-cell",
   "verb": "POST",
-  "path": "/redemption-rights/{rightId}/consume",
+  "path": "/cross-region-entitlements/{rightId}/consume",
   "reads": [
    "cache:idempotency",
-   "platform.redemption_right"
+   "platform.cross_region_entitlement"
   ],
   "writes": [
    "cache:idempotency",
-   "platform.redemption_right"
+   "platform.cross_region_entitlement"
   ],
   "routing": "",
   "scope": "workstation",
@@ -3734,7 +3734,7 @@
   "offline": true,
   "summary": "Consume entries against a right, locally authoritative",
   "source": "derived",
-  "service": "CrossCellService",
+  "service": "CrossRegionService",
   "stores": [
    "postgres",
    "redis"
@@ -3746,15 +3746,15 @@
  "reconcileRedemptions": {
   "contract": "cross-cell",
   "verb": "POST",
-  "path": "/redemption-rights/reconcile",
+  "path": "/cross-region-entitlements/reconcile",
   "reads": [
    "access.scan_event",
    "cache:idempotency",
-   "platform.redemption_right"
+   "platform.cross_region_entitlement"
   ],
   "writes": [
    "cache:idempotency",
-   "platform.redemption_right"
+   "platform.cross_region_entitlement"
   ],
   "routing": "",
   "scope": "tenant",
@@ -3762,7 +3762,7 @@
   "offline": false,
   "summary": "Report consumption back to the issuing cell",
   "source": "hand-mapped",
-  "service": "CrossCellService",
+  "service": "CrossRegionService",
   "stores": [
    "postgres",
    "redis"
@@ -3789,7 +3789,7 @@
   "offline": false,
   "summary": "Hold funds against the guest's home-cell balance",
   "source": "derived",
-  "service": "CrossCellService",
+  "service": "CrossRegionService",
   "stores": [
    "postgres",
    "redis"
@@ -3816,7 +3816,7 @@
   "offline": false,
   "summary": "Capture a held amount",
   "source": "derived",
-  "service": "CrossCellService",
+  "service": "CrossRegionService",
   "stores": [
    "postgres",
    "redis"
@@ -3843,7 +3843,7 @@
   "offline": false,
   "summary": "Release a hold without capturing",
   "source": "derived",
-  "service": "CrossCellService",
+  "service": "CrossRegionService",
   "stores": [
    "postgres",
    "redis"
@@ -3866,7 +3866,7 @@
   "offline": true,
   "summary": "The consuming cell's bounded offline allocation",
   "source": "derived",
-  "service": "CrossCellService",
+  "service": "CrossRegionService",
   "stores": [
    "postgres"
   ],
@@ -3892,7 +3892,7 @@
   "offline": false,
   "summary": "Set the allocation cap policy",
   "source": "derived",
-  "service": "CrossCellService",
+  "service": "CrossRegionService",
   "stores": [
    "postgres",
    "redis"
@@ -3919,7 +3919,7 @@
   "offline": false,
   "summary": "Raise a data subject request across every linked cell",
   "source": "derived",
-  "service": "CrossCellService",
+  "service": "CrossRegionService",
   "stores": [
    "postgres",
    "redis"
@@ -3942,7 +3942,7 @@
   "offline": false,
   "summary": "Track fan-out progress per cell",
   "source": "derived",
-  "service": "CrossCellService",
+  "service": "CrossRegionService",
   "stores": [
    "postgres"
   ],
@@ -3956,7 +3956,7 @@
   "path": "/auth/login",
   "reads": [
    "cache:idempotency",
-   "identity.grant",
+   "identity.delegated_access",
    "identity.principal",
    "identity.principal_credential",
    "identity.role"
@@ -3987,7 +3987,7 @@
   "path": "/auth/select-role",
   "reads": [
    "cache:idempotency",
-   "identity.grant",
+   "identity.delegated_access",
    "identity.role",
    "identity.session"
   ],
@@ -4097,7 +4097,7 @@
   "path": "/auth/session",
   "reads": [
    "cache:resolution",
-   "identity.grant",
+   "identity.delegated_access",
    "identity.principal",
    "identity.role",
    "identity.session"
@@ -4273,12 +4273,12 @@
    "staff"
   ]
  },
- "listGrants": {
+ "listDelegatedAccess": {
   "contract": "identity",
   "verb": "GET",
-  "path": "/grants",
+  "path": "/delegated-access",
   "reads": [
-   "identity.grant"
+   "identity.delegated_access"
   ],
   "writes": [],
   "routing": "replica",
@@ -4296,18 +4296,18 @@
    "partner"
   ]
  },
- "createGrant": {
+ "createDelegatedAccess": {
   "contract": "identity",
   "verb": "POST",
-  "path": "/grants",
+  "path": "/delegated-access",
   "reads": [
    "cache:idempotency",
-   "identity.grant"
+   "identity.delegated_access"
   ],
   "writes": [
    "cache:idempotency",
    "cache:resolution",
-   "identity.grant"
+   "identity.delegated_access"
   ],
   "routing": "",
   "scope": "venue",
@@ -4325,18 +4325,18 @@
    "partner"
   ]
  },
- "deleteGrant": {
+ "deleteDelegatedAccess": {
   "contract": "identity",
   "verb": "DELETE",
-  "path": "/grants/{grantId}",
+  "path": "/delegated-access/{delegatedAccessId}",
   "reads": [
    "cache:idempotency",
-   "identity.grant"
+   "identity.delegated_access"
   ],
   "writes": [
    "cache:idempotency",
    "cache:resolution",
-   "identity.grant"
+   "identity.delegated_access"
   ],
   "routing": "",
   "scope": "venue",
@@ -4361,11 +4361,11 @@
   "reads": [
    "cache:idempotency",
    "cache:resolution",
-   "identity.grant",
+   "identity.delegated_access",
    "identity.principal",
    "identity.role",
    "identity.role_permission",
-   "platform.scope_node"
+   "platform.org_unit"
   ],
   "writes": [
    "cache:idempotency",
@@ -5390,7 +5390,7 @@
   "path": "/deferred-revenue",
   "reads": [
    "ledger.account",
-   "ledger.entry",
+   "ledger.posting",
    "orders.sales_order"
   ],
   "writes": [],
@@ -5420,7 +5420,7 @@
   ],
   "writes": [
    "cache:idempotency",
-   "ledger.entry",
+   "ledger.posting",
    "ledger.journal_entry"
   ],
   "routing": "",
@@ -5698,7 +5698,7 @@
   ],
   "writes": [
    "cache:idempotency",
-   "ledger.entry",
+   "ledger.posting",
    "ledger.journal_entry"
   ],
   "routing": "",
@@ -5721,7 +5721,7 @@
   "verb": "GET",
   "path": "/ledger/entries",
   "reads": [
-   "ledger.entry"
+   "ledger.posting"
   ],
   "writes": [],
   "routing": "analytical",
@@ -5744,7 +5744,7 @@
   "path": "/ledger/trial-balance",
   "reads": [
    "ledger.account",
-   "ledger.entry",
+   "ledger.posting",
    "ledger.event_budget",
    "ledger.fiscal_period"
   ],
@@ -6122,7 +6122,7 @@
   "path": "/reports/financial",
   "reads": [
    "ledger.account",
-   "ledger.entry",
+   "ledger.posting",
    "ledger.event_budget",
    "ledger.fiscal_period"
   ],
@@ -7418,7 +7418,7 @@
   "offline": false,
   "summary": "List tenants",
   "source": "derived",
-  "service": "ControlService",
+  "service": "PlatformService",
   "stores": [
    "postgres"
   ],
@@ -7444,7 +7444,7 @@
   "offline": false,
   "summary": "Create a tenant",
   "source": "derived",
-  "service": "ControlService",
+  "service": "PlatformService",
   "stores": [
    "postgres",
    "redis"
@@ -7469,7 +7469,7 @@
   "offline": false,
   "summary": "Read a tenant with cells and subscription",
   "source": "derived",
-  "service": "ControlService",
+  "service": "PlatformService",
   "stores": [
    "postgres"
   ],
@@ -7495,7 +7495,7 @@
   "offline": false,
   "summary": "Amend tenant details",
   "source": "derived",
-  "service": "ControlService",
+  "service": "PlatformService",
   "stores": [
    "postgres",
    "redis"
@@ -7522,7 +7522,7 @@
   "offline": false,
   "summary": "Suspend a tenant",
   "source": "derived",
-  "service": "ControlService",
+  "service": "PlatformService",
   "stores": [
    "postgres",
    "redis"
@@ -7549,7 +7549,7 @@
   "offline": false,
   "summary": "Lift a suspension",
   "source": "derived",
-  "service": "ControlService",
+  "service": "PlatformService",
   "stores": [
    "postgres",
    "redis"
@@ -7578,7 +7578,7 @@
   "offline": false,
   "summary": "Begin termination",
   "source": "path-inferred",
-  "service": "ControlService",
+  "service": "PlatformService",
   "stores": [
    "postgres",
    "redis"
@@ -7592,7 +7592,7 @@
   "verb": "GET",
   "path": "/plans",
   "reads": [
-   "control.plan"
+   "control.subscription_plan"
   ],
   "writes": [],
   "routing": "replica",
@@ -7601,7 +7601,7 @@
   "offline": false,
   "summary": "List subscription plans",
   "source": "derived",
-  "service": "ControlService",
+  "service": "PlatformService",
   "stores": [
    "postgres"
   ],
@@ -7615,11 +7615,11 @@
   "path": "/plans",
   "reads": [
    "cache:idempotency",
-   "control.plan"
+   "control.subscription_plan"
   ],
   "writes": [
    "cache:idempotency",
-   "control.plan"
+   "control.subscription_plan"
   ],
   "routing": "",
   "scope": "tenant",
@@ -7627,7 +7627,7 @@
   "offline": false,
   "summary": "Create a subscription plan",
   "source": "derived",
-  "service": "ControlService",
+  "service": "PlatformService",
   "stores": [
    "postgres",
    "redis"
@@ -7641,7 +7641,7 @@
   "verb": "GET",
   "path": "/plans/{planId}",
   "reads": [
-   "control.plan"
+   "control.subscription_plan"
   ],
   "writes": [],
   "routing": "replica",
@@ -7650,7 +7650,7 @@
   "offline": false,
   "summary": "Read a plan",
   "source": "derived",
-  "service": "ControlService",
+  "service": "PlatformService",
   "stores": [
    "postgres"
   ],
@@ -7664,11 +7664,11 @@
   "path": "/plans/{planId}",
   "reads": [
    "cache:idempotency",
-   "control.plan"
+   "control.subscription_plan"
   ],
   "writes": [
    "cache:idempotency",
-   "control.plan"
+   "control.subscription_plan"
   ],
   "routing": "",
   "scope": "tenant",
@@ -7676,7 +7676,7 @@
   "offline": false,
   "summary": "Publish a new version of a plan",
   "source": "derived",
-  "service": "ControlService",
+  "service": "PlatformService",
   "stores": [
    "postgres",
    "redis"
@@ -7699,7 +7699,7 @@
   "offline": false,
   "summary": "Read the current subscription",
   "source": "derived",
-  "service": "ControlService",
+  "service": "PlatformService",
   "stores": [
    "postgres"
   ],
@@ -7725,7 +7725,7 @@
   "offline": false,
   "summary": "Assign or change a subscription",
   "source": "derived",
-  "service": "ControlService",
+  "service": "PlatformService",
   "stores": [
    "postgres",
    "redis"
@@ -7740,7 +7740,7 @@
   "path": "/tenants/{tenantId}/subscription/preview",
   "reads": [
    "cache:idempotency",
-   "control.plan",
+   "control.subscription_plan",
    "control.subscription",
    "platform.tenant"
   ],
@@ -7753,7 +7753,7 @@
   "offline": false,
   "summary": "Preview the effect of a plan change",
   "source": "path-inferred",
-  "service": "ControlService",
+  "service": "PlatformService",
   "stores": [
    "postgres",
    "redis"
@@ -7769,7 +7769,7 @@
   "path": "/tenants/{tenantId}/licences",
   "reads": [
    "control.licence_add_on",
-   "control.plan",
+   "control.subscription_plan",
    "control.subscription"
   ],
   "writes": [],
@@ -7779,7 +7779,7 @@
   "offline": true,
   "summary": "What a tenant is licensed to use",
   "source": "hand-mapped",
-  "service": "ControlService",
+  "service": "PlatformService",
   "stores": [
    "postgres"
   ],
@@ -7805,7 +7805,7 @@
   "offline": false,
   "summary": "License a module outside the plan",
   "source": "derived",
-  "service": "ControlService",
+  "service": "PlatformService",
   "stores": [
    "postgres",
    "redis"
@@ -7833,7 +7833,7 @@
   "offline": false,
   "summary": "Remove an add-on",
   "source": "path-inferred",
-  "service": "ControlService",
+  "service": "PlatformService",
   "stores": [
    "postgres",
    "redis"
@@ -7858,7 +7858,7 @@
   "offline": false,
   "summary": "Usage against licensed limits",
   "source": "hand-mapped",
-  "service": "ControlService",
+  "service": "PlatformService",
   "stores": [
    "postgres"
   ],
@@ -7880,7 +7880,7 @@
   "offline": false,
   "summary": "List a tenant's cells",
   "source": "derived",
-  "service": "ControlService",
+  "service": "PlatformService",
   "stores": [
    "postgres"
   ],
@@ -7906,7 +7906,7 @@
   "offline": false,
   "summary": "Provision a cell for a region",
   "source": "derived",
-  "service": "ControlService",
+  "service": "PlatformService",
   "stores": [
    "postgres",
    "redis"
@@ -7930,7 +7930,7 @@
   "offline": false,
   "summary": "Read a cell",
   "source": "derived",
-  "service": "ControlService",
+  "service": "PlatformService",
   "stores": [
    "postgres"
   ],
@@ -7956,7 +7956,7 @@
   "offline": false,
   "summary": "Change a cell's tier",
   "source": "derived",
-  "service": "ControlService",
+  "service": "PlatformService",
   "stores": [
    "postgres",
    "redis"
@@ -7983,7 +7983,7 @@
   "offline": false,
   "summary": "Begin decommissioning a cell",
   "source": "path-inferred",
-  "service": "ControlService",
+  "service": "PlatformService",
   "stores": [
    "postgres",
    "redis"
@@ -8010,7 +8010,7 @@
   "offline": false,
   "summary": "Halt a decommission",
   "source": "path-inferred",
-  "service": "ControlService",
+  "service": "PlatformService",
   "stores": [
    "postgres",
    "redis"
@@ -8033,7 +8033,7 @@
   "offline": false,
   "summary": "Load against headroom",
   "source": "hand-mapped",
-  "service": "ControlService",
+  "service": "PlatformService",
   "stores": [
    "postgres"
   ],
@@ -8055,7 +8055,7 @@
   "offline": false,
   "summary": "Clusters in a region",
   "source": "derived",
-  "service": "ControlService",
+  "service": "PlatformService",
   "stores": [
    "postgres"
   ],
@@ -8081,7 +8081,7 @@
   "offline": false,
   "summary": "Launch an identical cluster",
   "source": "derived",
-  "service": "ControlService",
+  "service": "PlatformService",
   "stores": [
    "postgres",
    "redis"
@@ -8108,7 +8108,7 @@
   "offline": false,
   "summary": "Roll a cutover back",
   "source": "path-inferred",
-  "service": "ControlService",
+  "service": "PlatformService",
   "stores": [
    "postgres",
    "redis"
@@ -8131,7 +8131,7 @@
   "offline": false,
   "summary": "Tenant moves between cells",
   "source": "derived",
-  "service": "ControlService",
+  "service": "PlatformService",
   "stores": [
    "postgres"
   ],
@@ -8157,7 +8157,7 @@
   "offline": false,
   "summary": "Plan moving a tenant to another cell",
   "source": "derived",
-  "service": "ControlService",
+  "service": "PlatformService",
   "stores": [
    "postgres",
    "redis"
@@ -8184,7 +8184,7 @@
   "offline": false,
   "summary": "Move the tenant",
   "source": "derived",
-  "service": "ControlService",
+  "service": "PlatformService",
   "stores": [
    "postgres",
    "redis"
@@ -8207,7 +8207,7 @@
   "offline": false,
   "summary": "Cell health and schema version",
   "source": "hand-mapped",
-  "service": "ControlService",
+  "service": "PlatformService",
   "stores": [
    "postgres"
   ],
@@ -8229,7 +8229,7 @@
   "offline": false,
   "summary": "Provisioning, migration and maintenance jobs",
   "source": "derived",
-  "service": "ControlService",
+  "service": "PlatformService",
   "stores": [
    "postgres"
   ],
@@ -8252,7 +8252,7 @@
   "offline": false,
   "summary": "Metered usage for a period",
   "source": "hand-mapped",
-  "service": "ControlService",
+  "service": "PlatformService",
   "stores": [
    "postgres"
   ],
@@ -8279,7 +8279,7 @@
   "offline": false,
   "summary": "Record metered usage",
   "source": "derived",
-  "service": "ControlService",
+  "service": "PlatformService",
   "stores": [
    "postgres",
    "postgres-analytical",
@@ -8308,7 +8308,7 @@
   "offline": false,
   "summary": "Record payment against an invoice",
   "source": "path-inferred",
-  "service": "ControlService",
+  "service": "PlatformService",
   "stores": [
    "postgres",
    "redis"
@@ -8335,7 +8335,7 @@
   "offline": false,
   "summary": "Raise a dispute",
   "source": "path-inferred",
-  "service": "ControlService",
+  "service": "PlatformService",
   "stores": [
    "postgres",
    "redis"
@@ -8362,7 +8362,7 @@
   "offline": false,
   "summary": "Resolve a dispute",
   "source": "path-inferred",
-  "service": "ControlService",
+  "service": "PlatformService",
   "stores": [
    "postgres",
    "redis"
@@ -8389,7 +8389,7 @@
   "offline": false,
   "summary": "Cancel or credit an invoice",
   "source": "path-inferred",
-  "service": "ControlService",
+  "service": "PlatformService",
   "stores": [
    "postgres",
    "redis"
@@ -8412,7 +8412,7 @@
   "offline": false,
   "summary": "List subscription invoices",
   "source": "derived",
-  "service": "ControlService",
+  "service": "PlatformService",
   "stores": [
    "postgres"
   ],
@@ -8438,7 +8438,7 @@
   "offline": false,
   "summary": "Generate an invoice for a period",
   "source": "derived",
-  "service": "ControlService",
+  "service": "PlatformService",
   "stores": [
    "postgres",
    "redis"
@@ -13614,7 +13614,7 @@
   "offline": false,
   "summary": "List releases",
   "source": "path-inferred",
-  "service": "ControlService",
+  "service": "PlatformService",
   "stores": [
    "postgres"
   ],
@@ -13640,7 +13640,7 @@
   "offline": false,
   "summary": "Cut a release",
   "source": "path-inferred",
-  "service": "ControlService",
+  "service": "PlatformService",
   "stores": [
    "postgres",
    "redis"
@@ -13652,7 +13652,7 @@
  "getRelease": {
   "contract": "platform-ops",
   "verb": "GET",
-  "path": "/releases/{releaseId}",
+  "path": "/releases/{reinventoryHoldId}",
   "reads": [
    "control.rollout"
   ],
@@ -13663,7 +13663,7 @@
   "offline": false,
   "summary": "Read a release with its rollout state",
   "source": "derived",
-  "service": "ControlService",
+  "service": "PlatformService",
   "stores": [
    "postgres"
   ],
@@ -13674,7 +13674,7 @@
  "rejectRelease": {
   "contract": "platform-ops",
   "verb": "POST",
-  "path": "/releases/{releaseId}/reject",
+  "path": "/releases/{reinventoryHoldId}/reject",
   "reads": [
    "cache:idempotency",
    "control.release"
@@ -13689,7 +13689,7 @@
   "offline": false,
   "summary": "Reject a release back a stage",
   "source": "path-inferred",
-  "service": "ControlService",
+  "service": "PlatformService",
   "stores": [
    "postgres",
    "redis"
@@ -13701,7 +13701,7 @@
  "withdrawRelease": {
   "contract": "platform-ops",
   "verb": "POST",
-  "path": "/releases/{releaseId}/withdraw",
+  "path": "/releases/{reinventoryHoldId}/withdraw",
   "reads": [
    "cache:idempotency",
    "control.release"
@@ -13716,7 +13716,7 @@
   "offline": false,
   "summary": "Withdraw a release",
   "source": "path-inferred",
-  "service": "ControlService",
+  "service": "PlatformService",
   "stores": [
    "postgres",
    "redis"
@@ -13728,7 +13728,7 @@
  "promoteRelease": {
   "contract": "platform-ops",
   "verb": "POST",
-  "path": "/releases/{releaseId}/promote",
+  "path": "/releases/{reinventoryHoldId}/promote",
   "reads": [
    "cache:idempotency",
    "control.rollout"
@@ -13743,7 +13743,7 @@
   "offline": false,
   "summary": "Promote a release to the next environment",
   "source": "derived",
-  "service": "ControlService",
+  "service": "PlatformService",
   "stores": [
    "postgres",
    "redis"
@@ -13755,7 +13755,7 @@
  "getReleaseReadiness": {
   "contract": "platform-ops",
   "verb": "GET",
-  "path": "/releases/{releaseId}/readiness",
+  "path": "/releases/{reinventoryHoldId}/readiness",
   "reads": [
    "control.release"
   ],
@@ -13766,7 +13766,7 @@
   "offline": false,
   "summary": "Whether a release can be promoted, and what blocks it",
   "source": "path-inferred",
-  "service": "ControlService",
+  "service": "PlatformService",
   "stores": [
    "postgres"
   ],
@@ -13789,7 +13789,7 @@
   "offline": false,
   "summary": "List rollouts",
   "source": "derived",
-  "service": "ControlService",
+  "service": "PlatformService",
   "stores": [
    "postgres"
   ],
@@ -13812,7 +13812,7 @@
   "offline": false,
   "summary": "Rollout progress per cell",
   "source": "derived",
-  "service": "ControlService",
+  "service": "PlatformService",
   "stores": [
    "postgres"
   ],
@@ -13838,7 +13838,7 @@
   "offline": false,
   "summary": "Start or continue a rollout",
   "source": "path-inferred",
-  "service": "ControlService",
+  "service": "PlatformService",
   "stores": [
    "postgres",
    "redis"
@@ -13867,7 +13867,7 @@
   "offline": false,
   "summary": "Halt a rollout in progress",
   "source": "derived",
-  "service": "ControlService",
+  "service": "PlatformService",
   "stores": [
    "postgres",
    "redis"
@@ -13896,7 +13896,7 @@
   "offline": false,
   "summary": "Roll a rollout back",
   "source": "derived",
-  "service": "ControlService",
+  "service": "PlatformService",
   "stores": [
    "postgres",
    "redis"
@@ -13919,7 +13919,7 @@
   "offline": false,
   "summary": "The migration register",
   "source": "derived",
-  "service": "ControlService",
+  "service": "PlatformService",
   "stores": [
    "postgres"
   ],
@@ -13945,7 +13945,7 @@
   "offline": false,
   "summary": "Plan a migration run without applying it",
   "source": "derived",
-  "service": "ControlService",
+  "service": "PlatformService",
   "stores": [
    "postgres",
    "redis"
@@ -13974,7 +13974,7 @@
   "offline": false,
   "summary": "Apply a planned migration run",
   "source": "derived",
-  "service": "ControlService",
+  "service": "PlatformService",
   "stores": [
    "postgres",
    "redis"
@@ -13998,7 +13998,7 @@
   "offline": false,
   "summary": "Migration run progress per cell",
   "source": "derived",
-  "service": "ControlService",
+  "service": "PlatformService",
   "stores": [
    "postgres"
   ],
@@ -14026,7 +14026,7 @@
   "offline": false,
   "summary": "Roll a migration run back",
   "source": "derived",
-  "service": "ControlService",
+  "service": "PlatformService",
   "stores": [
    "postgres",
    "redis"
@@ -14049,7 +14049,7 @@
   "offline": false,
   "summary": "Schema and application version across every cell",
   "source": "path-inferred",
-  "service": "ControlService",
+  "service": "PlatformService",
   "stores": [
    "postgres"
   ],
@@ -14071,7 +14071,7 @@
   "offline": false,
   "summary": "The environment registry",
   "source": "derived",
-  "service": "ControlService",
+  "service": "PlatformService",
   "stores": [
    "postgres"
   ],
@@ -14097,7 +14097,7 @@
   "offline": false,
   "summary": "Register an environment",
   "source": "derived",
-  "service": "ControlService",
+  "service": "PlatformService",
   "stores": [
    "postgres",
    "redis"
@@ -14120,7 +14120,7 @@
   "offline": false,
   "summary": "Scheduled tenant upgrades",
   "source": "derived",
-  "service": "ControlService",
+  "service": "PlatformService",
   "stores": [
    "postgres"
   ],
@@ -14146,7 +14146,7 @@
   "offline": false,
   "summary": "Schedule or defer a tenant upgrade",
   "source": "derived",
-  "service": "ControlService",
+  "service": "PlatformService",
   "stores": [
    "postgres",
    "redis"
@@ -14169,7 +14169,7 @@
   "offline": false,
   "summary": "End-of-support notices",
   "source": "derived",
-  "service": "ControlService",
+  "service": "PlatformService",
   "stores": [
    "postgres"
   ],
@@ -14195,7 +14195,7 @@
   "offline": false,
   "summary": "Publish an end-of-support notice",
   "source": "derived",
-  "service": "ControlService",
+  "service": "PlatformService",
   "stores": [
    "postgres",
    "redis"
@@ -15239,9 +15239,9 @@
    "ai.policy",
    "ai.provider",
    "cache:idempotency",
-   "catalogue.attribute_axis",
+   "catalogue.variant_dimension",
    "catalogue.entitlement_template",
-   "catalogue.envelope",
+   "catalogue.channel_capacity",
    "catalogue.event",
    "catalogue.performance",
    "catalogue.price",
@@ -15249,7 +15249,7 @@
    "catalogue.product",
    "marketing.loyalty_programme",
    "platform.region_settings",
-   "platform.scope_node",
+   "platform.org_unit",
    "promotions.promotion",
    "qdrant:knowledge",
    "seating.seat",
@@ -15633,14 +15633,14 @@
  "joinQueue": {
   "contract": "queue",
   "verb": "POST",
-  "path": "/queue-entries",
+  "path": "/waiting-guests",
   "reads": [
    "cache:idempotency",
-   "queue.entry"
+   "queue.waiting_guest"
   ],
   "writes": [
    "cache:idempotency",
-   "queue.entry"
+   "queue.waiting_guest"
   ],
   "routing": "",
   "scope": "venue",
@@ -15657,12 +15657,12 @@
    "guest"
   ]
  },
- "getQueueEntry": {
+ "getWaitingGuest": {
   "contract": "queue",
   "verb": "GET",
-  "path": "/queue-entries/{entryId}",
+  "path": "/waiting-guests/{entryId}",
   "reads": [
-   "queue.entry"
+   "queue.waiting_guest"
   ],
   "writes": [],
   "routing": "primary",
@@ -15682,14 +15682,14 @@
  "leaveQueue": {
   "contract": "queue",
   "verb": "DELETE",
-  "path": "/queue-entries/{entryId}",
+  "path": "/waiting-guests/{entryId}",
   "reads": [
    "cache:idempotency",
-   "queue.entry"
+   "queue.waiting_guest"
   ],
   "writes": [
    "cache:idempotency",
-   "queue.entry"
+   "queue.waiting_guest"
   ],
   "routing": "",
   "scope": "venue",
@@ -15706,17 +15706,17 @@
    "guest"
   ]
  },
- "redeemQueueEntry": {
+ "redeemWaitingGuest": {
   "contract": "queue",
   "verb": "POST",
-  "path": "/queue-entries/{entryId}/redeem",
+  "path": "/waiting-guests/{entryId}/redeem",
   "reads": [
    "cache:idempotency",
-   "queue.entry"
+   "queue.waiting_guest"
   ],
   "writes": [
    "cache:idempotency",
-   "queue.entry"
+   "queue.waiting_guest"
   ],
   "routing": "",
   "scope": "workstation",
@@ -15733,17 +15733,17 @@
    "staff"
   ]
  },
- "overrideQueueEntry": {
+ "overrideWaitingGuest": {
   "contract": "queue",
   "verb": "POST",
-  "path": "/queue-entries/{entryId}/override",
+  "path": "/waiting-guests/{entryId}/override",
   "reads": [
    "cache:idempotency",
-   "queue.entry"
+   "queue.waiting_guest"
   ],
   "writes": [
    "cache:idempotency",
-   "queue.entry"
+   "queue.waiting_guest"
   ],
   "routing": "",
   "scope": "venue",
@@ -15792,7 +15792,7 @@
   "verb": "GET",
   "path": "/queues/{queueId}/entries",
   "reads": [
-   "queue.entry"
+   "queue.waiting_guest"
   ],
   "writes": [],
   "routing": "primary",
@@ -15814,7 +15814,7 @@
   "verb": "GET",
   "path": "/queues/wait-times",
   "reads": [
-   "queue.entry",
+   "queue.waiting_guest",
    "queue.queue",
    "queue.reading"
   ],
@@ -16014,7 +16014,7 @@
   "verb": "GET",
   "path": "/signage/queue-calls",
   "reads": [
-   "queue.entry"
+   "queue.waiting_guest"
   ],
   "writes": [],
   "routing": "replica",
@@ -17697,8 +17697,8 @@
    "approvals.matrix",
    "approvals.rule",
    "cache:idempotency",
-   "identity.grant",
-   "platform.scope_node"
+   "identity.delegated_access",
+   "platform.org_unit"
   ],
   "writes": [
    "cache:idempotency"
@@ -17913,7 +17913,7 @@
   "path": "/delegations",
   "reads": [
    "cache:idempotency",
-   "identity.grant",
+   "identity.delegated_access",
    "identity.principal"
   ],
   "writes": [
@@ -18207,7 +18207,7 @@
   "path": "/rota-assignments",
   "reads": [
    "cache:idempotency",
-   "identity.grant",
+   "identity.delegated_access",
    "identity.principal",
    "platform.workstation"
   ],
@@ -18395,7 +18395,7 @@
   "reads": [
    "cache:idempotency",
    "identity.role",
-   "platform.scope_node"
+   "platform.org_unit"
   ],
   "writes": [
    "cache:idempotency",
@@ -18475,7 +18475,7 @@
   "reads": [
    "cache:idempotency",
    "pii.subject",
-   "platform.scope_node"
+   "platform.org_unit"
   ],
   "writes": [
    "cache:idempotency",
@@ -18501,8 +18501,8 @@
   "verb": "GET",
   "path": "/carts/{cartId}",
   "reads": [
-   "catalogue.envelope",
-   "catalogue.inventory_lease",
+   "catalogue.channel_capacity",
+   "catalogue.inventory_hold",
    "orders.cart",
    "orders.cart_line",
    "promotions.promotion"
@@ -18533,7 +18533,7 @@
   ],
   "writes": [
    "cache:idempotency",
-   "catalogue.inventory_lease",
+   "catalogue.inventory_hold",
    "orders.cart"
   ],
   "routing": "",
@@ -18557,13 +18557,13 @@
   "path": "/carts/{cartId}/lines",
   "reads": [
    "cache:idempotency",
-   "catalogue.envelope",
+   "catalogue.channel_capacity",
    "catalogue.performance",
    "catalogue.variant"
   ],
   "writes": [
    "cache:idempotency",
-   "catalogue.inventory_lease",
+   "catalogue.inventory_hold",
    "orders.cart",
    "orders.cart_line"
   ],
@@ -18589,12 +18589,12 @@
   "path": "/carts/{cartId}/lines/{lineId}",
   "reads": [
    "cache:idempotency",
-   "catalogue.envelope",
+   "catalogue.channel_capacity",
    "orders.cart_line"
   ],
   "writes": [
    "cache:idempotency",
-   "catalogue.inventory_lease",
+   "catalogue.inventory_hold",
    "orders.cart_line"
   ],
   "routing": "",
@@ -18623,7 +18623,7 @@
   ],
   "writes": [
    "cache:idempotency",
-   "catalogue.inventory_lease",
+   "catalogue.inventory_hold",
    "orders.cart_line"
   ],
   "routing": "",
@@ -18648,12 +18648,12 @@
   "path": "/carts/{cartId}/extend",
   "reads": [
    "cache:idempotency",
-   "catalogue.inventory_lease",
+   "catalogue.inventory_hold",
    "orders.cart"
   ],
   "writes": [
    "cache:idempotency",
-   "catalogue.inventory_lease",
+   "catalogue.inventory_hold",
    "orders.cart"
   ],
   "routing": "",
@@ -18706,7 +18706,7 @@
   "path": "/carts/{cartId}/checkout",
   "reads": [
    "cache:idempotency",
-   "catalogue.inventory_lease",
+   "catalogue.inventory_hold",
    "orders.cart",
    "orders.cart_line"
   ],
@@ -18861,7 +18861,7 @@
   "path": "/waitlist-entries",
   "reads": [
    "cache:idempotency",
-   "catalogue.envelope",
+   "catalogue.channel_capacity",
    "catalogue.performance"
   ],
   "writes": [
@@ -18916,12 +18916,12 @@
   "path": "/waitlist-entries/{entryId}/offer",
   "reads": [
    "cache:idempotency",
-   "catalogue.envelope",
+   "catalogue.channel_capacity",
    "catalogue.waitlist_entry"
   ],
   "writes": [
    "cache:idempotency",
-   "catalogue.inventory_lease",
+   "catalogue.inventory_hold",
    "catalogue.waitlist_entry"
   ],
   "routing": "",
@@ -19167,7 +19167,7 @@
   "offline": false,
   "summary": "Commercial agreements with B2B partners",
   "source": "hand-mapped",
-  "service": "ControlService",
+  "service": "PlatformService",
   "stores": [
    "postgres"
   ],
@@ -19196,7 +19196,7 @@
   "offline": false,
   "summary": "Agree commercial terms with a partner",
   "source": "hand-mapped",
-  "service": "ControlService",
+  "service": "PlatformService",
   "stores": [
    "postgres",
    "redis"
@@ -19225,7 +19225,7 @@
   "offline": false,
   "summary": "Amend, suspend or terminate",
   "source": "hand-mapped",
-  "service": "ControlService",
+  "service": "PlatformService",
   "stores": [
    "postgres",
    "redis"
@@ -19252,7 +19252,7 @@
   "offline": false,
   "summary": "A business applies to become a partner",
   "source": "hand-mapped",
-  "service": "ControlService",
+  "service": "PlatformService",
   "stores": [
    "postgres",
    "redis"
@@ -19279,7 +19279,7 @@
   "offline": false,
   "summary": "What the partner earned and what is owed",
   "source": "hand-mapped",
-  "service": "ControlService",
+  "service": "PlatformService",
   "stores": [
    "postgres"
   ],
@@ -19350,7 +19350,7 @@
   ],
   "writes": [
    "cache:idempotency",
-   "ledger.entry",
+   "ledger.posting",
    "ledger.inter_entity_obligation"
   ],
   "routing": "",
@@ -19463,7 +19463,7 @@
   "offline": false,
   "summary": "Terminate a tenant subscription",
   "source": "hand-mapped",
-  "service": "ControlService",
+  "service": "PlatformService",
   "stores": [
    "postgres",
    "redis"
@@ -19642,7 +19642,7 @@
   "path": "/merchandise-reservations/{reservationId}/collect",
   "reads": [
    "cache:idempotency",
-   "platform.scope_node"
+   "platform.org_unit"
   ],
   "writes": [
    "cache:idempotency",
@@ -19669,7 +19669,7 @@
   "path": "/merchandise-reservations/{reservationId}/cancel",
   "reads": [
    "cache:idempotency",
-   "platform.scope_node"
+   "platform.org_unit"
   ],
   "writes": [
    "cache:idempotency",
@@ -19735,7 +19735,7 @@
   "offline": false,
   "summary": "Exclude a cell from this wave",
   "source": "hand-mapped",
-  "service": "ControlService",
+  "service": "PlatformService",
   "stores": [
    "postgres",
    "redis"
@@ -19891,7 +19891,7 @@
   ],
   "writes": [
    "cache:idempotency",
-   "ledger.entry",
+   "ledger.posting",
    "orders.deposit_box"
   ],
   "routing": "",
@@ -19917,7 +19917,7 @@
    "ai.interaction",
    "ai.policy",
    "cache:idempotency",
-   "control.plan",
+   "control.subscription_plan",
    "control.subscription"
   ],
   "writes": [
@@ -19930,7 +19930,7 @@
   "offline": false,
   "summary": "Turn metered AI interactions into a billable usage record",
   "source": "hand-mapped",
-  "service": "ControlService",
+  "service": "PlatformService",
   "stores": [
    "postgres",
    "postgres-analytical",
@@ -21109,7 +21109,7 @@
   "reads": [
    "assets.media_asset",
    "cache:idempotency",
-   "platform.scope_node",
+   "platform.org_unit",
    "venuemap.map"
   ],
   "writes": [
@@ -21289,7 +21289,7 @@
   "path": "/venue-maps/{mapId}/live",
   "reads": [
    "access.scan_event",
-   "queue.entry",
+   "queue.waiting_guest",
    "venuemap.map",
    "venuemap.point"
   ],
@@ -21564,7 +21564,7 @@
   "path": "/resources",
   "reads": [
    "cache:idempotency",
-   "platform.scope_node",
+   "platform.org_unit",
    "resources.resource"
   ],
   "writes": [
@@ -21794,7 +21794,7 @@
   "writes": [
    "cache:idempotency",
    "ledger.deposit",
-   "ledger.entry"
+   "ledger.posting"
   ],
   "routing": "",
   "scope": "venue",
@@ -21824,7 +21824,7 @@
   "writes": [
    "cache:idempotency",
    "ledger.deposit",
-   "ledger.entry"
+   "ledger.posting"
   ],
   "routing": "",
   "scope": "venue",
@@ -21847,7 +21847,7 @@
   "verb": "GET",
   "path": "/reconciliation/unified",
   "reads": [
-   "ledger.entry",
+   "ledger.posting",
    "ledger.settlement",
    "orders.payment",
    "retail.wallet_transaction"
@@ -22038,7 +22038,7 @@
   ],
   "writes": [
    "cache:idempotency",
-   "ledger.entry",
+   "ledger.posting",
    "orders.chargeback"
   ],
   "routing": "",
@@ -22071,7 +22071,7 @@
   "offline": false,
   "summary": "Users beneath a partner, by branch",
   "source": "hand-mapped",
-  "service": "ControlService",
+  "service": "PlatformService",
   "stores": [
    "postgres"
   ],
@@ -22088,7 +22088,7 @@
    "cache:idempotency",
    "control.partner_agreement",
    "identity.principal",
-   "platform.scope_node"
+   "platform.org_unit"
   ],
   "writes": [
    "cache:idempotency",
@@ -22100,7 +22100,7 @@
   "offline": false,
   "summary": "Add a user to a partner branch",
   "source": "hand-mapped",
-  "service": "ControlService",
+  "service": "PlatformService",
   "stores": [
    "postgres",
    "redis"
@@ -22125,7 +22125,7 @@
   "offline": false,
   "summary": "What is listed on which OTA",
   "source": "hand-mapped",
-  "service": "ControlService",
+  "service": "PlatformService",
   "stores": [
    "postgres"
   ],
@@ -22139,7 +22139,7 @@
   "path": "/channel-listings",
   "reads": [
    "cache:idempotency",
-   "catalogue.envelope",
+   "catalogue.channel_capacity",
    "catalogue.price_list",
    "catalogue.product"
   ],
@@ -22153,7 +22153,7 @@
   "offline": false,
   "summary": "List a product on a channel, with its own allocation",
   "source": "hand-mapped",
-  "service": "ControlService",
+  "service": "PlatformService",
   "stores": [
    "postgres",
    "redis"
@@ -22169,7 +22169,7 @@
   "reads": [
    "cache:idempotency",
    "control.partner_agreement",
-   "ledger.entry",
+   "ledger.posting",
    "ledger.legal_entity",
    "orders.sales_order"
   ],
@@ -22182,7 +22182,7 @@
   "offline": false,
   "summary": "Partner invoice and settlement, in an ERP format",
   "source": "hand-mapped",
-  "service": "ControlService",
+  "service": "PlatformService",
   "stores": [
    "postgres",
    "redis"
@@ -22613,7 +22613,7 @@
   ],
   "writes": [
    "cache:idempotency",
-   "ledger.entry"
+   "ledger.posting"
   ],
   "routing": "",
   "scope": "tenant",
@@ -22889,7 +22889,7 @@
   "path": "/onboarding-applications",
   "reads": [
    "cache:idempotency",
-   "control.plan",
+   "control.subscription_plan",
    "control.venue_type_template"
   ],
   "writes": [
@@ -22902,7 +22902,7 @@
   "offline": false,
   "summary": "A prospect signs themselves up",
   "source": "hand-mapped",
-  "service": "ControlService",
+  "service": "PlatformService",
   "stores": [
    "postgres",
    "redis"
@@ -22925,7 +22925,7 @@
   "offline": false,
   "summary": "Starting configurations by venue kind",
   "source": "hand-mapped",
-  "service": "ControlService",
+  "service": "PlatformService",
   "stores": [
    "postgres"
   ],
@@ -23248,7 +23248,7 @@
   "verb": "GET",
   "path": "/guests/{subjectId}/delegations",
   "reads": [
-   "identity.grant",
+   "identity.delegated_access",
    "marketing.guest_profile",
    "pii.subject"
   ],
@@ -23275,12 +23275,12 @@
   "path": "/guests/{subjectId}/delegations",
   "reads": [
    "cache:idempotency",
-   "identity.grant",
+   "identity.delegated_access",
    "pii.subject"
   ],
   "writes": [
    "cache:idempotency",
-   "identity.grant"
+   "identity.delegated_access"
   ],
   "routing": "",
   "scope": "venue",
@@ -23332,7 +23332,7 @@
   "path": "/segregation-rules",
   "reads": [
    "cache:idempotency",
-   "identity.grant",
+   "identity.delegated_access",
    "identity.segregation_rule"
   ],
   "writes": [
@@ -23445,7 +23445,7 @@
   "verb": "POST",
   "path": "/recommendations",
   "reads": [
-   "catalogue.envelope",
+   "catalogue.channel_capacity",
    "catalogue.product",
    "marketing.guest_profile",
    "orders.cart",
@@ -23534,12 +23534,12 @@
    "access.entitlement",
    "cache:idempotency",
    "catalogue.entitlement_template",
-   "identity.grant"
+   "identity.delegated_access"
   ],
   "writes": [
    "access.entitlement",
    "cache:idempotency",
-   "identity.grant"
+   "identity.delegated_access"
   ],
   "routing": "",
   "scope": "venue",
@@ -23576,7 +23576,7 @@
   "offline": false,
   "summary": "Register a developer or organisation",
   "source": "hand-mapped",
-  "service": "ControlService",
+  "service": "PlatformService",
   "stores": [
    "postgres",
    "redis"
@@ -23597,7 +23597,7 @@
   "writes": [
    "cache:idempotency",
    "control.developer_account",
-   "identity.grant"
+   "identity.delegated_access"
   ],
   "routing": "",
   "scope": "tenant",
@@ -23605,7 +23605,7 @@
   "offline": false,
   "summary": "Who at this organisation may do what",
   "source": "hand-mapped",
-  "service": "ControlService",
+  "service": "PlatformService",
   "stores": [
    "postgres",
    "redis"
@@ -23628,7 +23628,7 @@
   "offline": false,
   "summary": "Registered clients for this developer",
   "source": "hand-mapped",
-  "service": "ControlService",
+  "service": "PlatformService",
   "stores": [
    "postgres"
   ],
@@ -23656,7 +23656,7 @@
   "offline": false,
   "summary": "Create a client with scopes and an environment",
   "source": "hand-mapped",
-  "service": "ControlService",
+  "service": "PlatformService",
   "stores": [
    "postgres",
    "redis"
@@ -23684,7 +23684,7 @@
   "offline": false,
   "summary": "Issue a new secret, with an overlap window",
   "source": "hand-mapped",
-  "service": "ControlService",
+  "service": "PlatformService",
   "stores": [
    "postgres",
    "redis"
@@ -23711,7 +23711,7 @@
   "offline": false,
   "summary": "Revoke immediately",
   "source": "hand-mapped",
-  "service": "ControlService",
+  "service": "PlatformService",
   "stores": [
    "postgres",
    "redis"
@@ -23736,7 +23736,7 @@
   "offline": false,
   "summary": "Exchange a credential for an access token",
   "source": "hand-mapped",
-  "service": "ControlService",
+  "service": "PlatformService",
   "stores": [
    "postgres"
   ],
@@ -23759,7 +23759,7 @@
   "offline": false,
   "summary": "Sandbox environments",
   "source": "hand-mapped",
-  "service": "ControlService",
+  "service": "PlatformService",
   "stores": [
    "postgres"
   ],
@@ -23786,7 +23786,7 @@
   "offline": false,
   "summary": "Provision a sandbox with synthetic data",
   "source": "hand-mapped",
-  "service": "ControlService",
+  "service": "PlatformService",
   "stores": [
    "postgres",
    "redis"
@@ -23814,7 +23814,7 @@
   "offline": false,
   "summary": "Back to a clean synthetic dataset",
   "source": "hand-mapped",
-  "service": "ControlService",
+  "service": "PlatformService",
   "stores": [
    "postgres",
    "redis"
@@ -23838,7 +23838,7 @@
   "offline": false,
   "summary": "What this client is subscribed to",
   "source": "hand-mapped",
-  "service": "ControlService",
+  "service": "PlatformService",
   "stores": [
    "postgres"
   ],
@@ -23865,7 +23865,7 @@
   "offline": false,
   "summary": "Subscribe to business events",
   "source": "hand-mapped",
-  "service": "ControlService",
+  "service": "PlatformService",
   "stores": [
    "postgres",
    "redis"
@@ -23889,7 +23889,7 @@
   "offline": false,
   "summary": "What was sent, what failed, and why",
   "source": "hand-mapped",
-  "service": "ControlService",
+  "service": "PlatformService",
   "stores": [
    "postgres"
   ],
@@ -23917,7 +23917,7 @@
   "offline": false,
   "summary": "Re-deliver events from a point in time",
   "source": "hand-mapped",
-  "service": "ControlService",
+  "service": "PlatformService",
   "stores": [
    "postgres",
    "redis"
@@ -23946,7 +23946,7 @@
   "offline": false,
   "summary": "Rate limits and throttling per client",
   "source": "hand-mapped",
-  "service": "ControlService",
+  "service": "PlatformService",
   "stores": [
    "postgres",
    "redis"
@@ -23969,7 +23969,7 @@
   "offline": false,
   "summary": "Calls, errors, latency and success rate",
   "source": "hand-mapped",
-  "service": "ControlService",
+  "service": "PlatformService",
   "stores": [
    "postgres"
   ],
@@ -23992,7 +23992,7 @@
   "offline": false,
   "summary": "Versions, their status and their sunset dates",
   "source": "hand-mapped",
-  "service": "ControlService",
+  "service": "PlatformService",
   "stores": [
    "postgres"
   ],
@@ -24021,7 +24021,7 @@
   "offline": false,
   "summary": "Announce a sunset date and notify subscribers",
   "source": "hand-mapped",
-  "service": "ControlService",
+  "service": "PlatformService",
   "stores": [
    "postgres",
    "redis"
@@ -24044,7 +24044,7 @@
   "offline": false,
   "summary": "Published third-party integrations",
   "source": "hand-mapped",
-  "service": "ControlService",
+  "service": "PlatformService",
   "stores": [
    "postgres"
   ],
@@ -24072,7 +24072,7 @@
   "offline": false,
   "summary": "Submit an integration for certification and listing",
   "source": "hand-mapped",
-  "service": "ControlService",
+  "service": "PlatformService",
   "stores": [
    "postgres",
    "redis"
@@ -24100,7 +24100,7 @@
   "offline": false,
   "summary": "Approve, reject or revoke a certification",
   "source": "hand-mapped",
-  "service": "ControlService",
+  "service": "PlatformService",
   "stores": [
    "postgres",
    "redis"
@@ -24128,7 +24128,7 @@
   "offline": false,
   "summary": "Which API modules a tenant has licensed, and on what terms",
   "source": "hand-mapped",
-  "service": "ControlService",
+  "service": "PlatformService",
   "stores": [
    "postgres",
    "redis"
@@ -24454,7 +24454,7 @@
    "access.entitlement",
    "catalogue.entitlement_template",
    "catalogue.product",
-   "identity.grant"
+   "identity.delegated_access"
   ],
   "writes": [],
   "routing": "replica",
@@ -24480,7 +24480,7 @@
   "reads": [
    "access.entitlement",
    "catalogue.entitlement_template",
-   "identity.grant"
+   "identity.delegated_access"
   ],
   "writes": [],
   "routing": "replica",
@@ -24591,7 +24591,7 @@
    "orders.payment_link",
    "orders.reservation",
    "orders.sales_order",
-   "platform.scope_node"
+   "platform.org_unit"
   ],
   "writes": [],
   "routing": "replica",
@@ -24995,7 +24995,7 @@
   "reads": [
    "cache:idempotency",
    "fnb.temperature_log",
-   "platform.scope_node"
+   "platform.org_unit"
   ],
   "writes": [
    "cache:idempotency",
@@ -26538,7 +26538,7 @@
    "cache:idempotency",
    "identity.principal",
    "platform.audit_record",
-   "platform.scope_node"
+   "platform.org_unit"
   ],
   "writes": [
    "platform.audit_read"
@@ -26857,7 +26857,7 @@
   "verb": "GET",
   "path": "/my/entitlements/all",
   "reads": [
-   "access.admission_profile",
+   "access.admission_rules",
    "access.entitlement",
    "catalogue.product"
   ],
@@ -27052,6 +27052,58 @@
   "summary": "How the import went",
   "source": "hand-mapped 24 August",
   "service": "CatalogueService",
+  "stores": [
+   "postgres"
+  ],
+  "audience": [
+   "staff"
+  ]
+ },
+ "ingestFxRates": {
+  "contract": "finance",
+  "verb": "POST",
+  "path": "/fx-rates/ingest",
+  "reads": [
+   "ledger.fx_rate",
+   "platform.region_settings"
+  ],
+  "writes": [
+   "cache:idempotency",
+   "ledger.fx_rate"
+  ],
+  "routing": "",
+  "scope": "region",
+  "perm": "LEDGER_APPROVE",
+  "offline": false,
+  "summary": "Pull rates from the configured provider",
+  "source": "hand-mapped 26 August",
+  "service": "LedgerService",
+  "stores": [
+   "postgres"
+  ],
+  "audience": [
+   "staff",
+   "service"
+  ]
+ },
+ "setFxProvider": {
+  "contract": "finance",
+  "verb": "PUT",
+  "path": "/fx-rates/providers",
+  "reads": [
+   "platform.region_settings"
+  ],
+  "writes": [
+   "cache:idempotency",
+   "platform.region_settings"
+  ],
+  "routing": "",
+  "scope": "region",
+  "perm": "LEDGER_APPROVE",
+  "offline": false,
+  "summary": "Which provider serves which purpose",
+  "source": "hand-mapped 26 August",
+  "service": "LedgerService",
   "stores": [
    "postgres"
   ],

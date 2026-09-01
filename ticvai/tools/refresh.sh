@@ -9,6 +9,7 @@ cd "$(dirname "$0")/.."
 
 python3 tools/derive-schema.py
 python3 tools/derive-relationships.py
+python3 tools/derive-table-notes.py --apply
 python3 tools/derive-schema-roots.py
 python3 tools/derive-frontend.py
 python3 tools/derive-board-panel-map.py
@@ -65,6 +66,6 @@ python3 tools/build-status.py --domain ai
 python3 tools/sync-counts.py
 
 echo
-for t in check-screens check-frontend check-flows check-states check-config-scope check-wireframes check-backlog check-traceability check-package; do
+for t in check-screens check-frontend check-flows check-states check-config-scope check-wireframes check-backlog check-traceability check-package audit-links; do
   printf "  %-22s" "$t"; python3 "tools/$t.py" 2>&1 | tail -1
 done

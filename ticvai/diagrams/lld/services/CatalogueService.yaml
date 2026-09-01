@@ -34,9 +34,9 @@ operationsByContract:
 - contract: catalogue
   count: 66
   operations:
-  - operation: acquireLease
+  - operation: acquireInventoryHold
     verb: POST
-    path: /leases
+    path: /inventory-holds
     scope: workstation
     permission: ORDER_CREATE
     offline: false
@@ -90,6 +90,14 @@ operationsByContract:
     offline: false
     reads: 2
     writes: 2
+  - operation: createChannelCapacity
+    verb: POST
+    path: /channel-capacities
+    scope: venue
+    permission: CAPACITY_CONFIGURE
+    offline: false
+    reads: 2
+    writes: 2
   - operation: createDonationCampaign
     verb: POST
     path: /donation-campaigns
@@ -103,14 +111,6 @@ operationsByContract:
     path: /entitlement-templates
     scope: venue
     permission: PRODUCT_CONFIGURE
-    offline: false
-    reads: 2
-    writes: 2
-  - operation: createEnvelope
-    verb: POST
-    path: /envelopes
-    scope: venue
-    permission: CAPACITY_CONFIGURE
     offline: false
     reads: 2
     writes: 2
@@ -146,9 +146,9 @@ operationsByContract:
     offline: false
     reads: 2
     writes: 2
-  - operation: forceReleaseLease
+  - operation: forceReleaseInventoryHold
     verb: POST
-    path: /leases/{leaseId}/force-release
+    path: /inventory-holds/{inventoryHoldId}/force-release
     scope: venue
     permission: CAPACITY_CONFIGURE
     offline: false
@@ -172,7 +172,7 @@ operationsByContract:
     writes: 0
   - operation: getChannelAllocations
     verb: GET
-    path: /envelopes/{envelopeId}/channel-allocations
+    path: /channel-capacities/{channelCapacityId}/channel-allocations
     scope: venue
     permission: PRODUCT_VIEW
     offline: false
@@ -266,6 +266,14 @@ operationsByContract:
     offline: true
     reads: 2
     writes: 0
+  - operation: listChannelCapacities
+    verb: GET
+    path: /channel-capacities
+    scope: venue
+    permission: PRODUCT_VIEW
+    offline: false
+    reads: 1
+    writes: 0
   - operation: listDonationCampaigns
     verb: GET
     path: /donation-campaigns
@@ -280,14 +288,6 @@ operationsByContract:
     scope: venue
     permission: PRODUCT_VIEW
     offline: true
-    reads: 1
-    writes: 0
-  - operation: listEnvelopes
-    verb: GET
-    path: /envelopes
-    scope: venue
-    permission: PRODUCT_VIEW
-    offline: false
     reads: 1
     writes: 0
   - operation: listEvents
@@ -306,9 +306,9 @@ operationsByContract:
     offline: false
     reads: 3
     writes: 0
-  - operation: listLeases
+  - operation: listInventoryHolds
     verb: GET
-    path: /leases
+    path: /inventory-holds
     scope: venue
     permission: PRODUCT_VIEW
     offline: false
@@ -404,23 +404,23 @@ operationsByContract:
     writes: 2
   - operation: releaseChannelAllocation
     verb: POST
-    path: /envelopes/{envelopeId}/channel-allocations/release
+    path: /channel-capacities/{channelCapacityId}/channel-allocations/release
     scope: venue
     permission: CAPACITY_CONFIGURE
     offline: false
     reads: 2
     writes: 2
-  - operation: releaseLease
+  - operation: releaseInventoryHold
     verb: DELETE
-    path: /leases/{leaseId}
+    path: /inventory-holds/{inventoryHoldId}
     scope: workstation
     permission: ORDER_CREATE
     offline: false
     reads: 2
     writes: 2
-  - operation: renewLease
+  - operation: renewInventoryHold
     verb: POST
-    path: /leases/{leaseId}/renew
+    path: /inventory-holds/{inventoryHoldId}/renew
     scope: workstation
     permission: ORDER_CREATE
     offline: false
@@ -468,7 +468,7 @@ operationsByContract:
     writes: 2
   - operation: setChannelAllocations
     verb: PUT
-    path: /envelopes/{envelopeId}/channel-allocations
+    path: /channel-capacities/{channelCapacityId}/channel-allocations
     scope: venue
     permission: CAPACITY_CONFIGURE
     offline: false
@@ -514,19 +514,19 @@ operationsByContract:
     offline: false
     reads: 2
     writes: 2
+  - operation: updateChannelCapacity
+    verb: PATCH
+    path: /channel-capacities/{channelCapacityId}
+    scope: venue
+    permission: CAPACITY_CONFIGURE
+    offline: false
+    reads: 2
+    writes: 2
   - operation: updateDonationCampaign
     verb: PATCH
     path: /donation-campaigns/{campaignId}
     scope: venue
     permission: PRODUCT_CONFIGURE
-    offline: false
-    reads: 2
-    writes: 2
-  - operation: updateEnvelope
-    verb: PATCH
-    path: /envelopes/{envelopeId}
-    scope: venue
-    permission: CAPACITY_CONFIGURE
     offline: false
     reads: 2
     writes: 2
@@ -1150,15 +1150,15 @@ tables:
   writtenBy:
   - catalogue
   foreignWriters: null
-- table: catalogue.attribute_axis
-  columns: 3
+- table: catalogue.channel_allocation
+  columns: 8
   store: postgres
   parent: null
   writtenBy:
   - catalogue
   foreignWriters: null
-- table: catalogue.channel_allocation
-  columns: 8
+- table: catalogue.channel_capacity
+  columns: 12
   store: postgres
   parent: null
   writtenBy:
@@ -1172,16 +1172,9 @@ tables:
   - catalogue
   foreignWriters: null
 - table: catalogue.entitlement_template
-  columns: 32
+  columns: 33
   store: postgres
   parent: access.entitlement
-  writtenBy:
-  - catalogue
-  foreignWriters: null
-- table: catalogue.envelope
-  columns: 12
-  store: postgres
-  parent: null
   writtenBy:
   - catalogue
   foreignWriters: null
@@ -1199,8 +1192,8 @@ tables:
   writtenBy:
   - catalogue
   foreignWriters: null
-- table: catalogue.inventory_lease
-  columns: 14
+- table: catalogue.inventory_hold
+  columns: 15
   store: postgres
   parent: null
   writtenBy:
@@ -1209,7 +1202,7 @@ tables:
   foreignWriters:
   - orders
 - table: catalogue.performance
-  columns: 9
+  columns: 10
   store: postgres
   parent: null
   writtenBy:
@@ -1271,6 +1264,13 @@ tables:
   writtenBy:
   - catalogue
   foreignWriters: null
+- table: catalogue.variant_dimension
+  columns: 3
+  store: postgres
+  parent: null
+  writtenBy:
+  - catalogue
+  foreignWriters: null
 - table: catalogue.waitlist_entry
   columns: 11
   store: postgres
@@ -1292,7 +1292,7 @@ tables:
   writtenBy: []
   foreignWriters: null
 - table: promotions.bundle
-  columns: 15
+  columns: 14
   store: postgres
   parent: null
   writtenBy:
@@ -1305,9 +1305,9 @@ tables:
   writtenBy: []
   foreignWriters: null
 - table: promotions.bundle_component
-  columns: 6
+  columns: 7
   store: postgres
-  parent: null
+  parent: promotions.bundle
   writtenBy:
   - promotions
   foreignWriters: null
@@ -1389,7 +1389,7 @@ tables:
   - seating
   foreignWriters: null
 - table: seating.seat_map
-  columns: 8
+  columns: 12
   store: postgres
   parent: null
   writtenBy:
@@ -1448,10 +1448,10 @@ screens:
 - P01:WEB-001 Home / Landing
 - P01:WEB-002 Event & Attraction Listing
 - P01:WEB-003 Search Results
-- P01:WEB-004 Event / Attraction Detail
+- P01:WEB-004 Attraction Details
 - P01:WEB-005 Ticket Type Selection
 - P01:WEB-006 Date & Session Selection
-- P01:WEB-007 Seat Map Selection
+- P01:WEB-007 Interactive Seat Selection
 - P01:WEB-008 Add-ons & Upsell
 - P01:WEB-010 Shopping Cart
 - P01:WEB-022 Membership Plans
@@ -1461,13 +1461,14 @@ screens:
 - P01:WEB-043 Loyalty & Rewards
 - P02:GST-001 Home – Default
 - P02:GST-002 Explore Categories
-- P02:GST-003 Attractions List
+- P02:GST-003 Event & Attraction Listing
 - P02:GST-004 Attraction Details
 - P02:GST-005 What's On
 - P02:GST-006 Event / Exhibition Details
 - P02:GST-007 Select Date & Time
 - P02:GST-015 Memberships
 - P02:GST-021 Interactive Map
+- P02:GST-036 Loyalty & Rewards
 - P02:GST-037 Offers & Promotions
 - P02:GST-038 Digital Companion Mode
 - P02:GST-044 Multi-Currency & Pricing

@@ -135,7 +135,8 @@ paths:
     post:
       operationId: requestSuggestion
       x-ticvai-consumed-by:
-        - "P01 WEB-044 AI Concierge"
+        - "P01 WEB-044 AI Concierge – Home"
+        - "P02 GST-031 AI Concierge – Home"
         - "P02 GST-052 Suggested Itineraries"
         - "P02 GST-054 AI Optimized Itinerary"
         - "P02 GST-059 Plan My Day – In Progress"
@@ -558,7 +559,8 @@ paths:
     post:
       operationId: createAiConversation
       x-ticvai-consumed-by:
-        - "P01 WEB-044 AI Concierge"
+        - "P01 WEB-044 AI Concierge – Home"
+        - "P02 GST-031 AI Concierge – Home"
         - "P06 EMP-019 AI assistant — home"
         - "P06 EMP-020 AI assistant — answer"
       x-ticvai-audience: [staff, guest]
@@ -609,7 +611,7 @@ paths:
     post:
       operationId: sendAiMessage
       x-ticvai-consumed-by:
-        - "P01 WEB-044 AI Concierge"
+        - "P01 WEB-044 AI Concierge – Home"
         - "P02 GST-031 AI Concierge – Home"
         - "P02 GST-032 AI Concierge – Chat"
         - "P02 GST-033 AI Concierge – Contextual Help"

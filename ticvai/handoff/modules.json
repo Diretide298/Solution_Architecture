@@ -71,7 +71,7 @@
  },
  {
   "module": "control",
-  "purpose": "Owned by ControlService",
+  "purpose": "Owned by PlatformService",
   "why": "A prospect signing themselves up (BL-165). **Nothing is provisioned until verification passes** \u2014 an unverified application that provisions a cell is a cell somebody has to clean up.",
   "tables": 41,
   "written": 0,
@@ -309,8 +309,8 @@
  },
  {
   "module": "sync",
-  "purpose": "Owned by CrossCellService",
-  "why": "Segregated by domain; owned by CrossCellService.",
+  "purpose": "Owned by CrossRegionService",
+  "why": "Segregated by domain; owned by CrossRegionService.",
   "tables": 1,
   "written": 0,
   "columns": 9,

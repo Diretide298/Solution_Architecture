@@ -1,0 +1,101 @@
+path,board,folder,kind,in_git,platforms,raw_id_matches,frames,claimed,unclaimed,wired,bytes,modified
+"wireframes/P08 Staff Web Back Office.dc.html","P08 Staff Web Back Office",wireframes,generated,yes,"",73,73,0,73,no,733456,2026-08-25
+"wireframes/P06 Staff App.dc.html","P06 Staff App",wireframes,generated,yes,"",50,50,0,50,no,285850,2026-08-25
+"wireframes/P08 Venue Management.dc.html","P08 Venue Management",wireframes,generated,yes,"P08",143,143,100,43,yes,415704,2026-08-31
+"wireframes/P09 Admin Web.dc.html","P09 Admin Web",wireframes,generated,yes,"",36,36,0,36,no,338829,2026-08-25
+"wireframes/P13 White-Label CMS.dc.html","P13 White-Label CMS",wireframes,generated,yes,"",20,20,0,20,no,171979,2026-08-25
+"wireframes/P07 Staff Scanner.dc.html","P07 Staff Scanner",wireframes,generated,yes,"",16,16,0,16,no,93080,2026-08-25
+"wireframes/FnB Board 2.dc.html","FnB Board 2",wireframes,pack,yes,"P08",26,18,5,13,yes,279332,2026-08-31
+"wireframes/P04 Venue POS.dc.html","P04 Venue POS",wireframes,generated,yes,"P04",24,24,12,12,yes,76833,2026-08-31
+"wireframes/Retail Board 2.dc.html","Retail Board 2",wireframes,pack,yes,"P08",22,18,7,11,yes,239537,2026-08-31
+"wireframes/Retail Board 6.dc.html","Retail Board 6",wireframes,pack,yes,"P08 P16",22,14,3,11,yes,203088,2026-08-31
+"wireframes/FnB Board 3.dc.html","FnB Board 3",wireframes,pack,yes,"P15",20,17,7,10,yes,208094,2026-08-31
+"wireframes/FnB Board 4.dc.html","FnB Board 4",wireframes,pack,yes,"P06",20,18,8,10,yes,213738,2026-08-31
+"wireframes/FnB Board 5.dc.html","FnB Board 5",wireframes,pack,yes,"P06",20,13,3,10,yes,205470,2026-08-31
+"wireframes/FnB Board 6.dc.html","FnB Board 6",wireframes,pack,yes,"",20,10,0,10,no,182854,2026-08-31
+"wireframes/Inventory Board 2.dc.html","Inventory Board 2",wireframes,pack,yes,"",20,10,0,10,no,197697,2026-08-31
+"wireframes/Inventory Board 3.dc.html","Inventory Board 3",wireframes,pack,yes,"",20,10,0,10,no,178364,2026-08-31
+"wireframes/Inventory Board 4.dc.html","Inventory Board 4",wireframes,pack,yes,"",20,10,0,10,no,182288,2026-08-31
+"wireframes/Inventory Board 5.dc.html","Inventory Board 5",wireframes,pack,yes,"",20,10,0,10,no,178821,2026-08-31
+"wireframes/Inventory Board 6.dc.html","Inventory Board 6",wireframes,pack,yes,"",20,10,0,10,no,166018,2026-08-31
+"wireframes/Inventory Board 7.dc.html","Inventory Board 7",wireframes,pack,yes,"",20,10,0,10,no,156659,2026-08-31
+"wireframes/Marketing Board 10.dc.html","Marketing Board 10",wireframes,pack,no,"",20,10,0,10,no,147515,2026-08-31
+"wireframes/Marketing Board 11.dc.html","Marketing Board 11",wireframes,pack,no,"",20,10,0,10,no,149020,2026-08-31
+"wireframes/Marketing Board 12.dc.html","Marketing Board 12",wireframes,pack,no,"",20,10,0,10,no,139495,2026-08-31
+"wireframes/Marketing Board 2.dc.html","Marketing Board 2",wireframes,pack,no,"",20,10,0,10,no,138648,2026-08-31
+"wireframes/Marketing Board 3.dc.html","Marketing Board 3",wireframes,pack,no,"",20,10,0,10,no,148170,2026-08-31
+"wireframes/Marketing Board 4.dc.html","Marketing Board 4",wireframes,pack,no,"",20,10,0,10,no,152610,2026-08-31
+"wireframes/Marketing Board 5.dc.html","Marketing Board 5",wireframes,pack,no,"",20,10,0,10,no,139261,2026-08-31
+"wireframes/Marketing Board 6.dc.html","Marketing Board 6",wireframes,pack,no,"",20,10,0,10,no,145353,2026-08-31
+"wireframes/Marketing Board 8.dc.html","Marketing Board 8",wireframes,pack,no,"",20,10,0,10,no,159216,2026-08-31
+"wireframes/Marketing Board 9.dc.html","Marketing Board 9",wireframes,pack,no,"",20,10,0,10,no,156833,2026-08-31
+"wireframes/P04 Staff POS.dc.html","P04 Staff POS",wireframes,generated,yes,"",10,10,0,10,no,117589,2026-08-25
+"wireframes/Retail Board 3.dc.html","Retail Board 3",wireframes,pack,yes,"P04 P08",20,15,5,10,yes,192232,2026-08-31
+"wireframes/Retail Board 4.dc.html","Retail Board 4",wireframes,pack,yes,"P06 P08",20,19,9,10,yes,197744,2026-08-31
+"wireframes/Retail Board 5.dc.html","Retail Board 5",wireframes,pack,yes,"P08",20,15,5,10,yes,192575,2026-08-31
+"wireframes/Seat Platform Board 1.dc.html","Seat Platform Board 1",wireframes,pack,no,"",20,10,0,10,no,148219,2026-08-31
+"wireframes/Seat Platform Board 10.dc.html","Seat Platform Board 10",wireframes,pack,no,"",20,10,0,10,no,137588,2026-08-31
+"wireframes/Seat Platform Board 11.dc.html","Seat Platform Board 11",wireframes,pack,no,"",20,10,0,10,no,130961,2026-08-31
+"wireframes/Seat Platform Board 12.dc.html","Seat Platform Board 12",wireframes,pack,no,"",20,10,0,10,no,149134,2026-08-31
+"wireframes/Seat Platform Board 13.dc.html","Seat Platform Board 13",wireframes,pack,no,"P08",20,11,1,10,yes,144748,2026-08-31
+"wireframes/Seat Platform Board 2.dc.html","Seat Platform Board 2",wireframes,pack,no,"",20,10,0,10,no,142851,2026-08-31
+"wireframes/Seat Platform Board 3.dc.html","Seat Platform Board 3",wireframes,pack,no,"",20,10,0,10,no,133045,2026-08-31
+"wireframes/Seat Platform Board 4.dc.html","Seat Platform Board 4",wireframes,pack,no,"",20,10,0,10,no,136779,2026-08-31
+"wireframes/Seat Platform Board 5.dc.html","Seat Platform Board 5",wireframes,pack,no,"",20,10,0,10,no,136925,2026-08-31
+"wireframes/Seat Platform Board 6.dc.html","Seat Platform Board 6",wireframes,pack,no,"",20,10,0,10,no,137840,2026-08-31
+"wireframes/Seat Platform Board 7.dc.html","Seat Platform Board 7",wireframes,pack,no,"P08",20,11,1,10,yes,130810,2026-08-31
+"wireframes/Seat Platform Board 8.dc.html","Seat Platform Board 8",wireframes,pack,no,"",20,10,0,10,no,105395,2026-08-31
+"wireframes/Seat Platform Board 9.dc.html","Seat Platform Board 9",wireframes,pack,no,"",20,10,0,10,no,121177,2026-08-31
+"wireframes/FnB Board 1.dc.html","FnB Board 1",wireframes,pack,yes,"P08",18,11,2,9,yes,180484,2026-08-31
+"wireframes/Marketing Board 1.dc.html","Marketing Board 1",wireframes,pack,no,"P08",20,10,1,9,yes,149257,2026-08-31
+"wireframes/Marketing Board 7.dc.html","Marketing Board 7",wireframes,pack,no,"P13",20,10,1,9,yes,141240,2026-08-31
+"wireframes/P06 Venue Staff App.dc.html","P06 Venue Staff App",wireframes,generated,yes,"P06",66,66,57,9,yes,207255,2026-08-31
+"wireframes/Retail Board 1.dc.html","Retail Board 1",wireframes,pack,yes,"P08",18,12,3,9,yes,139385,2026-08-31
+"wireframes/P11 Accreditation.dc.html","P11 Accreditation",wireframes,generated,yes,"",8,8,0,8,no,82560,2026-08-25
+"wireframes/P12 Support Console.dc.html","P12 Support Console",wireframes,generated,yes,"",8,8,0,8,no,86988,2026-08-25
+"wireframes/Inventory Board 1.dc.html","Inventory Board 1",wireframes,pack,yes,"P06",16,8,1,7,yes,147417,2026-08-31
+"wireframes/POS Board 1.dc.html","POS Board 1",wireframes,pack,yes,"P08",12,10,4,6,yes,128646,2026-08-31
+"wireframes/POS Board 3.dc.html","POS Board 3",wireframes,pack,yes,"P04",12,10,4,6,yes,118302,2026-08-31
+"wireframes/POS Board 4.dc.html","POS Board 4",wireframes,pack,yes,"P08",12,11,5,6,yes,121940,2026-08-31
+"wireframes/POS Board 5.dc.html","POS Board 5",wireframes,pack,yes,"P08",12,11,5,6,yes,120314,2026-08-31
+"wireframes/POS Board 6.dc.html","POS Board 6",wireframes,pack,yes,"",12,6,0,6,no,124835,2026-08-31
+"wireframes/TICVAI Boards v2.dc.html","TICVAI Boards",wireframes,pack,yes,"P04",12,8,2,6,yes,136749,2026-08-31
+"wireframes/Guest Mobile Board 1.dc.html","Guest Mobile Board 1",wireframes,pack,no,"P02",10,6,1,5,yes,58007,2026-08-31
+"wireframes/Guest Mobile Board 2.dc.html","Guest Mobile Board 2",wireframes,pack,no,"",10,5,0,5,no,53046,2026-08-31
+"wireframes/Guest Mobile Board 3.dc.html","Guest Mobile Board 3",wireframes,pack,no,"",10,5,0,5,no,53794,2026-08-31
+"wireframes/Guest Mobile Board 4.dc.html","Guest Mobile Board 4",wireframes,pack,no,"",10,5,0,5,no,51723,2026-08-31
+"wireframes/Guest Mobile Board 5.dc.html","Guest Mobile Board 5",wireframes,pack,no,"",10,5,0,5,no,51302,2026-08-31
+"wireframes/Guest Mobile Board 6.dc.html","Guest Mobile Board 6",wireframes,pack,no,"",10,5,0,5,no,56477,2026-08-31
+"wireframes/Guest Mobile Board 7.dc.html","Guest Mobile Board 7",wireframes,pack,no,"",10,5,0,5,no,53139,2026-08-31
+"wireframes/Guest Mobile Board 8.dc.html","Guest Mobile Board 8",wireframes,pack,no,"",10,5,0,5,no,48786,2026-08-31
+"wireframes/POS Frontline Board 2.dc.html","POS Frontline Board 2",wireframes,pack,yes,"P04",8,7,3,4,yes,70010,2026-08-31
+"wireframes/Seat Board 4.dc.html","Seat Board 4",wireframes,pack,yes,"P02 P06",6,6,3,3,yes,36622,2026-08-31
+"wireframes/Seat Board 2.dc.html","Seat Board 2",wireframes,pack,yes,"P08",10,7,5,2,yes,113050,2026-08-31
+"wireframes/Seat Board 3.dc.html","Seat Board 3",wireframes,pack,yes,"P01 P04 P10",8,6,4,2,yes,76826,2026-08-31
+"wireframes/Seat Board 1.dc.html","Seat Board 1",wireframes,pack,yes,"P08",6,4,3,1,yes,70498,2026-08-31
+"ui-design/designs/Aster Invite Day.dc.html","Aster Invite Day",ui-design,single,yes,"",0,0,0,0,no,11430,2026-08-31
+"ui-design/designs/Aster Invite.dc.html","Aster Invite",ui-design,single,yes,"",0,0,0,0,no,11128,2026-08-31
+"ui-design/designs/Aster Landing.dc.html","Aster Landing",ui-design,single,yes,"",0,0,0,0,no,22309,2026-08-31
+"ui-design/designs/Aster Sign In Day.dc.html","Aster Sign In Day",ui-design,single,yes,"",0,0,0,0,no,19106,2026-08-31
+"ui-design/designs/Aster Sign In.dc.html","Aster Sign In",ui-design,single,yes,"",0,0,0,0,no,18810,2026-08-31
+"wireframes/Dashboards Board.dc.html","Dashboards Board",wireframes,pack,yes,"P01 P09 P10 P12",10,5,5,0,yes,98846,2026-08-31
+"wireframes/Kiosk Board 1.dc.html","Kiosk Board 1",wireframes,pack,no,"P05",18,9,9,0,yes,50444,2026-08-31
+"wireframes/Kiosk Board 2.dc.html","Kiosk Board 2",wireframes,pack,no,"P05",16,8,8,0,yes,45509,2026-08-31
+"wireframes/P01 Guest Web.dc.html","P01 Guest Web",wireframes,generated,yes,"P01",46,46,46,0,yes,111531,2026-08-31
+"wireframes/P02 Guest App.dc.html","P02 Guest App",wireframes,generated,yes,"P02",63,63,63,0,yes,131646,2026-08-31
+"wireframes/P05 Guest Kiosk.dc.html","P05 Guest Kiosk",wireframes,generated,yes,"P05",17,17,17,0,yes,46515,2026-08-31
+"wireframes/P07 Venue Scanner.dc.html","P07 Venue Scanner",wireframes,generated,yes,"P07",11,11,11,0,yes,41445,2026-08-31
+"wireframes/P09 TICVAI Web.dc.html","P09 TICVAI Web",wireframes,generated,yes,"P09",37,37,37,0,yes,93222,2026-08-31
+"wireframes/P10 Partner Web.dc.html","P10 Partner Web",wireframes,generated,yes,"P10",21,21,21,0,yes,60621,2026-08-31
+"wireframes/P11 Accreditation Web.dc.html","P11 Accreditation Web",wireframes,generated,yes,"P11",8,8,8,0,yes,26160,2026-08-31
+"wireframes/P12 Venue Support.dc.html","P12 Venue Support",wireframes,generated,yes,"P12",8,8,8,0,yes,27002,2026-08-31
+"wireframes/P13 Venue CMS.dc.html","P13 Venue CMS",wireframes,generated,yes,"P13",20,20,20,0,yes,61377,2026-08-31
+"wireframes/P14 Developer.dc.html","P14 Developer",wireframes,generated,yes,"P14",8,8,8,0,yes,30896,2026-08-31
+"wireframes/P15 Kitchen Display.dc.html","P15 Kitchen Display",wireframes,generated,yes,"P15",10,10,10,0,yes,42222,2026-08-31
+"wireframes/P16 Venue Analytics.dc.html","P16 Venue Analytics",wireframes,generated,yes,"P16",10,10,10,0,yes,44248,2026-08-31
+"designs/Park_POS_dc.html","Park POS",designs,single,yes,"",0,0,0,0,no,121145,2026-08-25
+"designs/Park_POS_v1_dc.html","Park POS",designs,single,yes,"",0,0,0,0,no,46665,2026-08-25
+"wireframes/TICVAI All Boards Index.dc.html","TICVAI All Boards Index",wireframes,index,yes,"",0,0,0,0,no,970754,2026-08-31
+"wireframes/TICVAI Wireframe Boards.dc.html","TICVAI Wireframe Boards",wireframes,single,yes,"",0,0,0,0,no,12357,2026-08-31
+"ui-design/designs/Viewer Redesign - Topbar Night.dc.html","Viewer Redesign - Topbar Night",ui-design,single,yes,"",0,0,0,0,no,68962,2026-08-31
+"ui-design/designs/Viewer Redesign - Topbar.dc.html","Viewer Redesign - Topbar",ui-design,single,yes,"",0,0,0,0,no,68894,2026-08-31

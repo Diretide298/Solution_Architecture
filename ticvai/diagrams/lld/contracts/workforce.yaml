@@ -61,7 +61,7 @@ operations:
   offline: false
   reads:
   - cache:idempotency
-  - identity.grant
+  - identity.delegated_access
   - identity.principal
   - platform.workstation
   writes:
@@ -127,7 +127,7 @@ operations:
   reads:
   - cache:idempotency
   - identity.role
-  - platform.scope_node
+  - platform.org_unit
   writes:
   - cache:idempotency
   - workforce.announcement

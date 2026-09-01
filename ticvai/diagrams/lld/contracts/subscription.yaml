@@ -3,7 +3,7 @@ title: subscription — 55 operations
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/03-contracts.yaml
 tier: satellite
-service: ControlService
+service: PlatformService
 operations:
 - operation: addLicenceAddOn
   verb: POST
@@ -91,7 +91,7 @@ operations:
   - cache:idempotency
   - control.partner_agreement
   - identity.principal
-  - platform.scope_node
+  - platform.org_unit
   writes:
   - cache:idempotency
   - control.partner_user
@@ -105,10 +105,10 @@ operations:
   offline: false
   reads:
   - cache:idempotency
-  - control.plan
+  - control.subscription_plan
   writes:
   - cache:idempotency
-  - control.plan
+  - control.subscription_plan
 - operation: createPlanVersion
   verb: POST
   path: /plans/{planId}
@@ -119,10 +119,10 @@ operations:
   offline: false
   reads:
   - cache:idempotency
-  - control.plan
+  - control.subscription_plan
   writes:
   - cache:idempotency
-  - control.plan
+  - control.subscription_plan
 - operation: createTenant
   verb: POST
   path: /tenants
@@ -190,8 +190,8 @@ operations:
   reads:
   - cache:idempotency
   - control.partner_agreement
-  - ledger.entry
   - ledger.legal_entity
+  - ledger.posting
   - orders.sales_order
   writes:
   - cache:idempotency
@@ -280,7 +280,7 @@ operations:
   - staff
   offline: false
   reads:
-  - control.plan
+  - control.subscription_plan
   writes: []
 - operation: getSubscription
   verb: GET
@@ -316,8 +316,8 @@ operations:
   offline: true
   reads:
   - control.licence_add_on
-  - control.plan
   - control.subscription
+  - control.subscription_plan
   writes: []
 - operation: getUsageMetering
   verb: GET
@@ -413,7 +413,7 @@ operations:
   - staff
   offline: false
   reads:
-  - control.plan
+  - control.subscription_plan
   writes: []
 - operation: listSubscriptionInvoices
   verb: GET
@@ -495,8 +495,8 @@ operations:
   offline: false
   reads:
   - cache:idempotency
-  - control.plan
   - control.subscription
+  - control.subscription_plan
   - platform.tenant
   writes:
   - cache:idempotency
@@ -625,7 +625,7 @@ operations:
   offline: false
   reads:
   - cache:idempotency
-  - catalogue.envelope
+  - catalogue.channel_capacity
   - catalogue.price_list
   - catalogue.product
   writes:
@@ -657,8 +657,8 @@ operations:
   - ai.interaction
   - ai.policy
   - cache:idempotency
-  - control.plan
   - control.subscription
+  - control.subscription_plan
   writes:
   - cache:idempotency
   - control.usage_record
@@ -672,7 +672,7 @@ operations:
   offline: false
   reads:
   - cache:idempotency
-  - control.plan
+  - control.subscription_plan
   - control.venue_type_template
   writes:
   - cache:idempotency

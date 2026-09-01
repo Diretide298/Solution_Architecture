@@ -20,7 +20,7 @@ schemas:
   stores:
   - postgres
   - redis
-  largestTable: identity.grant
+  largestTable: identity.delegated_access
 - schema: pii
   tables: 4
   stores:
@@ -38,9 +38,9 @@ operationsByContract:
     offline: false
     reads: 3
     writes: 2
-  - operation: createGrant
+  - operation: createDelegatedAccess
     verb: POST
-    path: /grants
+    path: /delegated-access
     scope: venue
     permission: PERMISSION_GRANT
     offline: false
@@ -70,9 +70,9 @@ operationsByContract:
     offline: false
     reads: 2
     writes: 3
-  - operation: deleteGrant
+  - operation: deleteDelegatedAccess
     verb: DELETE
-    path: /grants/{grantId}
+    path: /delegated-access/{delegatedAccessId}
     scope: venue
     permission: PERMISSION_GRANT
     offline: false
@@ -190,6 +190,14 @@ operationsByContract:
     offline: false
     reads: 2
     writes: 0
+  - operation: listDelegatedAccess
+    verb: GET
+    path: /delegated-access
+    scope: venue
+    permission: PERMISSION_VIEW
+    offline: false
+    reads: 1
+    writes: 0
   - operation: listDelegations
     verb: GET
     path: /guests/{subjectId}/delegations
@@ -197,14 +205,6 @@ operationsByContract:
     permission: GUEST_VIEW
     offline: false
     reads: 3
-    writes: 0
-  - operation: listGrants
-    verb: GET
-    path: /grants
-    scope: venue
-    permission: PERMISSION_VIEW
-    offline: false
-    reads: 1
     writes: 0
   - operation: listMfaMethods
     verb: GET
@@ -403,7 +403,7 @@ tables:
   parent: null
   writtenBy: []
   foreignWriters: null
-- table: identity.grant
+- table: identity.delegated_access
   columns: 19
   store: postgres
   parent: null

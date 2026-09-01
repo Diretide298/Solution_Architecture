@@ -40,9 +40,9 @@ operationsByContract:
     offline: false
     reads: 2
     writes: 2
-  - operation: createAdmissionProfile
+  - operation: createAdmissionRules
     verb: POST
-    path: /admission-profiles
+    path: /admission-rules
     scope: venue
     permission: ACCESS_POINT_CONFIGURE
     offline: false
@@ -120,9 +120,9 @@ operationsByContract:
     offline: true
     reads: 1
     writes: 0
-  - operation: listAdmissionProfiles
+  - operation: listAdmissionRules
     verb: GET
-    path: /admission-profiles
+    path: /admission-rules
     scope: venue
     permission: SCOPE_VIEW
     offline: true
@@ -240,9 +240,9 @@ operationsByContract:
     offline: false
     reads: 2
     writes: 2
-  - operation: updateAdmissionProfile
+  - operation: updateAdmissionRules
     verb: PUT
-    path: /admission-profiles/{profileId}
+    path: /admission-rules/{profileId}
     scope: venue
     permission: ACCESS_POINT_CONFIGURE
     offline: false
@@ -294,7 +294,7 @@ tables:
   writtenBy:
   - access
   foreignWriters: null
-- table: access.admission_profile
+- table: access.admission_rules
   columns: 9
   store: postgres
   parent: null
@@ -361,7 +361,7 @@ writesOutside:
 - service: IdentityService
   operations: 2
   why: '**The owner defines the row; this service may only append to it.**'
-- service: CrossCellService
+- service: CrossRegionService
   operations: 1
   why: '**The owner defines the row; this service may only append to it.**'
 - service: MarketingService
@@ -369,7 +369,7 @@ writesOutside:
   why: '**The owner defines the row; this service may only append to it.**'
 screens:
 - P01:WEB-018 My Tickets
-- P01:WEB-041 Parking — Reserve & Pay
+- P01:WEB-041 Parking – Reserve & Pay
 - P02:GST-001 Home – Default
 - P02:GST-012 My Tickets
 - P02:GST-013 Ticket Details

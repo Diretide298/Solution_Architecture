@@ -115,7 +115,32 @@ requirement coverage.
 
 ---
 
-## 6 · Regenerate and diff the counts
+## 6 · Run the link audit
+
+```bash
+python3 tools/audit-links.py --detail
+```
+
+**Nine directions, and a non-zero count is a link a reader can follow into nothing.** It runs inside
+`refresh.sh` as the tenth check, but run it with `--detail` after a pack because that is when it
+fires.
+
+**`screen -> board anchor` is the one a pack breaks.** It checks two claims per screen — the board
+file exists, and the anchor exists inside it — plus every `boardFrames` entry against every board on
+disk.
+
+**156 broke on 31 August and all 156 were case drift**: `boardFrames` held `POS-2A` where the board
+anchored on `pos-2b`. **`check-wireframes` did not see them** because it only reads
+`wireframe.board`, not `boardFrames`, and the frames had been recorded from a pack that uppercased
+its labels.
+
+**The audit also reports reach, which is not integrity.** A link that resolves is not the same as a
+link that exists: `screens with no board` counts screens nobody has pointed anywhere, and
+`screens drawn` separates a client drawing from a generated one.
+
+---
+
+## 7 · Regenerate and diff the counts
 
 `refresh.sh` writes `handoff/status.json` — eleven counts. **A count that moved when you did not
 expect it to is the signal.**
@@ -144,6 +169,32 @@ claim against another artefact's fact.**
 | **`status` vs. board** | `wireframe.status` vs. the file it points at | 20 claiming a client drew a generated board |
 | **Duplicate YAML key** | A key defined twice — **YAML keeps the last silently** | 80 in one file, twice, from a `safe_dump` round-trip |
 | **Empty region** | A declared region with nothing in it *and no note* | 2, both correct, both now saying so |
+| **Cross-surface parity** | Two guest surfaces sharing a screen name vs. the operations each calls | 13 — `Loyalty & Rewards` shared **zero of nine** |
+| **Placeholder group** | `module` against a list of placeholder words | **124** reading `TODO`, including 59 of 63 on P02 |
+| **Unrecognised board** | Files in `wireframes/` vs. what the manifest accounts for | 17 — a consumer counted **811 frames against a real 359** |
+| **Anchor collision** | An anchor appearing on more than one board | 22 — Claude Design adopted our screen ids as frame ids |
+| **`boardFrames` resolution** | Every claimed frame vs. every board on disk | 156 stale, all case drift `check-wireframes` could not see |
+
+---
+
+## What the manifest is for
+
+**`wireframes/manifest.json` has three categories and a consumer can act on each:**
+
+**`generated`** — boards this package writes. **`refresh.sh` deletes any it no longer generates**,
+which is what stops a rename leaving a ghost. **`P08 Staff Web Back Office.dc.html` outlived its
+replacement by six days** at 733 KB against 383 KB, opening by name with nothing to say it was
+superseded.
+
+**`clientPacks`** — drawn boards, matched by a known pack prefix. **Never touched by any tool here**:
+the generator did not write them and has no business removing somebody else's work.
+
+**`unrecognised`** — everything else. **This is the category that did not exist and needed to.** A
+board from another product and a board superseded by a rename both used to answer *not generated*,
+which is the same answer for a file that belongs and a file that does not.
+
+**Count from the manifest, not from the folder.** A folder is what a copy-based transfer has
+accumulated; the manifest is what the package can account for.
 
 ---
 
@@ -154,6 +205,11 @@ insertions and not insertions *in the right place*, and passed a broken edit. A 
 couldn't reach controls in a closed view, left the previous tip in the panel, and read every element
 after the first as a pass. **Both were caught by a second measurement disagreeing, never by the
 check itself.**
+
+**A tool copied out of the package tests an empty package.** Every path here is anchored on the
+script's own location, so a copy in `/tmp` resolves `ROOT` to `/`, finds no `wireframes/`, prints
+*no wireframes directory* and returns zero. **I lost several rounds to probes that were silent
+because they were correct about the wrong folder.**
 
 **A number typed once is correct once.** `platform-P01.md` said 35 against a live 46. The viewer said
 654 operations against 1,023, in 25 places. `platform-deployment.md` had twelve rows against fifteen

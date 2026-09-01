@@ -306,6 +306,7 @@ paths:
       x-ticvai-consumed-by:
         - "P01 WEB-032 Offers & Promotions"
         - "P01 WEB-043 Loyalty & Rewards"
+        - "P02 GST-036 Loyalty & Rewards"
         - "P02 GST-037 Offers & Promotions"
         - "P04 POS-002 Sell — Ticket Catalogue"
         - "P08 BO-010 Promotions & Coupons"
@@ -1380,6 +1381,7 @@ paths:
         - "P01 WEB-010 Shopping Cart"
         - "P01 WEB-032 Offers & Promotions"
         - "P01 WEB-043 Loyalty & Rewards"
+        - "P02 GST-036 Loyalty & Rewards"
         - "P02 GST-037 Offers & Promotions"
         - "P04 POS-002 Sell — Ticket Catalogue"
         - "P04 POS-021 Sell — Food & Drink"

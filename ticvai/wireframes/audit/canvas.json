@@ -1,0 +1,79 @@
+{
+  "artboards": [
+    {
+      "file": "Main.dc.html",
+      "x": 0,
+      "y": 0,
+      "w": 1460,
+      "h": 1980,
+      "title": "Findings \u2014 14, 7 fixed",
+      "print": "flow"
+    },
+    {
+      "file": "BlastRadius.dc.html",
+      "x": 1580,
+      "y": 0,
+      "w": 1620,
+      "h": 1560,
+      "title": "Blast radius",
+      "print": "flow"
+    },
+    {
+      "file": "Confirmation.dc.html",
+      "x": 3320,
+      "y": 0,
+      "w": 1460,
+      "h": 1120,
+      "title": "F-14 \u00b7 F-06 \u2014 Destructive actions"
+    },
+    {
+      "file": "Payment.dc.html",
+      "x": 1580,
+      "y": 1700,
+      "w": 1460,
+      "h": 1120,
+      "title": "F-07 \u2014 Unresolved payment"
+    },
+    {
+      "file": "Kiosk.dc.html",
+      "x": 3160,
+      "y": 1700,
+      "w": 1460,
+      "h": 1240,
+      "title": "F-10 \u2014 Kiosk offline"
+    }
+  ],
+  "annotations": [
+    {
+      "id": "read-order",
+      "x": 0,
+      "y": -210,
+      "w": 470,
+      "text": "Start here.\n\nMain is the ledger \u2014 14 findings, rechecked against the 1 Sep dump. 2 closed, 11 unchanged, 1 new.\n\nBlast radius is the answer to \"what does the fix touch\" \u2014 measured, not estimated.\n\nThe three screen boards show the worst of it drawn."
+    },
+    {
+      "id": "audit-first",
+      "x": 1580,
+      "y": -210,
+      "w": 500,
+      "text": "The order matters.\n\n39 confirm dialogs cannot be written at the screen layer \u2014 a consequence lives in the write set, the state cascade and the event fan-out.\n\nRun the audit first and the copy falls out of it. Run the fix first and you get one string, 39 times."
+    },
+    {
+      "id": "applied",
+      "x": 4900,
+      "y": 0,
+      "w": 480,
+      "text": "Applied to the repo on 1 Sep:\n\n177 orphan Cancel buttons deleted \u2014 none of those screens had a single input field.\n\n38 confirm dialogs written per operation from the lineage, state models and events.\n\nPayment `unknown` transcribed onto POS-005, WEB-012, KSK-008.\n\nAnd both generators fixed, so it cannot recur."
+    },
+    {
+      "id": "corrections",
+      "x": 4900,
+      "y": 560,
+      "w": 480,
+      "text": "Two of my own calls changed once the lower layers were read:\n\nF-07 was CHEAPER \u2014 states/payment.yaml already modelled pendingConfirmation. No contract change; it was a transcription.\n\nF-10 was WRONG \u2014 do not flip offlineCapable on P05. 15 of its 23 operations are offline:false. It needs a degraded mode, and that is a product call, so it is left open."
+    }
+  ],
+  "launch": {
+    "view": "canvas"
+  }
+}

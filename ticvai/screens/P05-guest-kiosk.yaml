@@ -73,8 +73,9 @@ screens:
     inferred: true
     isEntryPoint: true
   wireframe:
-    status: generated
-    board: wireframes/P05 Guest Kiosk.dc.html#ksk-001
+    status: designed
+    board: wireframes/Kiosk Board 1.dc.html#KSK-001
+    generatedFallback: wireframes/P05 Guest Kiosk.dc.html#ksk-001
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations
     still to be written. **The attract loop is the entry.** A kiosk has no login and nobody navigates
     to it — it is what the screen shows when nobody is standing there. **Declared 20 August** — `isEntryPoint`
@@ -86,6 +87,8 @@ screens:
     status: notStarted
   density: touchLarge
   requiresModule: core
+  boardFrames:
+  - Kiosk Board 1.dc.html#KSK-001
 - id: KSK-002
   name: Language Select
   module: Sell
@@ -115,8 +118,9 @@ screens:
     inferred: true
     fromFlows: true
   wireframe:
-    status: generated
-    board: wireframes/P05 Guest Kiosk.dc.html#ksk-002
+    status: designed
+    board: wireframes/Kiosk Board 1.dc.html#KSK-002
+    generatedFallback: wireframes/P05 Guest Kiosk.dc.html#ksk-002
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations
     still to be written.
   implementation:
@@ -136,6 +140,8 @@ screens:
   density: touchLarge
   requiresModule: core
   statesDerived: true
+  boardFrames:
+  - Kiosk Board 1.dc.html#KSK-002
 - id: KSK-003
   name: What are you buying
   module: Sell
@@ -177,8 +183,9 @@ screens:
     - KSK-004
     inferred: true
   wireframe:
-    status: generated
-    board: wireframes/P05 Guest Kiosk.dc.html#ksk-003
+    status: designed
+    board: wireframes/Kiosk Board 1.dc.html#KSK-003
+    generatedFallback: wireframes/P05 Guest Kiosk.dc.html#ksk-003
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations
     still to be written.
   implementation:
@@ -194,6 +201,8 @@ screens:
   density: touchLarge
   requiresModule: ticketing
   statesDerived: true
+  boardFrames:
+  - Kiosk Board 1.dc.html#KSK-003
 - id: KSK-004
   name: Choose tickets
   module: Sell
@@ -237,8 +246,9 @@ screens:
     inferred: true
     fromFlows: true
   wireframe:
-    status: generated
-    board: wireframes/P05 Guest Kiosk.dc.html#ksk-004
+    status: designed
+    board: wireframes/Kiosk Board 1.dc.html#KSK-004
+    generatedFallback: wireframes/P05 Guest Kiosk.dc.html#ksk-004
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations
     still to be written.
   implementation:
@@ -264,6 +274,8 @@ screens:
       successor exists, and the catalogue where none does.'
   requiresModule: ticketing
   statesDerived: true
+  boardFrames:
+  - Kiosk Board 1.dc.html#KSK-004
 - id: KSK-005
   name: Choose a session
   module: Sell
@@ -279,13 +291,8 @@ screens:
         notes: Structure from the wireframe board. Components not yet enumerated.
       - kind: primaryButton
         derived: true
-        impliedBy: acquireLease
+        impliedBy: acquireInventoryHold
         notes: The act the screen exists for.
-      - kind: secondaryButton
-        label: Cancel
-        notes: '**A screen that can submit must be leaveable without submitting.**'
-        derived: true
-        impliedBy: acquireLease
   states:
     loading: Live availability, never cached
     emptyFirstRun: '**Sold out.** Offers the next available session rather than a dead end'
@@ -307,8 +314,9 @@ screens:
     inferred: true
     fromFlows: true
   wireframe:
-    status: generated
-    board: wireframes/P05 Guest Kiosk.dc.html#ksk-005
+    status: designed
+    board: wireframes/Kiosk Board 1.dc.html#KSK-005
+    generatedFallback: wireframes/P05 Guest Kiosk.dc.html#ksk-005
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations
     still to be written.
   implementation:
@@ -317,7 +325,7 @@ screens:
     component: apps/guest-app/src/routes/sell/ChooseASessionDetail.tsx
     status: notStarted
   apis:
-  - operationId: acquireLease
+  - operationId: acquireInventoryHold
     contract: catalogue
     purpose: Acquire an inventory lease
     trigger: onAction
@@ -328,6 +336,8 @@ screens:
   density: touchLarge
   requiresModule: ticketing
   statesDerived: true
+  boardFrames:
+  - Kiosk Board 1.dc.html#KSK-005
 - id: KSK-006
   name: Review
   module: Sell
@@ -346,11 +356,6 @@ screens:
         impliedBy: addCartLine
         label: Add cart line
         notes: The act the screen exists for.
-      - kind: secondaryButton
-        label: Cancel
-        notes: '**A screen that can submit must be leaveable without submitting.**'
-        derived: true
-        impliedBy: addCartLine
   states:
     loading: Promotion evaluation
     emptyFirstRun: Cart empty — returns to KSK-003
@@ -372,8 +377,9 @@ screens:
     inferred: true
     fromFlows: true
   wireframe:
-    status: generated
-    board: wireframes/P05 Guest Kiosk.dc.html#ksk-006
+    status: designed
+    board: wireframes/Kiosk Board 1.dc.html#KSK-006
+    generatedFallback: wireframes/P05 Guest Kiosk.dc.html#ksk-006
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations
     still to be written.
   implementation:
@@ -406,6 +412,8 @@ screens:
     coldEntry: Resolves from the session; a cold arrival is the ordinary case.
   requiresModule: ticketing
   statesDerived: true
+  boardFrames:
+  - Kiosk Board 1.dc.html#KSK-006
 - id: KSK-007
   name: Payment
   module: Sell
@@ -424,11 +432,6 @@ screens:
         impliedBy: createPayment
         label: Create payment
         notes: The act the screen exists for.
-      - kind: secondaryButton
-        label: Cancel
-        notes: '**A screen that can submit must be leaveable without submitting.**'
-        derived: true
-        impliedBy: createPayment
   states:
     loading: Terminal state, shown plainly
     emptyFirstRun: Not applicable
@@ -451,8 +454,9 @@ screens:
     inferred: true
     fromFlows: true
   wireframe:
-    status: generated
-    board: wireframes/P05 Guest Kiosk.dc.html#ksk-007
+    status: designed
+    board: wireframes/Kiosk Board 1.dc.html#KSK-007
+    generatedFallback: wireframes/P05 Guest Kiosk.dc.html#ksk-007
   notes: 'Definition derived from the wireframe board on 14 August. Components, states and operations
     still to be written. **Card only. No foreign cash** — a kiosk accepting foreign notes needs a note
     reader and a per-currency float, and neither is specified. A guest paying by card in a foreign currency
@@ -473,6 +477,8 @@ screens:
   density: touchLarge
   requiresModule: ticketing
   statesDerived: true
+  boardFrames:
+  - Kiosk Board 1.dc.html#KSK-007
 - id: KSK-008
   name: Payment unresolved
   module: Sell
@@ -490,11 +496,6 @@ screens:
         derived: true
         impliedBy: inquirePaymentStatus
         notes: The act the screen exists for.
-      - kind: secondaryButton
-        label: Cancel
-        notes: '**A screen that can submit must be leaveable without submitting.**'
-        derived: true
-        impliedBy: inquirePaymentStatus
   states:
     loading: Inquiry in progress
     emptyFirstRun: Not applicable
@@ -506,8 +507,28 @@ screens:
       **Also reached when `ticketing` is not licensed.** The tenant has not bought this module, which
       is a commercial answer and not a permission one — say which, because the person to ask is different.'
     error: '**The important screen.** A card charged with no response. It inquires rather than retries,
-      and prints nothing until it knows'
+      and prints nothing until it knows. **This is the clean decline only** - the issuer answered and
+      refused. An unanswered terminal is `unknown`, not this.'
     offline: Not applicable
+    unknown: '**The card may have been charged and the gateway did not say.** `Payment.status pendingConfirmation`
+      - entered by a timer when the gateway stops answering after the authorisation, and left only by
+      `inquirePaymentStatus`, which resolves it to `captured`, `declined` or `failed`.
+
+
+      **Offer the inquiry, never a retry.** A retry here is how a guest is charged twice, and the component
+      library names this the normal failure rather than the exotic one. Voiding the order is refused
+      while this state holds - there is nothing to void until the inquiry answers.
+
+
+      **Transcribed from `states/payment.yaml` on 1 September.** The state model has carried this since
+      the contracts were written; the screen declared only a clean decline.
+
+
+      **This is the screen the state exists for.** It is unattended, so the resolution is printed and
+      staff are called; there is no one to ask.'
+    inquiryFailed: '**The inquiry itself could not resolve it.** `pendingConfirmation -> failed` - the
+      gateway answered and still cannot say what happened to the money. This escalates to a person:
+      it is not a state the screen can clear, and the guest must leave with a reference, not a receipt.'
   navigation:
     exitTo:
     - KSK-001
@@ -515,8 +536,9 @@ screens:
     - KSK-003
     inferred: true
   wireframe:
-    status: generated
-    board: wireframes/P05 Guest Kiosk.dc.html#ksk-008
+    status: designed
+    board: wireframes/Kiosk Board 1.dc.html#KSK-008
+    generatedFallback: wireframes/P05 Guest Kiosk.dc.html#ksk-008
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations
     still to be written.
   implementation:
@@ -541,6 +563,13 @@ screens:
       from.** Arrives with `paymentId`.'
   requiresModule: ticketing
   statesDerived: true
+  boardFrames:
+  - Kiosk Board 1.dc.html#KSK-008
+  openQuestions:
+  - '**`createPayment` is `offline: true` in the lineage and `inquirePaymentStatus` is `offline: false`,
+    and `states/payment.yaml` declares no `offlineReachable`.** A card can therefore be taken offline
+    and not resolved offline, which is the double-charge path. Raised 1 September - this is a contract
+    question, not a screen one.'
 - id: KSK-009
   name: Ticket issued
   module: Sell
@@ -558,11 +587,6 @@ screens:
         derived: true
         impliedBy: transferOrderTickets
         notes: The act the screen exists for.
-      - kind: secondaryButton
-        label: Cancel
-        notes: '**A screen that can submit must be leaveable without submitting.**'
-        derived: true
-        impliedBy: transferOrderTickets
   states:
     loading: Printing
     emptyFirstRun: Not applicable
@@ -582,8 +606,9 @@ screens:
     - KSK-003
     inferred: true
   wireframe:
-    status: generated
-    board: wireframes/P05 Guest Kiosk.dc.html#ksk-009
+    status: designed
+    board: wireframes/Kiosk Board 1.dc.html#KSK-009
+    generatedFallback: wireframes/P05 Guest Kiosk.dc.html#ksk-009
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations
     still to be written.
   implementation:
@@ -610,6 +635,8 @@ screens:
       an error.'
   requiresModule: ticketing
   statesDerived: true
+  boardFrames:
+  - Kiosk Board 1.dc.html#KSK-009
 - id: KSK-010
   name: Print failure
   module: Sell
@@ -627,11 +654,6 @@ screens:
         derived: true
         impliedBy: transferOrderTickets
         notes: The act the screen exists for.
-      - kind: secondaryButton
-        label: Cancel
-        notes: '**A screen that can submit must be leaveable without submitting.**'
-        derived: true
-        impliedBy: transferOrderTickets
   states:
     loading: Sending by email and rendering the QR
     emptyFirstRun: Not applicable
@@ -646,8 +668,9 @@ screens:
     - KSK-013
     inferred: true
   wireframe:
-    status: generated
-    board: wireframes/P05 Guest Kiosk.dc.html#ksk-010
+    status: designed
+    board: wireframes/Kiosk Board 2.dc.html#KSK-010
+    generatedFallback: wireframes/P05 Guest Kiosk.dc.html#ksk-010
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations
     still to be written.
   implementation:
@@ -669,6 +692,8 @@ screens:
       if it was refunded or the performance passed, says which and offers the order list rather than
       an error.'
   requiresModule: ticketing
+  boardFrames:
+  - Kiosk Board 2.dc.html#KSK-010
 - id: KSK-011
   name: Collect a booking
   module: Sell
@@ -710,8 +735,9 @@ screens:
     - KSK-003
     inferred: true
   wireframe:
-    status: generated
-    board: wireframes/P05 Guest Kiosk.dc.html#ksk-011
+    status: designed
+    board: wireframes/Kiosk Board 2.dc.html#KSK-011
+    generatedFallback: wireframes/P05 Guest Kiosk.dc.html#ksk-011
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations
     still to be written.
   implementation:
@@ -738,6 +764,8 @@ screens:
       an error.'
   requiresModule: retail
   statesDerived: true
+  boardFrames:
+  - Kiosk Board 2.dc.html#KSK-011
 - id: KSK-012
   name: Booking found
   module: Sell
@@ -755,11 +783,6 @@ screens:
         derived: true
         impliedBy: transferOrderTickets
         notes: The act the screen exists for.
-      - kind: secondaryButton
-        label: Cancel
-        notes: '**A screen that can submit must be leaveable without submitting.**'
-        derived: true
-        impliedBy: transferOrderTickets
   states:
     loading: Booking detail
     emptyFirstRun: No booking for that reference
@@ -772,8 +795,9 @@ screens:
     - KSK-003
     inferred: true
   wireframe:
-    status: generated
-    board: wireframes/P05 Guest Kiosk.dc.html#ksk-012
+    status: designed
+    board: wireframes/Kiosk Board 2.dc.html#KSK-012
+    generatedFallback: wireframes/P05 Guest Kiosk.dc.html#ksk-012
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations
     still to be written.
   implementation:
@@ -795,6 +819,8 @@ screens:
       if it was refunded or the performance passed, says which and offers the order list rather than
       an error.'
   requiresModule: ticketing
+  boardFrames:
+  - Kiosk Board 2.dc.html#KSK-012
 - id: KSK-013
   name: Call staff
   module: Sell
@@ -812,11 +838,6 @@ screens:
         derived: true
         impliedBy: endKioskAssist
         notes: The act the screen exists for.
-      - kind: secondaryButton
-        label: Cancel
-        notes: '**A screen that can submit must be leaveable without submitting.**'
-        derived: true
-        impliedBy: endKioskAssist
   states:
     loading: Alerting staff
     emptyFirstRun: Not applicable
@@ -829,8 +850,9 @@ screens:
     - KSK-003
     inferred: true
   wireframe:
-    status: generated
-    board: wireframes/P05 Guest Kiosk.dc.html#ksk-013
+    status: designed
+    board: wireframes/Kiosk Board 2.dc.html#KSK-013
+    generatedFallback: wireframes/P05 Guest Kiosk.dc.html#ksk-013
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations
     still to be written. **Device audience on a guest surface.** `endKioskAssist` is called by the kiosk,
     not by the guest — **the guest presses a button and the device raises the call**, which is why the
@@ -854,6 +876,8 @@ screens:
     coldEntry: Resolves from the session; a cold arrival is the ordinary case.
   requiresModule: marketing
   audience: device
+  boardFrames:
+  - Kiosk Board 2.dc.html#KSK-013
 - id: KSK-014
   name: Out of service
   module: Sell
@@ -879,8 +903,9 @@ screens:
     - KSK-003
     inferred: true
   wireframe:
-    status: generated
-    board: wireframes/P05 Guest Kiosk.dc.html#ksk-014
+    status: designed
+    board: wireframes/Kiosk Board 2.dc.html#KSK-014
+    generatedFallback: wireframes/P05 Guest Kiosk.dc.html#ksk-014
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations
     still to be written.
   implementation:
@@ -890,6 +915,8 @@ screens:
     status: notStarted
   density: touchLarge
   requiresModule: core
+  boardFrames:
+  - Kiosk Board 2.dc.html#KSK-014
 - id: KSK-015
   name: Assistant
   module: AI
@@ -912,11 +939,6 @@ screens:
         impliedBy: listProducts
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
-      - kind: secondaryButton
-        label: Cancel
-        notes: '**A screen that can submit must be leaveable without submitting.**'
-        derived: true
-        impliedBy: sendAiMessage
   apis:
   - operationId: sendAiMessage
     contract: ai
@@ -962,8 +984,9 @@ screens:
     component: apps/guest-app/src/routes/Assistant.tsx
     status: notStarted
   wireframe:
-    status: generated
-    board: wireframes/P05 Guest Kiosk.dc.html#ksk-015
+    status: designed
+    board: wireframes/Kiosk Board 2.dc.html#KSK-015
+    generatedFallback: wireframes/P05 Guest Kiosk.dc.html#ksk-015
   notes: 'Added 17 August for 2.1.28, which names the kiosk explicitly and was the only surface with
     no AI screen. **Scoped to `guestCapabilityScope`** — ticket selection, promotions, FAQs, recommendations
     and checkout, and nothing else. **No keyboard**: voice or a constrained touch interface, which is
@@ -982,6 +1005,8 @@ screens:
       and by whom.
   requiresModule: ticketing
   statesDerived: true
+  boardFrames:
+  - Kiosk Board 2.dc.html#KSK-015
 - id: KSK-016
   name: Order Food
   module: Sell
@@ -1030,8 +1055,9 @@ screens:
     component: apps/guest-app/src/routes/sell/OrderFoodList.tsx
     status: notStarted
   wireframe:
-    status: generated
-    board: wireframes/P05 Guest Kiosk.dc.html#ksk-016
+    status: designed
+    board: wireframes/Kiosk Board 2.dc.html#KSK-016
+    generatedFallback: wireframes/P05 Guest Kiosk.dc.html#ksk-016
   notes: BL-066. **Every operation existed and no screen called them** — `getGuestMenu` and `createGuestFnbOrder`
     are contracted and guest-callable, and P05 had fifteen screens selling neither food nor merchandise.
   entryState:
@@ -1044,6 +1070,8 @@ screens:
       screen names the thing, says it is expired, cancelled or withdrawn, and offers the list it came
       from.** Arrives with `outletId`.'
   requiresModule: fnb
+  boardFrames:
+  - Kiosk Board 2.dc.html#KSK-016
 - id: KSK-017
   name: Shop
   module: Sell
@@ -1058,6 +1086,14 @@ screens:
     contract: retail
     purpose: Hold for collection
     trigger: onAction
+  - operationId: addCartLine
+    contract: orders
+    purpose: Add something
+    trigger: onAction
+  - operationId: lookupMerchandise
+    contract: retail
+    purpose: Price and stock check by barcode
+    trigger: onLoad
   states:
     loading: Products with stock, in-stock first
     emptyFirstRun: This kiosk does not sell merchandise. **Stated rather than shown as an empty shop**
@@ -1091,13 +1127,20 @@ screens:
     component: apps/guest-app/src/routes/sell/ShopList.tsx
     status: notStarted
   wireframe:
-    status: generated
-    board: wireframes/P05 Guest Kiosk.dc.html#ksk-017
-  notes: BL-066, BL-019. **A guest can browse and reserve and not buy**, which is where retail stops
-    for a guest surface — `createRetailSale` is a till operation.
+    status: designed
+    board: wireframes/Kiosk Board 2.dc.html#KSK-017
+    generatedFallback: wireframes/P05 Guest Kiosk.dc.html#ksk-017
+  notes: 'BL-066, BL-019. **A guest can browse and reserve and not buy**, which is where retail stops
+    for a guest surface — `createRetailSale` is a till operation. **Cross-surface parity, 31 August**:
+    added addCartLine, lookupMerchandise. **A guest does not know which surface they are on** — the
+    same named screen on web and app now calls the same guest-callable operations.'
   entryState:
     params:
     - name: outletId
       from: KSK-016
+    - name: cartId
+      from: session
     coldEntry: Resolves from the session; a cold arrival is the ordinary case.
   requiresModule: retail
+  boardFrames:
+  - Kiosk Board 2.dc.html#KSK-017

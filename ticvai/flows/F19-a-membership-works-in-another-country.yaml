@@ -34,15 +34,15 @@ steps:
   screen: ADM-003
   action: The right is propagated to the other cell
   operations:
-  - propagateRedemptionRight
-  - getRedemptionRight
+  - propagateCrossRegionEntitlement
+  - getCrossRegionEntitlement
   outcome: A copy of the entitlement to redeem against, not the entitlement itself
 - step: 3
   screen: SCN-003
   action: Guest scans at the other venue
   operations:
   - validateAccess
-  - consumeRedemptionRight
+  - consumeCrossRegionEntitlement
   outcome: Validated against the propagated right in the local bundle
 - step: 4
   screen: SCN-014

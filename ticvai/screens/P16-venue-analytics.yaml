@@ -168,9 +168,9 @@ screens:
     file being pointed at, and those are different facts.'
   requiresModule: analytics
   boardFrames:
-  - FNB-6A
-  - POS-6A
-  - RET-6A
+  - FnB Board 6.dc.html#fnb-6a
+  - POS Board 6.dc.html#pos-6a
+  - Retail Board 6.dc.html#ret-6a
 - id: ANL-002
   name: Sales, Revenue & Channel
   module: Analytics
@@ -254,8 +254,8 @@ screens:
     provenance is worth more than the wrong pointer.'
   requiresModule: analytics
   boardFrames:
-  - FNB-6B
-  - RET-6L
+  - FnB Board 6.dc.html#fnb-6b
+  - Retail Board 6.dc.html#ret-6l
 - id: ANL-003
   name: Operational Performance
   module: Analytics
@@ -356,13 +356,13 @@ screens:
     in `derivedFrom` because provenance is worth more than the wrong pointer.'
   requiresModule: analytics
   boardFrames:
-  - FNB-4K
-  - FNB-6C
-  - FNB-6G
-  - POS-6B
-  - POS-6C
-  - POS-6D
-  - RET-6B
+  - FnB Board 4.dc.html#fnb-4k
+  - FnB Board 6.dc.html#fnb-6c
+  - FnB Board 6.dc.html#fnb-6g
+  - POS Board 6.dc.html#pos-6b
+  - POS Board 6.dc.html#pos-6c
+  - POS Board 6.dc.html#pos-6d
+  - Retail Board 6.dc.html#ret-6b
 - id: ANL-004
   name: Product Performance
   module: Analytics
@@ -450,8 +450,8 @@ screens:
     provenance is worth more than the wrong pointer.'
   requiresModule: analytics
   boardFrames:
-  - FNB-6D
-  - RET-6C
+  - FnB Board 6.dc.html#fnb-6d
+  - Retail Board 6.dc.html#ret-6c
 - id: ANL-005
   name: Cost, Margin & Profitability
   module: Analytics
@@ -538,8 +538,8 @@ screens:
     in `derivedFrom` because provenance is worth more than the wrong pointer.'
   requiresModule: analytics
   boardFrames:
-  - FNB-6E
-  - RET-6F
+  - FnB Board 6.dc.html#fnb-6e
+  - Retail Board 6.dc.html#ret-6f
 - id: ANL-006
   name: Inventory & Waste Intelligence
   module: Analytics
@@ -618,11 +618,12 @@ screens:
     component: apps/venue-management-web/src/routes/analytics/InventoryWasteIntelligenceDashboard.tsx
     status: notStarted
   wireframe:
-    status: generated
-    board: wireframes/P16 Venue Analytics.dc.html#anl-006
+    status: designed
+    board: wireframes/Retail Board 6.dc.html#ret-6d
     source: Claude Design Retail pack, 24 August
     note: '**Drawn as RET-6D in the client Retail pack.**'
     derivedFrom: wireframes/Retail Board 6.dc.html#ret-6d
+    generatedFallback: wireframes/P16 Venue Analytics.dc.html#anl-006
   provenance: client board, specified
   notes: '**Built 20 August. Answers 2 board screens**: Inventory, Waste & Production Intelligence;
     Inventory, Sell-Through & Stock Intelligence. **Theoretical against actual is the whole analysis**
@@ -631,11 +632,16 @@ screens:
     in the client pack, which is where the design came from and not where this screen is drawn. **`P15
     Kitchen Display.dc.html` and `P16 Venue Analytics.dc.html` carry one anchor per screen and nothing
     referenced either**, so both shipped correctly anchored and unreachable. The pack frame is kept
-    in `derivedFrom` because provenance is worth more than the wrong pointer.'
+    in `derivedFrom` because provenance is worth more than the wrong pointer. **Drawn 31 August** —
+    `Retail Board 6.dc.html` frame `ret-6d`. **Matched on frame title against screen name, constrained
+    to this board’s platforms.** These packs label by board position (`GM-6C`) rather than naming the
+    screen, so the title is the only join — *Inventory &amp; Stock Intelligence* matched at 0.89. **A
+    cross-platform title match was refused**: `Outlet Management` scored 0.85 against a partner-portal
+    screen, which is how a mapping goes wrong quietly.'
   requiresModule: analytics
   boardFrames:
-  - FNB-6F
-  - RET-6D
+  - FnB Board 6.dc.html#fnb-6f
+  - Retail Board 6.dc.html#ret-6d
 - id: ANL-007
   name: Guest & Conversion Intelligence
   module: Analytics
@@ -734,7 +740,7 @@ screens:
     wrong pointer.'
   requiresModule: analytics
   boardFrames:
-  - RET-6E
+  - Retail Board 6.dc.html#ret-6e
 - id: ANL-008
   name: Demand Forecasting
   module: Analytics
@@ -816,8 +822,8 @@ screens:
     worth more than the wrong pointer.'
   requiresModule: analytics
   boardFrames:
-  - FNB-6H
-  - RET-6G
+  - FnB Board 6.dc.html#fnb-6h
+  - Retail Board 6.dc.html#ret-6g
 - id: ANL-009
   name: AI Assistant & Action Center
   module: Analytics
@@ -934,12 +940,12 @@ screens:
     worth more than the wrong pointer.'
   requiresModule: analytics
   boardFrames:
-  - FNB-5K
-  - FNB-6J
-  - FNB-6K
-  - POS-6E
-  - RET-5K
-  - RET-6K
+  - FnB Board 5.dc.html#fnb-5k
+  - FnB Board 6.dc.html#fnb-6j
+  - FnB Board 6.dc.html#fnb-6k
+  - POS Board 6.dc.html#pos-6e
+  - Retail Board 5.dc.html#ret-5k
+  - Retail Board 6.dc.html#ret-6k
 - id: ANL-010
   name: Suggestions & Advice
   module: Analytics
@@ -1025,4 +1031,4 @@ screens:
     both shipped correctly anchored and unreachable. The pack frame is kept in `derivedFrom` because
     provenance is worth more than the wrong pointer.'
   boardFrames:
-  - POS-6F
+  - POS Board 6.dc.html#pos-6f

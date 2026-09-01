@@ -34,7 +34,7 @@ modulesUsed:
 servicesCalled:
 - service: WhiteLabelService
   operationCalls: 28
-- service: ControlService
+- service: PlatformService
   operationCalls: 19
 - service: VenueOpsService
   operationCalls: 19
@@ -94,8 +94,9 @@ screens:
   - CMS-002
   - CMS-003
   - CMS-004
-  boardFrames: null
-  wireframe: wireframes/P13 Venue CMS.dc.html#cms-001
+  boardFrames:
+  - Marketing Board 7.dc.html#crm-7f
+  wireframe: wireframes/Marketing Board 7.dc.html#crm-7f
   inFlows:
   - F102 A brand is set, previewed, published and rolled back
 - screen: CMS-002

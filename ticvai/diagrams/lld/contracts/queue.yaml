@@ -58,17 +58,6 @@ operations:
   reads:
   - queue.queue
   writes: []
-- operation: getQueueEntry
-  verb: GET
-  path: /queue-entries/{entryId}
-  scope: venue
-  permission: null
-  audience:
-  - guest
-  offline: false
-  reads:
-  - queue.entry
-  writes: []
 - operation: getQueueFeedHealth
   verb: GET
   path: /queue-feeds/{feedId}/health
@@ -101,7 +90,7 @@ operations:
   - device
   offline: true
   reads:
-  - queue.entry
+  - queue.waiting_guest
   writes: []
 - operation: getWaitTimes
   verb: GET
@@ -113,13 +102,24 @@ operations:
   - public
   offline: true
   reads:
-  - queue.entry
   - queue.queue
   - queue.reading
+  - queue.waiting_guest
+  writes: []
+- operation: getWaitingGuest
+  verb: GET
+  path: /waiting-guests/{entryId}
+  scope: venue
+  permission: null
+  audience:
+  - guest
+  offline: false
+  reads:
+  - queue.waiting_guest
   writes: []
 - operation: joinQueue
   verb: POST
-  path: /queue-entries
+  path: /waiting-guests
   scope: venue
   permission: null
   audience:
@@ -127,13 +127,13 @@ operations:
   offline: false
   reads:
   - cache:idempotency
-  - queue.entry
+  - queue.waiting_guest
   writes:
   - cache:idempotency
-  - queue.entry
+  - queue.waiting_guest
 - operation: leaveQueue
   verb: DELETE
-  path: /queue-entries/{entryId}
+  path: /waiting-guests/{entryId}
   scope: venue
   permission: null
   audience:
@@ -141,10 +141,10 @@ operations:
   offline: false
   reads:
   - cache:idempotency
-  - queue.entry
+  - queue.waiting_guest
   writes:
   - cache:idempotency
-  - queue.entry
+  - queue.waiting_guest
 - operation: listQueueEntries
   verb: GET
   path: /queues/{queueId}/entries
@@ -154,7 +154,7 @@ operations:
   - staff
   offline: false
   reads:
-  - queue.entry
+  - queue.waiting_guest
   writes: []
 - operation: listQueueFeeds
   verb: GET
@@ -179,9 +179,9 @@ operations:
   reads:
   - queue.queue
   writes: []
-- operation: overrideQueueEntry
+- operation: overrideWaitingGuest
   verb: POST
-  path: /queue-entries/{entryId}/override
+  path: /waiting-guests/{entryId}/override
   scope: venue
   permission: QUEUE_OVERRIDE
   audience:
@@ -189,13 +189,13 @@ operations:
   offline: true
   reads:
   - cache:idempotency
-  - queue.entry
+  - queue.waiting_guest
   writes:
   - cache:idempotency
-  - queue.entry
-- operation: redeemQueueEntry
+  - queue.waiting_guest
+- operation: redeemWaitingGuest
   verb: POST
-  path: /queue-entries/{entryId}/redeem
+  path: /waiting-guests/{entryId}/redeem
   scope: workstation
   permission: QUEUE_REDEEM
   audience:
@@ -203,10 +203,10 @@ operations:
   offline: true
   reads:
   - cache:idempotency
-  - queue.entry
+  - queue.waiting_guest
   writes:
   - cache:idempotency
-  - queue.entry
+  - queue.waiting_guest
 - operation: setQueueStatus
   verb: PUT
   path: /queues/{queueId}/status

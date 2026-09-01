@@ -34,7 +34,7 @@ servicesCalled:
   operationCalls: 8
 - service: LedgerService
   operationCalls: 6
-- service: ControlService
+- service: PlatformService
   operationCalls: 5
 coverage:
   screens: 21
@@ -45,7 +45,7 @@ coverage:
 screens:
 - screen: PTR-001
   name: Partner Login / MFA
-  module: TODO
+  module: Access & Account
   requiresModule: partner
   wave: 2
   density: compact
@@ -84,7 +84,7 @@ screens:
   - F104 A platform operator signs in under MFA
 - screen: PTR-002
   name: Partner Dashboard
-  module: TODO
+  module: Overview
   requiresModule: partner
   wave: 2
   density: compact
@@ -120,13 +120,13 @@ screens:
   - PTR-004
   - PTR-007
   boardFrames:
-  - ptr-002
+  - Dashboards Board.dc.html#ptr-002
   wireframe: wireframes/Dashboards Board.dc.html#ptr-002
   inFlows:
   - F03 Partner books on credit
 - screen: PTR-003
   name: Profile & Company Details
-  module: TODO
+  module: Access & Account
   requiresModule: partner
   wave: 2
   density: compact
@@ -153,7 +153,7 @@ screens:
   inFlows: null
 - screen: PTR-004
   name: Notifications
-  module: TODO
+  module: Access & Account
   requiresModule: partner
   wave: 3
   density: compact
@@ -177,20 +177,20 @@ screens:
   inFlows: null
 - screen: PTR-005
   name: Inventory & Allocation View
-  module: TODO
+  module: Inventory & Pricing
   requiresModule: partner
   wave: 2
   density: compact
   operations:
   - applyManualDiscount
-  - createEnvelope
+  - createChannelCapacity
   - createOrder
   - exchangeOrderLines
   - getChannelAllocations
   - getOrder
   - getOrderStatement
   - holdOrder
-  - listEnvelopes
+  - listChannelCapacities
   - listOrderRefunds
   - listOrders
   - modifyOrder
@@ -199,7 +199,7 @@ screens:
   - rescheduleOrder
   - resumeOrder
   - setChannelAllocations
-  - updateEnvelope
+  - updateChannelCapacity
   - voidOrder
   states:
   - emptyFirstRun
@@ -209,7 +209,7 @@ screens:
   - loading
   offlineState: false
   entryParams:
-  - envelopeId<-deepLink
+  - channelCapacityId<-deepLink
   - orderId<-deepLink
   goesTo:
   - PTR-001
@@ -222,7 +222,7 @@ screens:
   - F10 Partner books, uses and settles
 - screen: PTR-006
   name: Product Catalog (B2B Pricing)
-  module: TODO
+  module: Inventory & Pricing
   requiresModule: partner
   wave: 2
   density: compact
@@ -263,7 +263,7 @@ screens:
   inFlows: null
 - screen: PTR-007
   name: Availability Search
-  module: TODO
+  module: Inventory & Pricing
   requiresModule: partner
   wave: 2
   density: compact
@@ -288,7 +288,7 @@ screens:
   - F03 Partner books on credit
 - screen: PTR-008
   name: Booking Creation
-  module: TODO
+  module: Booking & Quotes
   requiresModule: partner
   wave: 2
   density: compact
@@ -327,7 +327,7 @@ screens:
   - F10 Partner books, uses and settles
 - screen: PTR-009
   name: Group / Bulk Booking
-  module: TODO
+  module: Booking & Quotes
   requiresModule: partner
   wave: 3
   density: compact
@@ -350,12 +350,12 @@ screens:
   - PTR-002
   - PTR-003
   boardFrames:
-  - seat-3d
+  - Seat Board 3.dc.html#seat-3d
   wireframe: wireframes/Seat Board 3.dc.html#seat-3d
   inFlows: null
 - screen: PTR-010
   name: Cart & Quote
-  module: TODO
+  module: Booking & Quotes
   requiresModule: partner
   wave: 3
   density: compact
@@ -396,7 +396,7 @@ screens:
   inFlows: null
 - screen: PTR-011
   name: Quote Management
-  module: TODO
+  module: Booking & Quotes
   requiresModule: partner
   wave: 3
   density: compact
@@ -420,7 +420,7 @@ screens:
   inFlows: null
 - screen: PTR-012
   name: Checkout / Credit Purchase
-  module: TODO
+  module: Credit & Settlement
   requiresModule: partner
   wave: 2
   density: compact
@@ -446,7 +446,7 @@ screens:
   inFlows: null
 - screen: PTR-013
   name: Credit Limit & Balance
-  module: TODO
+  module: Credit & Settlement
   requiresModule: partner
   wave: 2
   density: compact
@@ -471,7 +471,7 @@ screens:
   inFlows: null
 - screen: PTR-014
   name: Settlement & Payment History
-  module: TODO
+  module: Reports & Settlement
   requiresModule: partner
   wave: 3
   density: compact
@@ -500,7 +500,7 @@ screens:
   - F99 A chargeback arrives and is defended
 - screen: PTR-015
   name: Order History
-  module: TODO
+  module: Orders & Fulfilment
   requiresModule: partner
   wave: 2
   density: compact
@@ -538,7 +538,7 @@ screens:
   - F10 Partner books, uses and settles
 - screen: PTR-016
   name: Voucher / Ticket Download
-  module: TODO
+  module: Orders & Fulfilment
   requiresModule: partner
   wave: 2
   density: compact
@@ -575,7 +575,7 @@ screens:
   - F03 Partner books on credit
 - screen: PTR-017
   name: Commission Statement
-  module: TODO
+  module: Reports & Settlement
   requiresModule: partner
   wave: 3
   density: compact
@@ -600,7 +600,7 @@ screens:
   inFlows: null
 - screen: PTR-018
   name: Reports & Sales Performance
-  module: TODO
+  module: Reports & Settlement
   requiresModule: partner
   wave: 3
   density: compact
@@ -632,7 +632,7 @@ screens:
   inFlows: null
 - screen: PTR-019
   name: API Credentials & Integration
-  module: TODO
+  module: Access & Account
   requiresModule: partner
   wave: 3
   density: compact
@@ -652,14 +652,14 @@ screens:
   inFlows: null
 - screen: PTR-020
   name: Sub-Agent Management
-  module: TODO
+  module: Access & Account
   requiresModule: partner
   wave: 3
   density: compact
   operations:
-  - createGrant
-  - deleteGrant
-  - listGrants
+  - createDelegatedAccess
+  - deleteDelegatedAccess
+  - listDelegatedAccess
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -667,7 +667,7 @@ screens:
   - loading
   offlineState: false
   entryParams:
-  - grantId<-deepLink
+  - delegatedAccessId<-deepLink
   goesTo:
   - PTR-001
   - PTR-002
@@ -678,7 +678,7 @@ screens:
   - F105 A rate limit is set and a developer hits it
 - screen: PTR-021
   name: Support & Contact
-  module: TODO
+  module: Support
   requiresModule: partner
   wave: 3
   density: compact

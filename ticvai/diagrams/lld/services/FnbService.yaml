@@ -1087,9 +1087,10 @@ writesOutside:
   operations: 2
   why: '**The owner defines the row; this service may only append to it.**'
 screens:
-- P01:WEB-036 F&B — Browse & Order
+- P01:WEB-036 F&B – Browse & Order
 - P01:WEB-037 Menu Item Detail
-- P01:WEB-038 F&B — Order Tracking
+- P01:WEB-038 F&B – Order Tracking
+- P01:WEB-044 AI Concierge – Home
 - P01:WEB-046 In-Venue Notifications
 - P02:GST-024 F&B – Browse & Order
 - P02:GST-025 F&B – Order Tracking

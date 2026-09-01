@@ -575,6 +575,7 @@ paths:
         - "P01 WEB-042 Retail & Shop and Drop"
         - "P04 POS-002 Sell — Ticket Catalogue"
         - "P04 POS-023 Sell — Merchandise"
+        - "P05 KSK-017 Shop"
         - "P06 EMP-069 Barcode, RFID, Serialized Stock & Traceability"
         - "P08 BO-048 Retail Products"
         - "P08 BO-114 Variants, Attributes, Barcode & RFID Management"

@@ -142,11 +142,46 @@ properties:
                         notes: { type: string }
         states:
           type: object
-          required: [loading, empty, error]
+          description: >
+            **`empty` was split into three on 18 August and this schema was not updated until
+            1 September.** It went on requiring a key that **no screen has ever carried** — all
+            492 declare `emptyFirstRun` — so the one rule here that could have caught the drift
+            was itself the drift. Nothing validated against it, which is why nobody noticed.
+
+            A first run, a filter that matched nothing, and a list the person may not see are
+            three different screens. `emptyNoResults` and `emptyNoAccess` are conditionally
+            required: `_components.yaml` states when.
+          required: [loading, emptyFirstRun, error]
           properties:
             loading: { type: string }
-            empty: { type: string }
+            emptyFirstRun:
+              type: string
+              description: >
+                Nothing exists yet and this person may create the first one. **The call to
+                action is the whole state.** "Not applicable" is not an answer — 29 screens
+                carry it, and it means the question was never asked.
+            emptyNoResults:
+              type: string
+              description: Required where the screen has a searchField, a filter or a dataTable.
+            emptyNoAccess:
+              type: string
+              description: >
+                Required where the screen resolves a permission some roles lack. **Never
+                rendered as empty** — an empty list where the truth is a permission is a lie
+                a person will act on.
             error: { type: string }
+            partial:
+              type: string
+              description: >
+                Some sources answered and some did not. A dashboard with four tiles where one
+                failed must say so rather than showing three tiles and a gap.
+            unknown:
+              type: string
+              description: >
+                **The outcome is genuinely not known** — a payment terminal that charged a card
+                and never returned a response. Distinct from `error`, which is a clean refusal.
+                Required on any screen carrying a `paymentTerminal`: the screen must offer
+                inquiry, never a retry that double-charges.
             offline:
               type: string
               description: >

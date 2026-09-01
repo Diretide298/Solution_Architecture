@@ -22,7 +22,7 @@ schemas:
   tables: 37
   stores:
   - postgres
-  largestTable: marketing.conversation
+  largestTable: marketing.guest_profile
 operationsByContract:
 - contract: marketing-crm
   count: 96
@@ -824,14 +824,14 @@ tables:
   writtenBy: []
   foreignWriters: null
 - table: marketing.campaign
-  columns: 17
+  columns: 20
   store: postgres
   parent: null
   writtenBy:
   - marketing-crm
   foreignWriters: null
 - table: marketing.case
-  columns: 17
+  columns: 19
   store: postgres
   parent: null
   writtenBy:
@@ -865,7 +865,7 @@ tables:
   - marketing-crm
   foreignWriters: null
 - table: marketing.consent_record
-  columns: 10
+  columns: 9
   store: postgres
   parent: null
   writtenBy:
@@ -918,7 +918,7 @@ tables:
   - marketing-crm
   foreignWriters: null
 - table: marketing.guest_profile
-  columns: 16
+  columns: 22
   store: postgres
   parent: null
   writtenBy:
@@ -1044,7 +1044,7 @@ tables:
   - marketing-crm
   foreignWriters: null
 - table: marketing.segment
-  columns: 10
+  columns: 9
   store: postgres
   parent: null
   writtenBy:
@@ -1095,7 +1095,7 @@ writesOutside:
 - service: IdentityService
   operations: 2
   why: '**The owner defines the row; this service may only append to it.**'
-- service: ControlService
+- service: PlatformService
   operations: 2
   why: '**The owner defines the row; this service may only append to it.**'
 - service: OrderService
@@ -1106,14 +1106,15 @@ screens:
 - P01:WEB-011 Guest Details & Attendee Forms
 - P01:WEB-017 My Account Dashboard
 - P01:WEB-020 Profile & Preferences
-- P01:WEB-024 Loyalty & Rewards
+- P01:WEB-024 Devices, Wishlist & Consent
 - P01:WEB-026 Survey & Feedback
 - P01:WEB-027 Newsletter Subscription
 - P01:WEB-034 Lost & Found
 - P01:WEB-043 Loyalty & Rewards
-- P01:WEB-044 AI Concierge
+- P01:WEB-044 AI Concierge – Home
 - P02:GST-001 Home – Default
 - P02:GST-020 Saved Items / Wishlist
+- P02:GST-031 AI Concierge – Home
 - P02:GST-032 AI Concierge – Chat
 - P02:GST-034 Lost & Found
 - P02:GST-035 Feedback & Ratings

@@ -3,7 +3,7 @@ title: platform-ops — 25 operations
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/03-contracts.yaml
 tier: satellite
-service: ControlService
+service: PlatformService
 operations:
 - operation: applyMigration
   verb: POST
@@ -49,7 +49,7 @@ operations:
   writes: []
 - operation: getRelease
   verb: GET
-  path: /releases/{releaseId}
+  path: /releases/{reinventoryHoldId}
   scope: tenant
   permission: PLATFORM_RELEASE_VIEW
   audience:
@@ -60,7 +60,7 @@ operations:
   writes: []
 - operation: getReleaseReadiness
   verb: GET
-  path: /releases/{releaseId}/readiness
+  path: /releases/{reinventoryHoldId}/readiness
   scope: tenant
   permission: PLATFORM_RELEASE_VIEW
   audience:
@@ -190,7 +190,7 @@ operations:
   - control.migration_plan
 - operation: promoteRelease
   verb: POST
-  path: /releases/{releaseId}/promote
+  path: /releases/{reinventoryHoldId}/promote
   scope: tenant
   permission: PLATFORM_RELEASE_PROMOTE
   audience:
@@ -232,7 +232,7 @@ operations:
   - control.environment
 - operation: rejectRelease
   verb: POST
-  path: /releases/{releaseId}/reject
+  path: /releases/{reinventoryHoldId}/reject
   scope: tenant
   permission: PLATFORM_RELEASE_PROMOTE
   audience:
@@ -320,7 +320,7 @@ operations:
   - control.rollout
 - operation: withdrawRelease
   verb: POST
-  path: /releases/{releaseId}/withdraw
+  path: /releases/{reinventoryHoldId}/withdraw
   scope: tenant
   permission: PLATFORM_RELEASE_MANAGE
   audience:

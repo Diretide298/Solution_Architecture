@@ -21,6 +21,21 @@ operations:
   - cache:idempotency
   - platform.device
   - platform.workstation
+- operation: createOrgUnit
+  verb: POST
+  path: /org-units
+  scope: brand
+  permission: SCOPE_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - platform.org_unit
+  writes:
+  - cache:idempotency
+  - cache:resolution
+  - platform.org_unit
 - operation: createOutlet
   verb: POST
   path: /outlets
@@ -49,21 +64,6 @@ operations:
   writes:
   - cache:idempotency
   - platform.sale_board
-- operation: createScopeNode
-  verb: POST
-  path: /scope-nodes
-  scope: brand
-  permission: SCOPE_MANAGE
-  audience:
-  - staff
-  offline: false
-  reads:
-  - cache:idempotency
-  - platform.scope_node
-  writes:
-  - cache:idempotency
-  - cache:resolution
-  - platform.scope_node
 - operation: deployConfigurationProfile
   verb: POST
   path: /configuration-profiles/{profileId}/deploy
@@ -80,6 +80,19 @@ operations:
   - cache:idempotency
   - platform.profile_deployment
   - platform.workstation
+- operation: getOrgUnit
+  verb: GET
+  path: /org-units/{orgUnitId}
+  scope: venue
+  permission: SCOPE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:resolution
+  - platform.org_unit
+  writes:
+  - cache:resolution
 - operation: getRegionSettings
   verb: GET
   path: /regions/{regionId}/settings
@@ -91,19 +104,6 @@ operations:
   reads:
   - cache:resolution
   - platform.region_settings
-  writes:
-  - cache:resolution
-- operation: getScopeNode
-  verb: GET
-  path: /scope-nodes/{scopeNodeId}
-  scope: venue
-  permission: SCOPE_VIEW
-  audience:
-  - staff
-  offline: false
-  reads:
-  - cache:resolution
-  - platform.scope_node
   writes:
   - cache:resolution
 - operation: getVenueSettings
@@ -155,7 +155,7 @@ operations:
   - cache:idempotency
   - identity.principal
   - platform.audit_record
-  - platform.scope_node
+  - platform.org_unit
   writes:
   - platform.audit_read
 - operation: listDevices
@@ -169,6 +169,19 @@ operations:
   reads:
   - platform.device
   writes: []
+- operation: listOrgUnits
+  verb: GET
+  path: /org-units
+  scope: tenant
+  permission: SCOPE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:resolution
+  - platform.org_unit
+  writes:
+  - cache:resolution
 - operation: listOutlets
   verb: GET
   path: /outlets
@@ -191,19 +204,6 @@ operations:
   reads:
   - platform.sale_board
   writes: []
-- operation: listScopeNodes
-  verb: GET
-  path: /scope-nodes
-  scope: tenant
-  permission: SCOPE_VIEW
-  audience:
-  - staff
-  offline: false
-  reads:
-  - cache:resolution
-  - platform.scope_node
-  writes:
-  - cache:resolution
 - operation: listWorkstations
   verb: GET
   path: /workstations
@@ -321,6 +321,21 @@ operations:
   - cache:idempotency
   - cache:resolution
   - platform.venue_settings
+- operation: updateOrgUnit
+  verb: PATCH
+  path: /org-units/{orgUnitId}
+  scope: brand
+  permission: SCOPE_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - platform.org_unit
+  writes:
+  - cache:idempotency
+  - cache:resolution
+  - platform.org_unit
 - operation: updateOutlet
   verb: PATCH
   path: /outlets/{outletId}
@@ -364,18 +379,3 @@ operations:
   writes:
   - cache:idempotency
   - platform.sale_board
-- operation: updateScopeNode
-  verb: PATCH
-  path: /scope-nodes/{scopeNodeId}
-  scope: brand
-  permission: SCOPE_MANAGE
-  audience:
-  - staff
-  offline: false
-  reads:
-  - cache:idempotency
-  - platform.scope_node
-  writes:
-  - cache:idempotency
-  - cache:resolution
-  - platform.scope_node

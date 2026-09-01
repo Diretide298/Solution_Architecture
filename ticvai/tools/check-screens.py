@@ -31,17 +31,6 @@ import re
 import json
 import yaml
 
-# A cp1252 console cannot encode the arrows and dashes this tool prints, and the
-# failure lands *after* the work is done — so the output is written, the summary
-# line raises UnicodeEncodeError, and a correct run exits 1. Reconfiguring at
-# import means anything importing this module gets it too, refresh.sh included.
-try:
-    sys.stdout.reconfigure(encoding="utf-8", errors="replace")
-    sys.stderr.reconfigure(encoding="utf-8", errors="replace")
-except Exception:      # a captured stream may not be reconfigurable; harmless
-    pass
-
-
 ROOT = Path(__file__).resolve().parents[1]
 SCREENS = ROOT / "screens"
 # The shipped `contracts/` is authoritative. Until 17 August these pointed at a sibling repo
@@ -313,7 +302,7 @@ def load_staff_operations() -> set[str]:
                 for verb, op in item.items():
                     if verb in ("get", "post", "put", "patch", "delete") and isinstance(op, dict):
                         # `x-ticvai-guest-callable` marks an operation a guest performs on
-                        # their own data — createOrder, createPayment, acquireLease. The
+                        # their own data — createOrder, createPayment, acquireInventoryHold. The
                         # permission is for staff doing it on a guest's behalf at a till.
                         if op.get("x-ticvai-permission") and not "guest" in (op.get("x-ticvai-audience") or []):
                             out.add(op["operationId"])
@@ -503,6 +492,147 @@ def main() -> int:
                     f"{sc['id']} says it keeps working offline and not one of its onLoad "
                     f"operations is offline-capable ({', '.join(loads[:3])}) — the screen renders "
                     "empty on the day the prose is about")
+
+    # **Two guest surfaces drawing one journey must not diverge silently.** P01 Guest Web and P02
+    # Guest App had thirteen identically-named screen pairs, and `Loyalty & Rewards` shared *zero*
+    # of nine operations across them — the same name, the same journey, and one side could not do
+    # what the other could.
+    #
+    # **A guest does not know which surface they are on.** They opened a link, or they installed an
+    # app, and the ticket is the same ticket. A divergence is either a defect or a decision, and
+    # only one of those should be silent.
+    #
+    # Guest-callable operations only: a web screen legitimately lacks a device-audience operation,
+    # and demanding parity on those would report the platform working correctly.
+    _guest = {}
+    for f in sorted(SCREENS.glob("P*.yaml")):
+        doc = yaml.safe_load(f.read_text(encoding="utf-8"))
+        if (doc.get("platform") or {}).get("audience") != "guest":
+            continue
+        code = doc["platform"]["code"]
+        for sc in doc.get("screens") or []:
+            ops = {a.get("operationId") for a in (sc.get("apis") or [])
+                   if a.get("operationId") in _lin
+                   and ({"guest", "public", "anonymous"} & set(_lin[a["operationId"]].get("audience") or []))}
+            _guest.setdefault(sc["name"].strip().lower(), []).append((code, sc["id"], ops, sc))
+    for name, group in sorted(_guest.items()):
+        if len(group) < 2:
+            continue
+        base = set.union(*[g[2] for g in group])
+        for code, sid, ops, sc in group:
+            missing = sorted(base - ops)
+            if not missing:
+                continue
+            if "parity" in str(sc.get("notes") or "").lower():
+                continue
+            WARNINGS.append(
+                f"{sid} ({code}) and its counterpart share the name '{sc['name']}' and it cannot "
+                f"call {', '.join(missing[:3])} — a guest does not know which surface they are on, "
+                "so a divergence needs a note saying it is deliberate")
+
+    # **A placeholder that renders is a placeholder that ships.** 124 screens carried
+    # `module: TODO` — 59 of the 63 on P02 Guest App, every one on P10 Partner Web — and the
+    # frontend drew them under a group heading reading *TODO* while P01 Guest Web beside it read
+    # *Discovery & Browse* and *Booking & Selection*.
+    #
+    # **No checker looked at `module`.** It is a grouping label, not a join, so nothing resolved it
+    # against anything and nothing complained. It was found by a person looking at two boards side
+    # by side.
+    #
+    # `module` groups screens for a reader; `requiresModule` gates them by licence. **Two different
+    # fields, and only the second had a check.**
+    PLACEHOLDER = {"todo", "tbd", "fixme", "xxx", "none", "n/a", "", "-", "?"}
+    for f in sorted(SCREENS.glob("P*.yaml")):
+        doc = yaml.safe_load(f.read_text(encoding="utf-8"))
+        code = (doc.get("platform") or {}).get("code", "")
+        for sc in doc.get("screens") or []:
+            grp = str(sc.get("module") or "").strip()
+            if grp.lower() in PLACEHOLDER:
+                WARNINGS.append(
+                    f"{sc['id']} ({code}) has module group '{grp or 'unset'}' — a placeholder that "
+                    "renders is a placeholder that ships, and this is the heading a reviewer reads "
+                    "above the screen")
+
+    # **A destructive button with no confirmation and no label is a button nobody can undo.**
+    # `confirmDialog` and `modal` were both in the component library and used **zero times across
+    # 492 screens**, while `destructiveButton` was used 39 times and its own library entry reads
+    # *always requires confirmation*. **Seven of the 39 had a `null` label** — a red button that
+    # cannot say what it destroys, and on `BO-033 Blacklist Management` and `ADM-007 Module &
+    # Feature Entitlement` it was the only way to remove a record.
+    #
+    # **Found by a design review on 31 August, not by anything here** — the components derived
+    # correctly from the operations and nobody asked what a destructive act needs beyond a button.
+    for f in sorted(SCREENS.glob("P*.yaml")):
+        doc = yaml.safe_load(f.read_text(encoding="utf-8"))
+        code = (doc.get("platform") or {}).get("code", "")
+        for sc in doc.get("screens") or []:
+            regions = (sc.get("layout") or {}).get("regions") or []
+            comps = [c for r in regions for c in (r.get("components") or [])]
+            kinds = {c.get("kind") for c in comps}
+            if "destructiveButton" not in kinds:
+                continue
+            if "confirmDialog" not in kinds and "modal" not in kinds:
+                WARNINGS.append(
+                    f"{sc['id']} ({code}) has a destructive button and no confirmDialog — the "
+                    "component library says one always requires confirmation")
+            for c in comps:
+                if c.get("kind") == "destructiveButton" and not str(c.get("label") or "").strip():
+                    WARNINGS.append(
+                        f"{sc['id']} ({code}) has a destructive button with no label — a red "
+                        "button that cannot say what it destroys")
+
+    # **Presence was the whole test, and presence is satisfiable by paste.** The rule above was
+    # added on 31 August and answered the same day by putting **one identical `confirmDialog` on
+    # all 39 screens** — same label, same note, `derived: true`, every one byte-for-byte the same.
+    # The label was *Confirm*, which is the *are you sure* the library entry exists to rule out,
+    # and the note pasted onto all 39 quoted that entry while breaking it.
+    #
+    # **A count cannot tell you a dialog names a consequence, but it can tell you 39 dialogs are
+    # one dialog.** Two screens sharing a confirmation is correct where they share an operation —
+    # ten screens void an order and the consequence is the same each time. Two screens sharing one
+    # where the operations differ is a paste.
+    seen_dialog: dict[str, list[str]] = {}
+    for f in sorted(SCREENS.glob("P*.yaml")):
+        doc = yaml.safe_load(f.read_text(encoding="utf-8"))
+        code = (doc.get("platform") or {}).get("code", "")
+        for sc in doc.get("screens") or []:
+            regions = (sc.get("layout") or {}).get("regions") or []
+            for c in (c for r in regions for c in (r.get("components") or [])):
+                if c.get("kind") != "confirmDialog":
+                    continue
+                label = str(c.get("label") or "").strip()
+                body = str(c.get("notes") or "").strip()
+                if not label:
+                    ERRORS.append(
+                        f"{sc['id']} ({code}) confirmDialog has no label — it cannot name the act")
+                elif label.lower() in {"confirm", "are you sure", "are you sure?", "ok", "yes"}:
+                    ERRORS.append(
+                        f"{sc['id']} ({code}) confirmDialog is labelled {label!r} — the library "
+                        "entry rules this out by name: \"Are you sure?\" is not a confirmation")
+                if not c.get("bindsTo"):
+                    WARNINGS.append(
+                        f"{sc['id']} ({code}) confirmDialog names no operation in `bindsTo`, so "
+                        "nothing says what it is confirming")
+                if "Body not written" in body:
+                    ERRORS.append(
+                        f"{sc['id']} ({code}) confirmDialog was proposed by derive-components and "
+                        "never written — the consequence has to be read off the lineage, the state "
+                        "model and the events")
+                # **An absent `bindsTo` must not defeat this.** Falling back to the operation
+                # alone let two unbound dialogs look like one operation and pass; keying an
+                # unbound dialog on its own screen id makes every one of them distinct, so a
+                # shared body across unbound dialogs still trips the rule below.
+                op_key = c.get("bindsTo") or f"unbound:{sc['id']}"
+                key = f"{label} {body}"
+                seen_dialog.setdefault(key, []).append(f"{sc['id']} ({op_key})")
+
+    for key, users in seen_dialog.items():
+        ops = {u.rsplit("(", 1)[-1].rstrip(")") for u in users}
+        if len(users) > 1 and len(ops) > 1:
+            ERRORS.append(
+                f"one confirmDialog definition is shared by {len(users)} screens across "
+                f"{len(ops)} different operations ({', '.join(sorted(ops))}) — a consequence that "
+                "fits every screen names none of them: " + ", ".join(users[:6]))
 
     for w in WARNINGS:
         print(f"  WARN  {w}")

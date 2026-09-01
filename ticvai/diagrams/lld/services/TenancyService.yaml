@@ -3,8 +3,8 @@ title: TenancyService — 52 operations, 35 tables
 generatedBy: tools/derive-diagrams.py
 tier: foundation
 index: diagrams/hld/02-services.yaml
-why: '**`platform.scope_node` is reached by 304 of 379 tables** — the tenancy spine. Workforce and approvals
-  are folded in because each is small, both read `scope_node` constantly and write it rarely, and splitting
+why: '**`platform.org_unit` is reached by 304 of 379 tables** — the tenancy spine. Workforce and approvals
+  are folded in because each is small, both read `org_unit` constantly and write it rarely, and splitting
   them means three services doing the same joins.
 
 
@@ -30,7 +30,7 @@ schemas:
   tables: 24
   stores:
   - postgres
-  largestTable: platform.workstation
+  largestTable: platform.wallet_authorisation
 - schema: workforce
   tables: 5
   stores:
@@ -53,6 +53,14 @@ operationsByContract:
     offline: false
     reads: 3
     writes: 3
+  - operation: createOrgUnit
+    verb: POST
+    path: /org-units
+    scope: brand
+    permission: SCOPE_MANAGE
+    offline: false
+    reads: 2
+    writes: 3
   - operation: createOutlet
     verb: POST
     path: /outlets
@@ -69,14 +77,6 @@ operationsByContract:
     offline: false
     reads: 2
     writes: 2
-  - operation: createScopeNode
-    verb: POST
-    path: /scope-nodes
-    scope: brand
-    permission: SCOPE_MANAGE
-    offline: false
-    reads: 2
-    writes: 3
   - operation: deployConfigurationProfile
     verb: POST
     path: /configuration-profiles/{profileId}/deploy
@@ -85,20 +85,20 @@ operationsByContract:
     offline: false
     reads: 3
     writes: 3
+  - operation: getOrgUnit
+    verb: GET
+    path: /org-units/{orgUnitId}
+    scope: venue
+    permission: SCOPE_VIEW
+    offline: false
+    reads: 2
+    writes: 1
   - operation: getRegionSettings
     verb: GET
     path: /regions/{regionId}/settings
     scope: region
     permission: SCOPE_VIEW
     offline: true
-    reads: 2
-    writes: 1
-  - operation: getScopeNode
-    verb: GET
-    path: /scope-nodes/{scopeNodeId}
-    scope: venue
-    permission: SCOPE_VIEW
-    offline: false
     reads: 2
     writes: 1
   - operation: getVenueSettings
@@ -141,6 +141,14 @@ operationsByContract:
     offline: true
     reads: 1
     writes: 0
+  - operation: listOrgUnits
+    verb: GET
+    path: /org-units
+    scope: tenant
+    permission: SCOPE_VIEW
+    offline: false
+    reads: 2
+    writes: 1
   - operation: listOutlets
     verb: GET
     path: /outlets
@@ -157,14 +165,6 @@ operationsByContract:
     offline: true
     reads: 1
     writes: 0
-  - operation: listScopeNodes
-    verb: GET
-    path: /scope-nodes
-    scope: tenant
-    permission: SCOPE_VIEW
-    offline: false
-    reads: 2
-    writes: 1
   - operation: listWorkstations
     verb: GET
     path: /workstations
@@ -229,6 +229,14 @@ operationsByContract:
     offline: false
     reads: 3
     writes: 3
+  - operation: updateOrgUnit
+    verb: PATCH
+    path: /org-units/{orgUnitId}
+    scope: brand
+    permission: SCOPE_MANAGE
+    offline: false
+    reads: 2
+    writes: 3
   - operation: updateOutlet
     verb: PATCH
     path: /outlets/{outletId}
@@ -253,14 +261,6 @@ operationsByContract:
     offline: false
     reads: 2
     writes: 2
-  - operation: updateScopeNode
-    verb: PATCH
-    path: /scope-nodes/{scopeNodeId}
-    scope: brand
-    permission: SCOPE_MANAGE
-    offline: false
-    reads: 2
-    writes: 3
 - contract: approvals
   count: 13
   operations:
@@ -557,6 +557,14 @@ tables:
   writtenBy:
   - tenancy
   foreignWriters: null
+- table: platform.cross_region_entitlement
+  columns: 17
+  store: postgres
+  parent: null
+  writtenBy:
+  - cross-cell
+  foreignWriters:
+  - cross-cell
 - table: platform.denomination
   columns: 8
   store: postgres
@@ -601,6 +609,13 @@ tables:
   writtenBy:
   - tenancy
   foreignWriters: null
+- table: platform.org_unit
+  columns: 8
+  store: postgres
+  parent: null
+  writtenBy:
+  - tenancy
+  foreignWriters: null
 - table: platform.outbox
   columns: 0
   store: postgres
@@ -621,21 +636,15 @@ tables:
   writtenBy:
   - tenancy
   foreignWriters: null
-- table: platform.redemption_right
-  columns: 16
-  store: postgres
-  parent: null
-  writtenBy:
-  - cross-cell
-  foreignWriters:
-  - cross-cell
 - table: platform.region_settings
   columns: 10
   store: postgres
   parent: null
   writtenBy:
+  - finance
   - tenancy
-  foreignWriters: null
+  foreignWriters:
+  - finance
 - table: platform.sale_board
   columns: 6
   store: postgres
@@ -661,13 +670,6 @@ tables:
   parent: null
   writtenBy: []
   foreignWriters: null
-- table: platform.scope_node
-  columns: 8
-  store: postgres
-  parent: null
-  writtenBy:
-  - tenancy
-  foreignWriters: null
 - table: platform.tenant
   columns: 1
   store: postgres
@@ -682,7 +684,7 @@ tables:
   - tenancy
   foreignWriters: null
 - table: platform.wallet_authorisation
-  columns: 16
+  columns: 24
   store: postgres
   parent: null
   writtenBy:

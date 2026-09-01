@@ -14,7 +14,7 @@ silently violates it.
 ## 1. Model
 
 ```
-Grant = (principal_id, permission, scope_node, effect)
+Grant = (principal_id, permission, org_unit, effect)
 effect ∈ { ALLOW, DENY }
 ```
 
@@ -347,7 +347,7 @@ inverted, and recorded as such. Checked against the table:
 |---|---|---|
 | R1 default deny | Yes | Allows drive the output set |
 | R2 deny-overrides-allow | Yes | `IsDenied` checks ancestors |
-| R3 downward inheritance only | Yes | `ScopeNode.Contains` |
+| R3 downward inheritance only | Yes | `OrgUnit.Contains` |
 | R4 wildcard deny | Yes | `"*"` handled |
 | R5 workstation not a source | Yes | No workstation input exists |
 | R6 selected role only | Yes | Caller supplies the role's grants |

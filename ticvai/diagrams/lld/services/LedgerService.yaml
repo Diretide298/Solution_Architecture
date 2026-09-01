@@ -1,5 +1,5 @@
 id: LLD-LedgerService
-title: LedgerService — 54 operations, 18 tables
+title: LedgerService — 56 operations, 18 tables
 generatedBy: tools/derive-diagrams.py
 tier: commerce
 index: diagrams/hld/02-services.yaml
@@ -10,7 +10,7 @@ scale: Write-heavy, batch-tolerant, not latency-critical. Recognition and revalu
 ifDown: '**Correctness over availability.** A ledger that is briefly unavailable is recoverable; one
   that is briefly wrong is not.'
 coverage:
-  operations: 54
+  operations: 56
   inAFlow: 33
   percent: 61%
   note: '**Flow coverage is how much of this service a journey has walked.** A service under 40% is
@@ -23,7 +23,7 @@ schemas:
   largestTable: ledger.journal_entry
 operationsByContract:
 - contract: finance
-  count: 54
+  count: 56
   operations:
   - operation: abandonPeriodClose
     verb: POST
@@ -193,6 +193,14 @@ operationsByContract:
     offline: false
     reads: 4
     writes: 0
+  - operation: ingestFxRates
+    verb: POST
+    path: /fx-rates/ingest
+    scope: region
+    permission: LEDGER_APPROVE
+    offline: false
+    reads: 2
+    writes: 2
   - operation: ingestSettlementFile
     verb: POST
     path: /settlements
@@ -417,6 +425,14 @@ operationsByContract:
     offline: false
     reads: 2
     writes: 2
+  - operation: setFxProvider
+    verb: PUT
+    path: /fx-rates/providers
+    scope: region
+    permission: LEDGER_APPROVE
+    offline: false
+    reads: 1
+    writes: 2
   - operation: setFxRate
     verb: PUT
     path: /fx-rates
@@ -493,17 +509,6 @@ tables:
   writtenBy:
   - finance
   foreignWriters: null
-- table: ledger.entry
-  columns: 12
-  store: postgres
-  parent: null
-  writtenBy:
-  - finance
-  - orders
-  - shift
-  foreignWriters:
-  - orders
-  - shift
 - table: ledger.event_budget
   columns: 8
   store: postgres
@@ -518,7 +523,7 @@ tables:
   - finance
   foreignWriters: null
 - table: ledger.fx_rate
-  columns: 10
+  columns: 12
   store: postgres
   parent: null
   writtenBy:
@@ -555,6 +560,17 @@ tables:
   writtenBy:
   - finance
   foreignWriters: null
+- table: ledger.posting
+  columns: 12
+  store: postgres
+  parent: null
+  writtenBy:
+  - finance
+  - orders
+  - shift
+  foreignWriters:
+  - orders
+  - shift
 - table: ledger.price_variance
   columns: 15
   store: postgres
@@ -604,7 +620,7 @@ readsFrom:
   operations: 1
 - service: RetailService
   operations: 1
-- service: ControlService
+- service: PlatformService
   operations: 1
 - service: CatalogueService
   operations: 1

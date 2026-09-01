@@ -2801,7 +2801,7 @@ components:
         includedAiTokens: { type: integer, nullable: true }
 
     Plan:
-      x-ticvai-persistence: "control.plan"
+      x-ticvai-persistence: "control.subscription_plan"
       allOf:
         - $ref: '#/components/schemas/CreatePlanRequest'
         - type: object

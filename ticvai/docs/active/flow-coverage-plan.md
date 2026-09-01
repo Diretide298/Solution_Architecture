@@ -54,8 +54,8 @@ the spread says where to look.
 
 | Service | Operations | In a flow | Coverage |
 |---|---:|---:|---|
-| CrossCellService | 16 | 5 | 31% |
-| ControlService | 102 | 40 | 39% |
+| CrossRegionService | 16 | 5 | 31% |
+| PlatformService | 102 | 40 | 39% |
 | MarketingService | 96 | 39 | 41% |
 | RetailService | 35 | 15 | 43% |
 | CatalogueService | 132 | 57 | 43% |
@@ -71,7 +71,7 @@ the spread says where to look.
 | FnbService | 96 | 70 | 73% |
 | InventoryService | 50 | 48 | 96% |
 
-**`InventoryService` at 96% and `CrossCellService` at 31%** — and the difference is not risk, it is
+**`InventoryService` at 96% and `CrossRegionService` at 31%** — and the difference is not risk, it is
 attention. Inventory was walked four times across three passes; cross-cell has one flow and it is
 the only service that reaches another jurisdiction.
 
@@ -104,8 +104,8 @@ one of those two unblocks a build team.
 **Report coverage per service and put it beside the deploy order.** It is now a column in
 `TICVAI_Services_and_Data_Segregation.xlsx`, banded — green above 60%, amber above 40%, red below.
 
-**Treat a service under 40% as unwalked rather than under-documented.** `CrossCellService`,
-`ControlService`, `MarketingService`, `RetailService` and `CatalogueService` are there, and
+**Treat a service under 40% as unwalked rather than under-documented.** `CrossRegionService`,
+`PlatformService`, `MarketingService`, `RetailService` and `CatalogueService` are there, and
 Catalogue is the largest service in the package.
 
 **Write a flow when a boundary is crossed, not to move a percentage.**

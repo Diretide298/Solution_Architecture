@@ -1,0 +1,817 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+html,body{margin:0;padding:0;background:#EEF1F6;-webkit-font-smoothing:antialiased}
+*{box-sizing:border-box}
+a{color:#0D6EFD;text-decoration:none}a:hover{color:#0A55C7}
+</style>
+</helmet>
+
+<div style="font-family:Manrope,system-ui,sans-serif;color:#0B1324;padding:26px 34px 90px;max-width:1420px;margin:0 auto">
+
+  <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:24px;padding-bottom:14px;border-bottom:2px solid #0B1324">
+    <div>
+      <div style="font-size:12px;font-weight:800;letter-spacing:.18em;background:linear-gradient(90deg,#0D6EFD,#00B8FF);-webkit-background-clip:text;background-clip:text;color:transparent">TICVAI</div>
+      <h1 style="font-size:21px;font-weight:800;letter-spacing:-.02em;margin:5px 0 0">Seat Management · Board 11 — Reseating &amp; Disruption <span style="font-weight:600;color:#6B7280">(10 screens)</span></h1>
+    </div>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#6B7280;text-align:right;line-height:1.7">
+      <div>staff · when the room changes under a sold house</div>
+      <div>1280 × 700 · <a href="TICVAI%20All%20Boards%20Index.dc.html">board index</a></div>
+    </div>
+  </div>
+
+  <p style="font-size:12.5px;color:#5A6577;max-width:82ch;margin:16px 0 0;line-height:1.65;text-wrap:pretty">Every other board in this module tries to prevent surprises. This one handles them: a row lost to a rig change, a lift out of service, a venue swap, a whole house to move at four hours' notice. The measure of a good reseat is that the guest hears it from the venue rather than from an usher, gets an equal or better seat, and is not asked to do any work. Everything here is built to be finished in one sitting by one person.</p>
+
+  <div style="display:flex;flex-direction:column;gap:52px;margin-top:40px">
+
+    <div id="seatp-11a" data-screen-label="SEATP-11A" data-screen-id="SEATP-11A" data-screen-id-origin="board" style="display:flex;flex-direction:column;gap:13px;scroll-margin-top:24px">
+      <div>
+        <div style="display:flex;align-items:baseline;gap:9px"><span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#8494A8">SEATP-11A</span><span style="font-size:16.5px;font-weight:800;letter-spacing:-.015em">Disruption Board</span><span style="font-size:9px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:2px 7px;border-radius:5px;background:#FDECEC;color:#A81E1E">4 open · 1 848 guests affected</span></div>
+        <div style="font-size:12px;color:#6B7280;margin-top:3px">Everything currently disrupting a sold seat, ranked by how many guests are affected and how little time there is left to tell them.</div>
+      </div>
+      <div style="width:1280px;height:700px;display:flex;background:#F7F9FC;border:1px solid #E3E8F0;border-radius:14px;overflow:hidden;box-shadow:0 16px 38px rgba(12,35,64,.09)">
+        <aside style="flex:none;width:180px;background:#0B1324;display:flex;flex-direction:column;position:relative">
+          <div style="position:absolute;inset:0;background:radial-gradient(300px 200px at 0% 4%,rgba(220,38,38,.20),transparent 70%);pointer-events:none"></div>
+          <div style="position:relative;padding:15px 14px 13px;border-bottom:1px solid rgba(255,255,255,.08)"><img src="assets/ticvai-light-logo.png" alt="TICVAI" style="display:block;height:24px;width:auto"><div style="font-size:9.5px;color:#7FA3C9;margin-top:5px">Disruption</div></div>
+          <nav style="position:relative;display:flex;flex-direction:column;gap:2px;padding:11px 9px">
+            <div style="padding:8px 10px;border-radius:9px;background:linear-gradient(90deg,rgba(13,110,253,.30),rgba(0,184,255,.10));color:#fff;font-size:11.5px;font-weight:700;box-shadow:inset 2px 0 0 #00B8FF">Open items</div>
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Reseat runs</div>
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Venue moves</div>
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Notices</div>
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Compensation</div>
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">History</div>
+          </nav>
+          <div style="position:relative;margin-top:auto;padding:12px;border-top:1px solid rgba(255,255,255,.08);font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#7FA3C9;line-height:1.7">4 open<br>2 need a decision today</div>
+        </aside>
+        <div style="flex:1;display:flex;flex-direction:column;min-width:0">
+          <header style="flex:none;height:54px;display:flex;align-items:center;gap:12px;padding:0 18px;background:#fff;border-bottom:1px solid #E8ECF3">
+            <div><div style="font-size:13.5px;font-weight:800;letter-spacing:-.01em">Open disruptions</div><div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#9AA5B6">4 items · 1 848 guests · 2 with less than 48 hours' notice · £14 200 of likely compensation</div></div>
+            <div style="margin-left:auto;display:flex;gap:6px"><div style="height:32px;display:flex;align-items:center;padding:0 11px;border:1px solid #E3E8F0;border-radius:8px;font-size:11px;font-weight:700;color:#5A6577">Closed items</div><div style="height:32px;display:flex;align-items:center;padding:0 12px;border-radius:8px;background:#0D6EFD;color:#fff;font-size:11px;font-weight:700">Log a disruption</div></div>
+          </header>
+          <div style="flex:1;display:grid;grid-template-columns:1fr 320px;gap:12px;padding:14px 16px;min-height:0">
+            <div style="background:#fff;border:1px solid #E8ECF3;border-radius:12px;display:flex;flex-direction:column;overflow:hidden;min-height:0">
+              <div style="flex:none;display:grid;grid-template-columns:1.4fr 84px 1fr 88px 84px;padding:9px 14px;font-size:9px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:#94A0B4;border-bottom:1px solid #EDF1F6"><div>Disruption</div><div style="text-align:right">Guests</div><div>Cause</div><div style="text-align:right">Notice</div><div style="text-align:right">State</div></div>
+              <div style="display:grid;grid-template-columns:1.4fr 84px 1fr 88px 84px;align-items:center;padding:11px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA;background:#FDF5F5"><div><div style="font-weight:700;color:#8A2020">Lift 2 out of service</div><div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#8A2020">Northgate upper tier · 6 nights</div></div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#8A2020">248</div><div style="font-size:10.5px;color:#8A2020">no service contract</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#8A2020">36 h</div><div style="text-align:right"><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;padding:2px 7px;border-radius:5px;background:#FDECEC;color:#A81E1E">urgent</span></div></div>
+              <div style="display:grid;grid-template-columns:1.4fr 84px 1fr 88px 84px;align-items:center;padding:11px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA;background:#FDF5F5"><div><div style="font-weight:700;color:#8A2020">Hall 2 roof leak</div><div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#8A2020">28 seats unusable · indefinite</div></div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#8A2020">412</div><div style="font-size:10.5px;color:#8A2020">storm damage</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#8A2020">6 days</div><div style="text-align:right"><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;padding:2px 7px;border-radius:5px;background:#FDECEC;color:#A81E1E">reseating</span></div></div>
+              <div style="display:grid;grid-template-columns:1.4fr 84px 1fr 88px 84px;align-items:center;padding:11px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA;background:#FFFBF4"><div><div style="font-weight:600;color:#7A5C00">Camera platform · row D</div><div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#7A5C00">permanent · Hall 1</div></div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#7A5C00">1 104</div><div style="font-size:10.5px;color:#7A5C00">map change, sold seats</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#7A5C00">14 days</div><div style="text-align:right"><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;padding:2px 7px;border-radius:5px;background:#FFF3D6;color:#7A5C00">in progress</span></div></div>
+              <div style="display:grid;grid-template-columns:1.4fr 84px 1fr 88px 84px;align-items:center;padding:11px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA"><div><div style="font-weight:600">Caption unit · 18 Sep</div><div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#9AA5B6">blocks CA1–CA6</div></div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">84</div><div style="font-size:10.5px;color:#5A6577">access performance rig</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">11 days</div><div style="text-align:right"><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;padding:2px 7px;border-radius:5px;background:#E8F6F0;color:#0B7A55">notified</span></div></div>
+              <div style="flex:none;padding:12px 14px;border-top:1px solid #EDF1F6;background:#FDF5F5;display:flex;gap:11px"><span style="width:3px;border-radius:2px;background:#DC2626;flex:none"></span><div style="flex:1;font-size:11px;color:#8A2020;line-height:1.55">Lift 2 has thirty-six hours' notice and 248 guests, of whom 12 booked a wheelchair space or told us they cannot manage stairs. Those twelve cannot simply be moved to another seat; the upper tier is unreachable without the lift.</div></div>
+              <div style="flex:1;padding:14px;display:flex;flex-direction:column;gap:10px;min-height:0">
+                <div style="font-size:12px;font-weight:800;letter-spacing:-.01em">How each item is judged</div>
+                <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;font-size:10.5px;color:#5A6577">
+                  <div style="border:1px solid #E8ECF3;border-radius:10px;padding:10px 12px;line-height:1.5"><span style="font-weight:700;color:#0B1324">Can it be fixed?</span><br>A repair before the performance beats every reseat. Ask this first and put a number on it.</div>
+                  <div style="border:1px solid #E8ECF3;border-radius:10px;padding:10px 12px;line-height:1.5"><span style="font-weight:700;color:#0B1324">Can everyone be moved?</span><br>Equal or better, party intact, access facts preserved. If not, some guests need a refund, not a seat.</div>
+                  <div style="border:1px solid #E8ECF3;border-radius:10px;padding:10px 12px;line-height:1.5"><span style="font-weight:700;color:#0B1324">How much notice is left?</span><br>Under 48 hours changes everything: the notice goes by text, and compensation is assumed rather than argued.</div>
+                </div>
+                <div style="margin-top:auto;font-size:11px;color:#5A6577;line-height:1.55">Three questions, asked in that order, on every disruption. Most of the damage in past incidents came from answering the second before the first.</div>
+              </div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:12px;min-height:0">
+              <div style="flex:none;background:#fff;border:1.5px solid #F5C9C9;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:8px">
+                <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em;color:#8A2020">Lift 2 · 12 guests cannot be moved</div>
+                <div style="display:flex;flex-direction:column;gap:5px;font-size:11px;color:#5A6577">
+                  <div style="display:flex;justify-content:space-between"><span>Wheelchair spaces</span><span style="font-family:'IBM Plex Mono',monospace;color:#8A2020">6 + 6 companions</span></div>
+                  <div style="display:flex;justify-content:space-between"><span>Stalls spaces free</span><span style="font-family:'IBM Plex Mono',monospace;color:#8A2020">0</span></div>
+                  <div style="display:flex;justify-content:space-between"><span>Other dates with space</span><span style="font-family:'IBM Plex Mono',monospace;color:#0B5B41">3</span></div>
+                  <div style="display:flex;justify-content:space-between"><span>Full refund cost</span><span style="font-family:'IBM Plex Mono',monospace;color:#0B1324">£912</span></div>
+                </div>
+                <div style="font-size:10.5px;color:#5A6577;line-height:1.5">Offer another date first, refund second, and say clearly that the lift is the reason. Nobody should be told to "make their way to the upper tier".</div>
+                <div style="height:30px;border-radius:9px;background:#0D6EFD;color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700">Open the 12 cases</div>
+              </div>
+              <div style="flex:none;background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:7px">
+                <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Notice is the whole game</div>
+                <div style="font-size:10.5px;color:#5A6577;line-height:1.55">A seat change told fourteen days out produces almost no complaints. The same change discovered at the door produces one complaint per affected guest and a refund for a third of them.</div>
+              </div>
+              <div style="flex:1;min-height:0"></div>
+              <div style="flex:none;background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:7px">
+                <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Every item has an owner</div>
+                <div style="font-size:10.5px;color:#5A6577;line-height:1.55">Disruptions do not sit in a shared inbox. Each has a named person, a next action and a deadline, and appears on their list until it is closed.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;line-height:1.85;color:#7C8899">
+        <div><b style="color:#4A5566;font-weight:600">OPERATIONS</b> · listDisruptions · countAffectedGuests · getNoticeRemaining · classifyUnmovableGuests · logDisruption</div>
+        <div><b style="color:#4A5566;font-weight:600">STATES</b> · open · <b style="color:#A81E1E">shortNotice — under 48 hours</b> · reseating · unmovableGuests · notified · closed · error</div>
+        <div><b style="color:#4A5566;font-weight:600">ARRIVES WITH</b> · tenantId←context</div>
+        <div><b style="color:#4A5566;font-weight:600">GOES TO</b> · <a href="#seatp-11b">reseat run</a> · <a href="#seatp-11e">notices</a></div>
+      </div>
+    </div>
+
+    <div id="seatp-11b" data-screen-label="SEATP-11B" data-screen-id="SEATP-11B" data-screen-id-origin="board" style="display:flex;flex-direction:column;gap:13px;scroll-margin-top:24px">
+      <div>
+        <div style="display:flex;align-items:baseline;gap:9px"><span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#8494A8">SEATP-11B</span><span style="font-size:16.5px;font-weight:800;letter-spacing:-.015em">Reseat Run</span><span style="font-size:9px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:2px 7px;border-radius:5px;background:#FDECEC;color:#A81E1E">412 guests · 28 seats unusable</span></div>
+        <div style="font-size:12px;color:#6B7280;margin-top:3px">Moving four hundred guests out of a leaking corner of Hall 2, in one operation, with the exceptions surfaced rather than buried.</div>
+      </div>
+      <div style="width:1280px;height:700px;display:flex;background:#F7F9FC;border:1px solid #E3E8F0;border-radius:14px;overflow:hidden;box-shadow:0 16px 38px rgba(12,35,64,.09)">
+        <aside style="flex:none;width:180px;background:#0B1324;display:flex;flex-direction:column;position:relative">
+          <div style="position:absolute;inset:0;background:radial-gradient(300px 200px at 0% 4%,rgba(0,184,255,.20),transparent 70%);pointer-events:none"></div>
+          <div style="position:relative;padding:15px 14px 13px;border-bottom:1px solid rgba(255,255,255,.08)"><img src="assets/ticvai-light-logo.png" alt="TICVAI" style="display:block;height:24px;width:auto"><div style="font-size:9.5px;color:#7FA3C9;margin-top:5px">Disruption</div></div>
+          <div style="position:relative;padding:11px 12px;border-bottom:1px solid rgba(255,255,255,.08)"><div style="font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.09em;text-transform:uppercase;color:#7FA3C9;margin-bottom:8px">Run</div><div style="display:flex;flex-direction:column;gap:4px;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#DCE7F5;line-height:1.7"><div style="color:#00B8FF;font-weight:600">Hall 2 · rows M–P left</div><div>28 seats</div><div>412 guests · 14 dates</div><div>6 days' notice</div></div></div>
+          <div style="position:relative;margin-top:auto;padding:12px;border-top:1px solid rgba(255,255,255,.08);font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#7FA3C9;line-height:1.7">386 matched<br>26 need a person</div>
+        </aside>
+        <div style="flex:1;display:flex;flex-direction:column;min-width:0">
+          <header style="flex:none;height:54px;display:flex;align-items:center;gap:12px;padding:0 18px;background:#fff;border-bottom:1px solid #E8ECF3">
+            <div><div style="font-size:13.5px;font-weight:800;letter-spacing:-.01em">Reseat · Hall 2 rows M–P left, 14 dates</div><div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#9AA5B6">412 guests · 386 matched to equal or better automatically · 26 need a decision · notice ready to send</div></div>
+            <div style="margin-left:auto;display:flex;gap:6px"><div style="height:32px;display:flex;align-items:center;padding:0 11px;border:1px solid #E3E8F0;border-radius:8px;font-size:11px;font-weight:700;color:#5A6577">Review the 26</div><div style="height:32px;display:flex;align-items:center;padding:0 12px;border-radius:8px;background:#0D6EFD;color:#fff;font-size:11px;font-weight:700">Move 386 and notify</div></div>
+          </header>
+          <div style="flex:1;display:grid;grid-template-columns:1fr 336px;gap:12px;padding:14px 16px;min-height:0">
+            <div style="background:#fff;border:1px solid #E8ECF3;border-radius:12px;display:flex;flex-direction:column;overflow:hidden;min-height:0">
+              <div style="flex:none;display:grid;grid-template-columns:1.3fr 80px 1fr 1fr;padding:9px 14px;font-size:9px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:#94A0B4;border-bottom:1px solid #EDF1F6"><div>Group</div><div style="text-align:right">Guests</div><div>Outcome</div><div>Why</div></div>
+              <div style="display:grid;grid-template-columns:1.3fr 80px 1fr 1fr;align-items:center;padding:11px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA"><div><div style="font-weight:700">Straight swap, same band</div><div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#9AA5B6">rows M–P right</div></div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">248</div><div style="font-size:10.5px;color:#0B5B41">mirrored seats, same row</div><div style="font-size:10.5px;color:#5A6577">identical view and distance</div></div>
+              <div style="display:grid;grid-template-columns:1.3fr 80px 1fr 1fr;align-items:center;padding:11px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA"><div><div style="font-weight:600">Moved forward, better band</div><div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#9AA5B6">rows J–L</div></div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">96</div><div style="font-size:10.5px;color:#0B5B41">upgrade at no charge</div><div style="font-size:10.5px;color:#5A6577">nothing equivalent left in band C</div></div>
+              <div style="display:grid;grid-template-columns:1.3fr 80px 1fr 1fr;align-items:center;padding:11px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA"><div><div style="font-weight:600">Parties kept together</div><div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#9AA5B6">groups of 3–6</div></div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">42</div><div style="font-size:10.5px;color:#0B5B41">whole party moved as a block</div><div style="font-size:10.5px;color:#5A6577">11 parties</div></div>
+              <div style="display:grid;grid-template-columns:1.3fr 80px 1fr 1fr;align-items:center;padding:11px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA;background:#FFFBF4"><div><div style="font-weight:700;color:#7A5C00">Party of 9 · school group</div><div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#7A5C00">no block of 9 anywhere</div></div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#7A5C00">9</div><div style="font-size:10.5px;color:#7A5C00">needs a call</div><div style="font-size:10.5px;color:#7A5C00">split 5 + 4 or change date</div></div>
+              <div style="display:grid;grid-template-columns:1.3fr 80px 1fr 1fr;align-items:center;padding:11px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA;background:#FFFBF4"><div><div style="font-weight:700;color:#7A5C00">Access bookings</div><div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#7A5C00">4 spaces + companions</div></div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#7A5C00">8</div><div style="font-size:10.5px;color:#7A5C00">needs a person</div><div style="font-size:10.5px;color:#7A5C00">only 2 spaces free on those dates</div></div>
+              <div style="display:grid;grid-template-columns:1.3fr 80px 1fr 1fr;align-items:center;padding:11px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA;background:#FFFBF4"><div><div style="font-weight:600;color:#7A5C00">Subscribers</div><div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#7A5C00">same seat all season</div></div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#7A5C00">9</div><div style="font-size:10.5px;color:#7A5C00">offer, do not move</div><div style="font-size:10.5px;color:#7A5C00">their seat is the product</div></div>
+              <div style="display:grid;grid-template-columns:1.3fr 80px 1fr 1fr;align-items:center;padding:11px 14px;font-size:11.5px"><div><div style="font-weight:600">Sold through agents</div><div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#9AA5B6">no guest contact details</div></div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">Encore · 14</div><div style="font-size:10.5px;color:#5A6577">agent notified, they contact</div><div style="font-size:10.5px;color:#5A6577">confirm within 24 h</div></div>
+              <div style="flex:none;padding:12px 14px;border-top:1px solid #EDF1F6;background:#F3FBF7;display:flex;gap:11px"><span style="width:3px;border-radius:2px;background:#0E9F6E;flex:none"></span><div style="flex:1;font-size:11px;color:#0B5B41;line-height:1.55">Ninety-four per cent are moved automatically to a seat of equal or better category, most of them to the mirrored seat on the other side of the aisle. Nobody pays more, and 96 guests are quietly upgraded.</div></div>
+              <div style="flex:1;padding:14px;display:flex;flex-direction:column;gap:9px;min-height:0">
+                <div style="font-size:12px;font-weight:800;letter-spacing:-.01em">What the run will do</div>
+                <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px">
+                  <div style="border:1px solid #E8ECF3;border-radius:10px;padding:10px 12px;display:flex;flex-direction:column;gap:1px"><span style="font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#94A0B4">Moved</span><span style="font-family:'IBM Plex Mono',monospace;font-size:15px;font-weight:600">386</span></div>
+                  <div style="border:1px solid #E8ECF3;border-radius:10px;padding:10px 12px;display:flex;flex-direction:column;gap:1px"><span style="font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#94A0B4">Upgraded free</span><span style="font-family:'IBM Plex Mono',monospace;font-size:15px;font-weight:600">96</span></div>
+                  <div style="border:1px solid #E8ECF3;border-radius:10px;padding:10px 12px;display:flex;flex-direction:column;gap:1px"><span style="font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#94A0B4">Tickets reissued</span><span style="font-family:'IBM Plex Mono',monospace;font-size:15px;font-weight:600">386</span></div>
+                  <div style="border:1.5px solid #F2DFB8;border-radius:10px;padding:10px 12px;display:flex;flex-direction:column;gap:1px"><span style="font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#8A6D00">Left for a person</span><span style="font-family:'IBM Plex Mono',monospace;font-size:15px;font-weight:600;color:#8A6D00">26</span></div>
+                </div>
+                <div style="margin-top:auto;font-size:11px;color:#5A6577;line-height:1.55">The twenty-six are the ones where an algorithm would make things worse: a party too big to keep together, access bookings with nowhere to go, and subscribers whose seat is the thing they bought.</div>
+              </div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:12px;min-height:0">
+              <div style="flex:none;background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:8px">
+                <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Matching rules, in order</div>
+                <div style="display:flex;flex-direction:column;gap:6px;font-size:10.5px;color:#5A6577;line-height:1.5">
+                  <div style="display:flex;gap:8px"><span style="font-family:'IBM Plex Mono',monospace;color:#0A4FB8;font-weight:600">1</span><span>Keep the party together, whatever else changes.</span></div>
+                  <div style="display:flex;gap:8px"><span style="font-family:'IBM Plex Mono',monospace;color:#0A4FB8;font-weight:600">2</span><span>Preserve access facts: steps, level entry, companion adjacency.</span></div>
+                  <div style="display:flex;gap:8px"><span style="font-family:'IBM Plex Mono',monospace;color:#0A4FB8;font-weight:600">3</span><span>Equal or better band, never worse, never a surcharge.</span></div>
+                  <div style="display:flex;gap:8px"><span style="font-family:'IBM Plex Mono',monospace;color:#0A4FB8;font-weight:600">4</span><span>Closest to the original position, then closest to the stage.</span></div>
+                </div>
+              </div>
+              <div style="flex:none;background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:7px">
+                <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Subscribers are offered, not moved</div>
+                <div style="font-size:10.5px;color:#5A6577;line-height:1.55">A subscriber has bought a specific seat for a season. Moving one without asking is the fastest way to lose an eleven-year relationship, so they get a call and a choice.</div>
+              </div>
+              <div style="flex:1;min-height:0"></div>
+              <div style="flex:none;background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:7px">
+                <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">One run, one notice</div>
+                <div style="font-size:10.5px;color:#5A6577;line-height:1.55">Every affected guest gets exactly one message about this, naming their new seat. Two emails about the same change reads as chaos.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;line-height:1.85;color:#7C8899">
+        <div><b style="color:#4A5566;font-weight:600">OPERATIONS</b> · buildReseatRun · matchEqualOrBetter · keepPartiesTogether · flagManualCases · applyRun · notifyAgents</div>
+        <div><b style="color:#4A5566;font-weight:600">STATES</b> · matching · <b style="color:#8A6D00">manualCasesRemaining</b> · readyToApply · applied · partiallyApplied · error</div>
+        <div><b style="color:#4A5566;font-weight:600">ARRIVES WITH</b> · disruptionId←<a href="#seatp-11a">SEATP-11A</a></div>
+        <div><b style="color:#4A5566;font-weight:600">GOES TO</b> · <a href="#seatp-11c">manual case</a> · <a href="#seatp-11e">notices</a></div>
+      </div>
+    </div>
+
+    <div id="seatp-11c" data-screen-label="SEATP-11C" data-screen-id="SEATP-11C" data-screen-id-origin="board" style="display:flex;flex-direction:column;gap:13px;scroll-margin-top:24px">
+      <div>
+        <div style="display:flex;align-items:baseline;gap:9px"><span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#8494A8">SEATP-11C</span><span style="font-size:16.5px;font-weight:800;letter-spacing:-.015em">Manual Case</span><span style="font-size:9px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:2px 7px;border-radius:5px;background:#FDECEC;color:#A81E1E">access booking · nowhere equivalent</span></div>
+        <div style="font-size:12px;color:#6B7280;margin-top:3px">The hard one: a wheelchair space and companion on a date where no space is free. Three honest options, each with what it costs the guest rather than the house.</div>
+      </div>
+      <div style="width:1280px;height:700px;display:flex;background:#F7F9FC;border:1px solid #E3E8F0;border-radius:14px;overflow:hidden;box-shadow:0 16px 38px rgba(12,35,64,.09)">
+        <aside style="flex:none;width:180px;background:#0B1324;display:flex;flex-direction:column;position:relative">
+          <div style="position:absolute;inset:0;background:radial-gradient(300px 200px at 0% 4%,rgba(0,184,255,.20),transparent 70%);pointer-events:none"></div>
+          <div style="position:relative;padding:15px 14px 13px;border-bottom:1px solid rgba(255,255,255,.08)"><img src="assets/ticvai-light-logo.png" alt="TICVAI" style="display:block;height:24px;width:auto"><div style="font-size:9.5px;color:#7FA3C9;margin-top:5px">Disruption</div></div>
+          <div style="position:relative;padding:11px 12px;border-bottom:1px solid rgba(255,255,255,.08)"><div style="font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.09em;text-transform:uppercase;color:#7FA3C9;margin-bottom:8px">Case 4 of 26</div><div style="display:flex;flex-direction:column;gap:4px;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#DCE7F5;line-height:1.7"><div style="color:#00B8FF;font-weight:600">L. Marchetti</div><div>W2 + C2 · Hall 2</div><div>Sat 26 Sep · 19:30</div><div>booked 3 months ago</div></div></div>
+          <div style="position:relative;margin-top:auto;padding:12px;border-top:1px solid rgba(255,255,255,.08);font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#7FA3C9;line-height:1.7">3 resolved<br>23 to go</div>
+        </aside>
+        <div style="flex:1;display:flex;flex-direction:column;min-width:0">
+          <header style="flex:none;height:54px;display:flex;align-items:center;gap:12px;padding:0 18px;background:#fff;border-bottom:1px solid #E8ECF3">
+            <div><div style="font-size:13.5px;font-weight:800;letter-spacing:-.01em">L. Marchetti · wheelchair space W2 and companion C2</div><div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#9AA5B6">Sat 26 Sep · the space sits under the leak · no other space free on that date · guest has visited 9 times</div></div>
+            <div style="margin-left:auto;display:flex;gap:6px"><div style="height:32px;display:flex;align-items:center;padding:0 11px;border:1px solid #E3E8F0;border-radius:8px;font-size:11px;font-weight:700;color:#5A6577">Skip for now</div><div style="height:32px;display:flex;align-items:center;padding:0 12px;border-radius:8px;background:#0D6EFD;color:#fff;font-size:11px;font-weight:700">Call and offer option 1</div></div>
+          </header>
+          <div style="flex:1;display:grid;grid-template-columns:1fr 320px;gap:12px;padding:14px 16px;min-height:0">
+            <div style="background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:14px 16px;display:flex;flex-direction:column;gap:12px;min-height:0;overflow:hidden">
+              <div style="flex:none;font-size:12.5px;font-weight:800;letter-spacing:-.01em">Three things we can offer</div>
+              <div style="flex:none;display:flex;flex-direction:column;gap:10px">
+                <div style="border:1.5px solid #BBD8FF;border-radius:11px;background:#F8FBFF;padding:13px 14px;display:flex;flex-direction:column;gap:6px">
+                  <div style="display:flex;align-items:baseline;gap:9px"><span style="font-size:13px;font-weight:800;color:#0A4FB8">Friday 25 September, same seats</span><span style="margin-left:auto;font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#0A4FB8">no cost</span></div>
+                  <div style="font-size:11.5px;color:#5A6577;line-height:1.55">W2 and C2 are free the night before, away from the leak. Same production, same space, same companion seat, same price. She has attended a Friday six of her nine visits.</div>
+                  <div style="display:flex;gap:14px;font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#0B5B41"><span>space preserved</span><span>companion preserved</span><span>step-free route unchanged</span></div>
+                </div>
+                <div style="border:1px solid #E8ECF3;border-radius:11px;padding:13px 14px;display:flex;flex-direction:column;gap:6px">
+                  <div style="display:flex;align-items:baseline;gap:9px"><span style="font-size:13px;font-weight:800">Saturday in Hall 1 instead</span><span style="margin-left:auto;font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#5A6577">different show</span></div>
+                  <div style="font-size:11.5px;color:#5A6577;line-height:1.55">A space is free on the Hall 1 platform the same evening, but it is a different production. Keeps the date, loses the show she booked.</div>
+                  <div style="display:flex;gap:14px;font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#7A5C00"><span>date kept</span><span>not the production she chose</span></div>
+                </div>
+                <div style="border:1px solid #E8ECF3;border-radius:11px;padding:13px 14px;display:flex;flex-direction:column;gap:6px">
+                  <div style="display:flex;align-items:baseline;gap:9px"><span style="font-size:13px;font-weight:800">Full refund plus travel</span><span style="margin-left:auto;font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#5A6577">£76 + £24</span></div>
+                  <div style="font-size:11.5px;color:#5A6577;line-height:1.55">If neither date works. Accessible transport is booked in advance and often non-refundable, so the travel cost is offered without being asked for.</div>
+                  <div style="display:flex;gap:14px;font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#5A6577"><span>no argument</span><span>paid within 24 h</span></div>
+                </div>
+              </div>
+              <div style="flex:1;min-height:0"></div>
+              <div style="flex:none;background:#FDF5F5;border:1px solid #F5C9C9;border-radius:11px;padding:12px 13px;display:flex;gap:11px">
+                <span style="width:3px;border-radius:2px;background:#DC2626;flex:none"></span>
+                <div style="flex:1;font-size:11px;color:#8A2020;line-height:1.55">Do not offer a standard seat as an alternative to a wheelchair space, and do not ask whether she "could manage" the stalls. Both have happened before and both produced a complaint that took months to settle.</div>
+              </div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:12px;min-height:0">
+              <div style="flex:none;background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:8px">
+                <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">What we know about her visits</div>
+                <div style="display:flex;flex-direction:column;gap:5px;font-size:11px;color:#5A6577">
+                  <div style="display:flex;justify-content:space-between"><span>Visits</span><span style="font-family:'IBM Plex Mono',monospace;color:#0B1324">9 since 2022</span></div>
+                  <div style="display:flex;justify-content:space-between"><span>Usually</span><span style="font-family:'IBM Plex Mono',monospace;color:#0B1324">Friday evening</span></div>
+                  <div style="display:flex;justify-content:space-between"><span>Companion</span><span style="font-family:'IBM Plex Mono',monospace;color:#0B1324">same name each time</span></div>
+                  <div style="display:flex;justify-content:space-between"><span>Access profile</span><span style="font-family:'IBM Plex Mono',monospace;color:#0B1324">confirmed 2024</span></div>
+                  <div style="display:flex;justify-content:space-between"><span>Travel</span><span style="font-family:'IBM Plex Mono',monospace;color:#0B1324">booked taxi, pre-paid</span></div>
+                  <div style="display:flex;justify-content:space-between"><span>Prefers</span><span style="font-family:'IBM Plex Mono',monospace;color:#0B1324">phone over email</span></div>
+                </div>
+                <div style="font-size:10.5px;color:#5A6577;line-height:1.5">The Friday offer is first because it is the night she usually chooses, not because it is the easiest for us.</div>
+              </div>
+              <div style="flex:none;background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:7px">
+                <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Say it in this order</div>
+                <div style="font-size:10.5px;color:#5A6577;line-height:1.6;padding:9px 11px;background:#FBFCFE;border:1px solid #EDF1F6;border-radius:8px">"There's water damage in the corner where your space is, so we can't use it on Saturday. I'm sorry. I've held the same space and companion seat for the Friday — would that work? If not, I can refund everything including the taxi."</div>
+                <div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#9AA5B6">cause · apology · the good option · the safety net</div>
+              </div>
+              <div style="flex:1;min-height:0"></div>
+              <div style="flex:none;background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:7px">
+                <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Twenty-six calls, not 412</div>
+                <div style="font-size:10.5px;color:#5A6577;line-height:1.55">Automating the 386 straightforward moves is what makes it possible to give these twenty-six a proper phone call each.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;line-height:1.85;color:#7C8899">
+        <div><b style="color:#4A5566;font-weight:600">OPERATIONS</b> · getManualCase · listHonestOptions · getGuestHistory · offerAlternativeDate · refundWithTravel · logOutcome</div>
+        <div><b style="color:#4A5566;font-weight:600">STATES</b> · open · <b style="color:#A81E1E">noEquivalentAvailable</b> · offered · accepted · refunded · escalated · error</div>
+        <div><b style="color:#4A5566;font-weight:600">ARRIVES WITH</b> · caseId←<a href="#seatp-11b">SEATP-11B</a></div>
+        <div><b style="color:#4A5566;font-weight:600">GOES TO</b> · <a href="#seatp-11d">venue move</a> · <a href="#seatp-11f">compensation</a></div>
+      </div>
+    </div>
+
+    <div id="seatp-11d" data-screen-label="SEATP-11D" data-screen-id="SEATP-11D" data-screen-id-origin="board" style="display:flex;flex-direction:column;gap:13px;scroll-margin-top:24px">
+      <div>
+        <div style="display:flex;align-items:baseline;gap:9px"><span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#8494A8">SEATP-11D</span><span style="font-size:16.5px;font-weight:800;letter-spacing:-.015em">Venue Move</span><span style="font-size:9px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:2px 7px;border-radius:5px;background:#FDECEC;color:#A81E1E">1 240 seats into a 880-seat room</span></div>
+        <div style="font-size:12px;color:#6B7280;margin-top:3px">The worst case: a room closes and the production moves to a smaller one. Mapping a sold house onto a different map, deciding who cannot come, and doing it in an order that can be defended.</div>
+      </div>
+      <div style="width:1280px;height:700px;display:flex;background:#F7F9FC;border:1px solid #E3E8F0;border-radius:14px;overflow:hidden;box-shadow:0 16px 38px rgba(12,35,64,.09)">
+        <aside style="flex:none;width:180px;background:#0B1324;display:flex;flex-direction:column;position:relative">
+          <div style="position:absolute;inset:0;background:radial-gradient(300px 200px at 0% 4%,rgba(220,38,38,.20),transparent 70%);pointer-events:none"></div>
+          <div style="position:relative;padding:15px 14px 13px;border-bottom:1px solid rgba(255,255,255,.08)"><img src="assets/ticvai-light-logo.png" alt="TICVAI" style="display:block;height:24px;width:auto"><div style="font-size:9.5px;color:#FFC9C9;margin-top:5px">Venue move</div></div>
+          <div style="position:relative;padding:11px 12px;border-bottom:1px solid rgba(255,255,255,.08)"><div style="font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.09em;text-transform:uppercase;color:#FFC9C9;margin-bottom:8px">Moving</div><div style="display:flex;flex-direction:column;gap:4px;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#DCE7F5;line-height:1.7"><div style="color:#FF9E9E;font-weight:600">Hall 2 → Northgate</div><div>1 240 sold</div><div>880 seats available</div><div>3 performances</div></div></div>
+          <div style="position:relative;margin-top:auto;padding:12px;border-top:1px solid rgba(255,255,255,.08);font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#FFC9C9;line-height:1.7">360 cannot be seated<br>decision needed</div>
+        </aside>
+        <div style="flex:1;display:flex;flex-direction:column;min-width:0">
+          <header style="flex:none;height:54px;display:flex;align-items:center;gap:12px;padding:0 18px;background:#fff;border-bottom:1px solid #E8ECF3">
+            <div><div style="font-size:13.5px;font-weight:800;letter-spacing:-.01em">Move · Hall 2 to Northgate Playhouse, 3 performances</div><div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#9AA5B6">1 240 sold seats · 880 available · 360 guests cannot be seated · 9 days' notice</div></div>
+            <div style="margin-left:auto;display:flex;gap:6px"><div style="height:32px;display:flex;align-items:center;padding:0 11px;border:1px solid #E3E8F0;border-radius:8px;font-size:11px;font-weight:700;color:#5A6577">Model an extra date</div><div style="height:32px;display:flex;align-items:center;padding:0 12px;border-radius:8px;background:#0D6EFD;color:#fff;font-size:11px;font-weight:700">Run the mapping</div></div>
+          </header>
+          <div style="flex:1;display:grid;grid-template-columns:1fr 336px;gap:12px;padding:14px 16px;min-height:0">
+            <div style="display:flex;flex-direction:column;gap:12px;min-height:0">
+              <div style="flex:none;background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:13px 15px;display:flex;flex-direction:column;gap:10px">
+                <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Mapping one house onto another</div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+                  <div style="border:1px solid #E8ECF3;border-radius:11px;padding:12px;display:flex;flex-direction:column;gap:7px">
+                    <div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:#94A0B4">from · Hall 2</div>
+                    <div style="display:flex;flex-direction:column;gap:5px;font-size:11px;color:#5A6577">
+                      <div style="display:flex;justify-content:space-between"><span>Capacity</span><span style="font-family:'IBM Plex Mono',monospace;color:#0B1324">1 240</span></div>
+                      <div style="display:flex;justify-content:space-between"><span>Bands</span><span style="font-family:'IBM Plex Mono',monospace;color:#0B1324">A–C, flat floor</span></div>
+                      <div style="display:flex;justify-content:space-between"><span>Access spaces</span><span style="font-family:'IBM Plex Mono',monospace;color:#0B1324">12</span></div>
+                      <div style="display:flex;justify-content:space-between"><span>All step-free</span><span style="font-family:'IBM Plex Mono',monospace;color:#0B5B41">yes</span></div>
+                    </div>
+                  </div>
+                  <div style="border:1.5px solid #F2DFB8;border-radius:11px;padding:12px;display:flex;flex-direction:column;gap:7px;background:#FFFBF4">
+                    <div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:#8A6D00">to · Northgate</div>
+                    <div style="display:flex;flex-direction:column;gap:5px;font-size:11px;color:#5A6577">
+                      <div style="display:flex;justify-content:space-between"><span>Capacity</span><span style="font-family:'IBM Plex Mono',monospace;color:#7A5C00">880</span></div>
+                      <div style="display:flex;justify-content:space-between"><span>Bands</span><span style="font-family:'IBM Plex Mono',monospace;color:#7A5C00">A–D, raked + upper tier</span></div>
+                      <div style="display:flex;justify-content:space-between"><span>Access spaces</span><span style="font-family:'IBM Plex Mono',monospace;color:#7A5C00">14, 6 need lift 2</span></div>
+                      <div style="display:flex;justify-content:space-between"><span>All step-free</span><span style="font-family:'IBM Plex Mono',monospace;color:#8A2020">no · 22 steps to upper</span></div>
+                    </div>
+                  </div>
+                </div>
+                <div style="font-size:10.5px;color:#5A6577;line-height:1.5">The new room is smaller, has steps and depends on a lift with no service contract. Every one of those facts changes who can be moved where.</div>
+              </div>
+              <div style="flex:1;background:#fff;border:1px solid #E8ECF3;border-radius:12px;display:flex;flex-direction:column;overflow:hidden;min-height:0">
+                <div style="flex:none;display:flex;align-items:center;gap:8px;padding:11px 14px 10px;border-bottom:1px solid #EDF1F6"><div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Who is seated, in this order</div><span style="margin-left:auto;font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#9AA5B6">published before the run</span></div>
+                <div style="display:grid;grid-template-columns:30px 1.5fr 90px 1fr;align-items:center;padding:10px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA"><div style="font-family:'IBM Plex Mono',monospace;color:#0A4FB8;font-weight:600">1</div><div><div style="font-weight:700">Access bookings and companions</div><div style="font-size:10.5px;color:#5A6577">matched to the 8 step-free spaces first</div></div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">16</div><div style="font-size:10.5px;color:#0B7A55">all seated</div></div>
+                <div style="display:grid;grid-template-columns:30px 1.5fr 90px 1fr;align-items:center;padding:10px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA"><div style="font-family:'IBM Plex Mono',monospace;color:#0A4FB8;font-weight:600">2</div><div><div style="font-weight:700">Guests who told us they cannot use stairs</div><div style="font-size:10.5px;color:#5A6577">from access profiles and booking notes</div></div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">104</div><div style="font-size:10.5px;color:#0B7A55">stalls only</div></div>
+                <div style="display:grid;grid-template-columns:30px 1.5fr 90px 1fr;align-items:center;padding:10px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA"><div style="font-family:'IBM Plex Mono',monospace;color:#0A4FB8;font-weight:600">3</div><div><div style="font-weight:700">Parties of 4 or more</div><div style="font-size:10.5px;color:#5A6577">hardest to place, so placed early</div></div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">312</div><div style="font-size:10.5px;color:#0B7A55">all kept together</div></div>
+                <div style="display:grid;grid-template-columns:30px 1.5fr 90px 1fr;align-items:center;padding:10px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA"><div style="font-family:'IBM Plex Mono',monospace;color:#0A4FB8;font-weight:600">4</div><div><div style="font-weight:600">Subscribers</div><div style="font-size:10.5px;color:#5A6577">offered a seat, and the choice of another date</div></div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">148</div><div style="font-size:10.5px;color:#0B7A55">seated or offered</div></div>
+                <div style="display:grid;grid-template-columns:30px 1.5fr 90px 1fr;align-items:center;padding:10px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA"><div style="font-family:'IBM Plex Mono',monospace;color:#0A4FB8;font-weight:600">5</div><div><div style="font-weight:600">Everyone else, earliest booking first</div><div style="font-size:10.5px;color:#5A6577">the only defensible tie-break</div></div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">300</div><div style="font-size:10.5px;color:#0B7A55">seated</div></div>
+                <div style="display:grid;grid-template-columns:30px 1.5fr 90px 1fr;align-items:center;padding:10px 14px;font-size:11.5px;background:#FDF5F5"><div style="font-family:'IBM Plex Mono',monospace;color:#8A2020;font-weight:600">—</div><div><div style="font-weight:700;color:#8A2020">Booked most recently</div><div style="font-size:10.5px;color:#8A2020">refunded in full plus a free ticket to any date</div></div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#8A2020">360</div><div style="font-size:10.5px;color:#A81E1E">cannot be seated</div></div>
+                <div style="margin-top:auto;flex:none;padding:11px 14px;border-top:1px solid #EDF1F6;background:#FBFCFE;font-size:11px;color:#5A6577;line-height:1.55">The order is published on the website before anybody is contacted, so no guest has to wonder whether somebody else was favoured. Latest booked is last in, not because they matter less, but because it is the only rule nobody can argue with.</div>
+              </div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:12px;min-height:0">
+              <div style="flex:none;background:#fff;border:1.5px solid #BBD8FF;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:8px">
+                <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em;color:#0A4FB8">An extra performance changes this</div>
+                <div style="font-size:10.5px;color:#5A6577;line-height:1.5">Northgate is free on the Sunday. A fourth performance seats 300 of the 360 and turns a refund into a date change.</div>
+                <div style="display:flex;flex-direction:column;gap:5px;font-size:11px;color:#5A6577">
+                  <div style="display:flex;justify-content:space-between"><span>Guests seated</span><span style="font-family:'IBM Plex Mono',monospace;color:#0B5B41">+300</span></div>
+                  <div style="display:flex;justify-content:space-between"><span>Company cost</span><span style="font-family:'IBM Plex Mono',monospace;color:#0B1324">£11 400</span></div>
+                  <div style="display:flex;justify-content:space-between"><span>Refunds avoided</span><span style="font-family:'IBM Plex Mono',monospace;color:#0B5B41">£18 200</span></div>
+                  <div style="display:flex;justify-content:space-between"><span>Needs by</span><span style="font-family:'IBM Plex Mono',monospace;color:#8A2020">tomorrow 12:00</span></div>
+                </div>
+                <div style="height:30px;border-radius:9px;background:#0D6EFD;color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700">Put the case to the company</div>
+              </div>
+              <div style="flex:none;background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:8px">
+                <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">What the 360 are offered</div>
+                <div style="display:flex;flex-direction:column;gap:5px;font-size:11px;color:#5A6577">
+                  <div style="display:flex;justify-content:space-between"><span>Full refund</span><span style="font-family:'IBM Plex Mono',monospace;color:#0B1324">including fee</span></div>
+                  <div style="display:flex;justify-content:space-between"><span>Free ticket, any date</span><span style="font-family:'IBM Plex Mono',monospace;color:#0B1324">this season</span></div>
+                  <div style="display:flex;justify-content:space-between"><span>First refusal</span><span style="font-family:'IBM Plex Mono',monospace;color:#0B1324">if a date is added</span></div>
+                  <div style="display:flex;justify-content:space-between"><span>Travel costs</span><span style="font-family:'IBM Plex Mono',monospace;color:#0B1324">on request, no proof</span></div>
+                </div>
+              </div>
+              <div style="flex:1;min-height:0"></div>
+              <div style="flex:none;background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:7px">
+                <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Publish the rule, then apply it</div>
+                <div style="font-size:10.5px;color:#5A6577;line-height:1.55">A venue move produces one question from every guest: why them and not me. The answer has to exist in writing before the first email goes out.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;line-height:1.85;color:#7C8899">
+        <div><b style="color:#4A5566;font-weight:600">OPERATIONS</b> · compareVenues · setSeatingPriority · runVenueMapping · modelExtraPerformance · publishPriorityRule</div>
+        <div><b style="color:#4A5566;font-weight:600">STATES</b> · modelling · <b style="color:#A81E1E">capacityShortfall</b> · priorityPublished · mapped · extraDateProposed · error</div>
+        <div><b style="color:#4A5566;font-weight:600">ARRIVES WITH</b> · disruptionId←<a href="#seatp-11a">SEATP-11A</a></div>
+        <div><b style="color:#4A5566;font-weight:600">GOES TO</b> · <a href="#seatp-11e">notices</a> · <a href="#seatp-11f">compensation</a></div>
+      </div>
+    </div>
+
+    <div id="seatp-11e" data-screen-label="SEATP-11E" data-screen-id="SEATP-11E" data-screen-id-origin="board" style="display:flex;flex-direction:column;gap:13px;scroll-margin-top:24px">
+      <div>
+        <div style="display:flex;align-items:baseline;gap:9px"><span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#8494A8">SEATP-11E</span><span style="font-size:16.5px;font-weight:800;letter-spacing:-.015em">Notices</span><span style="font-size:9px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:2px 7px;border-radius:5px;background:#EDF3FF;color:#0A4FB8">one message, everything in it</span></div>
+        <div style="font-size:12px;color:#6B7280;margin-top:3px">Writing the message that goes to affected guests. Written once, personalised with the actual new seat, and checked against the four things guests always ask next.</div>
+      </div>
+      <div style="width:1280px;height:700px;display:flex;background:#F7F9FC;border:1px solid #E3E8F0;border-radius:14px;overflow:hidden;box-shadow:0 16px 38px rgba(12,35,64,.09)">
+        <aside style="flex:none;width:180px;background:#0B1324;display:flex;flex-direction:column;position:relative">
+          <div style="position:absolute;inset:0;background:radial-gradient(300px 200px at 0% 4%,rgba(0,184,255,.20),transparent 70%);pointer-events:none"></div>
+          <div style="position:relative;padding:15px 14px 13px;border-bottom:1px solid rgba(255,255,255,.08)"><img src="assets/ticvai-light-logo.png" alt="TICVAI" style="display:block;height:24px;width:auto"><div style="font-size:9.5px;color:#7FA3C9;margin-top:5px">Disruption</div></div>
+          <nav style="position:relative;display:flex;flex-direction:column;gap:2px;padding:11px 9px">
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Open items</div>
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Reseat runs</div>
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Venue moves</div>
+            <div style="padding:8px 10px;border-radius:9px;background:linear-gradient(90deg,rgba(13,110,253,.30),rgba(0,184,255,.10));color:#fff;font-size:11.5px;font-weight:700;box-shadow:inset 2px 0 0 #00B8FF">Notices</div>
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Compensation</div>
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">History</div>
+          </nav>
+          <div style="position:relative;margin-top:auto;padding:12px;border-top:1px solid rgba(255,255,255,.08);font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#7FA3C9;line-height:1.7">386 emails<br>352 texts</div>
+        </aside>
+        <div style="flex:1;display:flex;flex-direction:column;min-width:0">
+          <header style="flex:none;height:54px;display:flex;align-items:center;gap:12px;padding:0 18px;background:#fff;border-bottom:1px solid #E8ECF3">
+            <div><div style="font-size:13.5px;font-weight:800;letter-spacing:-.01em">Notice · Hall 2 reseat</div><div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#9AA5B6">386 guests · email and text · each message names the guest's own new seat · send at 09:00</div></div>
+            <div style="margin-left:auto;display:flex;gap:6px"><div style="height:32px;display:flex;align-items:center;padding:0 11px;border:1px solid #E3E8F0;border-radius:8px;font-size:11px;font-weight:700;color:#5A6577">Send one to myself</div><div style="height:32px;display:flex;align-items:center;padding:0 12px;border-radius:8px;background:#0D6EFD;color:#fff;font-size:11px;font-weight:700">Send to 386</div></div>
+          </header>
+          <div style="flex:1;display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:14px 16px;min-height:0">
+            <div style="background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:14px 16px;display:flex;flex-direction:column;gap:12px;min-height:0;overflow:hidden">
+              <div style="flex:none;display:flex;align-items:baseline;gap:8px"><div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">The email</div><span style="margin-left:auto;font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#9AA5B6">preview for R. Vance · M14 → N12</span></div>
+              <div style="flex:none;border:1px solid #E8ECF3;border-radius:11px;padding:14px;display:flex;flex-direction:column;gap:10px;background:#FBFCFE">
+                <div style="font-size:13px;font-weight:800;letter-spacing:-.01em">Your seats for Twelfth Night have moved</div>
+                <div style="font-size:11.5px;color:#5A6577;line-height:1.65">Storm damage has made a corner of Hall 2 unusable, including your seats M14 and M15. We have moved you to <b style="color:#0B1324">N12 and N13</b> — one row back on the other side of the aisle, the same distance from the stage, and no steps, exactly as before. Your tickets have been reissued and are already in your account.</div>
+                <div style="font-size:11.5px;color:#5A6577;line-height:1.65">Nothing to pay and nothing to do. If the new seats do not suit you, you can move to another date or have a full refund including the booking fee — just reply to this message or call us on 0117 000 0000.</div>
+                <div style="font-size:11.5px;color:#5A6577;line-height:1.65">We are sorry for the change, and for the fact that the repair will take a few weeks.</div>
+              </div>
+              <div style="flex:1;min-height:0"></div>
+              <div style="flex:none;display:flex;flex-direction:column;gap:8px">
+                <div style="font-size:12px;font-weight:800;letter-spacing:-.01em">The text, for the same guest</div>
+                <div style="border:1px solid #E8ECF3;border-radius:11px;padding:12px 13px;background:#FBFCFE;font-size:11.5px;color:#5A6577;line-height:1.6">Riverside: your Twelfth Night seats have moved from M14/M15 to N12/N13 (same row distance, no steps) after storm damage. Tickets updated. Reply MOVE for another date or REFUND. Full details by email.</div>
+                <div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#9AA5B6">318 characters · sent to 352 guests who gave a mobile number</div>
+              </div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:12px;min-height:0">
+              <div style="flex:none;background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:9px">
+                <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">The four questions it must answer</div>
+                <div style="display:flex;flex-direction:column;gap:7px;font-size:11px;color:#5A6577">
+                  <div style="display:flex;align-items:center;gap:9px;padding:8px 10px;border:1px solid #CBE8DA;border-radius:8px;background:#F3FBF7"><span style="color:#0B5B41;font-weight:700;flex:1">Where am I sitting now?</span><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#0B5B41">named</span></div>
+                  <div style="display:flex;align-items:center;gap:9px;padding:8px 10px;border:1px solid #CBE8DA;border-radius:8px;background:#F3FBF7"><span style="color:#0B5B41;font-weight:700;flex:1">Is it as good?</span><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#0B5B41">compared</span></div>
+                  <div style="display:flex;align-items:center;gap:9px;padding:8px 10px;border:1px solid #CBE8DA;border-radius:8px;background:#F3FBF7"><span style="color:#0B5B41;font-weight:700;flex:1">Do I have to do anything?</span><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#0B5B41">no</span></div>
+                  <div style="display:flex;align-items:center;gap:9px;padding:8px 10px;border:1px solid #CBE8DA;border-radius:8px;background:#F3FBF7"><span style="color:#0B5B41;font-weight:700;flex:1">What if I am not happy?</span><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#0B5B41">two options</span></div>
+                </div>
+                <div style="font-size:10.5px;color:#5A6577;line-height:1.5">A notice that misses any of these produces a reply asking for it, which is a phone call the house then has to answer 386 times.</div>
+              </div>
+              <div style="flex:none;background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:8px">
+                <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">What we do not do</div>
+                <div style="display:flex;flex-direction:column;gap:6px;font-size:11px;color:#5A6577;line-height:1.55">
+                  <div>No "due to circumstances beyond our control".</div>
+                  <div>No link to a form the guest has to fill in.</div>
+                  <div>No "please contact us to confirm you still wish to attend".</div>
+                  <div>No mention of terms and conditions.</div>
+                </div>
+              </div>
+              <div style="flex:none;background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:8px">
+                <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Last time this was done well</div>
+                <div style="display:flex;flex-direction:column;gap:5px;font-size:11px;color:#5A6577">
+                  <div style="display:flex;justify-content:space-between"><span>Guests notified</span><span style="font-family:'IBM Plex Mono',monospace;color:#0B1324">412</span></div>
+                  <div style="display:flex;justify-content:space-between"><span>Replies needing a person</span><span style="font-family:'IBM Plex Mono',monospace;color:#0B5B41">31</span></div>
+                  <div style="display:flex;justify-content:space-between"><span>Refunds requested</span><span style="font-family:'IBM Plex Mono',monospace;color:#0B5B41">14</span></div>
+                  <div style="display:flex;justify-content:space-between"><span>Complaints</span><span style="font-family:'IBM Plex Mono',monospace;color:#0B5B41">2</span></div>
+                </div>
+                <div style="font-size:10.5px;color:#5A6577;line-height:1.5">Against a comparable incident handled by an unnamed-seat email in 2023: 148 replies, 96 refunds and 31 complaints.</div>
+              </div>
+              <div style="flex:1;min-height:0"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;line-height:1.85;color:#7C8899">
+        <div><b style="color:#4A5566;font-weight:600">OPERATIONS</b> · composeNotice · personaliseWithNewSeat · previewNotice · sendEmailAndText · trackReplies</div>
+        <div><b style="color:#4A5566;font-weight:600">STATES</b> · drafting · <b style="color:#0A4FB8">allFourQuestionsAnswered</b> · sending · sent · repliesOpen · error</div>
+        <div><b style="color:#4A5566;font-weight:600">ARRIVES WITH</b> · runId←<a href="#seatp-11b">SEATP-11B</a></div>
+        <div><b style="color:#4A5566;font-weight:600">GOES TO</b> · <a href="#seatp-11f">compensation</a> · <a href="#seatp-11g">replies</a></div>
+      </div>
+    </div>
+
+    <div id="seatp-11f" data-screen-label="SEATP-11F" data-screen-id="SEATP-11F" data-screen-id-origin="board" style="display:flex;flex-direction:column;gap:13px;scroll-margin-top:24px">
+      <div>
+        <div style="display:flex;align-items:baseline;gap:9px"><span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#8494A8">SEATP-11F</span><span style="font-size:16.5px;font-weight:800;letter-spacing:-.015em">Compensation Rules</span><span style="font-size:9px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:2px 7px;border-radius:5px;background:#EDF3FF;color:#0A4FB8">decided once, applied automatically</span></div>
+        <div style="font-size:12px;color:#6B7280;margin-top:3px">What a guest gets for each kind of disruption, set in advance so nobody negotiates in a doorway and nobody gets less because they complained politely.</div>
+      </div>
+      <div style="width:1280px;height:700px;display:flex;background:#F7F9FC;border:1px solid #E3E8F0;border-radius:14px;overflow:hidden;box-shadow:0 16px 38px rgba(12,35,64,.09)">
+        <aside style="flex:none;width:180px;background:#0B1324;display:flex;flex-direction:column;position:relative">
+          <div style="position:absolute;inset:0;background:radial-gradient(300px 200px at 0% 4%,rgba(0,184,255,.20),transparent 70%);pointer-events:none"></div>
+          <div style="position:relative;padding:15px 14px 13px;border-bottom:1px solid rgba(255,255,255,.08)"><img src="assets/ticvai-light-logo.png" alt="TICVAI" style="display:block;height:24px;width:auto"><div style="font-size:9.5px;color:#7FA3C9;margin-top:5px">Disruption</div></div>
+          <nav style="position:relative;display:flex;flex-direction:column;gap:2px;padding:11px 9px">
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Open items</div>
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Reseat runs</div>
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Venue moves</div>
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Notices</div>
+            <div style="padding:8px 10px;border-radius:9px;background:linear-gradient(90deg,rgba(13,110,253,.30),rgba(0,184,255,.10));color:#fff;font-size:11.5px;font-weight:700;box-shadow:inset 2px 0 0 #00B8FF">Compensation</div>
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">History</div>
+          </nav>
+          <div style="position:relative;margin-top:auto;padding:12px;border-top:1px solid rgba(255,255,255,.08);font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#7FA3C9;line-height:1.7">paid this season<br>£41 200</div>
+        </aside>
+        <div style="flex:1;display:flex;flex-direction:column;min-width:0">
+          <header style="flex:none;height:54px;display:flex;align-items:center;gap:12px;padding:0 18px;background:#fff;border-bottom:1px solid #E8ECF3">
+            <div><div style="font-size:13.5px;font-weight:800;letter-spacing:-.01em">Compensation · standing rules</div><div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#9AA5B6">7 kinds of disruption · applied without being asked · £41 200 paid this season across 1 840 guests</div></div>
+            <div style="margin-left:auto;display:flex;gap:6px"><div style="height:32px;display:flex;align-items:center;padding:0 11px;border:1px solid #E3E8F0;border-radius:8px;font-size:11px;font-weight:700;color:#5A6577">Publish on the website</div><div style="height:32px;display:flex;align-items:center;padding:0 12px;border-radius:8px;background:#0D6EFD;color:#fff;font-size:11px;font-weight:700">Save rules</div></div>
+          </header>
+          <div style="flex:1;display:grid;grid-template-columns:1fr 330px;gap:12px;padding:14px 16px;min-height:0">
+            <div style="background:#fff;border:1px solid #E8ECF3;border-radius:12px;display:flex;flex-direction:column;overflow:hidden;min-height:0">
+              <div style="flex:none;display:grid;grid-template-columns:1.4fr 1.2fr 1fr 88px;padding:9px 14px;font-size:9px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:#94A0B4;border-bottom:1px solid #EDF1F6"><div>What happened</div><div>Guest gets</div><div>Applied</div><div style="text-align:right">This season</div></div>
+              <div style="display:grid;grid-template-columns:1.4fr 1.2fr 1fr 88px;align-items:center;padding:10px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA"><div><div style="font-weight:600">Moved to an equal seat</div><div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#9AA5B6">14+ days' notice</div></div><div style="font-size:10.5px;color:#5A6577">nothing · seat is equivalent</div><div style="font-size:10.5px;color:#5A6577">notice only</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">1 104</div></div>
+              <div style="display:grid;grid-template-columns:1.4fr 1.2fr 1fr 88px;align-items:center;padding:10px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA"><div><div style="font-weight:600">Moved to a worse seat</div><div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#9AA5B6">any notice</div></div><div style="font-size:10.5px;color:#0B5B41">refund of the difference, plus 20%</div><div style="font-size:10.5px;color:#5A6577">automatic</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">86</div></div>
+              <div style="display:grid;grid-template-columns:1.4fr 1.2fr 1fr 88px;align-items:center;padding:10px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA"><div><div style="font-weight:600">Moved with under 48 hours' notice</div><div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#9AA5B6">even to a better seat</div></div><div style="font-size:10.5px;color:#0B5B41">£10 credit each, no questions</div><div style="font-size:10.5px;color:#5A6577">automatic</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">248</div></div>
+              <div style="display:grid;grid-template-columns:1.4fr 1.2fr 1fr 88px;align-items:center;padding:10px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA"><div><div style="font-weight:600">Party split</div><div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#9AA5B6">could not be kept together</div></div><div style="font-size:10.5px;color:#0B5B41">full refund on request, or free tickets to any date</div><div style="font-size:10.5px;color:#5A6577">offered in the notice</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">42</div></div>
+              <div style="display:grid;grid-template-columns:1.4fr 1.2fr 1fr 88px;align-items:center;padding:10px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA;background:#F5F9FF"><div><div style="font-weight:700;color:#0A4FB8">Access booking cannot be honoured</div><div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#0A4FB8">space, route or companion lost</div></div><div style="font-size:10.5px;color:#0A4FB8">full refund plus travel costs, no proof asked</div><div style="font-size:10.5px;color:#0A4FB8">automatic</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#0A4FB8">24</div></div>
+              <div style="display:grid;grid-template-columns:1.4fr 1.2fr 1fr 88px;align-items:center;padding:10px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA"><div><div style="font-weight:600">Performance cancelled</div><div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#9AA5B6">any reason</div></div><div style="font-size:10.5px;color:#0B5B41">full refund including fee, sent without being asked</div><div style="font-size:10.5px;color:#5A6577">automatic</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">2 140</div></div>
+              <div style="display:grid;grid-template-columns:1.4fr 1.2fr 1fr 88px;align-items:center;padding:10px 14px;font-size:11.5px"><div><div style="font-weight:600">Told at the door</div><div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#9AA5B6">notice failed</div></div><div style="font-size:10.5px;color:#0B5B41">full refund and a free ticket, whatever the seat</div><div style="font-size:10.5px;color:#5A6577">duty manager</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">11</div></div>
+              <div style="flex:none;padding:12px 14px;border-top:1px solid #EDF1F6;background:#F5F9FF;display:flex;gap:11px"><span style="width:3px;border-radius:2px;background:#0D6EFD;flex:none"></span><div style="flex:1;font-size:11px;color:#0A4FB8;line-height:1.55">Eleven guests found out at the door this season. Each is the most expensive category in the table, and each one is a failure of notice rather than of the reseat itself.</div></div>
+              <div style="flex:1;padding:14px;display:flex;flex-direction:column;gap:9px;min-height:0">
+                <div style="font-size:12px;font-weight:800;letter-spacing:-.01em">Why the rules are published</div>
+                <div style="font-size:11px;color:#5A6577;line-height:1.6">A guest who has read the compensation rule before they were disrupted knows the house is not deciding based on how angry they sound. It also means nobody on the counter has to guess, ask a manager or invent something generous under pressure. The whole table fits on one page of the website.</div>
+                <div style="margin-top:auto;display:flex;gap:14px;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#7C8899"><span>7 rules</span><span>5 automatic</span><span>0 require a form</span><span>0 require proof</span></div>
+              </div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:12px;min-height:0">
+              <div style="flex:none;background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:8px">
+                <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">What it cost, what it saved</div>
+                <div style="display:flex;flex-direction:column;gap:5px;font-size:11px;color:#5A6577">
+                  <div style="display:flex;justify-content:space-between"><span>Compensation paid</span><span style="font-family:'IBM Plex Mono',monospace;color:#0B1324">£41 200</span></div>
+                  <div style="display:flex;justify-content:space-between"><span>Guests affected</span><span style="font-family:'IBM Plex Mono',monospace;color:#0B1324">1 840</span></div>
+                  <div style="display:flex;justify-content:space-between"><span>Average per guest</span><span style="font-family:'IBM Plex Mono',monospace;color:#0B1324">£22</span></div>
+                  <div style="display:flex;justify-content:space-between"><span>Formal complaints</span><span style="font-family:'IBM Plex Mono',monospace;color:#0B5B41">6</span></div>
+                  <div style="display:flex;justify-content:space-between"><span>Complaints in 2023</span><span style="font-family:'IBM Plex Mono',monospace;color:#8A2020">84</span></div>
+                  <div style="display:flex;justify-content:space-between"><span>Retention of affected guests</span><span style="font-family:'IBM Plex Mono',monospace;color:#0B5B41">91%</span></div>
+                </div>
+                <div style="font-size:10.5px;color:#5A6577;line-height:1.5">Nine in ten disrupted guests came back. Before the rules were fixed and published, it was six in ten.</div>
+              </div>
+              <div style="flex:none;background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:7px">
+                <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Credit, not vouchers</div>
+                <div style="font-size:10.5px;color:#5A6577;line-height:1.55">The £10 goes on the account and can be spent on any ticket or at the bar. A voucher with conditions is a second insult.</div>
+              </div>
+              <div style="flex:1;min-height:0"></div>
+              <div style="flex:none;background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:7px">
+                <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Generous is cheaper</div>
+                <div style="font-size:10.5px;color:#5A6577;line-height:1.55">£22 a head against the cost of losing a guest worth £68 a year, or a subscriber worth £662. Every disputed £10 costs more in staff time than paying it.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;line-height:1.85;color:#7C8899">
+        <div><b style="color:#4A5566;font-weight:600">OPERATIONS</b> · listCompensationRules · setRule · applyAutomatically · publishRules · getSeasonSpend</div>
+        <div><b style="color:#4A5566;font-weight:600">STATES</b> · loading · <b style="color:#0A4FB8">appliedAutomatically</b> · offeredInNotice · managerDiscretion · published · error</div>
+        <div><b style="color:#4A5566;font-weight:600">ARRIVES WITH</b> · tenantId←context</div>
+        <div><b style="color:#4A5566;font-weight:600">GOES TO</b> · <a href="#seatp-11g">replies</a> · <a href="#seatp-11j">post-incident review</a></div>
+      </div>
+    </div>
+
+    <div id="seatp-11g" data-screen-label="SEATP-11G" data-screen-id="SEATP-11G" data-screen-id-origin="board" style="display:flex;flex-direction:column;gap:13px;scroll-margin-top:24px">
+      <div>
+        <div style="display:flex;align-items:baseline;gap:9px"><span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#8494A8">SEATP-11G</span><span style="font-size:16.5px;font-weight:800;letter-spacing:-.015em">Replies &amp; Requests</span><span style="font-size:9px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:2px 7px;border-radius:5px;background:#EDF3FF;color:#0A4FB8">31 replies · 22 handled by a rule</span></div>
+        <div style="font-size:12px;color:#6B7280;margin-top:3px">What came back after the notice went out. Most replies are a single word and can be actioned in one tap; the rest are grouped so a person deals with like with like.</div>
+      </div>
+      <div style="width:1280px;height:700px;display:flex;background:#F7F9FC;border:1px solid #E3E8F0;border-radius:14px;overflow:hidden;box-shadow:0 16px 38px rgba(12,35,64,.09)">
+        <aside style="flex:none;width:180px;background:#0B1324;display:flex;flex-direction:column;position:relative">
+          <div style="position:absolute;inset:0;background:radial-gradient(300px 200px at 0% 4%,rgba(0,184,255,.20),transparent 70%);pointer-events:none"></div>
+          <div style="position:relative;padding:15px 14px 13px;border-bottom:1px solid rgba(255,255,255,.08)"><img src="assets/ticvai-light-logo.png" alt="TICVAI" style="display:block;height:24px;width:auto"><div style="font-size:9.5px;color:#7FA3C9;margin-top:5px">Disruption</div></div>
+          <div style="position:relative;padding:11px 12px;border-bottom:1px solid rgba(255,255,255,.08)"><div style="font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.09em;text-transform:uppercase;color:#7FA3C9;margin-bottom:8px">Since 09:00</div><div style="display:flex;flex-direction:column;gap:4px;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#DCE7F5;line-height:1.7"><div style="color:#00B8FF;font-weight:600">31 replies</div><div>of 386 notices</div><div>8% reply rate</div><div>9 need a person</div></div></div>
+          <div style="position:relative;margin-top:auto;padding:12px;border-top:1px solid rgba(255,255,255,.08);font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#7FA3C9;line-height:1.7">avg response<br>22 minutes</div>
+        </aside>
+        <div style="flex:1;display:flex;flex-direction:column;min-width:0">
+          <header style="flex:none;height:54px;display:flex;align-items:center;gap:12px;padding:0 18px;background:#fff;border-bottom:1px solid #E8ECF3">
+            <div><div style="font-size:13.5px;font-weight:800;letter-spacing:-.01em">Replies · Hall 2 reseat notice</div><div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#9AA5B6">31 of 386 replied · 22 matched a standard action · 9 need a person · nothing older than 40 minutes</div></div>
+            <div style="margin-left:auto;display:flex;gap:6px"><div style="height:32px;display:flex;align-items:center;padding:0 11px;border:1px solid #E3E8F0;border-radius:8px;font-size:11px;font-weight:700;color:#5A6577">All conversations</div><div style="height:32px;display:flex;align-items:center;padding:0 12px;border-radius:8px;background:#0D6EFD;color:#fff;font-size:11px;font-weight:700">Action the 22</div></div>
+          </header>
+          <div style="flex:1;display:grid;grid-template-columns:1fr 330px;gap:12px;padding:14px 16px;min-height:0">
+            <div style="background:#fff;border:1px solid #E8ECF3;border-radius:12px;display:flex;flex-direction:column;overflow:hidden;min-height:0">
+              <div style="flex:none;display:grid;grid-template-columns:1.5fr 74px 1.2fr 96px;padding:9px 14px;font-size:9px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:#94A0B4;border-bottom:1px solid #EDF1F6"><div>What they said</div><div style="text-align:right">Count</div><div>Action</div><div style="text-align:right">Who</div></div>
+              <div style="display:grid;grid-template-columns:1.5fr 74px 1.2fr 96px;align-items:center;padding:11px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA"><div><div style="font-weight:600">"REFUND"</div><div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#9AA5B6">by text, one word</div></div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">11</div><div style="font-size:10.5px;color:#0B5B41">refund in full, seats released</div><div style="text-align:right"><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;padding:2px 7px;border-radius:5px;background:#E8F6F0;color:#0B7A55">automatic</span></div></div>
+              <div style="display:grid;grid-template-columns:1.5fr 74px 1.2fr 96px;align-items:center;padding:11px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA"><div><div style="font-weight:600">"MOVE"</div><div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#9AA5B6">wants another date</div></div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">8</div><div style="font-size:10.5px;color:#0B5B41">link to the exchange screen</div><div style="text-align:right"><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;padding:2px 7px;border-radius:5px;background:#E8F6F0;color:#0B7A55">automatic</span></div></div>
+              <div style="display:grid;grid-template-columns:1.5fr 74px 1.2fr 96px;align-items:center;padding:11px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA"><div><div style="font-weight:600">"Thanks, that's fine"</div><div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#9AA5B6">and variations</div></div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">3</div><div style="font-size:10.5px;color:#5A6577">acknowledged, closed</div><div style="text-align:right"><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;padding:2px 7px;border-radius:5px;background:#E8F6F0;color:#0B7A55">automatic</span></div></div>
+              <div style="display:grid;grid-template-columns:1.5fr 74px 1.2fr 96px;align-items:center;padding:11px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA;background:#F5F9FF"><div><div style="font-weight:700;color:#0A4FB8">"Can we have an aisle seat instead?"</div><div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#0A4FB8">4 guests, similar wording</div></div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#0A4FB8">4</div><div style="font-size:10.5px;color:#0A4FB8">3 possible, 1 not · reply drafted</div><div style="text-align:right"><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;padding:2px 7px;border-radius:5px;background:#EDF3FF;color:#0A4FB8">S. Reilly</span></div></div>
+              <div style="display:grid;grid-template-columns:1.5fr 74px 1.2fr 96px;align-items:center;padding:11px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA;background:#FFFBF4"><div><div style="font-weight:700;color:#7A5C00">"We booked those seats for a reason"</div><div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#7A5C00">access need not on file</div></div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#7A5C00">3</div><div style="font-size:10.5px;color:#7A5C00">call · capture the need properly</div><div style="text-align:right"><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;padding:2px 7px;border-radius:5px;background:#FFF3D6;color:#7A5C00">access team</span></div></div>
+              <div style="display:grid;grid-template-columns:1.5fr 74px 1.2fr 96px;align-items:center;padding:11px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA;background:#FDF5F5"><div><div style="font-weight:700;color:#8A2020">Complaint about the venue generally</div><div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#8A2020">third leak in two years</div></div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#8A2020">2</div><div style="font-size:10.5px;color:#8A2020">duty manager replies personally</div><div style="text-align:right"><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;padding:2px 7px;border-radius:5px;background:#FDECEC;color:#A81E1E">D. Marsh</span></div></div>
+              <div style="display:grid;grid-template-columns:1.5fr 74px 1.2fr 96px;align-items:center;padding:11px 14px;font-size:11.5px"><div><div style="font-weight:600">Out-of-office and bounces</div><div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#9AA5B6">no action needed</div></div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">14</div><div style="font-size:10.5px;color:#5A6577">6 bounced · texted instead</div><div style="text-align:right"><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;padding:2px 7px;border-radius:5px;background:#E8F6F0;color:#0B7A55">automatic</span></div></div>
+              <div style="flex:none;padding:12px 14px;border-top:1px solid #EDF1F6;background:#F5F9FF;display:flex;gap:11px"><span style="width:3px;border-radius:2px;background:#0D6EFD;flex:none"></span><div style="flex:1;font-size:11px;color:#0A4FB8;line-height:1.55">Three guests replied that they booked those seats "for a reason" — an access need nobody has on file. Each of those is a profile that should have existed, and the call is as much about fixing the record as fixing this booking.</div></div>
+              <div style="flex:1;padding:14px;display:flex;flex-direction:column;gap:9px;min-height:0">
+                <div style="font-size:12px;font-weight:800;letter-spacing:-.01em">Six bounced emails</div>
+                <div style="font-size:11px;color:#5A6577;line-height:1.6">Six of the 386 email addresses no longer work. All six had a mobile number, so a text went instead and five have been read. The sixth booked through an agent, who has been asked to make contact and confirm within twenty-four hours.</div>
+                <div style="margin-top:auto;display:flex;gap:14px;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#7C8899"><span>386 notified</span><span>380 confirmed reached</span><span>6 fallback used</span><span>1 via agent</span></div>
+              </div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:12px;min-height:0">
+              <div style="flex:none;background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:8px">
+                <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">One-word replies work</div>
+                <div style="font-size:10.5px;color:#5A6577;line-height:1.55">REFUND and MOVE by text handle nineteen of thirty-one replies with no staff involvement, and the guest gets an answer in seconds rather than a queue on Monday morning.</div>
+                <div style="display:flex;flex-direction:column;gap:5px;font-size:11px;color:#5A6577">
+                  <div style="display:flex;justify-content:space-between"><span>Handled automatically</span><span style="font-family:'IBM Plex Mono',monospace;color:#0B5B41">22 of 31</span></div>
+                  <div style="display:flex;justify-content:space-between"><span>Median response time</span><span style="font-family:'IBM Plex Mono',monospace;color:#0B5B41">8 seconds</span></div>
+                  <div style="display:flex;justify-content:space-between"><span>Needing a person</span><span style="font-family:'IBM Plex Mono',monospace;color:#0B1324">9</span></div>
+                </div>
+              </div>
+              <div style="flex:none;background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:7px">
+                <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Grouped, not queued</div>
+                <div style="font-size:10.5px;color:#5A6577;line-height:1.55">Four people asking for an aisle seat are one job, not four. Grouping by what was asked lets one person answer all four in the time it would take to read them separately.</div>
+              </div>
+              <div style="flex:1;min-height:0"></div>
+              <div style="flex:none;background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:7px">
+                <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">8% reply rate is good</div>
+                <div style="font-size:10.5px;color:#5A6577;line-height:1.55">Ninety-two per cent of guests read the notice and needed nothing further, which is the real measure of whether the message did its job.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;line-height:1.85;color:#7C8899">
+        <div><b style="color:#4A5566;font-weight:600">OPERATIONS</b> · getNoticeReplies · matchStandardActions · groupSimilarRequests · handleBounces · assignToPerson</div>
+        <div><b style="color:#4A5566;font-weight:600">STATES</b> · open · <b style="color:#0A4FB8">autoActioned</b> · grouped · assigned · <b style="color:#8A6D00">accessNeedDiscovered</b> · closed · error</div>
+        <div><b style="color:#4A5566;font-weight:600">ARRIVES WITH</b> · noticeId←<a href="#seatp-11e">SEATP-11E</a></div>
+        <div><b style="color:#4A5566;font-weight:600">GOES TO</b> · <a href="Seat%20Platform%20Board%203.dc.html#seatp-3d">access profile</a> · <a href="#seatp-11j">post-incident review</a></div>
+      </div>
+    </div>
+
+    <div id="seatp-11h" data-screen-label="SEATP-11H" data-screen-id="SEATP-11H" data-screen-id-origin="board" style="display:flex;flex-direction:column;gap:13px;scroll-margin-top:24px">
+      <div>
+        <div style="display:flex;align-items:baseline;gap:9px"><span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#8494A8">SEATP-11H</span><span style="font-size:16.5px;font-weight:800;letter-spacing:-.015em">Guest · Your Seats Have Changed</span><span style="font-size:9px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:2px 7px;border-radius:5px;background:#EDF3FF;color:#0A4FB8">handheld · 390 × 700</span></div>
+        <div style="font-size:12px;color:#6B7280;margin-top:3px">What the guest sees when they tap the link: the old seat, the new seat, why, and the two ways out. No form, no login, no small print.</div>
+      </div>
+      <div style="width:1280px;height:700px;display:flex;gap:22px;align-items:stretch;background:#F7F9FC;border:1px solid #E3E8F0;border-radius:14px;overflow:hidden;box-shadow:0 16px 38px rgba(12,35,64,.09);padding:20px 24px">
+        <div style="flex:none;width:390px;background:#fff;border-radius:22px;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 12px 30px rgba(12,35,64,.18);border:1px solid #E3E8F0">
+          <div style="flex:none;height:34px;display:flex;align-items:center;justify-content:space-between;padding:0 16px;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#9AA5B6;border-bottom:1px solid #F4F6FA"><span>09:14</span><span>ticvai.co.uk</span></div>
+          <div style="flex:1;display:flex;flex-direction:column;gap:13px;padding:16px;min-height:0;overflow:hidden">
+            <div style="flex:none">
+              <div style="font-size:17px;font-weight:800;letter-spacing:-.018em">Your seats have moved</div>
+              <div style="font-size:11.5px;color:#5A6577;margin-top:3px">Twelfth Night · Sat 26 Sep · 19:30 · Hall 2</div>
+            </div>
+            <div style="flex:none;display:flex;align-items:stretch;gap:9px">
+              <div style="flex:1;border:1px solid #E8ECF3;border-radius:12px;padding:12px;display:flex;flex-direction:column;gap:3px;background:#FBFCFE">
+                <span style="font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:#94A0B4">was</span>
+                <span style="font-size:19px;font-weight:800;color:#8494A8;letter-spacing:-.02em">M14 · M15</span>
+                <span style="font-size:10.5px;color:#8494A8">rear stalls left</span>
+              </div>
+              <div style="flex:none;display:flex;align-items:center;font-family:'IBM Plex Mono',monospace;font-size:15px;color:#9AA5B6">→</div>
+              <div style="flex:1;border:1.5px solid #0D6EFD;border-radius:12px;padding:12px;display:flex;flex-direction:column;gap:3px;background:#F8FBFF">
+                <span style="font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:#0A4FB8">now</span>
+                <span style="font-size:19px;font-weight:800;color:#0A4FB8;letter-spacing:-.02em">N12 · N13</span>
+                <span style="font-size:10.5px;color:#0A4FB8">rear stalls right</span>
+              </div>
+            </div>
+            <div style="flex:none;display:flex;flex-direction:column;gap:7px;font-size:11.5px;color:#5A6577">
+              <div style="display:flex;justify-content:space-between"><span>Distance to stage</span><span style="font-weight:700;color:#0B5B41">same · 28 m</span></div>
+              <div style="display:flex;justify-content:space-between"><span>Steps</span><span style="font-weight:700;color:#0B5B41">none, as before</span></div>
+              <div style="display:flex;justify-content:space-between"><span>Together</span><span style="font-weight:700;color:#0B5B41">yes, side by side</span></div>
+              <div style="display:flex;justify-content:space-between"><span>Price</span><span style="font-weight:700;color:#0B5B41">unchanged</span></div>
+            </div>
+            <div style="flex:none;background:#FFFBF4;border:1px solid #F2DFB8;border-radius:11px;padding:11px 12px;font-size:11px;color:#7A5C00;line-height:1.55">Storm damage has made the left corner of the rear stalls unusable while the roof is repaired. We are sorry for the change.</div>
+            <div style="flex:1;min-height:0"></div>
+            <div style="flex:none;display:flex;flex-direction:column;gap:8px">
+              <div style="height:48px;border-radius:12px;background:#0D6EFD;color:#fff;display:flex;align-items:center;justify-content:center;font-size:13.5px;font-weight:800">That's fine · see my tickets</div>
+              <div style="display:flex;gap:8px">
+                <div style="flex:1;height:44px;border-radius:12px;border:1px solid #E3E8F0;color:#5A6577;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700">Another date</div>
+                <div style="flex:1;height:44px;border-radius:12px;border:1px solid #E3E8F0;color:#5A6577;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700">Full refund</div>
+              </div>
+              <div style="font-size:10.5px;color:#5A6577;text-align:center;line-height:1.5">Either takes one tap. Refunds include the booking fee and arrive within five working days.</div>
+            </div>
+          </div>
+        </div>
+        <div style="flex:1;display:flex;flex-direction:column;gap:12px;min-width:0">
+          <div style="flex:none;background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:13px 15px;display:flex;flex-direction:column;gap:9px">
+            <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Old seat and new seat, side by side</div>
+            <div style="font-size:11.5px;color:#5A6577;line-height:1.6;text-wrap:pretty">The comparison is the whole screen. A guest's first question is not "why" but "is it as good", and four measured facts answer it in about three seconds. The reason comes after the answer, and the way out is always visible without scrolling.</div>
+          </div>
+          <div style="flex:1;display:grid;grid-template-columns:1fr 1fr;gap:12px;min-height:0">
+            <div style="background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:13px 15px;display:flex;flex-direction:column;gap:10px;min-height:0;overflow:hidden">
+              <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">What guests do here</div>
+              <div style="display:flex;flex-direction:column;gap:6px;font-size:11px;color:#5A6577">
+                <div style="display:flex;justify-content:space-between"><span>Accepted without contact</span><span style="font-family:'IBM Plex Mono',monospace;color:#0B5B41">92%</span></div>
+                <div style="display:flex;justify-content:space-between"><span>Moved to another date</span><span style="font-family:'IBM Plex Mono',monospace;color:#0B1324">4%</span></div>
+                <div style="display:flex;justify-content:space-between"><span>Took a refund</span><span style="font-family:'IBM Plex Mono',monospace;color:#0B1324">3%</span></div>
+                <div style="display:flex;justify-content:space-between"><span>Asked for something else</span><span style="font-family:'IBM Plex Mono',monospace;color:#0B1324">1%</span></div>
+                <div style="display:flex;justify-content:space-between"><span>Tapped "see my tickets"</span><span style="font-family:'IBM Plex Mono',monospace;color:#0B1324">61%</span></div>
+              </div>
+              <div style="margin-top:auto;font-size:10.5px;color:#5A6577;line-height:1.5">More than half tap through to look at the new tickets, which is why the tickets are already reissued before the notice is sent.</div>
+            </div>
+            <div style="background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:13px 15px;display:flex;flex-direction:column;gap:10px;min-height:0;overflow:hidden">
+              <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">When the new seat is worse</div>
+              <div style="font-size:11px;color:#5A6577;line-height:1.6">If any of the four facts is worse — further back, more steps, party split, lower band — the screen says so in plain words at the top, states the refund of the difference plus 20%, and puts the refund button first. Pretending a downgrade is equivalent is what turns a reseat into a complaint.</div>
+              <div style="margin-top:auto;display:flex;flex-direction:column;gap:5px;font-size:11px;color:#5A6577">
+                <div style="display:flex;justify-content:space-between"><span>Downgrades this season</span><span style="font-family:'IBM Plex Mono',monospace;color:#0B1324">86</span></div>
+                <div style="display:flex;justify-content:space-between"><span>Of those, refunded difference</span><span style="font-family:'IBM Plex Mono',monospace;color:#0B5B41">86</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;line-height:1.85;color:#7C8899">
+        <div><b style="color:#4A5566;font-weight:600">OPERATIONS</b> · getSeatChangeForGuest · compareOldAndNew · acceptChange · requestAnotherDate · requestRefund</div>
+        <div><b style="color:#4A5566;font-weight:600">STATES</b> · notified · <b style="color:#0B7A55">equivalentConfirmed</b> · downgradeDisclosed · accepted · dateChanged · refunded · error</div>
+        <div><b style="color:#4A5566;font-weight:600">ARRIVES WITH</b> · noticeLink←<a href="#seatp-11e">SEATP-11E</a></div>
+        <div><b style="color:#4A5566;font-weight:600">GOES TO</b> · <a href="Seat%20Platform%20Board%208.dc.html#seatp-8h">tickets</a> · <a href="#seatp-11i">at the door</a></div>
+      </div>
+    </div>
+
+    <div id="seatp-11i" data-screen-label="SEATP-11I" data-screen-id="SEATP-11I" data-screen-id-origin="board" style="display:flex;flex-direction:column;gap:13px;scroll-margin-top:24px">
+      <div>
+        <div style="display:flex;align-items:baseline;gap:9px"><span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#8494A8">SEATP-11I</span><span style="font-size:16.5px;font-weight:800;letter-spacing:-.015em">At the Door · unaware guest</span><span style="font-size:9px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:2px 7px;border-radius:5px;background:#FDECEC;color:#A81E1E">handheld · the notice did not reach them</span></div>
+        <div style="font-size:12px;color:#6B7280;margin-top:3px">Someone arrives holding a ticket for a seat that has moved and knows nothing about it. The scanner recognises this specific case and gives the usher a script and an authority.</div>
+      </div>
+      <div style="width:1280px;height:700px;display:flex;gap:22px;align-items:stretch;background:#F7F9FC;border:1px solid #E3E8F0;border-radius:14px;overflow:hidden;box-shadow:0 16px 38px rgba(12,35,64,.09);padding:20px 24px">
+        <div style="flex:none;width:390px;background:#0B1324;border-radius:22px;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 12px 30px rgba(12,35,64,.28)">
+          <div style="flex:none;height:34px;display:flex;align-items:center;justify-content:space-between;padding:0 16px;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#7FA3C9"><span>19:08</span><span>Door 4 · K. Idris</span></div>
+          <div style="flex:1;display:flex;flex-direction:column;gap:12px;padding:16px;min-height:0;overflow:hidden">
+            <div style="flex:none;background:rgba(240,180,41,.18);border:2px solid #F0B429;border-radius:16px;padding:16px;display:flex;flex-direction:column;gap:9px">
+              <div style="display:flex;align-items:center;gap:10px"><span style="width:28px;height:28px;border-radius:14px;background:#F0B429;color:#0B1324;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:800">!</span><span style="font-size:15px;font-weight:800;color:#F5D28A">Seat moved · admit</span></div>
+              <div style="font-size:12px;color:#DCE7F5">Their ticket says</div>
+              <div style="font-size:24px;font-weight:800;color:#8494A8;letter-spacing:-.02em;text-decoration:line-through">M14 · M15</div>
+              <div style="font-size:12px;color:#DCE7F5">Their seats now</div>
+              <div style="font-size:36px;font-weight:800;color:#fff;letter-spacing:-.03em;line-height:1">N12 · N13</div>
+              <div style="font-size:12px;color:#F5D28A">Same aisle, other side · no steps</div>
+            </div>
+            <div style="flex:none;background:rgba(255,255,255,.06);border-radius:13px;padding:12px 13px;display:flex;flex-direction:column;gap:6px">
+              <div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:#7FA3C9">say this</div>
+              <div style="font-size:11.5px;color:#DCE7F5;line-height:1.55">"There was water damage in that corner so we moved you across the aisle — N12 and N13, same distance back, no steps. Sorry, we did email but it may not have reached you."</div>
+            </div>
+            <div style="flex:none;background:rgba(220,38,38,.14);border:1px solid rgba(220,38,38,.32);border-radius:13px;padding:12px 13px;display:flex;flex-direction:column;gap:6px">
+              <div style="font-size:12px;font-weight:700;color:#FFC9C9">If they are unhappy</div>
+              <div style="font-size:11.5px;color:#DCE7F5;line-height:1.55">You can offer a full refund and a free ticket to any date, on the spot. You do not need a manager.</div>
+            </div>
+            <div style="flex:1;min-height:0"></div>
+            <div style="flex:none;display:flex;gap:9px">
+              <div style="flex:1;height:50px;border-radius:13px;border:1px solid rgba(255,255,255,.16);color:#DCE7F5;display:flex;align-items:center;justify-content:center;font-size:12.5px;font-weight:700">Offer refund</div>
+              <div style="flex:1;height:50px;border-radius:13px;background:#0E9F6E;color:#fff;display:flex;align-items:center;justify-content:center;font-size:13.5px;font-weight:800">Admit to N12/N13</div>
+            </div>
+          </div>
+        </div>
+        <div style="flex:1;display:flex;flex-direction:column;gap:12px;min-width:0">
+          <div style="flex:none;background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:13px 15px;display:flex;flex-direction:column;gap:9px">
+            <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">The usher needs authority, not an escalation</div>
+            <div style="font-size:11.5px;color:#5A6577;line-height:1.6;text-wrap:pretty">A guest standing at a door who has just learned their seat moved is the most expensive moment in this whole board. Fetching a manager takes four minutes and makes it worse. The person at the door can admit them, apologise, and offer a full refund with a free ticket without asking anybody — and every use of that authority is logged as a notice failure, not as a staff decision to review.</div>
+          </div>
+          <div style="flex:1;display:grid;grid-template-columns:1fr 1fr;gap:12px;min-height:0">
+            <div style="background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:13px 15px;display:flex;flex-direction:column;gap:10px;min-height:0;overflow:hidden">
+              <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Why the notice missed them</div>
+              <div style="display:flex;flex-direction:column;gap:6px;font-size:11px;color:#5A6577">
+                <div style="display:flex;justify-content:space-between"><span>Email bounced</span><span style="font-family:'IBM Plex Mono',monospace;color:#0B1324">4</span></div>
+                <div style="display:flex;justify-content:space-between"><span>Booked by somebody else</span><span style="font-family:'IBM Plex Mono',monospace;color:#0B1324">3</span></div>
+                <div style="display:flex;justify-content:space-between"><span>Bought through an agent</span><span style="font-family:'IBM Plex Mono',monospace;color:#0B1324">2</span></div>
+                <div style="display:flex;justify-content:space-between"><span>Simply did not read it</span><span style="font-family:'IBM Plex Mono',monospace;color:#0B1324">2</span></div>
+                <div style="display:flex;justify-content:space-between"><span>Total this season</span><span style="font-family:'IBM Plex Mono',monospace;color:#8A2020">11</span></div>
+              </div>
+              <div style="margin-top:auto;font-size:10.5px;color:#5A6577;line-height:1.5">Three of eleven were gifts, where the ticket holder is not the buyer. That is a fixable gap: the notice should go to both.</div>
+            </div>
+            <div style="background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:13px 15px;display:flex;flex-direction:column;gap:10px;min-height:0;overflow:hidden">
+              <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Outcomes at the door</div>
+              <div style="display:flex;flex-direction:column;gap:6px;font-size:11px;color:#5A6577">
+                <div style="display:flex;justify-content:space-between"><span>Accepted the new seat</span><span style="font-family:'IBM Plex Mono',monospace;color:#0B5B41">9 of 11</span></div>
+                <div style="display:flex;justify-content:space-between"><span>Took the refund</span><span style="font-family:'IBM Plex Mono',monospace;color:#0B1324">2</span></div>
+                <div style="display:flex;justify-content:space-between"><span>Escalated to a manager</span><span style="font-family:'IBM Plex Mono',monospace;color:#0B5B41">0</span></div>
+                <div style="display:flex;justify-content:space-between"><span>Average time at the door</span><span style="font-family:'IBM Plex Mono',monospace;color:#0B5B41">50 seconds</span></div>
+              </div>
+              <div style="margin-top:auto;font-size:10.5px;color:#5A6577;line-height:1.5">Fifty seconds and no manager, because the screen gave the usher the seat, the reason and the remedy at the same time.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;line-height:1.85;color:#7C8899">
+        <div><b style="color:#4A5566;font-weight:600">OPERATIONS</b> · detectMovedSeatOnScan · getUsherScript · admitToNewSeat · refundAtDoor · logNoticeFailure</div>
+        <div><b style="color:#4A5566;font-weight:600">STATES</b> · <b style="color:#A81E1E">guestUnaware</b> · admitted · refundedAtDoor · noticeFailureLogged · error</div>
+        <div><b style="color:#4A5566;font-weight:600">ARRIVES WITH</b> · scan←<a href="Seat%20Platform%20Board%209.dc.html#seatp-9a">SEATP-9A</a></div>
+        <div><b style="color:#4A5566;font-weight:600">GOES TO</b> · <a href="#seatp-11f">compensation</a> · <a href="#seatp-11j">post-incident review</a></div>
+      </div>
+    </div>
+
+    <div id="seatp-11j" data-screen-label="SEATP-11J" data-screen-id="SEATP-11J" data-screen-id-origin="board" style="display:flex;flex-direction:column;gap:13px;scroll-margin-top:24px">
+      <div>
+        <div style="display:flex;align-items:baseline;gap:9px"><span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#8494A8">SEATP-11J</span><span style="font-size:16.5px;font-weight:800;letter-spacing:-.015em">Post-Incident Review</span><span style="font-size:9px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:2px 7px;border-radius:5px;background:#EDF3FF;color:#0A4FB8">what to change before the next one</span></div>
+        <div style="font-size:12px;color:#6B7280;margin-top:3px">Closing a disruption properly: what it cost, what worked, and the two or three changes that would make the next one cheaper. Written within a week, with owners.</div>
+      </div>
+      <div style="width:1280px;height:700px;display:flex;background:#F7F9FC;border:1px solid #E3E8F0;border-radius:14px;overflow:hidden;box-shadow:0 16px 38px rgba(12,35,64,.09)">
+        <aside style="flex:none;width:180px;background:#0B1324;display:flex;flex-direction:column;position:relative">
+          <div style="position:absolute;inset:0;background:radial-gradient(300px 200px at 0% 4%,rgba(0,184,255,.20),transparent 70%);pointer-events:none"></div>
+          <div style="position:relative;padding:15px 14px 13px;border-bottom:1px solid rgba(255,255,255,.08)"><img src="assets/ticvai-light-logo.png" alt="TICVAI" style="display:block;height:24px;width:auto"><div style="font-size:9.5px;color:#7FA3C9;margin-top:5px">Disruption</div></div>
+          <nav style="position:relative;display:flex;flex-direction:column;gap:2px;padding:11px 9px">
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Open items</div>
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Reseat runs</div>
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Venue moves</div>
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Notices</div>
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Compensation</div>
+            <div style="padding:8px 10px;border-radius:9px;background:linear-gradient(90deg,rgba(13,110,253,.30),rgba(0,184,255,.10));color:#fff;font-size:11.5px;font-weight:700;box-shadow:inset 2px 0 0 #00B8FF">History</div>
+          </nav>
+          <div style="position:relative;margin-top:auto;padding:12px;border-top:1px solid rgba(255,255,255,.08);font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#7FA3C9;line-height:1.7">14 incidents<br>this season</div>
+        </aside>
+        <div style="flex:1;display:flex;flex-direction:column;min-width:0">
+          <header style="flex:none;height:54px;display:flex;align-items:center;gap:12px;padding:0 18px;background:#fff;border-bottom:1px solid #E8ECF3">
+            <div><div style="font-size:13.5px;font-weight:800;letter-spacing:-.01em">Review · Hall 2 roof leak</div><div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#9AA5B6">412 guests · £6 840 cost · 6 days' notice · 2 complaints · closed 4 Oct</div></div>
+            <div style="margin-left:auto;display:flex;gap:6px"><div style="height:32px;display:flex;align-items:center;padding:0 11px;border:1px solid #E3E8F0;border-radius:8px;font-size:11px;font-weight:700;color:#5A6577">Compare incidents</div><div style="height:32px;display:flex;align-items:center;padding:0 12px;border-radius:8px;background:#0D6EFD;color:#fff;font-size:11px;font-weight:700">Close with actions</div></div>
+          </header>
+          <div style="flex:1;display:flex;flex-direction:column;gap:12px;padding:14px 16px;min-height:0">
+            <div style="flex:none;display:grid;grid-template-columns:repeat(5,1fr);gap:11px">
+              <div style="background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:3px"><span style="font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#94A0B4">Guests affected</span><span style="font-family:'IBM Plex Mono',monospace;font-size:19px;font-weight:600">412</span></div>
+              <div style="background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:3px"><span style="font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#94A0B4">Total cost</span><span style="font-family:'IBM Plex Mono',monospace;font-size:19px;font-weight:600">£6 840</span></div>
+              <div style="background:#fff;border:1px solid #CBE8DA;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:3px"><span style="font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#0B7A55">Reached before arrival</span><span style="font-family:'IBM Plex Mono',monospace;font-size:19px;font-weight:600;color:#0B5B41">98%</span></div>
+              <div style="background:#fff;border:1px solid #CBE8DA;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:3px"><span style="font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#0B7A55">Kept their booking</span><span style="font-family:'IBM Plex Mono',monospace;font-size:19px;font-weight:600;color:#0B5B41">93%</span></div>
+              <div style="background:#fff;border:1.5px solid #F2DFB8;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:3px"><span style="font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#8A6D00">Staff hours</span><span style="font-family:'IBM Plex Mono',monospace;font-size:19px;font-weight:600;color:#8A6D00">21</span></div>
+            </div>
+            <div style="flex:1;display:grid;grid-template-columns:1.3fr 1fr;gap:12px;min-height:0">
+              <div style="background:#fff;border:1px solid #E8ECF3;border-radius:12px;display:flex;flex-direction:column;overflow:hidden;min-height:0">
+                <div style="flex:none;display:flex;align-items:center;gap:8px;padding:11px 14px 10px;border-bottom:1px solid #EDF1F6"><div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">What we learned</div><span style="margin-left:auto;font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#9AA5B6">written 3 Oct by the box office and venue ops</span></div>
+                <div style="display:grid;grid-template-columns:26px 1fr 112px;align-items:start;padding:11px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA"><div style="font-family:'IBM Plex Mono',monospace;color:#0A4FB8;font-weight:600">1</div><div><div style="font-weight:700">Mirrored seats made 248 moves invisible</div><div style="font-size:10.5px;color:#5A6577;margin-top:2px;line-height:1.5">Moving guests to the same seat number on the other side of the aisle produced almost no replies. Use mirroring as the first matching rule in every future run.</div></div><div style="text-align:right"><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;padding:2px 7px;border-radius:5px;background:#E8F6F0;color:#0B7A55">keep</span></div></div>
+                <div style="display:grid;grid-template-columns:26px 1fr 112px;align-items:start;padding:11px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA"><div style="font-family:'IBM Plex Mono',monospace;color:#0A4FB8;font-weight:600">2</div><div><div style="font-weight:700">Three guests had an access need we did not know about</div><div style="font-size:10.5px;color:#5A6577;margin-top:2px;line-height:1.5">They had chosen specific seats for a reason never recorded. Ask about access needs at checkout, not only on the access booking path.</div></div><div style="text-align:right"><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;padding:2px 7px;border-radius:5px;background:#EDF3FF;color:#0A4FB8">change</span></div></div>
+                <div style="display:grid;grid-template-columns:26px 1fr 112px;align-items:start;padding:11px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA"><div style="font-family:'IBM Plex Mono',monospace;color:#0A4FB8;font-weight:600">3</div><div><div style="font-weight:700">Gift bookings notified the wrong person</div><div style="font-size:10.5px;color:#5A6577;margin-top:2px;line-height:1.5">Three of the eleven who arrived unaware were attending on a ticket bought by somebody else. Notices should go to the buyer and the holder.</div></div><div style="text-align:right"><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;padding:2px 7px;border-radius:5px;background:#EDF3FF;color:#0A4FB8">change</span></div></div>
+                <div style="display:grid;grid-template-columns:26px 1fr 112px;align-items:start;padding:11px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA"><div style="font-family:'IBM Plex Mono',monospace;color:#0A4FB8;font-weight:600">4</div><div><div style="font-weight:700">Text got through where email did not</div><div style="font-size:10.5px;color:#5A6577;margin-top:2px;line-height:1.5">Six bounced emails were covered by text within minutes. Collect a mobile number as standard for every booking, optional but asked for.</div></div><div style="text-align:right"><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;padding:2px 7px;border-radius:5px;background:#EDF3FF;color:#0A4FB8">change</span></div></div>
+                <div style="display:grid;grid-template-columns:26px 1fr 112px;align-items:start;padding:11px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA"><div style="font-family:'IBM Plex Mono',monospace;color:#0A4FB8;font-weight:600">5</div><div><div style="font-weight:700">The leak was reported eleven days before it closed seats</div><div style="font-size:10.5px;color:#5A6577;margin-top:2px;line-height:1.5">A maintenance ticket existed and nobody connected it to ticketed seats. Maintenance tickets on seating areas should raise a disruption automatically.</div></div><div style="text-align:right"><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;padding:2px 7px;border-radius:5px;background:#FFF3D6;color:#7A5C00">process</span></div></div>
+                <div style="display:grid;grid-template-columns:26px 1fr 112px;align-items:start;padding:11px 14px;font-size:11.5px"><div style="font-family:'IBM Plex Mono',monospace;color:#0A4FB8;font-weight:600">6</div><div><div style="font-weight:700">Published compensation rules removed the arguing</div><div style="font-size:10.5px;color:#5A6577;margin-top:2px;line-height:1.5">Two complaints against eighty-four for a comparable incident in 2023. Nobody had to be persuaded of anything.</div></div><div style="text-align:right"><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;padding:2px 7px;border-radius:5px;background:#E8F6F0;color:#0B7A55">keep</span></div></div>
+                <div style="margin-top:auto;flex:none;padding:11px 14px;border-top:1px solid #EDF1F6;background:#FBFCFE;font-size:11px;color:#5A6577;line-height:1.55">Six notes, four of them changes, each with an owner and a date. The fifth is the one worth most: an existing maintenance ticket already knew about this eleven days earlier than the box office did.</div>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:12px;min-height:0">
+                <div style="flex:none;background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:8px">
+                  <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Where the £6 840 went</div>
+                  <div style="display:flex;flex-direction:column;gap:5px;font-size:11px;color:#5A6577">
+                    <div style="display:flex;justify-content:space-between"><span>Refunds</span><span style="font-family:'IBM Plex Mono',monospace;color:#0B1324">£2 180</span></div>
+                    <div style="display:flex;justify-content:space-between"><span>Free tickets given</span><span style="font-family:'IBM Plex Mono',monospace;color:#0B1324">£1 240</span></div>
+                    <div style="display:flex;justify-content:space-between"><span>Credits at £10</span><span style="font-family:'IBM Plex Mono',monospace;color:#0B1324">£0</span></div>
+                    <div style="display:flex;justify-content:space-between"><span>Band difference refunds</span><span style="font-family:'IBM Plex Mono',monospace;color:#0B1324">£620</span></div>
+                    <div style="display:flex;justify-content:space-between"><span>Staff time · 21 hours</span><span style="font-family:'IBM Plex Mono',monospace;color:#0B1324">£420</span></div>
+                    <div style="display:flex;justify-content:space-between"><span>Lost seat income</span><span style="font-family:'IBM Plex Mono',monospace;color:#0B1324">£2 380</span></div>
+                  </div>
+                  <div style="font-size:10.5px;color:#5A6577;line-height:1.5">No £10 credits because everyone had more than 48 hours' notice. That single fact saved £4 120.</div>
+                </div>
+                <div style="flex:none;background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:8px">
+                  <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Actions with owners</div>
+                  <div style="display:flex;flex-direction:column;gap:6px;font-size:10.5px;color:#5A6577">
+                    <div style="display:flex;justify-content:space-between;gap:8px"><span>Access question at checkout</span><span style="font-family:'IBM Plex Mono',monospace;color:#0B1324">product · 30 Oct</span></div>
+                    <div style="display:flex;justify-content:space-between;gap:8px"><span>Notify buyer and holder</span><span style="font-family:'IBM Plex Mono',monospace;color:#0B1324">product · 14 Oct</span></div>
+                    <div style="display:flex;justify-content:space-between;gap:8px"><span>Ask for a mobile number</span><span style="font-family:'IBM Plex Mono',monospace;color:#0B1324">product · 14 Oct</span></div>
+                    <div style="display:flex;justify-content:space-between;gap:8px"><span>Maintenance raises disruptions</span><span style="font-family:'IBM Plex Mono',monospace;color:#0B1324">venue ops · 21 Oct</span></div>
+                  </div>
+                </div>
+                <div style="flex:1;min-height:0"></div>
+                <div style="flex:none;background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:7px">
+                  <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Fourteen incidents, one pattern</div>
+                  <div style="font-size:10.5px;color:#5A6577;line-height:1.55">Across the season, every expensive disruption had one thing in common: somebody in the building knew days before the box office did. That is the thing worth fixing.</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;line-height:1.85;color:#7C8899">
+        <div><b style="color:#4A5566;font-weight:600">OPERATIONS</b> · buildIncidentReview · getIncidentCost · addReviewNote · createAction · closeIncident · compareIncidents</div>
+        <div><b style="color:#4A5566;font-weight:600">STATES</b> · drafting · <b style="color:#0B7A55">actionsAssigned</b> · closed · comparing · error</div>
+        <div><b style="color:#4A5566;font-weight:600">ARRIVES WITH</b> · disruptionId←<a href="#seatp-11a">SEATP-11A</a></div>
+        <div><b style="color:#4A5566;font-weight:600">GOES TO</b> · <a href="#seatp-11a">disruption board</a> · <a href="Seat%20Platform%20Board%209.dc.html#seatp-9h">seat incidents</a></div>
+      </div>
+    </div>
+
+  </div>
+
+  <div style="margin-top:56px;padding-top:16px;border-top:1px solid #DCE3ED;display:flex;justify-content:space-between;font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#8494A8">
+    <span>Seat Management · Board 11 of 13 · 10 screens</span>
+    <span><a href="Seat%20Platform%20Board%2010.dc.html">← Board 10</a> · <a href="TICVAI%20All%20Boards%20Index.dc.html">index</a></span>
+  </div>
+</div>
+</x-dc>
+</body>
+</html>

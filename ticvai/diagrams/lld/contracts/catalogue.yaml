@@ -5,9 +5,9 @@ index: diagrams/hld/03-contracts.yaml
 tier: spine
 service: CatalogueService
 operations:
-- operation: acquireLease
+- operation: acquireInventoryHold
   verb: POST
-  path: /leases
+  path: /inventory-holds
   scope: workstation
   permission: ORDER_CREATE
   audience:
@@ -16,12 +16,12 @@ operations:
   offline: false
   reads:
   - cache:idempotency
-  - catalogue.envelope
-  - catalogue.inventory_lease
+  - catalogue.channel_capacity
+  - catalogue.inventory_hold
   - platform.workstation
   writes:
   - cache:idempotency
-  - catalogue.inventory_lease
+  - catalogue.inventory_hold
 - operation: assessProductChange
   verb: POST
   path: /products/{productId}/change-impact
@@ -112,6 +112,21 @@ operations:
   writes:
   - cache:idempotency
   - catalogue.price_list
+- operation: createChannelCapacity
+  verb: POST
+  path: /channel-capacities
+  scope: venue
+  permission: CAPACITY_CONFIGURE
+  audience:
+  - staff
+  - partner
+  offline: false
+  reads:
+  - cache:idempotency
+  - catalogue.channel_capacity
+  writes:
+  - cache:idempotency
+  - catalogue.channel_capacity
 - operation: createDonationCampaign
   verb: POST
   path: /donation-campaigns
@@ -140,21 +155,6 @@ operations:
   writes:
   - cache:idempotency
   - catalogue.entitlement_template
-- operation: createEnvelope
-  verb: POST
-  path: /envelopes
-  scope: venue
-  permission: CAPACITY_CONFIGURE
-  audience:
-  - staff
-  - partner
-  offline: false
-  reads:
-  - cache:idempotency
-  - catalogue.envelope
-  writes:
-  - cache:idempotency
-  - catalogue.envelope
 - operation: createEvent
   verb: POST
   path: /events
@@ -213,9 +213,9 @@ operations:
   writes:
   - cache:idempotency
   - catalogue.product
-- operation: forceReleaseLease
+- operation: forceReleaseInventoryHold
   verb: POST
-  path: /leases/{leaseId}/force-release
+  path: /inventory-holds/{inventoryHoldId}/force-release
   scope: venue
   permission: CAPACITY_CONFIGURE
   audience:
@@ -223,10 +223,10 @@ operations:
   offline: false
   reads:
   - cache:idempotency
-  - catalogue.inventory_lease
+  - catalogue.inventory_hold
   writes:
   - cache:idempotency
-  - catalogue.inventory_lease
+  - catalogue.inventory_hold
 - operation: freezeEntitlement
   verb: POST
   path: /entitlements/{entitlementId}/freeze
@@ -252,13 +252,13 @@ operations:
   - partner
   offline: false
   reads:
-  - catalogue.envelope
-  - catalogue.inventory_lease
+  - catalogue.channel_capacity
+  - catalogue.inventory_hold
   - catalogue.performance
   writes: []
 - operation: getChannelAllocations
   verb: GET
-  path: /envelopes/{envelopeId}/channel-allocations
+  path: /channel-capacities/{channelCapacityId}/channel-allocations
   scope: venue
   permission: PRODUCT_VIEW
   audience:
@@ -365,7 +365,7 @@ operations:
   offline: false
   reads:
   - cache:idempotency
-  - catalogue.envelope
+  - catalogue.channel_capacity
   - catalogue.performance
   writes:
   - cache:idempotency
@@ -409,6 +409,18 @@ operations:
   - catalogue.product
   - catalogue.published_bundle
   writes: []
+- operation: listChannelCapacities
+  verb: GET
+  path: /channel-capacities
+  scope: venue
+  permission: PRODUCT_VIEW
+  audience:
+  - staff
+  - partner
+  offline: false
+  reads:
+  - catalogue.channel_capacity
+  writes: []
 - operation: listDonationCampaigns
   verb: GET
   path: /donation-campaigns
@@ -430,18 +442,6 @@ operations:
   offline: true
   reads:
   - catalogue.entitlement_template
-  writes: []
-- operation: listEnvelopes
-  verb: GET
-  path: /envelopes
-  scope: venue
-  permission: PRODUCT_VIEW
-  audience:
-  - staff
-  - partner
-  offline: false
-  reads:
-  - catalogue.envelope
   writes: []
 - operation: listEvents
   verb: GET
@@ -468,16 +468,16 @@ operations:
   - catalogue.product
   - orders.sales_order
   writes: []
-- operation: listLeases
+- operation: listInventoryHolds
   verb: GET
-  path: /leases
+  path: /inventory-holds
   scope: venue
   permission: PRODUCT_VIEW
   audience:
   - staff
   offline: false
   reads:
-  - catalogue.inventory_lease
+  - catalogue.inventory_hold
   writes: []
 - operation: listPerformances
   verb: GET
@@ -589,11 +589,11 @@ operations:
   offline: false
   reads:
   - cache:idempotency
-  - catalogue.envelope
+  - catalogue.channel_capacity
   - catalogue.waitlist_entry
   writes:
   - cache:idempotency
-  - catalogue.inventory_lease
+  - catalogue.inventory_hold
   - catalogue.waitlist_entry
 - operation: publishBundle
   verb: POST
@@ -624,7 +624,7 @@ operations:
   - cache:idempotency
 - operation: releaseChannelAllocation
   verb: POST
-  path: /envelopes/{envelopeId}/channel-allocations/release
+  path: /channel-capacities/{channelCapacityId}/channel-allocations/release
   scope: venue
   permission: CAPACITY_CONFIGURE
   audience:
@@ -637,9 +637,9 @@ operations:
   writes:
   - cache:idempotency
   - catalogue.channel_allocation
-- operation: releaseLease
+- operation: releaseInventoryHold
   verb: DELETE
-  path: /leases/{leaseId}
+  path: /inventory-holds/{inventoryHoldId}
   scope: workstation
   permission: ORDER_CREATE
   audience:
@@ -647,13 +647,13 @@ operations:
   offline: false
   reads:
   - cache:idempotency
-  - catalogue.inventory_lease
+  - catalogue.inventory_hold
   writes:
   - cache:idempotency
-  - catalogue.inventory_lease
-- operation: renewLease
+  - catalogue.inventory_hold
+- operation: renewInventoryHold
   verb: POST
-  path: /leases/{leaseId}/renew
+  path: /inventory-holds/{inventoryHoldId}/renew
   scope: workstation
   permission: ORDER_CREATE
   audience:
@@ -661,10 +661,10 @@ operations:
   offline: false
   reads:
   - cache:idempotency
-  - catalogue.inventory_lease
+  - catalogue.inventory_hold
   writes:
   - cache:idempotency
-  - catalogue.inventory_lease
+  - catalogue.inventory_hold
 - operation: reportBundleApplied
   verb: POST
   path: /catalogue/bundles/{version}/applied
@@ -737,7 +737,7 @@ operations:
   - catalogue.alternative_code
 - operation: setChannelAllocations
   verb: PUT
-  path: /envelopes/{envelopeId}/channel-allocations
+  path: /channel-capacities/{channelCapacityId}/channel-allocations
   scope: venue
   permission: CAPACITY_CONFIGURE
   audience:
@@ -777,10 +777,10 @@ operations:
   offline: false
   reads:
   - cache:idempotency
-  - catalogue.attribute_axis
+  - catalogue.variant_dimension
   writes:
   - cache:idempotency
-  - catalogue.attribute_axis
+  - catalogue.variant_dimension
 - operation: setProductCategories
   verb: PUT
   path: /product-categories
@@ -826,6 +826,21 @@ operations:
   writes:
   - cache:idempotency
   - catalogue.product
+- operation: updateChannelCapacity
+  verb: PATCH
+  path: /channel-capacities/{channelCapacityId}
+  scope: venue
+  permission: CAPACITY_CONFIGURE
+  audience:
+  - staff
+  - partner
+  offline: false
+  reads:
+  - cache:idempotency
+  - catalogue.channel_capacity
+  writes:
+  - cache:idempotency
+  - catalogue.channel_capacity
 - operation: updateDonationCampaign
   verb: PATCH
   path: /donation-campaigns/{campaignId}
@@ -840,21 +855,6 @@ operations:
   writes:
   - cache:idempotency
   - catalogue.donation_campaign
-- operation: updateEnvelope
-  verb: PATCH
-  path: /envelopes/{envelopeId}
-  scope: venue
-  permission: CAPACITY_CONFIGURE
-  audience:
-  - staff
-  - partner
-  offline: false
-  reads:
-  - cache:idempotency
-  - catalogue.envelope
-  writes:
-  - cache:idempotency
-  - catalogue.envelope
 - operation: updateEvent
   verb: PATCH
   path: /events/{eventId}

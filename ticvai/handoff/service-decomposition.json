@@ -56,7 +56,7 @@
    ],
    "operations": 52,
    "tables": 35,
-   "why": "**`platform.scope_node` is reached by 304 of 379 tables** \u2014 the tenancy spine. Workforce and approvals are folded in because each is small, both read `scope_node` constantly and write it rarely, and splitting them means three services doing the same joins.\n\n**`shift` was folded in here on 24 August and moved to OrderService the same day.** The reasoning was that a shift owns no tables of its own \u2014 which is true \u2014 and the conclusion was wrong. **A service with no data belongs where its data is**, and a shift's data is entirely in `orders`: `orders.shift`, `orders.deposit_box`, `orders.cash_movement`, `orders.cash_count_line`.\n\n**The coupling made it visible.** All 43 of Tenancy's cross-service touches into `orders` were the `shift` contract \u2014 19 writes and 24 reads, the heaviest coupling in the platform, created to solve a cosmetic problem.",
+   "why": "**`platform.org_unit` is reached by 304 of 379 tables** \u2014 the tenancy spine. Workforce and approvals are folded in because each is small, both read `org_unit` constantly and write it rarely, and splitting them means three services doing the same joins.\n\n**`shift` was folded in here on 24 August and moved to OrderService the same day.** The reasoning was that a shift owns no tables of its own \u2014 which is true \u2014 and the conclusion was wrong. **A service with no data belongs where its data is**, and a shift's data is entirely in `orders`: `orders.shift`, `orders.deposit_box`, `orders.cash_movement`, `orders.cash_count_line`.\n\n**The coupling made it visible.** All 43 of Tenancy's cross-service touches into `orders` were the `shift` contract \u2014 19 writes and 24 reads, the heaviest coupling in the platform, created to solve a cosmetic problem.",
    "scale": "Read-heavy and highly cacheable. Config changes are rare.",
    "risk": "Same as identity \u2014 nothing runs without a scope.",
    "readsFrom": {
@@ -123,7 +123,7 @@
    ],
    "operations": 96,
    "tables": 34,
-   "why": "**The transactional core.** 96 operations, 34 tables, and the highest write rate in the platform. Separate because its scaling profile is unlike anything else \u2014 a Saturday evening is ten times a Tuesday morning.\n\n**`shift` belongs here and not in Tenancy.** A shift is venue-scoped, which is what made it look like a tenancy concern \u2014 but **venue scope is the platform's default rather than a service boundary**: 675 of 1,014 operations are venue-scoped.\n\n**What decides the service is who owns the tables.** A shift holds cash, `orders.deposit_box` reconciles against payments, and `orders.cash_movement` posts to `ledger.entry` at close. **A till's takings and a till's drawer are the same money counted twice** \u2014 separating them makes every settlement a distributed join.",
+   "why": "**The transactional core.** 96 operations, 34 tables, and the highest write rate in the platform. Separate because its scaling profile is unlike anything else \u2014 a Saturday evening is ten times a Tuesday morning.\n\n**`shift` belongs here and not in Tenancy.** A shift is venue-scoped, which is what made it look like a tenancy concern \u2014 but **venue scope is the platform's default rather than a service boundary**: 675 of 1,014 operations are venue-scoped.\n\n**What decides the service is who owns the tables.** A shift holds cash, `orders.deposit_box` reconciles against payments, and `orders.cash_movement` posts to `ledger.posting` at close. **A till's takings and a till's drawer are the same money counted twice** \u2014 separating them makes every settlement a distributed join.",
    "scale": "Write-heavy, spiky, latency-critical. **The one that autoscales.**",
    "risk": "**Down means no sales.** Highest availability target in the platform.",
    "readsFrom": {
@@ -170,7 +170,7 @@
    },
    "writesOutside": {
     "IdentityService": 2,
-    "CrossCellService": 1,
+    "CrossRegionService": 1,
     "MarketingService": 1
    },
    "flowCoverage": {
@@ -198,7 +198,7 @@
     "OrderService": 6,
     "TenancyService": 1,
     "RetailService": 1,
-    "ControlService": 1,
+    "PlatformService": 1,
     "CatalogueService": 1
    },
    "writesOutside": {},
@@ -326,7 +326,7 @@
    },
    "writesOutside": {
     "IdentityService": 2,
-    "ControlService": 2,
+    "PlatformService": 2,
     "OrderService": 1
    },
    "flowCoverage": {
@@ -401,7 +401,7 @@
    },
    "writesOutside": {
     "OrderService": 2,
-    "CrossCellService": 1,
+    "CrossRegionService": 1,
     "InventoryService": 1
    },
    "flowCoverage": {
@@ -412,7 +412,7 @@
    "screens": 53,
    "flows": 15
   },
-  "ControlService": {
+  "PlatformService": {
    "tier": "platform",
    "contracts": [
     "subscription",
@@ -462,12 +462,12 @@
    "scale": "Read-heavy and heavily cached. Published, not queried.",
    "risk": "Down freezes the current published config. Guests see the last good version.",
    "readsFrom": {
-    "ControlService": 3,
+    "PlatformService": 3,
     "MarketingService": 1,
     "IdentityService": 1
    },
    "writesOutside": {
-    "ControlService": 3
+    "PlatformService": 3
    },
    "flowCoverage": {
     "operations": 50,
@@ -506,7 +506,7 @@
    "screens": 31,
    "flows": 10
   },
-  "CrossCellService": {
+  "CrossRegionService": {
    "tier": "platform",
    "contracts": [
     "cross-cell"

@@ -3,7 +3,7 @@ title: cross-cell — 16 operations
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/03-contracts.yaml
 tier: spine
-service: CrossCellService
+service: CrossRegionService
 operations:
 - operation: authoriseWalletSpend
   verb: POST
@@ -33,9 +33,9 @@ operations:
   writes:
   - cache:idempotency
   - platform.wallet_authorisation
-- operation: consumeRedemptionRight
+- operation: consumeCrossRegionEntitlement
   verb: POST
-  path: /redemption-rights/{rightId}/consume
+  path: /cross-region-entitlements/{rightId}/consume
   scope: workstation
   permission: ACCESS_VALIDATE
   audience:
@@ -43,10 +43,10 @@ operations:
   offline: true
   reads:
   - cache:idempotency
-  - platform.redemption_right
+  - platform.cross_region_entitlement
   writes:
   - cache:idempotency
-  - platform.redemption_right
+  - platform.cross_region_entitlement
 - operation: createDsarRequest
   verb: POST
   path: /dsar/requests
@@ -75,6 +75,17 @@ operations:
   writes:
   - cache:idempotency
   - platform.guest_link
+- operation: getCrossRegionEntitlement
+  verb: GET
+  path: /cross-region-entitlements/{rightId}
+  scope: venue
+  permission: TICKET_LOOKUP
+  audience:
+  - staff
+  offline: true
+  reads:
+  - platform.cross_region_entitlement
+  writes: []
 - operation: getDsarRequest
   verb: GET
   path: /dsar/requests/{requestId}
@@ -97,17 +108,6 @@ operations:
   reads:
   - platform.guest_link
   writes: []
-- operation: getRedemptionRight
-  verb: GET
-  path: /redemption-rights/{rightId}
-  scope: venue
-  permission: TICKET_LOOKUP
-  audience:
-  - staff
-  offline: true
-  reads:
-  - platform.redemption_right
-  writes: []
 - operation: getWalletAllocation
   verb: GET
   path: /wallet-allocations
@@ -119,9 +119,9 @@ operations:
   reads:
   - platform.wallet_authorisation
   writes: []
-- operation: propagateRedemptionRight
+- operation: propagateCrossRegionEntitlement
   verb: POST
-  path: /redemption-rights
+  path: /cross-region-entitlements
   scope: tenant
   permission: null
   audience:
@@ -129,13 +129,13 @@ operations:
   offline: false
   reads:
   - cache:idempotency
-  - platform.redemption_right
+  - platform.cross_region_entitlement
   writes:
   - cache:idempotency
-  - platform.redemption_right
+  - platform.cross_region_entitlement
 - operation: reconcileRedemptions
   verb: POST
-  path: /redemption-rights/reconcile
+  path: /cross-region-entitlements/reconcile
   scope: tenant
   permission: null
   audience:
@@ -144,10 +144,10 @@ operations:
   reads:
   - access.scan_event
   - cache:idempotency
-  - platform.redemption_right
+  - platform.cross_region_entitlement
   writes:
   - cache:idempotency
-  - platform.redemption_right
+  - platform.cross_region_entitlement
 - operation: releaseWalletAuthorisation
   verb: POST
   path: /wallet-authorisations/{authorisationId}/release
@@ -173,6 +173,20 @@ operations:
   reads:
   - platform.guest_link
   writes: []
+- operation: revokeCrossRegionEntitlement
+  verb: DELETE
+  path: /cross-region-entitlements/{rightId}
+  scope: tenant
+  permission: null
+  audience:
+  - service
+  offline: false
+  reads:
+  - cache:idempotency
+  - platform.cross_region_entitlement
+  writes:
+  - cache:idempotency
+  - platform.cross_region_entitlement
 - operation: revokeGuestLink
   verb: DELETE
   path: /guest-links/{guestLinkId}
@@ -187,20 +201,6 @@ operations:
   writes:
   - cache:idempotency
   - platform.guest_link
-- operation: revokeRedemptionRight
-  verb: DELETE
-  path: /redemption-rights/{rightId}
-  scope: tenant
-  permission: null
-  audience:
-  - service
-  offline: false
-  reads:
-  - cache:idempotency
-  - platform.redemption_right
-  writes:
-  - cache:idempotency
-  - platform.redemption_right
 - operation: setWalletAllocationPolicy
   verb: PUT
   path: /wallet-allocations

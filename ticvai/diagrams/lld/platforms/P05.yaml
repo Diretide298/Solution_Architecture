@@ -31,11 +31,11 @@ modulesUsed:
   screens: 1
 servicesCalled:
 - service: OrderService
-  operationCalls: 10
+  operationCalls: 11
 - service: CatalogueService
   operationCalls: 8
 - service: RetailService
-  operationCalls: 3
+  operationCalls: 4
 - service: WhiteLabelService
   operationCalls: 2
 - service: MarketingService
@@ -69,8 +69,9 @@ screens:
   - KSK-002
   - KSK-003
   - KSK-004
-  boardFrames: null
-  wireframe: wireframes/P05 Guest Kiosk.dc.html#ksk-001
+  boardFrames:
+  - Kiosk Board 1.dc.html#KSK-001
+  wireframe: wireframes/Kiosk Board 1.dc.html#KSK-001
   inFlows:
   - F07 Guest buys at a kiosk
   - F75 A kiosk serves itself and calls for help
@@ -95,8 +96,9 @@ screens:
   - KSK-001
   - KSK-003
   - KSK-004
-  boardFrames: null
-  wireframe: wireframes/P05 Guest Kiosk.dc.html#ksk-002
+  boardFrames:
+  - Kiosk Board 1.dc.html#KSK-002
+  wireframe: wireframes/Kiosk Board 1.dc.html#KSK-002
   inFlows:
   - F07 Guest buys at a kiosk
   - F75 A kiosk serves itself and calls for help
@@ -121,8 +123,9 @@ screens:
   - KSK-001
   - KSK-002
   - KSK-004
-  boardFrames: null
-  wireframe: wireframes/P05 Guest Kiosk.dc.html#ksk-003
+  boardFrames:
+  - Kiosk Board 1.dc.html#KSK-003
+  wireframe: wireframes/Kiosk Board 1.dc.html#KSK-003
   inFlows:
   - F07 Guest buys at a kiosk
   - F75 A kiosk serves itself and calls for help
@@ -150,8 +153,9 @@ screens:
   - KSK-002
   - KSK-003
   - KSK-005
-  boardFrames: null
-  wireframe: wireframes/P05 Guest Kiosk.dc.html#ksk-004
+  boardFrames:
+  - Kiosk Board 1.dc.html#KSK-004
+  wireframe: wireframes/Kiosk Board 1.dc.html#KSK-004
   inFlows:
   - F07 Guest buys at a kiosk
 - screen: KSK-005
@@ -161,7 +165,7 @@ screens:
   wave: 2
   density: touchLarge
   operations:
-  - acquireLease
+  - acquireInventoryHold
   - getAvailability
   states:
   - emptyFirstRun
@@ -176,8 +180,9 @@ screens:
   - KSK-002
   - KSK-003
   - KSK-006
-  boardFrames: null
-  wireframe: wireframes/P05 Guest Kiosk.dc.html#ksk-005
+  boardFrames:
+  - Kiosk Board 1.dc.html#KSK-005
+  wireframe: wireframes/Kiosk Board 1.dc.html#KSK-005
   inFlows:
   - F07 Guest buys at a kiosk
 - screen: KSK-006
@@ -205,8 +210,9 @@ screens:
   - KSK-002
   - KSK-003
   - KSK-007
-  boardFrames: null
-  wireframe: wireframes/P05 Guest Kiosk.dc.html#ksk-006
+  boardFrames:
+  - Kiosk Board 1.dc.html#KSK-006
+  wireframe: wireframes/Kiosk Board 1.dc.html#KSK-006
   inFlows:
   - F07 Guest buys at a kiosk
   - F57 A guest uses a kiosk and it fails
@@ -232,8 +238,9 @@ screens:
   - KSK-002
   - KSK-003
   - KSK-009
-  boardFrames: null
-  wireframe: wireframes/P05 Guest Kiosk.dc.html#ksk-007
+  boardFrames:
+  - Kiosk Board 1.dc.html#KSK-007
+  wireframe: wireframes/Kiosk Board 1.dc.html#KSK-007
   inFlows:
   - F07 Guest buys at a kiosk
   - F75 A kiosk serves itself and calls for help
@@ -258,8 +265,9 @@ screens:
   - KSK-001
   - KSK-002
   - KSK-003
-  boardFrames: null
-  wireframe: wireframes/P05 Guest Kiosk.dc.html#ksk-008
+  boardFrames:
+  - Kiosk Board 1.dc.html#KSK-008
+  wireframe: wireframes/Kiosk Board 1.dc.html#KSK-008
   inFlows:
   - F57 A guest uses a kiosk and it fails
 - screen: KSK-009
@@ -284,8 +292,9 @@ screens:
   - KSK-001
   - KSK-002
   - KSK-003
-  boardFrames: null
-  wireframe: wireframes/P05 Guest Kiosk.dc.html#ksk-009
+  boardFrames:
+  - Kiosk Board 1.dc.html#KSK-009
+  wireframe: wireframes/Kiosk Board 1.dc.html#KSK-009
   inFlows:
   - F07 Guest buys at a kiosk
   - F75 A kiosk serves itself and calls for help
@@ -310,8 +319,9 @@ screens:
   - KSK-002
   - KSK-003
   - KSK-013
-  boardFrames: null
-  wireframe: wireframes/P05 Guest Kiosk.dc.html#ksk-010
+  boardFrames:
+  - Kiosk Board 2.dc.html#KSK-010
+  wireframe: wireframes/Kiosk Board 2.dc.html#KSK-010
   inFlows:
   - F57 A guest uses a kiosk and it fails
 - screen: KSK-011
@@ -337,8 +347,9 @@ screens:
   - KSK-001
   - KSK-002
   - KSK-003
-  boardFrames: null
-  wireframe: wireframes/P05 Guest Kiosk.dc.html#ksk-011
+  boardFrames:
+  - Kiosk Board 2.dc.html#KSK-011
+  wireframe: wireframes/Kiosk Board 2.dc.html#KSK-011
   inFlows: null
 - screen: KSK-012
   name: Booking found
@@ -360,8 +371,9 @@ screens:
   - KSK-001
   - KSK-002
   - KSK-003
-  boardFrames: null
-  wireframe: wireframes/P05 Guest Kiosk.dc.html#ksk-012
+  boardFrames:
+  - Kiosk Board 2.dc.html#KSK-012
+  wireframe: wireframes/Kiosk Board 2.dc.html#KSK-012
   inFlows: null
 - screen: KSK-013
   name: Call staff
@@ -383,8 +395,9 @@ screens:
   - KSK-001
   - KSK-002
   - KSK-003
-  boardFrames: null
-  wireframe: wireframes/P05 Guest Kiosk.dc.html#ksk-013
+  boardFrames:
+  - Kiosk Board 2.dc.html#KSK-013
+  wireframe: wireframes/Kiosk Board 2.dc.html#KSK-013
   inFlows:
   - F57 A guest uses a kiosk and it fails
   - F75 A kiosk serves itself and calls for help
@@ -406,8 +419,9 @@ screens:
   - KSK-001
   - KSK-002
   - KSK-003
-  boardFrames: null
-  wireframe: wireframes/P05 Guest Kiosk.dc.html#ksk-014
+  boardFrames:
+  - Kiosk Board 2.dc.html#KSK-014
+  wireframe: wireframes/Kiosk Board 2.dc.html#KSK-014
   inFlows: null
 - screen: KSK-015
   name: Assistant
@@ -431,8 +445,9 @@ screens:
   - conversationId<-deepLink
   goesTo:
   - KSK-001
-  boardFrames: null
-  wireframe: wireframes/P05 Guest Kiosk.dc.html#ksk-015
+  boardFrames:
+  - Kiosk Board 2.dc.html#KSK-015
+  wireframe: wireframes/Kiosk Board 2.dc.html#KSK-015
   inFlows:
   - F24 A guest asks the assistant and ends up with a person
 - screen: KSK-016
@@ -455,8 +470,9 @@ screens:
   - outletId<-deepLink
   goesTo:
   - KSK-017
-  boardFrames: null
-  wireframe: wireframes/P05 Guest Kiosk.dc.html#ksk-016
+  boardFrames:
+  - Kiosk Board 2.dc.html#KSK-016
+  wireframe: wireframes/Kiosk Board 2.dc.html#KSK-016
   inFlows: null
 - screen: KSK-017
   name: Shop
@@ -465,7 +481,9 @@ screens:
   wave: 2
   density: touchLarge
   operations:
+  - addCartLine
   - listMerchandise
+  - lookupMerchandise
   - reserveMerchandise
   states:
   - emptyFirstRun
@@ -476,8 +494,10 @@ screens:
   offlineState: false
   entryParams:
   - outletId<-KSK-016
+  - cartId<-session
   goesTo: []
-  boardFrames: null
-  wireframe: wireframes/P05 Guest Kiosk.dc.html#ksk-017
+  boardFrames:
+  - Kiosk Board 2.dc.html#KSK-017
+  wireframe: wireframes/Kiosk Board 2.dc.html#KSK-017
   inFlows:
   - F51 A guest shops in the venue and collects on the way out

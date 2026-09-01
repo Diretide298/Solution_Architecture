@@ -141,13 +141,14 @@ screens:
     component: apps/kitchen-display/src/routes/kitchen/KitchenOperationsCommandCenterBoard.tsx
     status: notStarted
   wireframe:
-    status: generated
-    board: wireframes/P15 Kitchen Display.dc.html#kit-001
+    status: designed
+    board: wireframes/FnB Board 3.dc.html#fnb-3a
     source: Claude Design F&B pack, 20 August
     note: '**Drawn as FNB-3A in the client pack.** The pack''s frame is the specification for this screen
       — it carries operations, states, entry params and exits, and it is better specified than anything
       derived from the screen file.'
     derivedFrom: wireframes/FnB Board 3.dc.html#fnb-3a
+    generatedFallback: wireframes/P15 Kitchen Display.dc.html#kit-001
   provenance: client board, specified
   notes: '**Built 20 August from board 3 of the client F&B design set.** **Board repointed 24 August.**
     This screen pointed at `wireframes/FnB Board 3.dc.html#fnb-3a` — a frame in the client pack, which
@@ -158,10 +159,14 @@ screens:
     these screens were repointed from the client pack to their own board on 24 August, the status stayed
     `designed` — **which claimed a client had drawn a board this package generated.** `derivedFrom`
     keeps the pack frame, which is where the design came from; `status` describes the file being pointed
-    at, and those are different facts.'
+    at, and those are different facts. **Drawn 31 August** — `FnB Board 3.dc.html` frame `fnb-3a`. **Matched
+    on frame title against screen name, constrained to this board’s platforms.** These packs label by
+    board position (`GM-6C`) rather than naming the screen, so the title is the only join — *Kitchen
+    Operations Command Center* matched at 1.0. **A cross-platform title match was refused**: `Outlet
+    Management` scored 0.85 against a partner-portal screen, which is how a mapping goes wrong quietly.'
   requiresModule: fnb
   boardFrames:
-  - FNB-3A
+  - FnB Board 3.dc.html#fnb-3a
 - id: KIT-002
   name: Kitchen Display System (KDS)
   module: Kitchen
@@ -251,13 +256,14 @@ screens:
     component: apps/kitchen-display/src/routes/kitchen/KitchenDisplaySystemKdsBoard.tsx
     status: notStarted
   wireframe:
-    status: generated
-    board: wireframes/P15 Kitchen Display.dc.html#kit-002
+    status: designed
+    board: wireframes/FnB Board 3.dc.html#fnb-3b
     source: Claude Design F&B pack, 20 August
     note: '**Drawn as FNB-3B in the client pack.** The pack''s frame is the specification for this screen
       — it carries operations, states, entry params and exits, and it is better specified than anything
       derived from the screen file.'
     derivedFrom: wireframes/FnB Board 3.dc.html#fnb-3b
+    generatedFallback: wireframes/P15 Kitchen Display.dc.html#kit-002
   provenance: client board, specified
   notes: '**Built 20 August from board 3 of the client F&B design set.** **The screen the platform exists
     for.** Bumped, not tapped — a bump bar and a touch target sized for somebody wearing gloves. Nothing
@@ -270,10 +276,15 @@ screens:
     pack, which is where the design came from and not where this screen is drawn. **`P15 Kitchen Display.dc.html`
     and `P16 Venue Analytics.dc.html` carry one anchor per screen and nothing referenced either**, so
     both shipped correctly anchored and unreachable. The pack frame is kept in `derivedFrom` because
-    provenance is worth more than the wrong pointer.'
+    provenance is worth more than the wrong pointer. **Drawn 31 August** — `FnB Board 3.dc.html` frame
+    `fnb-3b`. **Matched on frame title against screen name, constrained to this board’s platforms.**
+    These packs label by board position (`GM-6C`) rather than naming the screen, so the title is the
+    only join — *Kitchen Display System (KDS)* matched at 1.0. **A cross-platform title match was refused**:
+    `Outlet Management` scored 0.85 against a partner-portal screen, which is how a mapping goes wrong
+    quietly.'
   requiresModule: fnb
   boardFrames:
-  - FNB-3B
+  - FnB Board 3.dc.html#fnb-3b
 - id: KIT-003
   name: Order Firing & Course Management
   module: Kitchen
@@ -354,13 +365,14 @@ screens:
     component: apps/kitchen-display/src/routes/kitchen/OrderFiringCourseManagementBoard.tsx
     status: notStarted
   wireframe:
-    status: generated
-    board: wireframes/P15 Kitchen Display.dc.html#kit-003
+    status: designed
+    board: wireframes/FnB Board 3.dc.html#fnb-3c
     source: Claude Design F&B pack, 20 August
     note: '**Drawn as FNB-3C in the client pack.** The pack''s frame is the specification for this screen
       — it carries operations, states, entry params and exits, and it is better specified than anything
       derived from the screen file.'
     derivedFrom: wireframes/FnB Board 3.dc.html#fnb-3c
+    generatedFallback: wireframes/P15 Kitchen Display.dc.html#kit-003
   provenance: client board, specified
   notes: '**Built 20 August from board 3 of the client F&B design set.** **Starters before mains is
     the entire job of a kitchen pass.** `KitchenTicket.coursing` carries `holdAndFire`, `phased` and
@@ -370,10 +382,15 @@ screens:
     3.dc.html#fnb-3c` — a frame in the client pack, which is where the design came from and not where
     this screen is drawn. **`P15 Kitchen Display.dc.html` and `P16 Venue Analytics.dc.html` carry one
     anchor per screen and nothing referenced either**, so both shipped correctly anchored and unreachable.
-    The pack frame is kept in `derivedFrom` because provenance is worth more than the wrong pointer.'
+    The pack frame is kept in `derivedFrom` because provenance is worth more than the wrong pointer.
+    **Drawn 31 August** — `FnB Board 3.dc.html` frame `fnb-3c`. **Matched on frame title against screen
+    name, constrained to this board’s platforms.** These packs label by board position (`GM-6C`) rather
+    than naming the screen, so the title is the only join — *Order Firing &amp; Course Management* matched
+    at 1.0. **A cross-platform title match was refused**: `Outlet Management` scored 0.85 against a
+    partner-portal screen, which is how a mapping goes wrong quietly.'
   requiresModule: fnb
   boardFrames:
-  - FNB-3C
+  - FnB Board 3.dc.html#fnb-3c
 - id: KIT-004
   name: Active Order Management & Fulfilment Journey
   module: Kitchen
@@ -455,7 +472,7 @@ screens:
     provenance is worth more than the wrong pointer.'
   requiresModule: fnb
   boardFrames:
-  - FNB-3D
+  - FnB Board 3.dc.html#fnb-3d
 - id: KIT-005
   name: Kitchen Station Workload & Dynamic Routing
   module: Kitchen
@@ -519,23 +536,29 @@ screens:
     component: apps/kitchen-display/src/routes/kitchen/KitchenStationWorkloadDynamicRoutiBoard.tsx
     status: notStarted
   wireframe:
-    status: generated
-    board: wireframes/P15 Kitchen Display.dc.html#kit-005
+    status: designed
+    board: wireframes/FnB Board 3.dc.html#fnb-3e
     source: Claude Design F&B pack, 20 August
     note: '**Drawn as FNB-3E in the client pack.** The pack''s frame is the specification for this screen
       — it carries operations, states, entry params and exits, and it is better specified than anything
       derived from the screen file.'
     derivedFrom: wireframes/FnB Board 3.dc.html#fnb-3e
+    generatedFallback: wireframes/P15 Kitchen Display.dc.html#kit-005
   provenance: client board, specified
   notes: '**Built 20 August from board 3 of the client F&B design set.** **Board repointed 24 August.**
     This screen pointed at `wireframes/FnB Board 3.dc.html#fnb-3e` — a frame in the client pack, which
     is where the design came from and not where this screen is drawn. **`P15 Kitchen Display.dc.html`
     and `P16 Venue Analytics.dc.html` carry one anchor per screen and nothing referenced either**, so
     both shipped correctly anchored and unreachable. The pack frame is kept in `derivedFrom` because
-    provenance is worth more than the wrong pointer.'
+    provenance is worth more than the wrong pointer. **Drawn 31 August** — `FnB Board 3.dc.html` frame
+    `fnb-3e`. **Matched on frame title against screen name, constrained to this board’s platforms.**
+    These packs label by board position (`GM-6C`) rather than naming the screen, so the title is the
+    only join — *Station Workload &amp; Dynamic Routing* matched at 0.89. **A cross-platform title match
+    was refused**: `Outlet Management` scored 0.85 against a partner-portal screen, which is how a mapping
+    goes wrong quietly.'
   requiresModule: fnb
   boardFrames:
-  - FNB-3E
+  - FnB Board 3.dc.html#fnb-3e
 - id: KIT-006
   name: Expeditor & Order Assembly
   module: Kitchen
@@ -616,13 +639,14 @@ screens:
     component: apps/kitchen-display/src/routes/kitchen/ExpeditorOrderAssemblyBoard.tsx
     status: notStarted
   wireframe:
-    status: generated
-    board: wireframes/P15 Kitchen Display.dc.html#kit-006
+    status: designed
+    board: wireframes/FnB Board 3.dc.html#fnb-3f
     source: Claude Design F&B pack, 20 August
     note: '**Drawn as FNB-3F in the client pack.** The pack''s frame is the specification for this screen
       — it carries operations, states, entry params and exits, and it is better specified than anything
       derived from the screen file.'
     derivedFrom: wireframes/FnB Board 3.dc.html#fnb-3f
+    generatedFallback: wireframes/P15 Kitchen Display.dc.html#kit-006
   provenance: client board, specified
   notes: '**Built 20 August from board 3 of the client F&B design set.** **No expeditor role is modelled**
     — this reads and sets ticket status like the KDS. Whether an expeditor needs their own state is
@@ -633,10 +657,14 @@ screens:
     the design came from and not where this screen is drawn. **`P15 Kitchen Display.dc.html` and `P16
     Venue Analytics.dc.html` carry one anchor per screen and nothing referenced either**, so both shipped
     correctly anchored and unreachable. The pack frame is kept in `derivedFrom` because provenance is
-    worth more than the wrong pointer.'
+    worth more than the wrong pointer. **Drawn 31 August** — `FnB Board 3.dc.html` frame `fnb-3f`. **Matched
+    on frame title against screen name, constrained to this board’s platforms.** These packs label by
+    board position (`GM-6C`) rather than naming the screen, so the title is the only join — *Expeditor
+    &amp; Order Assembly* matched at 1.0. **A cross-platform title match was refused**: `Outlet Management`
+    scored 0.85 against a partner-portal screen, which is how a mapping goes wrong quietly.'
   requiresModule: fnb
   boardFrames:
-  - FNB-3F
+  - FnB Board 3.dc.html#fnb-3f
 - id: KIT-007
   name: Guest Collection, Buzzer & Digital Notification
   module: Kitchen
@@ -719,7 +747,7 @@ screens:
     The pack frame is kept in `derivedFrom` because provenance is worth more than the wrong pointer.'
   requiresModule: fnb
   boardFrames:
-  - FNB-3G
+  - FnB Board 3.dc.html#fnb-3g
 - id: KIT-008
   name: Exceptions, Re-Fire & Unavailable Items
   module: Kitchen
@@ -802,13 +830,14 @@ screens:
     component: apps/kitchen-display/src/routes/kitchen/ExceptionsReFireUnavailableItemsBoard.tsx
     status: notStarted
   wireframe:
-    status: generated
-    board: wireframes/P15 Kitchen Display.dc.html#kit-008
+    status: designed
+    board: wireframes/FnB Board 3.dc.html#fnb-3h
     source: Claude Design F&B pack, 20 August
     note: '**Drawn as FNB-3H in the client pack.** The pack''s frame is the specification for this screen
       — it carries operations, states, entry params and exits, and it is better specified than anything
       derived from the screen file.'
     derivedFrom: wireframes/FnB Board 3.dc.html#fnb-3h
+    generatedFallback: wireframes/P15 Kitchen Display.dc.html#kit-008
   provenance: client board, specified
   notes: '**Built 20 August from board 3 of the client F&B design set.** **86 is a kitchen word and
     a real state.** An item marked unavailable here stops selling at every till in the venue within
@@ -820,10 +849,15 @@ screens:
     in the client pack, which is where the design came from and not where this screen is drawn. **`P15
     Kitchen Display.dc.html` and `P16 Venue Analytics.dc.html` carry one anchor per screen and nothing
     referenced either**, so both shipped correctly anchored and unreachable. The pack frame is kept
-    in `derivedFrom` because provenance is worth more than the wrong pointer.'
+    in `derivedFrom` because provenance is worth more than the wrong pointer. **Drawn 31 August** —
+    `FnB Board 3.dc.html` frame `fnb-3h`. **Matched on frame title against screen name, constrained
+    to this board’s platforms.** These packs label by board position (`GM-6C`) rather than naming the
+    screen, so the title is the only join — *Exceptions, Re-Fire &amp; Unavailable Items* matched at
+    1.0. **A cross-platform title match was refused**: `Outlet Management` scored 0.85 against a partner-portal
+    screen, which is how a mapping goes wrong quietly.'
   requiresModule: fnb
   boardFrames:
-  - FNB-3H
+  - FnB Board 3.dc.html#fnb-3h
 - id: KIT-009
   name: SLA, Priority & Service Rules
   module: Kitchen
@@ -889,23 +923,29 @@ screens:
     component: apps/kitchen-display/src/routes/kitchen/SlaPriorityServiceRulesBoard.tsx
     status: notStarted
   wireframe:
-    status: generated
-    board: wireframes/P15 Kitchen Display.dc.html#kit-009
+    status: designed
+    board: wireframes/FnB Board 3.dc.html#fnb-3j
     source: Claude Design F&B pack, 20 August
     note: '**Drawn as FNB-3J in the client pack.** The pack''s frame is the specification for this screen
       — it carries operations, states, entry params and exits, and it is better specified than anything
       derived from the screen file.'
     derivedFrom: wireframes/FnB Board 3.dc.html#fnb-3j
+    generatedFallback: wireframes/P15 Kitchen Display.dc.html#kit-009
   provenance: client board, specified
   notes: '**Built 20 August from board 3 of the client F&B design set.** **Board repointed 24 August.**
     This screen pointed at `wireframes/FnB Board 3.dc.html#fnb-3j` — a frame in the client pack, which
     is where the design came from and not where this screen is drawn. **`P15 Kitchen Display.dc.html`
     and `P16 Venue Analytics.dc.html` carry one anchor per screen and nothing referenced either**, so
     both shipped correctly anchored and unreachable. The pack frame is kept in `derivedFrom` because
-    provenance is worth more than the wrong pointer.'
+    provenance is worth more than the wrong pointer. **Drawn 31 August** — `FnB Board 3.dc.html` frame
+    `fnb-3j`. **Matched on frame title against screen name, constrained to this board’s platforms.**
+    These packs label by board position (`GM-6C`) rather than naming the screen, so the title is the
+    only join — *SLA, Priority &amp; Service Rules* matched at 1.0. **A cross-platform title match was
+    refused**: `Outlet Management` scored 0.85 against a partner-portal screen, which is how a mapping
+    goes wrong quietly.'
   requiresModule: fnb
   boardFrames:
-  - FNB-3J
+  - FnB Board 3.dc.html#fnb-3j
 - id: KIT-010
   name: Kitchen Performance, AI & Operational Optimization
   module: Kitchen
@@ -988,4 +1028,4 @@ screens:
     provenance is worth more than the wrong pointer.'
   requiresModule: fnb
   boardFrames:
-  - FNB-3K
+  - FnB Board 3.dc.html#fnb-3k

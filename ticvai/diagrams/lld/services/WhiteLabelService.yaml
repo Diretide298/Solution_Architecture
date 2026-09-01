@@ -530,14 +530,14 @@ tables:
   - white-label
   foreignWriters: null
 readsFrom:
-- service: ControlService
+- service: PlatformService
   operations: 3
 - service: MarketingService
   operations: 1
 - service: IdentityService
   operations: 1
 writesOutside:
-- service: ControlService
+- service: PlatformService
   operations: 3
   why: '**The owner defines the row; this service may only append to it.**'
 screens:

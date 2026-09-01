@@ -198,9 +198,9 @@ paths:
             application/problem+json:
               schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
 
-  /releases/{releaseId}:
+  /releases/{reinventoryHoldId}:
     parameters:
-      - name: releaseId
+      - name: reinventoryHoldId
         in: path
         required: true
         schema: { type: string, format: uuid }
@@ -225,9 +225,9 @@ paths:
               schema: { $ref: '#/components/schemas/ReleaseDetail' }
         '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
 
-  /releases/{releaseId}/reject:
+  /releases/{reinventoryHoldId}/reject:
     parameters:
-      - name: releaseId
+      - name: reinventoryHoldId
         in: path
         required: true
         schema: { type: string }
@@ -265,9 +265,9 @@ paths:
             application/problem+json:
               schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
 
-  /releases/{releaseId}/withdraw:
+  /releases/{reinventoryHoldId}/withdraw:
     parameters:
-      - name: releaseId
+      - name: reinventoryHoldId
         in: path
         required: true
         schema: { type: string }
@@ -305,9 +305,9 @@ paths:
             application/problem+json:
               schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
 
-  /releases/{releaseId}/promote:
+  /releases/{reinventoryHoldId}/promote:
     parameters:
-      - name: releaseId
+      - name: reinventoryHoldId
         in: path
         required: true
         schema: { type: string, format: uuid }
@@ -367,9 +367,9 @@ paths:
             application/problem+json:
               schema: { $ref: '#/components/schemas/PromotionBlockedProblem' }
 
-  /releases/{releaseId}/readiness:
+  /releases/{reinventoryHoldId}/readiness:
     parameters:
-      - name: releaseId
+      - name: reinventoryHoldId
         in: path
         required: true
         schema: { type: string, format: uuid }
@@ -1067,9 +1067,9 @@ components:
     ReleaseReadiness:
       type: object
       x-ticvai-persistence: "none — computed"
-      required: [releaseId, canPromote, gates]
+      required: [reinventoryHoldId, canPromote, gates]
       properties:
-        releaseId: { type: string, format: uuid }
+        reinventoryHoldId: { type: string, format: uuid }
         canPromote: { type: boolean }
         targetEnvironment: { $ref: '#/components/schemas/EnvironmentKind' }
         gates:
@@ -1107,10 +1107,10 @@ components:
     Rollout:
       type: object
       x-ticvai-persistence: "control.rollout"
-      required: [id, releaseId, environment, status, startedAt]
+      required: [id, reinventoryHoldId, environment, status, startedAt]
       properties:
         id: { type: string, format: uuid }
-        releaseId: { type: string, format: uuid }
+        reinventoryHoldId: { type: string, format: uuid }
         environment: { $ref: '#/components/schemas/EnvironmentKind' }
         status: { $ref: '#/components/schemas/RolloutStatus' }
         cellsTotal: { type: integer }

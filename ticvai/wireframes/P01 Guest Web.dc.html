@@ -169,7 +169,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listProducts · listPerformances · searchCatalogue</div>
+          <div><b>OPERATIONS</b> &middot; listProducts · listPerformances · searchCatalogue · getWaitTimes</div>
           <div><b>STATES</b> &middot; <span class="">loading · emptyFirstRun · emptyNoResults · emptyNoAccess · error</span></div>
           <div><b>ARRIVES WITH</b> &middot; eventId&larr;deepLink</div>
           <div><b>GOES TO</b> &middot; WEB-001 · WEB-003 · WEB-004</div>
@@ -206,14 +206,14 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
       <div id="web-004" class="scr">
         <div>
           <div class="hdr"><span class="code">WEB-004</span>
-            <span class="ttl">Event / Attraction Detail</span></div>
+            <span class="ttl">Attraction Details</span></div>
           <div class="pur">Decide whether to book this.</div>
         </div>
         <div class="frame">
           <aside class="rail"><div class="brand"><b>Guest</b><span>Discovery &amp; Browse</span></div><nav class="nav"><i class="">What&#x27;s on</i><i class="on">My tickets</i><i class="">Food &amp; drink</i><i class="">Map</i><i class="">Help</i></nav></aside>
           <div class="body">
             <div class="top">
-              <div><h2>Event / Attraction Detail</h2>
+              <div><h2>Attraction Details</h2>
                 <small>Guest Web · wave 1 · compact</small></div>
               <div class="acts"><div class="chip">Sign in</div><div class="chip cta">Basket</div></div>
             </div>
@@ -225,7 +225,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; getProduct · listPerformances</div>
+          <div><b>OPERATIONS</b> &middot; getProduct · listPerformances · getAvailability · getWaitTimes</div>
           <div><b>STATES</b> &middot; <span class="">loading · emptyFirstRun · emptyNoAccess · error</span></div>
           <div><b>ARRIVES WITH</b> &middot; eventId&larr;WEB-002, productId&larr;WEB-001</div>
           <div><b>GOES TO</b> &middot; WEB-001 · WEB-002 · WEB-003 · WEB-005</div>
@@ -281,7 +281,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; getAvailability · acquireLease</div>
+          <div><b>OPERATIONS</b> &middot; getAvailability · acquireInventoryHold</div>
           <div><b>STATES</b> &middot; <span class="">loading · emptyFirstRun · emptyNoResults · emptyNoAccess · error</span></div>
           
           <div><b>GOES TO</b> &middot; WEB-001 · WEB-005 · WEB-007 · WEB-008 · WEB-010</div>
@@ -290,14 +290,14 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
       <div id="web-007" class="scr">
         <div>
           <div class="hdr"><span class="code">WEB-007</span>
-            <span class="ttl">Seat Map Selection</span><span class="pill">seat-3b</span></div>
+            <span class="ttl">Interactive Seat Selection</span><span class="pill">Seat Board 3.dc.html#seat-3b</span></div>
           <div class="pur">Choose specific seats.</div>
         </div>
         <div class="frame">
           <aside class="rail"><div class="brand"><b>Guest</b><span>Booking &amp; Selection</span></div><nav class="nav"><i class="">What&#x27;s on</i><i class="on">My tickets</i><i class="">Food &amp; drink</i><i class="">Map</i><i class="">Help</i></nav></aside>
           <div class="body">
             <div class="top">
-              <div><h2>Seat Map Selection</h2>
+              <div><h2>Interactive Seat Selection</h2>
                 <small>Guest Web · wave 2 · compact</small></div>
               <div class="acts"><div class="chip">Sign in</div><div class="chip cta">Basket</div></div>
             </div>
@@ -309,7 +309,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; createSeatHold · getSeatAvailability</div>
+          <div><b>OPERATIONS</b> &middot; createSeatHold · getSeatAvailability · recommendSeats</div>
           <div><b>STATES</b> &middot; <span class="">loading · emptyFirstRun · emptyNoAccess · error</span></div>
           <div><b>ARRIVES WITH</b> &middot; performanceId&larr;deepLink</div>
           <div><b>GOES TO</b> &middot; WEB-001 · WEB-005 · WEB-006 · WEB-008 · WEB-010</div>
@@ -360,7 +360,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
             
             <div class="canvas">
               
-              <div class="two"><div class="grow"><div class="panel"><span class="kind">detailPanel</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><b>Add to wishlist</b><div class="chip cta">Add to wishlist</div><span class="why">The act the screen exists for.</span></div><div class="panel"><span class="kind">destructiveButton</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">**Always confirms, never the default focus.** The consequence goes in the body — *cancel 3 orders worth AED 480* is a confirmation, *are you sure* is not.</span></div></div><div class="side"><div class="panel"><b>Cancel</b><div class="chip">Cancel</div><span class="why">**A screen that can submit must be leaveable without submitting.**</span></div></div></div>
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">detailPanel</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><b>Add to wishlist</b><div class="chip cta">Add to wishlist</div><span class="why">The act the screen exists for.</span></div><div class="panel"><b>Remove from wishlist</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">**Always confirms, never the default focus.** The consequence goes in the body — *cancel 3 orders worth AED 480* is a confirmation, *are you sure* is not.</span></div></div><div class="side"><div class="panel"><b>Cancel</b><div class="chip">Cancel</div><span class="why">**A screen that can submit must be leaveable without submitting.**</span></div><div class="panel"><b>Confirm</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">**The consequence goes in the body, not the title.** *Cancel 3 orders worth AED 480* is a confirmation; *are you sure* is not — and a dialog that cannot name what it dest</span></div></div></div>
             </div>
           </div>
         </div>
@@ -458,14 +458,14 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
       <div id="web-013" class="scr">
         <div>
           <div class="hdr"><span class="code">WEB-013</span>
-            <span class="ttl">Order Confirmation</span></div>
+            <span class="ttl">Booking Confirmation</span></div>
           <div class="pur">Confirm the purchase and deliver the tickets.</div>
         </div>
         <div class="frame">
           <aside class="rail"><div class="brand"><b>Guest</b><span>Cart &amp; Checkout</span></div><nav class="nav"><i class="">What&#x27;s on</i><i class="on">My tickets</i><i class="">Food &amp; drink</i><i class="">Map</i><i class="">Help</i></nav></aside>
           <div class="body">
             <div class="top">
-              <div><h2>Order Confirmation</h2>
+              <div><h2>Booking Confirmation</h2>
                 <small>Guest Web · wave 1 · compact</small></div>
               <div class="acts"><div class="chip">Sign in</div><div class="chip cta">Basket</div></div>
             </div>
@@ -514,14 +514,14 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
       <div id="web-015" class="scr">
         <div>
           <div class="hdr"><span class="code">WEB-015</span>
-            <span class="ttl">Virtual Waiting Room</span></div>
+            <span class="ttl">Branded Queue / Waiting Room</span></div>
           <div class="pur">Virtual Waiting Room — the screen a person opens when they need to deal with virtual waiting room.</div>
         </div>
         <div class="frame">
           <aside class="rail"><div class="brand"><b>Guest</b><span>High-Demand Access</span></div><nav class="nav"><i class="">What&#x27;s on</i><i class="on">My tickets</i><i class="">Food &amp; drink</i><i class="">Map</i><i class="">Help</i></nav></aside>
           <div class="body">
             <div class="top">
-              <div><h2>Virtual Waiting Room</h2>
+              <div><h2>Branded Queue / Waiting Room</h2>
                 <small>Guest Web · wave 2 · compact</small></div>
               <div class="acts"><div class="chip">Sign in</div><div class="chip cta">Basket</div></div>
             </div>
@@ -533,7 +533,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; joinQueue · getQueueEntry · getWaitTimes</div>
+          <div><b>OPERATIONS</b> &middot; joinQueue · getWaitingGuest · getWaitTimes</div>
           <div><b>STATES</b> &middot; <span class="">loading · emptyFirstRun · error</span></div>
           <div><b>ARRIVES WITH</b> &middot; entryId&larr;deepLink</div>
           <div><b>GOES TO</b> &middot; WEB-001</div>
@@ -570,7 +570,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
       <div id="web-017" class="scr">
         <div>
           <div class="hdr"><span class="code">WEB-017</span>
-            <span class="ttl">My Account Dashboard</span><span class="pill">web-017</span></div>
+            <span class="ttl">My Account Dashboard</span><span class="pill">Dashboards Board.dc.html#web-017</span></div>
           <div class="pur">The screen this app sits on. Everything else is entered from here and returns to it.</div>
         </div>
         <div class="frame">
@@ -617,9 +617,9 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listMyEntitlements · getEntitlement · getEntitlementCredential · getEntitlementHistory +1</div>
+          <div><b>OPERATIONS</b> &middot; listMyEntitlements · getEntitlement · getEntitlementCredential · getEntitlementHistory +2</div>
           <div><b>STATES</b> &middot; <span class="">loading · emptyFirstRun · error · emptyNoResults</span></div>
-          <div><b>ARRIVES WITH</b> &middot; entitlementId&larr;deepLink</div>
+          <div><b>ARRIVES WITH</b> &middot; entitlementId&larr;deepLink, orderId&larr;deepLink</div>
           <div><b>GOES TO</b> &middot; WEB-001 · WEB-016 · WEB-017 · WEB-019</div>
         </div>
       </div>
@@ -645,7 +645,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; transferOrderTickets · listMyOrders</div>
+          <div><b>OPERATIONS</b> &middot; transferOrderTickets · listMyOrders · getOrder · listOrders</div>
           <div><b>STATES</b> &middot; <span class="">loading · emptyFirstRun · emptyNoResults · error</span></div>
           <div><b>ARRIVES WITH</b> &middot; orderId&larr;deepLink</div>
           <div><b>GOES TO</b> &middot; WEB-001 · WEB-016 · WEB-017 · WEB-018</div>
@@ -766,21 +766,21 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
       <div id="web-024" class="scr">
         <div>
           <div class="hdr"><span class="code">WEB-024</span>
-            <span class="ttl">Loyalty &amp; Rewards</span></div>
+            <span class="ttl">Devices, Wishlist &amp; Consent</span></div>
           <div class="pur">See loyalty &amp; rewards for this venue.</div>
         </div>
         <div class="frame">
           <aside class="rail"><div class="brand"><b>Guest</b><span>Membership, Loyalty &amp; Value</span></div><nav class="nav"><i class="">What&#x27;s on</i><i class="on">My tickets</i><i class="">Food &amp; drink</i><i class="">Map</i><i class="">Help</i></nav></aside>
           <div class="body">
             <div class="top">
-              <div><h2>Loyalty &amp; Rewards</h2>
+              <div><h2>Devices, Wishlist &amp; Consent</h2>
                 <small>Guest Web · wave 3 · compact</small></div>
               <div class="acts"><div class="chip">Sign in</div><div class="chip cta">Basket</div></div>
             </div>
             
             <div class="canvas">
               
-              <div class="two"><div class="grow"><div class="panel"><span class="kind">detailPanel</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><b>Add to wishlist</b><div class="chip cta">Add to wishlist</div><span class="why">The act the screen exists for.</span></div><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue&#x27;s busiest hour is a list that skips rows.</span></div></div><div class="side"><div class="panel"><span class="kind">destructiveButton</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">**Always confirms, never the default focus.** The consequence goes in the body — *cancel 3 orders worth AED 480* is a confirmation, *are you sure* is not.</span></div><div class="panel"><b>Cancel</b><div class="chip">Cancel</div><span class="why">**A screen that can submit must be leaveable without submitting.**</span></div></div></div>
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">detailPanel</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><b>Add to wishlist</b><div class="chip cta">Add to wishlist</div><span class="why">The act the screen exists for.</span></div><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue&#x27;s busiest hour is a list that skips rows.</span></div></div><div class="side"><div class="panel"><b>Remove from wishlist</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">**Always confirms, never the default focus.** The consequence goes in the body — *cancel 3 orders worth AED 480* is a confirmation, *are you sure* is not.</span></div><div class="panel"><b>Cancel</b><div class="chip">Cancel</div><span class="why">**A screen that can submit must be leaveable without submitting.**</span></div></div></div>
             </div>
           </div>
         </div>
@@ -892,7 +892,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
             
             <div class="canvas">
               
-              <div class="two"><div class="grow"><div class="panel"><span class="kind">detailPanel</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><span class="kind">primaryButton</span><div class="chip cta">primaryButton</div><span class="why">The act the screen exists for.</span></div><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue&#x27;s busiest hour is a list that skips rows.</span></div></div><div class="side"><div class="panel"><span class="kind">destructiveButton</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">**Always confirms, never the default focus.** The consequence goes in the body — *cancel 3 orders worth AED 480* is a confirmation, *are you sure* is not.</span></div><div class="panel"><b>Cancel</b><div class="chip">Cancel</div><span class="why">**A screen that can submit must be leaveable without submitting.**</span></div></div></div>
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">detailPanel</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><span class="kind">primaryButton</span><div class="chip cta">primaryButton</div><span class="why">The act the screen exists for.</span></div><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue&#x27;s busiest hour is a list that skips rows.</span></div></div><div class="side"><div class="panel"><b>Remove from wishlist</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">**Always confirms, never the default focus.** The consequence goes in the body — *cancel 3 orders worth AED 480* is a confirmation, *are you sure* is not.</span></div><div class="panel"><b>Cancel</b><div class="chip">Cancel</div><span class="why">**A screen that can submit must be leaveable without submitting.**</span></div></div></div>
             </div>
           </div>
         </div>
@@ -934,14 +934,14 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
       <div id="web-044" class="scr">
         <div>
           <div class="hdr"><span class="code">WEB-044</span>
-            <span class="ttl">AI Concierge</span></div>
+            <span class="ttl">AI Concierge – Home</span></div>
           <div class="pur">Ask, and be answered or handed to a person.</div>
         </div>
         <div class="frame">
           <aside class="rail"><div class="brand"><b>Guest</b><span>Engagement &amp; Support</span></div><nav class="nav"><i class="">What&#x27;s on</i><i class="on">My tickets</i><i class="">Food &amp; drink</i><i class="">Map</i><i class="">Help</i></nav></aside>
           <div class="body">
             <div class="top">
-              <div><h2>AI Concierge</h2>
+              <div><h2>AI Concierge – Home</h2>
                 <small>Guest Web · wave 2 · compact</small></div>
               <div class="acts"><div class="chip">Sign in</div><div class="chip cta">Basket</div></div>
             </div>
@@ -953,9 +953,9 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; createAiConversation · sendAiMessage · handoverToAgent · requestSuggestion</div>
+          <div><b>OPERATIONS</b> &middot; createAiConversation · sendAiMessage · handoverToAgent · requestSuggestion +1</div>
           <div><b>STATES</b> &middot; <span class="">loading · emptyFirstRun · emptyNoResults · emptyNoAccess · error</span></div>
-          <div><b>ARRIVES WITH</b> &middot; conversationId&larr;deepLink</div>
+          <div><b>ARRIVES WITH</b> &middot; conversationId&larr;deepLink, outletId&larr;session</div>
           <div><b>GOES TO</b> &middot; WEB-001</div>
         </div>
       </div>
@@ -1060,7 +1060,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
             
             <div class="canvas">
               
-              <div class="two"><div class="grow"><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div></div><div class="panel"><span class="kind">detailPanel</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">One record, read-only.</span></div><div class="panel"><b>Cancel reservation</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">**Always confirms, never the default focus.** The consequence goes in the body — *cancel 3 orders worth AED 480* is a confirmation, *are you sure* is not.</span></div></div><div class="side"><div class="panel"><b>Cancel</b><div class="chip">Cancel</div><span class="why">**A screen that can submit must be leaveable without submitting.**</span></div></div></div>
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div></div><div class="panel"><span class="kind">detailPanel</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">One record, read-only.</span></div><div class="panel"><b>Cancel reservation</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">**Always confirms, never the default focus.** The consequence goes in the body — *cancel 3 orders worth AED 480* is a confirmation, *are you sure* is not.</span></div></div><div class="side"><div class="panel"><b>Cancel</b><div class="chip">Cancel</div><span class="why">**A screen that can submit must be leaveable without submitting.**</span></div><div class="panel"><b>Confirm</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">**The consequence goes in the body, not the title.** *Cancel 3 orders worth AED 480* is a confirmation; *are you sure* is not — and a dialog that cannot name what it dest</span></div></div></div>
             </div>
           </div>
         </div>
@@ -1242,14 +1242,14 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
       <div id="web-036" class="scr">
         <div>
           <div class="hdr"><span class="code">WEB-036</span>
-            <span class="ttl">F&amp;B — Browse &amp; Order</span></div>
+            <span class="ttl">F&amp;B – Browse &amp; Order</span></div>
           <div class="pur">Order food from a table, a lounger or a seat.</div>
         </div>
         <div class="frame">
           <aside class="rail"><div class="brand"><b>Guest</b><span>In-venue Services</span></div><nav class="nav"><i class="">What&#x27;s on</i><i class="on">My tickets</i><i class="">Food &amp; drink</i><i class="">Map</i><i class="">Help</i></nav></aside>
           <div class="body">
             <div class="top">
-              <div><h2>F&amp;B — Browse &amp; Order</h2>
+              <div><h2>F&amp;B – Browse &amp; Order</h2>
                 <small>Guest Web · wave 2 · compact</small></div>
               <div class="acts"><div class="chip">Sign in</div><div class="chip cta">Basket</div></div>
             </div>
@@ -1261,9 +1261,9 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; getGuestMenu · listDiningOutlets · listModifierGroups · claimLocationSession +3</div>
+          <div><b>OPERATIONS</b> &middot; getGuestMenu · listDiningOutlets · listModifierGroups · claimLocationSession +4</div>
           <div><b>STATES</b> &middot; <span class="">loading · emptyFirstRun · emptyNoResults · emptyNoAccess · error</span></div>
-          <div><b>ARRIVES WITH</b> &middot; outletId&larr;deepLink, venueId&larr;session</div>
+          <div><b>ARRIVES WITH</b> &middot; outletId&larr;deepLink, venueId&larr;session, orderId&larr;deepLink</div>
           <div><b>GOES TO</b> &middot; WEB-001</div>
         </div>
       </div>
@@ -1298,14 +1298,14 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
       <div id="web-038" class="scr">
         <div>
           <div class="hdr"><span class="code">WEB-038</span>
-            <span class="ttl">F&amp;B — Order Tracking</span></div>
+            <span class="ttl">F&amp;B – Order Tracking</span></div>
           <div class="pur">Watch it being made, and settle the bill.</div>
         </div>
         <div class="frame">
           <aside class="rail"><div class="brand"><b>Guest</b><span>In-venue Services</span></div><nav class="nav"><i class="">What&#x27;s on</i><i class="on">My tickets</i><i class="">Food &amp; drink</i><i class="">Map</i><i class="">Help</i></nav></aside>
           <div class="body">
             <div class="top">
-              <div><h2>F&amp;B — Order Tracking</h2>
+              <div><h2>F&amp;B – Order Tracking</h2>
                 <small>Guest Web · wave 2 · compact</small></div>
               <div class="acts"><div class="chip">Sign in</div><div class="chip cta">Basket</div></div>
             </div>
@@ -1326,7 +1326,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
       <div id="web-039" class="scr">
         <div>
           <div class="hdr"><span class="code">WEB-039</span>
-            <span class="ttl">Venue Map &amp; Wait Times</span><span class="pill">seat-3c</span></div>
+            <span class="ttl">Venue Map &amp; Wait Times</span><span class="pill">Seat Board 3.dc.html#seat-3c</span></div>
           <div class="pur">Where things are, and how long they take.</div>
         </div>
         <div class="frame">
@@ -1373,7 +1373,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; joinQueue · getQueueEntry · leaveQueue · getWaitTimes</div>
+          <div><b>OPERATIONS</b> &middot; joinQueue · getWaitingGuest · leaveQueue · getWaitTimes</div>
           <div><b>STATES</b> &middot; <span class="">loading · emptyFirstRun · emptyNoResults · emptyNoAccess · error</span></div>
           <div><b>ARRIVES WITH</b> &middot; entryId&larr;deepLink</div>
           <div><b>GOES TO</b> &middot; WEB-001</div>
@@ -1382,14 +1382,14 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
       <div id="web-041" class="scr">
         <div>
           <div class="hdr"><span class="code">WEB-041</span>
-            <span class="ttl">Parking — Reserve &amp; Pay</span></div>
+            <span class="ttl">Parking – Reserve &amp; Pay</span></div>
           <div class="pur">Reserve a facility before arriving.</div>
         </div>
         <div class="frame">
           <aside class="rail"><div class="brand"><b>Guest</b><span>In-venue Services</span></div><nav class="nav"><i class="">What&#x27;s on</i><i class="on">My tickets</i><i class="">Food &amp; drink</i><i class="">Map</i><i class="">Help</i></nav></aside>
           <div class="body">
             <div class="top">
-              <div><h2>Parking — Reserve &amp; Pay</h2>
+              <div><h2>Parking – Reserve &amp; Pay</h2>
                 <small>Guest Web · wave 2 · compact</small></div>
               <div class="acts"><div class="chip">Sign in</div><div class="chip cta">Basket</div></div>
             </div>

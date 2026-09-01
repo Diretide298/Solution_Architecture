@@ -1,0 +1,222 @@
+|  |  |
+| --- | --- |
+
+**Minutes of Meeting**
+
+*Workshop — Ticketing **&** Product Configuration (Ticket Catalog, Ticket Types, Validity, Capacity, Entitlements **&** Policies)*
+
+| **Date** | 25-August-2026 | **Project** | TICVAI |
+| --- | --- | --- | --- |
+| **Meeting Type** | Product Workshop — Ticketing & Product Configuration Deep-Dive | **Prepared by** | Chitrangi Mestry |
+
+**Primary Objective**
+
+To walk through the back-end product/ticketing configuration module in detail — how products and tickets are created, the full range of ticket types and their rules, validity and expiry management, capacity and performance management, entitlements and access control, eligibility rules, special product types, and the policies and approval workflow governing publication — so the team can align on configuration strategy ahead of build.
+
+**Participants**
+
+- TICVAI Team 
+
+- Softlabs Team 
+
+**Agenda**
+
+- Product/ticket catalog creation workflow — from scratch, templates, cloning, import from file, and AI-assisted draft creation
+
+- Ticket configuration reference — identity & classification, category hierarchy, localization, attributes/metadata, preview and publish flow
+
+- Ticket type deep-dive — open-dated, dated/special-day, time-slot (performance-based), multi-day, membership/pass, and camping/lesson-based tickets
+
+- Product combination matrix (guest category, admission tier, residency) and ownership/anonymity rules
+
+- Validity management and expiry rules
+
+- Performances, capacity management and AI-driven demand suggestions
+
+- Entitlements, access control and consumption tracking
+
+- Eligibility rules, special product types, membership lifecycle and stored value
+
+- Product relationships/bundles, add-ons, upsell/cross-sell, donation campaigns and policies
+
+- AI governance — approval workflow, versioning and rollback
+
+- Planning for the next session
+
+**4. Detailed Discussion**
+
+**4.1 Product / Ticket Catalog Creation**
+
+- Allam introduced the product lifecycle dashboard, showing overall counts of products in draft, in approval, and published status, with filters by venue/department — every product goes through an authorization step before it can be published online or on-site.
+
+- Reviewed the product creation wizard, offering four paths: create from scratch (step-by-step, field-by-field); create and save as a reusable template (e.g., an events template that can be replicated for each new event); clone an existing product (e.g., duplicating a general admission ticket to create a child ticket); and import from file, using a standard template shared with tenants/clients to collect their product and pricing information ahead of configuration.
+
+- **Action: **Allam to share the existing ticket configuration template (“technical data sheet,” with multiple sheets covering different information types) so the team can adapt it to TICVAI's own product strategy and database architecture.
+
+- **AI-assisted draft: **an AI wizard can ask the user what type of ticket they want to create and the relevant fields to capture, then auto-configure a draft ticket for review before approval and publish. Chinmay proposed extending this so the AI can also parse unstructured input (including OCR on images) and prompt the user for any missing details needed to complete the ticket — confirmed as a valid extension by Allam.
+
+- Chinmay noted the team already has a copy of the database schema showing which fields are captured for tickets, and will share it for cross-reference against the configuration template.
+
+**4.2 Ticket Configuration Reference**
+
+- Identity & classification: product name, product ID, main/sub-category, venue association (for multi-venue setups), and ticket type (single-day, multi-day, open-dated, performance-based).
+
+- Category hierarchy manager: packages and ticket types can be grouped and sorted under categories (e.g., admission > general admission > single-day, multi-day, annual pass, packages, vouchers).
+
+- Content localization: separate content (images, descriptions) can be configured per sales channel (POS vs. B2C/B2B) and per language (e.g., English/Arabic).
+
+- Attributes & metadata: configurable ticket-level attributes such as minimum age, ID-proof requirements (e.g., Emirates ID for UAE-resident tickets, with format validation or photo upload), or embedded ID-reader integration for on-site verification — confirmed these are configurable per region/ticket rather than fixed.
+
+- Preview & publish: a product-review/preview step shows how the ticket will appear on the B2C front end before publishing. Chinmay requested this preview also cover the PDF ticket layout and Apple Wallet / Google Wallet formats so the reviewer can see all output formats, not only the web preview — Allam confirmed this is feasible as a separate design association.
+
+**4.3 Ticket Type Deep-Dive**
+
+- Open-dated ticket: the simplest ticket type — name, description, price, and validity period (e.g., 1 day, 1 month, 6 months), with a configurable reservation rule controlling whether customer details (name, email, phone) are captured at point of sale.
+
+- Dated ticket with special-day setup: used for fixed-date tickets (e.g., a New Year ticket valid only on 1 January), with its own sales window and a configurable “allow date change” flag — typically disabled for special-day tickets given dedicated pricing, versus enabled for standard general-admission tickets.
+
+- **Decision: **date-change/reschedule policy will be a configurable, product-level on/off setting with its own policy rules (e.g., reschedule allowed up to 24 hours before visit, denied within 24 hours) rather than a separate dedicated screen — raised by Chinmay to reduce configuration complexity, agreed by Allam.
+
+- Time-slot (performance-based) ticket: requires configuration of early/late entry and an entry time window (e.g., entry allowed from 30 minutes before the event start until a defined cut-off).
+
+- Multi-day ticket: valid across multiple days/parks (e.g., a 3-day ticket), configurable as consecutive-day use or flexible use within a longer date range (e.g., any 3 days within a month).
+
+- Membership/pass ticket: seasonal, monthly, or annual membership classes with configurable renewal/auto-renewal, including tokenized card-on-file for auto-renewal billing ahead of expiry, subject to consent on terms and conditions.
+
+- Camping/lesson-based ticket: a performance-based ticket for recurring classes (e.g., ski or snowboard lessons held on a regular schedule), where the guest selects specific class dates/performances when purchasing a multi-lesson package.
+
+**4.4 Product Combination Matrix ****&**** Ownership**
+
+- Products are classified using fully configurable components (e.g., guest category, admission tier, residency) rather than a fixed/predefined structure — e.g., resident/non-resident, then standard/VIP tier, then adult/child/youth within each tier. New components can be added as needed; not every venue will use every component (e.g., a venue with a simple product strategy may only need guest category).
+
+- Ownership/anonymity: tickets can be configured as anonymous (no guest details required to purchase) or requiring captured details, depending on business need.
+
+**4.5 Validity Management ****&**** Expiry Rules**
+
+- Validity types include fixed date-range validity, variable/rolling validity (e.g., 90 days from date of issue), and first-use activation (validity period starts when the ticket is first scanned rather than at date of sale) — the latter commonly used for memberships that start on first use rather than date of purchase.
+
+- Weekday/calendar rules allow different validity and pricing for weekday-only vs. all-days products (e.g., Global Village's weekday vs. weekend-inclusive tickets).
+
+- **Confirmed: **a fallback/dynamic expiry rule is required for first-use-activation tickets — if a ticket is never scanned, it must still expire after a defined period (e.g., date of issue + 30 days) so revenue can be recognized rather than leaving tickets open indefinitely.
+
+- Blockout dates: certain ticket types (e.g., some memberships) can be excluded from use on public holidays or special event days, requiring the guest to purchase a separate ticket for those dates.
+
+**4.6 Performances ****&**** Capacity Management**
+
+- Performances (time slots) can be created individually or via a reusable time-slot template (e.g., every 30 minutes from a start to end time) that auto-generates the full schedule for an event.
+
+- Capacity is set by default at the event level and inherited by all performances created for that event, with the ability to override capacity for specific performances (e.g., higher capacity for evening slots).
+
+- **AI-driven suggestions: **based on sales forecasts, the system can recommend adding/removing time slots, merging under-sold adjacent slots (with guest notification of the time change), and applying dynamic pricing (e.g., increase price when a slot is more than ~80% sold, decrease when under ~20–30%).
+
+- Two distinct capacity types were distinguished: sales capacity (how many tickets can be sold per performance) and admission capacity (a real-time, scan-based count of guests currently inside the venue via entry/exit turnstiles), used to cap total on-site attendance independent of how many tickets were sold for the day.
+
+- **Decision: **venue-level admission capacity should supersede event-level capacity, with a system prompt/validation preventing an event from being configured or sold beyond the remaining venue capacity; overriding this will be an authorization-gated (role-based access control) action for authorized users only.
+
+- Inventory pool association allows capacity to be split by ticket type (e.g., 50% general admission, 30% child, 20% senior) and/or by sales channel (e.g., 50% of an event's capacity reserved for online sale, 50% for on-site), with a capacity hierarchy of global → attraction → product → variant → time slot.
+
+- Cancellation/reschedule handling: when a booking is cancelled, refunded, or rescheduled, the business can configure whether that slot's capacity is released back into inventory for resale or held.
+
+**4.7 Entitlements ****&**** Access Control**
+
+- Entitlements define what a ticket can redeem beyond admission — e.g., a combo ticket bundling park admission with an F&B item and a retail item, redeemed via QR-code scan at each respective counter.
+
+- Admission entitlements control number of entries permitted per ticket (e.g., maximum 2 entries); product entitlements define time-bound access to a specific experience (e.g., a 60-minute activity window starting from first scan).
+
+- F&B/retail entitlement via stored value: a combo product can bundle admission with a stored-value credit that the guest draws down against F&B or retail purchases (wallet mechanics to be covered in a dedicated session).
+
+- **Discussion (referral-to-wallet): **Chinmay raised whether referral rewards could be credited as currency/points directly into a guest's wallet (similar to consumer apps such as Swiggy), rather than only as a discount voucher. Qossai and Allam agreed this is a reasonable, business-configurable extension of the referral/loyalty entitlement model.
+
+- Check-in/check-out enforcement: if a guest exits without a matching checkout scan (e.g., a manually opened door), the system should flag and block a subsequent re-entry scan until check-in/check-out is properly reconciled.
+
+- A ticket look-up screen will show full consumption history for a ticket — transaction date/time, number of scans, expiry, and (if applicable) wallet balance and F&B/retail spend against that ticket.
+
+**4.8 Eligibility Rules, Special Products ****&**** Memberships**
+
+- Eligibility rules are fully configurable and can include residency/nationality/geography restrictions (e.g., UAE-resident-only tickets requiring Emirates ID capture), minimum age (e.g., date-of-birth check for a minimum age activity), guest-profile category (e.g., VIP-only products), and minimum loyalty points or spend to qualify for a membership tier.
+
+- Quantity and purchase limits can be set per order, per guest, per account category, and per sales channel (e.g., maximum 6 tickets per transaction).
+
+- Special product types — group tickets (configurable minimum/maximum group size, single or multiple QR codes), family tickets (configurable minimum/maximum composition), and corporate/allocation-based tickets — are managed within the same product configuration screen rather than requiring separate screens.
+
+- Membership lifecycle rules cover upgrade, downgrade, suspend (freezes validity until re-enabled), deactivate, and cancel, with configurable timing windows (e.g., upgrade allowed only in the final two months before expiry).
+
+- Stored value configuration covers minimum stored value, top-up maximum balance, expiry of stored balance, and refund destination (original payment method or credited back to wallet balance).
+
+**4.9 Bundles, Add-Ons, Donations ****&**** Policies**
+
+- Product relationships/bundles: multi-park and multi-attraction/multi-venue tickets can be visually mapped, showing which venues, meal vouchers, VIP parking, or upgrade options a bundle includes.
+
+- Add-ons, upsell and cross-sell: mandatory or optional add-ons can be attached to a main product; cross-sell offers related add-on products, while upsell proposes a higher-tier product (e.g., upselling an adult admission ticket to a membership).
+
+- Donation campaigns can be configured with fixed or variable amounts, enabled per sales channel, and triggered at a specific product level or across all products, with proceeds tracked to a separate account code.
+
+- **Open question (raised by Chinmay): **whether donation contributions should be taxable and require a taxation-module configuration — Allam's understanding is that donations are typically not taxable, but agreed the system should still support enabling/disabling a tax or service fee on donations if required. Chinmay to confirm the correct treatment.
+
+- Policy management covers reschedule, exchange, refund, cancellation, upgrade and downgrade rules, ownership transfer, and membership-to-pass conversion — all managed centrally rather than through separate screens.
+
+- Each product is also mapped to pricing, chart-of-accounts/GL account code, promotion/discount linkages, and sales-channel availability.
+
+**4.10 AI Governance ****&**** Publish Workflow**
+
+- The AI governance/dashboard view shows product counts by status (draft, pending approval, approved, published) and supports versioned publishing — each price, terms, or policy revision is tracked as a new version.
+
+- Role-based approval: publish rights are restricted to the user/department authorized to approve a given product change.
+
+- Version history and rollback: if a published change causes an issue, the system should support rolling back to a prior published version.
+
+**4.11 UX Simplification ****&**** Distributed Inventory**
+
+- **Requested: **Chinmay flagged that the number of configuration screens/pages should be reduced and related settings/toggles consolidated, to avoid an overly long, click-heavy configuration flow for admins; Allam agreed and referred the team to the previous system's demo as a starting reference for simplification.
+
+- **Confirmed (Chinmay Patkar): **inventory can be distributed across sales channels and will be configurable at the venue/event level.
+
+**5. Key Decisions ****&**** Agreements**
+
+- Date-change/reschedule behavior will be a configurable on/off setting with associated policy rules, not a dedicated separate screen.
+
+- Venue-level admission capacity will supersede event-level capacity, with a system-enforced validation and a role-based override for authorized users only.
+
+- Guest/ID-proof attributes (e.g., Emirates ID, passport, handicap/PoD documentation) are configurable per ticket and per region rather than fixed system behavior.
+
+- Special product types (group, family, corporate) and all policy types (reschedule, exchange, refund, cancellation, upgrade, downgrade) will be managed within the unified product configuration screen rather than separate dedicated screens.
+
+- Referral rewards may be extended to credit currency/points directly into a guest's wallet, in addition to discount vouchers, as a business-configurable option.
+
+- The preview/publish step will be extended to show PDF ticket and Apple Wallet / Google Wallet formats, not only the B2C web preview.
+
+**6. Open Items / Questions for Follow-Up**
+
+- VAT/tax treatment for donation contributions, and whether a taxation-module configuration is required — pending confirmation from Chinmay.
+
+- Simplified, reduced-click configuration flow proposal, referencing the previous system's demo — pending from Softlabs.
+
+- Ticket configuration template (“technical data sheet”) and database schema/field list cross-reference — pending exchange between Allam and Chinmay.
+
+- Hardware specification document — to be aligned internally by Allam/Qossai and presented to the team shortly after this session.
+
+- Events configuration document (sent separately) — to be reviewed given its overlap with today's ticketing discussion.
+
+**7. Action Items**
+
+| **Action Item** | **Owner** | **Due** | **Status** |
+| --- | --- | --- | --- |
+| Share the ticket configuration template (“technical data sheet”) with its different sheets, along with today's presentation slides, so the team can review the information captured per client | Allam | After this session | Open |
+| Share the database schema / form-field list currently captured for tickets, for cross-reference against the configuration template | Chinmay Parab | Next session | Open |
+| Review the previous-system product/ticket configuration demo and propose a simplified flow that reduces the number of pages/clicks for admin configuration | Chinmay Parab / Softlabs Team | Next session | Open |
+| Confirm VAT/tax treatment for donation contributions and whether a taxation-module configuration is required | Chinmay Parab | Next session | Open |
+| Share the events configuration document (sent separately to the team) covering event setup, since it overlaps closely with today's ticketing discussion | Qossai / Allam | After this session | Open |
+| Hold a short internal call to align on hardware specifications, then present to the team | Allam / Qossai | Same day (post-call) | Open |
+| Prepare and present wallet configuration and resource management / service allocation, plus hardware requirements | Allam | Next session (10:00 AM Dubai time) | Open |
+
+**8. Next Steps**
+
+- Next workshop session scheduled for 10:00 AM Dubai time, covering wallet configuration and resource management / service allocation, plus hardware requirements.
+
+- Allam and Qossai to hold a short internal alignment call on hardware specifications shortly after this session.
+
+- Events configuration document to be shared and reviewed given its close overlap with the ticketing configuration discussed today.
+
+*--- End of Minutes ---*
+
+Page  of

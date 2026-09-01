@@ -7,7 +7,7 @@
 | Screens | 37 |
 | Operations | 110 |
 | Contracts | 9 |
-| Modules | 2 |
+| Modules | 9 |
 | Undrawn | 0 |
 | Operations with no screen | 70 |
 | Waves | wave1 11 · wave2 16 · wave3 10 |
@@ -62,58 +62,68 @@
 | `listCellClusters` | subscription | GET | Clusters in a region |
 | … | | | 30 more |
 
-### 1 modules split across waves
+### 4 modules split across waves
 
 **A platform that sells in one wave and cannot refund until a later one can take money and not give it back.** Not always wrong — worth a look each time.
 
-- **TODO** — waves 1, 2, 3
+- **Infrastructure & Resilience** — waves 2, 3
+- **Overview & Health** — waves 1, 2
+- **Releases & Environments** — waves 1, 2, 3
+- **Tenants & Licensing** — waves 1, 2, 3
 
 ## Modules
 
 | Module | Screens | Waves |
 |---|---|---|
-| TODO | 36 | 1, 2, 3 |
+| Tenants & Licensing | 9 | 1, 2, 3 |
+| Releases & Environments | 7 | 1, 2, 3 |
+| Overview & Health | 5 | 1, 2 |
+| Infrastructure & Resilience | 4 | 2, 3 |
+| Branding & Localisation | 4 | 2 |
+| Access & Identity | 3 | 1 |
+| Security & Compliance | 2 | 3 |
+| Support & Communications | 2 | 3 |
 | AI | 1 | 1 |
 
 ## Screens
 
 | | Name | Module | Wave | Ops | Drawn |
 |---|---|---|---|---|---|
-| `ADM-001` | Platform Login / MFA | TODO | 1 | 8 | yes |
-| `ADM-002` | Platform Dashboard | TODO | 1 | 6 | yes |
-| `ADM-003` | Cross-Tenant Health Dashboard | TODO | 2 | 10 | yes |
-| `ADM-004` | Platform Audit Log | TODO | 2 | 1 | yes |
-| `ADM-005` | Tenant Directory | TODO | 1 | 15 | yes |
-| `ADM-006` | Tenant Hierarchy Explorer | TODO | 1 | 9 | yes |
-| `ADM-007` | Module & Feature Entitlement | TODO | 1 | 9 | yes |
-| `ADM-008` | Subscription & Plan Management | TODO | 1 | 19 | yes |
-| `ADM-009` | Tenant Billing & Invoicing | TODO | 2 | 9 | yes |
-| `ADM-010` | Usage Metering | TODO | 2 | 7 | yes |
-| `ADM-011` | Licence & Seat Management | TODO | 2 | 11 | yes |
-| `ADM-012` | Tenant Isolation & Resource Pool | TODO | 1 | 8 | yes |
-| `ADM-013` | Tenant Performance Monitor | TODO | 2 | 7 | yes |
-| `ADM-014` | Auto-Scaling Configuration | TODO | 3 | 7 | yes |
-| `ADM-015` | API Rate Limit & Quota Management | TODO | 3 | 9 | yes |
-| `ADM-016` | White-Label Branding Management | TODO | 2 | 11 | yes |
-| `ADM-017` | Domain & Certificate Management | TODO | 2 | 4 | yes |
-| `ADM-018` | Localisation & Language Pack | TODO | 2 | 5 | yes |
-| `ADM-019` | Global Configuration & Defaults | TODO | 2 | 4 | yes |
-| `ADM-020` | Platform User Directory | TODO | 1 | 4 | yes |
-| `ADM-021` | Platform Role Management | TODO | 1 | 2 | yes |
-| `ADM-022` | Release & Version Management | TODO | 2 | 7 | yes |
-| `ADM-023` | Staging Promotion & Approval | TODO | 2 | 7 | yes |
-| `ADM-024` | Release Notification Composer | TODO | 3 | 2 | yes |
-| `ADM-025` | Tenant Upgrade Scheduler | TODO | 2 | 2 | yes |
-| `ADM-026` | End-of-Support Notice Management | TODO | 3 | 2 | yes |
-| `ADM-027` | Database Migration Console | TODO | 1 | 6 | yes |
-| `ADM-028` | Environment Registry | TODO | 2 | 2 | yes |
-| `ADM-029` | Deployment Monitor | TODO | 2 | 12 | yes |
-| `ADM-030` | Infrastructure Sizing & Scaling Policy | TODO | 3 | 7 | yes |
-| `ADM-031` | Security & Compliance Dashboard | TODO | 3 | 4 | yes |
-| `ADM-032` | WAF & Security Policy View | TODO | 3 | 7 | yes |
-| `ADM-033` | Backup & DR Status | TODO | 2 | 7 | yes |
-| `ADM-034` | Archival Job Monitor | TODO | 3 | 7 | yes |
-| `ADM-035` | Support & Escalation Console | TODO | 3 | 2 | yes |
-| `ADM-036` | Platform Notification Broadcast | TODO | 3 | 2 | yes |
+| `ADM-001` | Platform Login / MFA | Access & Identity | 1 | 8 | yes |
+| `ADM-002` | Platform Dashboard | Overview & Health | 1 | 6 | yes |
+| `ADM-003` | Cross-Tenant Health Dashboard | Overview & Health | 2 | 10 | yes |
+| `ADM-004` | Platform Audit Log | Overview & Health | 2 | 1 | yes |
+| `ADM-005` | Tenant Directory | Tenants & Licensing | 1 | 15 | yes |
+| `ADM-006` | Tenant Hierarchy Explorer | Tenants & Licensing | 1 | 9 | yes |
+| `ADM-007` | Module & Feature Entitlement | Tenants & Licensing | 1 | 9 | yes |
+| `ADM-008` | Subscription & Plan Management | Tenants & Licensing | 1 | 19 | yes |
+| `ADM-009` | Tenant Billing & Invoicing | Tenants & Licensing | 2 | 9 | yes |
+| `ADM-010` | Usage Metering | Tenants & Licensing | 2 | 7 | yes |
+| `ADM-011` | Licence & Seat Management | Tenants & Licensing | 2 | 11 | yes |
+| `ADM-012` | Tenant Isolation & Resource Pool | Tenants & Licensing | 1 | 8 | yes |
+| `ADM-013` | Tenant Performance Monitor | Overview & Health | 2 | 7 | yes |
+| `ADM-014` | Auto-Scaling Configuration | Infrastructure & Resilience | 3 | 7 | yes |
+| `ADM-015` | API Rate Limit & Quota Management | Tenants & Licensing | 3 | 9 | yes |
+| `ADM-016` | White-Label Branding Management | Branding & Localisation | 2 | 11 | yes |
+| `ADM-017` | Domain & Certificate Management | Branding & Localisation | 2 | 4 | yes |
+| `ADM-018` | Localisation & Language Pack | Branding & Localisation | 2 | 5 | yes |
+| `ADM-019` | Global Configuration & Defaults | Branding & Localisation | 2 | 4 | yes |
+| `ADM-020` | Platform User Directory | Access & Identity | 1 | 4 | yes |
+| `ADM-021` | Platform Role Management | Access & Identity | 1 | 2 | yes |
+| `ADM-022` | Release & Version Management | Releases & Environments | 2 | 7 | yes |
+| `ADM-023` | Staging Promotion & Approval | Releases & Environments | 2 | 7 | yes |
+| `ADM-024` | Release Notification Composer | Releases & Environments | 3 | 2 | yes |
+| `ADM-025` | Tenant Upgrade Scheduler | Releases & Environments | 2 | 2 | yes |
+| `ADM-026` | End-of-Support Notice Management | Releases & Environments | 3 | 2 | yes |
+| `ADM-027` | Database Migration Console | Releases & Environments | 1 | 6 | yes |
+| `ADM-028` | Environment Registry | Releases & Environments | 2 | 2 | yes |
+| `ADM-029` | Deployment Monitor | Overview & Health | 2 | 12 | yes |
+| `ADM-030` | Infrastructure Sizing & Scaling Policy | Infrastructure & Resilience | 3 | 7 | yes |
+| `ADM-031` | Security & Compliance Dashboard | Security & Compliance | 3 | 4 | yes |
+| `ADM-032` | WAF & Security Policy View | Security & Compliance | 3 | 7 | yes |
+| `ADM-033` | Backup & DR Status | Infrastructure & Resilience | 2 | 7 | yes |
+| `ADM-034` | Archival Job Monitor | Infrastructure & Resilience | 3 | 7 | yes |
+| `ADM-035` | Support & Escalation Console | Support & Communications | 3 | 2 | yes |
+| `ADM-036` | Platform Notification Broadcast | Support & Communications | 3 | 2 | yes |
 | `ADM-037` | AI Provider & Credentials | AI | 1 | 4 | yes |
 

@@ -226,7 +226,7 @@ operations:
   - guest
   offline: false
   reads:
-  - catalogue.envelope
+  - catalogue.channel_capacity
   - catalogue.product
   - marketing.guest_profile
   - orders.cart

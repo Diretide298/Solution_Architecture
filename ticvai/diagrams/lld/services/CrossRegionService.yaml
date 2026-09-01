@@ -1,5 +1,5 @@
-id: LLD-CrossCellService
-title: CrossCellService — 16 operations, 1 tables
+id: LLD-CrossRegionService
+title: CrossRegionService — 16 operations, 1 tables
 generatedBy: tools/derive-diagrams.py
 tier: platform
 index: diagrams/hld/02-services.yaml
@@ -43,9 +43,9 @@ operationsByContract:
     offline: false
     reads: 2
     writes: 2
-  - operation: consumeRedemptionRight
+  - operation: consumeCrossRegionEntitlement
     verb: POST
-    path: /redemption-rights/{rightId}/consume
+    path: /cross-region-entitlements/{rightId}/consume
     scope: workstation
     permission: ACCESS_VALIDATE
     offline: true
@@ -67,6 +67,14 @@ operationsByContract:
     offline: false
     reads: 2
     writes: 2
+  - operation: getCrossRegionEntitlement
+    verb: GET
+    path: /cross-region-entitlements/{rightId}
+    scope: venue
+    permission: TICKET_LOOKUP
+    offline: true
+    reads: 1
+    writes: 0
   - operation: getDsarRequest
     verb: GET
     path: /dsar/requests/{requestId}
@@ -83,14 +91,6 @@ operationsByContract:
     offline: false
     reads: 1
     writes: 0
-  - operation: getRedemptionRight
-    verb: GET
-    path: /redemption-rights/{rightId}
-    scope: venue
-    permission: TICKET_LOOKUP
-    offline: true
-    reads: 1
-    writes: 0
   - operation: getWalletAllocation
     verb: GET
     path: /wallet-allocations
@@ -99,9 +99,9 @@ operationsByContract:
     offline: true
     reads: 1
     writes: 0
-  - operation: propagateRedemptionRight
+  - operation: propagateCrossRegionEntitlement
     verb: POST
-    path: /redemption-rights
+    path: /cross-region-entitlements
     scope: tenant
     permission: null
     offline: false
@@ -109,7 +109,7 @@ operationsByContract:
     writes: 2
   - operation: reconcileRedemptions
     verb: POST
-    path: /redemption-rights/reconcile
+    path: /cross-region-entitlements/reconcile
     scope: tenant
     permission: null
     offline: false
@@ -131,17 +131,17 @@ operationsByContract:
     offline: false
     reads: 1
     writes: 0
-  - operation: revokeGuestLink
+  - operation: revokeCrossRegionEntitlement
     verb: DELETE
-    path: /guest-links/{guestLinkId}
+    path: /cross-region-entitlements/{rightId}
     scope: tenant
     permission: null
     offline: false
     reads: 2
     writes: 2
-  - operation: revokeRedemptionRight
+  - operation: revokeGuestLink
     verb: DELETE
-    path: /redemption-rights/{rightId}
+    path: /guest-links/{guestLinkId}
     scope: tenant
     permission: null
     offline: false

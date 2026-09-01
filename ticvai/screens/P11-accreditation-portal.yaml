@@ -396,11 +396,6 @@ screens:
         impliedBy: listApprovalRequests
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
-      - kind: secondaryButton
-        label: Cancel
-        notes: '**A screen that can submit must be leaveable without submitting.**'
-        derived: true
-        impliedBy: decideApprovalRequest
   states:
     loading: Content loads
     emptyFirstRun: '**A venue that opened this morning.** Nothing here yet, and nothing on this screen

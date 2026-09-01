@@ -70,11 +70,6 @@ screens:
         impliedBy: listMfaMethods
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
-      - kind: secondaryButton
-        label: Cancel
-        notes: '**A screen that can submit must be leaveable without submitting.**'
-        derived: true
-        impliedBy: login
   states:
     loading: Biometric prompt, or SSO redirect
     emptyFirstRun: Not applicable
@@ -162,11 +157,6 @@ screens:
         impliedBy: listMfaMethods
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
-      - kind: secondaryButton
-        label: Cancel
-        notes: '**A screen that can submit must be leaveable without submitting.**'
-        derived: true
-        impliedBy: selectRole
   states:
     loading: Roles and venues for this principal
     emptyFirstRun: Only one role — skipped entirely
@@ -260,11 +250,6 @@ screens:
         impliedBy: acceptShiftVariance
         label: Accept shift variance
         notes: The act the screen exists for.
-      - kind: secondaryButton
-        label: Cancel
-        notes: '**A screen that can submit must be leaveable without submitting.**'
-        derived: true
-        impliedBy: acceptShiftVariance
   states:
     loading: Tiles skeleton. Shift state renders first
     emptyFirstRun: Nothing on today
@@ -432,11 +417,6 @@ screens:
         impliedBy: submitInspection
         label: Submit inspection
         notes: The act the screen exists for.
-      - kind: secondaryButton
-        label: Cancel
-        notes: '**A screen that can submit must be leaveable without submitting.**'
-        derived: true
-        impliedBy: submitInspection
   states:
     loading: Checklist items from the template
     emptyFirstRun: No checklist configured for this venue — a gap, shown as one
@@ -518,11 +498,6 @@ screens:
         impliedBy: listCashMovements
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
-      - kind: secondaryButton
-        label: Cancel
-        notes: '**A screen that can submit must be leaveable without submitting.**'
-        derived: true
-        impliedBy: closeShift
   states:
     loading: Closing
     emptyFirstRun: Not applicable
@@ -646,11 +621,6 @@ screens:
         derived: true
         impliedBy: overrideAccess
         notes: The act the screen exists for.
-      - kind: secondaryButton
-        label: Cancel
-        notes: '**A screen that can submit must be leaveable without submitting.**'
-        derived: true
-        impliedBy: syncScans
   states:
     loading: Instant. This screen must never wait
     emptyFirstRun: —
@@ -757,11 +727,21 @@ screens:
         label: Void order
         notes: '**Always confirms, never the default focus.** The consequence goes in the body — *cancel
           3 orders worth AED 480* is a confirmation, *are you sure* is not.'
-      - kind: secondaryButton
-        label: Cancel
-        notes: '**A screen that can submit must be leaveable without submitting.**'
-        derived: true
-        impliedBy: createOrder
+      - kind: confirmDialog
+        label: Void this order?
+        notes: '**The consequence goes in the body, not the title.** Written per operation on 1 September,
+          replacing one identical definition that had been pasted onto all 39 screens - the label read
+          *Confirm*, which is the *are you sure* the library entry rules out.
+
+
+          **Name the order, its line count and its value, and what happens to money already taken.**
+          Writes `orders.sales_order`, `orders.order_line` and `orders.payment`. **No event is emitted,
+          so the ledger is not told** - until `order.voided` exists this is a silent write and the confirmation
+          is the only place a person learns it.
+
+
+          **State:** `Order pending -> voided`.'
+        bindsTo: voidOrder
   states:
     loading: Local first, then server
     emptyFirstRun: No match
@@ -895,11 +875,6 @@ screens:
         derived: true
         impliedBy: overrideAccess
         notes: The act the screen exists for.
-      - kind: secondaryButton
-        label: Cancel
-        notes: '**A screen that can submit must be leaveable without submitting.**'
-        derived: true
-        impliedBy: syncScans
   states:
     loading: Party resolution
     emptyFirstRun: Party of one — falls through to a normal scan
@@ -1002,11 +977,6 @@ screens:
         derived: true
         impliedBy: overrideAccess
         notes: The act the screen exists for.
-      - kind: secondaryButton
-        label: Cancel
-        notes: '**A screen that can submit must be leaveable without submitting.**'
-        derived: true
-        impliedBy: syncScans
   states:
     loading: Sync in progress, with a count
     emptyFirstRun: Nothing to sync
@@ -1106,11 +1076,6 @@ screens:
         derived: true
         impliedBy: reportBundleApplied
         notes: The act the screen exists for.
-      - kind: secondaryButton
-        label: Cancel
-        notes: '**A screen that can submit must be leaveable without submitting.**'
-        derived: true
-        impliedBy: reportBundleApplied
   states:
     loading: Downloading, with size and progress
     emptyFirstRun: —
@@ -1201,11 +1166,19 @@ screens:
         label: Cancel work order
         notes: '**Always confirms, never the default focus.** The consequence goes in the body — *cancel
           3 orders worth AED 480* is a confirmation, *are you sure* is not.'
-      - kind: secondaryButton
-        label: Cancel
-        notes: '**A screen that can submit must be leaveable without submitting.**'
-        derived: true
-        impliedBy: acceptWorkOrder
+      - kind: confirmDialog
+        label: Cancel this work order?
+        notes: '**The consequence goes in the body, not the title.** Written per operation on 1 September,
+          replacing one identical definition that had been pasted onto all 39 screens - the label read
+          *Confirm*, which is the *are you sure* the library entry rules out.
+
+
+          **Name the work order, the asset and the assigned technician.** A cancelled work order on
+          an out-of-service asset leaves the asset out of service - say so. No event is emitted.
+
+
+          **State:** `Work order open/assigned -> cancelled`.'
+        bindsTo: cancelWorkOrder
   states:
     loading: List skeleton
     emptyFirstRun: No tasks assigned — offers available work rather than nothing
@@ -1348,11 +1321,19 @@ screens:
         impliedBy: listWorkOrders
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
-      - kind: secondaryButton
-        label: Cancel
-        notes: '**A screen that can submit must be leaveable without submitting.**'
-        derived: true
-        impliedBy: startWorkOrder
+      - kind: confirmDialog
+        label: Cancel this work order?
+        notes: '**The consequence goes in the body, not the title.** Written per operation on 1 September,
+          replacing one identical definition that had been pasted onto all 39 screens - the label read
+          *Confirm*, which is the *are you sure* the library entry rules out.
+
+
+          **Name the work order, the asset and the assigned technician.** A cancelled work order on
+          an out-of-service asset leaves the asset out of service - say so. No event is emitted.
+
+
+          **State:** `Work order open/assigned -> cancelled`.'
+        bindsTo: cancelWorkOrder
   states:
     loading: Detail skeleton
     emptyFirstRun: Not applicable
@@ -1499,11 +1480,19 @@ screens:
         impliedBy: listWorkOrders
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
-      - kind: secondaryButton
-        label: Cancel
-        notes: '**A screen that can submit must be leaveable without submitting.**'
-        derived: true
-        impliedBy: createWorkOrder
+      - kind: confirmDialog
+        label: Cancel this work order?
+        notes: '**The consequence goes in the body, not the title.** Written per operation on 1 September,
+          replacing one identical definition that had been pasted onto all 39 screens - the label read
+          *Confirm*, which is the *are you sure* the library entry rules out.
+
+
+          **Name the work order, the asset and the assigned technician.** A cancelled work order on
+          an out-of-service asset leaves the asset out of service - say so. No event is emitted.
+
+
+          **State:** `Work order open/assigned -> cancelled`.'
+        bindsTo: cancelWorkOrder
   states:
     loading: Form
     emptyFirstRun: Not applicable
@@ -1641,11 +1630,6 @@ screens:
         impliedBy: publishAnnouncement
         label: Publish announcement
         notes: The act the screen exists for.
-      - kind: secondaryButton
-        label: Cancel
-        notes: '**A screen that can submit must be leaveable without submitting.**'
-        derived: true
-        impliedBy: publishAnnouncement
   states:
     loading: Notes load
     emptyFirstRun: No notes from the previous shift
@@ -1732,11 +1716,6 @@ screens:
         derived: true
         impliedBy: suspendShift
         notes: The act the screen exists for.
-      - kind: secondaryButton
-        label: Cancel
-        notes: '**A screen that can submit must be leaveable without submitting.**'
-        derived: true
-        impliedBy: suspendShift
   states:
     loading: Shift totals
     emptyFirstRun: No shift open
@@ -1828,11 +1807,6 @@ screens:
         impliedBy: createAiConversation
         label: Create ai conversation
         notes: The act the screen exists for.
-      - kind: secondaryButton
-        label: Cancel
-        notes: '**A screen that can submit must be leaveable without submitting.**'
-        derived: true
-        impliedBy: createAiConversation
   states:
     loading: Conversations load
     emptyFirstRun: No history — explains what the assistant can answer
@@ -1915,11 +1889,6 @@ screens:
         impliedBy: listAiConversations
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
-      - kind: secondaryButton
-        label: Cancel
-        notes: '**A screen that can submit must be leaveable without submitting.**'
-        derived: true
-        impliedBy: sendAiMessage
   states:
     loading: Streaming the answer
     emptyFirstRun: —
@@ -2005,11 +1974,6 @@ screens:
         derived: true
         impliedBy: callNextParties
         notes: The act the screen exists for.
-      - kind: secondaryButton
-        label: Cancel
-        notes: '**A screen that can submit must be leaveable without submitting.**'
-        derived: true
-        impliedBy: callNextParties
   states:
     loading: Queues and waits
     emptyFirstRun: No queues configured
@@ -2113,11 +2077,6 @@ screens:
         impliedBy: listQueueEntries
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
-      - kind: secondaryButton
-        label: Cancel
-        notes: '**A screen that can submit must be leaveable without submitting.**'
-        derived: true
-        impliedBy: setWaitTime
   states:
     loading: —
     emptyFirstRun: —
@@ -2210,19 +2169,14 @@ screens:
         notes: Structure from the wireframe board. Components not yet enumerated.
       - kind: dataTable
         derived: true
-        impliedBy: listEnvelopes
+        impliedBy: listChannelCapacities
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
       - kind: primaryButton
         derived: true
-        impliedBy: createEnvelope
+        impliedBy: createChannelCapacity
         label: Create envelope
         notes: The act the screen exists for.
-      - kind: secondaryButton
-        label: Cancel
-        notes: '**A screen that can submit must be leaveable without submitting.**'
-        derived: true
-        impliedBy: createEnvelope
   states:
     loading: Capacity by area
     emptyFirstRun: —
@@ -2261,7 +2215,7 @@ screens:
     component: apps/venue-staff-app/src/routes/operations/CapacityViewDetail.tsx
     status: notStarted
   apis:
-  - operationId: listEnvelopes
+  - operationId: listChannelCapacities
     contract: catalogue
     purpose: List capacity envelopes
     trigger: onLoad
@@ -2269,7 +2223,7 @@ screens:
     contract: catalogue
     purpose: Capacity allocated to each channel
     trigger: onLoad
-  - operationId: createEnvelope
+  - operationId: createChannelCapacity
     contract: catalogue
     purpose: Create a capacity envelope
     trigger: onAction
@@ -2281,20 +2235,20 @@ screens:
     contract: catalogue
     purpose: Allocate envelope capacity across channels
     trigger: onAction
-  - operationId: updateEnvelope
+  - operationId: updateChannelCapacity
     contract: catalogue
     purpose: Amend an envelope
     trigger: onAction
   density: comfortable
   entryState:
     params:
-    - name: envelopeId
+    - name: channelCapacityId
       from: deepLink
     coldEntry: '**A staff link opened cold resolves the thing or says plainly that it is gone.** No
       silent redirect — a supervisor following a link from an alert needs to know whether the record
       moved, closed or never existed, because those are three different next actions. **The scope is
       resolved from the session, never from the link**: a link cannot move somebody to a venue they
-      do not hold. Arrives with `envelopeId`.'
+      do not hold. Arrives with `channelCapacityId`.'
   requiresModule: ticketing
   statesDerived: true
 - id: EMP-034
@@ -2326,11 +2280,21 @@ screens:
         label: Void order
         notes: '**Always confirms, never the default focus.** The consequence goes in the body — *cancel
           3 orders worth AED 480* is a confirmation, *are you sure* is not.'
-      - kind: secondaryButton
-        label: Cancel
-        notes: '**A screen that can submit must be leaveable without submitting.**'
-        derived: true
-        impliedBy: createOrder
+      - kind: confirmDialog
+        label: Void this order?
+        notes: '**The consequence goes in the body, not the title.** Written per operation on 1 September,
+          replacing one identical definition that had been pasted onto all 39 screens - the label read
+          *Confirm*, which is the *are you sure* the library entry rules out.
+
+
+          **Name the order, its line count and its value, and what happens to money already taken.**
+          Writes `orders.sales_order`, `orders.order_line` and `orders.payment`. **No event is emitted,
+          so the ledger is not told** - until `order.voided` exists this is a silent write and the confirmation
+          is the only place a person learns it.
+
+
+          **State:** `Order pending -> voided`.'
+        bindsTo: voidOrder
   states:
     loading: Products load
     emptyFirstRun: Nothing sellable from this device
@@ -2491,11 +2455,6 @@ screens:
         impliedBy: createPayment
         label: Create payment
         notes: The act the screen exists for.
-      - kind: secondaryButton
-        label: Cancel
-        notes: '**A screen that can submit must be leaveable without submitting.**'
-        derived: true
-        impliedBy: createPayment
   states:
     loading: Terminal state
     emptyFirstRun: —
@@ -2577,11 +2536,6 @@ screens:
         derived: true
         impliedBy: appendEntitlementToMedia
         notes: The act the screen exists for.
-      - kind: secondaryButton
-        label: Cancel
-        notes: '**A screen that can submit must be leaveable without submitting.**'
-        derived: true
-        impliedBy: appendEntitlementToMedia
   states:
     loading: —
     emptyFirstRun: —
@@ -2667,11 +2621,6 @@ screens:
         derived: true
         impliedBy: acknowledgeAnnouncement
         notes: The act the screen exists for.
-      - kind: secondaryButton
-        label: Cancel
-        notes: '**A screen that can submit must be leaveable without submitting.**'
-        derived: true
-        impliedBy: acknowledgeAnnouncement
   states:
     loading: Notifications load
     emptyFirstRun: Nothing new
@@ -2756,11 +2705,6 @@ screens:
         derived: true
         impliedBy: acknowledgeAnnouncement
         notes: The act the screen exists for.
-      - kind: secondaryButton
-        label: Cancel
-        notes: '**A screen that can submit must be leaveable without submitting.**'
-        derived: true
-        impliedBy: acknowledgeAnnouncement
   states:
     loading: Announcements load
     emptyFirstRun: None
@@ -2846,11 +2790,6 @@ screens:
         derived: true
         impliedBy: acknowledgeAnnouncement
         notes: The act the screen exists for.
-      - kind: secondaryButton
-        label: Cancel
-        notes: '**A screen that can submit must be leaveable without submitting.**'
-        derived: true
-        impliedBy: acknowledgeAnnouncement
   states:
     loading: Instant. This screen preempts everything
     emptyFirstRun: Not applicable
@@ -2935,11 +2874,6 @@ screens:
         derived: true
         impliedBy: recordAuthorityNotification
         notes: The act the screen exists for.
-      - kind: secondaryButton
-        label: Cancel
-        notes: '**A screen that can submit must be leaveable without submitting.**'
-        derived: true
-        impliedBy: recordAuthorityNotification
   states:
     loading: —
     emptyFirstRun: —
@@ -3031,11 +2965,6 @@ screens:
         derived: true
         impliedBy: requestShiftSwap
         notes: The act the screen exists for.
-      - kind: secondaryButton
-        label: Cancel
-        notes: '**A screen that can submit must be leaveable without submitting.**'
-        derived: true
-        impliedBy: requestShiftSwap
   states:
     loading: Roster loads
     emptyFirstRun: Nobody rostered
@@ -3115,11 +3044,6 @@ screens:
         derived: true
         impliedBy: requestShiftSwap
         notes: The act the screen exists for.
-      - kind: secondaryButton
-        label: Cancel
-        notes: '**A screen that can submit must be leaveable without submitting.**'
-        derived: true
-        impliedBy: requestShiftSwap
   states:
     loading: My assignments
     emptyFirstRun: Nothing assigned
@@ -3199,11 +3123,6 @@ screens:
         impliedBy: listRotaAssignments
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
-      - kind: secondaryButton
-        label: Cancel
-        notes: '**A screen that can submit must be leaveable without submitting.**'
-        derived: true
-        impliedBy: requestShiftSwap
   states:
     loading: —
     emptyFirstRun: —
@@ -3283,11 +3202,6 @@ screens:
         impliedBy: listAttendance
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
-      - kind: secondaryButton
-        label: Cancel
-        notes: '**A screen that can submit must be leaveable without submitting.**'
-        derived: true
-        impliedBy: recordAttendance
   states:
     loading: —
     emptyFirstRun: —
@@ -3369,11 +3283,6 @@ screens:
         impliedBy: listAttendance
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
-      - kind: secondaryButton
-        label: Cancel
-        notes: '**A screen that can submit must be leaveable without submitting.**'
-        derived: true
-        impliedBy: recordAttendance
   states:
     loading: —
     emptyFirstRun: —
@@ -3452,11 +3361,6 @@ screens:
         impliedBy: listIncidents
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
-      - kind: secondaryButton
-        label: Cancel
-        notes: '**A screen that can submit must be leaveable without submitting.**'
-        derived: true
-        impliedBy: reportIncident
   states:
     loading: Form
     emptyFirstRun: Not applicable
@@ -3553,11 +3457,6 @@ screens:
         impliedBy: listIncidents
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
-      - kind: secondaryButton
-        label: Cancel
-        notes: '**A screen that can submit must be leaveable without submitting.**'
-        derived: true
-        impliedBy: updateIncident
   states:
     loading: Incident detail
     emptyFirstRun: —
@@ -3648,11 +3547,6 @@ screens:
         impliedBy: listCases
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
-      - kind: secondaryButton
-        label: Cancel
-        notes: '**A screen that can submit must be leaveable without submitting.**'
-        derived: true
-        impliedBy: createCase
   states:
     loading: Items load
     emptyFirstRun: Nothing logged
@@ -3754,11 +3648,6 @@ screens:
         impliedBy: listCases
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
-      - kind: secondaryButton
-        label: Cancel
-        notes: '**A screen that can submit must be leaveable without submitting.**'
-        derived: true
-        impliedBy: reportIncident
   states:
     loading: —
     emptyFirstRun: —
@@ -3956,7 +3845,7 @@ screens:
   requiresModule: ticketing
   statesDerived: true
   boardFrames:
-  - seat-4c
+  - Seat Board 4.dc.html#seat-4c
 - id: EMP-038
   name: Broadcast to team
   module: Operations
@@ -3980,11 +3869,6 @@ screens:
         impliedBy: listAnnouncements
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
-      - kind: secondaryButton
-        label: Cancel
-        notes: '**A screen that can submit must be leaveable without submitting.**'
-        derived: true
-        impliedBy: publishAnnouncement
   states:
     loading: —
     emptyFirstRun: —
@@ -4064,11 +3948,6 @@ screens:
         derived: true
         impliedBy: semanticSearch
         notes: The act the screen exists for.
-      - kind: secondaryButton
-        label: Cancel
-        notes: '**A screen that can submit must be leaveable without submitting.**'
-        derived: true
-        impliedBy: semanticSearch
   states:
     loading: Search results
     emptyFirstRun: No articles match
@@ -4126,11 +4005,6 @@ screens:
         derived: true
         impliedBy: semanticSearch
         notes: The act the screen exists for.
-      - kind: secondaryButton
-        label: Cancel
-        notes: '**A screen that can submit must be leaveable without submitting.**'
-        derived: true
-        impliedBy: semanticSearch
   states:
     loading: Modules load
     emptyFirstRun: Nothing assigned
@@ -4267,11 +4141,6 @@ screens:
         derived: true
         impliedBy: registerDevice
         notes: The act the screen exists for.
-      - kind: secondaryButton
-        label: Cancel
-        notes: '**A screen that can submit must be leaveable without submitting.**'
-        derived: true
-        impliedBy: registerDevice
   states:
     loading: Device state
     emptyFirstRun: —
@@ -4423,11 +4292,6 @@ screens:
         derived: true
         impliedBy: logout
         notes: The act the screen exists for.
-      - kind: secondaryButton
-        label: Cancel
-        notes: '**A screen that can submit must be leaveable without submitting.**'
-        derived: true
-        impliedBy: logout
   states:
     loading: Closing the session
     emptyFirstRun: —
@@ -4476,11 +4340,6 @@ screens:
         notes: '**A screen that validates a credential needs somewhere to point the camera.** `denied`
           and `hardwareError` look different because an operator facing a guest needs to know whether
           to try again or explain something.'
-      - kind: secondaryButton
-        label: Cancel
-        notes: '**A screen that can submit must be leaveable without submitting.**'
-        derived: true
-        impliedBy: syncScans
   states:
     loading: Journal summary
     emptyFirstRun: Nothing journalled
@@ -4589,14 +4448,22 @@ screens:
     component: apps/venue-staff-app/src/routes/operations/RestaurantServiceCommandCenterDetail.tsx
     status: notStarted
   wireframe:
-    status: generated
-    board: wireframes/P06 Venue Staff App.dc.html#emp-051
+    status: designed
+    board: wireframes/FnB Board 4.dc.html#fnb-4a
+    generatedFallback: wireframes/P06 Venue Staff App.dc.html#emp-051
   provenance: client board, named only
   notes: '**Added 20 August from the client design board.** P06 had no table or stock operations at
     all — **twenty screens of floor work with nothing behind them** — and every operation these need
-    already existed. **Named in the board contents and not written up in it.**'
+    already existed. **Named in the board contents and not written up in it.** **Drawn 31 August** —
+    `FnB Board 4.dc.html` frame `fnb-4a`. **Matched on frame title against screen name, constrained
+    to this board’s platforms.** These packs label by board position (`GM-6C`) rather than naming the
+    screen, so the title is the only join — *Restaurant Service Command Center* matched at 1.0. **A
+    cross-platform title match was refused**: `Outlet Management` scored 0.85 against a partner-portal
+    screen, which is how a mapping goes wrong quietly.'
   requiresModule: fnb
   statesDerived: true
+  boardFrames:
+  - FnB Board 4.dc.html#fnb-4a
 - id: EMP-052
   name: Floor Plan & Table Map
   module: Floor Service
@@ -4656,14 +4523,21 @@ screens:
     component: apps/venue-staff-app/src/routes/operations/FloorPlanTableMapDetail.tsx
     status: notStarted
   wireframe:
-    status: generated
-    board: wireframes/P06 Venue Staff App.dc.html#emp-052
+    status: designed
+    board: wireframes/FnB Board 4.dc.html#fnb-4b
+    generatedFallback: wireframes/P06 Venue Staff App.dc.html#emp-052
   provenance: client board, specified
   notes: '**Added 20 August from the client design board.** P06 had no table or stock operations at
     all — **twenty screens of floor work with nothing behind them** — and every operation these need
-    already existed.'
+    already existed. **Drawn 31 August** — `FnB Board 4.dc.html` frame `fnb-4b`. **Matched on frame
+    title against screen name, constrained to this board’s platforms.** These packs label by board position
+    (`GM-6C`) rather than naming the screen, so the title is the only join — *Floor Plan &amp; Table
+    Map* matched at 1.0. **A cross-platform title match was refused**: `Outlet Management` scored 0.85
+    against a partner-portal screen, which is how a mapping goes wrong quietly.'
   requiresModule: fnb
   statesDerived: true
+  boardFrames:
+  - FnB Board 4.dc.html#fnb-4b
 - id: EMP-053
   name: Table & Seating Configuration
   module: Floor Service
@@ -4719,14 +4593,22 @@ screens:
     component: apps/venue-staff-app/src/routes/operations/TableSeatingConfigurationDetail.tsx
     status: notStarted
   wireframe:
-    status: generated
-    board: wireframes/P06 Venue Staff App.dc.html#emp-053
+    status: designed
+    board: wireframes/FnB Board 4.dc.html#fnb-4c
+    generatedFallback: wireframes/P06 Venue Staff App.dc.html#emp-053
   provenance: client board, named only
   notes: '**Added 20 August from the client design board.** P06 had no table or stock operations at
     all — **twenty screens of floor work with nothing behind them** — and every operation these need
-    already existed. **Named in the board contents and not written up in it.**'
+    already existed. **Named in the board contents and not written up in it.** **Drawn 31 August** —
+    `FnB Board 4.dc.html` frame `fnb-4c`. **Matched on frame title against screen name, constrained
+    to this board’s platforms.** These packs label by board position (`GM-6C`) rather than naming the
+    screen, so the title is the only join — *Table &amp; Seating Configuration* matched at 1.0. **A
+    cross-platform title match was refused**: `Outlet Management` scored 0.85 against a partner-portal
+    screen, which is how a mapping goes wrong quietly.'
   requiresModule: fnb
   statesDerived: true
+  boardFrames:
+  - FnB Board 4.dc.html#fnb-4c
 - id: EMP-054
   name: Reservation Calendar & Timeline
   module: Floor Service
@@ -4780,14 +4662,21 @@ screens:
     component: apps/venue-staff-app/src/routes/operations/ReservationCalendarTimelineDetail.tsx
     status: notStarted
   wireframe:
-    status: generated
-    board: wireframes/P06 Venue Staff App.dc.html#emp-054
+    status: designed
+    board: wireframes/FnB Board 4.dc.html#fnb-4d
+    generatedFallback: wireframes/P06 Venue Staff App.dc.html#emp-054
   provenance: client board, specified
   notes: '**Added 20 August from the client design board.** P06 had no table or stock operations at
     all — **twenty screens of floor work with nothing behind them** — and every operation these need
-    already existed.'
+    already existed. **Drawn 31 August** — `FnB Board 4.dc.html` frame `fnb-4d`. **Matched on frame
+    title against screen name, constrained to this board’s platforms.** These packs label by board position
+    (`GM-6C`) rather than naming the screen, so the title is the only join — *Reservation Calendar &amp;
+    Timeline* matched at 1.0. **A cross-platform title match was refused**: `Outlet Management` scored
+    0.85 against a partner-portal screen, which is how a mapping goes wrong quietly.'
   requiresModule: fnb
   statesDerived: true
+  boardFrames:
+  - FnB Board 4.dc.html#fnb-4d
 - id: EMP-055
   name: Create / Edit Reservation
   module: Floor Service
@@ -4841,14 +4730,22 @@ screens:
     component: apps/venue-staff-app/src/routes/operations/CreateEditReservationDetail.tsx
     status: notStarted
   wireframe:
-    status: generated
-    board: wireframes/P06 Venue Staff App.dc.html#emp-055
+    status: designed
+    board: wireframes/FnB Board 4.dc.html#fnb-4e
+    generatedFallback: wireframes/P06 Venue Staff App.dc.html#emp-055
   provenance: client board, named only
   notes: '**Added 20 August from the client design board.** P06 had no table or stock operations at
     all — **twenty screens of floor work with nothing behind them** — and every operation these need
-    already existed. **Named in the board contents and not written up in it.**'
+    already existed. **Named in the board contents and not written up in it.** **Drawn 31 August** —
+    `FnB Board 4.dc.html` frame `fnb-4e`. **Matched on frame title against screen name, constrained
+    to this board’s platforms.** These packs label by board position (`GM-6C`) rather than naming the
+    screen, so the title is the only join — *Create / Edit Reservation* matched at 1.0. **A cross-platform
+    title match was refused**: `Outlet Management` scored 0.85 against a partner-portal screen, which
+    is how a mapping goes wrong quietly.'
   requiresModule: fnb
   statesDerived: true
+  boardFrames:
+  - FnB Board 4.dc.html#fnb-4e
 - id: EMP-056
   name: Walk-In & Waitlist Management
   module: Floor Service
@@ -4902,14 +4799,21 @@ screens:
     component: apps/venue-staff-app/src/routes/operations/WalkInWaitlistManagementDetail.tsx
     status: notStarted
   wireframe:
-    status: generated
-    board: wireframes/P06 Venue Staff App.dc.html#emp-056
+    status: designed
+    board: wireframes/FnB Board 4.dc.html#fnb-4f
+    generatedFallback: wireframes/P06 Venue Staff App.dc.html#emp-056
   provenance: client board, specified
   notes: '**Added 20 August from the client design board.** P06 had no table or stock operations at
     all — **twenty screens of floor work with nothing behind them** — and every operation these need
-    already existed.'
+    already existed. **Drawn 31 August** — `FnB Board 4.dc.html` frame `fnb-4f`. **Matched on frame
+    title against screen name, constrained to this board’s platforms.** These packs label by board position
+    (`GM-6C`) rather than naming the screen, so the title is the only join — *Walk-In &amp; Waitlist
+    Management* matched at 1.0. **A cross-platform title match was refused**: `Outlet Management` scored
+    0.85 against a partner-portal screen, which is how a mapping goes wrong quietly.'
   requiresModule: fnb
   statesDerived: true
+  boardFrames:
+  - FnB Board 4.dc.html#fnb-4f
 - id: EMP-057
   name: Guest Profile & Dining History
   module: Floor Service
@@ -4969,14 +4873,22 @@ screens:
     component: apps/venue-staff-app/src/routes/operations/GuestProfileDiningHistoryDetail.tsx
     status: notStarted
   wireframe:
-    status: generated
-    board: wireframes/P06 Venue Staff App.dc.html#emp-057
+    status: designed
+    board: wireframes/FnB Board 4.dc.html#fnb-4g
+    generatedFallback: wireframes/P06 Venue Staff App.dc.html#emp-057
   provenance: client board, named only
   notes: '**Added 20 August from the client design board.** P06 had no table or stock operations at
     all — **twenty screens of floor work with nothing behind them** — and every operation these need
-    already existed. **Named in the board contents and not written up in it.**'
+    already existed. **Named in the board contents and not written up in it.** **Drawn 31 August** —
+    `FnB Board 4.dc.html` frame `fnb-4g`. **Matched on frame title against screen name, constrained
+    to this board’s platforms.** These packs label by board position (`GM-6C`) rather than naming the
+    screen, so the title is the only join — *Guest Profile &amp; Dining History* matched at 1.0. **A
+    cross-platform title match was refused**: `Outlet Management` scored 0.85 against a partner-portal
+    screen, which is how a mapping goes wrong quietly.'
   requiresModule: marketing
   statesDerived: true
+  boardFrames:
+  - FnB Board 4.dc.html#fnb-4g
 - id: EMP-058
   name: Live Table & Service Management
   module: Floor Service
@@ -5120,9 +5032,9 @@ screens:
     rather than a screen pretending there is a link.'
   requiresModule: fnb
   boardFrames:
-  - FNB-4A
-  - FNB-4B
-  - FNB-4H
+  - FnB Board 4.dc.html#fnb-4a
+  - FnB Board 4.dc.html#fnb-4b
+  - FnB Board 4.dc.html#fnb-4h
   statesDerived: true
 - id: EMP-059
   name: Table Order, Bill & Payment Management
@@ -5216,7 +5128,7 @@ screens:
     how 92 operations reached 49% of screens.'
   requiresModule: fnb
   boardFrames:
-  - FNB-4J
+  - FnB Board 4.dc.html#fnb-4j
   statesDerived: true
 - id: EMP-060
   name: Reservation & Table Performance
@@ -5287,7 +5199,7 @@ screens:
     already existed. **Named in the board contents and not written up in it.**'
   requiresModule: fnb
   boardFrames:
-  - FNB-4C
+  - FnB Board 4.dc.html#fnb-4c
   statesDerived: true
 - id: EMP-061
   name: Retail Inventory Command Center
@@ -5356,8 +5268,8 @@ screens:
     already existed. **Named in the board contents and not written up in it.**'
   requiresModule: inventory
   boardFrames:
-  - FNB-4D
-  - FNB-4E
+  - FnB Board 4.dc.html#fnb-4d
+  - FnB Board 4.dc.html#fnb-4e
   statesDerived: true
 - id: EMP-062
   name: Store Stock & SKU Availability
@@ -5440,7 +5352,7 @@ screens:
     2, and a due-checks list that cannot reach the recording screen is a list nobody acts on.'
   requiresModule: fnb
   boardFrames:
-  - FNB-5J
+  - FnB Board 5.dc.html#fnb-5j
   statesDerived: true
 - id: EMP-063
   name: Requisition & Smart Store Replenishment
@@ -5509,7 +5421,7 @@ screens:
     already existed.'
   requiresModule: inventory
   boardFrames:
-  - FNB-4F
+  - FnB Board 4.dc.html#fnb-4f
   statesDerived: true
 - id: EMP-064
   name: Store-to-Store & Warehouse Transfers
@@ -5578,7 +5490,7 @@ screens:
     already existed.'
   requiresModule: inventory
   boardFrames:
-  - FNB-4G
+  - FnB Board 4.dc.html#fnb-4g
   statesDerived: true
 - id: EMP-065
   name: Receiving & Store Put-Away
@@ -5663,7 +5575,7 @@ screens:
     pack, and **HACCP is a regulatory obligation nothing in the package touched.**'
   requiresModule: inventory
   boardFrames:
-  - FNB-5G
+  - FnB Board 5.dc.html#fnb-5g
   statesDerived: true
 - id: EMP-066
   name: Stock Count & Cycle Count Management
@@ -5740,15 +5652,23 @@ screens:
     component: apps/venue-staff-app/src/routes/operations/StockCountCycleCountManagementDetail.tsx
     status: notStarted
   wireframe:
-    status: generated
-    board: wireframes/P06 Venue Staff App.dc.html#emp-066
+    status: designed
+    board: wireframes/Retail Board 4.dc.html#ret-4f
+    generatedFallback: wireframes/P06 Venue Staff App.dc.html#emp-066
   provenance: client board, specified
   notes: '**Added 20 August from the client design board.** P06 had no table or stock operations at
     all — **twenty screens of floor work with nothing behind them** — and every operation these need
     already existed. **Operations from the 24 August F&B build wired here** — the contract grew and
-    the screens had not caught up, which is how 92 operations reached 49% of screens.'
+    the screens had not caught up, which is how 92 operations reached 49% of screens. **Drawn 31 August**
+    — `Retail Board 4.dc.html` frame `ret-4f`. **Matched on frame title against screen name, constrained
+    to this board’s platforms.** These packs label by board position (`GM-6C`) rather than naming the
+    screen, so the title is the only join — *Stock Count &amp; Cycle Count Management* matched at 1.0.
+    **A cross-platform title match was refused**: `Outlet Management` scored 0.85 against a partner-portal
+    screen, which is how a mapping goes wrong quietly.'
   requiresModule: inventory
   statesDerived: true
+  boardFrames:
+  - Retail Board 4.dc.html#ret-4f
 - id: EMP-067
   name: Damage, Loss, Shrinkage & Stock Adjustment
   module: Stock on the Floor
@@ -5832,7 +5752,7 @@ screens:
     pack, and **HACCP is a regulatory obligation nothing in the package touched.**'
   requiresModule: fnb
   boardFrames:
-  - FNB-5E
+  - FnB Board 5.dc.html#fnb-5e
   statesDerived: true
 - id: EMP-068
   name: Reservation, Allocation & Omnichannel Inventory
@@ -5893,14 +5813,22 @@ screens:
     component: apps/venue-staff-app/src/routes/operations/ReservationAllocationOmnichannelInDetail.tsx
     status: notStarted
   wireframe:
-    status: generated
-    board: wireframes/P06 Venue Staff App.dc.html#emp-068
+    status: designed
+    board: wireframes/Retail Board 4.dc.html#ret-4h
+    generatedFallback: wireframes/P06 Venue Staff App.dc.html#emp-068
   provenance: client board, named only
   notes: '**Added 20 August from the client design board.** P06 had no table or stock operations at
     all — **twenty screens of floor work with nothing behind them** — and every operation these need
-    already existed. **Named in the board contents and not written up in it.**'
+    already existed. **Named in the board contents and not written up in it.** **Drawn 31 August** —
+    `Retail Board 4.dc.html` frame `ret-4h`. **Matched on frame title against screen name, constrained
+    to this board’s platforms.** These packs label by board position (`GM-6C`) rather than naming the
+    screen, so the title is the only join — *Reservation, Allocation &amp; Omnichannel Inventory* matched
+    at 1.0. **A cross-platform title match was refused**: `Outlet Management` scored 0.85 against a
+    partner-portal screen, which is how a mapping goes wrong quietly.'
   requiresModule: inventory
   statesDerived: true
+  boardFrames:
+  - Retail Board 4.dc.html#ret-4h
 - id: EMP-069
   name: Barcode, RFID, Serialized Stock & Traceability
   module: Stock on the Floor
@@ -5958,14 +5886,21 @@ screens:
     component: apps/venue-staff-app/src/routes/operations/BarcodeRfidSerializedStockTraceabiDetail.tsx
     status: notStarted
   wireframe:
-    status: generated
-    board: wireframes/P06 Venue Staff App.dc.html#emp-069
+    status: designed
+    board: wireframes/Retail Board 4.dc.html#ret-4j
+    generatedFallback: wireframes/P06 Venue Staff App.dc.html#emp-069
   provenance: client board, specified
   notes: '**Added 20 August from the client design board.** P06 had no table or stock operations at
     all — **twenty screens of floor work with nothing behind them** — and every operation these need
-    already existed.'
+    already existed. **Drawn 31 August** — `Retail Board 4.dc.html` frame `ret-4j`. **Matched on frame
+    title against screen name, constrained to this board’s platforms.** These packs label by board position
+    (`GM-6C`) rather than naming the screen, so the title is the only join — *Barcode, RFID, Serialized
+    Stock &amp; Traceability* matched at 1.0. **A cross-platform title match was refused**: `Outlet
+    Management` scored 0.85 against a partner-portal screen, which is how a mapping goes wrong quietly.'
   requiresModule: inventory
   statesDerived: true
+  boardFrames:
+  - Retail Board 4.dc.html#ret-4j
 - id: EMP-070
   name: Inventory Exceptions, AI Replenishment & Action Center
   module: Stock on the Floor
@@ -6030,11 +5965,18 @@ screens:
     component: apps/venue-staff-app/src/routes/operations/InventoryExceptionsAiReplenishmentDetail.tsx
     status: notStarted
   wireframe:
-    status: generated
-    board: wireframes/P06 Venue Staff App.dc.html#emp-070
+    status: designed
+    board: wireframes/Inventory Board 1.dc.html#inv-10
+    generatedFallback: wireframes/P06 Venue Staff App.dc.html#emp-070
   provenance: client board, named only
   notes: '**Added 20 August from the client design board.** P06 had no table or stock operations at
     all — **twenty screens of floor work with nothing behind them** — and every operation these need
-    already existed. **Named in the board contents and not written up in it.**'
+    already existed. **Named in the board contents and not written up in it.** **Drawn 31 August** —
+    `Inventory Board 1.dc.html` frame `inv-10` (*Inventory Exceptions, Data Quality & AI*). **Inventory
+    Board 1 is the only one of the seven that maps onto screens this package has** — item master, categories,
+    UoM, locations, statuses, movement history. Boards 2 to 7 draw a warehouse and procurement suite
+    the contracts do not contain.'
   requiresModule: analytics
   statesDerived: true
+  boardFrames:
+  - Inventory Board 1.dc.html#inv-10

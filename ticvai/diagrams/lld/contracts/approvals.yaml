@@ -15,7 +15,7 @@ operations:
   offline: false
   reads:
   - cache:idempotency
-  - identity.grant
+  - identity.delegated_access
   - identity.principal
   writes:
   - approvals.delegation
@@ -84,8 +84,8 @@ operations:
   - approvals.matrix
   - approvals.rule
   - cache:idempotency
-  - identity.grant
-  - platform.scope_node
+  - identity.delegated_access
+  - platform.org_unit
   writes:
   - cache:idempotency
 - operation: getApprovalAnalytics

@@ -85,8 +85,8 @@ screens:
   - KIT-009
   - KIT-010
   boardFrames:
-  - FNB-3A
-  wireframe: wireframes/P15 Kitchen Display.dc.html#kit-001
+  - FnB Board 3.dc.html#fnb-3a
+  wireframe: wireframes/FnB Board 3.dc.html#fnb-3a
   inFlows:
   - F83 A kitchen works a service from the rail to the exception
   - F88 An order is assembled, collected and notified
@@ -119,8 +119,8 @@ screens:
   - visitId<-deepLink
   goesTo: []
   boardFrames:
-  - FNB-3B
-  wireframe: wireframes/P15 Kitchen Display.dc.html#kit-002
+  - FnB Board 3.dc.html#fnb-3b
+  wireframe: wireframes/FnB Board 3.dc.html#fnb-3b
   inFlows:
   - F108 A guest orders food at a counter and collects it
   - F29 A table is seated, coursed and split
@@ -153,8 +153,8 @@ screens:
   - outletId<-session
   goesTo: []
   boardFrames:
-  - FNB-3C
-  wireframe: wireframes/P15 Kitchen Display.dc.html#kit-003
+  - FnB Board 3.dc.html#fnb-3c
+  wireframe: wireframes/FnB Board 3.dc.html#fnb-3c
   inFlows:
   - F83 A kitchen works a service from the rail to the exception
   - F88 An order is assembled, collected and notified
@@ -181,7 +181,7 @@ screens:
   - orderId<-KIT-002
   goesTo: []
   boardFrames:
-  - FNB-3D
+  - FnB Board 3.dc.html#fnb-3d
   wireframe: wireframes/P15 Kitchen Display.dc.html#kit-004
   inFlows:
   - F83 A kitchen works a service from the rail to the exception
@@ -208,8 +208,8 @@ screens:
   - stationId<-session
   goesTo: []
   boardFrames:
-  - FNB-3E
-  wireframe: wireframes/P15 Kitchen Display.dc.html#kit-005
+  - FnB Board 3.dc.html#fnb-3e
+  wireframe: wireframes/FnB Board 3.dc.html#fnb-3e
   inFlows: null
 - screen: KIT-006
   name: Expeditor & Order Assembly
@@ -238,8 +238,8 @@ screens:
   - orderId<-session
   goesTo: []
   boardFrames:
-  - FNB-3F
-  wireframe: wireframes/P15 Kitchen Display.dc.html#kit-006
+  - FnB Board 3.dc.html#fnb-3f
+  wireframe: wireframes/FnB Board 3.dc.html#fnb-3f
   inFlows:
   - F88 An order is assembled, collected and notified
 - screen: KIT-007
@@ -265,7 +265,7 @@ screens:
   - orderId<-KIT-002
   goesTo: []
   boardFrames:
-  - FNB-3G
+  - FnB Board 3.dc.html#fnb-3g
   wireframe: wireframes/P15 Kitchen Display.dc.html#kit-007
   inFlows: null
 - screen: KIT-008
@@ -296,8 +296,8 @@ screens:
   - outletId<-session
   goesTo: []
   boardFrames:
-  - FNB-3H
-  wireframe: wireframes/P15 Kitchen Display.dc.html#kit-008
+  - FnB Board 3.dc.html#fnb-3h
+  wireframe: wireframes/FnB Board 3.dc.html#fnb-3h
   inFlows:
   - F83 A kitchen works a service from the rail to the exception
 - screen: KIT-009
@@ -323,8 +323,8 @@ screens:
   - ticketId<-KIT-002
   goesTo: []
   boardFrames:
-  - FNB-3J
-  wireframe: wireframes/P15 Kitchen Display.dc.html#kit-009
+  - FnB Board 3.dc.html#fnb-3j
+  wireframe: wireframes/FnB Board 3.dc.html#fnb-3j
   inFlows: null
 - screen: KIT-010
   name: Kitchen Performance, AI & Operational Optimization
@@ -349,6 +349,6 @@ screens:
   - dashboardId<-KIT-002
   goesTo: []
   boardFrames:
-  - FNB-3K
+  - FnB Board 3.dc.html#fnb-3k
   wireframe: wireframes/P15 Kitchen Display.dc.html#kit-010
   inFlows: null

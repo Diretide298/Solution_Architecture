@@ -16,7 +16,7 @@
     "workforce",
     "approvals"
    ],
-   "why": "**`platform.scope_node` is reached by 304 of 379 tables** \u2014 the tenancy spine. Workforce and approvals are folded in because each is small, both read `scope_node` constantly and write it rarely, and splitting them means three services doing the same joins.\n\n**`shift` was folded in here on 24 August and moved to OrderService the same day.** The reasoning was that a shift owns no tables of its own \u2014 which is true \u2014 and the conclusion was wrong. **A service with no data belongs where its data is**, and a shift's data is entirely in `orders`: `orders.shift`, `orders.deposit_box`, `orders.cash_movement`, `orders.cash_count_line`.\n\n**The coupling made it visible.** All 43 of Tenancy's cross-service touches into `orders` were the `shift` contract \u2014 19 writes and 24 reads, the heaviest coupling in the platform, created to solve a cosmetic problem.",
+   "why": "**`platform.org_unit` is reached by 304 of 379 tables** \u2014 the tenancy spine. Workforce and approvals are folded in because each is small, both read `org_unit` constantly and write it rarely, and splitting them means three services doing the same joins.\n\n**`shift` was folded in here on 24 August and moved to OrderService the same day.** The reasoning was that a shift owns no tables of its own \u2014 which is true \u2014 and the conclusion was wrong. **A service with no data belongs where its data is**, and a shift's data is entirely in `orders`: `orders.shift`, `orders.deposit_box`, `orders.cash_movement`, `orders.cash_count_line`.\n\n**The coupling made it visible.** All 43 of Tenancy's cross-service touches into `orders` were the `shift` contract \u2014 19 writes and 24 reads, the heaviest coupling in the platform, created to solve a cosmetic problem.",
    "scale": "Read-heavy and highly cacheable. Config changes are rare.",
    "risk": "Same as identity \u2014 nothing runs without a scope.",
    "counts": {
@@ -36,7 +36,7 @@
     "createOutlet",
     "createRotaAssignment",
     "createSaleBoard",
-    "createScopeNode",
+    "createOrgUnit",
     "decideApprovalRequest",
     "deployConfigurationProfile",
     "escalateApprovalRequest",
@@ -44,7 +44,7 @@
     "getAnnouncementReach",
     "getApprovalAnalytics",
     "getRegionSettings",
-    "getScopeNode",
+    "getOrgUnit",
     "getVenueSettings",
     "getWorkstation",
     "getWorkstationHealth",
@@ -58,7 +58,7 @@
     "listOutlets",
     "listRotaAssignments",
     "listSaleBoards",
-    "listScopeNodes",
+    "listOrgUnits",
     "listWorkstations",
     "publishAnnouncement",
     "recordAttendance",
@@ -77,7 +77,7 @@
     "updateRegionSettings",
     "updateRotaAssignment",
     "updateSaleBoard",
-    "updateScopeNode",
+    "updateOrgUnit",
     "withdrawApprovalRequest"
    ],
    "tables": [
@@ -100,13 +100,13 @@
     "platform.outbox",
     "platform.outlet",
     "platform.profile_deployment",
-    "platform.redemption_right",
+    "platform.cross_region_entitlement",
     "platform.region_settings",
     "platform.sale_board",
     "platform.sale_board_page",
     "platform.sale_board_tile",
     "platform.schema_version",
-    "platform.scope_node",
+    "platform.org_unit",
     "platform.tenant",
     "platform.venue_settings",
     "platform.wallet_authorisation",
@@ -150,11 +150,11 @@
    },
    "operations": [
     "completeSsoAuthorization",
-    "createGrant",
+    "createDelegatedAccess",
     "createMfaChallenge",
     "createPrincipal",
     "createRole",
-    "deleteGrant",
+    "deleteDelegatedAccess",
     "deleteGuestAccount",
     "enrolMfaMethod",
     "exportSubjectData",
@@ -170,7 +170,7 @@
     "linkGuestCheckout",
     "listActiveSessions",
     "listDelegations",
-    "listGrants",
+    "listDelegatedAccess",
     "listMfaMethods",
     "listPrincipals",
     "listRoles",
@@ -196,7 +196,7 @@
    ],
    "tables": [
     "identity.authz_audit",
-    "identity.grant",
+    "identity.delegated_access",
     "identity.guest_session",
     "identity.mfa_challenge",
     "identity.mfa_method",
@@ -252,7 +252,7 @@
     "flowCoverage": 43
    },
    "operations": [
-    "acquireLease",
+    "acquireInventoryHold",
     "allocateBlockedSeats",
     "analysePromotionConflicts",
     "assessProductChange",
@@ -269,7 +269,7 @@
     "createCouponCampaign",
     "createDonationCampaign",
     "createEntitlementTemplate",
-    "createEnvelope",
+    "createChannelCapacity",
     "createEvent",
     "createPerformances",
     "createPriceList",
@@ -286,7 +286,7 @@
     "endPromotion",
     "evaluatePromotions",
     "extendSeatHold",
-    "forceReleaseLease",
+    "forceReleaseInventoryHold",
     "freezeEntitlement",
     "generateCouponCodes",
     "getAvailability",
@@ -321,10 +321,10 @@
     "listCouponCodes",
     "listDonationCampaigns",
     "listEntitlementTemplates",
-    "listEnvelopes",
+    "listChannelCapacities",
     "listEvents",
     "listGuestMemberships",
-    "listLeases",
+    "listInventoryHolds",
     "listPerformances",
     "listPriceLists",
     "listPrices",
@@ -351,10 +351,10 @@
     "redeemVoucher",
     "reinstateEntitlement",
     "releaseChannelAllocation",
-    "releaseLease",
+    "releaseInventoryHold",
     "releaseSeatBlock",
     "releaseSeatHold",
-    "renewLease",
+    "renewInventoryHold",
     "reportBundleApplied",
     "resolveProductByCode",
     "restoreProductVersion",
@@ -373,7 +373,7 @@
     "unschedulePromotion",
     "updateBundle",
     "updateDonationCampaign",
-    "updateEnvelope",
+    "updateChannelCapacity",
     "updateEvent",
     "updatePerformance",
     "updatePriceList",
@@ -387,14 +387,14 @@
    ],
    "tables": [
     "catalogue.alternative_code",
-    "catalogue.attribute_axis",
+    "catalogue.variant_dimension",
     "catalogue.channel_allocation",
     "catalogue.donation_campaign",
     "catalogue.entitlement_template",
-    "catalogue.envelope",
+    "catalogue.channel_capacity",
     "catalogue.event",
     "catalogue.import_job",
-    "catalogue.inventory_lease",
+    "catalogue.inventory_hold",
     "catalogue.performance",
     "catalogue.price",
     "catalogue.price_list",
@@ -448,7 +448,7 @@
    "schemas": [
     "orders"
    ],
-   "why": "**The transactional core.** 96 operations, 34 tables, and the highest write rate in the platform. Separate because its scaling profile is unlike anything else \u2014 a Saturday evening is ten times a Tuesday morning.\n\n**`shift` belongs here and not in Tenancy.** A shift is venue-scoped, which is what made it look like a tenancy concern \u2014 but **venue scope is the platform's default rather than a service boundary**: 675 of 1,014 operations are venue-scoped.\n\n**What decides the service is who owns the tables.** A shift holds cash, `orders.deposit_box` reconciles against payments, and `orders.cash_movement` posts to `ledger.entry` at close. **A till's takings and a till's drawer are the same money counted twice** \u2014 separating them makes every settlement a distributed join.",
+   "why": "**The transactional core.** 96 operations, 34 tables, and the highest write rate in the platform. Separate because its scaling profile is unlike anything else \u2014 a Saturday evening is ten times a Tuesday morning.\n\n**`shift` belongs here and not in Tenancy.** A shift is venue-scoped, which is what made it look like a tenancy concern \u2014 but **venue scope is the platform's default rather than a service boundary**: 675 of 1,014 operations are venue-scoped.\n\n**What decides the service is who owns the tables.** A shift holds cash, `orders.deposit_box` reconciles against payments, and `orders.cash_movement` posts to `ledger.posting` at close. **A till's takings and a till's drawer are the same money counted twice** \u2014 separating them makes every settlement a distributed join.",
    "scale": "Write-heavy, spiky, latency-critical. **The one that autoscales.**",
    "risk": "**Down means no sales.** Highest availability target in the platform.",
    "counts": {
@@ -687,7 +687,7 @@
     "ledger.account_mapping",
     "ledger.cost_center",
     "ledger.deposit",
-    "ledger.entry",
+    "ledger.posting",
     "ledger.event_budget",
     "ledger.fiscal_period",
     "ledger.fx_rate",
@@ -706,7 +706,7 @@
     "OrderService": 6,
     "TenancyService": 1,
     "RetailService": 1,
-    "ControlService": 1,
+    "PlatformService": 1,
     "CatalogueService": 1
    },
    "writesOutside": {}
@@ -733,7 +733,7 @@
    "operations": [
     "addBlacklistEntry",
     "createAccessPoint",
-    "createAdmissionProfile",
+    "createAdmissionRules",
     "createParkingEntitlement",
     "enrolFacePass",
     "getAccessPoint",
@@ -743,7 +743,7 @@
     "getFacePassEnrolment",
     "getOfflinePackage",
     "listAccessPoints",
-    "listAdmissionProfiles",
+    "listAdmissionRules",
     "listBlacklist",
     "listMyEntitlements",
     "listParkingFacilities",
@@ -757,14 +757,14 @@
     "setTurnstileMode",
     "syncScans",
     "updateAccessPoint",
-    "updateAdmissionProfile",
+    "updateAdmissionRules",
     "updateParkingEntitlement",
     "validateAccess",
     "validateGroupAccess"
    ],
    "tables": [
     "access.access_point",
-    "access.admission_profile",
+    "access.admission_rules",
     "access.blacklist",
     "access.entitlement",
     "access.parking_entitlement",
@@ -781,7 +781,7 @@
    },
    "writesOutside": {
     "IdentityService": 2,
-    "CrossCellService": 1,
+    "CrossRegionService": 1,
     "MarketingService": 1
    }
   },
@@ -849,7 +849,7 @@
     "getIncident",
     "getMediaAsset",
     "getQueue",
-    "getQueueEntry",
+    "getWaitingGuest",
     "getQueueFeedHealth",
     "getResourceAvailability",
     "getSessionManifest",
@@ -880,7 +880,7 @@
     "listWorkOrders",
     "loadGameCredits",
     "lookupAsset",
-    "overrideQueueEntry",
+    "overrideWaitingGuest",
     "pauseWorkOrder",
     "publishVenueMap",
     "recordAuthorityNotification",
@@ -888,7 +888,7 @@
     "recordWorkOrderParts",
     "recordWorkOrderTime",
     "redeemPrize",
-    "redeemQueueEntry",
+    "redeemWaitingGuest",
     "rejectWorkOrder",
     "reorderSessionManifest",
     "replaceMediaAsset",
@@ -939,7 +939,7 @@
     "maintenance.maintenance_plan",
     "maintenance.work_order",
     "maintenance.work_order_attachment",
-    "queue.entry",
+    "queue.waiting_guest",
     "queue.feed",
     "queue.queue",
     "queue.reading",
@@ -962,7 +962,7 @@
    },
    "writesOutside": {
     "OrderService": 2,
-    "CrossCellService": 1,
+    "CrossRegionService": 1,
     "InventoryService": 1
    }
   },
@@ -1482,7 +1482,7 @@
    },
    "writesOutside": {
     "IdentityService": 2,
-    "ControlService": 2,
+    "PlatformService": 2,
     "OrderService": 1
    }
   },
@@ -1566,7 +1566,7 @@
    "writesOutside": {}
   },
   {
-   "service": "ControlService",
+   "service": "PlatformService",
    "tier": "platform",
    "contracts": [
     "subscription",
@@ -1715,7 +1715,7 @@
     "control.onboarding_application",
     "control.partner_agreement",
     "control.partner_user",
-    "control.plan",
+    "control.subscription_plan",
     "control.release",
     "control.rollout",
     "control.rollout_cell",
@@ -1834,12 +1834,12 @@
     "whitelabel.tenant_config"
    ],
    "readsFrom": {
-    "ControlService": 3,
+    "PlatformService": 3,
     "MarketingService": 1,
     "IdentityService": 1
    },
    "writesOutside": {
-    "ControlService": 3
+    "PlatformService": 3
    }
   },
   {
@@ -1917,7 +1917,7 @@
    }
   },
   {
-   "service": "CrossCellService",
+   "service": "CrossRegionService",
    "tier": "platform",
    "contracts": [
     "cross-cell"
@@ -1938,19 +1938,19 @@
    "operations": [
     "authoriseWalletSpend",
     "captureWalletAuthorisation",
-    "consumeRedemptionRight",
+    "consumeCrossRegionEntitlement",
     "createDsarRequest",
     "createGuestLink",
     "getDsarRequest",
     "getGuestLink",
-    "getRedemptionRight",
+    "getCrossRegionEntitlement",
     "getWalletAllocation",
-    "propagateRedemptionRight",
+    "propagateCrossRegionEntitlement",
     "reconcileRedemptions",
     "releaseWalletAuthorisation",
     "resolveGuestLink",
     "revokeGuestLink",
-    "revokeRedemptionRight",
+    "revokeCrossRegionEntitlement",
     "setWalletAllocationPolicy"
    ],
    "tables": [

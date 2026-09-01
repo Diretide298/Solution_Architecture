@@ -28,7 +28,7 @@ modulesUsed:
 - module: analytics
   screens: 1
 servicesCalled:
-- service: ControlService
+- service: PlatformService
   operationCalls: 186
 - service: IdentityService
   operationCalls: 25
@@ -38,7 +38,7 @@ servicesCalled:
   operationCalls: 5
 - service: ReportingService
   operationCalls: 4
-- service: CrossCellService
+- service: CrossRegionService
   operationCalls: 3
 - service: TenancyService
   operationCalls: 2
@@ -51,7 +51,7 @@ coverage:
 screens:
 - screen: ADM-001
   name: Platform Login / MFA
-  module: TODO
+  module: Access & Identity
   requiresModule: core
   wave: 1
   density: compact
@@ -83,7 +83,7 @@ screens:
   - F104 A platform operator signs in under MFA
 - screen: ADM-002
   name: Platform Dashboard
-  module: TODO
+  module: Overview & Health
   requiresModule: membership
   wave: 1
   density: compact
@@ -112,12 +112,12 @@ screens:
   - ADM-008
   - ADM-012
   boardFrames:
-  - adm-002
+  - Dashboards Board.dc.html#adm-002
   wireframe: wireframes/Dashboards Board.dc.html#adm-002
   inFlows: null
 - screen: ADM-003
   name: Cross-Tenant Health Dashboard
-  module: TODO
+  module: Overview & Health
   requiresModule: membership
   wave: 2
   density: compact
@@ -127,9 +127,9 @@ screens:
   - getCell
   - getCellCapacity
   - getCellHealth
-  - getRedemptionRight
+  - getCrossRegionEntitlement
   - listCellJobs
-  - propagateRedemptionRight
+  - propagateCrossRegionEntitlement
   - reconcileRedemptions
   - updateCellTier
   states:
@@ -146,13 +146,13 @@ screens:
   - ADM-002
   - ADM-004
   boardFrames:
-  - adm-003
+  - Dashboards Board.dc.html#adm-003
   wireframe: wireframes/Dashboards Board.dc.html#adm-003
   inFlows:
   - F19 A membership works in another country
 - screen: ADM-004
   name: Platform Audit Log
-  module: TODO
+  module: Overview & Health
   requiresModule: ai
   wave: 2
   density: compact
@@ -177,7 +177,7 @@ screens:
   - F106 A security dashboard surfaces something and it is investigated
 - screen: ADM-005
   name: Tenant Directory
-  module: TODO
+  module: Tenants & Licensing
   requiresModule: membership
   wave: 1
   density: compact
@@ -218,17 +218,17 @@ screens:
   - F96 A tenant is provisioned, licensed and its modules enabled
 - screen: ADM-006
   name: Tenant Hierarchy Explorer
-  module: TODO
+  module: Tenants & Licensing
   requiresModule: membership
   wave: 1
   density: compact
   operations:
-  - createScopeNode
+  - createOrgUnit
   - getEntitlementUsage
   - getSsoConfig
   - getTenant
   - getTenantLicences
-  - listScopeNodes
+  - listOrgUnits
   - listTenantCells
   - listTenants
   - updateTenant
@@ -252,7 +252,7 @@ screens:
   - F16 A venue opens for the first time
 - screen: ADM-007
   name: Module & Feature Entitlement
-  module: TODO
+  module: Tenants & Licensing
   requiresModule: membership
   wave: 1
   density: compact
@@ -286,7 +286,7 @@ screens:
   - F96 A tenant is provisioned, licensed and its modules enabled
 - screen: ADM-008
   name: Subscription & Plan Management
-  module: TODO
+  module: Tenants & Licensing
   requiresModule: membership
   wave: 1
   density: compact
@@ -330,7 +330,7 @@ screens:
   - F96 A tenant is provisioned, licensed and its modules enabled
 - screen: ADM-009
   name: Tenant Billing & Invoicing
-  module: TODO
+  module: Tenants & Licensing
   requiresModule: membership
   wave: 2
   density: compact
@@ -362,7 +362,7 @@ screens:
   inFlows: null
 - screen: ADM-010
   name: Usage Metering
-  module: TODO
+  module: Tenants & Licensing
   requiresModule: membership
   wave: 2
   density: compact
@@ -392,7 +392,7 @@ screens:
   inFlows: null
 - screen: ADM-011
   name: Licence & Seat Management
-  module: TODO
+  module: Tenants & Licensing
   requiresModule: membership
   wave: 2
   density: compact
@@ -427,7 +427,7 @@ screens:
   - F96 A tenant is provisioned, licensed and its modules enabled
 - screen: ADM-012
   name: Tenant Isolation & Resource Pool
-  module: TODO
+  module: Tenants & Licensing
   requiresModule: membership
   wave: 1
   density: compact
@@ -463,7 +463,7 @@ screens:
   - F97 A cell is capacity-checked and a tenant is placed on it
 - screen: ADM-013
   name: Tenant Performance Monitor
-  module: TODO
+  module: Overview & Health
   requiresModule: membership
   wave: 2
   density: compact
@@ -493,7 +493,7 @@ screens:
   - F97 A cell is capacity-checked and a tenant is placed on it
 - screen: ADM-014
   name: Auto-Scaling Configuration
-  module: TODO
+  module: Infrastructure & Resilience
   requiresModule: membership
   wave: 3
   density: compact
@@ -523,7 +523,7 @@ screens:
   - F97 A cell is capacity-checked and a tenant is placed on it
 - screen: ADM-015
   name: API Rate Limit & Quota Management
-  module: TODO
+  module: Tenants & Licensing
   requiresModule: membership
   wave: 3
   density: compact
@@ -555,7 +555,7 @@ screens:
   - F105 A rate limit is set and a developer hits it
 - screen: ADM-016
   name: White-Label Branding Management
-  module: TODO
+  module: Branding & Localisation
   requiresModule: core
   wave: 2
   density: compact
@@ -593,7 +593,7 @@ screens:
   - F103 A tenant claims a domain and gets a certificate
 - screen: ADM-017
   name: Domain & Certificate Management
-  module: TODO
+  module: Branding & Localisation
   requiresModule: core
   wave: 2
   density: compact
@@ -624,7 +624,7 @@ screens:
   - F103 A tenant claims a domain and gets a certificate
 - screen: ADM-018
   name: Localisation & Language Pack
-  module: TODO
+  module: Branding & Localisation
   requiresModule: core
   wave: 2
   density: compact
@@ -655,7 +655,7 @@ screens:
   inFlows: null
 - screen: ADM-019
   name: Global Configuration & Defaults
-  module: TODO
+  module: Branding & Localisation
   requiresModule: membership
   wave: 2
   density: compact
@@ -681,7 +681,7 @@ screens:
   inFlows: null
 - screen: ADM-020
   name: Platform User Directory
-  module: TODO
+  module: Access & Identity
   requiresModule: core
   wave: 1
   density: compact
@@ -709,7 +709,7 @@ screens:
   - F16 A venue opens for the first time
 - screen: ADM-021
   name: Platform Role Management
-  module: TODO
+  module: Access & Identity
   requiresModule: core
   wave: 1
   density: compact
@@ -732,7 +732,7 @@ screens:
   inFlows: null
 - screen: ADM-022
   name: Release & Version Management
-  module: TODO
+  module: Releases & Environments
   requiresModule: core
   wave: 2
   density: compact
@@ -751,7 +751,7 @@ screens:
   - loading
   offlineState: false
   entryParams:
-  - releaseId<-deepLink
+  - reinventoryHoldId<-deepLink
   goesTo:
   - ADM-001
   - ADM-002
@@ -763,7 +763,7 @@ screens:
   - F04 Platform admin ships a release
 - screen: ADM-023
   name: Staging Promotion & Approval
-  module: TODO
+  module: Releases & Environments
   requiresModule: core
   wave: 2
   density: compact
@@ -782,7 +782,7 @@ screens:
   - loading
   offlineState: false
   entryParams:
-  - releaseId<-deepLink
+  - reinventoryHoldId<-deepLink
   goesTo:
   - ADM-001
   - ADM-002
@@ -794,7 +794,7 @@ screens:
   - F04 Platform admin ships a release
 - screen: ADM-024
   name: Release Notification Composer
-  module: TODO
+  module: Releases & Environments
   requiresModule: core
   wave: 3
   density: compact
@@ -817,7 +817,7 @@ screens:
   inFlows: null
 - screen: ADM-025
   name: Tenant Upgrade Scheduler
-  module: TODO
+  module: Releases & Environments
   requiresModule: core
   wave: 2
   density: compact
@@ -840,7 +840,7 @@ screens:
   inFlows: null
 - screen: ADM-026
   name: End-of-Support Notice Management
-  module: TODO
+  module: Releases & Environments
   requiresModule: core
   wave: 3
   density: compact
@@ -863,7 +863,7 @@ screens:
   inFlows: null
 - screen: ADM-027
   name: Database Migration Console
-  module: TODO
+  module: Releases & Environments
   requiresModule: core
   wave: 1
   density: compact
@@ -894,7 +894,7 @@ screens:
   - F04 Platform admin ships a release
 - screen: ADM-028
   name: Environment Registry
-  module: TODO
+  module: Releases & Environments
   requiresModule: core
   wave: 2
   density: compact
@@ -918,7 +918,7 @@ screens:
   inFlows: null
 - screen: ADM-029
   name: Deployment Monitor
-  module: TODO
+  module: Overview & Health
   requiresModule: membership
   wave: 2
   density: compact
@@ -954,7 +954,7 @@ screens:
   - F04 Platform admin ships a release
 - screen: ADM-030
   name: Infrastructure Sizing & Scaling Policy
-  module: TODO
+  module: Infrastructure & Resilience
   requiresModule: membership
   wave: 3
   density: compact
@@ -983,7 +983,7 @@ screens:
   inFlows: null
 - screen: ADM-031
   name: Security & Compliance Dashboard
-  module: TODO
+  module: Security & Compliance
   requiresModule: analytics
   wave: 3
   density: compact
@@ -1010,7 +1010,7 @@ screens:
   - F106 A security dashboard surfaces something and it is investigated
 - screen: ADM-032
   name: WAF & Security Policy View
-  module: TODO
+  module: Security & Compliance
   requiresModule: membership
   wave: 3
   density: compact
@@ -1039,7 +1039,7 @@ screens:
   inFlows: null
 - screen: ADM-033
   name: Backup & DR Status
-  module: TODO
+  module: Infrastructure & Resilience
   requiresModule: membership
   wave: 2
   density: compact
@@ -1068,7 +1068,7 @@ screens:
   inFlows: null
 - screen: ADM-034
   name: Archival Job Monitor
-  module: TODO
+  module: Infrastructure & Resilience
   requiresModule: membership
   wave: 3
   density: compact
@@ -1097,7 +1097,7 @@ screens:
   inFlows: null
 - screen: ADM-035
   name: Support & Escalation Console
-  module: TODO
+  module: Support & Communications
   requiresModule: core
   wave: 3
   density: compact
@@ -1121,7 +1121,7 @@ screens:
   inFlows: null
 - screen: ADM-036
   name: Platform Notification Broadcast
-  module: TODO
+  module: Support & Communications
   requiresModule: core
   wave: 3
   density: compact

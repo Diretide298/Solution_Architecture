@@ -25,18 +25,6 @@ import openpyxl
 import yaml
 from openpyxl.styles import Alignment, Border, Font, PatternFill, Side
 from openpyxl.utils import get_column_letter
-import sys
-
-# A cp1252 console cannot encode the arrows and dashes this tool prints, and the
-# failure lands *after* the work is done — so the output is written, the summary
-# line raises UnicodeEncodeError, and a correct run exits 1. Reconfiguring at
-# import means anything importing this module gets it too, refresh.sh included.
-try:
-    sys.stdout.reconfigure(encoding="utf-8", errors="replace")
-    sys.stderr.reconfigure(encoding="utf-8", errors="replace")
-except Exception:      # a captured stream may not be reconfigurable; harmless
-    pass
-
 
 PKG = Path("/home/claude/ticvai-pkg")
 CSV = Path("/mnt/user-data/uploads/ticvai-review-activity-2026-08-24-filtered.csv")
@@ -88,7 +76,7 @@ RESPONSES = {
         "are a genuine gap — raising as a scope question rather than building against a guess."),
     ("WEB-006", "Potential Missing API -"): (
         "Wired, not shown",
-        "`acquireLease` exists and **is not on WEB-006**. Correct call: a session selection that "
+        "`acquireInventoryHold` exists and **is not on WEB-006**. Correct call: a session selection that "
         "does not lease is a slot two channels can sell. **Contended inventory is leased, not "
         "reserved** (CF-115)."),
     ("WEB-007", "Validation Required"): (
@@ -146,7 +134,7 @@ RESPONSES = {
     ("WEB-015", "clarification needed"): (
         "Agreed",
         "**`joinQueue` on a waiting room with no join action.** A virtual waiting room is entered, "
-        "not joined — the guest is already in it. Removing; `getQueueEntry` is what the screen "
+        "not joined — the guest is already in it. Removing; `getWaitingGuest` is what the screen "
         "needs."),
     ("WEB-017", "Get Account Summary is needed"): (
         "Agreed",

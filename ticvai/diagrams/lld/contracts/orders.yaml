@@ -18,7 +18,7 @@ operations:
   - orders.cart
   writes:
   - cache:idempotency
-  - catalogue.inventory_lease
+  - catalogue.inventory_hold
   - orders.cart
 - operation: addCartLine
   verb: POST
@@ -31,12 +31,12 @@ operations:
   offline: false
   reads:
   - cache:idempotency
-  - catalogue.envelope
+  - catalogue.channel_capacity
   - catalogue.performance
   - catalogue.variant
   writes:
   - cache:idempotency
-  - catalogue.inventory_lease
+  - catalogue.inventory_hold
   - orders.cart
   - orders.cart_line
 - operation: addTip
@@ -181,7 +181,7 @@ operations:
   offline: false
   reads:
   - cache:idempotency
-  - catalogue.inventory_lease
+  - catalogue.inventory_hold
   - orders.cart
   - orders.cart_line
   writes:
@@ -280,7 +280,7 @@ operations:
   reads:
   - cache:idempotency
   - pii.subject
-  - platform.scope_node
+  - platform.org_unit
   writes:
   - cache:idempotency
   - orders.cart
@@ -321,8 +321,8 @@ operations:
   - orders.sales_order
   writes:
   - cache:idempotency
-  - ledger.entry
   - ledger.journal_entry
+  - ledger.posting
   - orders.payment
 - operation: createPaymentLink
   verb: POST
@@ -356,8 +356,8 @@ operations:
   - orders.sales_order
   writes:
   - cache:idempotency
-  - ledger.entry
   - ledger.journal_entry
+  - ledger.posting
   - orders.refund
 - operation: createRefundRequest
   verb: POST
@@ -430,11 +430,11 @@ operations:
   offline: false
   reads:
   - cache:idempotency
-  - catalogue.inventory_lease
+  - catalogue.inventory_hold
   - orders.cart
   writes:
   - cache:idempotency
-  - catalogue.inventory_lease
+  - catalogue.inventory_hold
   - orders.cart
 - operation: extendReservation
   verb: POST
@@ -472,8 +472,8 @@ operations:
   - partner
   offline: false
   reads:
-  - catalogue.envelope
-  - catalogue.inventory_lease
+  - catalogue.channel_capacity
+  - catalogue.inventory_hold
   - orders.cart
   - orders.cart_line
   - promotions.promotion
@@ -532,7 +532,7 @@ operations:
   - partner
   offline: false
   reads:
-  - ledger.entry
+  - ledger.posting
   - orders.payment
   - orders.refund
   - orders.sales_order
@@ -551,7 +551,7 @@ operations:
   - orders.payment_link
   - orders.reservation
   - orders.sales_order
-  - platform.scope_node
+  - platform.org_unit
   writes: []
 - operation: getRefundPolicy
   verb: GET
@@ -940,7 +940,7 @@ operations:
   - orders.cart_line
   writes:
   - cache:idempotency
-  - catalogue.inventory_lease
+  - catalogue.inventory_hold
   - orders.cart_line
 - operation: reprintOrder
   verb: POST
@@ -1005,7 +1005,7 @@ operations:
   - orders.sales_order
   writes:
   - cache:idempotency
-  - ledger.entry
+  - ledger.posting
   - orders.chargeback
 - operation: resumeOrder
   verb: POST
@@ -1099,11 +1099,11 @@ operations:
   - access.entitlement
   - cache:idempotency
   - catalogue.entitlement_template
-  - identity.grant
+  - identity.delegated_access
   writes:
   - access.entitlement
   - cache:idempotency
-  - identity.grant
+  - identity.delegated_access
 - operation: splitOrder
   verb: POST
   path: /orders/{orderId}/split
@@ -1177,11 +1177,11 @@ operations:
   offline: false
   reads:
   - cache:idempotency
-  - catalogue.envelope
+  - catalogue.channel_capacity
   - orders.cart_line
   writes:
   - cache:idempotency
-  - catalogue.inventory_lease
+  - catalogue.inventory_hold
   - orders.cart_line
 - operation: voidOrder
   verb: POST

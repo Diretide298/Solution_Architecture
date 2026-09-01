@@ -691,7 +691,7 @@ operations:
   reads:
   - cache:idempotency
   - fnb.temperature_log
-  - platform.scope_node
+  - platform.org_unit
   writes:
   - cache:idempotency
   - fnb.corrective_action

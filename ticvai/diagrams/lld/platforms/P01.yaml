@@ -41,15 +41,15 @@ servicesCalled:
 - service: MarketingService
   operationCalls: 45
 - service: CatalogueService
-  operationCalls: 29
+  operationCalls: 31
 - service: OrderService
-  operationCalls: 28
+  operationCalls: 31
 - service: IdentityService
   operationCalls: 19
 - service: FnbService
-  operationCalls: 13
+  operationCalls: 15
 - service: VenueOpsService
-  operationCalls: 11
+  operationCalls: 13
 - service: RetailService
   operationCalls: 10
 - service: AccessService
@@ -112,6 +112,7 @@ screens:
   wave: 1
   density: compact
   operations:
+  - getWaitTimes
   - listPerformances
   - listProducts
   - searchCatalogue
@@ -156,13 +157,15 @@ screens:
   wireframe: wireframes/P01 Guest Web.dc.html#web-003
   inFlows: null
 - screen: WEB-004
-  name: Event / Attraction Detail
+  name: Attraction Details
   module: Discovery & Browse
   requiresModule: ticketing
   wave: 1
   density: compact
   operations:
+  - getAvailability
   - getProduct
+  - getWaitTimes
   - listPerformances
   states:
   - emptyFirstRun
@@ -217,7 +220,7 @@ screens:
   wave: 1
   density: compact
   operations:
-  - acquireLease
+  - acquireInventoryHold
   - getAvailability
   states:
   - emptyFirstRun
@@ -239,7 +242,7 @@ screens:
   - F01 Guest buys a ticket online
   - F02 Guest buys seated tickets
 - screen: WEB-007
-  name: Seat Map Selection
+  name: Interactive Seat Selection
   module: Booking & Selection
   requiresModule: seating
   wave: 2
@@ -247,6 +250,7 @@ screens:
   operations:
   - createSeatHold
   - getSeatAvailability
+  - recommendSeats
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -262,7 +266,7 @@ screens:
   - WEB-008
   - WEB-010
   boardFrames:
-  - seat-3b
+  - Seat Board 3.dc.html#seat-3b
   wireframe: wireframes/Seat Board 3.dc.html#seat-3b
   inFlows:
   - F02 Guest buys seated tickets
@@ -422,7 +426,7 @@ screens:
   - F01 Guest buys a ticket online
   - F02 Guest buys seated tickets
 - screen: WEB-013
-  name: Order Confirmation
+  name: Booking Confirmation
   module: Cart & Checkout
   requiresModule: ticketing
   wave: 1
@@ -475,14 +479,14 @@ screens:
   wireframe: wireframes/P01 Guest Web.dc.html#web-014
   inFlows: null
 - screen: WEB-015
-  name: Virtual Waiting Room
+  name: Branded Queue / Waiting Room
   module: High-Demand Access
   requiresModule: queue
   wave: 2
   density: compact
   operations:
-  - getQueueEntry
   - getWaitTimes
+  - getWaitingGuest
   - joinQueue
   states:
   - emptyFirstRun
@@ -571,7 +575,7 @@ screens:
   - WEB-018
   - WEB-019
   boardFrames:
-  - web-017
+  - Dashboards Board.dc.html#web-017
   wireframe: wireframes/Dashboards Board.dc.html#web-017
   inFlows: null
 - screen: WEB-018
@@ -586,6 +590,7 @@ screens:
   - getEntitlementHistory
   - listEntitlements
   - listMyEntitlements
+  - transferOrderTickets
   states:
   - emptyFirstRun
   - emptyNoResults
@@ -594,6 +599,7 @@ screens:
   offlineState: false
   entryParams:
   - entitlementId<-deepLink
+  - orderId<-deepLink
   goesTo:
   - WEB-001
   - WEB-016
@@ -609,7 +615,9 @@ screens:
   wave: 1
   density: compact
   operations:
+  - getOrder
   - listMyOrders
+  - listOrders
   - transferOrderTickets
   states:
   - emptyFirstRun
@@ -737,7 +745,7 @@ screens:
   wireframe: wireframes/P01 Guest Web.dc.html#web-023
   inFlows: null
 - screen: WEB-024
-  name: Loyalty & Rewards
+  name: Devices, Wishlist & Consent
   module: Membership, Loyalty & Value
   requiresModule: marketing
   wave: 3
@@ -1041,7 +1049,7 @@ screens:
   wireframe: wireframes/P01 Guest Web.dc.html#web-035
   inFlows: null
 - screen: WEB-036
-  name: F&B — Browse & Order
+  name: F&B – Browse & Order
   module: In-venue Services
   requiresModule: fnb
   wave: 2
@@ -1051,6 +1059,7 @@ screens:
   - claimTableSession
   - createGuestFnbOrder
   - getGuestMenu
+  - getGuestOrderStatus
   - listDeliveryLocations
   - listDiningOutlets
   - listModifierGroups
@@ -1064,6 +1073,7 @@ screens:
   entryParams:
   - outletId<-deepLink
   - venueId<-session
+  - orderId<-deepLink
   goesTo:
   - WEB-001
   boardFrames: null
@@ -1093,7 +1103,7 @@ screens:
   wireframe: wireframes/P01 Guest Web.dc.html#web-037
   inFlows: null
 - screen: WEB-038
-  name: F&B — Order Tracking
+  name: F&B – Order Tracking
   module: In-venue Services
   requiresModule: fnb
   wave: 2
@@ -1142,7 +1152,7 @@ screens:
   goesTo:
   - WEB-001
   boardFrames:
-  - seat-3c
+  - Seat Board 3.dc.html#seat-3c
   wireframe: wireframes/Seat Board 3.dc.html#seat-3c
   inFlows: null
 - screen: WEB-040
@@ -1152,8 +1162,8 @@ screens:
   wave: 2
   density: compact
   operations:
-  - getQueueEntry
   - getWaitTimes
+  - getWaitingGuest
   - joinQueue
   - leaveQueue
   states:
@@ -1171,7 +1181,7 @@ screens:
   wireframe: wireframes/P01 Guest Web.dc.html#web-040
   inFlows: null
 - screen: WEB-041
-  name: Parking — Reserve & Pay
+  name: Parking – Reserve & Pay
   module: In-venue Services
   requiresModule: access
   wave: 2
@@ -1245,13 +1255,14 @@ screens:
   wireframe: wireframes/P01 Guest Web.dc.html#web-043
   inFlows: null
 - screen: WEB-044
-  name: AI Concierge
+  name: AI Concierge – Home
   module: Engagement & Support
   requiresModule: ai
   wave: 2
   density: compact
   operations:
   - createAiConversation
+  - getGuestMenu
   - handoverToAgent
   - requestSuggestion
   - sendAiMessage
@@ -1264,6 +1275,7 @@ screens:
   offlineState: false
   entryParams:
   - conversationId<-deepLink
+  - outletId<-session
   goesTo:
   - WEB-001
   boardFrames: null

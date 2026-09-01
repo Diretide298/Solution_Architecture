@@ -1,0 +1,841 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+html,body{margin:0;padding:0;background:#EEF1F6;-webkit-font-smoothing:antialiased}
+*{box-sizing:border-box}
+a{color:#0D6EFD;text-decoration:none}a:hover{color:#0A55C7}
+</style>
+</helmet>
+
+<div style="font-family:Manrope,system-ui,sans-serif;color:#0B1324;padding:26px 34px 90px;max-width:1420px;margin:0 auto">
+
+  <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:24px;padding-bottom:14px;border-bottom:2px solid #0B1324">
+    <div>
+      <div style="font-size:12px;font-weight:800;letter-spacing:.18em;background:linear-gradient(90deg,#0D6EFD,#00B8FF);-webkit-background-clip:text;background-clip:text;color:transparent">TICVAI</div>
+      <h1 style="font-size:21px;font-weight:800;letter-spacing:-.02em;margin:5px 0 0">Marketing &amp; CRM · Board 7 — Inbox, Chatbot &amp; Agents <span style="font-weight:600;color:#6B7280">(10 screens)</span></h1>
+    </div>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#6B7280;text-align:right;line-height:1.7">
+      <div>staff · guests talking back</div>
+      <div>1280 × 700 · <a href="TICVAI%20All%20Boards%20Index.dc.html">board index</a></div>
+    </div>
+  </div>
+
+  <p style="font-size:12.5px;color:#5A6577;max-width:82ch;margin:16px 0 0;line-height:1.65;text-wrap:pretty">Every board before this one sends. This one receives. Two rules shape it: a guest who is already unhappy must never wait behind a routine question, and a bot that cannot answer should hand over quickly rather than trying three more times.</p>
+
+  <div style="display:flex;flex-direction:column;gap:52px;margin-top:40px">
+
+    <div id="crm-7a" data-screen-label="CRM-7A" data-screen-id="CRM-7A" data-screen-id-origin="board" style="display:flex;flex-direction:column;gap:13px;scroll-margin-top:24px">
+      <div>
+        <div style="display:flex;align-items:baseline;gap:9px"><span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#8494A8">CRM-7A</span><span style="font-size:16.5px;font-weight:800;letter-spacing:-.015em">Omnichannel Command Center</span><span style="font-size:9px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:2px 7px;border-radius:5px;background:#FDECEC;color:#A81E1E">oldest unanswered · 6 days</span></div>
+        <div style="font-size:12px;color:#6B7280;margin-top:3px">Everything waiting for a reply, across every channel, ordered by how long the guest has been waiting. Volume and handle time come second — the number that matters is the age of the oldest thing nobody has answered.</div>
+      </div>
+      <div style="width:1280px;height:700px;display:flex;background:#F7F9FC;border:1px solid #E3E8F0;border-radius:14px;overflow:hidden;box-shadow:0 16px 38px rgba(12,35,64,.09)">
+        <aside style="flex:none;width:180px;background:#0B1324;display:flex;flex-direction:column;position:relative">
+          <div style="position:absolute;inset:0;background:radial-gradient(300px 200px at 0% 4%,rgba(0,184,255,.20),transparent 70%);pointer-events:none"></div>
+          <div style="position:relative;padding:15px 14px 13px;border-bottom:1px solid rgba(255,255,255,.08)"><img src="assets/ticvai-light-logo.png" alt="TICVAI" style="display:block;height:24px;width:auto"><div style="font-size:9.5px;color:#7FA3C9;margin-top:5px">Service &amp; Conversations</div></div>
+          <nav style="position:relative;display:flex;flex-direction:column;gap:2px;padding:11px 9px">
+            <div style="padding:8px 10px;border-radius:9px;background:linear-gradient(90deg,rgba(13,110,253,.30),rgba(0,184,255,.10));color:#fff;font-size:11.5px;font-weight:700;box-shadow:inset 2px 0 0 #00B8FF">Overview</div>
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Inbox</div>
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Chatbot</div>
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Knowledge</div>
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Routing</div>
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Quality</div>
+          </nav>
+          <div style="position:relative;margin-top:auto;padding:12px;border-top:1px solid rgba(255,255,255,.08);font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#7FA3C9;line-height:1.7">184 open<br>7 agents on</div>
+        </aside>
+        <div style="flex:1;display:flex;flex-direction:column;min-width:0">
+          <header style="flex:none;height:54px;display:flex;align-items:center;gap:12px;padding:0 18px;background:#fff;border-bottom:1px solid #E8ECF3">
+            <div><div style="font-size:13.5px;font-weight:800;letter-spacing:-.01em">Conversations</div><div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#9AA5B6">184 open · 7 agents on shift · 1 240 handled this week</div></div>
+            <div style="margin-left:auto;display:flex;gap:6px"><div style="height:32px;display:flex;align-items:center;gap:6px;padding:0 11px;border:1px solid #E3E8F0;border-radius:8px;font-size:11px;font-weight:700;color:#5A6577">Today<span style="color:#9AA5B6">▾</span></div><div style="height:32px;display:flex;align-items:center;padding:0 12px;border-radius:8px;background:#0D6EFD;color:#fff;font-size:11px;font-weight:700">Open the 6-day case</div></div>
+          </header>
+          <div style="flex:1;display:flex;flex-direction:column;gap:12px;padding:14px 16px;min-height:0">
+            <div style="flex:none;display:grid;grid-template-columns:repeat(4,1fr);gap:11px">
+              <div style="background:#fff;border:1.5px solid #F5C9C9;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:4px"><span style="font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#A81E1E">Oldest unanswered</span><span style="font-family:'IBM Plex Mono',monospace;font-size:20px;font-weight:600;color:#8A2020">6 days</span><span style="font-size:10.5px;color:#A81E1E">a complaint · top-4% member</span></div>
+              <div style="background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:4px"><span style="font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#94A0B4">Waiting now</span><span style="font-family:'IBM Plex Mono',monospace;font-size:20px;font-weight:600">184</span><span style="font-size:10.5px;color:#5A6577">31 over four hours</span></div>
+              <div style="background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:4px"><span style="font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#94A0B4">Bot resolved</span><span style="font-family:'IBM Plex Mono',monospace;font-size:20px;font-weight:600">61%</span><span style="font-size:10.5px;color:#5A6577">of 3 100 opened this week</span></div>
+              <div style="background:#fff;border:1px solid #CBE8DA;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:4px"><span style="font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#0B7A55">First reply · median</span><span style="font-family:'IBM Plex Mono',monospace;font-size:20px;font-weight:600;color:#0B5B41">14 min</span><span style="font-size:10.5px;color:#0B7A55">target 30</span></div>
+            </div>
+            <div style="flex:1;display:grid;grid-template-columns:1.3fr 1fr;gap:12px;min-height:0">
+              <div style="background:#fff;border:1px solid #E8ECF3;border-radius:12px;display:flex;flex-direction:column;overflow:hidden;min-height:0">
+                <div style="flex:none;display:flex;align-items:center;gap:8px;padding:11px 14px 10px;border-bottom:1px solid #EDF1F6"><div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">By channel</div><span style="margin-left:auto;font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#9AA5B6">waiting · oldest · who handles it</span></div>
+                <div style="flex:none;display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr 1.2fr;padding:8px 14px;font-size:9px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:#94A0B4;border-bottom:1px solid #EDF1F6"><div>Channel</div><div style="text-align:right">Open</div><div style="text-align:right">Oldest</div><div style="text-align:right">Bot first</div><div>Target</div></div>
+                <div style="display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr 1.2fr;align-items:center;padding:9px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA"><div style="font-weight:600">Web chat</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">42</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">4 min</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#0B7A55">yes</div><div style="font-size:10.5px;color:#5A6577">reply in 2 min</div></div>
+                <div style="display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr 1.2fr;align-items:center;padding:9px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA;background:#FDF5F5"><div style="font-weight:700;color:#8A2020">Email</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#8A2020">88</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;font-weight:700;color:#8A2020">6 d</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#8A2020">no</div><div style="font-size:10.5px;color:#A81E1E">reply in 1 day</div></div>
+                <div style="display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr 1.2fr;align-items:center;padding:9px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA"><div style="font-weight:600">Phone · voicemail</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">14</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">3 h</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#9AA5B6">—</div><div style="font-size:10.5px;color:#5A6577">call back in 4 h</div></div>
+                <div style="display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr 1.2fr;align-items:center;padding:9px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA"><div style="font-weight:600">WhatsApp</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">21</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">18 min</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#0B7A55">yes</div><div style="font-size:10.5px;color:#5A6577">reply in 15 min</div></div>
+                <div style="display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr 1.2fr;align-items:center;padding:9px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA"><div style="font-weight:600">Social · public</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">11</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">41 min</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#9AA5B6">—</div><div style="font-size:10.5px;color:#5A6577">reply in 30 min</div></div>
+                <div style="display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr 1.2fr;align-items:center;padding:9px 14px;font-size:11.5px"><div style="font-weight:600">Web form · complaints</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">8</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#8A4708">6 d</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#9AA5B6">—</div><div style="font-size:10.5px;color:#5A6577">reply in 1 day</div></div>
+                <div style="margin-top:auto;flex:none;padding:11px 14px;border-top:1px solid #EDF1F6;background:#FDF5F5;display:flex;gap:11px"><span style="width:3px;border-radius:2px;background:#DC2626;flex:none"></span><div style="flex:1;font-size:11px;color:#8A2020;line-height:1.55">Chat is answered in four minutes and email has an eighty-eight message backlog with a six-day tail. The channel with no queue visible to the guest is the one being left, and complaints arrive by email and web form.</div></div>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:12px;min-height:0">
+                <div style="flex:none;background:#fff;border:1.5px solid #F5C9C9;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:8px">
+                  <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em;color:#8A2020">C-2214 has waited six days</div>
+                  <div style="font-size:10.5px;color:#5A6577;line-height:1.5">Seats moved on 14 August, partial refund requested. Unassigned. Her churn score is 64% and 52 points of it is this case.</div>
+                  <div style="height:30px;border-radius:9px;background:#0D6EFD;color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700">Assign and answer now</div>
+                </div>
+                <div style="flex:none;background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:8px">
+                  <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">What guests contact us about</div>
+                  <div style="display:flex;align-items:center;gap:9px"><span style="font-size:11px;color:#5A6577;width:104px;flex:none">Where are my tickets</span><div style="flex:1;height:9px;border-radius:5px;background:#EEF2F7;display:flex;overflow:hidden"><span style="width:31%;background:#0D6EFD"></span></div><span style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#5A6577;width:26px;text-align:right">31%</span></div>
+                  <div style="display:flex;align-items:center;gap:9px"><span style="font-size:11px;color:#5A6577;width:104px;flex:none">Change or refund</span><div style="flex:1;height:9px;border-radius:5px;background:#EEF2F7;display:flex;overflow:hidden"><span style="width:24%;background:#00B8FF"></span></div><span style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#5A6577;width:26px;text-align:right">24%</span></div>
+                  <div style="display:flex;align-items:center;gap:9px"><span style="font-size:11px;color:#5A6577;width:104px;flex:none">Access and getting here</span><div style="flex:1;height:9px;border-radius:5px;background:#EEF2F7;display:flex;overflow:hidden"><span style="width:18%;background:#7BE0B8"></span></div><span style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#5A6577;width:26px;text-align:right">18%</span></div>
+                  <div style="display:flex;align-items:center;gap:9px"><span style="font-size:11px;color:#5A6577;width:104px;flex:none">Complaints</span><div style="flex:1;height:9px;border-radius:5px;background:#EEF2F7;display:flex;overflow:hidden"><span style="width:14%;background:#DC2626"></span></div><span style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#5A6577;width:26px;text-align:right">14%</span></div>
+                  <div style="font-size:10.5px;color:#5A6577;line-height:1.5">Nearly a third are guests who cannot find their tickets. Fixing the confirmation email would remove more contacts than any staffing change.</div>
+                </div>
+                <div style="flex:1;min-height:0"></div>
+                <div style="flex:none;background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:7px">
+                  <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Sorted by wait, not by channel</div>
+                  <div style="font-size:10.5px;color:#5A6577;line-height:1.55">Agents work one list across all channels. Giving each channel its own queue is how an email backlog builds while chat stays at four minutes.</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;line-height:1.85;color:#7C8899">
+        <div><b style="color:#4A5566;font-weight:600">OPERATIONS</b> · getConversationSummary · getOpenByChannel · getOldestUnanswered · getContactReasons · getBotResolutionRate · assignConversation</div>
+        <div><b style="color:#4A5566;font-weight:600">STATES</b> · loading · <b style="color:#8A6D00">slaBreached — the oldest unanswered conversation is the headline, not average handle time</b> · noAgentsOn · allClear · error</div>
+        <div><b style="color:#4A5566;font-weight:600">ARRIVES WITH</b> · tenantId←context · window←picker</div>
+        <div><b style="color:#4A5566;font-weight:600">GOES TO</b> · <a href="#crm-7b">unified inbox</a> · <a href="#crm-7g">routing</a> · <a href="#crm-7i">escalation</a></div>
+      </div>
+    </div>
+
+    <div id="crm-7b" data-screen-label="CRM-7B" data-screen-id="CRM-7B" data-screen-id-origin="board" style="display:flex;flex-direction:column;gap:13px;scroll-margin-top:24px">
+      <div>
+        <div style="display:flex;align-items:baseline;gap:9px"><span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#8494A8">CRM-7B</span><span style="font-size:16.5px;font-weight:800;letter-spacing:-.015em">Unified Inbox</span><span style="font-size:9px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:2px 7px;border-radius:5px;background:#EDF3FF;color:#0A4FB8">one list, five channels</span></div>
+        <div style="font-size:12px;color:#6B7280;margin-top:3px">The agent's working list. Channel is a small label rather than a filter, and each row carries what the agent needs to decide whether to open it: how long they have waited, whether they have a visit soon, and whether they are already angry.</div>
+      </div>
+      <div style="width:1280px;height:700px;display:flex;background:#F7F9FC;border:1px solid #E3E8F0;border-radius:14px;overflow:hidden;box-shadow:0 16px 38px rgba(12,35,64,.09)">
+        <aside style="flex:none;width:180px;background:#0B1324;display:flex;flex-direction:column;position:relative">
+          <div style="position:absolute;inset:0;background:radial-gradient(300px 200px at 0% 4%,rgba(0,184,255,.20),transparent 70%);pointer-events:none"></div>
+          <div style="position:relative;padding:15px 14px 13px;border-bottom:1px solid rgba(255,255,255,.08)"><img src="assets/ticvai-light-logo.png" alt="TICVAI" style="display:block;height:24px;width:auto"><div style="font-size:9.5px;color:#7FA3C9;margin-top:5px">Service &amp; Conversations</div></div>
+          <nav style="position:relative;display:flex;flex-direction:column;gap:2px;padding:11px 9px">
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Overview</div>
+            <div style="padding:8px 10px;border-radius:9px;background:linear-gradient(90deg,rgba(13,110,253,.30),rgba(0,184,255,.10));color:#fff;font-size:11.5px;font-weight:700;box-shadow:inset 2px 0 0 #00B8FF">Inbox</div>
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Chatbot</div>
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Knowledge</div>
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Routing</div>
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Quality</div>
+          </nav>
+          <div style="position:relative;margin-top:auto;padding:12px;border-top:1px solid rgba(255,255,255,.08);font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#7FA3C9;line-height:1.7">R. Sayeed<br>4 assigned</div>
+        </aside>
+        <div style="flex:1;display:flex;flex-direction:column;min-width:0">
+          <header style="flex:none;height:54px;display:flex;align-items:center;gap:12px;padding:0 18px;background:#fff;border-bottom:1px solid #E8ECF3">
+            <div><div style="font-size:13.5px;font-weight:800;letter-spacing:-.01em">My inbox · R. Sayeed</div><div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#9AA5B6">4 assigned · 184 unassigned · sorted by how long they have waited</div></div>
+            <div style="margin-left:auto;display:flex;gap:6px"><div style="height:32px;display:flex;align-items:center;padding:0 11px;border:1px solid #E3E8F0;border-radius:8px;font-size:11px;font-weight:700;color:#5A6577">Unassigned</div><div style="height:32px;display:flex;align-items:center;padding:0 12px;border-radius:8px;background:#0D6EFD;color:#fff;font-size:11px;font-weight:700">Take the next one</div></div>
+          </header>
+          <div style="flex:1;display:grid;grid-template-columns:1fr 320px;gap:12px;padding:14px 16px;min-height:0">
+            <div style="background:#fff;border:1px solid #E8ECF3;border-radius:12px;display:flex;flex-direction:column;overflow:hidden;min-height:0">
+              <div style="flex:none;display:flex;align-items:center;gap:7px;padding:11px 14px 10px;border-bottom:1px solid #EDF1F6;flex-wrap:wrap">
+                <span style="height:27px;display:flex;align-items:center;padding:0 10px;border-radius:8px;background:#0D6EFD;color:#fff;font-size:10.5px;font-weight:700">Everything 188</span>
+                <span style="height:27px;display:flex;align-items:center;padding:0 10px;border:1px solid #F5C9C9;background:#FDECEC;border-radius:8px;font-size:10.5px;font-weight:700;color:#A81E1E">Complaints 8</span>
+                <span style="height:27px;display:flex;align-items:center;padding:0 10px;border:1px solid #E3E8F0;border-radius:8px;font-size:10.5px;font-weight:700;color:#5A6577">Visit in 48 h 34</span>
+                <span style="height:27px;display:flex;align-items:center;padding:0 10px;border:1px solid #E3E8F0;border-radius:8px;font-size:10.5px;font-weight:700;color:#5A6577">Bot handed over 21</span>
+                <span style="margin-left:auto;font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#9AA5B6">longest wait first</span>
+              </div>
+              <div style="display:flex;gap:11px;padding:11px 14px;border-bottom:1px solid #F4F6FA;background:#FDF5F5">
+                <span style="flex:none;width:3px;border-radius:2px;background:#DC2626"></span>
+                <div style="flex:1"><div style="display:flex;align-items:baseline;gap:8px"><span style="font-size:12px;font-weight:700;color:#8A2020">Joanne Hartley</span><span style="font-size:8.5px;font-weight:700;padding:2px 6px;border-radius:4px;background:#FDECEC;color:#A81E1E">complaint</span><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#A81E1E">web form · 6 d</span></div><div style="font-size:10.5px;color:#8A2020;margin-top:2px;line-height:1.5">"We booked row D four months ago and were put in row G with no warning. I would like some of the money back."</div></div>
+                <div style="flex:none;display:flex;flex-direction:column;align-items:flex-end;gap:3px"><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#8A2020">£1 284 · gold</span><span style="font-size:10px;font-weight:700;color:#0D6EFD">Open</span></div>
+              </div>
+              <div style="display:flex;gap:11px;padding:11px 14px;border-bottom:1px solid #F4F6FA;background:#FFFBF4">
+                <span style="flex:none;width:3px;border-radius:2px;background:#B4530A"></span>
+                <div style="flex:1"><div style="display:flex;align-items:baseline;gap:8px"><span style="font-size:12px;font-weight:700;color:#7A3F06">Whitmore Academy</span><span style="font-size:8.5px;font-weight:700;padding:2px 6px;border-radius:4px;background:#FFF3E0;color:#8A4708">group · visit in 2 d</span><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#8A4708">email · 2 d</span></div><div style="font-size:10.5px;color:#7A3F06;margin-top:2px;line-height:1.5">"Nobody has replied about our 62 tickets for Thursday. Also our finance contact has left, who do we pay?"</div></div>
+                <div style="flex:none;display:flex;flex-direction:column;align-items:flex-end;gap:3px"><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#7A3F06">£21 400 account</span><span style="font-size:10px;font-weight:700;color:#0D6EFD">Open</span></div>
+              </div>
+              <div style="display:flex;gap:11px;padding:11px 14px;border-bottom:1px solid #F4F6FA">
+                <span style="flex:none;width:3px;border-radius:2px;background:#0D6EFD"></span>
+                <div style="flex:1"><div style="display:flex;align-items:baseline;gap:8px"><span style="font-size:12px;font-weight:700">D. Okoye</span><span style="font-size:8.5px;font-weight:700;padding:2px 6px;border-radius:4px;background:#EDF3FF;color:#0A4FB8">data request</span><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#9AA5B6">email · 4 h</span></div><div style="font-size:10.5px;color:#5A6577;margin-top:2px;line-height:1.5">"Following up on my access request from 4 August — is there any news?"</div></div>
+                <div style="flex:none;display:flex;flex-direction:column;align-items:flex-end;gap:3px"><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#8A2020">8 days to deadline</span><span style="font-size:10px;font-weight:700;color:#0D6EFD">Open</span></div>
+              </div>
+              <div style="display:flex;gap:11px;padding:11px 14px;border-bottom:1px solid #F4F6FA">
+                <span style="flex:none;width:3px;border-radius:2px;background:#C7D3E4"></span>
+                <div style="flex:1"><div style="display:flex;align-items:baseline;gap:8px"><span style="font-size:12px;font-weight:700">A. Bergström</span><span style="font-size:8.5px;font-weight:700;padding:2px 6px;border-radius:4px;background:#EEF2F7;color:#5A6577">bot handed over</span><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#9AA5B6">chat · 4 min</span></div><div style="font-size:10.5px;color:#5A6577;margin-top:2px;line-height:1.5">"Can I bring a wheelchair user into row D or do we need to move?" · bot could not answer</div></div>
+                <div style="flex:none;display:flex;flex-direction:column;align-items:flex-end;gap:3px"><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#5A6577">visit tomorrow</span><span style="font-size:10px;font-weight:700;color:#0D6EFD">Open</span></div>
+              </div>
+              <div style="display:flex;gap:11px;padding:11px 14px;border-bottom:1px solid #F4F6FA">
+                <span style="flex:none;width:3px;border-radius:2px;background:#C7D3E4"></span>
+                <div style="flex:1"><div style="display:flex;align-items:baseline;gap:8px"><span style="font-size:12px;font-weight:700">P. Kaur</span><span style="font-size:8.5px;font-weight:700;padding:2px 6px;border-radius:4px;background:#EEF2F7;color:#5A6577">whatsapp</span><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#9AA5B6">18 min</span></div><div style="font-size:10.5px;color:#5A6577;margin-top:2px;line-height:1.5">"Is parking free on a Saturday evening?"</div></div>
+                <div style="flex:none;display:flex;flex-direction:column;align-items:flex-end;gap:3px"><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#0B7A55">answer in knowledge</span><span style="font-size:10px;font-weight:700;color:#0D6EFD">Open</span></div>
+              </div>
+              <div style="margin-top:auto;flex:none;display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-top:1px solid #EDF1F6;background:#FBFCFE"><span style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8494A8">5 of 188 shown · channel is a label, never a filter by default</span><span style="font-size:10.5px;font-weight:700;color:#0D6EFD">Take the top three</span></div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:12px;min-height:0">
+              <div style="flex:none;background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:8px">
+                <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">What each row tells you before you open it</div>
+                <div style="display:flex;align-items:center;gap:9px;padding:7px 9px;border-radius:8px;background:#F7F9FC;border:1px solid #E8ECF3"><span style="flex:1;font-size:11px;color:#5A6577">How long they have waited</span></div>
+                <div style="display:flex;align-items:center;gap:9px;padding:7px 9px;border-radius:8px;background:#F7F9FC;border:1px solid #E8ECF3"><span style="flex:1;font-size:11px;color:#5A6577">Whether a visit is imminent</span></div>
+                <div style="display:flex;align-items:center;gap:9px;padding:7px 9px;border-radius:8px;background:#F7F9FC;border:1px solid #E8ECF3"><span style="flex:1;font-size:11px;color:#5A6577">Whether there is a deadline attached</span></div>
+                <div style="display:flex;align-items:center;gap:9px;padding:7px 9px;border-radius:8px;background:#F7F9FC;border:1px solid #E8ECF3"><span style="flex:1;font-size:11px;color:#5A6577">Their value, plainly</span></div>
+                <div style="font-size:10.5px;color:#5A6577;line-height:1.5">Value is shown because it is a real factor in how a business responds. Pretending otherwise just means the decision gets made without being visible.</div>
+              </div>
+              <div style="flex:none;background:#fff;border:1.5px solid #F3DFC0;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:7px">
+                <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em;color:#7A3F06">Two of the top five are the same failure</div>
+                <div style="font-size:10.5px;color:#7A3F06;line-height:1.5">Hartley was reseated without notice; Whitmore's confirmation went to a departed contact. Both trace to notification rules rather than to anything an agent did.</div>
+              </div>
+              <div style="flex:1;min-height:0"></div>
+              <div style="flex:none;background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:7px">
+                <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Taking one assigns it to you</div>
+                <div style="font-size:10.5px;color:#5A6577;line-height:1.55">A conversation can only be open with one agent, and it returns to the queue after twenty minutes of inactivity. Two agents replying to the same guest is worse than a longer wait.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;line-height:1.85;color:#7C8899">
+        <div><b style="color:#4A5566;font-weight:600">OPERATIONS</b> · listConversations · getConversationPreview · takeConversation · releaseConversation · getGuestContext · getSlaState</div>
+        <div><b style="color:#4A5566;font-weight:600">STATES</b> · loading · <b style="color:#8A6D00">claimedByAnother — the row is greyed rather than removed, so the agent knows why it vanished</b> · empty · slaBreached · error</div>
+        <div><b style="color:#4A5566;font-weight:600">ARRIVES WITH</b> · agentId←login · filter←panel</div>
+        <div><b style="color:#4A5566;font-weight:600">GOES TO</b> · <a href="#crm-7c">conversation 360</a> · <a href="#crm-7f">agent workspace</a> · <a href="#crm-7g">routing</a></div>
+      </div>
+    </div>
+
+    <div id="crm-7c" data-screen-label="CRM-7C" data-screen-id="CRM-7C" data-screen-id-origin="board" style="display:flex;flex-direction:column;gap:13px;scroll-margin-top:24px">
+      <div>
+        <div style="display:flex;align-items:baseline;gap:9px"><span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#8494A8">CRM-7C</span><span style="font-size:16.5px;font-weight:800;letter-spacing:-.015em">Guest Conversation 360</span><span style="font-size:9px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:2px 7px;border-radius:5px;background:#FDECEC;color:#A81E1E">everything she has said to us</span></div>
+        <div style="font-size:12px;color:#6B7280;margin-top:3px">One guest's whole conversation history in one thread, whatever channel each message arrived on. An agent should never have to ask a guest to repeat something they said on the phone last month.</div>
+      </div>
+      <div style="width:1280px;height:700px;display:flex;background:#F7F9FC;border:1px solid #E3E8F0;border-radius:14px;overflow:hidden;box-shadow:0 16px 38px rgba(12,35,64,.09)">
+        <aside style="flex:none;width:180px;background:#0B1324;display:flex;flex-direction:column;position:relative">
+          <div style="position:absolute;inset:0;background:radial-gradient(300px 200px at 0% 4%,rgba(0,184,255,.20),transparent 70%);pointer-events:none"></div>
+          <div style="position:relative;padding:15px 14px 13px;border-bottom:1px solid rgba(255,255,255,.08)"><img src="assets/ticvai-light-logo.png" alt="TICVAI" style="display:block;height:24px;width:auto"><div style="font-size:9.5px;color:#7FA3C9;margin-top:5px">Service &amp; Conversations</div></div>
+          <nav style="position:relative;display:flex;flex-direction:column;gap:2px;padding:11px 9px">
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Overview</div>
+            <div style="padding:8px 10px;border-radius:9px;background:linear-gradient(90deg,rgba(13,110,253,.30),rgba(0,184,255,.10));color:#fff;font-size:11.5px;font-weight:700;box-shadow:inset 2px 0 0 #00B8FF">Inbox</div>
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Chatbot</div>
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Knowledge</div>
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Routing</div>
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Quality</div>
+          </nav>
+          <div style="position:relative;margin-top:auto;padding:12px;border-top:1px solid rgba(255,255,255,.08);font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#7FA3C9;line-height:1.7">G-108442<br>9 conversations</div>
+        </aside>
+        <div style="flex:1;display:flex;flex-direction:column;min-width:0">
+          <header style="flex:none;height:54px;display:flex;align-items:center;gap:12px;padding:0 18px;background:#fff;border-bottom:1px solid #E8ECF3">
+            <div><div style="font-size:13.5px;font-weight:800;letter-spacing:-.01em">Joanne Hartley · all conversations</div><div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#9AA5B6">9 conversations since 2022 · 4 channels · 1 open, 6 days</div></div>
+            <div style="margin-left:auto;display:flex;gap:6px"><div style="height:32px;display:flex;align-items:center;padding:0 11px;border:1px solid #E3E8F0;border-radius:8px;font-size:11px;font-weight:700;color:#5A6577"><a href="Marketing%20Board%201.dc.html#crm-1d" style="color:#5A6577">Open her profile</a></div><div style="height:32px;display:flex;align-items:center;padding:0 12px;border-radius:8px;background:#0D6EFD;color:#fff;font-size:11px;font-weight:700">Reply to the open case</div></div>
+          </header>
+          <div style="flex:1;display:grid;grid-template-columns:1fr 340px;gap:12px;padding:14px 16px;min-height:0">
+            <div style="background:#fff;border:1px solid #E8ECF3;border-radius:12px;display:flex;flex-direction:column;overflow:hidden;min-height:0">
+              <div style="flex:none;display:flex;align-items:center;gap:8px;padding:11px 14px 10px;border-bottom:1px solid #EDF1F6"><div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">One thread, every channel</div><span style="margin-left:auto;font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#9AA5B6">newest first</span></div>
+              <div style="flex:1;padding:13px 14px;display:flex;flex-direction:column;gap:11px;min-height:0;overflow:hidden">
+                <div style="display:flex;gap:10px"><span style="width:3px;border-radius:2px;background:#DC2626;flex:none"></span><div style="flex:1"><div style="display:flex;align-items:baseline;gap:8px"><span style="font-size:11.5px;font-weight:700">She wrote · web form</span><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#A81E1E">20 Aug · unanswered 6 d</span></div><div style="font-size:10.5px;color:#8A2020;margin-top:2px;line-height:1.55">"We booked row D four months ago and were put in row G with no warning. My daughter could not see. I would like some of the money back."</div></div></div>
+                <div style="display:flex;gap:10px"><span style="width:3px;border-radius:2px;background:#C7D3E4;flex:none"></span><div style="flex:1"><div style="display:flex;align-items:baseline;gap:8px"><span style="font-size:11.5px;font-weight:700">We sent · automatic</span><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#9AA5B6">20 Aug 15:20</span></div><div style="font-size:10.5px;color:#5A6577;margin-top:2px;line-height:1.55">"Thanks — we have your message and will come back to you within two working days." Opened at 15:24. Nothing followed.</div></div></div>
+                <div style="display:flex;gap:10px"><span style="width:3px;border-radius:2px;background:#0D6EFD;flex:none"></span><div style="flex:1"><div style="display:flex;align-items:baseline;gap:8px"><span style="font-size:11.5px;font-weight:700">She called · 6 min</span><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#9AA5B6">3 Jul · resolved</span></div><div style="font-size:10.5px;color:#5A6577;margin-top:2px;line-height:1.55">Asked whether row D has a step-free route. Agent confirmed it does. Note added to her record: "prefers row D or further back, step-free needed."</div></div></div>
+                <div style="display:flex;gap:10px"><span style="width:3px;border-radius:2px;background:#0E9F6E;flex:none"></span><div style="flex:1"><div style="display:flex;align-items:baseline;gap:8px"><span style="font-size:11.5px;font-weight:700">Chat · bot resolved</span><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#9AA5B6">18 Jul</span></div><div style="font-size:10.5px;color:#5A6577;margin-top:2px;line-height:1.55">Asked how to renew membership. Bot gave the link, she renewed nine minutes later.</div></div></div>
+                <div style="display:flex;gap:10px"><span style="width:3px;border-radius:2px;background:#0E9F6E;flex:none"></span><div style="flex:1"><div style="display:flex;align-items:baseline;gap:8px"><span style="font-size:11.5px;font-weight:700">Chat · bot resolved</span><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#9AA5B6">4 Jun</span></div><div style="font-size:10.5px;color:#5A6577;margin-top:2px;line-height:1.55">Asked about refunds for a cancelled matinee. Bot explained, refund already issued.</div></div></div>
+                <div style="margin-top:auto;padding:10px 12px;border-radius:10px;background:#FDF5F5;border:1px solid #F5C9C9;font-size:10.5px;color:#8A2020;line-height:1.5">The July call recorded that she needs a step-free route and prefers row D. Six weeks later a map republish moved her to row G automatically. Her note existed; nothing read it.</div>
+              </div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:12px;min-height:0">
+              <div style="flex:none;background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:8px">
+                <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">What the agent needs to know</div>
+                <div style="display:flex;justify-content:space-between;font-size:11.5px"><span style="color:#6B7280">Lifetime</span><span style="font-family:'IBM Plex Mono',monospace">£1 284 · gold</span></div>
+                <div style="display:flex;justify-content:space-between;font-size:11.5px"><span style="color:#6B7280">Visits</span><span style="font-family:'IBM Plex Mono',monospace">31</span></div>
+                <div style="display:flex;justify-content:space-between;font-size:11.5px"><span style="color:#6B7280">Complaints before</span><span style="font-family:'IBM Plex Mono',monospace">none</span></div>
+                <div style="display:flex;justify-content:space-between;font-size:11.5px"><span style="color:#6B7280">Unused voucher</span><span style="font-family:'IBM Plex Mono',monospace;color:#0B7A55">£50</span></div>
+                <div style="display:flex;justify-content:space-between;font-size:11.5px"><span style="color:#6B7280">Band difference</span><span style="font-family:'IBM Plex Mono',monospace">£32</span></div>
+              </div>
+              <div style="flex:none;background:#fff;border:1.5px solid #BBD6FF;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:8px">
+                <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em;color:#0A4FB8">Suggested reply</div>
+                <div style="font-size:10.5px;color:#0A4FB8;line-height:1.55">Apologise without conditions, state that the reseat was automatic and should have been notified, refund £40 and mention the £50 voucher is still hers. Do not offer a discount on a future booking — she asked for money back.</div>
+                <div style="height:30px;border-radius:9px;background:#0D6EFD;color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700">Draft it</div>
+              </div>
+              <div style="flex:1;min-height:0"></div>
+              <div style="flex:none;background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:7px">
+                <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Notes are part of the thread</div>
+                <div style="font-size:10.5px;color:#5A6577;line-height:1.55">What an agent wrote down in July sits in the same list as what the guest wrote in August. Separating internal notes into a different tab is how they stop being read.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;line-height:1.85;color:#7C8899">
+        <div><b style="color:#4A5566;font-weight:600">OPERATIONS</b> · getGuestConversations · getConversationThread · getGuestContextForAgent · getSuggestedReply · addInternalNote</div>
+        <div><b style="color:#4A5566;font-weight:600">STATES</b> · loading · <b style="color:#8A6D00">firstContact — no history; the screen says so rather than showing empty panels</b> · openCase · resolved · error</div>
+        <div><b style="color:#4A5566;font-weight:600">ARRIVES WITH</b> · guestId←<a href="#crm-7b">inbox</a> · conversationId←row</div>
+        <div><b style="color:#4A5566;font-weight:600">GOES TO</b> · <a href="#crm-7f">agent workspace</a> · <a href="Marketing%20Board%201.dc.html#crm-1i">refund</a> · <a href="Marketing%20Board%201.dc.html#crm-1d">profile</a></div>
+      </div>
+    </div>
+
+    <div id="crm-7d" data-screen-label="CRM-7D" data-screen-id="CRM-7D" data-screen-id-origin="board" style="display:flex;flex-direction:column;gap:13px;scroll-margin-top:24px">
+      <div>
+        <div style="display:flex;align-items:baseline;gap:9px"><span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#8494A8">CRM-7D</span><span style="font-size:16.5px;font-weight:800;letter-spacing:-.015em">AI Chatbot Configuration</span><span style="font-size:9px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:2px 7px;border-radius:5px;background:#FFF1E6;color:#9A5B00">hands over after 2 tries</span></div>
+        <div style="font-size:12px;color:#6B7280;margin-top:3px">What the bot may answer, what it must hand over, and how hard it tries before giving up. The handover threshold matters more than the answer quality — a bot that loops three times has cost more goodwill than it saved.</div>
+      </div>
+      <div style="width:1280px;height:700px;display:flex;background:#F7F9FC;border:1px solid #E3E8F0;border-radius:14px;overflow:hidden;box-shadow:0 16px 38px rgba(12,35,64,.09)">
+        <aside style="flex:none;width:180px;background:#0B1324;display:flex;flex-direction:column;position:relative">
+          <div style="position:absolute;inset:0;background:radial-gradient(300px 200px at 0% 4%,rgba(0,184,255,.20),transparent 70%);pointer-events:none"></div>
+          <div style="position:relative;padding:15px 14px 13px;border-bottom:1px solid rgba(255,255,255,.08)"><img src="assets/ticvai-light-logo.png" alt="TICVAI" style="display:block;height:24px;width:auto"><div style="font-size:9.5px;color:#7FA3C9;margin-top:5px">Service &amp; Conversations</div></div>
+          <nav style="position:relative;display:flex;flex-direction:column;gap:2px;padding:11px 9px">
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Overview</div>
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Inbox</div>
+            <div style="padding:8px 10px;border-radius:9px;background:linear-gradient(90deg,rgba(13,110,253,.30),rgba(0,184,255,.10));color:#fff;font-size:11.5px;font-weight:700;box-shadow:inset 2px 0 0 #00B8FF">Chatbot</div>
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Knowledge</div>
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Routing</div>
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Quality</div>
+          </nav>
+          <div style="position:relative;margin-top:auto;padding:12px;border-top:1px solid rgba(255,255,255,.08);font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#7FA3C9;line-height:1.7">resolves 61%<br>hands over 39%</div>
+        </aside>
+        <div style="flex:1;display:flex;flex-direction:column;min-width:0">
+          <header style="flex:none;height:54px;display:flex;align-items:center;gap:12px;padding:0 18px;background:#fff;border-bottom:1px solid #E8ECF3">
+            <div><div style="font-size:13.5px;font-weight:800;letter-spacing:-.01em">Chatbot configuration</div><div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#9AA5B6">3 100 chats this week · resolves 61% · hands over after 2 failed attempts</div></div>
+            <div style="margin-left:auto;display:flex;gap:6px"><div style="height:32px;display:flex;align-items:center;padding:0 11px;border:1px solid #E3E8F0;border-radius:8px;font-size:11px;font-weight:700;color:#5A6577">Test the bot</div><div style="height:32px;display:flex;align-items:center;padding:0 12px;border-radius:8px;background:#0D6EFD;color:#fff;font-size:11px;font-weight:700">Save configuration</div></div>
+          </header>
+          <div style="flex:1;display:grid;grid-template-columns:1fr 340px;gap:12px;padding:14px 16px;min-height:0">
+            <div style="display:flex;flex-direction:column;gap:12px;min-height:0">
+              <div style="flex:none;background:#fff;border:1px solid #E8ECF3;border-radius:12px;display:flex;flex-direction:column;overflow:hidden">
+                <div style="display:flex;align-items:center;gap:8px;padding:11px 14px 9px"><div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">What it may do</div><span style="margin-left:auto;font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#9AA5B6">answer · act · hand over</span></div>
+                <div style="display:grid;grid-template-columns:1.9fr 1.2fr 1fr 1.3fr;padding:0 14px 8px;font-size:9px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:#94A0B4;border-bottom:1px solid #EDF1F6"><div>Topic</div><div>Permission</div><div style="text-align:right">Volume</div><div>Note</div></div>
+                <div style="display:grid;grid-template-columns:1.9fr 1.2fr 1fr 1.3fr;align-items:center;padding:8px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA"><div style="font-weight:600">Where are my tickets</div><div style="font-size:10.5px;font-weight:600;color:#0B7A55">answer and resend</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">960</div><div style="font-size:10.5px;color:#5A6577">resolves 91%</div></div>
+                <div style="display:grid;grid-template-columns:1.9fr 1.2fr 1fr 1.3fr;align-items:center;padding:8px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA"><div style="font-weight:600">Opening hours and parking</div><div style="font-size:10.5px;font-weight:600;color:#0B7A55">answer</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">640</div><div style="font-size:10.5px;color:#5A6577">resolves 94%</div></div>
+                <div style="display:grid;grid-template-columns:1.9fr 1.2fr 1fr 1.3fr;align-items:center;padding:8px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA"><div style="font-weight:600">Change a booking date</div><div style="font-size:10.5px;font-weight:600;color:#0A4FB8">answer and act</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">410</div><div style="font-size:10.5px;color:#5A6577">same price only</div></div>
+                <div style="display:grid;grid-template-columns:1.9fr 1.2fr 1fr 1.3fr;align-items:center;padding:8px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA;background:#FDF5F5"><div style="font-weight:700;color:#8A2020">Refunds</div><div style="font-size:10.5px;font-weight:700;color:#A81E1E">explain, never act</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#8A2020">380</div><div style="font-size:10.5px;color:#A81E1E">hands over to reply</div></div>
+                <div style="display:grid;grid-template-columns:1.9fr 1.2fr 1fr 1.3fr;align-items:center;padding:8px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA;background:#FDF5F5"><div style="font-weight:700;color:#8A2020">Accessibility questions</div><div style="font-size:10.5px;font-weight:700;color:#A81E1E">hand over at once</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#8A2020">180</div><div style="font-size:10.5px;color:#A81E1E">never answered by bot</div></div>
+                <div style="display:grid;grid-template-columns:1.9fr 1.2fr 1fr 1.3fr;align-items:center;padding:8px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA;background:#FDF5F5"><div style="font-weight:700;color:#8A2020">Complaints</div><div style="font-size:10.5px;font-weight:700;color:#A81E1E">hand over at once</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#8A2020">140</div><div style="font-size:10.5px;color:#A81E1E">no acknowledgement script</div></div>
+                <div style="display:grid;grid-template-columns:1.9fr 1.2fr 1fr 1.3fr;align-items:center;padding:8px 14px;font-size:11.5px"><div style="font-weight:600">Group and school bookings</div><div style="font-size:10.5px;color:#5A6577">collect and hand over</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">120</div><div style="font-size:10.5px;color:#5A6577">takes the details first</div></div>
+              </div>
+              <div style="flex:1;background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:13px 14px;display:flex;flex-direction:column;gap:10px;min-height:0">
+                <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">When it gives up</div>
+                <div style="display:flex;flex-direction:column;gap:8px">
+                  <div style="display:flex;align-items:center;gap:10px;padding:9px 11px;border-radius:10px;background:#F4F8FF;border:1.5px solid #BBD6FF"><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#0A4FB8;width:70px;flex:none;font-weight:700">2 attempts</span><span style="flex:1;font-size:11px;font-weight:600;color:#0A4FB8">Then it hands over and says so plainly</span></div>
+                  <div style="display:flex;align-items:center;gap:10px;padding:9px 11px;border-radius:10px;background:#F7F9FC;border:1px solid #E8ECF3"><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#9AA5B6;width:70px;flex:none">any time</span><span style="flex:1;font-size:11px;color:#5A6577">"Talk to a person" is always visible, never buried</span></div>
+                  <div style="display:flex;align-items:center;gap:10px;padding:9px 11px;border-radius:10px;background:#F7F9FC;border:1px solid #E8ECF3"><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#9AA5B6;width:70px;flex:none">frustration</span><span style="flex:1;font-size:11px;color:#5A6577">Swearing or repetition hands over immediately</span></div>
+                  <div style="display:flex;align-items:center;gap:10px;padding:9px 11px;border-radius:10px;background:#F7F9FC;border:1px solid #E8ECF3"><span style="flex:1;font-size:11px;color:#5A6577">Out of hours it takes a message rather than pretending</span></div>
+                </div>
+                <div style="margin-top:auto;padding:9px 11px;border-radius:9px;background:#F4F8FF;border:1px solid #BBD6FF;font-size:10.5px;color:#0A4FB8;line-height:1.5">Two attempts was three until June. Dropping it to two raised satisfaction on handed-over chats from 3.1 to 4.2 out of 5 and cost nothing — the third attempt almost never worked.</div>
+              </div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:12px;min-height:0">
+              <div style="flex:none;background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:8px">
+                <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">How it identifies itself</div>
+                <div style="font-size:10.5px;color:#5A6577;line-height:1.55">It opens with "I'm an assistant, not a person" and never uses a human name or an avatar. A guest who thinks they are talking to staff and then discovers otherwise complains about the deception rather than the answer.</div>
+              </div>
+              <div style="flex:none;background:#fff;border:1.5px solid #F5C9C9;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:7px">
+                <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em;color:#8A2020">It never answers accessibility questions</div>
+                <div style="font-size:10.5px;color:#8A2020;line-height:1.5">A wrong answer about a step-free route means a guest cannot get to their seat. 180 of these a week go straight to a person, and that is the correct cost.</div>
+              </div>
+              <div style="flex:1;min-height:0"></div>
+              <div style="flex:none;background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:7px">
+                <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Acting is narrower than answering</div>
+                <div style="font-size:10.5px;color:#5A6577;line-height:1.55">The bot can resend tickets and move a booking to an identically priced session. It cannot refund, cannot change a price, and cannot touch a group booking — anything with money attached needs a person.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;line-height:1.85;color:#7C8899">
+        <div><b style="color:#4A5566;font-weight:600">OPERATIONS</b> · getBotConfiguration · setTopicPermission · setHandoverThreshold · getBotResolutionByTopic · testBotResponse · getHandoverSatisfaction</div>
+        <div><b style="color:#4A5566;font-weight:600">STATES</b> · loading · <b style="color:#8A6D00">handoverImmediate — accessibility and complaints never receive a bot answer</b> · outOfHours · noAgentsAvailable · saved · error</div>
+        <div><b style="color:#4A5566;font-weight:600">ARRIVES WITH</b> · tenantId←context</div>
+        <div><b style="color:#4A5566;font-weight:600">GOES TO</b> · <a href="#crm-7e">knowledge</a> · <a href="#crm-7g">routing</a> · <a href="#crm-7j">chat analytics</a></div>
+      </div>
+    </div>
+
+    <div id="crm-7e" data-screen-label="CRM-7E" data-screen-id="CRM-7E" data-screen-id-origin="board" style="display:flex;flex-direction:column;gap:13px;scroll-margin-top:24px">
+      <div>
+        <div style="display:flex;align-items:baseline;gap:9px"><span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#8494A8">CRM-7E</span><span style="font-size:16.5px;font-weight:800;letter-spacing:-.015em">Intent &amp; Knowledge Management</span><span style="font-size:9px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:2px 7px;border-radius:5px;background:#FDECEC;color:#A81E1E">2 articles contradict the till</span></div>
+        <div style="font-size:12px;color:#6B7280;margin-top:3px">What guests ask, what the bot and agents answer with, and which articles no longer match reality. A knowledge base that disagrees with the till is worse than no knowledge base, because the wrong answer arrives confidently.</div>
+      </div>
+      <div style="width:1280px;height:700px;display:flex;background:#F7F9FC;border:1px solid #E3E8F0;border-radius:14px;overflow:hidden;box-shadow:0 16px 38px rgba(12,35,64,.09)">
+        <aside style="flex:none;width:180px;background:#0B1324;display:flex;flex-direction:column;position:relative">
+          <div style="position:absolute;inset:0;background:radial-gradient(300px 200px at 0% 4%,rgba(0,184,255,.20),transparent 70%);pointer-events:none"></div>
+          <div style="position:relative;padding:15px 14px 13px;border-bottom:1px solid rgba(255,255,255,.08)"><img src="assets/ticvai-light-logo.png" alt="TICVAI" style="display:block;height:24px;width:auto"><div style="font-size:9.5px;color:#7FA3C9;margin-top:5px">Service &amp; Conversations</div></div>
+          <nav style="position:relative;display:flex;flex-direction:column;gap:2px;padding:11px 9px">
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Overview</div>
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Inbox</div>
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Chatbot</div>
+            <div style="padding:8px 10px;border-radius:9px;background:linear-gradient(90deg,rgba(13,110,253,.30),rgba(0,184,255,.10));color:#fff;font-size:11.5px;font-weight:700;box-shadow:inset 2px 0 0 #00B8FF">Knowledge</div>
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Routing</div>
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Quality</div>
+          </nav>
+          <div style="position:relative;margin-top:auto;padding:12px;border-top:1px solid rgba(255,255,255,.08);font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#7FA3C9;line-height:1.7">64 articles<br>9 unmatched intents</div>
+        </aside>
+        <div style="flex:1;display:flex;flex-direction:column;min-width:0">
+          <header style="flex:none;height:54px;display:flex;align-items:center;gap:12px;padding:0 18px;background:#fff;border-bottom:1px solid #E8ECF3">
+            <div><div style="font-size:13.5px;font-weight:800;letter-spacing:-.01em">Intents and knowledge</div><div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#9AA5B6">64 articles · 41 intents matched · 9 asked often with no article</div></div>
+            <div style="margin-left:auto;display:flex;gap:6px"><div style="height:32px;display:flex;align-items:center;padding:0 11px;border:1px solid #E3E8F0;border-radius:8px;font-size:11px;font-weight:700;color:#5A6577">Check against source systems</div><div style="height:32px;display:flex;align-items:center;padding:0 12px;border-radius:8px;background:#0D6EFD;color:#fff;font-size:11px;font-weight:700">Fix the two conflicts</div></div>
+          </header>
+          <div style="flex:1;display:grid;grid-template-columns:1fr 340px;gap:12px;padding:14px 16px;min-height:0">
+            <div style="display:flex;flex-direction:column;gap:12px;min-height:0">
+              <div style="flex:none;background:#fff;border:1px solid #E8ECF3;border-radius:12px;display:flex;flex-direction:column;overflow:hidden">
+                <div style="display:flex;align-items:center;gap:8px;padding:11px 14px 9px"><div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">What guests actually ask</div><span style="margin-left:auto;font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#9AA5B6">this week · 3 100 chats</span></div>
+                <div style="display:grid;grid-template-columns:2fr 1fr 1.3fr 1.4fr;padding:0 14px 8px;font-size:9px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:#94A0B4;border-bottom:1px solid #EDF1F6"><div>Intent</div><div style="text-align:right">Asked</div><div>Article</div><div>State</div></div>
+                <div style="display:grid;grid-template-columns:2fr 1fr 1.3fr 1.4fr;align-items:center;padding:8px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA"><div style="font-weight:600">Where are my tickets</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">960</div><div style="font-size:10.5px;color:#5A6577">KB-004</div><div style="font-size:10.5px;color:#0B7A55">matches the system</div></div>
+                <div style="display:grid;grid-template-columns:2fr 1fr 1.3fr 1.4fr;align-items:center;padding:8px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA;background:#FDF5F5"><div style="font-weight:700;color:#8A2020">Can I get a refund</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#8A2020">380</div><div style="font-size:10.5px;color:#8A2020">KB-011</div><div style="font-size:10.5px;font-weight:600;color:#A81E1E">says 14 days · policy is 7</div></div>
+                <div style="display:grid;grid-template-columns:2fr 1fr 1.3fr 1.4fr;align-items:center;padding:8px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA"><div style="font-weight:600">Is parking free</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">310</div><div style="font-size:10.5px;color:#5A6577">KB-018</div><div style="font-size:10.5px;color:#0B7A55">matches the system</div></div>
+                <div style="display:grid;grid-template-columns:2fr 1fr 1.3fr 1.4fr;align-items:center;padding:8px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA;background:#FDF5F5"><div style="font-weight:700;color:#8A2020">Can I bring a pushchair</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#8A2020">210</div><div style="font-size:10.5px;color:#8A2020">KB-029</div><div style="font-size:10.5px;font-weight:600;color:#A81E1E">says no · venue allows it</div></div>
+                <div style="display:grid;grid-template-columns:2fr 1fr 1.3fr 1.4fr;align-items:center;padding:8px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA;background:#FFFBF4"><div style="font-weight:700;color:#7A3F06">Why were my seats changed</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#7A3F06">148</div><div style="font-size:10.5px;font-weight:600;color:#8A4708">none</div><div style="font-size:10.5px;color:#8A4708">agents answer from memory</div></div>
+                <div style="display:grid;grid-template-columns:2fr 1fr 1.3fr 1.4fr;align-items:center;padding:8px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA;background:#FFFBF4"><div style="font-weight:700;color:#7A3F06">Do you have a quiet session</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#7A3F06">88</div><div style="font-size:10.5px;font-weight:600;color:#8A4708">none</div><div style="font-size:10.5px;color:#8A4708">we do · nobody wrote it up</div></div>
+                <div style="display:grid;grid-template-columns:2fr 1fr 1.3fr 1.4fr;align-items:center;padding:8px 14px;font-size:11.5px"><div style="font-weight:600">Can I change the date</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">410</div><div style="font-size:10.5px;color:#5A6577">KB-007</div><div style="font-size:10.5px;color:#0B7A55">matches the system</div></div>
+              </div>
+              <div style="flex:1;background:#fff;border:1.5px solid #F5C9C9;border-radius:12px;padding:13px 14px;display:flex;flex-direction:column;gap:10px;min-height:0">
+                <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em;color:#8A2020">The refund article is wrong and the bot quotes it</div>
+                <div style="display:flex;gap:11px">
+                  <div style="flex:1;padding:11px 12px;border-radius:11px;background:#FDF5F5;border:1px solid #F5C9C9;display:flex;flex-direction:column;gap:4px"><span style="font-size:10px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:#A81E1E">KB-011 says</span><span style="font-size:11px;color:#8A2020;line-height:1.5">"You can request a refund up to 14 days before your visit."</span></div>
+                  <div style="flex:1;padding:11px 12px;border-radius:11px;background:#F7F9FC;border:1px solid #E8ECF3;display:flex;flex-direction:column;gap:4px"><span style="font-size:10px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:#94A0B4">The till enforces</span><span style="font-size:11px;color:#5A6577;line-height:1.5">7 days for standard tickets, 14 for group bookings only.</span></div>
+                </div>
+                <div style="margin-top:auto;padding:9px 11px;border-radius:9px;background:#FDF5F5;font-size:10.5px;color:#8A2020;line-height:1.5">380 guests a week ask this. Each one told "14 days" who then arrives at day 10 has been promised something the system will refuse, and the agent then has to either break policy or break the promise.</div>
+              </div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:12px;min-height:0">
+              <div style="flex:none;background:#fff;border:1.5px solid #F3DFC0;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:8px">
+                <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em;color:#7A3F06">148 guests asked why their seats changed</div>
+                <div style="font-size:10.5px;color:#7A3F06;line-height:1.5">There is no article, because until August it never happened. Agents are explaining it from memory and inconsistently, which is how one of those became a formal complaint.</div>
+                <div style="height:30px;border-radius:9px;background:#0D6EFD;color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700">Write the article</div>
+              </div>
+              <div style="flex:none;background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:8px">
+                <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Articles checked against the system</div>
+                <div style="display:flex;justify-content:space-between;font-size:11.5px"><span style="color:#6B7280">Articles</span><span style="font-family:'IBM Plex Mono',monospace">64</span></div>
+                <div style="display:flex;justify-content:space-between;font-size:11.5px"><span style="color:#6B7280">Checkable automatically</span><span style="font-family:'IBM Plex Mono',monospace">31</span></div>
+                <div style="display:flex;justify-content:space-between;font-size:11.5px"><span style="color:#6B7280">Conflicting</span><span style="font-family:'IBM Plex Mono',monospace;color:#A81E1E">2</span></div>
+                <div style="display:flex;justify-content:space-between;font-size:11.5px"><span style="color:#6B7280">Not updated in a year</span><span style="font-family:'IBM Plex Mono',monospace;color:#8A4708">18</span></div>
+                <div style="font-size:10.5px;color:#5A6577;line-height:1.5">Prices, dates and policies can be checked against their source. Tone and explanation cannot, which is why half the base needs a human review.</div>
+              </div>
+              <div style="flex:1;min-height:0"></div>
+              <div style="flex:none;background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:7px">
+                <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Unmatched intents are the roadmap</div>
+                <div style="font-size:10.5px;color:#5A6577;line-height:1.55">Nine questions are asked often with nothing written for them. That list is a better guide to what to document than any internal opinion about what guests need to know.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;line-height:1.85;color:#7C8899">
+        <div><b style="color:#4A5566;font-weight:600">OPERATIONS</b> · listIntents · getIntentVolume · getLinkedArticle · checkArticleAgainstSource · listUnmatchedIntents · createArticle · updateArticle</div>
+        <div><b style="color:#4A5566;font-weight:600">STATES</b> · loading · <b style="color:#8A6D00">articleConflictsWithSystem — flagged and withheld from the bot until corrected</b> · unmatchedIntent · stale · error</div>
+        <div><b style="color:#4A5566;font-weight:600">ARRIVES WITH</b> · tenantId←context · window←picker</div>
+        <div><b style="color:#4A5566;font-weight:600">GOES TO</b> · <a href="#crm-7d">chatbot config</a> · <a href="#crm-7f">agent workspace</a> · <a href="#crm-7j">analytics</a></div>
+      </div>
+    </div>
+
+    <div id="crm-7f" data-screen-label="CRM-7F" data-screen-id="CRM-7F" data-screen-id-origin="board" style="display:flex;flex-direction:column;gap:13px;scroll-margin-top:24px">
+      <div>
+        <div style="display:flex;align-items:baseline;gap:9px"><span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#8494A8">CRM-7F</span><span style="font-size:16.5px;font-weight:800;letter-spacing:-.015em">Agent Workspace</span><span style="font-size:9px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:2px 7px;border-radius:5px;background:#EDF3FF;color:#0A4FB8">reply, context and actions in one place</span></div>
+        <div style="font-size:12px;color:#6B7280;margin-top:3px">Where the reply is written. Everything the agent needs to answer without leaving — the guest's history, the article that applies, and the actions they are permitted to take — because switching screens mid-conversation is where mistakes come from.</div>
+      </div>
+      <div style="width:1280px;height:700px;display:flex;background:#F7F9FC;border:1px solid #E3E8F0;border-radius:14px;overflow:hidden;box-shadow:0 16px 38px rgba(12,35,64,.09)">
+        <aside style="flex:none;width:180px;background:#0B1324;display:flex;flex-direction:column;position:relative">
+          <div style="position:absolute;inset:0;background:radial-gradient(300px 200px at 0% 4%,rgba(0,184,255,.20),transparent 70%);pointer-events:none"></div>
+          <div style="position:relative;padding:15px 14px 13px;border-bottom:1px solid rgba(255,255,255,.08)"><img src="assets/ticvai-light-logo.png" alt="TICVAI" style="display:block;height:24px;width:auto"><div style="font-size:9.5px;color:#7FA3C9;margin-top:5px">Service &amp; Conversations</div></div>
+          <nav style="position:relative;display:flex;flex-direction:column;gap:2px;padding:11px 9px">
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Overview</div>
+            <div style="padding:8px 10px;border-radius:9px;background:linear-gradient(90deg,rgba(13,110,253,.30),rgba(0,184,255,.10));color:#fff;font-size:11.5px;font-weight:700;box-shadow:inset 2px 0 0 #00B8FF">Inbox</div>
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Chatbot</div>
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Knowledge</div>
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Routing</div>
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Quality</div>
+          </nav>
+          <div style="position:relative;margin-top:auto;padding:12px;border-top:1px solid rgba(255,255,255,.08);font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#7FA3C9;line-height:1.7">C-2214<br>open 6 days</div>
+        </aside>
+        <div style="flex:1;display:flex;flex-direction:column;min-width:0">
+          <header style="flex:none;height:54px;display:flex;align-items:center;gap:12px;padding:0 18px;background:#fff;border-bottom:1px solid #E8ECF3">
+            <div><div style="font-size:13.5px;font-weight:800;letter-spacing:-.01em">C-2214 · Joanne Hartley · complaint</div><div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#9AA5B6">assigned to R. Sayeed 2 min ago · open 6 days · gold member</div></div>
+            <div style="margin-left:auto;display:flex;gap:6px"><div style="height:32px;display:flex;align-items:center;padding:0 11px;border:1px solid #E3E8F0;border-radius:8px;font-size:11px;font-weight:700;color:#5A6577">Hand to a manager</div><div style="height:32px;display:flex;align-items:center;padding:0 12px;border-radius:8px;background:#0D6EFD;color:#fff;font-size:11px;font-weight:700">Send reply and refund £40</div></div>
+          </header>
+          <div style="flex:1;display:grid;grid-template-columns:1.3fr 300px;gap:12px;padding:14px 16px;min-height:0">
+            <div style="display:flex;flex-direction:column;gap:12px;min-height:0">
+              <div style="flex:1;background:#fff;border:1px solid #E8ECF3;border-radius:12px;display:flex;flex-direction:column;overflow:hidden;min-height:0">
+                <div style="flex:none;display:flex;align-items:center;gap:8px;padding:11px 14px 10px;border-bottom:1px solid #EDF1F6"><div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">The conversation</div><span style="margin-left:auto;font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#9AA5B6">web form · then email</span></div>
+                <div style="flex:1;padding:13px 14px;display:flex;flex-direction:column;gap:10px;min-height:0;overflow:hidden">
+                  <div style="max-width:76%;padding:11px 13px;border-radius:13px 13px 13px 4px;background:#F4F6FA;border:1px solid #E8ECF3;font-size:11.5px;line-height:1.55">We booked row D four months ago and were put in row G with no warning. My daughter could not see. I would like some of the money back.<div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#9AA5B6;margin-top:5px">20 Aug 14:22</div></div>
+                  <div style="max-width:76%;align-self:flex-end;padding:11px 13px;border-radius:13px 13px 4px 13px;background:#EEF2F7;border:1px dashed #C7D3E4;font-size:11.5px;line-height:1.55;color:#5A6577">Automatic acknowledgement · "we will come back within two working days"<div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#9AA5B6;margin-top:5px">20 Aug 15:20 · opened 15:24</div></div>
+                  <div style="margin-top:auto;flex:none;display:flex;flex-direction:column;gap:8px">
+                    <div style="padding:11px 12px;border-radius:11px;border:1.5px solid #BBD6FF;background:#FBFCFE;font-size:11.5px;line-height:1.6;color:#0B1324">Dear Joanne,<br><br>I am sorry — you booked row D and we moved you without telling you. That was our mistake, not a change you should have had to discover on the night.<br><br>The seats we moved you to are in a lower price band, so I have refunded £40 to the card you paid with. It will reach you within five working days. Your £50 voucher from April is also still valid.<br><br>Rachel</div>
+                    <div style="display:flex;align-items:center;gap:8px"><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#9AA5B6">drafted from the suggested reply · edited</span><span style="margin-left:auto;font-size:10.5px;font-weight:700;color:#0D6EFD">Insert KB article</span></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:12px;min-height:0">
+              <div style="flex:none;background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:8px">
+                <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Her, at a glance</div>
+                <div style="display:flex;justify-content:space-between;font-size:11.5px"><span style="color:#6B7280">Lifetime</span><span style="font-family:'IBM Plex Mono',monospace">£1 284</span></div>
+                <div style="display:flex;justify-content:space-between;font-size:11.5px"><span style="color:#6B7280">Visits</span><span style="font-family:'IBM Plex Mono',monospace">31</span></div>
+                <div style="display:flex;justify-content:space-between;font-size:11.5px"><span style="color:#6B7280">Complaints before</span><span style="font-family:'IBM Plex Mono',monospace">none</span></div>
+                <div style="display:flex;justify-content:space-between;font-size:11.5px"><span style="color:#6B7280">Note on file</span><span style="font-family:'IBM Plex Mono',monospace;font-size:10px">step-free, row D</span></div>
+              </div>
+              <div style="flex:none;background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:8px">
+                <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">What I can do here</div>
+                <div style="display:flex;align-items:center;gap:9px;padding:7px 9px;border-radius:8px;background:#F7F9FC;border:1px solid #E8ECF3"><span style="flex:1;font-size:11px;color:#5A6577">Refund up to £50</span><span style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#0B7A55">yes</span></div>
+                <div style="display:flex;align-items:center;gap:9px;padding:7px 9px;border-radius:8px;background:#F7F9FC;border:1px solid #E8ECF3"><span style="flex:1;font-size:11px;color:#5A6577">Move a booking</span><span style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#0B7A55">yes</span></div>
+                <div style="display:flex;align-items:center;gap:9px;padding:7px 9px;border-radius:8px;background:#F7F9FC;border:1px solid #E8ECF3"><span style="flex:1;font-size:11px;color:#5A6577">Issue a goodwill voucher</span><span style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#0B7A55">to £25</span></div>
+                <div style="display:flex;align-items:center;gap:9px;padding:7px 9px;border-radius:8px;background:#F7F9FC;border:1px solid #E8ECF3"><span style="flex:1;font-size:11px;color:#5A6577">Refund over £50</span><span style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8A4708">manager</span></div>
+              </div>
+              <div style="flex:1;min-height:0"></div>
+              <div style="flex:none;background:#fff;border:1.5px solid #F3DFC0;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:7px">
+                <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em;color:#7A3F06">No article for this yet</div>
+                <div style="font-size:10.5px;color:#7A3F06;line-height:1.5">147 other guests have asked the same question. Once this reply is sent, offer it as the basis for KB-065.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;line-height:1.85;color:#7C8899">
+        <div><b style="color:#4A5566;font-weight:600">OPERATIONS</b> · getConversation · sendReply · getAgentPermissions · refundOrder · issueVoucher · escalateToManager · promoteReplyToArticle</div>
+        <div><b style="color:#4A5566;font-weight:600">STATES</b> · open · <b style="color:#8A6D00">actionAboveLimit — the action is shown and disabled with the approver named</b> · replySent · escalated · resolved · error</div>
+        <div><b style="color:#4A5566;font-weight:600">ARRIVES WITH</b> · conversationId←<a href="#crm-7b">inbox</a> · agentId←login</div>
+        <div><b style="color:#4A5566;font-weight:600">GOES TO</b> · <a href="#crm-7h">service actions</a> · <a href="#crm-7e">knowledge</a> · <a href="#crm-7i">escalation</a></div>
+      </div>
+    </div>
+
+    <div id="crm-7g" data-screen-label="CRM-7G" data-screen-id="CRM-7G" data-screen-id-origin="board" style="display:flex;flex-direction:column;gap:13px;scroll-margin-top:24px">
+      <div>
+        <div style="display:flex;align-items:baseline;gap:9px"><span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#8494A8">CRM-7G</span><span style="font-size:16.5px;font-weight:800;letter-spacing:-.015em">Routing &amp; Queue Management</span><span style="font-size:9px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:2px 7px;border-radius:5px;background:#FFF1E6;color:#9A5B00">email has no owner</span></div>
+        <div style="font-size:12px;color:#6B7280;margin-top:3px">Which queue a conversation lands in and who is watching it. The email backlog exists because email routes to a queue nobody is assigned to — a routing gap looks exactly like an understaffing problem until you draw it.</div>
+      </div>
+      <div style="width:1280px;height:700px;display:flex;background:#F7F9FC;border:1px solid #E3E8F0;border-radius:14px;overflow:hidden;box-shadow:0 16px 38px rgba(12,35,64,.09)">
+        <aside style="flex:none;width:180px;background:#0B1324;display:flex;flex-direction:column;position:relative">
+          <div style="position:absolute;inset:0;background:radial-gradient(300px 200px at 0% 4%,rgba(0,184,255,.20),transparent 70%);pointer-events:none"></div>
+          <div style="position:relative;padding:15px 14px 13px;border-bottom:1px solid rgba(255,255,255,.08)"><img src="assets/ticvai-light-logo.png" alt="TICVAI" style="display:block;height:24px;width:auto"><div style="font-size:9.5px;color:#7FA3C9;margin-top:5px">Service &amp; Conversations</div></div>
+          <nav style="position:relative;display:flex;flex-direction:column;gap:2px;padding:11px 9px">
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Overview</div>
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Inbox</div>
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Chatbot</div>
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Knowledge</div>
+            <div style="padding:8px 10px;border-radius:9px;background:linear-gradient(90deg,rgba(13,110,253,.30),rgba(0,184,255,.10));color:#fff;font-size:11.5px;font-weight:700;box-shadow:inset 2px 0 0 #00B8FF">Routing</div>
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Quality</div>
+          </nav>
+          <div style="position:relative;margin-top:auto;padding:12px;border-top:1px solid rgba(255,255,255,.08);font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#7FA3C9;line-height:1.7">6 queues<br>1 unstaffed</div>
+        </aside>
+        <div style="flex:1;display:flex;flex-direction:column;min-width:0">
+          <header style="flex:none;height:54px;display:flex;align-items:center;gap:12px;padding:0 18px;background:#fff;border-bottom:1px solid #E8ECF3">
+            <div><div style="font-size:13.5px;font-weight:800;letter-spacing:-.01em">Routing and queues</div><div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#9AA5B6">6 queues · 7 agents on shift · 1 queue with nobody assigned</div></div>
+            <div style="margin-left:auto;display:flex;gap:6px"><div style="height:32px;display:flex;align-items:center;padding:0 11px;border:1px solid #E3E8F0;border-radius:8px;font-size:11px;font-weight:700;color:#5A6577">Shift plan</div><div style="height:32px;display:flex;align-items:center;padding:0 12px;border-radius:8px;background:#0D6EFD;color:#fff;font-size:11px;font-weight:700">Staff the email queue</div></div>
+          </header>
+          <div style="flex:1;display:grid;grid-template-columns:1fr 340px;gap:12px;padding:14px 16px;min-height:0">
+            <div style="display:flex;flex-direction:column;gap:12px;min-height:0">
+              <div style="flex:none;background:#fff;border:1px solid #E8ECF3;border-radius:12px;display:flex;flex-direction:column;overflow:hidden">
+                <div style="display:flex;align-items:center;gap:8px;padding:11px 14px 9px"><div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Queues</div><span style="margin-left:auto;font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#9AA5B6">waiting · agents · oldest</span></div>
+                <div style="display:grid;grid-template-columns:1.7fr 1fr 1fr 1fr 1.3fr;padding:0 14px 8px;font-size:9px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:#94A0B4;border-bottom:1px solid #EDF1F6"><div>Queue</div><div style="text-align:right">Waiting</div><div style="text-align:right">Agents</div><div style="text-align:right">Oldest</div><div>Target</div></div>
+                <div style="display:grid;grid-template-columns:1.7fr 1fr 1fr 1fr 1.3fr;align-items:center;padding:9px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA"><div style="font-weight:600">Live chat</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">42</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">4</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#0B7A55">4 min</div><div style="font-size:10.5px;color:#0B7A55">within target</div></div>
+                <div style="display:grid;grid-template-columns:1.7fr 1fr 1fr 1fr 1.3fr;align-items:center;padding:9px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA;background:#FDF5F5"><div style="font-weight:700;color:#8A2020">Email</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#8A2020">88</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;font-weight:700;color:#8A2020">0</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;font-weight:700;color:#8A2020">6 d</div><div style="font-size:10.5px;font-weight:600;color:#A81E1E">nobody assigned</div></div>
+                <div style="display:grid;grid-template-columns:1.7fr 1fr 1fr 1fr 1.3fr;align-items:center;padding:9px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA"><div style="font-weight:600">Complaints</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">8</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">1</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#8A4708">6 d</div><div style="font-size:10.5px;color:#8A4708">one agent for all</div></div>
+                <div style="display:grid;grid-template-columns:1.7fr 1fr 1fr 1fr 1.3fr;align-items:center;padding:9px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA"><div style="font-weight:600">Accessibility</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">6</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">1</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#0B7A55">11 min</div><div style="font-size:10.5px;color:#0B7A55">trained agents only</div></div>
+                <div style="display:grid;grid-template-columns:1.7fr 1fr 1fr 1fr 1.3fr;align-items:center;padding:9px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA"><div style="font-weight:600">Groups and schools</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">18</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">1</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#8A4708">2 d</div><div style="font-size:10.5px;color:#5A6577">sales team</div></div>
+                <div style="display:grid;grid-template-columns:1.7fr 1fr 1fr 1fr 1.3fr;align-items:center;padding:9px 14px;font-size:11.5px"><div style="font-weight:600">Social · public</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">11</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">1</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">41 min</div><div style="font-size:10.5px;color:#5A6577">shared with marketing</div></div>
+              </div>
+              <div style="flex:1;background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:13px 14px;display:flex;flex-direction:column;gap:10px;min-height:0">
+                <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">How a conversation is routed</div>
+                <div style="display:flex;flex-direction:column;gap:8px">
+                  <div style="display:flex;align-items:center;gap:10px;padding:9px 11px;border-radius:10px;background:#FDF5F5;border:1.5px solid #F5C9C9"><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#A81E1E;width:20px;flex:none;font-weight:700">1</span><span style="flex:1;font-size:11px;font-weight:600;color:#8A2020">Accessibility mentioned · straight to the trained queue</span></div>
+                  <div style="display:flex;align-items:center;gap:10px;padding:9px 11px;border-radius:10px;background:#FDF5F5;border:1px solid #F5C9C9"><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#A81E1E;width:20px;flex:none;font-weight:700">2</span><span style="flex:1;font-size:11px;color:#8A2020">A complaint · to the complaints queue whatever the channel</span></div>
+                  <div style="display:flex;align-items:center;gap:10px;padding:9px 11px;border-radius:10px;background:#F7F9FC;border:1px solid #E8ECF3"><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#9AA5B6;width:20px;flex:none">3</span><span style="flex:1;font-size:11px;color:#5A6577">A group account · to the sales owner for that account</span></div>
+                  <div style="display:flex;align-items:center;gap:10px;padding:9px 11px;border-radius:10px;background:#F7F9FC;border:1px solid #E8ECF3"><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#9AA5B6;width:20px;flex:none">4</span><span style="flex:1;font-size:11px;color:#5A6577">Previously handled by an agent · back to the same agent</span></div>
+                  <div style="display:flex;align-items:center;gap:10px;padding:9px 11px;border-radius:10px;background:#F7F9FC;border:1px solid #E8ECF3"><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#9AA5B6;width:20px;flex:none">5</span><span style="flex:1;font-size:11px;color:#5A6577">Otherwise · to the channel queue</span></div>
+                </div>
+                <div style="margin-top:auto;padding:9px 11px;border-radius:9px;background:#FDF5F5;border:1px solid #F5C9C9;font-size:10.5px;color:#8A2020;line-height:1.5">Rule 5 is the problem. Everything that does not match rules 1 to 4 falls into a channel queue, and the email channel queue has nobody rostered to it — 88 conversations deep with a six-day tail.</div>
+              </div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:12px;min-height:0">
+              <div style="flex:none;background:#fff;border:1.5px solid #F5C9C9;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:8px">
+                <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em;color:#8A2020">Nobody is on email</div>
+                <div style="font-size:10.5px;color:#5A6577;line-height:1.5">Four agents are on chat, which clears in four minutes. Moving one to email would clear 88 conversations in roughly three hours and take chat to six minutes.</div>
+                <div style="height:30px;border-radius:9px;background:#0D6EFD;color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700">Move one agent</div>
+              </div>
+              <div style="flex:none;background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:8px">
+                <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Why chat is fully staffed</div>
+                <div style="font-size:10.5px;color:#5A6577;line-height:1.55">A guest waiting in chat is visibly waiting and complains within minutes. An email backlog is invisible to everyone except the guest, so staffing drifts toward the queue that shouts.</div>
+              </div>
+              <div style="flex:1;min-height:0"></div>
+              <div style="flex:none;background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:7px">
+                <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Accessibility routes first</div>
+                <div style="font-size:10.5px;color:#5A6577;line-height:1.55">It is rule one, above complaints, because a guest asking whether they can get to their seat has a visit to plan and only a trained agent should answer. Six waiting, longest eleven minutes.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;line-height:1.85;color:#7C8899">
+        <div><b style="color:#4A5566;font-weight:600">OPERATIONS</b> · listQueues · getQueueDepth · getRoutingRules · setRoutingRule · assignAgentToQueue · getShiftPlan</div>
+        <div><b style="color:#4A5566;font-weight:600">STATES</b> · loading · <b style="color:#8A6D00">queueUnstaffed — conversations still route in and nobody is watching; named as a gap</b> · overTarget · balanced · error</div>
+        <div><b style="color:#4A5566;font-weight:600">ARRIVES WITH</b> · tenantId←context</div>
+        <div><b style="color:#4A5566;font-weight:600">GOES TO</b> · <a href="#crm-7b">inbox</a> · <a href="#crm-7a">command centre</a> · staffing roster</div>
+      </div>
+    </div>
+
+    <div id="crm-7h" data-screen-label="CRM-7H" data-screen-id="CRM-7H" data-screen-id-origin="board" style="display:flex;flex-direction:column;gap:13px;scroll-margin-top:24px">
+      <div>
+        <div style="display:flex;align-items:baseline;gap:9px"><span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#8494A8">CRM-7H</span><span style="font-size:16.5px;font-weight:800;letter-spacing:-.015em">Sales &amp; Service Actions</span><span style="font-size:9px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:2px 7px;border-radius:5px;background:#EDF3FF;color:#0A4FB8">what an agent may do without asking</span></div>
+        <div style="font-size:12px;color:#6B7280;margin-top:3px">The actions available inside a conversation and the limit on each. Limits set too low turn every second conversation into a manager request; set too high they turn goodwill into an unbudgeted cost.</div>
+      </div>
+      <div style="width:1280px;height:700px;display:flex;background:#F7F9FC;border:1px solid #E3E8F0;border-radius:14px;overflow:hidden;box-shadow:0 16px 38px rgba(12,35,64,.09)">
+        <aside style="flex:none;width:180px;background:#0B1324;display:flex;flex-direction:column;position:relative">
+          <div style="position:absolute;inset:0;background:radial-gradient(300px 200px at 0% 4%,rgba(0,184,255,.20),transparent 70%);pointer-events:none"></div>
+          <div style="position:relative;padding:15px 14px 13px;border-bottom:1px solid rgba(255,255,255,.08)"><img src="assets/ticvai-light-logo.png" alt="TICVAI" style="display:block;height:24px;width:auto"><div style="font-size:9.5px;color:#7FA3C9;margin-top:5px">Service &amp; Conversations</div></div>
+          <nav style="position:relative;display:flex;flex-direction:column;gap:2px;padding:11px 9px">
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Overview</div>
+            <div style="padding:8px 10px;border-radius:9px;background:linear-gradient(90deg,rgba(13,110,253,.30),rgba(0,184,255,.10));color:#fff;font-size:11.5px;font-weight:700;box-shadow:inset 2px 0 0 #00B8FF">Inbox</div>
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Chatbot</div>
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Knowledge</div>
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Routing</div>
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Quality</div>
+          </nav>
+          <div style="position:relative;margin-top:auto;padding:12px;border-top:1px solid rgba(255,255,255,.08);font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#7FA3C9;line-height:1.7">£4 100 given<br>this month</div>
+        </aside>
+        <div style="flex:1;display:flex;flex-direction:column;min-width:0">
+          <header style="flex:none;height:54px;display:flex;align-items:center;gap:12px;padding:0 18px;background:#fff;border-bottom:1px solid #E8ECF3">
+            <div><div style="font-size:13.5px;font-weight:800;letter-spacing:-.01em">Actions and limits</div><div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#9AA5B6">£4 100 of goodwill this month · 41 manager requests · 7 agents</div></div>
+            <div style="margin-left:auto;display:flex;gap:6px"><div style="height:32px;display:flex;align-items:center;padding:0 11px;border:1px solid #E3E8F0;border-radius:8px;font-size:11px;font-weight:700;color:#5A6577">Audit the month</div><div style="height:32px;display:flex;align-items:center;padding:0 12px;border-radius:8px;background:#0D6EFD;color:#fff;font-size:11px;font-weight:700">Raise the refund limit</div></div>
+          </header>
+          <div style="flex:1;display:grid;grid-template-columns:1fr 340px;gap:12px;padding:14px 16px;min-height:0">
+            <div style="display:flex;flex-direction:column;gap:12px;min-height:0">
+              <div style="flex:none;background:#fff;border:1px solid #E8ECF3;border-radius:12px;display:flex;flex-direction:column;overflow:hidden">
+                <div style="display:flex;align-items:center;gap:8px;padding:11px 14px 9px"><div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">What an agent can do from a conversation</div><span style="margin-left:auto;font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#9AA5B6">used this month</span></div>
+                <div style="display:grid;grid-template-columns:1.8fr 1fr 1fr 1fr 1.3fr;padding:0 14px 8px;font-size:9px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:#94A0B4;border-bottom:1px solid #EDF1F6"><div>Action</div><div style="text-align:right">Limit</div><div style="text-align:right">Used</div><div style="text-align:right">Escalated</div><div>Note</div></div>
+                <div style="display:grid;grid-template-columns:1.8fr 1fr 1fr 1fr 1.3fr;align-items:center;padding:8px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA"><div style="font-weight:600">Resend tickets</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">no limit</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">1 840</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#9AA5B6">—</div><div style="font-size:10.5px;color:#5A6577">most used action</div></div>
+                <div style="display:grid;grid-template-columns:1.8fr 1fr 1fr 1fr 1.3fr;align-items:center;padding:8px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA"><div style="font-weight:600">Move a booking</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">same price</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">410</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">18</div><div style="font-size:10.5px;color:#5A6577">upgrade needs a manager</div></div>
+                <div style="display:grid;grid-template-columns:1.8fr 1fr 1fr 1fr 1.3fr;align-items:center;padding:8px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA;background:#FFFBF4"><div style="font-weight:700;color:#7A3F06">Refund</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#7A3F06">£50</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#7A3F06">184</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;font-weight:700;color:#8A4708">31</div><div style="font-size:10.5px;color:#8A4708">limit hit often</div></div>
+                <div style="display:grid;grid-template-columns:1.8fr 1fr 1fr 1fr 1.3fr;align-items:center;padding:8px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA"><div style="font-weight:600">Goodwill voucher</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">£25</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">96</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">4</div><div style="font-size:10.5px;color:#5A6577">rarely challenged</div></div>
+                <div style="display:grid;grid-template-columns:1.8fr 1fr 1fr 1fr 1.3fr;align-items:center;padding:8px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA"><div style="font-weight:600">Sell a ticket in conversation</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">list price</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">142</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#9AA5B6">—</div><div style="font-size:10.5px;color:#5A6577">£8 400 of sales</div></div>
+                <div style="display:grid;grid-template-columns:1.8fr 1fr 1fr 1fr 1.3fr;align-items:center;padding:8px 14px;font-size:11.5px"><div style="font-weight:600">Cancel a membership</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#8A4708">manager</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">0</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">14</div><div style="font-size:10.5px;color:#5A6577">always escalated</div></div>
+              </div>
+              <div style="flex:1;background:#fff;border:1.5px solid #F3DFC0;border-radius:12px;padding:13px 14px;display:flex;flex-direction:column;gap:10px;min-height:0">
+                <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em;color:#7A3F06">The refund limit is set too low</div>
+                <div style="display:flex;gap:11px">
+                  <div style="flex:1;padding:11px 12px;border-radius:11px;background:#fff;border:1px solid #F3DFC0;display:flex;flex-direction:column;gap:3px"><span style="font-size:10px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:#8A4708">Escalated for a refund</span><span style="font-family:'IBM Plex Mono',monospace;font-size:17px;font-weight:600;color:#7A3F06">31</span><span style="font-size:10.5px;color:#7A3F06">of 41 manager requests</span></div>
+                  <div style="flex:1;padding:11px 12px;border-radius:11px;background:#fff;border:1px solid #F3DFC0;display:flex;flex-direction:column;gap:3px"><span style="font-size:10px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:#8A4708">Approved unchanged</span><span style="font-family:'IBM Plex Mono',monospace;font-size:17px;font-weight:600;color:#7A3F06">29</span><span style="font-size:10.5px;color:#7A3F06">94% of them</span></div>
+                </div>
+                <div style="margin-top:auto;padding:9px 11px;border-radius:9px;background:#fff;border:1px solid #F3DFC0;font-size:10.5px;color:#7A3F06;line-height:1.5">Managers approve 94% of refund escalations without change, and the median escalated amount is £68. Raising the limit to £75 would remove 27 of 31 escalations and cost, in the two cases a manager did reduce, about £40 a month.</div>
+              </div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:12px;min-height:0">
+              <div style="flex:none;background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:8px">
+                <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Goodwill, this month</div>
+                <div style="display:flex;justify-content:space-between;font-size:11.5px"><span style="color:#6B7280">Refunds</span><span style="font-family:'IBM Plex Mono',monospace">£2 700</span></div>
+                <div style="display:flex;justify-content:space-between;font-size:11.5px"><span style="color:#6B7280">Vouchers</span><span style="font-family:'IBM Plex Mono',monospace">£1 400</span></div>
+                <div style="display:flex;justify-content:space-between;font-size:11.5px;font-weight:700;padding-top:6px;border-top:1px solid #EDF1F6"><span>Total</span><span style="font-family:'IBM Plex Mono',monospace">£4 100</span></div>
+                <div style="display:flex;justify-content:space-between;font-size:11.5px"><span style="color:#6B7280">Sales in conversation</span><span style="font-family:'IBM Plex Mono',monospace;color:#0B7A55">£8 400</span></div>
+                <div style="font-size:10.5px;color:#5A6577;line-height:1.5">Service pays for itself twice over on this month's numbers, before counting anyone retained.</div>
+              </div>
+              <div style="flex:none;background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:7px">
+                <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Selling is allowed, discounting is not</div>
+                <div style="font-size:10.5px;color:#5A6577;line-height:1.55">An agent can complete a booking at list price inside a conversation. They cannot apply a discount code — that is a marketing decision with a budget behind it, not a service gesture.</div>
+              </div>
+              <div style="flex:1;min-height:0"></div>
+              <div style="flex:none;background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:7px">
+                <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Every action is on the guest's record</div>
+                <div style="font-size:10.5px;color:#5A6577;line-height:1.55">A refund made in a chat appears on the guest's timeline with the agent's name and the conversation it came from. That trail is what makes a generous limit safe.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;line-height:1.85;color:#7C8899">
+        <div><b style="color:#4A5566;font-weight:600">OPERATIONS</b> · getAgentActionLimits · setActionLimit · getActionUsage · getEscalationOutcomes · performServiceAction · getGoodwillTotal</div>
+        <div><b style="color:#4A5566;font-weight:600">STATES</b> · loading · <b style="color:#8A6D00">limitFrequentlyEscalated — surfaced with the approval rate so the limit can be argued about</b> · actionPerformed · escalated · error</div>
+        <div><b style="color:#4A5566;font-weight:600">ARRIVES WITH</b> · tenantId←context · agentId←optional</div>
+        <div><b style="color:#4A5566;font-weight:600">GOES TO</b> · <a href="#crm-7f">agent workspace</a> · <a href="Marketing%20Board%201.dc.html#crm-1i">refunds</a> · <a href="#crm-7j">audit</a></div>
+      </div>
+    </div>
+
+    <div id="crm-7i" data-screen-label="CRM-7I" data-screen-id="CRM-7I" data-screen-id-origin="board" style="display:flex;flex-direction:column;gap:13px;scroll-margin-top:24px">
+      <div>
+        <div style="display:flex;align-items:baseline;gap:9px"><span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#8494A8">CRM-7I</span><span style="font-size:16.5px;font-weight:800;letter-spacing:-.015em">Sentiment, Quality &amp; Escalation</span><span style="font-size:9px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:2px 7px;border-radius:5px;background:#FFF1E6;color:#9A5B00">quality scored on outcome</span></div>
+        <div style="font-size:12px;color:#6B7280;margin-top:3px">How conversations are ending. Handle time and satisfaction scores are here but subordinate to the only question that matters — did the guest's problem get solved, and did they come back.</div>
+      </div>
+      <div style="width:1280px;height:700px;display:flex;background:#F7F9FC;border:1px solid #E3E8F0;border-radius:14px;overflow:hidden;box-shadow:0 16px 38px rgba(12,35,64,.09)">
+        <aside style="flex:none;width:180px;background:#0B1324;display:flex;flex-direction:column;position:relative">
+          <div style="position:absolute;inset:0;background:radial-gradient(300px 200px at 0% 4%,rgba(0,184,255,.20),transparent 70%);pointer-events:none"></div>
+          <div style="position:relative;padding:15px 14px 13px;border-bottom:1px solid rgba(255,255,255,.08)"><img src="assets/ticvai-light-logo.png" alt="TICVAI" style="display:block;height:24px;width:auto"><div style="font-size:9.5px;color:#7FA3C9;margin-top:5px">Service &amp; Conversations</div></div>
+          <nav style="position:relative;display:flex;flex-direction:column;gap:2px;padding:11px 9px">
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Overview</div>
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Inbox</div>
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Chatbot</div>
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Knowledge</div>
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Routing</div>
+            <div style="padding:8px 10px;border-radius:9px;background:linear-gradient(90deg,rgba(13,110,253,.30),rgba(0,184,255,.10));color:#fff;font-size:11.5px;font-weight:700;box-shadow:inset 2px 0 0 #00B8FF">Quality</div>
+          </nav>
+          <div style="position:relative;margin-top:auto;padding:12px;border-top:1px solid rgba(255,255,255,.08);font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#7FA3C9;line-height:1.7">1 240 handled<br>solved 84%</div>
+        </aside>
+        <div style="flex:1;display:flex;flex-direction:column;min-width:0">
+          <header style="flex:none;height:54px;display:flex;align-items:center;gap:12px;padding:0 18px;background:#fff;border-bottom:1px solid #E8ECF3">
+            <div><div style="font-size:13.5px;font-weight:800;letter-spacing:-.01em">Quality and escalation · this week</div><div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#9AA5B6">1 240 conversations closed · 84% solved first time · 14 escalated</div></div>
+            <div style="margin-left:auto;display:flex;gap:6px"><div style="height:32px;display:flex;align-items:center;padding:0 11px;border:1px solid #E3E8F0;border-radius:8px;font-size:11px;font-weight:700;color:#5A6577">Escalation rules</div><div style="height:32px;display:flex;align-items:center;padding:0 12px;border-radius:8px;background:#0D6EFD;color:#fff;font-size:11px;font-weight:700">Review the 12 reopened</div></div>
+          </header>
+          <div style="flex:1;display:flex;flex-direction:column;gap:12px;padding:14px 16px;min-height:0">
+            <div style="flex:none;display:grid;grid-template-columns:repeat(4,1fr);gap:11px">
+              <div style="background:#fff;border:1px solid #CBE8DA;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:4px"><span style="font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#0B7A55">Solved first time</span><span style="font-family:'IBM Plex Mono',monospace;font-size:20px;font-weight:600;color:#0B5B41">84%</span><span style="font-size:10.5px;color:#0B7A55">the number that matters</span></div>
+              <div style="background:#fff;border:1.5px solid #F3DFC0;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:4px"><span style="font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#8A4708">Reopened within 7 days</span><span style="font-family:'IBM Plex Mono',monospace;font-size:20px;font-weight:600;color:#7A3F06">12</span><span style="font-size:10.5px;color:#8A4708">closed but not solved</span></div>
+              <div style="background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:4px"><span style="font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#94A0B4">Satisfaction</span><span style="font-family:'IBM Plex Mono',monospace;font-size:20px;font-weight:600">4.4 / 5</span><span style="font-size:10.5px;color:#5A6577">on 310 responses</span></div>
+              <div style="background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:4px"><span style="font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#94A0B4">Handle time · median</span><span style="font-family:'IBM Plex Mono',monospace;font-size:20px;font-weight:600">7 min</span><span style="font-size:10.5px;color:#5A6577">not a target</span></div>
+            </div>
+            <div style="flex:1;display:grid;grid-template-columns:1.3fr 1fr;gap:12px;min-height:0">
+              <div style="background:#fff;border:1px solid #E8ECF3;border-radius:12px;display:flex;flex-direction:column;overflow:hidden;min-height:0">
+                <div style="flex:none;display:flex;align-items:center;gap:8px;padding:11px 14px 10px;border-bottom:1px solid #EDF1F6"><div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">The 12 that came back</div><span style="margin-left:auto;font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#9AA5B6">closed, then reopened</span></div>
+                <div style="flex:none;display:grid;grid-template-columns:1.4fr 1.9fr 1fr 1.2fr;padding:8px 14px;font-size:9px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:#94A0B4;border-bottom:1px solid #EDF1F6"><div>Guest</div><div>Why it came back</div><div style="text-align:right">Gap</div><div>Pattern</div></div>
+                <div style="display:grid;grid-template-columns:1.4fr 1.9fr 1fr 1.2fr;align-items:center;padding:9px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA;background:#FDF5F5"><div style="font-weight:700;color:#8A2020">4 guests</div><div style="font-size:10.5px;color:#8A2020">Told 14 days for a refund, refused at 10</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#8A2020">3 d</div><div style="font-size:10.5px;font-weight:600;color:#A81E1E">KB-011 is wrong</div></div>
+                <div style="display:grid;grid-template-columns:1.4fr 1.9fr 1fr 1.2fr;align-items:center;padding:9px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA;background:#FDF5F5"><div style="font-weight:700;color:#8A2020">3 guests</div><div style="font-size:10.5px;color:#8A2020">Told a pushchair was not allowed, then it was</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#8A2020">1 d</div><div style="font-size:10.5px;font-weight:600;color:#A81E1E">KB-029 is wrong</div></div>
+                <div style="display:grid;grid-template-columns:1.4fr 1.9fr 1fr 1.2fr;align-items:center;padding:9px 14px;font-size:11.5px;border-bottom:1px solid #F4F6FA"><div style="font-weight:600">3 guests</div><div style="font-size:10.5px;color:#5A6577">Tickets resent, still not received</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">2 d</div><div style="font-size:10.5px;color:#5A6577">delivery, not service</div></div>
+                <div style="display:grid;grid-template-columns:1.4fr 1.9fr 1fr 1.2fr;align-items:center;padding:9px 14px;font-size:11.5px"><div style="font-weight:600">2 guests</div><div style="font-size:10.5px;color:#5A6577">Answer was right, guest disagreed with policy</div><div style="font-family:'IBM Plex Mono',monospace;text-align:right">4 d</div><div style="font-size:10.5px;color:#5A6577">not a quality issue</div></div>
+                <div style="margin-top:auto;flex:none;padding:11px 14px;border-top:1px solid #EDF1F6;background:#FDF5F5;display:flex;gap:11px"><span style="width:3px;border-radius:2px;background:#DC2626;flex:none"></span><div style="flex:1;font-size:11px;color:#8A2020;line-height:1.55">Seven of twelve reopenings are two wrong knowledge articles. Agents gave the answer the system told them to give. Scoring them on quality here would be scoring them for following instructions.</div></div>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:12px;min-height:0">
+                <div style="flex:none;background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:8px">
+                  <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">What escalates automatically</div>
+                  <div style="display:flex;align-items:center;gap:9px;padding:7px 9px;border-radius:8px;background:#F7F9FC;border:1px solid #E8ECF3"><span style="flex:1;font-size:11px;color:#5A6577">A complaint open over 48 hours</span></div>
+                  <div style="display:flex;align-items:center;gap:9px;padding:7px 9px;border-radius:8px;background:#F7F9FC;border:1px solid #E8ECF3"><span style="flex:1;font-size:11px;color:#5A6577">A third message with no reply</span></div>
+                  <div style="display:flex;align-items:center;gap:9px;padding:7px 9px;border-radius:8px;background:#F7F9FC;border:1px solid #E8ECF3"><span style="flex:1;font-size:11px;color:#5A6577">Legal or regulator mentioned</span></div>
+                  <div style="display:flex;align-items:center;gap:9px;padding:7px 9px;border-radius:8px;background:#F7F9FC;border:1px solid #E8ECF3"><span style="flex:1;font-size:11px;color:#5A6577">Anything about a child's safety</span></div>
+                  <div style="font-size:10.5px;color:#8A2020;line-height:1.5">C-2214 met the first rule on 22 August and was not escalated, because the rule was advisory. It is now enforced.</div>
+                </div>
+                <div style="flex:1;min-height:0"></div>
+                <div style="flex:none;background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:7px">
+                  <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Handle time is measured, not targeted</div>
+                  <div style="font-size:10.5px;color:#5A6577;line-height:1.55">It is here to spot a conversation that has gone wrong, not to push agents faster. The moment it becomes a target, the first-time-solved rate falls and the reopen count rises.</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;line-height:1.85;color:#7C8899">
+        <div><b style="color:#4A5566;font-weight:600">OPERATIONS</b> · getQualityMetrics · listReopenedConversations · getReopenReason · getEscalationRules · escalateConversation · getSatisfactionScores</div>
+        <div><b style="color:#4A5566;font-weight:600">STATES</b> · loading · <b style="color:#8A6D00">reopenedDueToKnowledge — attributed to the article, never to the agent</b> · escalationMissed · healthy · error</div>
+        <div><b style="color:#4A5566;font-weight:600">ARRIVES WITH</b> · tenantId←context · window←picker</div>
+        <div><b style="color:#4A5566;font-weight:600">GOES TO</b> · <a href="#crm-7e">knowledge</a> · <a href="#crm-7j">audit</a> · <a href="#crm-7f">agent workspace</a></div>
+      </div>
+    </div>
+
+    <div id="crm-7j" data-screen-label="CRM-7J" data-screen-id="CRM-7J" data-screen-id-origin="board" style="display:flex;flex-direction:column;gap:13px;scroll-margin-top:24px">
+      <div>
+        <div style="display:flex;align-items:baseline;gap:9px"><span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#8494A8">CRM-7J</span><span style="font-size:16.5px;font-weight:800;letter-spacing:-.015em">Chat Analytics &amp; Audit</span><span style="font-size:9px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:2px 7px;border-radius:5px;background:#EEF2F7;color:#64748B">what conversations are telling us</span></div>
+        <div style="font-size:12px;color:#6B7280;margin-top:3px">The last screen in the module, and the one that points back at all the others. Most contact is caused by something upstream, so the useful output is not a service report — it is a list of things to fix elsewhere.</div>
+      </div>
+      <div style="width:1280px;height:700px;display:flex;background:#F7F9FC;border:1px solid #E3E8F0;border-radius:14px;overflow:hidden;box-shadow:0 16px 38px rgba(12,35,64,.09)">
+        <aside style="flex:none;width:180px;background:#0B1324;display:flex;flex-direction:column;position:relative">
+          <div style="position:absolute;inset:0;background:radial-gradient(300px 200px at 0% 4%,rgba(0,184,255,.20),transparent 70%);pointer-events:none"></div>
+          <div style="position:relative;padding:15px 14px 13px;border-bottom:1px solid rgba(255,255,255,.08)"><img src="assets/ticvai-light-logo.png" alt="TICVAI" style="display:block;height:24px;width:auto"><div style="font-size:9.5px;color:#7FA3C9;margin-top:5px">Service &amp; Conversations</div></div>
+          <nav style="position:relative;display:flex;flex-direction:column;gap:2px;padding:11px 9px">
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Overview</div>
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Inbox</div>
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Chatbot</div>
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Knowledge</div>
+            <div style="padding:8px 10px;border-radius:9px;color:#8296B0;font-size:11.5px;font-weight:600">Routing</div>
+            <div style="padding:8px 10px;border-radius:9px;background:linear-gradient(90deg,rgba(13,110,253,.30),rgba(0,184,255,.10));color:#fff;font-size:11.5px;font-weight:700;box-shadow:inset 2px 0 0 #00B8FF">Quality</div>
+          </nav>
+          <div style="position:relative;margin-top:auto;padding:12px;border-top:1px solid rgba(255,255,255,.08);font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#7FA3C9;line-height:1.7">3 100 chats<br>1 240 handled</div>
+        </aside>
+        <div style="flex:1;display:flex;flex-direction:column;min-width:0">
+          <header style="flex:none;height:54px;display:flex;align-items:center;gap:12px;padding:0 18px;background:#fff;border-bottom:1px solid #E8ECF3">
+            <div><div style="font-size:13.5px;font-weight:800;letter-spacing:-.01em">What conversations are telling us</div><div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#9AA5B6">4 340 contacts this week · 68% caused by something fixable upstream</div></div>
+            <div style="margin-left:auto;display:flex;gap:6px"><div style="height:32px;display:flex;align-items:center;padding:0 11px;border:1px solid #E3E8F0;border-radius:8px;font-size:11px;font-weight:700;color:#5A6577">Export the audit log</div><div style="height:32px;display:flex;align-items:center;padding:0 12px;border-radius:8px;background:#0D6EFD;color:#fff;font-size:11px;font-weight:700">Raise the four fixes</div></div>
+          </header>
+          <div style="flex:1;display:grid;grid-template-columns:1fr 340px;gap:12px;padding:14px 16px;min-height:0">
+            <div style="background:#fff;border:1px solid #E8ECF3;border-radius:12px;display:flex;flex-direction:column;overflow:hidden;min-height:0">
+              <div style="flex:none;display:flex;align-items:center;gap:8px;padding:11px 14px 10px;border-bottom:1px solid #EDF1F6"><div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Contacts caused by something else</div><span style="margin-left:auto;font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#9AA5B6">each links to where it belongs</span></div>
+              <div style="display:flex;gap:11px;padding:12px 14px;border-bottom:1px solid #F4F6FA;background:#FDF5F5">
+                <span style="width:3px;border-radius:2px;background:#DC2626;flex:none"></span>
+                <div style="flex:1"><div style="display:flex;align-items:baseline;gap:8px"><span style="font-size:12px;font-weight:700;color:#8A2020">960 guests could not find their tickets</span><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#A81E1E">31% of all contact</span></div><div style="font-size:10.5px;color:#8A2020;margin-top:2px;line-height:1.5">The booking confirmation renders as an image and is blank with images off. Fixing one template removes almost a third of all inbound contact.</div></div>
+                <span style="flex:none;font-size:10px;font-weight:700;color:#0D6EFD;align-self:center"><a href="Marketing%20Board%206.dc.html#crm-6b">Template</a></span>
+              </div>
+              <div style="display:flex;gap:11px;padding:12px 14px;border-bottom:1px solid #F4F6FA;background:#FDF5F5">
+                <span style="width:3px;border-radius:2px;background:#DC2626;flex:none"></span>
+                <div style="flex:1"><div style="display:flex;align-items:baseline;gap:8px"><span style="font-size:12px;font-weight:700;color:#8A2020">148 asked why their seats changed</span><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#A81E1E">14 complaints</span></div><div style="font-size:10.5px;color:#8A2020;margin-top:2px;line-height:1.5">A seat map republish moved them and no notification rule exists. All 148 found out at the door.</div></div>
+                <span style="flex:none;font-size:10px;font-weight:700;color:#0D6EFD;align-self:center"><a href="Marketing%20Board%206.dc.html#crm-6f">Add the rule</a></span>
+              </div>
+              <div style="display:flex;gap:11px;padding:12px 14px;border-bottom:1px solid #F4F6FA;background:#FFFBF4">
+                <span style="width:3px;border-radius:2px;background:#B4530A;flex:none"></span>
+                <div style="flex:1"><div style="display:flex;align-items:baseline;gap:8px"><span style="font-size:12px;font-weight:700;color:#7A3F06">380 asked about refund windows</span><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#8A4708">7 reopened</span></div><div style="font-size:10.5px;color:#7A3F06;margin-top:2px;line-height:1.5">The knowledge article says 14 days, the till enforces 7. Guests are being promised something the system refuses.</div></div>
+                <span style="flex:none;font-size:10px;font-weight:700;color:#0D6EFD;align-self:center"><a href="#crm-7e">Fix KB-011</a></span>
+              </div>
+              <div style="display:flex;gap:11px;padding:12px 14px;border-bottom:1px solid #F4F6FA;background:#FFFBF4">
+                <span style="width:3px;border-radius:2px;background:#B4530A;flex:none"></span>
+                <div style="flex:1"><div style="display:flex;align-items:baseline;gap:8px"><span style="font-size:12px;font-weight:700;color:#7A3F06">88 asked about quiet sessions</span><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#8A4708">no article</span></div><div style="font-size:10.5px;color:#7A3F06;margin-top:2px;line-height:1.5">We run them monthly and they are not documented anywhere a guest or the bot can find.</div></div>
+                <span style="flex:none;font-size:10px;font-weight:700;color:#0D6EFD;align-self:center"><a href="#crm-7e">Write it</a></span>
+              </div>
+              <div style="display:flex;gap:11px;padding:12px 14px">
+                <span style="width:3px;border-radius:2px;background:#C7D3E4;flex:none"></span>
+                <div style="flex:1"><div style="display:flex;align-items:baseline;gap:8px"><span style="font-size:12px;font-weight:700">1 390 genuine questions</span><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#8494A8">32%</span></div><div style="font-size:10.5px;color:#5A6577;margin-top:2px;line-height:1.5">Parking, access, changing dates, group bookings. This is the irreducible part, and the bot handles most of it.</div></div>
+              </div>
+              <div style="margin-top:auto;flex:none;display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-top:1px solid #EDF1F6;background:#FBFCFE"><span style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8494A8">4 fixes would remove 2 950 contacts a week</span><span style="font-size:10.5px;font-weight:700;color:#0D6EFD">Send to the product backlog</span></div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:12px;min-height:0">
+              <div style="flex:none;background:#fff;border:1.5px solid #BBD6FF;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:8px">
+                <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em;color:#0A4FB8">Two thirds of contact is avoidable</div>
+                <div style="display:flex;justify-content:space-between;font-size:11.5px"><span style="color:#0A4FB8">Contacts this week</span><span style="font-family:'IBM Plex Mono',monospace;color:#0A4FB8">4 340</span></div>
+                <div style="display:flex;justify-content:space-between;font-size:11.5px"><span style="color:#0A4FB8">Caused upstream</span><span style="font-family:'IBM Plex Mono',monospace;color:#0A4FB8">2 950</span></div>
+                <div style="display:flex;justify-content:space-between;font-size:11.5px"><span style="color:#0A4FB8">Genuine</span><span style="font-family:'IBM Plex Mono',monospace;color:#0A4FB8">1 390</span></div>
+                <div style="font-size:10.5px;color:#0A4FB8;line-height:1.5">Four fixes, none of them in this module, would cut inbound contact by 68%. That is the argument service should be making to the rest of the business.</div>
+              </div>
+              <div style="flex:none;background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:8px">
+                <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">What the audit log holds</div>
+                <div style="display:flex;justify-content:space-between;font-size:11.5px"><span style="color:#6B7280">Conversations · 12 months</span><span style="font-family:'IBM Plex Mono',monospace">148 000</span></div>
+                <div style="display:flex;justify-content:space-between;font-size:11.5px"><span style="color:#6B7280">Bot transcripts kept</span><span style="font-family:'IBM Plex Mono',monospace">all</span></div>
+                <div style="display:flex;justify-content:space-between;font-size:11.5px"><span style="color:#6B7280">Agent actions logged</span><span style="font-family:'IBM Plex Mono',monospace">all</span></div>
+                <div style="display:flex;justify-content:space-between;font-size:11.5px"><span style="color:#6B7280">Retention</span><span style="font-family:'IBM Plex Mono',monospace">3 years</span></div>
+                <div style="font-size:10.5px;color:#5A6577;line-height:1.5">A transcript is personal data and appears in an access request. It is included in the export pack alongside the send log.</div>
+              </div>
+              <div style="flex:1;min-height:0"></div>
+              <div style="flex:none;background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:7px">
+                <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Service is the best listening post we have</div>
+                <div style="font-size:10.5px;color:#5A6577;line-height:1.55">Every broken thing in the other six boards showed up here first, as a question. Treating this screen as a service report rather than a defect list is how the same 960 tickets-missing contacts arrive again next week.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;line-height:1.85;color:#7C8899">
+        <div><b style="color:#4A5566;font-weight:600">OPERATIONS</b> · getContactDrivers · getAvoidableContactShare · linkDriverToSource · exportConversationAudit · getRetentionPolicy · raiseProductIssue</div>
+        <div><b style="color:#4A5566;font-weight:600">STATES</b> · loading · <b style="color:#8A6D00">driverUnattributed — a contact reason with no identified cause is listed as unexplained, not as genuine</b> · exporting · error</div>
+        <div><b style="color:#4A5566;font-weight:600">ARRIVES WITH</b> · tenantId←context · window←picker</div>
+        <div><b style="color:#4A5566;font-weight:600">GOES TO</b> · <a href="Marketing%20Board%206.dc.html#crm-6b">templates</a> · <a href="Marketing%20Board%206.dc.html#crm-6f">notification rules</a> · <a href="Marketing%20Board%202.dc.html#crm-2g">data requests</a></div>
+      </div>
+    </div>
+
+    <div style="background:#fff;border:1px solid #E3E8F0;border-radius:12px;padding:18px 20px;display:flex;flex-direction:column;gap:14px">
+      <div><div style="font-size:14px;font-weight:800;letter-spacing:-.01em">Mapping table · Marketing Board 7</div><div style="font-size:11.5px;color:#6B7280;margin-top:3px">Reference pack rows, in the order the client listed them.</div></div>
+      <div style="display:grid;grid-template-columns:.55fr 1.6fr 1.7fr;border:1px solid #EDF1F6;border-radius:9px;overflow:hidden">
+        <div style="padding:8px 11px;background:#FBFCFE;font-size:9px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:#94A0B4;border-bottom:1px solid #EDF1F6">Frame</div>
+        <div style="padding:8px 11px;background:#FBFCFE;font-size:9px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:#94A0B4;border-bottom:1px solid #EDF1F6">Reference row</div>
+        <div style="padding:8px 11px;background:#FBFCFE;font-size:9px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:#94A0B4;border-bottom:1px solid #EDF1F6">What the frame decides</div>
+        <div style="padding:8px 11px;font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600;color:#0D6EFD;border-bottom:1px solid #F4F6FA">crm-7a</div>
+        <div style="padding:8px 11px;font-size:11.5px;border-bottom:1px solid #F4F6FA">Omnichannel Command Center</div>
+        <div style="padding:8px 11px;font-size:11.5px;color:#5A6577;border-bottom:1px solid #F4F6FA">Who has waited longest anywhere</div>
+        <div style="padding:8px 11px;font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600;color:#0D6EFD;border-bottom:1px solid #F4F6FA">crm-7b</div>
+        <div style="padding:8px 11px;font-size:11.5px;border-bottom:1px solid #F4F6FA">Unified Inbox</div>
+        <div style="padding:8px 11px;font-size:11.5px;color:#5A6577;border-bottom:1px solid #F4F6FA">Which conversation to open next</div>
+        <div style="padding:8px 11px;font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600;color:#0D6EFD;border-bottom:1px solid #F4F6FA">crm-7c</div>
+        <div style="padding:8px 11px;font-size:11.5px;border-bottom:1px solid #F4F6FA">Guest Conversation 360</div>
+        <div style="padding:8px 11px;font-size:11.5px;color:#5A6577;border-bottom:1px solid #F4F6FA">What this guest has already told us</div>
+        <div style="padding:8px 11px;font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600;color:#0D6EFD;border-bottom:1px solid #F4F6FA">crm-7d</div>
+        <div style="padding:8px 11px;font-size:11.5px;border-bottom:1px solid #F4F6FA">AI Chatbot Configuration</div>
+        <div style="padding:8px 11px;font-size:11.5px;color:#5A6577;border-bottom:1px solid #F4F6FA">What the bot may answer, and when to stop</div>
+        <div style="padding:8px 11px;font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600;color:#0D6EFD;border-bottom:1px solid #F4F6FA">crm-7e</div>
+        <div style="padding:8px 11px;font-size:11.5px;border-bottom:1px solid #F4F6FA">Intent &amp; Knowledge Management</div>
+        <div style="padding:8px 11px;font-size:11.5px;color:#5A6577;border-bottom:1px solid #F4F6FA">Which article is lying to guests</div>
+        <div style="padding:8px 11px;font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600;color:#0D6EFD;border-bottom:1px solid #F4F6FA">crm-7f</div>
+        <div style="padding:8px 11px;font-size:11.5px;border-bottom:1px solid #F4F6FA">Agent Workspace</div>
+        <div style="padding:8px 11px;font-size:11.5px;color:#5A6577;border-bottom:1px solid #F4F6FA">What to say and what to do about it</div>
+        <div style="padding:8px 11px;font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600;color:#0D6EFD;border-bottom:1px solid #F4F6FA">crm-7g</div>
+        <div style="padding:8px 11px;font-size:11.5px;border-bottom:1px solid #F4F6FA">Routing &amp; Queue Management</div>
+        <div style="padding:8px 11px;font-size:11.5px;color:#5A6577;border-bottom:1px solid #F4F6FA">Which queue nobody is watching</div>
+        <div style="padding:8px 11px;font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600;color:#0D6EFD;border-bottom:1px solid #F4F6FA">crm-7h</div>
+        <div style="padding:8px 11px;font-size:11.5px;border-bottom:1px solid #F4F6FA">Sales &amp; Service Actions</div>
+        <div style="padding:8px 11px;font-size:11.5px;color:#5A6577;border-bottom:1px solid #F4F6FA">Where an agent's authority should end</div>
+        <div style="padding:8px 11px;font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600;color:#0D6EFD;border-bottom:1px solid #F4F6FA">crm-7i</div>
+        <div style="padding:8px 11px;font-size:11.5px;border-bottom:1px solid #F4F6FA">Sentiment, Quality &amp; Escalation</div>
+        <div style="padding:8px 11px;font-size:11.5px;color:#5A6577;border-bottom:1px solid #F4F6FA">Whether the problem was actually solved</div>
+        <div style="padding:8px 11px;font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600;color:#0D6EFD;">crm-7j</div>
+        <div style="padding:8px 11px;font-size:11.5px;">Chat Analytics &amp; Audit</div>
+        <div style="padding:8px 11px;font-size:11.5px;color:#5A6577;">What to fix so nobody has to ask</div>
+      </div>
+      <div style="display:flex;gap:12px;padding:13px 15px;border-radius:10px;background:#FFF6EA;border:1px solid #F3DFC0;font-size:11.5px;color:#7A3F06;line-height:1.6">
+        <div style="width:3px;border-radius:2px;background:#B4530A;flex:none"></div>
+        <div><b>70 of 120 drawn in Marketing &amp; CRM.</b> Board 8 takes loyalty and membership. This board closes the loop on three threads from earlier boards — the unreadable confirmation, the missing reseat notification, and a refund article that contradicts the till — all of which arrived here first as questions.</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+</x-dc>
+</body>
+</html>

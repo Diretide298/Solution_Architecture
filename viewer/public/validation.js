@@ -20,7 +20,14 @@
 //
 // No trailing /api — every path below already starts with one, and call() joins
 // them as `${API}${path}`, so a base ending in /api asks for /api/api/....
-const API_DEPLOYED = 'https://asterapi.ainfinite.ai';
+//
+// `adamapi`, not `asterapi`, since the rename. The nginx block answers to both
+// names on the same certificate, so the old value still worked — which is why
+// it survived the commit that moved everything else and `deploy/README.md`
+// asserting this constant "moves in the same commit" was untrue for a day. The
+// alias is temporary by design; a constant that only works until a name is
+// retired is a page that breaks on the day nobody is looking for it.
+const API_DEPLOYED = 'https://adamapi.ainfinite.ai';
 
 // A workstation is the exception, and only a workstation: there the two halves
 // are on separate ports on this machine and the deployed address is the wrong

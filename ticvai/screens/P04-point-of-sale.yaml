@@ -221,8 +221,8 @@ screens:
   provenance: client board, specified
   requiresModule: core
   boardFrames:
-  - POS-2A
-  - POS-3D
+  - POS Board 3.dc.html#pos-3d
+  - TICVAI Boards v2.dc.html#pos-2a
   statesDerived: true
 - id: POS-002
   name: Sell — Ticket Catalogue
@@ -255,6 +255,18 @@ screens:
         label: Sort by
       - kind: multiSelect
         label: Filters
+      - kind: confirmDialog
+        label: Clear the cart?
+        notes: '**The consequence goes in the body, not the title.** Written per operation on 1 September,
+          replacing one identical definition that had been pasted onto all 39 screens.
+
+
+          **Name the line count and the cart value being discarded, and whether the guest is standing
+          there.** Clearing is not voiding - nothing has been ordered yet, so there is no `orders.sales_order`
+          to reverse and no state transition. **On `touchLarge` with a queue behind, an undo is better
+          than a dialog** - this confirmation exists because Clear cart sits in the same action bar
+          as Checkout, and moving it out would remove the need for it.'
+        bindsTo: removeCartLine
     - name: contextPanel
       components:
       - kind: cartPanel
@@ -530,9 +542,9 @@ screens:
   provenance: client board, specified
   requiresModule: ticketing
   boardFrames:
-  - RET-3B
-  - RET-3C
-  - RET-3D
+  - Retail Board 3.dc.html#ret-3b
+  - Retail Board 3.dc.html#ret-3c
+  - Retail Board 3.dc.html#ret-3d
   statesDerived: true
 - id: POS-003
   name: Sell — Timed Entry
@@ -591,7 +603,7 @@ screens:
     contract: catalogue
     purpose: Per-session remaining
     trigger: onLoad
-  - operationId: acquireLease
+  - operationId: acquireInventoryHold
     contract: catalogue
     purpose: Hold capacity for this terminal
     trigger: onAction
@@ -607,7 +619,7 @@ screens:
     contract: catalogue
     purpose: External identifiers for a product
     trigger: onLoad
-  - operationId: listLeases
+  - operationId: listInventoryHolds
     contract: catalogue
     purpose: List leases
     trigger: onLoad
@@ -615,11 +627,11 @@ screens:
     contract: catalogue
     purpose: List products
     trigger: onLoad
-  - operationId: releaseLease
+  - operationId: releaseInventoryHold
     contract: catalogue
     purpose: Return unsold units
     trigger: onAction
-  - operationId: renewLease
+  - operationId: renewInventoryHold
     contract: catalogue
     purpose: Extend a lease TTL
     trigger: onAction
@@ -629,10 +641,10 @@ screens:
     trigger: onLoad
   notes: 'Design: Park_POS_dc.html, "Aquarium Entry" timed entry. The demand indicator is a presentation
     of remaining capacity, not a separate field. **Authoring operations removed 24 August**: createProduct,
-    forceReleaseLease, setAlternativeCodes, setProductAttributes, transitionProductLifecycle, updateProduct.
-    **A till sells the catalogue; it does not author it.** These arrived in the 18 August bulk attach
-    — the same defect that put 21 of 39 review rows in one bucket — and a flow walking a ticket sale
-    is what surfaced them.'
+    forceReleaseInventoryHold, setAlternativeCodes, setProductAttributes, transitionProductLifecycle,
+    updateProduct. **A till sells the catalogue; it does not author it.** These arrived in the 18 August
+    bulk attach — the same defect that put 21 of 39 review rows in one bucket — and a flow walking a
+    ticket sale is what surfaced them.'
   implementation:
     app: venue-pos
     route: /sell/sell-timed-entry
@@ -650,7 +662,7 @@ screens:
   density: touchLarge
   entryState:
     params:
-    - name: leaseId
+    - name: inventoryHoldId
       from: deepLink
     - name: productId
       from: POS-002
@@ -658,7 +670,7 @@ screens:
       silent redirect — a supervisor following a link from an alert needs to know whether the record
       moved, closed or never existed, because those are three different next actions. **The scope is
       resolved from the session, never from the link**: a link cannot move somebody to a venue they
-      do not hold. Arrives with `leaseId`.'
+      do not hold. Arrives with `inventoryHoldId`.'
   requiresModule: ticketing
   statesDerived: true
 - id: POS-004
@@ -791,7 +803,7 @@ screens:
   requiresModule: seating
   statesDerived: true
   boardFrames:
-  - seat-3a
+  - Seat Board 3.dc.html#seat-3a
 - id: POS-005
   name: Payment
   module: Payment
@@ -813,6 +825,21 @@ screens:
         notes: Computed live. Quick-tender chips for exact, 250, 300
       - kind: paymentTerminal
         bindsTo: Payment
+      - kind: confirmDialog
+        label: Cancel this order and release the payment?
+        notes: '**The consequence goes in the body, not the title.** Written per operation on 1 September,
+          replacing one identical definition that had been pasted onto all 39 screens.
+
+
+          **Name the order value and the state of the payment.** Writes `orders.sales_order`, `orders.order_line`
+          and `orders.payment`; `Order pending -> voided`. **No event is emitted, so the ledger is not
+          told.**
+
+
+          **Must be refused, not confirmed, while `Payment.status` is `pendingConfirmation`** - voiding
+          an order whose card may already have been charged is how a guest is charged for nothing. Offer
+          `inquirePaymentStatus` instead and disable this action until it resolves.'
+        bindsTo: voidOrder
     - name: contextPanel
       components:
       - kind: cartPanel
@@ -846,9 +873,29 @@ screens:
 
       **Also reached when `ticketing` is not licensed.** The tenant has not bought this module, which
       is a commercial answer and not a permission one — say which, because the person to ask is different.'
-    error: Declined, with the reason. Retry reuses the same idempotency key
+    error: Declined, with the reason. Retry reuses the same idempotency key. **This is the clean decline
+      only** - the issuer answered and refused. An unanswered terminal is `unknown`, not this.
     offline: Cash completes locally and journals. **Card does not** — an offline card approval the acquirer
       never saw is a sale that vanishes at settlement
+    unknown: '**The card may have been charged and the gateway did not say.** `Payment.status pendingConfirmation`
+      - entered by a timer when the gateway stops answering after the authorisation, and left only by
+      `inquirePaymentStatus`, which resolves it to `captured`, `declined` or `failed`.
+
+
+      **Offer the inquiry, never a retry.** A retry here is how a guest is charged twice, and the component
+      library names this the normal failure rather than the exotic one. Voiding the order is refused
+      while this state holds - there is nothing to void until the inquiry answers.
+
+
+      **Transcribed from `states/payment.yaml` on 1 September.** The state model has carried this since
+      the contracts were written; the screen declared only a clean decline.
+
+
+      **A till may not retry an unresolved card.** Complete payment stays available for a different
+      tender; the card path is locked to the inquiry.'
+    inquiryFailed: '**The inquiry itself could not resolve it.** `pendingConfirmation -> failed` - the
+      gateway answered and still cannot say what happened to the money. This escalates to a person:
+      it is not a state the screen can clear, and the guest must leave with a reference, not a receipt.'
   wireframe:
     status: designed
     board: wireframes/Retail Board 3.dc.html#ret-3e
@@ -944,8 +991,13 @@ screens:
   provenance: client board, specified
   requiresModule: ticketing
   boardFrames:
-  - RET-3E
+  - Retail Board 3.dc.html#ret-3e
   statesDerived: true
+  openQuestions:
+  - '**`createPayment` is `offline: true` in the lineage and `inquirePaymentStatus` is `offline: false`,
+    and `states/payment.yaml` declares no `offlineReachable`.** A card can therefore be taken offline
+    and not resolved offline, which is the double-charge path. Raised 1 September - this is a contract
+    question, not a screen one.'
 - id: POS-006
   name: Held Orders
   module: Sell
@@ -1075,7 +1127,7 @@ screens:
   provenance: client board, specified
   requiresModule: ticketing
   boardFrames:
-  - RET-3F
+  - Retail Board 3.dc.html#ret-3f
   statesDerived: true
 - id: POS-007
   name: Close Shift
@@ -1228,8 +1280,8 @@ screens:
   provenance: client board, specified
   requiresModule: core
   boardFrames:
-  - POS-2F
-  - POS-3F
+  - POS Board 3.dc.html#pos-3f
+  - TICVAI Boards v2.dc.html#pos-2f
   statesDerived: true
 - id: POS-008
   name: Reports
@@ -1470,7 +1522,7 @@ screens:
   provenance: client board, specified
   requiresModule: core
   boardFrames:
-  - POS-3A
+  - POS Board 3.dc.html#pos-3a
   statesDerived: true
 - id: POS-010
   name: Add to Existing Ticket
@@ -1681,8 +1733,8 @@ screens:
     and a reader who trusts a bad table is worse off than one who has none.'
   requiresModule: ticketing
   boardFrames:
-  - POS-2B
-  - RET-3G
+  - POS Frontline Board 2.dc.html#pos-2b
+  - Retail Board 3.dc.html#ret-3g
   statesDerived: true
 - id: POS-012
   name: Omnichannel Order & Fulfilment Center
@@ -1777,8 +1829,8 @@ screens:
     is worse off than one who has none.'
   requiresModule: ticketing
   boardFrames:
-  - POS-2C
-  - RET-3H
+  - POS Frontline Board 2.dc.html#pos-2c
+  - Retail Board 3.dc.html#ret-3h
   statesDerived: true
 - id: POS-013
   name: Mobile POS, Event Sales & Offline Operations
@@ -1878,8 +1930,8 @@ screens:
     bad table is worse off than one who has none.'
   requiresModule: ticketing
   boardFrames:
-  - POS-2D
-  - POS-2E
+  - POS Frontline Board 2.dc.html#pos-2d
+  - POS Frontline Board 2.dc.html#pos-2e
   statesDerived: true
 - id: POS-014
   name: Sales Exceptions, Controls & Operational Actions
@@ -2064,13 +2116,21 @@ screens:
     component: apps/venue-pos/src/routes/sell/TillConfigurationBoard.tsx
     status: notStarted
   wireframe:
-    status: generated
-    board: wireframes/P04 Venue POS.dc.html#pos-016
+    status: designed
+    board: wireframes/POS Frontline Board 2.dc.html#pos-2b
+    generatedFallback: wireframes/P04 Venue POS.dc.html#pos-016
   provenance: client board, named only
   notes: '**Added 20 August from the client design board.** The operations existed and no screen called
-    them. **Named in the board contents and not written up in it.**'
+    them. **Named in the board contents and not written up in it.** **Drawn 31 August** — `POS Frontline
+    Board 2.dc.html` frame `pos-2b`. **Matched on frame title against screen name, constrained to this
+    board’s platforms.** These packs label by board position (`GM-6C`) rather than naming the screen,
+    so the title is the only join — *Till Configuration* matched at 1.0. **A cross-platform title match
+    was refused**: `Outlet Management` scored 0.85 against a partner-portal screen, which is how a mapping
+    goes wrong quietly.'
   requiresModule: core
   statesDerived: true
+  boardFrames:
+  - POS Frontline Board 2.dc.html#pos-2b
 - id: POS-017
   name: Cash In / Cash Out Operations
   module: Sell
@@ -2122,13 +2182,20 @@ screens:
     component: apps/venue-pos/src/routes/sell/CashInCashOutOperationsBoard.tsx
     status: notStarted
   wireframe:
-    status: generated
-    board: wireframes/P04 Venue POS.dc.html#pos-017
+    status: designed
+    board: wireframes/POS Frontline Board 2.dc.html#pos-2d
+    generatedFallback: wireframes/P04 Venue POS.dc.html#pos-017
   provenance: client board, specified
   notes: '**Added 20 August from the client design board.** The operations existed and no screen called
-    them.'
+    them. **Drawn 31 August** — `POS Frontline Board 2.dc.html` frame `pos-2d`. **Matched on frame title
+    against screen name, constrained to this board’s platforms.** These packs label by board position
+    (`GM-6C`) rather than naming the screen, so the title is the only join — *Cash In / Cash Out Operations*
+    matched at 1.0. **A cross-platform title match was refused**: `Outlet Management` scored 0.85 against
+    a partner-portal screen, which is how a mapping goes wrong quietly.'
   requiresModule: core
   statesDerived: true
+  boardFrames:
+  - POS Frontline Board 2.dc.html#pos-2d
 - id: POS-018
   name: Safe Drop & Cash Transfer Management
   module: Sell
@@ -2211,7 +2278,7 @@ screens:
     and a reader who trusts a bad table is worse off than one who has none.'
   requiresModule: core
   boardFrames:
-  - POS-3B
+  - POS Board 3.dc.html#pos-3b
   statesDerived: true
 - id: POS-019
   name: Shift Templates & Policies
@@ -2286,7 +2353,7 @@ screens:
     is worse off than one who has none.'
   requiresModule: core
   boardFrames:
-  - POS-3C
+  - POS Board 3.dc.html#pos-3c
   statesDerived: true
 - id: POS-020
   name: Shift Exceptions & Alerts
@@ -2377,7 +2444,7 @@ screens:
     and a reader who trusts a bad table is worse off than one who has none.'
   requiresModule: analytics
   boardFrames:
-  - POS-3E
+  - POS Board 3.dc.html#pos-3e
   statesDerived: true
 - id: POS-021
   name: Sell — Food & Drink

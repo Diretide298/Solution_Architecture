@@ -8,7 +8,7 @@
 ## Why this is written late
 
 **The separation is built and complete.** Four `pii.*` tables, ten operations touching
-`ledger.entry`, fifteen touching `pii.*`, and — verified 17 August — **zero operations touching
+`ledger.posting`, fifteen touching `pii.*`, and — verified 17 August — **zero operations touching
 both.**
 
 It was never written down, so it survived as a discipline nobody had stated. **A boundary that
@@ -38,7 +38,7 @@ ledger is mutable, or erasure is a lie.
 **Personal data is never a value in the ledger. It is a reference the ledger holds and the
 subject store resolves.**
 
-    ledger.entry            subject_id: uuid    ← a pointer, never a name
+    ledger.posting            subject_id: uuid    ← a pointer, never a name
     pii.subject             the person
     pii.subject_contact     email, phone, address
     pii.subject_document    passport, ID, visa

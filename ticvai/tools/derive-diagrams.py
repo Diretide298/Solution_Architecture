@@ -28,18 +28,6 @@ from collections import Counter, defaultdict
 from pathlib import Path
 
 import yaml
-import sys
-
-# A cp1252 console cannot encode the arrows and dashes this tool prints, and the
-# failure lands *after* the work is done — so the output is written, the summary
-# line raises UnicodeEncodeError, and a correct run exits 1. Reconfiguring at
-# import means anything importing this module gets it too, refresh.sh included.
-try:
-    sys.stdout.reconfigure(encoding="utf-8", errors="replace")
-    sys.stderr.reconfigure(encoding="utf-8", errors="replace")
-except Exception:      # a captured stream may not be reconfigurable; harmless
-    pass
-
 
 ROOT = Path(__file__).resolve().parents[1]
 OUT = ROOT / "diagrams"
@@ -47,7 +35,7 @@ OUT = ROOT / "diagrams"
 TIER_ORDER = ["foundation", "commerce", "operations", "engagement", "platform"]
 TIER_NOTE = {
     "foundation": ("Read by everything, reads nothing above. **Deploys first and alone** — twelve "
-                   "contracts read Identity and 289 tables anchor on `platform.scope_node`."),
+                   "contracts read Identity and 289 tables anchor on `platform.org_unit`."),
     "commerce": "The sale path. Highest availability and the highest write rate in the platform.",
     "operations": ("What a venue does with what it sold. **Licensed per module** — a venue that "
                    "bought none of these runs none of them."),
@@ -136,13 +124,13 @@ def write_hierarchy(lin, contract_configs):
             "at four different heights, and flattening them means either every venue configures "
             "everything from scratch or one change at the top breaks a venue that needed to "
             "differ.\n\n"
-            "`platform.scope_node` is the answer. A node has a `level`, a `parent_id` and a "
+            "`platform.org_unit` is the answer. A node has a `level`, a `parent_id` and a "
             "materialised `path`; **configuration resolves by walking that path upward until "
             "something answers.**"),
         "decisions": ["docs/adr/0011-hierarchy-is-binding.md",
                       "docs/adr/0018-configuration-scope.md"],
         "spine": {
-            "table": "platform.scope_node",
+            "table": "platform.org_unit",
             "columns": ["id", "level", "parent_id", "path", "code", "name", "is_active",
                         "child_count"],
             "note": ('**The tenancy spine.** **304 of 379 tables anchor on it** and 71 reference it directly — the terminal anchor for almost everything in the package, and the reason a scope walk answers nearly every configuration question.'),
@@ -353,7 +341,7 @@ def write_project_hld(services, lin, schema, real, owner):
             "model": "one cell per jurisdiction",
             "note": ("**A cell is a deployment and a legal boundary at once** (ADR-0001). UAE data "
                      "residency is required and DESC review shapes it.\n\n"
-                     "**Only CrossCellService reaches another region**, and it moves a pseudonymous "
+                     "**Only CrossRegionService reaches another region**, and it moves a pseudonymous "
                      "guest link rather than a guest (ADR-0010) — which is what makes a membership "
                      "work in another country without moving anybody's personal data."),
             "unresolved": "CF-64 — the cloud provider is undecided, and every concrete infrastructure artefact depends on it",
@@ -771,7 +759,7 @@ def main() -> int:
             "deployable services, and **the data boundary decides where they split** — no service "
             "spans a schema it does not own, and no schema is written by two services.\n\n"
             "**Arrows are cross-service writes.** The rule is that the owner defines the row and a "
-            "foreign writer may only append to it: a till closing posts to `ledger.entry` because "
+            "foreign writer may only append to it: a till closing posts to `ledger.posting` because "
             "settling a shift *is* a ledger act."),
         "decision": "docs/adr/0028-service-decomposition.md",
         "tiers": tiers,
@@ -793,7 +781,7 @@ def main() -> int:
         ],
         "canBeDownWithoutStoppingASale": [
             n for n, v in services.items()
-            if v["tier"] in ("engagement",) or n in ("ReportingService", "CrossCellService")],
+            if v["tier"] in ("engagement",) or n in ("ReportingService", "CrossRegionService")],
         "notes": (
             "**`shift` moved from Tenancy to Order on 24 August.** It owns no tables of its own — "
             "which is true, and the conclusion drawn from it was wrong. **A service with no data "

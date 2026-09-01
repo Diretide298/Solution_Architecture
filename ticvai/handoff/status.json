@@ -1,12 +1,12 @@
 {
  "scope": "platform",
- "generated": "2026-08-27",
+ "generated": "2026-09-01",
  "note": "Derived on every run by tools/build-status.py. A hand-maintained status page is worse than none, because somebody plans against it.",
  "counts": {
-  "operations": 1023,
+  "operations": 1025,
   "contracts": 28,
-  "tables": 379,
-  "relationships": 914,
+  "tables": 380,
+  "relationships": 932,
   "states": 122,
   "events": 29,
   "flows": 94,
@@ -19,15 +19,15 @@
   "design": [
    {
     "name": "API data lineage resolved",
-    "done": 1023,
-    "total": 1023,
+    "done": 1025,
+    "total": 1025,
     "percent": 100,
     "note": "Every operation maps to the tables it reads and writes."
    },
    {
     "name": "Operations declaring an auth model",
-    "done": 1023,
-    "total": 1023,
+    "done": 1025,
+    "total": 1025,
     "percent": 100,
     "note": "A permission, an auth mode, or a declared audience. None may be silent."
    },
@@ -68,8 +68,8 @@
    },
    {
     "name": "Tables with a relationship",
-    "done": 356,
-    "total": 379,
+    "done": 357,
+    "total": 380,
     "percent": 94,
     "note": "The remainder are partitions, platform-written tables and caches, each stating why."
    },
@@ -97,7 +97,7 @@
    {
     "name": "Operations reaching a screen",
     "done": 758,
-    "total": 1023,
+    "total": 1025,
     "percent": 74,
     "note": "Not a defect on its own \u2014 sync, webhook and job operations have no screen."
    },
@@ -120,7 +120,7 @@
    {
     "name": "Tables written",
     "done": 0,
-    "total": 379,
+    "total": 380,
     "percent": 0,
     "note": "DDL is generated when the design stops moving (ADR-0024)."
    },

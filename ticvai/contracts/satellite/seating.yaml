@@ -826,7 +826,7 @@ paths:
       - staff
       x-ticvai-read-routing: replica
       summary: List seat categories
-      description: 'Categories combine with Space Structure and an Envelope to form capacity allocation.
+      description: 'Categories combine with Space Structure and an ChannelCapacity to form capacity allocation.
         They are an entitlement concept, not a colour on a map.
 
         '
@@ -908,7 +908,7 @@ paths:
     get:
       operationId: getSeatAvailability
       x-ticvai-consumed-by:
-        - "P01 WEB-007 Seat Map Selection"
+        - "P01 WEB-007 Interactive Seat Selection"
         - "P02 GST-049 Interactive Seat Selection"
         - "P04 POS-004 Sell — Seat Map"
         - "P08 BO-002 Queue Configuration"
@@ -975,7 +975,7 @@ paths:
     post:
       operationId: createSeatHold
       x-ticvai-consumed-by:
-        - "P01 WEB-007 Seat Map Selection"
+        - "P01 WEB-007 Interactive Seat Selection"
         - "P02 GST-049 Interactive Seat Selection"
         - "P04 POS-004 Sell — Seat Map"
       x-ticvai-audience:
@@ -1363,6 +1363,7 @@ paths:
     post:
       operationId: recommendSeats
       x-ticvai-consumed-by:
+        - "P01 WEB-007 Interactive Seat Selection"
         - "P02 GST-049 Interactive Seat Selection"
         - "P04 POS-004 Sell — Seat Map"
         - "P08 BO-002 Queue Configuration"
