@@ -302,6 +302,7 @@ export async function renderDeployMap(host, burst, fetchFile) {
   const stage = el('div', 'bd-stage');
   const svg = svgEl('svg', {
     viewBox: `0 0 ${W} ${H}`,
+    preserveAspectRatio: 'xMidYMid meet',
     class: 'bd-svg',
     role: 'img',
     'aria-label': 'The flash-sale environment: three service clusters behind a connection pooler',

@@ -2466,6 +2466,7 @@ mark.search-hit-first {
    look broken too even though it has always been drawn. */
 .icon-theme { width: 15px; height: 15px; display: block; }
 .icon-home { width: 15px; height: 15px; display: block; }
+.icon-burst { width: 15px; height: 15px; display: block; }
 
 /* The home link is an anchor rather than a button, so it does not inherit the
    centring a button gives its content for free. */

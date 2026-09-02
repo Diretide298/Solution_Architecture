@@ -100,28 +100,51 @@
 .bd-stage {
   border: 1px solid var(--line);
   border-radius: 10px;
-  background: var(--bg-card);
+  /* The ground, so the node fills read as objects on it rather than as panels
+     the same colour as what they sit on. */
+  background: var(--bg-canvas);
   padding: 6px;
   overflow: hidden;
 }
 
-.bd-svg { display: block; width: 100%; height: auto; }
+/* Capped, because the drawing is 1000x540 and a full-width viewport turns
+   that into three quarters of a screen of boxes — the map is one block on a
+   page of several, not the page. preserveAspectRatio letterboxes it when the
+   cap bites, so the shape never distorts. */
+.bd-svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: min(560px, 62vh);
+}
 
+/* Solid token fills rather than a few per cent of the accent over transparent.
+   At 5% these were ghosts on either ground, and an SVG shape whose `fill`
+   fails to parse falls back to black rather than to nothing — so a token that
+   is missing or a mix a browser will not take turns the whole drawing into
+   silhouettes. A flat token cannot fail that way. */
 .bd-node rect,
 .bd-node path {
-  fill: color-mix(in srgb, var(--accent) 5%, transparent);
+  fill: var(--bg-raised);
   stroke: var(--line);
-  stroke-width: 1;
+  stroke-width: 1.2;
 }
 
-.bd-ingress rect { fill: transparent; stroke-dasharray: 4 3; }
+/* The buyers are outside the environment, so the box is drawn as an opening
+   rather than as another machine. */
+.bd-ingress rect {
+  fill: none;
+  stroke-dasharray: 4 3;
+}
 
 .bd-pool path {
-  fill: color-mix(in srgb, var(--accent) 10%, transparent);
+  fill: var(--bg-card);
   stroke: var(--accent);
+  stroke-width: 1.6;
 }
 
-.bd-pg rect { stroke: color-mix(in srgb, var(--accent) 55%, var(--line)); }
+.bd-pg rect,
+.bd-redis rect { stroke: var(--accent); }
 
 .bd-t-title {
   fill: var(--text);
@@ -144,11 +167,11 @@
 /* A replica that is not running is drawn rather than omitted: the gap between
    what is up and what the file allows is the thing the slider moves. */
 .bd-cell {
-  fill: transparent;
-  stroke: var(--line);
+  fill: none;
+  stroke: var(--text-faint, var(--text-dim));
   stroke-width: 1;
   transition: fill 180ms ease, stroke 180ms ease, opacity 180ms ease;
-  opacity: 0.5;
+  opacity: 0.45;
 }
 
 .bd-cell.on {
@@ -159,8 +182,9 @@
 
 .bd-edge {
   fill: none;
-  stroke: color-mix(in srgb, var(--accent) 45%, transparent);
+  stroke: var(--accent);
   stroke-width: 1.2;
+  stroke-opacity: 0.5;
   stroke-dasharray: 5 7;
 }
 
