@@ -32,6 +32,9 @@
  */
 
 const COMPOSE = 'deploy/c-flash-sale.yml';
+// The platform the burst sits beside, so the two can be drawn to the same
+// scale and the merge back has somewhere to land.
+const PERMANENT = 'deploy/b-shared-platform.yml';
 
 const SVG = 'http://www.w3.org/2000/svg';
 
@@ -206,38 +209,88 @@ function topology(burst, compose) {
   };
 }
 
-// ── geometry ────────────────────────────────────────────────────────────────
-// One coordinate space, scaled by the viewBox, so the drawing is the same
-// shape at every width and there is no measuring to do on resize.
-const W = 1000;
-const H = 540;
-const CELL = 15;
-const CELL_GAP = 5;
-const PER_ROW = 5;
-
-function layout(deployedCount, maxes) {
-  const heights = maxes.map((m) => {
-    const rows = Math.ceil(m / PER_ROW);
-    return 46 + rows * (CELL + CELL_GAP);
-  });
-  const total = heights.reduce((a, b) => a + b, 0) + (deployedCount - 1) * 22;
-  let y = (H - total) / 2;
-  return heights.map((h) => {
-    const box = { x: 196, y, w: 250, h };
-    y += h + 22;
-    return box;
-  });
-}
 
 /** `**bold**` is the package's emphasis; a title attribute cannot render it. */
 const stripEmphasis = (text) => String(text ?? '').replace(/\*\*/g, '').trim();
 
 /**
+/**
+ * What the burst costs, and the rate it costs it at.
+ *
+ * **The four totals are ADR-0035's, quoted.** The split across containers is
+ * not: the ADR prices the environment and says nothing about which part of it
+ * is which. So the rate is anchored on the ADR — the month figure, $8,587 over
+ * 720 hours, being the longest-run of the four and therefore the least
+ * sensitive to rounding — and apportioned across containers by the `cpus`
+ * limits the compose file already declares.
+ *
+ * That apportionment is a model and it is labelled as one on the page. What it
+ * buys is the thing a flat hourly rate cannot show: **a half-expanded
+ * environment costs less than a full one**, which is the whole argument for a
+ * threshold you can move.
+ */
+const COST_POINTS = [
+  { hours: 2, usd: 24, label: 'a two-hour sale' },
+  { hours: 6, usd: 71, label: 'six hours' },
+  { hours: 24, usd: 282, label: 'a day' },
+  { hours: 720, usd: 8587, label: 'a month left running' },
+];
+const RATE_PER_HOUR = 8587 / 720;
+
+/** `32G` -> 32, `512M` -> 0.5. Compose states memory as a limit string. */
+const gigs = (value) => {
+  const hit = String(value ?? '').match(/^([\d.]+)\s*([GMK])?/i);
+  if (!hit) return 0;
+  const n = Number(hit[1]);
+  const unit = (hit[2] ?? 'G').toUpperCase();
+  return unit === 'M' ? n / 1024 : unit === 'K' ? n / 1048576 : n;
+};
+
+/**
+ * Indicative list rates for serverless container compute, per vCPU-hour and
+ * per GB-hour.
+ *
+ * **These are not the package's numbers, and there is no provider to make them
+ * the package's.** CF-64 — the cloud provider — is open, owned by Dinesh and
+ * Qossai, and the brief records the shortlist as *AWS or Azure, pending DESC*.
+ * Everything above that line in the package is provider-neutral and, as the
+ * brief puts it, nothing below it can be: managed Postgres, the Redis tier,
+ * Qdrant hosting, the CDN and the secret store all follow from the choice.
+ *
+ * Azure is here because it is the other candidate. GCP is here because it was
+ * asked for, and it is worth knowing that it is not on the shortlist.
+ *
+ * They price container compute and nothing else — no managed-database premium,
+ * no storage, no IO, no egress, no support plan — which is most of why they
+ * land under ADR-0035's own figure. Check them before quoting them.
+ */
+const PROVIDERS = [
+  { key: 'aws', name: 'AWS Fargate', region: 'us-east-1', vcpu: 0.04048, gb: 0.004445 },
+  { key: 'gcp', name: 'Google Cloud Run', region: 'us-central1', vcpu: 0.0456, gb: 0.0050 },
+  { key: 'azure', name: 'Azure Container Apps', region: 'East US', vcpu: 0.0432, gb: 0.0054 },
+];
+
+const money = (usd) => (usd < 10
+  ? `$${usd.toFixed(2)}`
+  : `$${Math.round(usd).toLocaleString('en-GB')}`);
+
+const clock = (minutes) => {
+  const h = Math.floor(minutes / 60);
+  const m = Math.floor(minutes % 60);
+  return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
+};
+
+// ── geometry ────────────────────────────────────────────────────────────────
+const W = 1200;
+const H = 640;
+const CELL = 22;
+const CELL_GAP = 5;
+const PER_ROW = 5;
+
+/**
  * @param host  where the section goes
  * @param burst the parsed burst-scope.json
  * @param io    { file(path), api(route) } — this file does no auth of its own.
- *              Two fetchers because it needs one package file, the compose, and
- *              one already-parsed payload, the state machine behind /api/domain.
  */
 export async function renderDeployMap(host, burst, io) {
   const section = el('section', 'bd');
@@ -248,6 +301,7 @@ export async function renderDeployMap(host, burst, io) {
   section.append(head);
 
   let compose;
+  let permanent = null;
   let raw;
   try {
     raw = await io.file(COMPOSE);
@@ -258,6 +312,9 @@ export async function renderDeployMap(host, burst, io) {
       + 'so there is nothing to draw without it.'));
     return;
   }
+  // The platform the burst sits beside. Optional: if it is not there the burst
+  // still draws, it just draws alone.
+  try { permanent = parseYaml(await io.file(PERMANENT)); } catch { permanent = null; }
 
   const t = topology(burst, compose);
   if (!t.deployed.length) {
@@ -267,30 +324,20 @@ export async function renderDeployMap(host, burst, io) {
   }
 
   head.append(el('p', 'bd-sub',
-    `${t.deployed.length} clusters · ${COMPOSE} and handoff/burst-scope.json for the machine, `
+    `${t.deployed.length} clusters beside the permanent platform · ${COMPOSE} and `
+    + `${PERMANENT} for the machines, handoff/burst-scope.json for the shape, `
     + 'states/burst-environment.yaml for the lifecycle, ADR-0031 to 0035 for the rules'));
 
   // ── the lifecycle ─────────────────────────────────────────────────────────
-  // **Read from the package, not written here.** `states/burst-environment.yaml`
-  // is the state model and the server has already parsed it — `/api/domain`
-  // carries all 125 machines with their guards. Retyping nine states into this
-  // file would be a second copy to disagree with the first the day somebody
-  // adds one.
-  //
-  // Parsing it here was the alternative and it was rejected after trying: the
-  // compose subset is regular enough to hand-parse and was checked against
-  // js-yaml on all four configs, but the state files use multi-line quoted
-  // scalars and a hand-rolled reader silently returned the first line of every
-  // guard. A parser that is quietly wrong is worse than no parser.
+  // Read from the package, not written here. /api/domain carries all 125 parsed
+  // machines, so retyping nine states into a viewer file would be a second copy
+  // to disagree with the first the day somebody adds one.
   let machine = null;
   try {
     const domain = await io.api('domain');
     machine = (domain?.machines ?? []).find((m) => m.id === 'burst-environment') ?? null;
   } catch { machine = null; }
 
-  // The happy path, walked rather than listed: from the initial state, take the
-  // transition that is not into a terminal failure, until there is nowhere left
-  // to go. A state added to the model appears here without an edit.
   const phases = [];
   if (machine) {
     const terminalFail = new Set((machine.terminal ?? []).filter((x) => x === 'failed'));
@@ -310,25 +357,21 @@ export async function renderDeployMap(host, burst, io) {
       at = next.to;
     }
   }
-  // No machine, no lifecycle — the map still draws, it just does not step.
   const hasPhases = phases.length > 1;
 
-  /**
-   * How each state looks. A lookup with a default rather than a required
-   * entry per state: the phases come from the package, so a state this file
-   * has never heard of must still draw as something reasonable.
-   */
+  /** How each state looks. A lookup with a default: the phases come from the
+   *  package, so a state this file has never heard of must still draw. */
   const LOOK = {
-    requested: { infra: 0, replicas: 0, flow: 0, arriving: false },
-    provisioning: { infra: 1, replicas: 0, flow: 0, arriving: false },
-    warming: { infra: 1, replicas: 'min', flow: 0.2, arriving: false },
-    live: { infra: 1, replicas: 'ramp', flow: 1, arriving: true },
-    draining: { infra: 1, replicas: 'max', flow: 0.3, arriving: false },
-    reconciling: { infra: 1, replicas: 'min', flow: 0.15, arriving: false, replay: true },
-    reconciled: { infra: 1, replicas: 0, flow: 0, arriving: false },
-    decommissioned: { infra: 0, replicas: 0, flow: 0, arriving: false },
+    requested: { infra: 0, load: 0, arriving: false, billing: false },
+    provisioning: { infra: 1, load: 0, arriving: false, billing: true },
+    warming: { infra: 1, load: 0.05, arriving: false, billing: true },
+    live: { infra: 1, load: 'ramp', arriving: true, billing: true },
+    draining: { infra: 1, load: 0.25, arriving: false, billing: true },
+    reconciling: { infra: 1, load: 0.08, arriving: false, billing: true, replay: true },
+    reconciled: { infra: 1, load: 0, arriving: false, billing: true },
+    decommissioned: { infra: 0, load: 0, arriving: false, billing: false },
   };
-  const lookOf = (name) => LOOK[name] ?? { infra: 1, replicas: 'min', flow: 0.3, arriving: false };
+  const lookOf = (name) => LOOK[name] ?? { infra: 1, load: 0.2, arriving: false, billing: true };
 
   // ── controls ──────────────────────────────────────────────────────────────
   const bar = el('div', 'bd-bar');
@@ -340,11 +383,32 @@ export async function renderDeployMap(host, burst, io) {
   range.min = '0';
   range.max = '1000';
   range.value = '0';
-  range.setAttribute('aria-label', hasPhases
-    ? 'Move through the environment lifecycle'
-    : 'Scale between minimum and maximum replicas');
+  range.setAttribute('aria-label', 'Move through the environment lifecycle');
   bar.append(play, el('div', 'bd-slide', range));
   section.append(bar);
+
+  // The threshold. **Yours, not the package's** — b-shared-platform.yml says
+  // "Catalogue and Order autoscale on RPS" and burst-scope says "replicates on
+  // RPS", and neither says at what. Rather than invent a number and present it
+  // as the package's, it is a control: the number is the reader's to choose and
+  // the consequences are drawn.
+  const thrBar = el('div', 'bd-bar bd-bar-thr');
+  const thrRange = document.createElement('input');
+  thrRange.type = 'range';
+  thrRange.className = 'bd-range';
+  thrRange.min = '40';
+  thrRange.max = '100';
+  thrRange.value = '70';
+  thrRange.setAttribute('aria-label', 'Target utilisation per replica');
+  const thrLabel = el('span', 'bd-thr-live', '70%');
+  thrBar.append(
+    el('span', 'bd-bar-label', 'add a replica above'),
+    el('div', 'bd-slide', thrRange),
+    thrLabel,
+    el('span', 'bd-bar-note', 'utilisation per replica — the package says these autoscale on '
+      + 'RPS and never says at what, so this one is yours'),
+  );
+  section.append(thrBar);
 
   const steps = el('div', 'bd-steps');
   const stepNodes = phases.map((phase, n) => {
@@ -366,20 +430,25 @@ export async function renderDeployMap(host, burst, io) {
 
   // ── readouts ──────────────────────────────────────────────────────────────
   const reads = el('div', 'bd-reads');
-  const readout = (label, hint) => {
-    const cell = el('div', 'bd-read');
+  const readout = (label, hint, cls) => {
+    const cell = el('div', `bd-read ${cls ?? ''}`);
     const v = el('div', 'bd-read-v', '—');
     cell.append(v, el('div', 'bd-read-l', label));
     if (hint) cell.append(el('div', 'bd-read-h', hint));
     reads.append(cell);
     return v;
   };
+  const outClockV = readout('elapsed', 'one second of yours is a minute of the sale');
+  const outSpend = readout('spent so far', 'apportioned by cpu limits', 'bd-read-cost');
+  const outRate = readout('burn rate', 'per hour at this size');
   const outReplicas = readout('containers running', 'across the three clusters');
   const outClient = readout('client connections asked for', 'replicas × PG_POOL_MAX');
-  const outServer = readout('server connections to postgres',
-    t.bouncer ? `pgbouncer DEFAULT_POOL_SIZE, ${t.bouncer.mode} mode` : 'no pgbouncer in the file');
-  const outRatio = readout('connections per server connection', 'what the pooler absorbs');
+  const outRatio = readout('per server connection', `${t.bouncer?.poolSize ?? '—'} in the pool`);
   section.append(reads);
+
+  const capped = el('p', 'bd-capped');
+  capped.hidden = true;
+  section.append(capped);
 
   // ── stage ─────────────────────────────────────────────────────────────────
   const stage = el('div', 'bd-stage');
@@ -388,7 +457,8 @@ export async function renderDeployMap(host, burst, io) {
     preserveAspectRatio: 'xMidYMid meet',
     class: 'bd-svg',
     role: 'img',
-    'aria-label': 'The flash-sale environment: three service clusters behind a connection pooler',
+    'aria-label': 'The permanent platform on the left, the burst environment on the right, '
+      + 'and the reconciliation that merges one back into the other',
   });
   stage.append(svg);
   section.append(stage);
@@ -397,117 +467,210 @@ export async function renderDeployMap(host, burst, io) {
   const bodies = svgEl('g');
   svg.append(edges, bodies);
 
-  const boxes = layout(t.deployed.length, t.deployed.map((s) => s.max));
+  const box = (parent, x, y, w, h, cls) => {
+    const g = svgEl('g', { class: `bd-node ${cls ?? ''}` });
+    g.append(svgEl('rect', { x, y, width: w, height: h, rx: 9 }));
+    parent.append(g);
+    return g;
+  };
+  const text = (parent, x, y, cls, value) => {
+    const node = svgEl('text', { x, y, class: cls });
+    node.textContent = value;
+    parent.append(node);
+    return node;
+  };
+  const label = (parent, x, y, value) => text(parent, x, y, 'bd-t-label', value);
 
-  // buyers
-  const ingressY = H / 2;
+  // ── left: the permanent platform ──────────────────────────────────────────
+  const perm = svgEl('g', { class: 'bd-perm' });
+  bodies.append(perm);
+  perm.append(svgEl('rect', { x: 14, y: 36, width: 536, height: 480, rx: 12, class: 'bd-frame' }));
+  text(perm, 30, 60, 'bd-t-head', 'the permanent platform');
+  text(perm, 30, 78, 'bd-t-small', 'scenario (b) — where the data lives');
+
+  label(perm, 30, 104, 'one database per tenant');
+  const tenants = ['tenant A', 'tenant B', 'tenant C'];
+  tenants.forEach((name, n) => {
+    const x = 30 + n * 172;
+    const g = box(perm, x, 114, 160, 74, 'bd-tenant');
+    text(g, x + 12, 134, 'bd-t-title', name);
+    // ADR-0005: venues inside a tenant are list partitions on venue_id, and
+    // database-per-venue was rejected — five cross-venue features become
+    // distributed transactions. Drawn as ticks inside the one box, because
+    // three boxes here would be the rejected design.
+    for (let k = 0; k < 4; k += 1) {
+      g.append(svgEl('rect', {
+        x: x + 12 + k * 26, y: 146, width: 20, height: 12, rx: 2, class: 'bd-part',
+      }));
+    }
+    text(g, x + 12, 176, 'bd-t-tiny', 'venues: partitions on venue_id');
+  });
+
+  label(perm, 30, 212, 'one cell: a primary, a pooler, and the shared tier');
+  const permPg = box(perm, 30, 222, 232, 62, 'bd-pg');
+  text(permPg, 42, 244, 'bd-t-title', 'postgres primary');
+  text(permPg, 42, 264, 'bd-t-small',
+    permanent?.services?.postgres
+      ? `max_connections ${pgFlag(permanent.services.postgres.command, 'max_connections') ?? '—'}`
+      : 'the transaction store');
+  const permPool = box(perm, 274, 222, 228, 62, 'bd-pool-flat');
+  text(permPool, 286, 244, 'bd-t-title', 'pgbouncer');
+  text(permPool, 286, 264, 'bd-t-small',
+    permanent?.services?.pgbouncer
+      ? `${permanent.services.pgbouncer.environment?.MAX_CLIENT_CONN ?? '—'} clients → `
+        + `${permanent.services.pgbouncer.environment?.DEFAULT_POOL_SIZE ?? '—'}`
+      : 'transaction pooling');
+
+  // The three that are not the transaction store. Drawn apart because they are
+  // apart: a replica you may not write to, a vector store with no database
+  // above its collections, and an append-only record.
+  label(perm, 30, 312, 'not the transaction store, and not interchangeable with it');
+  const aside = [
+    {
+      x: 30, w: 152, cls: 'bd-reporting', title: 'reporting replica',
+      lines: ['analytical · minutes', 'never the primary', 'in-cell, in-region'],
+      tip: 'ADR-0016. Analytical reads are served from the replica and cannot fall back to '
+        + 'the primary even when it is unavailable — they fail with a lag error instead. '
+        + 'Cross-cell reporting comes from the central warehouse, because no cell may read '
+        + 'another for reporting: that is data residency, not performance.',
+    },
+    {
+      x: 194, w: 152, cls: 'bd-qdrant', title: 'qdrant',
+      lines: ['one collection per', 'embedding model', 'one shard per tenant'],
+      tip: 'ADR-0021. A collection is Qdrant’s only top-level container and each one holds '
+        + 'a single vector configuration, so the split is by embedding model and nothing else. '
+        + 'Tenant is the shard key on every placement, so a tenant moving between placements '
+        + 'does not reshape the store.',
+    },
+    {
+      x: 358, w: 144, cls: 'bd-audit', title: 'audit',
+      lines: ['platform.audit_record', 'platform.audit_read', 'identity.authz_audit'],
+      tip: 'Append-only. A failed financial posting is an incident rather than a queue item '
+        + '(ADR-0033), and the read log exists because who looked is itself a fact somebody '
+        + 'has to be able to answer for.',
+    },
+  ];
+  for (const item of aside) {
+    const g = box(perm, item.x, 322, item.w, 96, item.cls);
+    text(g, item.x + 12, 344, 'bd-t-title', item.title);
+    item.lines.forEach((line, k) => text(g, item.x + 12, 366 + k * 16, 'bd-t-tiny', line));
+    const tip = svgEl('title');
+    tip.textContent = item.tip;
+    g.append(tip);
+  }
+
+  label(perm, 30, 444, 'the shared tier, and the venue services that sit at the venue');
+  const permServices = Object.keys(permanent?.services ?? {})
+    .filter((n) => /service/i.test(n));
+  const shared = permServices.filter((n) => !/-v\d+$/.test(n));
+  const venue = [...new Set(permServices.filter((n) => /-v\d+$/.test(n))
+    .map((n) => n.replace(/-v\d+$/, '')))];
+  let cx = 30;
+  let cy = 456;
+  const chip = (name, cls) => {
+    const w = Math.max(46, name.length * 5.6 + 14);
+    if (cx + w > 508) { cx = 30; cy += 22; }
+    const g = svgEl('g', { class: `bd-chip ${cls}` });
+    g.append(svgEl('rect', { x: cx, y: cy, width: w, height: 17, rx: 4 }));
+    text(g, cx + w / 2, cy + 12, 'bd-t-tiny bd-t-mid', name);
+    perm.append(g);
+    cx += w + 5;
+  };
+  for (const name of shared) chip(name.replace(/service$/i, ''), 'bd-chip-shared');
+  for (const name of venue) chip(`${name.replace(/service$/i, '')} ×3`, 'bd-chip-venue');
+  if (!permServices.length) text(perm, 30, 468, 'bd-t-tiny', `${PERMANENT} not readable`);
+
+  // ── right: the burst environment ──────────────────────────────────────────
+  const bx = 596;
+  const burstG = svgEl('g', { class: 'bd-burst' });
+  bodies.append(burstG);
+  burstG.append(svgEl('rect', {
+    x: bx, y: 36, width: W - bx - 14, height: 480, rx: 12, class: 'bd-frame bd-frame-burst',
+  }));
+  text(burstG, bx + 16, 60, 'bd-t-head', 'the burst environment');
+  text(burstG, bx + 16, 78, 'bd-t-small', 'scenario (c) — where data passes through');
+
   const ingress = svgEl('g', { class: 'bd-node bd-ingress' });
-  ingress.append(svgEl('rect', { x: 24, y: ingressY - 40, width: 116, height: 80, rx: 10 }));
-  const ingressLabel = svgEl('text', { x: 82, y: ingressY - 8, class: 'bd-t-title' });
-  ingressLabel.textContent = 'buyers';
-  const ingressSub = svgEl('text', { x: 82, y: ingressY + 14, class: 'bd-t-small' });
-  ingressSub.textContent = 'one event, one moment';
-  ingress.append(ingressLabel, ingressSub);
-  bodies.append(ingress);
+  ingress.append(svgEl('rect', { x: bx + 16, y: 96, width: 118, height: 58, rx: 9 }));
+  text(ingress, bx + 75, 120, 'bd-t-title bd-t-mid', 'buyers');
+  text(ingress, bx + 75, 138, 'bd-t-tiny bd-t-mid', 'one event, one moment');
+  burstG.append(ingress);
 
-  // clusters
   const clusters = t.deployed.map((service, n) => {
-    const box = boxes[n];
-    const g = svgEl('g', { class: 'bd-node bd-cluster' });
-    g.append(svgEl('rect', { x: box.x, y: box.y, width: box.w, height: box.h, rx: 10 }));
-    const title = svgEl('text', { x: box.x + 14, y: box.y + 24, class: 'bd-t-title' });
-    title.textContent = service.short;
-    const share = svgEl('text', {
-      x: box.x + box.w - 14, y: box.y + 24, class: 'bd-t-small', 'text-anchor': 'end',
-    });
-    share.textContent = `${service.share}% of the burst`;
-    const count = svgEl('text', { x: box.x + 14, y: box.y + 40, class: 'bd-t-small' });
-    g.append(title, share, count);
-
+    const rows = Math.ceil(service.max / PER_ROW);
+    const y = 174 + n * 112;
+    const x = bx + 16;
+    const w = 320;
+    const h = 42 + rows * (CELL + CELL_GAP);
+    const g = box(burstG, x, y, w, h, 'bd-cluster');
+    text(g, x + 12, y + 22, 'bd-t-title', service.short);
+    text(g, x + w - 12, y + 22, 'bd-t-tiny', `${service.share}%`).setAttribute('text-anchor', 'end');
+    const count = text(g, x + 12, y + 38, 'bd-t-tiny', '');
     const cells = [];
     for (let k = 0; k < service.max; k += 1) {
-      const col = k % PER_ROW;
-      const row = Math.floor(k / PER_ROW);
       const cell = svgEl('rect', {
-        x: box.x + 14 + col * (CELL + CELL_GAP),
-        y: box.y + 50 + row * (CELL + CELL_GAP),
-        width: CELL,
-        height: CELL,
-        rx: 3,
-        class: 'bd-cell',
+        x: x + 12 + (k % PER_ROW) * (CELL + CELL_GAP),
+        y: y + 46 + Math.floor(k / PER_ROW) * (CELL + CELL_GAP),
+        width: CELL, height: CELL, rx: 3, class: 'bd-cell',
       });
       cells.push(cell);
       g.append(cell);
     }
-    bodies.append(g);
-    return { service, box, cells, count, node: g };
+    return { service, x, y, w, h, cells, count, node: g };
   });
 
-  // pooler and stores
-  const poolX = 560;
-  const poolY = H / 2;
+  const poolX = bx + 366;
+  const poolY = 250;
   const pool = svgEl('g', { class: 'bd-node bd-pool' });
   pool.append(svgEl('path', {
-    // a funnel: wide where the clients arrive, narrow where the pool leaves
-    d: `M ${poolX} ${poolY - 92} L ${poolX + 118} ${poolY - 34}`
-      + ` L ${poolX + 118} ${poolY + 34} L ${poolX} ${poolY + 92} Z`,
-    rx: 8,
+    d: `M ${poolX} ${poolY - 74} L ${poolX + 92} ${poolY - 26}`
+      + ` L ${poolX + 92} ${poolY + 26} L ${poolX} ${poolY + 74} Z`,
   }));
-  const poolTitle = svgEl('text', { x: poolX + 40, y: poolY - 6, class: 'bd-t-title' });
-  poolTitle.textContent = 'pgbouncer';
-  const poolSub = svgEl('text', { x: poolX + 40, y: poolY + 14, class: 'bd-t-small' });
-  poolSub.textContent = t.bouncer ? `${t.bouncer.mode} pooling` : '';
-  pool.append(poolTitle, poolSub);
-  bodies.append(pool);
+  text(pool, poolX + 34, poolY - 2, 'bd-t-title bd-t-mid', 'pgbouncer');
+  text(pool, poolX + 34, poolY + 16, 'bd-t-tiny bd-t-mid', t.bouncer?.mode ?? '');
+  burstG.append(pool);
 
-  const store = (x, y, w, h, title, lines, cls) => {
-    const g = svgEl('g', { class: `bd-node ${cls}` });
-    g.append(svgEl('rect', { x, y, width: w, height: h, rx: 10 }));
-    const tt = svgEl('text', { x: x + 16, y: y + 26, class: 'bd-t-title' });
-    tt.textContent = title;
-    g.append(tt);
-    lines.forEach((line, k) => {
-      const node = svgEl('text', { x: x + 16, y: y + 48 + k * 16, class: 'bd-t-small' });
-      node.textContent = line;
-      g.append(node);
-    });
-    bodies.append(g);
-    return g;
-  };
+  const hotG = box(burstG, bx + 366, 340, 190, 92, 'bd-pg');
+  text(hotG, bx + 380, 362, 'bd-t-title', 'postgres-hot');
+  [`max_connections ${t.postgres?.maxConnections ?? '—'}`,
+    `${t.postgres?.cpus ?? '—'} cpu · ${t.postgres?.memory ?? '—'}`,
+    t.postgres?.synchronousCommit === 'off' ? 'synchronous_commit off' : '']
+    .filter(Boolean)
+    .forEach((line, k) => text(hotG, bx + 380, 384 + k * 16, 'bd-t-tiny', line));
 
-  if (t.postgres) {
-    store(772, poolY - 116, 204, 132, 'postgres-hot', [
-      `max_connections ${t.postgres.maxConnections}`,
-      `shared_buffers ${t.postgres.sharedBuffers ?? '—'}`,
-      `${t.postgres.cpus ?? '—'} cpu · ${t.postgres.memory ?? '—'}`,
-      t.postgres.synchronousCommit === 'off' ? 'synchronous_commit off' : '',
-    ].filter(Boolean), 'bd-pg');
-  }
-  if (t.redis) {
-    store(772, poolY + 40, 204, 78, 'redis', [
-      `${t.redis.cpus ?? '—'} cpu · ${t.redis.memory ?? '—'}`,
-    ], 'bd-redis');
-  }
+  const redisG = box(burstG, bx + 366, 444, 190, 56, 'bd-redis');
+  text(redisG, bx + 380, 466, 'bd-t-title', 'redis');
+  text(redisG, bx + 380, 486, 'bd-t-tiny', `${t.redis?.cpus ?? '—'} cpu · ${t.redis?.memory ?? '—'}`);
 
-  // edges: buyers → each cluster → pooler → postgres
+  // flows inside the burst
   const flow = [];
-  const addEdge = (d, weight) => {
-    const path = svgEl('path', { d, class: 'bd-edge' });
+  const addEdge = (d, weight, cls) => {
+    const path = svgEl('path', { d, class: `bd-edge ${cls ?? ''}` });
     edges.append(path);
     flow.push({ path, weight });
     return path;
   };
   for (const c of clusters) {
-    const midY = c.box.y + c.box.h / 2;
-    addEdge(`M 140 ${ingressY} C 168 ${ingressY}, 168 ${midY}, ${c.box.x} ${midY}`, c.service.share);
-    addEdge(
-      `M ${c.box.x + c.box.w} ${midY} C ${c.box.x + c.box.w + 40} ${midY},`
-      + ` ${poolX - 40} ${poolY}, ${poolX + 4} ${poolY}`,
-      c.service.share,
-    );
+    const midY = c.y + c.h / 2;
+    addEdge(`M ${bx + 134} 125 C ${bx + 150} 125, ${bx + 150} ${midY}, ${c.x} ${midY}`,
+      c.service.share);
+    addEdge(`M ${c.x + c.w} ${midY} C ${c.x + c.w + 20} ${midY},`
+      + ` ${poolX - 24} ${poolY}, ${poolX + 2} ${poolY}`, c.service.share);
   }
-  if (t.postgres) addEdge(`M ${poolX + 118} ${poolY} L 772 ${poolY - 50}`, 100);
-  if (t.redis) addEdge(`M ${poolX + 118} ${poolY} L 772 ${poolY + 79}`, 20);
+  addEdge(`M ${poolX + 92} ${poolY} L ${bx + 366} 386`, 100);
+  addEdge(`M ${poolX + 92} ${poolY} L ${bx + 366} 472`, 20);
+
+  // ── the merge back ────────────────────────────────────────────────────────
+  // Drawn as its own lane under both panels, because it is the one edge that
+  // joins them and the reason the environment cannot simply be switched off.
+  const mergePath = svgEl('path', {
+    d: `M ${bx + 40} 528 C ${bx - 60} 600, 300 600, 148 546`,
+    class: 'bd-merge',
+  });
+  edges.append(mergePath);
+  const mergeLabel = text(bodies, 470, 596, 'bd-t-merge',
+    'reconcile — environment id, monotonic sequence, idempotent replay');
+  mergeLabel.setAttribute('text-anchor', 'middle');
 
   // ── the write path ────────────────────────────────────────────────────────
   // ADR-0033. Drawn because "how does it hold up" and "what happens to the
@@ -761,21 +924,120 @@ export async function renderDeployMap(host, burst, io) {
   // ── the scenario, in its own words ────────────────────────────────────────
   const note = leadingNote(raw);
   if (note) {
-    const box = el('details', 'bd-note');
-    box.append(el('summary', null, `Why this scenario exists — the header of ${COMPOSE}`));
-    box.append(el('pre', 'bd-note-body', note));
-    section.append(box);
+    // `details` and not `box`: there is an SVG `box()` helper in this scope and
+    // shadowing it here would read as a call to it.
+    const details = el('details', 'bd-note');
+    details.append(el('summary', null, `Why this scenario exists — the header of ${COMPOSE}`));
+    details.append(el('pre', 'bd-note-body', note));
+    section.append(details);
   }
 
+  // ── the result of the run ─────────────────────────────────────────────────
+  // Hidden until a run finishes, and cleared by a scrub, because a number
+  // sitting under a diagram somebody dragged is a number about nothing.
+  const result = el('div', 'bd-panel bd-result');
+  result.hidden = true;
+  section.append(result);
+
+  const showResult = () => {
+    result.replaceChildren();
+    result.hidden = false;
+    result.append(el('h3', 'bd-risk-h', 'The run'));
+
+    const facts = el('div', 'bd-thr-list');
+    const fact = (name, value, note) => {
+      const row = el('div', 'bd-thr-row');
+      row.append(el('span', 'bd-thr-n', name));
+      row.append(el('span', 'bd-thr-v', value));
+      row.append(el('span', 'bd-thr-note', note));
+      facts.append(row);
+    };
+    fact('simulated', clock(simMinutes),
+      `${phases.length} phases, ${Math.round(totalMinutes)} minutes of sale time`);
+    fact('target utilisation', `${Math.round(threshold * 100)}%`,
+      everCapped
+        ? 'the file could not always provide enough replicas to hold it — utilisation '
+          + 'ran above target and ADR-0032 sheds rather than queues'
+        : 'held throughout, within the replica ceiling the compose file sets');
+    fact('peak containers', String(peakContainers),
+      `of ${t.deployed.reduce((a, x) => a + x.max, 0)} the file allows`);
+    fact('peak connections', peakClient.toLocaleString('en-GB'),
+      t.bouncer
+        ? `against MAX_CLIENT_CONN ${t.bouncer.maxClient.toLocaleString('en-GB')}, `
+          + `answered from ${t.bouncer.poolSize} server connections`
+        : 'no pooler in the file');
+    fact('resources', `${cpuHours.toFixed(1)} cpu-h · ${gbHours.toFixed(0)} GB-h`,
+      'integrated across the run, which is what the prices below are applied to');
+    fact('at the ADR rate', money(spent),
+      `${money(RATE_PER_HOUR)} an hour at full expansion, apportioned by cpu`);
+    result.append(facts);
+
+    result.append(el('p', 'bd-result-h', 'The same run, priced at list container compute'));
+    const grid = el('div', 'bd-prices');
+    for (const provider of PROVIDERS) {
+      const cost2 = cpuHours * provider.vcpu + gbHours * provider.gb;
+      const card = el('div', `bd-price bd-price-${provider.key}`);
+      card.append(el('div', 'bd-price-v', money(cost2)));
+      card.append(el('div', 'bd-price-n', provider.name));
+      card.append(el('div', 'bd-price-h',
+        `$${provider.vcpu.toFixed(5)}/vCPU-h · $${provider.gb.toFixed(6)}/GB-h · ${provider.region}`));
+      if (provider.key === 'gcp') card.append(el('div', 'bd-price-tag', 'not on the shortlist'));
+      if (provider.key !== 'gcp') card.append(el('div', 'bd-price-tag', 'CF-64 candidate'));
+      grid.append(card);
+    }
+    result.append(grid);
+
+    result.append(el('p', 'bd-open',
+      'CF-64 is open: the cloud provider is AWS or Azure, pending DESC, owned by Dinesh '
+      + 'and Qossai. GCP is priced here because it was asked for and it is not one of the '
+      + 'two. Everything in the package above that decision is provider-neutral, and as '
+      + 'the brief puts it nothing below it can be — managed Postgres, the Redis tier, '
+      + 'Qdrant hosting, the CDN and the secret store all follow from the choice. CF-64 '
+      + 'also carries the RPO and RTO targets, which are stated nowhere else.'));
+    result.append(el('p', 'bd-risk-n',
+      'These three rates are mine and not the package’s, and they price container '
+      + 'compute only — no managed-database premium, no storage, no IO, no egress, no '
+      + 'support plan. That is most of why they land under ADR-0035’s own figure for '
+      + 'the same environment, and it is why they are a sanity check on the order of '
+      + 'magnitude rather than a quote. Check them before they go in front of a client.'));
+  };
+
   // ── the animation ─────────────────────────────────────────────────────────
-  const totalMin = t.deployed.reduce((a, x) => a + x.min, 0);
-  const totalMax = t.deployed.reduce((a, x) => a + x.max, 0);
   const stillness = window.matchMedia('(prefers-reduced-motion: reduce)');
   const replayAt = phases.findIndex((x) => lookOf(x.name).replay);
+
+  // Cost is apportioned by cpu, so the weights come off the compose file. A
+  // container with no declared limit weighs nothing and says so rather than
+  // being guessed at — pgbouncer declares none in this file.
+  const baseCpu = num(t.postgres?.cpus) + num(t.redis?.cpus);
+  const baseGb = gigs(t.postgres?.memory) + gigs(t.redis?.memory);
+  const peakCpu = baseCpu
+    + t.deployed.reduce((a, s) => a + num(s.cpus) * s.max, 0);
+  const perCpuHour = peakCpu > 0 ? RATE_PER_HOUR / peakCpu : 0;
+
+  // How long the whole run represents. The lifecycle is not two hours of
+  // wall-clock in equal parts — provisioning takes minutes and the sale takes
+  // seconds — so each phase carries its own share of the simulated clock.
+  const PHASE_MINUTES = {
+    requested: 0, provisioning: 8, warming: 6, live: 120,
+    draining: 15, reconciling: 20, reconciled: 2, decommissioned: 0,
+  };
+  const minutesOf = (name) => PHASE_MINUTES[name] ?? 10;
+  const totalMinutes = phases.reduce((a, x) => a + minutesOf(x.name), 0) || 120;
 
   let p = 0;
   let playing = false;
   let last = 0;
+  let spent = 0;
+  let simMinutes = 0;
+  let threshold = 0.7;
+  // Integrated once and priced three ways at the end. Pricing per frame would
+  // tie the answer to the frame rate.
+  let cpuHours = 0;
+  let gbHours = 0;
+  let peakContainers = 0;
+  let peakClient = 0;
+  let everCapped = false;
 
   const phaseAt = (u) => {
     if (!hasPhases) return { index: 0, name: 'live', within: u };
@@ -784,37 +1046,72 @@ export async function renderDeployMap(host, burst, io) {
     return { index, name: phases[index].name, within: Math.min(1, (u - index * span) / span) };
   };
 
+  /**
+   * How many replicas a cluster runs at this demand and this threshold.
+   *
+   * Capacity per replica is taken as peak ÷ max, because `max` is what the
+   * compose file provisions for the peak. Holding utilisation at or under the
+   * threshold then needs demand × max ÷ threshold replicas — which is why a
+   * lower threshold buys headroom and costs money, and why at a low enough one
+   * the answer exceeds what the file allows. That case is drawn rather than
+   * clamped away silently.
+   */
+  const wantedFor = (service, demand) => Math.ceil((demand * service.max) / threshold);
+
   const apply = () => {
     const at = phaseAt(p);
     const look = lookOf(at.name);
-    // Only `live` ramps. Every other state holds a fixed size, so stepping back
-    // to warming shows the environment small again rather than leaving it at
-    // whatever the last phase grew it to.
-    const u = look.replicas === 'ramp' ? at.within : look.replicas === 'max' ? 1 : 0;
-    const running = look.replicas !== 0;
+    const demand = look.load === 'ramp' ? at.within : Number(look.load) || 0;
+    const running = look.infra > 0 && demand > 0;
 
     let replicas = 0;
     let client = 0;
+    let liveCpu = look.infra > 0 ? baseCpu : 0;
+    const short = [];
+
     for (const c of clusters) {
-      const n = running ? Math.round(c.service.min + (c.service.max - c.service.min) * u) : 0;
+      const want = running ? Math.max(c.service.min, wantedFor(c.service, demand)) : 0;
+      const n = Math.min(c.service.max, want);
+      if (want > c.service.max) short.push(`${c.service.short} wants ${want}`);
       replicas += n;
       client += n * c.service.poolMax;
+      liveCpu += num(c.service.cpus) * n;
       c.cells.forEach((cell, k) => cell.classList.toggle('on', k < n));
       c.count.textContent = running
-        ? `${n} of ${c.service.max} replicas`
-          + (c.service.poolMax ? ` · ${n * c.service.poolMax} connections` : '')
+        ? `${n} of ${c.service.max}${want > c.service.max ? ` · wants ${want}` : ''}`
+          + (c.service.poolMax ? ` · ${n * c.service.poolMax} conns` : '')
         : 'not running';
       c.node.classList.toggle('bd-quiet', !running);
+      c.node.classList.toggle('bd-capped', want > c.service.max);
+    }
+
+    // The honest consequence of a low threshold, said rather than hidden: the
+    // compose file caps replicas, so below some target the environment simply
+    // cannot hold utilisation there.
+    peakContainers = Math.max(peakContainers, replicas);
+    peakClient = Math.max(peakClient, client);
+    if (short.length && running) {
+      everCapped = true;
+      capped.hidden = false;
+      capped.textContent = `At ${Math.round(threshold * 100)}% the file does not allow enough `
+        + `replicas — ${short.join(', ')}. deploy/c-flash-sale.yml caps them, so utilisation `
+        + 'runs above the target rather than more containers appearing.';
+    } else {
+      capped.hidden = true;
     }
 
     const server = t.bouncer?.poolSize ?? 0;
     outReplicas.textContent = String(replicas);
     outClient.textContent = client ? client.toLocaleString('en-GB') : '—';
-    outServer.textContent = running && server ? String(server) : '—';
     outRatio.textContent = server && client ? `${(client / server).toFixed(1)} : 1` : '—';
     const over = t.bouncer?.maxClient ? client > t.bouncer.maxClient : false;
     outClient.classList.toggle('bd-over', over);
     if (poolRow) poolRow.classList.toggle('bd-thr-hot', over);
+
+    const rate = look.billing ? liveCpu * perCpuHour : 0;
+    outRate.textContent = rate ? `${money(rate)}/h` : '—';
+    outSpend.textContent = money(spent);
+    outClockV.textContent = clock(simMinutes);
 
     section.style.setProperty('--bd-infra', String(look.infra));
     ingress.classList.toggle('bd-quiet', !look.arriving);
@@ -830,18 +1127,19 @@ export async function renderDeployMap(host, burst, io) {
         : `${at.name} — a terminal state of the model`;
     }
 
-    // the write path runs while the sale does
-    const writing = look.flow > 0.5;
+    const writing = demand > 0.2;
     wp.classList.toggle('bd-idle', !writing);
     if (!stillness.matches && writing) {
-      const cycle = (performance.now() / 2600) % 1;
-      wdot.setAttribute('cx', String(28 + cycle * 870));
+      wdot.setAttribute('cx', String(28 + ((performance.now() / 2600) % 1) * 870));
       wdot.setAttribute('opacity', '1');
     } else {
       wdot.setAttribute('opacity', '0');
     }
 
-    // reconciliation runs in its own phase and nowhere else
+    // the merge lane lights only while it is actually happening
+    mergePath.classList.toggle('bd-merge-on', Boolean(look.replay));
+    mergeLabel.classList.toggle('bd-merge-on', Boolean(look.replay));
+
     if (look.replay) {
       const done = Math.round(at.within * 100);
       recFill.style.width = `${done}%`;
@@ -860,9 +1158,9 @@ export async function renderDeployMap(host, burst, io) {
     if (!stillness.matches) {
       const now = performance.now();
       for (const f of flow) {
-        f.path.style.strokeOpacity = String(0.1 + 0.5 * look.flow);
+        f.path.style.strokeOpacity = String(0.1 + 0.5 * demand);
         f.path.style.strokeDashoffset =
-          String(-((now / (24 - 16 * u)) * (0.2 + f.weight / 100)) % 1000);
+          String(-((now / (24 - 16 * demand)) * (0.2 + f.weight / 100)) % 1000);
       }
     }
   };
@@ -872,34 +1170,102 @@ export async function renderDeployMap(host, burst, io) {
     play.textContent = hasPhases ? 'Run the sale' : 'Expand';
     p = Math.max(0, Math.min(1, v));
     range.value = String(Math.round(p * 1000));
+    // Scrubbing is not spending. The clock and the meter follow the position
+    // rather than accumulating, or dragging back and forth would run the bill
+    // up without any of it having happened.
+    simMinutes = 0;
+    spent = 0;
+    cpuHours = 0;
+    gbHours = 0;
+    result.hidden = true;
+    const at = phaseAt(p);
+    for (let n = 0; n < at.index; n += 1) simMinutes += minutesOf(phases[n]?.name);
+    simMinutes += minutesOf(at.name) * at.within;
   };
 
   const frame = (now) => {
-    if (playing) {
-      const dt = last ? Math.min(64, now - last) : 16;
-      // The sale is the part worth watching, so it gets the time. Provisioning
-      // takes minutes and the sale takes seconds, which is the ADR's point and
-      // the reverse of what is useful to sit through.
-      const pace = lookOf(phaseAt(p).name).replicas === 'ramp' ? 7000 : 2200;
-      p = Math.min(1, p + dt / pace);
-      range.value = String(Math.round(p * 1000));
-      if (p >= 1) { playing = false; play.textContent = 'Again'; }
-    }
+    const dt = last ? Math.min(64, now - last) : 16;
     last = now;
+    if (playing) {
+      // One second of yours is a minute of the sale.
+      const step = dt / 1000;
+      simMinutes += step;
+      p = Math.min(1, simMinutes / totalMinutes);
+      range.value = String(Math.round(p * 1000));
+      const look = lookOf(phaseAt(p).name);
+      if (look.billing) {
+        const at = phaseAt(p);
+        const demand = look.load === 'ramp' ? at.within : Number(look.load) || 0;
+        let cpu = look.infra > 0 ? baseCpu : 0;
+        let gb = look.infra > 0 ? baseGb : 0;
+        for (const c of clusters) {
+          if (look.infra > 0 && demand > 0) {
+            const n = Math.min(c.service.max,
+              Math.max(c.service.min, wantedFor(c.service, demand)));
+            cpu += num(c.service.cpus) * n;
+            gb += gigs(c.service.memory) * n;
+          }
+        }
+        const hours = step / 60;
+        spent += cpu * perCpuHour * hours;
+        cpuHours += cpu * hours;
+        gbHours += gb * hours;
+      }
+      if (p >= 1) { playing = false; play.textContent = 'Again'; showResult(); }
+    }
     apply();
     requestAnimationFrame(frame);
   };
   requestAnimationFrame(frame);
 
   play.onclick = () => {
-    if (p >= 1) { p = 0; range.value = '0'; }
+    if (p >= 1) {
+      p = 0; simMinutes = 0; spent = 0; range.value = '0';
+      cpuHours = 0; gbHours = 0; peakContainers = 0; peakClient = 0; everCapped = false;
+      result.hidden = true;
+    }
     playing = !playing;
     play.textContent = playing ? 'Pause' : (hasPhases ? 'Run the sale' : 'Expand');
   };
   range.oninput = () => { seek(Number(range.value) / 1000); };
+  thrRange.oninput = () => {
+    threshold = Number(thrRange.value) / 100;
+    thrLabel.textContent = `${thrRange.value}%`;
+  };
+
+  // ── the cost ladder ───────────────────────────────────────────────────────
+  const cost = el('div', 'bd-panel bd-cost');
+  cost.append(el('h3', 'bd-risk-h', 'What it costs, and why teardown is wired to the calendar'));
+  cost.append(el('p', 'bd-risk-p',
+    'ADR-0035 prices the environment at four durations. The risk it names is not the '
+    + 'cost but forgetting: a month of forgetting costs more than the platform the '
+    + 'environment was protecting, which is why teardown is tied to '
+    + 'catalogue.performance.onSaleTo rather than to somebody’s calendar, and why '
+    + 'listBurstEnvironments exists at all — an environment nobody is looking at is '
+    + 'the one left running for a month.'));
+  const ladder = el('div', 'bd-thr-list');
+  for (const point of COST_POINTS) {
+    const row = el('div', 'bd-thr-row');
+    row.append(el('span', 'bd-thr-n', point.label));
+    row.append(el('span', 'bd-thr-v', money(point.usd)));
+    row.append(el('span', 'bd-thr-note',
+      `${point.hours} hour${point.hours === 1 ? '' : 's'} · `
+      + `${money(point.usd / point.hours)} an hour at full expansion`));
+    ladder.append(row);
+  }
+  cost.append(ladder);
+  cost.append(el('p', 'bd-risk-n',
+    `The four totals are the ADR’s, quoted. The meter above is anchored on the month `
+    + `figure — ${money(RATE_PER_HOUR)} an hour, the longest run of the four and so the `
+    + 'least sensitive to rounding — and split across containers by the cpu limits the '
+    + `compose file declares: ${peakCpu} cpu fully expanded, ${baseCpu} for the database `
+    + 'and cache alone. That split is a model, not a quote. pgbouncer declares no cpu '
+    + 'limit in this file and so weighs nothing in it.'));
+  section.append(cost);
 
   head.append(el('p', 'bd-sub bd-sub-fine',
-    `At rest ${totalMin} containers, fully expanded ${totalMax}. `
+    `${t.deployed.reduce((a, x) => a + x.min, 0)} containers at rest, `
+    + `${t.deployed.reduce((a, x) => a + x.max, 0)} fully expanded. `
     + (hasPhases
       ? `${phases.length} phases, walked from states/burst-environment.yaml — the line `
         + 'under the strip is the package’s own guard for that step. '
