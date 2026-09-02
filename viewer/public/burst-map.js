@@ -338,60 +338,92 @@ export async function renderDeployMap(host, burst, io) {
     machine = (domain?.machines ?? []).find((m) => m.id === 'burst-environment') ?? null;
   } catch { machine = null; }
 
-  const phases = [];
-  if (machine) {
-    const terminalFail = new Set((machine.terminal ?? []).filter((x) => x === 'failed'));
-    const out = new Map();
-    for (const tr of machine.transitions ?? []) {
-      if (!out.has(tr.from)) out.set(tr.from, []);
-      out.get(tr.from).push(tr);
-    }
-    let at = (machine.initial ?? [])[0] ?? null;
-    const seen = new Set();
-    while (at && !seen.has(at)) {
-      seen.add(at);
-      phases.push({ name: at, into: null });
-      const next = (out.get(at) ?? []).find((tr) => !terminalFail.has(tr.to) && !seen.has(tr.to));
-      if (!next) break;
-      phases[phases.length - 1].into = next;
-      at = next.to;
-    }
-  }
-  const hasPhases = phases.length > 1;
-
-  /** How each state looks. A lookup with a default: the phases come from the
-   *  package, so a state this file has never heard of must still draw. */
-  const LOOK = {
-    requested: { infra: 0, load: 0, arriving: false, billing: false },
-    provisioning: { infra: 1, load: 0, arriving: false, billing: true },
-    warming: { infra: 1, load: 0.05, arriving: false, billing: true },
-    live: { infra: 1, load: 'ramp', arriving: true, billing: true },
-    draining: { infra: 1, load: 0.25, arriving: false, billing: true },
-    reconciling: { infra: 1, load: 0.08, arriving: false, billing: true, replay: true },
-    reconciled: { infra: 1, load: 0, arriving: false, billing: true },
-    decommissioned: { infra: 0, load: 0, arriving: false, billing: false },
-  };
-  const lookOf = (name) => LOOK[name] ?? { infra: 1, load: 0.2, arriving: false, billing: true };
+  // The walk that built a fixed happy path is gone: nothing runs on a
+  // timeline any more, so the transitions are read where they are needed —
+  // `trigger: operation` becomes a button, `system` and `time` fire on their
+  // own — and the order comes out of the model rather than out of a list.
 
   // ── controls ──────────────────────────────────────────────────────────────
-  const bar = el('div', 'bd-bar');
-  const play = el('button', 'bd-play', hasPhases ? 'Run the sale' : 'Expand');
-  play.type = 'button';
-  const range = document.createElement('input');
-  range.type = 'range';
-  range.className = 'bd-range';
-  range.min = '0';
-  range.max = '1000';
-  range.value = '0';
-  range.setAttribute('aria-label', 'Move through the environment lifecycle');
-  bar.append(play, el('div', 'bd-slide', range));
-  section.append(bar);
+  //
+  // **The operations are the buttons, taken from the machine.** Four of the
+  // twelve transitions carry `trigger: operation` and name the operation that
+  // causes them; the rest are `system` or `time` and happen on their own. So
+  // the controls are not a menu somebody wrote — they are the transitions the
+  // model says a person causes, enabled exactly when their `from` is the state
+  // the environment is in.
+  //
+  // Nothing here scrubs. Time runs forward once the environment is requested,
+  // and what the reader controls is the load: everything else is a consequence.
 
-  // The threshold. **Yours, not the package's** — b-shared-platform.yml says
-  // "Catalogue and Order autoscale on RPS" and burst-scope says "replicates on
-  // RPS", and neither says at what. Rather than invent a number and present it
-  // as the package's, it is a control: the number is the reader's to choose and
-  // the consequences are drawn.
+  // 55 requests per buyer, summed from callsPerBuyer across the 34 burst
+  // operations — the package's own figure, not a ratio invented here.
+  const CALLS_PER_BUYER = (burst.operations ?? [])
+    .reduce((a, op) => a + num(op.callsPerBuyer), 0) || 1;
+  // ADR-0035: "At 5,000 RPS the entire daily volume arrives in fifty seconds."
+  const PEAK_RPS = 5000;
+  const PEAK_BUYERS = Math.round(PEAK_RPS / CALLS_PER_BUYER);
+  // One second of yours is a minute of the sale.
+  const SIM_PER_REAL = 60;
+
+  const opTransitions = (machine?.transitions ?? []).filter((tr) => tr.trigger === 'operation');
+  const byOperation = new Map();
+  for (const tr of opTransitions) {
+    if (!byOperation.has(tr.operation)) byOperation.set(tr.operation, []);
+    byOperation.get(tr.operation).push(tr);
+  }
+
+  const opBar = el('div', 'bd-ops');
+  const opButtons = [...byOperation.entries()].map(([operation, list]) => {
+    const node = el('button', 'bd-op');
+    node.type = 'button';
+    node.textContent = operation.replace(/BurstEnvironment$/, '');
+    node.title = stripEmphasis(list[0]?.guard ?? operation);
+    node.onclick = () => fire(operation);
+    opBar.append(node);
+    return { operation, list, node };
+  });
+  section.append(opBar);
+
+  const stateLine = el('p', 'bd-state');
+  section.append(stateLine);
+
+  // What the model says no to. Shown rather than swallowed: the 409 on
+  // decommission is the edge ADR-0035 exists for, and a button that quietly
+  // does nothing teaches the opposite of what the ADR decided.
+  const refused = el('p', 'bd-refused');
+  refused.hidden = true;
+  section.append(refused);
+
+  const guard = el('p', 'bd-guard');
+  section.append(guard);
+
+  // The load. **Buyers and not requests**, because a buyer is what the scenario
+  // counts and the request rate follows from it: 55 calls each, summed from the
+  // package's own callsPerBuyer. Estimated rather than measured — tools/bench.py
+  // replaces them when there is something to run it against — so the slider is
+  // labelled in the unit the estimate is expressed in.
+  const loadBar = el('div', 'bd-bar bd-bar-load');
+  const loadRange = document.createElement('input');
+  loadRange.type = 'range';
+  loadRange.className = 'bd-range';
+  loadRange.min = '0';
+  loadRange.max = String(PEAK_BUYERS * 2);
+  loadRange.value = '0';
+  loadRange.setAttribute('aria-label', 'Buyers arriving per second');
+  const loadLabel = el('span', 'bd-thr-live', '0/s');
+  loadBar.append(
+    el('span', 'bd-bar-label', 'buyers arriving'),
+    el('div', 'bd-slide', loadRange),
+    loadLabel,
+    el('span', 'bd-bar-note bd-load-note', ''),
+  );
+  const loadNote = loadBar.querySelector('.bd-load-note');
+  section.append(loadBar);
+
+  // The threshold. Yours, not the package's: both the shared-platform header
+  // and burst-scope say these services autoscale on RPS, and neither says at
+  // what. Rather than invent a number and present it as the package's, the
+  // number is the reader's and the consequences are drawn.
   const thrBar = el('div', 'bd-bar bd-bar-thr');
   const thrRange = document.createElement('input');
   thrRange.type = 'range';
@@ -402,48 +434,67 @@ export async function renderDeployMap(host, burst, io) {
   thrRange.setAttribute('aria-label', 'Target utilisation per replica');
   const thrLabel = el('span', 'bd-thr-live', '70%');
   thrBar.append(
-    el('span', 'bd-bar-label', 'add a replica above'),
+    el('span', 'bd-bar-label', 'scale above'),
     el('div', 'bd-slide', thrRange),
     thrLabel,
-    el('span', 'bd-bar-note', 'utilisation per replica — the package says these autoscale on '
-      + 'RPS and never says at what, so this one is yours'),
+    el('span', 'bd-bar-note', 'utilisation per replica — the package says these autoscale '
+      + 'on RPS and never says at what, so this one is yours'),
   );
   section.append(thrBar);
 
-  const steps = el('div', 'bd-steps');
-  const stepNodes = phases.map((phase, n) => {
-    const node = el('button', 'bd-step');
-    node.type = 'button';
-    node.append(el('span', 'bd-step-dot'));
-    node.append(el('span', 'bd-step-name', phase.name));
-    node.title = phase.into?.guard
-      ? stripEmphasis(phase.into.guard)
-      : `${phase.name} — from states/burst-environment.yaml`;
-    node.onclick = () => seek(n / Math.max(1, phases.length - 1));
-    steps.append(node);
-    return node;
-  });
-  if (hasPhases) section.append(steps);
-
-  const guard = el('p', 'bd-guard');
-  if (hasPhases) section.append(guard);
+  // ADR-0035's open question, made operable. The catalogue is a snapshot rather
+  // than a replica, so a price that moves during the sale has to be resolved at
+  // reconciliation — and `priceDivergencePolicy` names three answers with no
+  // default, deliberately, because somebody chooses per sale. Both controls
+  // start at the position that asks nothing: no divergence, honour what the
+  // guest saw.
+  const divBar = el('div', 'bd-bar bd-bar-div');
+  const divRange = document.createElement('input');
+  divRange.type = 'range';
+  divRange.className = 'bd-range';
+  divRange.min = '0';
+  divRange.max = '100';
+  divRange.value = '0';
+  divRange.setAttribute('aria-label', 'Share of orders taken at a price that later changed');
+  const divLabel = el('span', 'bd-thr-live', '0%');
+  const policy = document.createElement('select');
+  policy.className = 'bd-policy';
+  for (const [value, text2] of [
+    ['honourSnapshot', 'honourSnapshot'],
+    ['honourCurrent', 'honourCurrent'],
+    ['reject', 'reject'],
+  ]) {
+    const option = document.createElement('option');
+    option.value = value;
+    option.textContent = text2;
+    policy.append(option);
+  }
+  divBar.append(
+    el('span', 'bd-bar-label', 'price moved for'),
+    el('div', 'bd-slide', divRange),
+    divLabel,
+    policy,
+    el('span', 'bd-bar-note bd-policy-note', ''),
+  );
+  const policyNote = divBar.querySelector('.bd-policy-note');
+  section.append(divBar);
 
   // ── readouts ──────────────────────────────────────────────────────────────
   const reads = el('div', 'bd-reads');
-  const readout = (label, hint, cls) => {
+  const readout = (label2, hint, cls) => {
     const cell = el('div', `bd-read ${cls ?? ''}`);
     const v = el('div', 'bd-read-v', '—');
-    cell.append(v, el('div', 'bd-read-l', label));
+    cell.append(v, el('div', 'bd-read-l', label2));
     if (hint) cell.append(el('div', 'bd-read-h', hint));
     reads.append(cell);
     return v;
   };
-  const outClockV = readout('elapsed', 'one second of yours is a minute of the sale');
+  const outClockV = readout('elapsed', 'a second of yours is a minute of the sale');
+  const outRps = readout('requests a second', `${CALLS_PER_BUYER} per buyer, from the package`);
+  const outOrders = readout('orders taken', 'what reconciliation has to move');
+  const outReplicas = readout('containers running', 'scaling up and down with the load');
   const outSpend = readout('spent so far', 'apportioned by cpu limits', 'bd-read-cost');
   const outRate = readout('burn rate', 'per hour at this size');
-  const outReplicas = readout('containers running', 'across the three clusters');
-  const outClient = readout('client connections asked for', 'replicas × PG_POOL_MAX');
-  const outRatio = readout('per server connection', `${t.bouncer?.poolSize ?? '—'} in the pool`);
   section.append(reads);
 
   const capped = el('p', 'bd-capped');
@@ -491,8 +542,11 @@ export async function renderDeployMap(host, burst, io) {
   label(perm, 30, 104, 'one database per tenant');
   const tenants = ['tenant A', 'tenant B', 'tenant C'];
   tenants.forEach((name, n) => {
-    const x = 30 + n * 172;
-    const g = box(perm, x, 114, 160, 74, 'bd-tenant');
+    // 168 wide and not 160: the caption underneath ran past the edge of the
+    // box at the narrower size, which read as a clipping bug rather than as a
+    // caption.
+    const x = 30 + n * 174;
+    const g = box(perm, x, 114, 168, 74, 'bd-tenant');
     text(g, x + 12, 134, 'bd-t-title', name);
     // ADR-0005: venues inside a tenant are list partitions on venue_id, and
     // database-per-venue was rejected — five cross-venue features become
@@ -503,7 +557,7 @@ export async function renderDeployMap(host, burst, io) {
         x: x + 12 + k * 26, y: 146, width: 20, height: 12, rx: 2, class: 'bd-part',
       }));
     }
-    text(g, x + 12, 176, 'bd-t-tiny', 'venues: partitions on venue_id');
+    text(g, x + 12, 176, 'bd-t-tiny', 'venues: partitions, not databases');
   });
 
   label(perm, 30, 212, 'one cell: a primary, a pooler, and the shared tier');
@@ -671,6 +725,14 @@ export async function renderDeployMap(host, burst, io) {
   const mergeLabel = text(bodies, 470, 596, 'bd-t-merge',
     'reconcile — environment id, monotonic sequence, idempotent replay');
   mergeLabel.setAttribute('text-anchor', 'middle');
+  // Orders in flight along it. Six is enough to read as movement and few
+  // enough that the lane does not turn into a solid line.
+  const mergeLen = mergePath.getTotalLength ? mergePath.getTotalLength() : 0;
+  const mergeDots = Array.from({ length: 6 }, () => {
+    const dot = svgEl('circle', { r: 3.5, cx: -10, cy: -10, class: 'bd-mergedot', opacity: '0' });
+    bodies.append(dot);
+    return dot;
+  });
 
   // ── the write path ────────────────────────────────────────────────────────
   // ADR-0033. Drawn because "how does it hold up" and "what happens to the
@@ -952,8 +1014,14 @@ export async function renderDeployMap(host, burst, io) {
       row.append(el('span', 'bd-thr-note', note));
       facts.append(row);
     };
-    fact('simulated', clock(simMinutes),
-      `${phases.length} phases, ${Math.round(totalMinutes)} minutes of sale time`);
+    fact('simulated', clock(simSeconds / 60),
+      `ended in ${state}, which is the only state teardown is allowed from`);
+    fact('orders taken', Math.round(orders).toLocaleString('en-GB'),
+      rejected >= 1
+        ? `${Math.round(replayed).toLocaleString('en-GB')} replayed, `
+          + `${Math.round(rejected).toLocaleString('en-GB')} to sync.rejection under `
+          + `${policy.value}`
+        : 'all replayed into the permanent platform, none rejected');
     fact('target utilisation', `${Math.round(threshold * 100)}%`,
       everCapped
         ? 'the file could not always provide enough replicas to hold it — utilisation '
@@ -1002,132 +1070,229 @@ export async function renderDeployMap(host, burst, io) {
       + 'magnitude rather than a quote. Check them before they go in front of a client.'));
   };
 
-  // ── the animation ─────────────────────────────────────────────────────────
+  // ── the simulation ────────────────────────────────────────────────────────
   const stillness = window.matchMedia('(prefers-reduced-motion: reduce)');
-  const replayAt = phases.findIndex((x) => lookOf(x.name).replay);
 
-  // Cost is apportioned by cpu, so the weights come off the compose file. A
-  // container with no declared limit weighs nothing and says so rather than
-  // being guessed at — pgbouncer declares none in this file.
   const baseCpu = num(t.postgres?.cpus) + num(t.redis?.cpus);
   const baseGb = gigs(t.postgres?.memory) + gigs(t.redis?.memory);
-  const peakCpu = baseCpu
-    + t.deployed.reduce((a, s) => a + num(s.cpus) * s.max, 0);
+  const peakCpu = baseCpu + t.deployed.reduce((a, s) => a + num(s.cpus) * s.max, 0);
   const perCpuHour = peakCpu > 0 ? RATE_PER_HOUR / peakCpu : 0;
 
-  // How long the whole run represents. The lifecycle is not two hours of
-  // wall-clock in equal parts — provisioning takes minutes and the sale takes
-  // seconds — so each phase carries its own share of the simulated clock.
-  const PHASE_MINUTES = {
-    requested: 0, provisioning: 8, warming: 6, live: 120,
-    draining: 15, reconciling: 20, reconciled: 2, decommissioned: 0,
-  };
-  const minutesOf = (name) => PHASE_MINUTES[name] ?? 10;
-  const totalMinutes = phases.reduce((a, x) => a + minutesOf(x.name), 0) || 120;
+  // How long a `system` transition takes to fire, in simulated seconds. The
+  // ADR says provisioning takes minutes and a sale takes seconds, and gives no
+  // figures; these are this page's, and they only pace the animation.
+  const DWELL = { provisioning: 240, warming: 150, reconciling: null };
 
-  let p = 0;
-  let playing = false;
+  let state = machine ? (machine.initial ?? [])[0] ?? 'requested' : 'live';
+  let started = false;
+  let stateSince = 0;
+  let simSeconds = 0;
   let last = 0;
-  let spent = 0;
-  let simMinutes = 0;
+  let buyers = 0;
   let threshold = 0.7;
-  // Integrated once and priced three ways at the end. Pricing per frame would
-  // tie the answer to the frame rate.
+  let divergence = 0;
+  let orders = 0;
+  let replayed = 0;
+  let rejected = 0;
+  let spent = 0;
   let cpuHours = 0;
   let gbHours = 0;
   let peakContainers = 0;
   let peakClient = 0;
   let everCapped = false;
+  // Where each cluster actually is, as opposed to where it wants to be. Kept
+  // as a float so scaling reads as a movement rather than as a jump.
+  const at = new Map(clusters.map((c) => [c.service.name, 0]));
 
-  const phaseAt = (u) => {
-    if (!hasPhases) return { index: 0, name: 'live', within: u };
-    const span = 1 / phases.length;
-    const index = Math.min(phases.length - 1, Math.floor(u / span));
-    return { index, name: phases[index].name, within: Math.min(1, (u - index * span) / span) };
+  const LOOK = {
+    requested: { infra: 0, live: false, billing: false },
+    provisioning: { infra: 1, live: false, billing: true },
+    warming: { infra: 1, live: false, billing: true },
+    live: { infra: 1, live: true, billing: true },
+    draining: { infra: 1, live: true, billing: true, draining: true },
+    reconciling: { infra: 1, live: false, billing: true, replay: true },
+    reconciled: { infra: 1, live: false, billing: true },
+    decommissioned: { infra: 0, live: false, billing: false },
+  };
+  const lookOf = (name) => LOOK[name] ?? { infra: 1, live: false, billing: true };
+
+  const guardInto = (to) => (machine?.transitions ?? [])
+    .find((tr) => tr.from === state && tr.to === to)?.guard ?? '';
+
+  const enter = (next) => {
+    state = next;
+    stateSince = simSeconds;
+    if (next === 'reconciling') { replayed = 0; rejected = 0; }
+    if (next === 'decommissioned') showResult();
   };
 
   /**
-   * How many replicas a cluster runs at this demand and this threshold.
-   *
-   * Capacity per replica is taken as peak ÷ max, because `max` is what the
-   * compose file provisions for the peak. Holding utilisation at or under the
-   * threshold then needs demand × max ÷ threshold replicas — which is why a
-   * lower threshold buys headroom and costs money, and why at a low enough one
-   * the answer exceeds what the file allows. That case is drawn rather than
-   * clamped away silently.
+   * An operation the reader pressed. **Refused rather than ignored when the
+   * model does not allow it** — `decommissionBurstEnvironment` before
+   * `reconciled` is the 409 ADR-0035 is built around, and a button that
+   * silently does nothing teaches the opposite of what the ADR decided.
    */
-  const wantedFor = (service, demand) => Math.ceil((demand * service.max) / threshold);
+  const fire = (operation) => {
+    const allowed = (byOperation.get(operation) ?? []).find((tr) => tr.from === state);
+    if (allowed) {
+      started = true;
+      enter(allowed.to);
+      refused.hidden = true;
+      return;
+    }
+    refused.hidden = false;
+    refused.textContent = operation === 'decommissionBurstEnvironment'
+      ? `409. decommissionBurstEnvironment is refused in ${state}: decommissioned is `
+        + 'reachable only through reconciled, because an environment torn down before its '
+        + 'orders reach the permanent platform has lost real money and real tickets. '
+        + 'ADR-0035.'
+      : `${operation} has no transition out of ${state} in states/burst-environment.yaml.`;
+  };
 
-  const apply = () => {
-    const at = phaseAt(p);
-    const look = lookOf(at.name);
-    const demand = look.load === 'ramp' ? at.within : Number(look.load) || 0;
-    const running = look.infra > 0 && demand > 0;
+  const rps = () => buyers * CALLS_PER_BUYER;
+  const demand = () => Math.min(1.4, rps() / PEAK_RPS);
 
+  /** Replicas needed to hold utilisation at the threshold, before the cap. */
+  const wantedFor = (service, d) => Math.max(
+    service.min, Math.ceil((d * service.max) / threshold),
+  );
+
+  const step = (dt) => {
+    const look = lookOf(state);
+    if (started && state !== 'decommissioned') simSeconds += dt * SIM_PER_REAL;
+    const held = simSeconds - stateSince;
+
+    // system transitions fire on their own
+    const dwell = DWELL[state];
+    if (dwell != null && held >= dwell) {
+      const next = (machine?.transitions ?? [])
+        .find((tr) => tr.from === state && tr.trigger === 'system' && tr.to !== 'failed');
+      if (next) enter(next.to);
+    }
+
+    // buyers arrive only while the environment is serving them
+    if (look.live && !look.draining) orders += buyers * dt * SIM_PER_REAL;
+
+    // the merge back, at a rate that finishes a large sale in a few minutes of
+    // simulated time rather than instantly — the point is that it takes long
+    // enough to be interrupted, which is why it is resumable
+    if (look.replay) {
+      const share = divergence;
+      const rate = Math.max(400, orders / 180);
+      const moved = Math.min(orders - replayed - rejected, rate * dt * SIM_PER_REAL);
+      // `reject` is the only policy that sends anything to sync.rejection. The
+      // other two replay everything and pay for it elsewhere: honourSnapshot
+      // may undercharge, honourCurrent charges a price the guest never saw.
+      const toReject = policy.value === 'reject' ? moved * share : 0;
+      rejected += toReject;
+      replayed += moved - toReject;
+      if (orders > 0 && replayed + rejected >= orders - 1) {
+        const done = (machine?.transitions ?? [])
+          .find((tr) => tr.from === 'reconciling' && tr.trigger === 'system');
+        if (done) enter(done.to);
+      } else if (orders === 0) {
+        const done = (machine?.transitions ?? [])
+          .find((tr) => tr.from === 'reconciling' && tr.trigger === 'system');
+        if (done) enter(done.to);
+      }
+    }
+
+    // autoscale: up quickly, down slowly. A cluster that follows demand down as
+    // fast as it followed it up flaps on every dip, and the cooldown is why
+    // real autoscalers do not.
+    const d = look.live ? demand() : 0;
     let replicas = 0;
     let client = 0;
-    let liveCpu = look.infra > 0 ? baseCpu : 0;
+    let cpu = look.infra > 0 ? baseCpu : 0;
+    let gb = look.infra > 0 ? baseGb : 0;
     const short = [];
 
     for (const c of clusters) {
-      const want = running ? Math.max(c.service.min, wantedFor(c.service, demand)) : 0;
-      const n = Math.min(c.service.max, want);
-      if (want > c.service.max) short.push(`${c.service.short} wants ${want}`);
+      const running = look.infra > 0 && (look.live || look.replay || state === 'warming');
+      const want = running ? wantedFor(c.service, running && look.live ? d : 0) : 0;
+      const target = Math.min(c.service.max, want);
+      if (want > c.service.max) { short.push(`${c.service.short} wants ${want}`); }
+      const now2 = at.get(c.service.name) ?? 0;
+      const pace = target > now2 ? 6 : 1.4;
+      at.set(c.service.name, now2 + (target - now2) * Math.min(1, dt * pace));
+      const n = Math.round(at.get(c.service.name));
       replicas += n;
       client += n * c.service.poolMax;
-      liveCpu += num(c.service.cpus) * n;
+      cpu += num(c.service.cpus) * n;
+      gb += gigs(c.service.memory) * n;
       c.cells.forEach((cell, k) => cell.classList.toggle('on', k < n));
-      c.count.textContent = running
+      c.count.textContent = look.infra > 0
         ? `${n} of ${c.service.max}${want > c.service.max ? ` · wants ${want}` : ''}`
           + (c.service.poolMax ? ` · ${n * c.service.poolMax} conns` : '')
         : 'not running';
-      c.node.classList.toggle('bd-quiet', !running);
+      c.node.classList.toggle('bd-quiet', look.infra === 0);
       c.node.classList.toggle('bd-capped', want > c.service.max);
     }
 
-    // The honest consequence of a low threshold, said rather than hidden: the
-    // compose file caps replicas, so below some target the environment simply
-    // cannot hold utilisation there.
-    peakContainers = Math.max(peakContainers, replicas);
-    peakClient = Math.max(peakClient, client);
-    if (short.length && running) {
+    if (short.length && look.live) {
       everCapped = true;
       capped.hidden = false;
       capped.textContent = `At ${Math.round(threshold * 100)}% the file does not allow enough `
         + `replicas — ${short.join(', ')}. deploy/c-flash-sale.yml caps them, so utilisation `
-        + 'runs above the target rather than more containers appearing.';
+        + 'runs above target and ADR-0032 sheds rather than queues: guest and public first, '
+        + 'staff and service last.';
     } else {
       capped.hidden = true;
     }
 
-    const server = t.bouncer?.poolSize ?? 0;
+    if (look.billing && started) {
+      const hours = (dt * SIM_PER_REAL) / 3600;
+      spent += cpu * perCpuHour * hours;
+      cpuHours += cpu * hours;
+      gbHours += gb * hours;
+    }
+    peakContainers = Math.max(peakContainers, replicas);
+    peakClient = Math.max(peakClient, client);
+
+    return { look, replicas, client, cpu, d };
+  };
+
+  const paint = ({ look, replicas, client, cpu, d }) => {
+    outClockV.textContent = clock(simSeconds / 60);
+    outRps.textContent = look.live ? Math.round(rps()).toLocaleString('en-GB') : '0';
+    outOrders.textContent = Math.round(orders).toLocaleString('en-GB');
     outReplicas.textContent = String(replicas);
-    outClient.textContent = client ? client.toLocaleString('en-GB') : '—';
-    outRatio.textContent = server && client ? `${(client / server).toFixed(1)} : 1` : '—';
+    outSpend.textContent = money(spent);
+    const rate = look.billing && started ? cpu * perCpuHour : 0;
+    outRate.textContent = rate ? `${money(rate)}/h` : '—';
+
     const over = t.bouncer?.maxClient ? client > t.bouncer.maxClient : false;
-    outClient.classList.toggle('bd-over', over);
+    outReplicas.classList.toggle('bd-over', over);
     if (poolRow) poolRow.classList.toggle('bd-thr-hot', over);
 
-    const rate = look.billing ? liveCpu * perCpuHour : 0;
-    outRate.textContent = rate ? `${money(rate)}/h` : '—';
-    outSpend.textContent = money(spent);
-    outClockV.textContent = clock(simMinutes);
+    stateLine.textContent = started
+      ? `${state} · ${Math.round(client).toLocaleString('en-GB')} client connections into `
+        + `${t.bouncer?.poolSize ?? '—'} server ones`
+      : 'nothing is running. requestBurstEnvironment starts it — and the ADR asks for it '
+        + 'against the sale calendar rather than against arriving demand, because '
+        + 'provisioning takes minutes and a sale takes seconds.';
 
-    section.style.setProperty('--bd-infra', String(look.infra));
-    ingress.classList.toggle('bd-quiet', !look.arriving);
+    const next = (machine?.transitions ?? []).find((tr) => tr.from === state);
+    guard.textContent = next?.guard ? stripEmphasis(next.guard) : '';
 
-    if (hasPhases) {
-      stepNodes.forEach((node, n) => {
-        node.classList.toggle('bd-step-on', n === at.index);
-        node.classList.toggle('bd-step-done', n < at.index);
-      });
-      const into = phases[at.index]?.into;
-      guard.textContent = into?.guard
-        ? stripEmphasis(into.guard)
-        : `${at.name} — a terminal state of the model`;
+    for (const b of opButtons) {
+      const allowed = b.list.some((tr) => tr.from === state);
+      b.node.classList.toggle('bd-op-on', allowed);
+      // Not disabled: pressing decommission early is how the 409 gets seen, and
+      // that refusal is the point of the state model.
+      b.node.classList.toggle('bd-op-off', !allowed);
     }
 
-    const writing = demand > 0.2;
+    loadLabel.textContent = `${buyers}/s`;
+    loadNote.textContent =
+      `${Math.round(rps()).toLocaleString('en-GB')} requests a second at ${CALLS_PER_BUYER} `
+      + `per buyer · ${PEAK_BUYERS}/s is the ${PEAK_RPS.toLocaleString('en-GB')} RPS `
+      + 'ADR-0035 describes, where a stadium’s whole day arrives in fifty seconds';
+
+    section.style.setProperty('--bd-infra', String(look.infra));
+    ingress.classList.toggle('bd-quiet', !look.live || look.draining);
+
+    const writing = look.live && d > 0.02;
     wp.classList.toggle('bd-idle', !writing);
     if (!stillness.matches && writing) {
       wdot.setAttribute('cx', String(28 + ((performance.now() / 2600) % 1) * 870));
@@ -1136,101 +1301,81 @@ export async function renderDeployMap(host, burst, io) {
       wdot.setAttribute('opacity', '0');
     }
 
-    // the merge lane lights only while it is actually happening
+    // the merge lane
     mergePath.classList.toggle('bd-merge-on', Boolean(look.replay));
     mergeLabel.classList.toggle('bd-merge-on', Boolean(look.replay));
+    const moving = look.replay && orders > 0;
+    mergeDots.forEach((dot, k) => {
+      if (!moving || stillness.matches) { dot.setAttribute('opacity', '0'); return; }
+      const u = (((performance.now() / 2200) + k / mergeDots.length) % 1);
+      const point = mergePath.getPointAtLength(u * mergeLen);
+      dot.setAttribute('cx', String(point.x));
+      dot.setAttribute('cy', String(point.y));
+      dot.setAttribute('opacity', String(0.35 + 0.65 * Math.sin(u * Math.PI)));
+    });
 
     if (look.replay) {
-      const done = Math.round(at.within * 100);
-      recFill.style.width = `${done}%`;
-      recNote.textContent = `replaying in sequence · ${done}% · resumable, so an `
-        + 'interruption here continues from where it stopped rather than restarting';
+      const done = orders > 0 ? (replayed + rejected) / orders : 1;
+      recFill.style.width = `${Math.round(done * 100)}%`;
+      recNote.textContent = orders > 0
+        ? `${Math.round(replayed).toLocaleString('en-GB')} replayed in sequence`
+          + (rejected >= 1
+            ? ` · ${Math.round(rejected).toLocaleString('en-GB')} to sync.rejection`
+            : '')
+          + ` of ${Math.round(orders).toLocaleString('en-GB')} · resumable, so an `
+          + 'interruption continues from here rather than restarting'
+        : 'nothing was sold, so there is nothing to move';
       rec.classList.remove('bd-idle');
     } else {
-      const past = replayAt >= 0 && at.index > replayAt;
-      recFill.style.width = past ? '100%' : '0%';
-      recNote.textContent = past
-        ? 'reconciled — and only now may the environment be torn down'
+      const done = state === 'reconciled' || state === 'decommissioned';
+      recFill.style.width = done ? '100%' : '0%';
+      recNote.textContent = done
+        ? `${Math.round(replayed).toLocaleString('en-GB')} orders landed`
+          + (rejected >= 1 ? `, ${Math.round(rejected).toLocaleString('en-GB')} rejected` : '')
+          + ' — and only now may the environment be torn down'
         : 'idle';
       rec.classList.add('bd-idle');
     }
 
+    policyNote.textContent = divergence === 0
+      ? 'no price moved during the sale, so the policy costs nothing. ADR-0035 gives '
+        + 'priceDivergencePolicy no default on purpose — the answer depends on how large '
+        + 'the divergence is and who the venue would rather disappoint.'
+      : policy.value === 'reject'
+        ? `${Math.round(divergence * 100)}% of orders reject at reconciliation and land in `
+          + 'sync.rejection. Safe, and it turns a completed purchase into a support case.'
+        : policy.value === 'honourCurrent'
+          ? `${Math.round(divergence * 100)}% replay at the current price. Correct in the `
+            + 'ledger, and it charges somebody a price they never saw.'
+          : `${Math.round(divergence * 100)}% replay at the price the guest saw. What a guest `
+            + 'expects, and it may undercharge.';
+
     if (!stillness.matches) {
-      const now = performance.now();
+      const now2 = performance.now();
       for (const f of flow) {
-        f.path.style.strokeOpacity = String(0.1 + 0.5 * demand);
+        f.path.style.strokeOpacity = String(0.08 + 0.55 * (look.live ? d : 0));
         f.path.style.strokeDashoffset =
-          String(-((now / (24 - 16 * demand)) * (0.2 + f.weight / 100)) % 1000);
+          String(-((now2 / (26 - 16 * Math.min(1, d))) * (0.2 + f.weight / 100)) % 1000);
       }
     }
-  };
-
-  const seek = (v) => {
-    playing = false;
-    play.textContent = hasPhases ? 'Run the sale' : 'Expand';
-    p = Math.max(0, Math.min(1, v));
-    range.value = String(Math.round(p * 1000));
-    // Scrubbing is not spending. The clock and the meter follow the position
-    // rather than accumulating, or dragging back and forth would run the bill
-    // up without any of it having happened.
-    simMinutes = 0;
-    spent = 0;
-    cpuHours = 0;
-    gbHours = 0;
-    result.hidden = true;
-    const at = phaseAt(p);
-    for (let n = 0; n < at.index; n += 1) simMinutes += minutesOf(phases[n]?.name);
-    simMinutes += minutesOf(at.name) * at.within;
   };
 
   const frame = (now) => {
-    const dt = last ? Math.min(64, now - last) : 16;
+    const dt = last ? Math.min(0.064, (now - last) / 1000) : 0.016;
     last = now;
-    if (playing) {
-      // One second of yours is a minute of the sale.
-      const step = dt / 1000;
-      simMinutes += step;
-      p = Math.min(1, simMinutes / totalMinutes);
-      range.value = String(Math.round(p * 1000));
-      const look = lookOf(phaseAt(p).name);
-      if (look.billing) {
-        const at = phaseAt(p);
-        const demand = look.load === 'ramp' ? at.within : Number(look.load) || 0;
-        let cpu = look.infra > 0 ? baseCpu : 0;
-        let gb = look.infra > 0 ? baseGb : 0;
-        for (const c of clusters) {
-          if (look.infra > 0 && demand > 0) {
-            const n = Math.min(c.service.max,
-              Math.max(c.service.min, wantedFor(c.service, demand)));
-            cpu += num(c.service.cpus) * n;
-            gb += gigs(c.service.memory) * n;
-          }
-        }
-        const hours = step / 60;
-        spent += cpu * perCpuHour * hours;
-        cpuHours += cpu * hours;
-        gbHours += gb * hours;
-      }
-      if (p >= 1) { playing = false; play.textContent = 'Again'; showResult(); }
-    }
-    apply();
+    paint(step(dt));
     requestAnimationFrame(frame);
   };
   requestAnimationFrame(frame);
 
-  play.onclick = () => {
-    if (p >= 1) {
-      p = 0; simMinutes = 0; spent = 0; range.value = '0';
-      cpuHours = 0; gbHours = 0; peakContainers = 0; peakClient = 0; everCapped = false;
-      result.hidden = true;
-    }
-    playing = !playing;
-    play.textContent = playing ? 'Pause' : (hasPhases ? 'Run the sale' : 'Expand');
-  };
-  range.oninput = () => { seek(Number(range.value) / 1000); };
+  loadRange.oninput = () => { buyers = Number(loadRange.value); };
   thrRange.oninput = () => {
     threshold = Number(thrRange.value) / 100;
     thrLabel.textContent = `${thrRange.value}%`;
+  };
+  divRange.oninput = () => {
+    divergence = Number(divRange.value) / 100;
+    divLabel.textContent = `${divRange.value}%`;
   };
 
   // ── the cost ladder ───────────────────────────────────────────────────────
@@ -1265,11 +1410,9 @@ export async function renderDeployMap(host, burst, io) {
 
   head.append(el('p', 'bd-sub bd-sub-fine',
     `${t.deployed.reduce((a, x) => a + x.min, 0)} containers at rest, `
-    + `${t.deployed.reduce((a, x) => a + x.max, 0)} fully expanded. `
-    + (hasPhases
-      ? `${phases.length} phases, walked from states/burst-environment.yaml — the line `
-        + 'under the strip is the package’s own guard for that step. '
-      : '')
-    + 'The requests-per-second figures the scenario quotes are prose in the compose '
-    + 'header, not structured data, so they are shown there rather than animated here.'));
+    + `${t.deployed.reduce((a, x) => a + x.max, 0)} fully expanded. Nothing here is on a `
+    + 'timeline: the environment is requested, the clusters follow the load you set, and '
+    + 'the state changes when you ask for one or when the model says it happens on its '
+    + 'own. callsPerBuyer is estimated from the flow steps rather than measured — '
+    + 'tools/bench.py replaces those numbers when there is something to run it against.'));
 }

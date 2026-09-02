@@ -648,3 +648,74 @@ text.bd-merge-on { opacity: 1; fill: var(--text); }
 
 .bd-price-gcp { opacity: 0.82; }
 .bd-price-gcp .bd-price-tag { border-color: var(--amber); color: var(--amber); }
+
+/* ── the operations ──────────────────────────────────────────────────── */
+
+/* The four transitions the model marks `trigger: operation`, as controls. The
+   other eight are system or time and are not anybody's to press. */
+.bd-ops {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 14px 0 10px;
+}
+
+.bd-op {
+  padding: 8px 15px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: transparent;
+  color: var(--text-dim);
+  font: inherit;
+  font-size: 12.5px;
+  font-family: var(--mono);
+  cursor: pointer;
+  transition: border-color 160ms ease, color 160ms ease;
+}
+
+.bd-op-on {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+/* Still pressable when it is not allowed — that is how the 409 gets seen. */
+.bd-op-off { opacity: 0.55; }
+
+.bd-op:hover { border-color: var(--accent); }
+
+.bd-state {
+  margin: 0 0 6px;
+  max-width: 82ch;
+  font-family: var(--mono);
+  font-size: 12.5px;
+  color: var(--text);
+}
+
+.bd-refused {
+  margin: 0 0 12px;
+  padding: 10px 13px;
+  border: 1px solid var(--red);
+  border-radius: 8px;
+  max-width: 84ch;
+  color: var(--text-dim);
+  font-size: 12.5px;
+  line-height: 1.55;
+}
+
+.bd-bar-load .bd-thr-live,
+.bd-bar-div .bd-thr-live { min-width: 5ch; }
+
+.bd-policy {
+  flex: none;
+  padding: 5px 9px;
+  border: 1px solid var(--line);
+  border-radius: 5px;
+  background: var(--bg-card);
+  color: var(--text);
+  font: inherit;
+  font-size: 12px;
+  font-family: var(--mono);
+}
+
+/* Orders moving back into the permanent platform. */
+.bd-mergedot { fill: var(--accent); }
