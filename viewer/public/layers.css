@@ -2737,3 +2737,57 @@ textarea.rt-sendback-note {
 .auth-lockup-night { display: none; }
 :root[data-theme="dark"] .auth-lockup-day { display: none; }
 :root[data-theme="dark"] .auth-lockup-night { display: block; }
+
+
+/* ── the burst scope, under the deploy order ─────────────────────────────
+   Rows rather than tiles: the reason each service is in or out is a sentence,
+   and a sentence in a tile wraps to four lines and stops being read. */
+.burst-scope { margin-top: 26px; }
+.burst-group-head {
+  display: flex; align-items: baseline; gap: 9px;
+  margin: 16px 0 6px; padding-bottom: 5px;
+  border-bottom: 1px solid var(--line);
+}
+.burst-group-title { font-size: 12.5px; font-weight: 700; color: var(--text); }
+.burst-group-count {
+  font-family: var(--mono); font-size: 11px; color: var(--text-faint);
+  font-variant-numeric: tabular-nums;
+}
+.burst-row {
+  display: grid;
+  grid-template-columns: 150px minmax(70px, 110px) 46px minmax(0, 1fr);
+  gap: 12px; align-items: center; padding: 5px 0;
+}
+.burst-row .service-pill { justify-self: start; }
+.burst-row .service-pill:disabled { opacity: .75; cursor: default; }
+.burst-bar { height: 7px; border-radius: 999px; background: var(--tint-2); overflow: hidden; }
+.burst-bar span { display: block; height: 100%; border-radius: 999px; background: var(--accent); }
+.burst-shared .burst-bar span { background: var(--amber); }
+.burst-off .burst-bar span { background: transparent; }
+.burst-share {
+  font-family: var(--mono); font-size: 12px; text-align: right;
+  font-variant-numeric: tabular-nums; color: var(--text);
+}
+.burst-off .burst-share { color: var(--text-faint); }
+.burst-reason { font-size: 12px; line-height: 1.5; color: var(--text-dim); }
+.burst-more { margin-top: 16px; }
+
+@media (max-width: 780px) {
+  .burst-row { grid-template-columns: 130px 1fr 44px; }
+  .burst-reason { grid-column: 1 / -1; }
+}
+
+/* The way from the Deploy block to the full map. Sits on the section label,
+   right-aligned, because the label is the only line in the block that belongs
+   to the section rather than to a service. */
+.burst-more {
+  float: right;
+  font-weight: 500;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--accent);
+  text-decoration: none;
+  border-bottom: 1px solid color-mix(in srgb, var(--accent) 45%, transparent);
+}
+
+.burst-more:hover { border-bottom-color: var(--accent); }

@@ -1,0 +1,278 @@
+/**
+ * The deployment map. Tokens only — the page follows the viewer's day/night
+ * choice, so nothing here names a colour the theme cannot override.
+ */
+
+.bd {
+  margin: 34px 0 0;
+  padding: 22px 0 0;
+  border-top: 1px solid var(--line);
+}
+
+.bd-head { margin-bottom: 16px; }
+
+.bd-sub {
+  margin: 6px 0 0;
+  max-width: 76ch;
+  color: var(--text-dim);
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+.bd-sub-fine { font-size: 12px; opacity: 0.85; }
+
+/* ── controls ─────────────────────────────────────────────────────────── */
+
+.bd-bar {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin: 18px 0 14px;
+}
+
+.bd-play {
+  flex: none;
+  min-width: 92px;
+  padding: 8px 16px;
+  border: 1px solid var(--accent);
+  border-radius: 6px;
+  background: transparent;
+  color: var(--accent);
+  font: inherit;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.bd-play:hover { background: color-mix(in srgb, var(--accent) 14%, transparent); }
+
+.bd-slide { flex: 1 1 240px; min-width: 180px; }
+
+.bd-range { width: 100%; accent-color: var(--accent); }
+
+.bd-ends {
+  flex: 1 1 100%;
+  display: flex;
+  justify-content: space-between;
+  color: var(--text-dim);
+  font-size: 11px;
+  font-family: var(--mono);
+}
+
+/* ── readouts ─────────────────────────────────────────────────────────── */
+
+.bd-reads {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(158px, 1fr));
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.bd-read {
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--bg-card);
+}
+
+.bd-read-v {
+  font-family: var(--mono);
+  font-size: 22px;
+  line-height: 1.1;
+  /* The number changes every frame, so it must not reflow the card as it
+     grows a digit — a readout that jitters is one nobody can read. */
+  font-variant-numeric: tabular-nums;
+}
+
+.bd-read-v.bd-over { color: var(--red); }
+
+.bd-read-l { margin-top: 5px; font-size: 12px; }
+
+.bd-read-h {
+  margin-top: 2px;
+  color: var(--text-dim);
+  font-size: 11px;
+  font-family: var(--mono);
+}
+
+/* ── the drawing ──────────────────────────────────────────────────────── */
+
+.bd-stage {
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--bg-card);
+  padding: 6px;
+  overflow: hidden;
+}
+
+.bd-svg { display: block; width: 100%; height: auto; }
+
+.bd-node rect,
+.bd-node path {
+  fill: color-mix(in srgb, var(--accent) 5%, transparent);
+  stroke: var(--line);
+  stroke-width: 1;
+}
+
+.bd-ingress rect { fill: transparent; stroke-dasharray: 4 3; }
+
+.bd-pool path {
+  fill: color-mix(in srgb, var(--accent) 10%, transparent);
+  stroke: var(--accent);
+}
+
+.bd-pg rect { stroke: color-mix(in srgb, var(--accent) 55%, var(--line)); }
+
+.bd-t-title {
+  fill: var(--text);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.bd-ingress .bd-t-title,
+.bd-pool .bd-t-title { text-anchor: middle; }
+
+.bd-ingress .bd-t-small,
+.bd-pool .bd-t-small { text-anchor: middle; }
+
+.bd-t-small {
+  fill: var(--text-dim);
+  font-size: 10.5px;
+  font-family: var(--mono);
+}
+
+/* A replica that is not running is drawn rather than omitted: the gap between
+   what is up and what the file allows is the thing the slider moves. */
+.bd-cell {
+  fill: transparent;
+  stroke: var(--line);
+  stroke-width: 1;
+  transition: fill 180ms ease, stroke 180ms ease, opacity 180ms ease;
+  opacity: 0.5;
+}
+
+.bd-cell.on {
+  fill: var(--accent);
+  stroke: var(--accent);
+  opacity: 1;
+}
+
+.bd-edge {
+  fill: none;
+  stroke: color-mix(in srgb, var(--accent) 45%, transparent);
+  stroke-width: 1.2;
+  stroke-dasharray: 5 7;
+}
+
+/* ── contention ───────────────────────────────────────────────────────── */
+
+.bd-risk,
+.bd-absent {
+  margin-top: 18px;
+  padding: 16px 18px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--bg-card);
+}
+
+.bd-risk { border-left: 3px solid var(--amber); }
+
+.bd-risk-h { margin: 0 0 6px; font-size: 14px; }
+
+.bd-risk-p {
+  margin: 0 0 12px;
+  max-width: 78ch;
+  color: var(--text-dim);
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+.bd-risk-row {
+  padding: 10px 0;
+  border-top: 1px solid var(--line);
+}
+
+.bd-risk-t {
+  font-family: var(--mono);
+  font-size: 12.5px;
+  color: var(--amber);
+}
+
+.bd-risk-ops {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 6px;
+}
+
+.bd-lock {
+  padding: 3px 8px;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--text-dim);
+}
+
+.bd-lock strong { color: var(--text); font-weight: 600; }
+
+.bd-lock-none { color: var(--red); }
+
+.bd-risk-n {
+  margin: 6px 0 0;
+  max-width: 78ch;
+  color: var(--text-dim);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+/* ── absent services ──────────────────────────────────────────────────── */
+
+.bd-strip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.bd-off {
+  padding: 4px 9px;
+  border: 1px dashed var(--line);
+  border-radius: 4px;
+  font-size: 11.5px;
+  color: var(--text-dim);
+}
+
+/* On the path and still not deployed — the group that is easiest to misread
+   as irrelevant, so it is the one that gets the accent. */
+.bd-off-path {
+  border-style: solid;
+  border-color: color-mix(in srgb, var(--accent) 55%, var(--line));
+  color: var(--text);
+}
+
+/* ── the scenario's own words ─────────────────────────────────────────── */
+
+.bd-note {
+  margin-top: 18px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--bg-card);
+  padding: 12px 16px;
+}
+
+.bd-note summary { cursor: pointer; font-size: 13px; }
+
+.bd-note-body {
+  margin: 12px 0 0;
+  max-width: 92ch;
+  white-space: pre-wrap;
+  color: var(--text-dim);
+  font-family: var(--mono);
+  font-size: 11.5px;
+  line-height: 1.6;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bd-cell { transition: none; }
+  .bd-edge { stroke-dasharray: none; }
+}

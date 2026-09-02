@@ -9199,7 +9199,15 @@ async function renderBurstScope(body) {
   const services = [...burst.services].sort((a, b) => b.weightedShare - a.weightedShare);
   const peak = services.reduce((max, s) => Math.max(max, s.weightedShare), 0);
 
-  block.append(el('div', 'journey-section-label', 'what a flash sale stands up'));
+  const label = el('div', 'journey-section-label', 'what a flash sale stands up');
+  // The way to the full page. It was linked only from the account panel, next
+  // to "Domain lenses", which is where somebody goes to manage their sign-in
+  // and not where they go to ask what an environment runs — so in practice the
+  // page could not be found from the view that raises the question.
+  const openMap = el('a', 'burst-more', 'Open the deployment map');
+  openMap.href = '/burst.html';
+  label.append(openMap);
+  block.append(label);
   block.append(proseLine(
     `${burst.totals.deployed} services of ${burst.totals.services}, ` +
     `${burst.totals.operations} operations of ${burst.totals.ofTotalOperations}, ` +
