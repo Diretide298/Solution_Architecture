@@ -697,7 +697,30 @@ export async function buildDiagrams(root, context = {}) {
   }
 
   const unowned = (context.tables ?? []).filter((t) => !named(t.service)).map((t) => t.name);
-  if (unowned.length) {
+  const claimed = services.reduce((a, s) => a + (s.tables ?? 0), 0);
+  // **Two different findings, and reporting them the same way was wrong.**
+  //
+  // Some tables naming no owner while others do is drift: the column is being
+  // filled and these were missed. *Every* table naming none is not drift — the
+  // column is unfilled, the cross-check has nothing to check, and listing 382
+  // table names to say so buries the one sentence that matters.
+  //
+  // Neither case means "nothing ships them". The services state their own
+  // table counts and between them claim nearly all of these; what is missing
+  // is the per-table half that would let the two be checked against each
+  // other. Saying otherwise reads as a build status and is not one.
+  if (unowned.length && unowned.length === (context.tables ?? []).length) {
+    problems.push({
+      severity: 'warning',
+      kind: 'diagram-table-unowned',
+      file: 'handoff/',
+      message:
+        `No table on the workbook's Tables sheet names an owning service — all ` +
+        `${unowned.length} carry the placeholder. The ${services.length} services claim ` +
+        `${claimed} tables between them, so the ownership is stated service by service ` +
+        `and cannot be checked table by table until that column is filled.`,
+    });
+  } else if (unowned.length) {
     problems.push({
       severity: 'warning',
       kind: 'diagram-table-unowned',
@@ -705,7 +728,7 @@ export async function buildDiagrams(root, context = {}) {
       message:
         `${unowned.length} table(s) name no service on the workbook's Tables sheet ` +
         `(${unowned.slice(0, 6).join(', ')}${unowned.length > 6 ? '…' : ''}) — ` +
-        `so nothing ships them.`,
+        `so no service is stated to own them.`,
     });
   }
 
@@ -1245,6 +1268,9 @@ export async function buildDiagrams(root, context = {}) {
       crossWrites: crossServiceWrites.length,
       tablesOwned: [...ownedInWorkbook.values()].reduce((a, owned) => a + owned.length, 0),
       tablesUnowned: unowned.length,
+      // What the services say about themselves, so a reader can tell an
+      // unfilled column from an unbuilt platform.
+      tablesClaimed: claimed,
 
       // what the folder holds
       layout: indexed ? 'indexed' : 'flat',

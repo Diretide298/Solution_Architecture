@@ -52,11 +52,31 @@ function parseCsv(text) {
 }
 
 /**
- * `how` says what the relationship was read from. Three of these are the
+ * `how` says what the relationship was read from. Some of these are the
  * database or a person saying so; the rest are the deriver's own inference,
  * and the viewer keeps drawing that distinction.
+ *
+ * **Both vocabularies, because the generator changed its own and this went on
+ * matching neither.** `derive-relationships.py` emits `declared`, `convention`
+ * and `lineage`; the three names below it were an earlier spelling. Nothing
+ * errored when they stopped appearing — every one of the 956 edges simply came
+ * back inferred, so unchecking "Inferred keys" emptied the diagram instead of
+ * leaving the 594 the package declares.
+ *
+ * The split follows the generator's own comments. `convention` is a `*_id`
+ * column whose stem happens to name a table — *"weaker than declared and
+ * marked so"*, and the one thing here that is genuinely a guess. `lineage`
+ * comes off the workbook's data-lineage sheet, which is somebody stating it;
+ * it is separated from the rest by `edgeKind: ambient` and the viewer's own
+ * ambient toggle rather than by this flag.
+ *
+ * The old names are kept rather than replaced: an older dump is still a dump
+ * somebody may open, and the failure mode of getting this wrong is silent.
  */
-const DECLARED_HOW = new Set(['DDL foreign key', 'DDL composite FK', 'manual']);
+const DECLARED_HOW = new Set([
+  'declared', 'lineage',
+  'DDL foreign key', 'DDL composite FK', 'manual',
+]);
 
 export async function buildRelationships(root) {
   const abs = path.join(root, FILE);

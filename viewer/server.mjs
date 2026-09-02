@@ -486,7 +486,13 @@ async function refreshIndex(pkg, reason = 'startup') {
           `services ${diagrams?.stats.services ?? 0} in ${diagrams?.stats.tiers ?? 0} tiers · ` +
           `${Object.values(diagrams?.lld ?? {}).reduce((a, list) => a + list.length, 0)} LLDs ` +
           `(${diagrams?.layout ?? 'none'}) · ` +
-          `${diagrams?.stats.tablesOwned ?? 0}/${(diagrams?.stats.tablesOwned ?? 0) + (diagrams?.stats.tablesUnowned ?? 0)} tables shipped | ` +
+          // **Not "shipped".** This counts how many tables the workbook names an
+          // owning service for, and the column is a placeholder throughout this
+          // package — so it printed `0/382 tables shipped` beside 373 tables
+          // that have DDL, which reads as a platform nobody has built.
+          `${diagrams?.stats.tablesOwned
+            ? `${diagrams.stats.tablesOwned}/${diagrams.stats.tablesOwned + diagrams.stats.tablesUnowned} tables owned`
+            : `no table owner stated (${diagrams?.stats.tablesClaimed ?? 0} claimed by services)`} | ` +
           `lenses ${(domains?.lenses ?? [])
             .map((l) => `${l.key} ${l.stats.total} (${l.stats.gaps} undeclared)`)
             .join(' · ') || 'none'} ` +
