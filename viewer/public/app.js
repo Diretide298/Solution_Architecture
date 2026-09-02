@@ -5678,6 +5678,13 @@ function buildSchemaGalaxy() {
   for (const table of tables) {
     cross(table.module, tableModule.get(table.childOf), true);
     for (const ref of table.references ?? []) cross(table.module, tableModule.get(ref.toTable), true);
+    // Same pair as buildTableGalaxy and buildSchemaMap use. applyMigrations
+    // fills `keys` from the DDL and empties `foreignKeys` for that table, so
+    // reading only the latter counted the guesses that survived and nothing
+    // else — one relationship across the whole database. The per-schema
+    // galaxy already read both, which is why a single schema drew its
+    // clusters while the schemas themselves floated unconnected.
+    for (const key of table.keys ?? []) cross(table.module, tableModule.get(key.toTable), true);
     for (const key of table.foreignKeys ?? []) cross(table.module, tableModule.get(key.toTable), false);
   }
   const outbound = new Map();
