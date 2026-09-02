@@ -372,11 +372,23 @@ export async function renderDeployMap(host, burst, io) {
     byOperation.get(tr.operation).push(tr);
   }
 
+  // What each operation is for, in the words somebody would use for it. The
+  // operationId is kept underneath rather than replaced: it is the package's
+  // name and the thing to search for, but on its own — lowercased and stripped
+  // of its suffix — it was too quiet to read as the button that starts
+  // everything.
+  const OP_LABEL = {
+    requestBurstEnvironment: 'Stand the environment up',
+    drainBurstEnvironment: 'Close the sale',
+    reconcileBurstEnvironment: 'Merge back',
+    decommissionBurstEnvironment: 'Tear it down',
+  };
   const opBar = el('div', 'bd-ops');
   const opButtons = [...byOperation.entries()].map(([operation, list]) => {
     const node = el('button', 'bd-op');
     node.type = 'button';
-    node.textContent = operation.replace(/BurstEnvironment$/, '');
+    node.append(el('span', 'bd-op-t', OP_LABEL[operation] ?? operation));
+    node.append(el('span', 'bd-op-id', operation));
     node.title = stripEmphasis(list[0]?.guard ?? operation);
     node.onclick = () => fire(operation);
     opBar.append(node);
@@ -1254,7 +1266,11 @@ export async function renderDeployMap(host, burst, io) {
 
   const paint = ({ look, replicas, client, cpu, d }) => {
     outClockV.textContent = clock(simSeconds / 60);
-    outRps.textContent = look.live ? Math.round(rps()).toLocaleString('en-GB') : '0';
+    // The rate you are offering, whether or not anything is up to take it.
+    // Reading '0' while the slider sat at 90 made the control look broken when
+    // what was actually true was that nothing had been deployed to serve it.
+    outRps.textContent = Math.round(rps()).toLocaleString('en-GB');
+    outRps.classList.toggle('bd-unserved', buyers > 0 && !look.live);
     outOrders.textContent = Math.round(orders).toLocaleString('en-GB');
     outReplicas.textContent = String(replicas);
     outSpend.textContent = money(spent);
@@ -1265,12 +1281,23 @@ export async function renderDeployMap(host, burst, io) {
     outReplicas.classList.toggle('bd-over', over);
     if (poolRow) poolRow.classList.toggle('bd-thr-hot', over);
 
-    stateLine.textContent = started
+    const waiting = buyers > 0 && !look.live;
+    stateLine.classList.toggle('bd-state-wait', waiting);
+    stateLine.textContent = look.live
       ? `${state} · ${Math.round(client).toLocaleString('en-GB')} client connections into `
         + `${t.bouncer?.poolSize ?? '—'} server ones`
-      : 'nothing is running. requestBurstEnvironment starts it — and the ADR asks for it '
-        + 'against the sale calendar rather than against arriving demand, because '
-        + 'provisioning takes minutes and a sale takes seconds.';
+      : waiting
+        ? `${Math.round(rps()).toLocaleString('en-GB')} requests a second are being offered `
+          + `and nothing is serving them — the environment is ${state}. `
+          + (started
+            ? 'It is coming up; provisioning and warming take minutes.'
+            : 'Press “Stand the environment up”. And note what this is showing you: '
+              + 'ADR-0035 asks for it against the sale calendar rather than against '
+              + 'arriving demand, because requesting it when the load appears is '
+              + 'requesting it too late.')
+        : started
+          ? `${state} · nothing is arriving`
+          : 'nothing is running yet. Stand the environment up, then set the load.';
 
     const next = (machine?.transitions ?? []).find((tr) => tr.from === state);
     guard.textContent = next?.guard ? stripEmphasis(next.guard) : '';

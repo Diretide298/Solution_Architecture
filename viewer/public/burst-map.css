@@ -661,6 +661,11 @@ text.bd-merge-on { opacity: 1; fill: var(--text); }
 }
 
 .bd-op {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  text-align: left;
   padding: 8px 15px;
   border: 1px solid var(--line);
   border-radius: 6px;
@@ -673,9 +678,23 @@ text.bd-merge-on { opacity: 1; fill: var(--text); }
   transition: border-color 160ms ease, color 160ms ease;
 }
 
+/* The one the model allows right now is the action, not a peer of the three
+   that are refused — it was a thin outline among four and nobody could see
+   where to start. */
 .bd-op-on {
   border-color: var(--accent);
-  color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 15%, transparent);
+  color: var(--text);
+}
+
+.bd-op-on .bd-op-t { color: var(--accent); }
+
+.bd-op-t { font-size: 13px; font-family: var(--font, inherit); font-weight: 600; }
+
+.bd-op-id {
+  font-size: 10px;
+  font-family: var(--mono);
+  color: var(--text-dim);
 }
 
 /* Still pressable when it is not allowed — that is how the 409 gets seen. */
@@ -719,3 +738,15 @@ text.bd-merge-on { opacity: 1; fill: var(--text); }
 
 /* Orders moving back into the permanent platform. */
 .bd-mergedot { fill: var(--accent); }
+
+/* Load offered that nothing is serving. Amber and not red: it is not an error,
+   it is the state the ADR is about — an environment requested when the load
+   arrives is requested too late. */
+.bd-unserved { color: var(--amber); }
+
+.bd-state-wait {
+  color: var(--amber);
+  padding: 9px 12px;
+  border: 1px solid var(--amber);
+  border-radius: 8px;
+}
