@@ -405,8 +405,25 @@ async function refreshIndex(pkg, reason = 'startup') {
         .then(JSON.parse)
         .catch(() => null);
 
+      // **The burst scope is a lens the package states outright.** Every other
+      // lens is derived by closure from a seed contract; this one is a list —
+      // `tools/derive-burst-scope.py` already worked out which operations and
+      // tables one deployment scenario touches, and re-deriving it here would
+      // be a second answer to a question the package has answered.
+      //
+      // Absent is fine and says nothing is wrong: a package without the
+      // scenario simply has no burst chip.
+      const burst = await readFile(path.join(ROOT, 'handoff/burst-scope.json'), 'utf8')
+        .then(JSON.parse)
+        .catch(() => null);
+
       domains = buildDomains({
         markers,
+        burst,
+        // For the burst lens: it names services as `CatalogueService` and the
+        // Architecture tree keys its rows by the diagram's key, so the lens
+        // needs the one to resolve to the other. Built above, so it is in hand.
+        services: diagrams?.services ?? [],
         operations: index.nodes.filter((n) => n.type === 'operation'),
         machines: domain.machines ?? [],
         events: domain.events ?? [],

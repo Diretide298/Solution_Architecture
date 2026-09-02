@@ -1513,11 +1513,11 @@ function countLensRows(key) {
   const kinds = {
     frontend: ['screen'], backend: ['table'],
     domain: ['state', 'event'], decisions: ['decision'],
-    // Architecture groups by tier and lists services, so an operation-and-table
-    // lens has nothing to filter here — but the count is still worth showing,
-    // because the chip is what tells a reader on this layer that the lens
-    // exists at all before they go looking for it on DB or Contracts.
-    services: ['operation', 'table'],
+    // Counted in the unit this layer draws. It used to count the lens's
+    // operations and tables here, which put 76 on a chip beside a tree of 16
+    // services and then filtered nothing when clicked. A count has to be a
+    // count of the rows the chip acts on, or it is a promise the click breaks.
+    services: ['service'],
   }[state.layer] ?? [];
   return lens.members.filter((m) => kinds.includes(m.kind)).length;
 }
@@ -1575,6 +1575,7 @@ function renderServiceTree() {
   if (groupBy() === 'size') {
     const sorted = [...diagrams.services]
       .filter((service) => hit(service.name) || hit(service.tier))
+      .filter((service) => passesLens('service', service.key))
       .sort((a, b) => (b.operations ?? 0) - (a.operations ?? 0));
     for (const service of sorted) { box.append(row(service)); shown += 1; }
   } else {
@@ -1582,7 +1583,11 @@ function renderServiceTree() {
       const services = tier.services
         .map((key) => byKey.get(key))
         .filter(Boolean)
-        .filter((service) => hit(service.name) || hit(tier.tier));
+        .filter((service) => hit(service.name) || hit(tier.tier))
+        .filter((service) => passesLens('service', service.key));
+      // An empty tier is dropped rather than drawn empty: under a lens most
+      // tiers have nothing in them, and five headings over one row each reads
+      // as the filter having failed.
       if (!services.length) continue;
       const group = el('div', 'tree-group');
       const head = el('div', 'tree-group-head');
@@ -1597,8 +1602,10 @@ function renderServiceTree() {
   }
 
   if (!shown) box.append(el('p', 'pane-empty', 'Nothing matches that filter.'));
-  $('file-count').textContent =
-    `${diagrams.services.length} services · ${diagrams.tiers.length} tiers`;
+  $('file-count').textContent = state.lensFilter
+    ? `${shown} of ${diagrams.services.length} services · `
+      + `${state.lensById?.get(state.lensFilter)?.label ?? state.lensFilter}`
+    : `${diagrams.services.length} services · ${diagrams.tiers.length} tiers`;
 }
 
 /** The ADRs and the registers, as a list you can jump from. */

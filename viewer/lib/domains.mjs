@@ -339,11 +339,138 @@ export function buildDomains(sources) {
     });
   }
 
+  const burstLens = buildBurstLens(sources);
+  if (burstLens) lenses.push(burstLens);
+
   return {
     present: lenses.some((l) => l.stats.total > 0),
     lenses,
     // so a tree row in any layer can ask "which lenses is this in?" in O(1)
     byArtefact: index(lenses),
+  };
+}
+
+/**
+ * The burst scope as a lens: what one deployment scenario actually touches.
+ *
+ * **Stated, not derived, and that is the difference from every lens above.**
+ * The AI lens exists because no folder holds the subject and a closure has to
+ * find it. This subject *is* held — `tools/derive-burst-scope.py` reads flows
+ * F43, F58 and F59 and emits the answer — so deriving it a second time here
+ * would be a second answer to a settled question, and the two would disagree
+ * the first time the flows changed.
+ *
+ * So every member is marked `declared` and none `derived`, which is honest
+ * about where it came from and keeps it out of the derived-not-declared gap
+ * report — a gap list is for drift between two sources, and this has one.
+ *
+ * **Why a lens rather than only a page.** A reader on the DB layer asking
+ * "which of these 372 tables does a flash sale touch?" gets 42 without leaving
+ * the layer or losing the schema grouping; the same chip on Contracts leaves
+ * the 34 operations. That question has no good answer in a standalone page,
+ * because the answer is a filter over a tree the page does not have.
+ */
+function buildBurstLens(sources) {
+  const burst = sources.burst;
+  if (!burst?.operations?.length && !burst?.tables?.length) return null;
+
+  const byServiceName = new Map((sources.services ?? []).map((s) => [s.name, s]));
+
+  const opFile = new Map(
+    (sources.operations ?? []).map((o) => [o.name ?? o.id, o.file]).filter(([k]) => k),
+  );
+
+  const members = [
+    ...(burst.operations ?? []).map((o) => ({
+      kind: 'operation',
+      id: o.operationId,
+      label: o.operationId,
+      method: o.verb,
+      path: o.path,
+      // The tree marks a contract file, not an operation, so the file has to be
+      // resolved here — burst-scope names the contract stem and the index knows
+      // the path. Falling back to the stem keeps the member rather than
+      // dropping it, because a member with no file still counts on the chip.
+      file: opFile.get(o.operationId) ?? null,
+      contract: o.contract,
+      service: o.service,
+      derived: false,
+      declared: true,
+      why: `${o.callsPerBuyer} call(s) per buyer${o.lock ? ` · ${o.lock}` : ''}`,
+    })),
+    ...(burst.tables ?? []).map((t) => ({
+      kind: 'table',
+      id: t.table,
+      label: t.table,
+      schema: t.schema,
+      written: t.written,
+      contended: t.contended,
+      derived: false,
+      declared: true,
+      // The two contended rows are the whole risk in the scenario, so the one
+      // line a reader sees on hover says so rather than repeating the count.
+      why: t.contended
+        ? 'contended — every buyer wants these rows, and the lease path serialises'
+        : `${t.burstOperations} burst operation(s)${t.written ? ', written' : ''}`,
+    })),
+    // The services, so the chip on Architecture filters rather than only
+    // counting. That layer lists services and groups them by tier; a lens of
+    // operations and tables has nothing there to match, so the chip drew a
+    // number and did nothing when clicked — which reads as a broken button
+    // rather than as a lens that does not apply.
+    //
+    // On the burst path, not deployed: seven services, of which three are the
+    // environment. A filter that kept only the three would answer a different
+    // question — "what is deployed" is on the page, "what a sale touches" is
+    // this — and it is the four on the path but served from the shared cell
+    // that a reader most needs to see, because they are the ones easy to
+    // mistake for absent.
+    ...(burst.services ?? [])
+      .filter((s) => s.onBurstPath)
+      .map((s) => {
+        const known = byServiceName.get(s.name);
+        return {
+          kind: 'service',
+          // The tree keys rows by the diagram's key, so match on that and fall
+          // back to the name — an unmatched member still counts on the chip,
+          // it just never matches a row.
+          id: known?.key ?? s.name,
+          label: s.name.replace(/Service$/, ''),
+          tier: s.tier,
+          deployed: s.deployed,
+          weightedShare: s.weightedShare,
+          derived: false,
+          declared: true,
+          why: s.deployed
+            ? `deployed · ${s.weightedShare}% of the burst · ${s.reason}`
+            : `on the path, served from the shared cell · ${s.weightedShare}% · ${s.reason}`,
+        };
+      }),
+  ];
+
+  const byKind = {};
+  for (const m of members) (byKind[m.kind] ??= []).push(m);
+
+  return {
+    key: 'burst',
+    label: 'Flash sale',
+    blurb:
+      'What a burst environment actually runs. Three services of sixteen, and the two ' +
+      'contended tables that decide whether the scenario works.',
+    seed: [],
+    docs: ['docs/adr/0035-burst-environments.md', 'deploy/c-flash-sale.yml'],
+    members,
+    byKind,
+    // Stated by the package, so there is no second source to disagree with.
+    gaps: [],
+    stats: {
+      total: members.length,
+      derived: 0,
+      declared: members.length,
+      both: 0,
+      gaps: 0,
+      ...Object.fromEntries(Object.entries(byKind).map(([k, v]) => [k, v.length])),
+    },
   };
 }
 
