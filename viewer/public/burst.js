@@ -388,10 +388,19 @@ async function main() {
     // The map goes straight after the totals: it is the one block that answers
     // "what does this look like running" rather than "what is in it", and a
     // reader who stops after the first screen should have had that.
-    await renderDeployMap(host, data, async (path) => {
-      const file = await auth.apiFetch(`/api/file?path=${encodeURIComponent(path)}`);
-      if (!file.ok) throw new Error(`${file.status}`);
-      return file.text();
+    await renderDeployMap(host, data, {
+      file: async (path) => {
+        const res2 = await auth.apiFetch(`/api/file?path=${encodeURIComponent(path)}`);
+        if (!res2.ok) throw new Error(String(res2.status));
+        return res2.text();
+      },
+      // The parsed payloads the viewer already builds. /api/domain carries the
+      // state machines, so the burst lifecycle arrives read rather than reread.
+      api: async (route) => {
+        const res2 = await auth.apiFetch(`/api/${route}`);
+        if (!res2.ok) throw new Error(String(res2.status));
+        return res2.json();
+      },
     });
     renderServices(host, data);
     renderTables(host, data);

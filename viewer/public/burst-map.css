@@ -300,3 +300,178 @@
   .bd-cell { transition: none; }
   .bd-edge { stroke-dasharray: none; }
 }
+
+/* ── the lifecycle strip ──────────────────────────────────────────────── */
+
+.bd-steps {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin: 4px 0 10px;
+}
+
+.bd-step {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 5px 11px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--text-dim);
+  font: inherit;
+  font-size: 11.5px;
+  cursor: pointer;
+}
+
+.bd-step-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--line);
+  flex: none;
+}
+
+.bd-step-done { color: var(--text); }
+.bd-step-done .bd-step-dot { background: var(--accent); opacity: 0.55; }
+
+.bd-step-on {
+  border-color: var(--accent);
+  color: var(--text);
+}
+
+.bd-step-on .bd-step-dot { background: var(--accent); }
+
+/* The package's own sentence for the step on screen. Reserved height, so the
+   panel below does not jump every time the phase changes. */
+.bd-guard {
+  margin: 0 0 14px;
+  min-height: 3.2em;
+  max-width: 82ch;
+  color: var(--text-dim);
+  font-size: 12.5px;
+  line-height: 1.55;
+}
+
+/* ── phase dimming ───────────────────────────────────────────────────── */
+
+/* Infrastructure that is not up yet, and clusters with nothing running. Drawn
+   faint rather than removed: a box that vanishes reads as a rendering fault,
+   and the point of the phase is that the thing is not there yet. */
+.bd-pool,
+.bd-pg,
+.bd-redis { opacity: var(--bd-infra, 1); transition: opacity 260ms ease; }
+
+.bd-quiet { opacity: 0.32; transition: opacity 260ms ease; }
+
+/* ── panels ──────────────────────────────────────────────────────────── */
+
+.bd-panel {
+  margin-top: 18px;
+  padding: 16px 18px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--bg-card);
+}
+
+.bd-panel.bd-idle { opacity: 0.62; transition: opacity 300ms ease; }
+
+.bd-stage-flat { margin: 12px 0; }
+
+.bd-wsvg { display: block; width: 100%; height: auto; max-height: 220px; }
+
+.bd-t-mid { text-anchor: middle; }
+
+/* The transaction boundary is a container, not a machine. */
+.bd-txn rect {
+  fill: none;
+  stroke: var(--accent);
+  stroke-dasharray: 5 4;
+}
+
+.bd-w-dead rect,
+.bd-w-retry rect { stroke: var(--amber); }
+
+.bd-edge-warn { stroke: var(--amber); stroke-opacity: 0.7; }
+
+.bd-wdot {
+  fill: var(--accent);
+  transition: opacity 200ms ease;
+}
+
+/* ── thresholds ──────────────────────────────────────────────────────── */
+
+.bd-thr-list { margin-top: 10px; }
+
+.bd-thr-row {
+  display: grid;
+  grid-template-columns: 150px 190px 1fr;
+  gap: 12px;
+  padding: 9px 0;
+  border-top: 1px solid var(--line);
+  align-items: baseline;
+}
+
+@media (max-width: 720px) {
+  .bd-thr-row { grid-template-columns: 1fr; gap: 3px; }
+}
+
+.bd-thr-n { font-size: 12.5px; }
+
+.bd-thr-v {
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--text);
+}
+
+/* Computed here from the compose file, rather than quoted from an ADR. The
+   distinction is the point of the panel: one can be checked against the
+   package on this page and the other is a rule somebody wrote down. */
+.bd-thr-computed .bd-thr-v { color: var(--accent); }
+
+.bd-thr-hot .bd-thr-v { color: var(--red); }
+
+.bd-thr-note {
+  color: var(--text-dim);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+/* ── reconciliation ──────────────────────────────────────────────────── */
+
+.bd-rec { border-left: 3px solid var(--accent); }
+
+.bd-recbar {
+  height: 6px;
+  border-radius: 3px;
+  background: var(--bg-raised);
+  border: 1px solid var(--line);
+  overflow: hidden;
+  margin: 4px 0 6px;
+}
+
+.bd-recfill {
+  height: 100%;
+  width: 0;
+  background: var(--accent);
+}
+
+.bd-rec-note {
+  margin: 0 0 10px;
+  color: var(--text-dim);
+  font-size: 12px;
+  font-family: var(--mono);
+}
+
+/* The one thing on this page that is not decided. Said in the amber the rest
+   of the package uses for an open question rather than in the accent. */
+.bd-open {
+  margin: 14px 0 0;
+  padding: 11px 13px;
+  border: 1px solid var(--amber);
+  border-radius: 8px;
+  max-width: 84ch;
+  color: var(--text-dim);
+  font-size: 12.5px;
+  line-height: 1.55;
+}
