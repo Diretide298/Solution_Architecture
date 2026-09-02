@@ -208,12 +208,24 @@ export async function buildMigrations(root) {
         const table = parseCreateTable(statement, name);
         if (!table) continue;
         if (tables[table.name]) {
+          // The first CREATE TABLE wins and this one is dropped. Replacing
+          // would be worse than losing a definition: files are read in sorted
+          // order, so 900-foreign-keys.sql has already hung its ALTER TABLE
+          // keys off the table object standing here, and swapping the object
+          // silently discards them. That is what a leftover V0002__identity.sql
+          // did to 65 keys — and nothing looked broken afterwards, because the
+          // superseded generation's tables existed too, so every key it carried
+          // still resolved. An error, not a warning: two files creating one
+          // table means the package shipped two generations of DDL, and which
+          // one a reader gets is decided by filename.
           problems.push({
-            severity: 'warning',
+            severity: 'error',
             kind: 'migration-duplicate-table',
             file: `backend/${name}`,
-            message: `${table.name} is created in both ${tables[table.name].file} and ${name}`,
+            message: `${table.name} is created in both ${tables[table.name].file} and ${name}; `
+              + `keeping the ${tables[table.name].file} definition and ignoring this one`,
           });
+          continue;
         }
         tables[table.name] = table;
         file.tables.push(table.name);
