@@ -454,6 +454,9 @@ async function refreshIndex(pkg, reason = 'startup') {
       // the others.
       search = await buildSearch(ROOT, {
         journeys, domain, decisions, backend, uiux, platforms,
+        // Only so the flash-sale page is offered when there is a scenario to
+        // open — read above for the burst lens.
+        burst,
       }).catch(() => null);
 
       // Published together. Until this line the package still answers with the

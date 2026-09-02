@@ -11423,6 +11423,9 @@ const KIND_COLOR = {
   event: 'var(--layer-domain, #c88bff)',
   table: 'var(--layer-backend, #ffb454)',
   adr: 'var(--layer-decisions, #ff8fa3)',
+  // A page is not part of any layer, so it borrows the accent rather than
+  // claiming a colour that means "frontend" or "decisions" to a reader.
+  page: 'var(--accent, #7ee0d2)',
 };
 const colorForKind = (kind) => KIND_COLOR[kind] ?? 'var(--text-faint)';
 

@@ -116,7 +116,7 @@ async function headingLine(root, rel) {
  * @param subjects  the built payloads — journeys, domain, decisions, backend, uiux, platforms
  */
 export async function buildSearch(root, subjects = {}) {
-  const { journeys, domain, decisions, backend, uiux, platforms } = subjects;
+  const { journeys, domain, decisions, backend, uiux, platforms, burst } = subjects;
   const entries = [];
 
   const screenFiles = await readDir(root, 'screens');
@@ -262,6 +262,49 @@ export async function buildSearch(root, subjects = {}) {
       href: '/uiux.html',
       terms: [b.name, b.file, b.title, ...b.platforms,
         ...b.frames.map((f) => `${f.anchor} ${f.name ?? ''}`)].filter(Boolean).join(' '),
+    });
+  }
+
+  // ---- pages ---------------------------------------------------------------
+  // The viewer's standalone pages, so Ctrl+K can reach them.
+  //
+  // **They were reachable only from the account panel.** Every one of these is
+  // about what the package contains, and the way in was a list of links beside
+  // "Manage accounts and invites" — where somebody goes to change their sign-in
+  // and not to ask what a flash sale runs. A page nothing points at from the
+  // view that raises its question is a page that does not exist, and search is
+  // the one place a reader looks for something by name rather than by route.
+  //
+  // Gated on the subject actually being in the package: a scenario with no
+  // burst scope should not offer a page that opens on nothing.
+  const pages = [
+    burst?.services?.length && {
+      id: 'burst', name: 'Flash sale — what an environment runs',
+      sub: `${burst.totals?.deployed ?? 0} of ${burst.totals?.services ?? 0} services deployed`,
+      href: '/burst.html',
+      terms: 'flash sale burst scope deployment map environment clusters replicas '
+        + 'scale out scaling contended inventory hold seat hold pgbouncer scenario c '
+        + (burst.services ?? []).map((x) => x.name).join(' '),
+    },
+    { id: 'uiux', name: 'UI/UX — screens, flows and boards', href: '/uiux.html',
+      terms: 'uiux wireframes boards frames screens flows' },
+    { id: 'domains', name: 'Domain lenses', href: '/domains.html',
+      terms: 'domain lenses cross-cutting subjects ai flash sale' },
+    { id: 'audit', name: 'Audit the delivery package', href: '/audit.html',
+      terms: 'audit dump checks validators problems package' },
+    { id: 'validation', name: 'What has been signed off', href: '/validation.html',
+      terms: 'validation sign-off verdicts reviews approved' },
+  ].filter(Boolean);
+  for (const page of pages) {
+    entries.push({
+      kind: 'page',
+      id: page.id,
+      name: page.name,
+      sub: page.sub ?? 'a page of its own',
+      file: null, line: null,
+      hash: null, layer: null,
+      href: page.href,
+      terms: `${page.name} ${page.terms}`,
     });
   }
 
