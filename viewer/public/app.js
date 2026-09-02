@@ -1513,6 +1513,11 @@ function countLensRows(key) {
   const kinds = {
     frontend: ['screen'], backend: ['table'],
     domain: ['state', 'event'], decisions: ['decision'],
+    // Architecture groups by tier and lists services, so an operation-and-table
+    // lens has nothing to filter here — but the count is still worth showing,
+    // because the chip is what tells a reader on this layer that the lens
+    // exists at all before they go looking for it on DB or Contracts.
+    services: ['operation', 'table'],
   }[state.layer] ?? [];
   return lens.members.filter((m) => kinds.includes(m.kind)).length;
 }
@@ -5344,6 +5349,17 @@ function buildSchemaMap() {
 
     note(table.module, tableModule.get(table.childOf), true);
     for (const ref of table.references ?? []) note(table.module, tableModule.get(ref.toTable), true);
+    // `keys` and not `foreignKeys`. Both fields exist and only one of them is
+    // ever populated per table: applyMigrations moves the parsed constraints
+    // into `keys` and empties `foreignKeys` for any table the DDL covers, on
+    // the grounds that the DDL is the answer and the workbook's guesses for
+    // that table can go. Reading only `foreignKeys` was therefore reading the
+    // field that gets cleared — and once backend/ shipped real DDL for 373
+    // tables it was cleared nearly everywhere, leaving 2 keys to draw the
+    // whole database. Both lines are needed and neither double-counts: a
+    // table with DDL contributes through `keys`, one without through the
+    // guesses in `foreignKeys`.
+    for (const key of table.keys ?? []) note(table.module, tableModule.get(key.toTable), true);
     for (const key of table.foreignKeys ?? []) note(table.module, tableModule.get(key.toTable), false);
   }
 
@@ -9131,6 +9147,115 @@ function renderDeploy() {
     body.append(el('div', 'journey-section-label', 'notes'));
     body.append(proseLine(diagrams.notes));
   }
+
+  renderBurstScope(body);
+}
+
+/**
+ * The burst scope, under the deploy order it belongs beneath.
+ *
+ * **The view above says what ships and in what order. This says what one
+ * scenario actually stands up** — the same reader's next question, which is why
+ * it is a block here rather than a page elsewhere. It also sits directly under
+ * *may be down while a sale still goes through*, which is the same distinction
+ * drawn from the other side: that list is what an outage can spare, this is
+ * what a flash sale cannot.
+ *
+ * Fetched here and cached on `state` rather than loaded at boot: the services
+ * array — the weighted share, and the reason each service is in or out — is
+ * wanted by this one view. The operations and tables are already aboard as the
+ * burst lens, so nothing is fetched twice.
+ */
+async function renderBurstScope(body) {
+  const block = el('div', 'burst-scope');
+  body.append(block);
+
+  if (state.burst === undefined) {
+    try {
+      const res = await auth.apiFetch('/api/file?path=handoff%2Fburst-scope.json');
+      // The file route hands back package source as text/plain, so the body is
+      // parsed here rather than trusted to a content type it never claimed.
+      state.burst = res.ok ? JSON.parse(await res.text()) : null;
+    } catch { state.burst = null; }
+  }
+  const burst = state.burst;
+  // A package with no scenario is not a failure — the block simply is not there.
+  if (!burst?.services?.length) return;
+
+  const services = [...burst.services].sort((a, b) => b.weightedShare - a.weightedShare);
+  const peak = services.reduce((max, s) => Math.max(max, s.weightedShare), 0);
+
+  block.append(el('div', 'journey-section-label', 'what a flash sale stands up'));
+  block.append(proseLine(
+    `${burst.totals.deployed} services of ${burst.totals.services}, ` +
+    `${burst.totals.operations} operations of ${burst.totals.ofTotalOperations}, ` +
+    `${burst.totals.tables} tables of ${burst.totals.ofTotalTables}. ` +
+    'Share is weighted by how many times one buyer calls each operation, so it ' +
+    'measures load rather than presence.', 'journey-trigger'));
+
+  // Three groups, because the file draws three. `onBurstPath` and `deployed`
+  // disagree for four services — on the path and still not deployed, because the
+  // shared cell answers for them — and collapsing that into in/out loses the one
+  // group whose absence is a routing decision rather than disinterest.
+  const groups = [
+    ['deployed', 'Deployed here', (s) => s.deployed],
+    ['shared', 'On the path, served from the shared cell', (s) => !s.deployed && s.onBurstPath],
+    ['off', 'No part of a ticket sale', (s) => !s.deployed && !s.onBurstPath],
+  ];
+
+  for (const [key, title, match] of groups) {
+    const members = services.filter(match);
+    if (!members.length) continue;
+    const head = el('div', 'burst-group-head');
+    head.append(el('span', 'burst-group-title', title));
+    head.append(el('span', 'burst-group-count', String(members.length)));
+    block.append(head);
+
+    const rows = el('div', `burst-rows burst-${key}`);
+    for (const svc of members) {
+      const row = el('div', 'burst-row');
+      const key2 = serviceKeyOf(svc.name);
+      const button = el('button', 'service-pill', svc.name.replace(/Service$/, ''));
+      button.style.setProperty('--tier', tierColour(svc.tier));
+      if (key2) button.onclick = () => { selectService(key2); setMode('service'); };
+      else button.disabled = true;
+      row.append(button);
+
+      const bar = el('div', 'burst-bar');
+      const fill = el('span');
+      fill.style.width = peak > 0 ? `${(svc.weightedShare / peak) * 100}%` : '0%';
+      bar.append(fill);
+      row.append(bar);
+      row.append(el('span', 'burst-share', svc.weightedShare ? `${svc.weightedShare}%` : '—'));
+      // Read, never inferred: Identity is 1.8% and mandatory, and a row showing
+      // only the number would present it as marginal.
+      row.append(el('span', 'burst-reason', svc.reason ?? ''));
+      rows.append(row);
+    }
+    block.append(rows);
+  }
+
+  const more = el('div', 'burst-more');
+  const link = el('a', 'chip', 'Every operation and table in the scenario');
+  link.href = '/burst.html';
+  more.append(link);
+  block.append(more);
+  block.append(sourceLine('handoff/burst-scope.json', burst.generatedBy));
+}
+
+/**
+ * The diagram key for a service named in burst-scope.json.
+ *
+ * The two files name the same sixteen services in their own way, so the match is
+ * made on the name each carries rather than assumed to be one string. A miss
+ * leaves the pill unclickable instead of navigating somewhere wrong.
+ */
+function serviceKeyOf(name) {
+  const services = state.diagrams?.services ?? [];
+  const bare = (n) => String(n ?? '').replace(/Service$/, '');
+  const hit = services.find((s) => s.name === name)
+    ?? services.find((s) => bare(s.name) === bare(name));
+  return hit?.key ?? null;
 }
 
 // ── contracts: lineage ───────────────────────────────────────────────
