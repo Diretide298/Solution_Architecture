@@ -198,31 +198,95 @@ export class BoxDiagram {
       if (edge.source !== edge.target) outgoing.get(edge.source.id).add(edge.target.id);
     }
 
-    // depth = longest chain of references leaving this box. A box that
-    // references nothing is depth 0 and sits at the top; a cycle stops at the
-    // box that closes it rather than looping forever.
-    const depth = new Map();
-    const visiting = new Set();
-    const measure = (id) => {
-      if (depth.has(id)) return depth.get(id);
-      if (visiting.has(id)) return 0;
-      visiting.add(id);
+    const succ = new Map([...outgoing].map(([id, set]) => [id, [...set]]));
+
+    // Boxes that reference each other have no order between them, so they are
+    // one tier and not a queue. Depth is still the longest chain of references
+    // leaving a box — a box that references nothing is depth 0 and sits at the
+    // top — but it is measured over groups of mutually-referencing boxes
+    // rather than over the boxes themselves.
+    //
+    // Measured per box, a cycle strings out one box per row in whatever order
+    // the traversal happened to break it. The 31 schemas of this package are
+    // 16 singletons and one knot of 15 that all reach each other; per box that
+    // drew 17 layers, 11 holding a single box. It read as a hierarchy 17 deep
+    // and it was one arbitrary path through a knot, drawn as though the
+    // distance down it meant something.
+    //
+    // Tarjan, iterative: this view also draws schemas of several hundred
+    // tables, and a recursive walk over a chain that long overflows the stack.
+    const group = new Map();
+    const groups = [];
+    {
+      const order = new Map();
+      const low = new Map();
+      const onStack = new Set();
+      const stack = [];
+      let counter = 0;
+      for (const root of nodes) {
+        if (order.has(root.id)) continue;
+        const work = [[root.id, 0]];
+        while (work.length) {
+          const frame = work[work.length - 1];
+          const id = frame[0];
+          if (frame[1] === 0) {
+            order.set(id, counter);
+            low.set(id, counter);
+            counter += 1;
+            stack.push(id);
+            onStack.add(id);
+          }
+          const next = succ.get(id) ?? [];
+          if (frame[1] < next.length) {
+            const to = next[frame[1]];
+            frame[1] += 1;
+            if (!order.has(to)) work.push([to, 0]);
+            else if (onStack.has(to)) low.set(id, Math.min(low.get(id), order.get(to)));
+            continue;
+          }
+          work.pop();
+          if (work.length) {
+            const parent = work[work.length - 1][0];
+            low.set(parent, Math.min(low.get(parent), low.get(id)));
+          }
+          if (low.get(id) === order.get(id)) {
+            const members = [];
+            for (;;) {
+              const member = stack.pop();
+              onStack.delete(member);
+              members.push(member);
+              if (member === id) break;
+            }
+            for (const member of members) group.set(member, groups.length);
+            groups.push(members);
+          }
+        }
+      }
+    }
+
+    // Tarjan emits a group only once everything it reaches has been emitted,
+    // so reading them in order means every successor's depth is already final
+    // and there is nothing to recurse into.
+    const groupDepth = groups.map(() => 0);
+    groups.forEach((members, g) => {
       let d = 0;
-      for (const next of outgoing.get(id) ?? []) d = Math.max(d, measure(next) + 1);
-      visiting.delete(id);
-      depth.set(id, d);
-      return d;
-    };
+      for (const id of members) {
+        for (const to of succ.get(id) ?? []) {
+          const other = group.get(to);
+          if (other !== g) d = Math.max(d, groupDepth[other] + 1);
+        }
+      }
+      groupDepth[g] = d;
+    });
 
     // boxes with no relationships at all are not part of the hierarchy; they
     // go in a block underneath rather than padding out the top row
     const linked = nodes.filter((n) => n.degree > 0);
     const loose = nodes.filter((n) => n.degree === 0);
-    for (const node of linked) measure(node.id);
 
     const layers = [];
     for (const node of linked) {
-      const d = depth.get(node.id) ?? 0;
+      const d = groupDepth[group.get(node.id)] ?? 0;
       (layers[d] ??= []).push(node);
     }
 
