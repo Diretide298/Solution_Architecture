@@ -285,3 +285,61 @@
   color: var(--text-faint);
 }
 .bu-sim-foot a { color: var(--accent-text); }
+
+/* ── the hot path ──────────────────────────────────────────────────────── */
+/* A ranked list and not a chart. The bar is the share, the row underneath is
+   what makes the share matter — six calls a buyer to a read is a cache
+   question, three to a locked row is the sale failing — and the tables are
+   named because that is where the contended ones are reached from. */
+.bu-hot { display: grid; gap: 9px; }
+.bu-hot-row {
+  border: 1px solid var(--line);
+  border-left-width: 3px;
+  border-left-color: var(--line);
+  border-radius: 10px;
+  padding: 12px 14px;
+  background: var(--bg-card);
+}
+.bu-hot-row.is-contended { border-left-color: var(--warning); }
+.bu-hot-head { display: flex; align-items: baseline; gap: 9px; flex-wrap: wrap; }
+.bu-hot-id { font-family: var(--mono); font-size: 12.5px; font-weight: 700; }
+.bu-hot-path { font-family: var(--mono); font-size: 11px; color: var(--text-faint); }
+.bu-hot-track {
+  height: 5px;
+  margin: 9px 0 8px;
+  border-radius: 3px;
+  background: var(--line);
+  overflow: hidden;
+}
+.bu-hot-fill { height: 100%; background: var(--accent); }
+.bu-hot-row.is-contended .bu-hot-fill { background: var(--warning); }
+.bu-hot-foot {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  flex-wrap: wrap;
+  font-size: 11.5px;
+  color: var(--text-faint);
+}
+.bu-hot-n { font-family: var(--mono); color: var(--text); }
+.bu-hot-pc { font-family: var(--mono); }
+.bu-hot-svc { font-weight: 600; color: var(--text-dim); }
+.bu-hot-rw { font-family: var(--mono); font-size: 10.5px; }
+.bu-hot-rw.is-write { color: var(--warning); }
+.bu-hot-tables { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 9px; }
+.bu-hot-table {
+  font-family: var(--mono);
+  font-size: 10.5px;
+  color: var(--text-faint);
+  border: 1px solid var(--line);
+  border-radius: 5px;
+  padding: 1px 6px;
+}
+/* The two rows the sale actually fails on, wherever they appear. */
+.bu-hot-table.is-contended { color: var(--warning); border-color: var(--warning); }
+
+/* The replica cell is a floor and a stated absence, not a range — see the
+   comment in `serviceRow`. Stacked so the number reads as the number and the
+   two qualifiers read as qualifiers. */
+.bu-rep-n { display: block; font-family: var(--mono); font-size: 13px; color: var(--text); }
+.bu-rep-k { display: block; font-size: 10.5px; line-height: 1.4; color: var(--text-faint); }
