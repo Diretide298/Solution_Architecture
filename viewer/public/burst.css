@@ -5,7 +5,11 @@
    not a line in a footnote. Everything here is painted from the viewer's own
    tokens, so it follows the day/night choice like the rest of the app. */
 
-.bu-main { max-width: 1120px; }
+/* No measure on the page — it is on `bu-col`, which everything except the
+   simulator sits in. The simulator is drawn at 1,440px by the package and a
+   column narrower than that crops it rather than scaling it. */
+.bu-main { max-width: none; padding-left: 0; padding-right: 0; }
+.bu-col { max-width: 1120px; margin: 0 auto; padding: 0 18px; }
 
 /* ── hero ──────────────────────────────────────────────────────────────── */
 .bu-hero { padding: 6px 2px 22px; border-bottom: 1px solid var(--line); }
@@ -256,19 +260,25 @@
 /* Full-bleed inside the column: the page inside has its own 1,440px measure
    and its own padding, so a second set of margins around it would only make
    it narrower than it was designed for. */
+/* Edge to edge. A border and a radius would be drawing a card around a page,
+   and the page inside has its own centred 1,440px measure — so the width it is
+   given is headroom rather than stretch, and it stops looking framed. */
 .bu-sim { margin: 22px 0 0; }
 .bu-sim-frame {
   display: block;
   width: 100%;
-  border: 1px solid var(--line);
-  border-radius: 14px;
+  border: 0;
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
   background: var(--bg-card);
   /* It reports its own height and this follows it, so nothing scrolls inside
      a page that already scrolls. */
   overflow: hidden;
 }
 .bu-sim-foot {
-  margin: 9px 0 0;
+  max-width: 1120px;
+  margin: 9px auto 0;
+  padding: 0 18px;
   font-family: var(--mono);
   font-size: 11.5px;
   line-height: 1.6;

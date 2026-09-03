@@ -497,16 +497,28 @@ async function main() {
     const data = JSON.parse(await res.text());
 
     $('bu-basis').textContent = data.basis ?? '';
-    renderTotals(host, data);
+
+    // A column for everything that is prose or a table, and the page itself
+    // for the simulator, which is the only block with a width of its own.
+    const column = () => {
+      const box = el('div', 'bu-col');
+      host.append(box);
+      return box;
+    };
+
+    renderTotals(column(), data);
     // The simulation goes straight after the totals: it is the one block that
     // answers "what does this look like running" rather than "what is in it",
     // and a reader who stops after the first screen should have had that.
-    // The package's own page if the drop ships it, this file's map if not.
-    if (!await renderSimulator(host)) await renderMap(host, data);
-    renderServices(host, data);
-    renderTables(host, data);
-    renderOperations(host, data);
-    renderRelated(host);
+    // The package's own page if the drop ships it, this file's map if not —
+    // and the map was drawn for a column, so it stays in one.
+    if (!await renderSimulator(host)) await renderMap(column(), data);
+
+    const rest = column();
+    renderServices(rest, data);
+    renderTables(rest, data);
+    renderOperations(rest, data);
+    renderRelated(rest);
     revealHandoffPages();
   } catch (err) {
     host.append(el('div', 'bu-error',

@@ -77,7 +77,12 @@
       </div>
     </header>
 
+    <!-- `bu-main` carries no measure of its own any more: the simulator inside
+         it is 1,440px wide by its own design and a 1,120px column cropped it.
+         Everything that is prose or a table sits in a `bu-col` instead, and the
+         simulator is the one thing that spans. -->
     <main class="admin-main bu-main">
+      <div class="bu-col">
       <section class="bu-hero">
         <p class="bu-eyebrow">Deployment · scenario (c)</p>
         <h1 class="bu-title">What a flash-sale environment actually runs</h1>
@@ -94,6 +99,7 @@
           basis: <strong id="bu-basis"></strong>
         </p>
       </section>
+      </div>
       <div id="burst-body"></div>
     </main>
 
