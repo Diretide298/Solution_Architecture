@@ -157,7 +157,21 @@ function topology(burst, compose) {
     .map((s) => {
       const spec = composeFor(s.name);
       const min = num(s.replicas?.min, 1);
-      const max = num(s.replicas?.max, Math.max(min, num(spec?.deploy?.replicas, min)));
+      // **`max: null` means no ceiling, and the package says so in as many
+      // words**: "a cap is a cap on absorbing a peak nobody predicted, and the
+      // peak is the whole reason this environment exists". So a missing max is
+      // not a missing number to fill in from compose — compose's fixed
+      // `replicas:` is one deployment's answer, and treating it as the ceiling
+      // drew a wall the package had deliberately removed.
+      //
+      // A drawing still needs somewhere to stop, so `drawTo` is how many boxes
+      // to lay out and `capped` says whether that is a real limit or just the
+      // edge of the picture.
+      const stated = s.replicas?.max;
+      const uncapped = stated == null;
+      const drawTo = uncapped
+        ? Math.max(min * 2, num(spec?.deploy?.replicas, min * 2))
+        : num(stated, min);
       return {
         name: s.name,
         short: s.name.replace(/Service$/, ''),
@@ -165,7 +179,14 @@ function topology(burst, compose) {
         share: num(s.weightedShare),
         reason: s.reason ?? '',
         min,
-        max,
+        max: drawTo,
+        uncapped,
+        // What the compose file actually provisions. The cost the package
+        // quotes is for the environment as configured, so that is the size the
+        // hourly rate has to land on.
+        specReplicas: num(spec?.deploy?.replicas, min),
+        maxNote: s.replicas?.maxNote ?? null,
+        derivedFrom: s.replicas?.derivedFrom ?? null,
         // Per replica. The pool is what a single container opens, so the
         // demand on pgbouncer is this multiplied by however many are up.
         poolMax: num(spec?.environment?.PG_POOL_MAX, 0),
@@ -235,7 +256,16 @@ const COST_POINTS = [
   { hours: 24, usd: 282, label: 'a day' },
   { hours: 720, usd: 8587, label: 'a month left running' },
 ];
-const RATE_PER_HOUR = 8587 / 720;
+// **$11.76, stated, not derived.** handoff/TICVAI_Hosting_Summary.docx prices
+// the four hosting options on Amazon and Google side by side, and option 3 —
+// the big sale, billed by the hour while it runs — is $11.76 an hour on Amazon.
+//
+// This was 8587/720 and gave $11.93. The month figure is the same document's
+// Amazon column and it divides by 730, the billing month, not 720: 8587/730 is
+// $11.76 exactly, and the two-, six- and twenty-four-hour figures all fall out
+// of it. Deriving a rate from a total when the rate is stated one row above it
+// is how a viewer ends up 1.4% away from its own source.
+const RATE_PER_HOUR = 11.76;
 
 /** `32G` -> 32, `512M` -> 0.5. Compose states memory as a limit string. */
 const gigs = (value) => {
@@ -247,27 +277,43 @@ const gigs = (value) => {
 };
 
 /**
- * Indicative list rates for serverless container compute, per vCPU-hour and
- * per GB-hour.
+ * What the package charges for a burst environment, by the hour.
  *
- * **These are not the package's numbers, and there is no provider to make them
- * the package's.** CF-64 — the cloud provider — is open, owned by Dinesh and
- * Qossai, and the brief records the shortlist as *AWS or Azure, pending DESC*.
- * Everything above that line in the package is provider-neutral and, as the
- * brief puts it, nothing below it can be: managed Postgres, the Redis tier,
- * Qdrant hosting, the CDN and the secret store all follow from the choice.
+ * **Stated, not estimated.** `handoff/TICVAI_Hosting_Summary.docx` prices all
+ * four hosting options on Amazon and Google side by side — the header row is
+ * `Option | Billed as | Amazon | Google` — and option 3, the big sale, is
+ * billed by the hour while it runs.
  *
- * Azure is here because it is the other candidate. GCP is here because it was
- * asked for, and it is worth knowing that it is not on the shortlist.
+ * An earlier version of this file asserted that the package held no provider
+ * figures because CF-64 is open, and invented three sets of container-compute
+ * list rates instead. It holds both, they disagree with the invented ones in
+ * both magnitude and direction, and the document says why: Google comes out
+ * 15–18% cheaper *"mostly on database pricing"*, which is exactly what a
+ * compute-only estimate leaves out.
  *
- * They price container compute and nothing else — no managed-database premium,
- * no storage, no IO, no egress, no support plan — which is most of why they
- * land under ADR-0035's own figure. Check them before quoting them.
+ * **The two documents do not name the same shortlist.** CF-64 in the
+ * deployment brief reads *AWS or Azure, pending DESC*; the Hosting Summary
+ * prices Amazon and Google and prices no Azure at all. That contradiction is
+ * shown on the page rather than resolved here.
  */
 const PROVIDERS = [
-  { key: 'aws', name: 'AWS Fargate', region: 'us-east-1', vcpu: 0.04048, gb: 0.004445 },
-  { key: 'gcp', name: 'Google Cloud Run', region: 'us-central1', vcpu: 0.0456, gb: 0.0050 },
-  { key: 'azure', name: 'Azure Container Apps', region: 'East US', vcpu: 0.0432, gb: 0.0054 },
+  { key: 'aws', name: 'Amazon', hourly: 11.76, month: 8587 },
+  { key: 'gcp', name: 'Google', hourly: 9.76, month: null },
+];
+
+/**
+ * Indicative list rates for serverless container compute, per vCPU-hour and
+ * per GB-hour. **A cross-check on the figures above, and not a substitute.**
+ *
+ * These are mine. They price container compute only — no managed-database
+ * premium, no storage, no IO, no egress — which is why they come out under the
+ * package's own numbers, and the Hosting Summary says the gap between the two
+ * providers is *"mostly on database pricing"*, exactly the part these miss. So
+ * they answer one question: how much of the bill is compute.
+ */
+const COMPUTE_RATES = [
+  { key: 'aws', vcpu: 0.04048, gb: 0.004445 },
+  { key: 'gcp', vcpu: 0.0456, gb: 0.0050 },
 ];
 
 const money = (usd) => (usd < 10
@@ -1052,34 +1098,52 @@ export async function renderDeployMap(host, burst, io) {
       `${money(RATE_PER_HOUR)} an hour at full expansion, apportioned by cpu`);
     result.append(facts);
 
-    result.append(el('p', 'bd-result-h', 'The same run, priced at list container compute'));
+    result.append(el('p', 'bd-result-h', 'The same run, priced'));
     const grid = el('div', 'bd-prices');
     for (const provider of PROVIDERS) {
-      const cost2 = cpuHours * provider.vcpu + gbHours * provider.gb;
+      const hours = simSeconds / 3600;
       const card = el('div', `bd-price bd-price-${provider.key}`);
-      card.append(el('div', 'bd-price-v', money(cost2)));
+      card.append(el('div', 'bd-price-v', money(provider.hourly * hours)));
       card.append(el('div', 'bd-price-n', provider.name));
       card.append(el('div', 'bd-price-h',
-        `$${provider.vcpu.toFixed(5)}/vCPU-h · $${provider.gb.toFixed(6)}/GB-h · ${provider.region}`));
-      if (provider.key === 'gcp') card.append(el('div', 'bd-price-tag', 'not on the shortlist'));
-      if (provider.key !== 'gcp') card.append(el('div', 'bd-price-tag', 'CF-64 candidate'));
+        `$${provider.hourly.toFixed(2)} an hour while it runs`
+        + (provider.month ? ` · $${provider.month.toLocaleString('en-GB')} a month` : '')));
+      card.append(el('div', 'bd-price-tag', 'the package’s own figure'));
       grid.append(card);
     }
     result.append(grid);
 
-    result.append(el('p', 'bd-open',
-      'CF-64 is open: the cloud provider is AWS or Azure, pending DESC, owned by Dinesh '
-      + 'and Qossai. GCP is priced here because it was asked for and it is not one of the '
-      + 'two. Everything in the package above that decision is provider-neutral, and as '
-      + 'the brief puts it nothing below it can be — managed Postgres, the Redis tier, '
-      + 'Qdrant hosting, the CDN and the secret store all follow from the choice. CF-64 '
-      + 'also carries the RPO and RTO targets, which are stated nowhere else.'));
     result.append(el('p', 'bd-risk-n',
-      'These three rates are mine and not the package’s, and they price container '
-      + 'compute only — no managed-database premium, no storage, no IO, no egress, no '
-      + 'support plan. That is most of why they land under ADR-0035’s own figure for '
-      + 'the same environment, and it is why they are a sanity check on the order of '
-      + 'magnitude rather than a quote. Check them before they go in front of a client.'));
+      'Both rates are the package’s, from handoff/TICVAI_Hosting_Summary.docx, which prices '
+      + 'all four hosting options on Amazon and Google side by side. Option 3 is the big '
+      + 'sale, billed by the hour while it runs. Charged for the whole time the environment '
+      + 'existed rather than only while it was serving, because that is how it is rented.'));
+
+    // The compute share, kept small and underneath. It answers "how much of
+    // this is containers" and nothing else.
+    const computeLine = COMPUTE_RATES.map((r) => {
+      const provider = PROVIDERS.find((x) => x.key === r.key);
+      const compute = cpuHours * r.vcpu + gbHours * r.gb;
+      return `${provider?.name ?? r.key} ${money(compute)}`;
+    }).join(' · ');
+    result.append(el('p', 'bd-risk-n',
+      `Container compute alone over ${cpuHours.toFixed(1)} cpu-hours and `
+      + `${gbHours.toFixed(0)} GB-hours would be ${computeLine} at list rates — mine, not the `
+      + 'package’s, and short of the figures above because they exclude the managed database, '
+      + 'storage, IO and egress. The Hosting Summary puts the gap between the two providers '
+      + '"mostly on database pricing", which is precisely the part this leaves out.'));
+
+    result.append(el('p', 'bd-open',
+      'The package names two different shortlists for the same open decision. CF-64 in '
+      + 'docs/active/deployment-and-scaling-brief.md reads "AWS or Azure, pending DESC", '
+      + 'owned by Dinesh and Qossai. The Hosting Summary prices Amazon and Google, says '
+      + '"we priced both", and notes Google comes out 15 to 18% cheaper — while adding that '
+      + 'this is not a reason to pick it, because what matters more is which one satisfies '
+      + 'the Dubai compliance guidance nobody has yet. Azure is priced nowhere. Everything '
+      + 'above that decision is provider-neutral and nothing below it can be: the managed '
+      + 'Postgres, the Redis tier, Qdrant hosting, the CDN and the secret store all follow '
+      + 'from it, and CF-64 also carries the RPO and RTO targets, which are stated nowhere '
+      + 'else.'));
   };
 
   // ── the simulation ────────────────────────────────────────────────────────
@@ -1087,8 +1151,14 @@ export async function renderDeployMap(host, burst, io) {
 
   const baseCpu = num(t.postgres?.cpus) + num(t.redis?.cpus);
   const baseGb = gigs(t.postgres?.memory) + gigs(t.redis?.memory);
-  const peakCpu = baseCpu + t.deployed.reduce((a, s) => a + num(s.cpus) * s.max, 0);
-  const perCpuHour = peakCpu > 0 ? RATE_PER_HOUR / peakCpu : 0;
+  // **Anchored on the environment as configured, not on the widest the drawing
+  // goes.** $11.76 an hour is what the Hosting Summary charges for option 3,
+  // and option 3 is this compose file — so the meter has to read $11.76 when
+  // the clusters are at the size that file provisions. Dividing by a drawn
+  // maximum instead made the quoted configuration cost two thirds of its own
+  // price.
+  const specCpu = baseCpu + t.deployed.reduce((a, s) => a + num(s.cpus) * s.specReplicas, 0);
+  const perCpuHour = specCpu > 0 ? RATE_PER_HOUR / specCpu : 0;
 
   // How long a `system` transition takes to fire, in simulated seconds. The
   // ADR says provisioning takes minutes and a sale takes seconds, and gives no
@@ -1244,10 +1314,21 @@ export async function renderDeployMap(host, burst, io) {
     if (short.length && look.live) {
       everCapped = true;
       capped.hidden = false;
-      capped.textContent = `At ${Math.round(threshold * 100)}% the file does not allow enough `
-        + `replicas — ${short.join(', ')}. deploy/c-flash-sale.yml caps them, so utilisation `
-        + 'runs above target and ADR-0032 sheds rather than queues: guest and public first, '
-        + 'staff and service last.';
+      // Two different sentences, because a cluster the package caps and one it
+      // deliberately does not are not the same situation. Saying "the file
+      // caps them" of a service whose max is null, with a note attached
+      // explaining that the absence of a cap is the point, would be inventing
+      // a limit and then complaining about it.
+      const anyUncapped = clusters.some((c) => c.service.uncapped);
+      capped.textContent = anyUncapped
+        ? `At ${Math.round(threshold * 100)}% this needs more than is drawn — `
+          + `${short.join(', ')}. burst-scope.json states no ceiling for these on purpose: `
+          + 'a cap is a cap on absorbing a peak nobody predicted, and the peak is the whole '
+          + 'reason the environment exists. The boxes stop because the picture does.'
+        : `At ${Math.round(threshold * 100)}% the file does not allow enough `
+          + `replicas — ${short.join(', ')}. deploy/c-flash-sale.yml caps them, so `
+          + 'utilisation runs above target and ADR-0032 sheds rather than queues: guest '
+          + 'and public first, staff and service last.';
     } else {
       capped.hidden = true;
     }
@@ -1430,7 +1511,7 @@ export async function renderDeployMap(host, burst, io) {
     `The four totals are the ADR’s, quoted. The meter above is anchored on the month `
     + `figure — ${money(RATE_PER_HOUR)} an hour, the longest run of the four and so the `
     + 'least sensitive to rounding — and split across containers by the cpu limits the '
-    + `compose file declares: ${peakCpu} cpu fully expanded, ${baseCpu} for the database `
+    + `compose file declares: ${specCpu} cpu as configured, ${baseCpu} for the database `
     + 'and cache alone. That split is a model, not a quote. pgbouncer declares no cpu '
     + 'limit in this file and so weighs nothing in it.'));
   section.append(cost);
