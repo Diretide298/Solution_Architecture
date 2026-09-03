@@ -873,7 +873,10 @@ const server = http.createServer(async (req, res) => {
           },
           domain: { machines: domain?.stats?.machines ?? 0, events: domain?.events?.length ?? 0 },
           backend: {
-            schemas: backend?.modules?.length ?? 0,
+            // Postgres schemas. `modules` also carries five stores — four
+            // `cache:*` and `qdrant:knowledge` — which are not in the database
+            // this number is about.
+            schemas: backend?.stats?.schemas ?? backend?.modules?.length ?? 0,
             columns: backend?.columns?.length ?? 0,
           },
           decisions: {

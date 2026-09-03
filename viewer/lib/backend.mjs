@@ -817,6 +817,22 @@ export async function buildBackend(root, contractSchemas = []) {
         (row.columns ? '' : ' — and no rows on the Columns sheet either'),
     });
   }
+  // **Five of these are not Postgres schemas and the list is used as one.**
+  // `cache:answer`, `cache:embedding`, `cache:idempotency`, `cache:resolution`
+  // and `qdrant:knowledge` are a Redis key space and a Qdrant collection —
+  // no DDL, no `CREATE SCHEMA`, and `backend/000-schemas.sql` creates 26.
+  //
+  // The colon is the package's own marker: every real table is `schema.table`
+  // and every store is `store:name`, a convention that exists precisely so a
+  // consumer can tell them apart. Splitting on it here rather than dropping
+  // them, because they are worth seeing — `cache:answer` is the largest AI
+  // cost lever and `qdrant:knowledge` is the one component whose residency is
+  // unsettled. They are just not schemas, and a control headed "whole
+  // database" that counts them is making a claim about Postgres that is wrong
+  // by five.
+  for (const m of modules) {
+    m.store = m.name.includes(':') ? m.name.slice(0, m.name.indexOf(':')) : null;
+  }
   modules.sort((a, b) => a.name.localeCompare(b.name));
 
   // the sheet carries explanatory prose below the table, which lands in the
@@ -904,6 +920,11 @@ export async function buildBackend(root, contractSchemas = []) {
     problems,
     stats: {
       modules: modules.length,
+      // Postgres schemas, and the stores counted apart from them. `modules`
+      // stays the length of the list because things index into it; these two
+      // are what a reader is told.
+      schemas: modules.filter((m) => !m.store).length,
+      stores: modules.filter((m) => m.store).length,
       tables: tables.length,
       columns: columnCount,
       written: modules.filter((m) => m.written).length,

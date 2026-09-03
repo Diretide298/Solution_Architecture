@@ -5899,17 +5899,40 @@ function renderData({ focus } = {}) {
 
   if (picker.options.length !== backend.modules.length + 1) {
     picker.innerHTML = '';
-    const everything = el('option', null, `whole database · ${backend.modules.length} schemas`);
+    // **Schemas, not entries.** Five of the entries are a Redis key space and a
+    // Qdrant collection — `cache:*` and `qdrant:knowledge`, marked by the
+    // colon the package uses for exactly this — and `backend/000-schemas.sql`
+    // creates 26. A control headed "whole database" that said 31 was making a
+    // claim about Postgres that was wrong by five, and the list even flagged
+    // four of them as "not on the Modules sheet" without drawing the
+    // conclusion.
+    const schemas = backend.modules.filter((m) => !m.store);
+    const stores = backend.modules.filter((m) => m.store);
+
+    const everything = el('option', null, `whole database · ${schemas.length} schemas`);
     everything.value = ALL_SCHEMAS;
     picker.append(everything);
-    for (const module of backend.modules) {
+
+    const optionFor = (module) => {
       const option = el(
         'option',
         null,
         `${module.name} · ${module.tables} tables${module.unlisted ? ' · not on the Modules sheet' : ''}`
       );
       option.value = module.name;
-      picker.append(option);
+      return option;
+    };
+    for (const module of schemas) picker.append(optionFor(module));
+
+    // Kept in the list and kept out of the count. They are worth reaching —
+    // `cache:answer` is the largest AI cost lever and `qdrant:knowledge` is the
+    // one component whose residency is unsettled — and they are not in the
+    // database the option above them selects.
+    if (stores.length) {
+      const group = document.createElement('optgroup');
+      group.label = `not Postgres · ${stores.length} stores`;
+      for (const module of stores) group.append(optionFor(module));
+      picker.append(group);
     }
   }
   // A workbook whose Modules sheet cannot be read leaves this empty. That is
