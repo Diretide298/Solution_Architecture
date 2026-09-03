@@ -287,6 +287,39 @@ async function readStorage(root) {
   return { schemas, tables, partitions, policies, createsDatabase, files };
 }
 
+/**
+ * Which decision records have stopped being current.
+ *
+ * **Only the Status line of an ADR's own header counts**, which is the rule
+ * `tools/check-package.py` applies to ADRs citing each other — a document that
+ * merely discusses a supersession is not itself superseded. This extends the
+ * same check to `deploy/`, which the package's own checker does not cover: a
+ * compose file that cites its reasoning is a compose file that can be reading
+ * a decision somebody replaced.
+ */
+async function readDecisionStatus(root) {
+  const dir = path.join(root, 'docs', 'adr');
+  const names = (await readdir(dir).catch(() => [])).filter((f) => /^0\d{3}.*\.md$/.test(f));
+  const stale = new Map();
+  for (const name of names) {
+    const text = await readFile(path.join(dir, name), 'utf8').catch(() => null);
+    if (text == null) continue;
+    for (const line of text.split(/\r?\n/).slice(0, 8)) {
+      if (!line.startsWith('**Status:**')) continue;
+      if (/uperseded|mended/.test(line)) {
+        stale.set(name.slice(0, 4), {
+          file: `docs/adr/${name}`,
+          // The state and what replaced it, off the same line — a citation is
+          // only useful to a reader if it says where to go instead.
+          status: line.replace('**Status:**', '').replace(/\[([^\]]+)\]\([^)]*\)/g, '$1').trim(),
+        });
+      }
+      break;
+    }
+  }
+  return stale;
+}
+
 async function readConfigs(root) {
   const out = [];
   for (const [dir, kind] of [['deploy', 'scenario'], ['deploy/variants', 'variant']]) {
@@ -317,6 +350,10 @@ async function readConfigs(root) {
         replicas: Object.values(doc?.services ?? {})
           .reduce((sum, s) => sum + (Number(s?.deploy?.replicas) || 0), 0),
         db: databaseModelOf(doc),
+        // Every ADR the file's own prose reasons from. The compose files carry
+        // their argument in comments and cite it, which is what makes this
+        // checkable at all.
+        cites: [...new Set((text.match(/ADR-0\d{3}/g) ?? []).map((m) => m.slice(4)))].sort(),
         header: header.slice(0, 400),
       });
     }
@@ -331,7 +368,7 @@ async function readConfigs(root) {
  * is an assertion, and this viewer's whole argument is that an assertion in a
  * package is worth less than the two lines it was read from.
  */
-function findFindings({ workflows, images, recipes, configs, repos, storage }) {
+function findFindings({ workflows, images, recipes, configs, repos, storage, stale }) {
   const out = [];
 
   if (recipes.length === 1 && images.length > 1) {
@@ -466,6 +503,30 @@ function findFindings({ workflows, images, recipes, configs, repos, storage }) {
     });
   }
 
+  // ---- a configuration reasoning from a decision that has been replaced ---
+  //
+  // **The package checks this between ADRs and nowhere else.** `check-package`
+  // refuses an ADR that cites a superseded one without saying so; a compose
+  // file citing the same superseded ADR passes every check there is, and it is
+  // the artefact somebody actually deploys.
+  if (stale?.size) {
+    for (const [num, adr] of stale) {
+      const citing = configs.filter((c) => c.cites?.includes(num));
+      if (!citing.length) continue;
+      out.push({
+        severity: 'error',
+        kind: 'config-cites-stale-decision',
+        title: `${citing.length} configuration${citing.length === 1 ? '' : 's'} reason from `
+          + `ADR-${num}, which is no longer current`,
+        detail: `ADR-${num} now reads **${adr.status}** Its reasoning is in the header of `
+          + `${citing.map((c) => c.name).join(', ')}, and the arrangement below those headers is `
+          + 'what it argued for. A compose file is the artefact that gets deployed, and nothing in '
+          + 'the package checks whether the decision it cites still holds.',
+        where: [adr.file, ...citing.map((c) => c.file)].slice(0, 5),
+      });
+    }
+  }
+
   // ---- what isolates one tenant's rows from another's ---------------------
   if (storage?.tables) {
     const shared = configs.filter((c) => c.db?.model === 'one database, shared');
@@ -497,6 +558,7 @@ export async function buildCicd(root) {
   const { images, recipes } = await readImages(root);
   const configs = await readConfigs(root);
   const storage = await readStorage(root);
+  const stale = await readDecisionStatus(root);
 
   const repos = await Promise.all(repoNames.map(async (name) => {
     const mine = workflows.filter((w) => w.repo === name);
@@ -511,7 +573,7 @@ export async function buildCicd(root) {
     };
   }));
 
-  const findings = findFindings({ workflows, images, recipes, configs, repos, storage });
+  const findings = findFindings({ workflows, images, recipes, configs, repos, storage, stale });
 
   return {
     repos,
@@ -520,6 +582,7 @@ export async function buildCicd(root) {
     recipes,
     configs,
     storage,
+    stale: [...stale].map(([num, adr]) => ({ num, ...adr })),
     findings,
     stats: {
       repos: repos.length,
