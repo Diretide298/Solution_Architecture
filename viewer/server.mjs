@@ -796,7 +796,7 @@ const server = http.createServer(async (req, res) => {
       // Taken off the package once. Every name below is the same name it was
       // when there was one package, which is the point — what changed is where
       // the payloads come from, not what any of them says.
-      const { index, journeys, backend, domain, decisions, diagrams, uiux } = pkg;
+      const { index, journeys, backend, domain, decisions, diagrams, uiux, cicd } = pkg;
       const counts = {
         frontend: journeys?.screens?.length ?? 0,
         // Boards, not screens. The Frontend layer counts screens and UI/UX
@@ -819,6 +819,10 @@ const server = http.createServer(async (req, res) => {
             .filter((k) => diagrams[k]?.present).length
             + Object.values(diagrams.lld ?? {}).reduce((a, list) => a + list.length, 0)
           : 0,
+        // The three folders together, and not the workflows alone — same
+        // argument as `services` above. The tab strip and the landing cluster
+        // read the same field.
+        cicd: cicd?.stats?.artefacts ?? 0,
       };
       // What is actually in each layer, by name, for the landing page to put
       // inside its clusters once a reader zooms in far enough to ask. Capped:
@@ -834,6 +838,15 @@ const server = http.createServer(async (req, res) => {
         backend: take(backend?.tables, (t) => t.name),
         decisions: take(decisions?.adrs, (a) => (a.id ? `ADR-${a.id}` : a.title)),
         services: take(diagrams?.services, (s2) => s2.name),
+        // Named in the order the path runs: what a change passes, what it
+        // becomes, where it lands. The cluster is small — 32 against 500 — and
+        // that is the honest shape of it, because the delivery surface of this
+        // package really is two files a repository and one recipe.
+        cicd: [
+          ...take(cicd?.workflows, (w) => `${w.repo.replace(/^ticvai-/, '')} · ${w.name}`),
+          ...take(cicd?.images, (i) => i.service.replace(/Service$/, '')),
+          ...take(cicd?.configs, (c) => c.name),
+        ].slice(0, NAMES),
       };
 
       return sendCachedJson(res, req, pkg.packed, 'summary', {
@@ -866,6 +879,13 @@ const server = http.createServer(async (req, res) => {
           decisions: {
             documents: decisions?.stats?.documents ?? 0,
             permissions: decisions?.stats?.vectors ?? 0,
+          },
+          cicd: {
+            // The two worth putting on the front. A gate is the only kind of
+            // step that stops a merge, and an error here is two files that
+            // cannot both be true.
+            gates: cicd?.stats?.gates ?? 0,
+            disagreements: cicd?.stats?.errors ?? 0,
           },
         },
       });

@@ -383,6 +383,12 @@ export async function buildCicd(root) {
       images: images.length,
       recipes: recipes.length,
       configs: configs.length,
+      // The headline, and it is not `workflows`. The layer is the three
+      // folders together, the same way Architecture counts every design in
+      // `diagrams/` rather than the sixteen services one of them describes —
+      // and a layer whose door, tab and landing cluster count three different
+      // things is a layer none of whose numbers can be trusted.
+      artefacts: workflows.length + images.length + configs.length,
       errors: findings.filter((f) => f.severity === 'error').length,
     },
   };

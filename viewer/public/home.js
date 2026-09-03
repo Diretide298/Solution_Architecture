@@ -75,7 +75,7 @@ const LAYOUT = {
 const UNITS = {
   frontend:  { unit: 'screens',      from: 'screens/ · flows/ · frontend/ · wireframes/' },
   uiux:      { unit: 'design boards', from: 'wireframes/ · designs/ · ui-design/' },
-  cicd:      { unit: 'workflows',    from: 'repos/ · services/ · deploy/' },
+  cicd:      { unit: 'delivery artefacts', from: 'repos/ · services/ · deploy/' },
   contracts: { unit: 'contracts',    from: 'the OpenAPI contracts' },
   // State models, not status enums. A status enum is a list of values a
   // contract declares — it is not a lifecycle, and under a layer named for

@@ -533,9 +533,10 @@ function layerCount(key) {
     // counts what has been *drawn* of it, and the two differing is the whole
     // reason there are two tabs.
     case 'uiux': return state.uiux?.stats?.boards ?? null;
-    // Workflows, not repositories. The layer is about what a change has to
-    // pass, and the number of places it can start from is not that.
-    case 'cicd': return state.cicd?.stats?.workflows ?? null;
+    // Everything the three folders hold, not the workflows alone — same
+    // argument as Architecture below, and the landing page and the summary
+    // count the same thing.
+    case 'cicd': return state.cicd?.stats?.artefacts ?? null;
     case 'contracts': return nodes.filter((n) => n.type === 'operation').length || null;
     case 'domain': return state.domain?.machines?.length ?? null;
     case 'backend': return state.backend?.tables?.length ?? null;
