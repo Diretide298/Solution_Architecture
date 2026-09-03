@@ -35,6 +35,10 @@ const COMPOSE = 'deploy/c-flash-sale.yml';
 // The platform the burst sits beside, so the two can be drawn to the same
 // scale and the merge back has somewhere to land.
 const PERMANENT = 'deploy/b-shared-platform.yml';
+// What one replica sustains, what share of the load each service carries, and
+// the utilisation the platform sizes against. The package computes replicas
+// rather than stating them.
+const SIZING = 'handoff/sizing.json';
 
 const SVG = 'http://www.w3.org/2000/svg';
 
@@ -146,7 +150,7 @@ const num = (v, fallback = 0) => {
  * weighted share, the reason); the compose file owns the machine (pool sizes,
  * cpu and memory limits, what each service depends on).
  */
-function topology(burst, compose) {
+function topology(burst, compose, sizing, loadCeilingRps) {
   const services = compose?.services ?? {};
   const byCompose = new Map(Object.entries(services));
   // orderservice ← OrderService. The compose keys are lowercased service names.
@@ -169,8 +173,26 @@ function topology(burst, compose) {
       // edge of the picture.
       const stated = s.replicas?.max;
       const uncapped = stated == null;
+
+      // **What the calculator says, per service.** derive-sizing.py sizes
+      // against the target rather than the cliff — one replica is treated as
+      // carrying 60% of what it can, so the headroom a scale-out needs exists
+      // before the scale-out starts. Each service has its own cliff: 400 RPS
+      // for Catalogue, 250 for Order, 600 for Identity.
+      const calc = sizing?.services?.[s.name] ?? null;
+      const perReplica = num(calc?.rpsPerReplica, 400);
+      const shareOfLoad = num(calc?.share, num(s.weightedShare));
+      const target = num(calc?.targetUtilisation, 0.6);
+      const absoluteMin = num(s.replicas?.absoluteMin, num(calc?.floor, min));
+
+      // With no ceiling there is nothing to draw up to, so the picture is laid
+      // out for the most the load control can ask for. The boxes then never
+      // run out and never imply a cap that is not there.
+      const atCeiling = perReplica > 0
+        ? Math.ceil((loadCeilingRps * shareOfLoad / 100) / (perReplica * target))
+        : min;
       const drawTo = uncapped
-        ? Math.max(min * 2, num(spec?.deploy?.replicas, min * 2))
+        ? Math.max(min, absoluteMin, atCeiling)
         : num(stated, min);
       return {
         name: s.name,
@@ -181,6 +203,12 @@ function topology(burst, compose) {
         min,
         max: drawTo,
         uncapped,
+        perReplica,
+        shareOfLoad,
+        target,
+        absoluteMin,
+        scaleOutAt: num(calc?.scaleOutAt, Math.round(perReplica * target)),
+        drivenBy: calc?.drivenBy ?? null,
         // What the compose file actually provisions. The cost the package
         // quotes is for the environment as configured, so that is the size the
         // hourly rate has to land on.
@@ -362,7 +390,26 @@ export async function renderDeployMap(host, burst, io) {
   // still draws, it just draws alone.
   try { permanent = parseYaml(await io.file(PERMANENT)); } catch { permanent = null; }
 
-  const t = topology(burst, compose);
+  // **The sizing calculator, which is the package's answer to how many.**
+  // tools/refresh.sh runs derive-sizing.py --apply at step 14, so this is a
+  // normal artefact and not something this page derives. Without it the page
+  // falls back to the floors burst-scope states, which is a snapshot of one
+  // load rather than a function of load.
+  let sizing = null;
+  try { sizing = JSON.parse(await io.file(SIZING))?.sale ?? null; } catch { sizing = null; }
+
+  // 55 requests per buyer, summed from callsPerBuyer across the 34 burst
+  // operations — the package's own figure, not a ratio invented here.
+  const CALLS_PER_BUYER = (burst.operations ?? [])
+    .reduce((a, op) => a + num(op.callsPerBuyer), 0) || 1;
+  // ADR-0035: "At 5,000 RPS the entire daily volume arrives in fifty seconds."
+  const PEAK_RPS = 5000;
+  const PEAK_BUYERS = Math.round(PEAK_RPS / CALLS_PER_BUYER);
+  const MAX_BUYERS = PEAK_BUYERS * 2;
+  // One second of yours is a minute of the sale.
+  const SIM_PER_REAL = 60;
+
+  const t = topology(burst, compose, sizing, MAX_BUYERS * CALLS_PER_BUYER);
   if (!t.deployed.length) {
     section.append(el('p', 'bu-error',
       'No service in burst-scope.json is marked deployed, so there is no cluster to draw.'));
@@ -400,16 +447,6 @@ export async function renderDeployMap(host, burst, io) {
   //
   // Nothing here scrubs. Time runs forward once the environment is requested,
   // and what the reader controls is the load: everything else is a consequence.
-
-  // 55 requests per buyer, summed from callsPerBuyer across the 34 burst
-  // operations — the package's own figure, not a ratio invented here.
-  const CALLS_PER_BUYER = (burst.operations ?? [])
-    .reduce((a, op) => a + num(op.callsPerBuyer), 0) || 1;
-  // ADR-0035: "At 5,000 RPS the entire daily volume arrives in fifty seconds."
-  const PEAK_RPS = 5000;
-  const PEAK_BUYERS = Math.round(PEAK_RPS / CALLS_PER_BUYER);
-  // One second of yours is a minute of the sale.
-  const SIM_PER_REAL = 60;
 
   const opTransitions = (machine?.transitions ?? []).filter((tr) => tr.trigger === 'operation');
   const byOperation = new Map();
@@ -465,7 +502,7 @@ export async function renderDeployMap(host, burst, io) {
   loadRange.type = 'range';
   loadRange.className = 'bd-range';
   loadRange.min = '0';
-  loadRange.max = String(PEAK_BUYERS * 2);
+  loadRange.max = String(MAX_BUYERS);
   loadRange.value = '0';
   loadRange.setAttribute('aria-label', 'Buyers arriving per second');
   const loadLabel = el('span', 'bd-thr-live', '0/s');
@@ -478,25 +515,30 @@ export async function renderDeployMap(host, burst, io) {
   const loadNote = loadBar.querySelector('.bd-load-note');
   section.append(loadBar);
 
-  // The threshold. Yours, not the package's: both the shared-platform header
-  // and burst-scope say these services autoscale on RPS, and neither says at
-  // what. Rather than invent a number and present it as the package's, the
-  // number is the reader's and the consequences are drawn.
+  // **Target utilisation, and it is the package's.** derive-sizing.py sets it
+  // at 0.60 and says why: one replica is treated as carrying 60% of what it
+  // can, so the headroom a scale-out needs exists before the scale-out starts.
+  //
+  // An earlier version of this control was labelled as the reader's own
+  // invention, on the grounds that nothing in the package named a number. That
+  // was true of burst-scope and of the compose headers and not true of the
+  // calculator, which had simply never been generated in the dump on hand.
+  // It moves, because seeing what a different target costs is the point of
+  // having it on a slider, but it starts where the package puts it.
   const thrBar = el('div', 'bd-bar bd-bar-thr');
   const thrRange = document.createElement('input');
   thrRange.type = 'range';
   thrRange.className = 'bd-range';
   thrRange.min = '40';
   thrRange.max = '100';
-  thrRange.value = '70';
+  thrRange.value = String(Math.round((t.deployed[0]?.target ?? 0.6) * 100));
   thrRange.setAttribute('aria-label', 'Target utilisation per replica');
-  const thrLabel = el('span', 'bd-thr-live', '70%');
+  const thrLabel = el('span', 'bd-thr-live', `${thrRange.value}%`);
   thrBar.append(
-    el('span', 'bd-bar-label', 'scale above'),
+    el('span', 'bd-bar-label', 'size each replica to'),
     el('div', 'bd-slide', thrRange),
     thrLabel,
-    el('span', 'bd-bar-note', 'utilisation per replica — the package says these autoscale '
-      + 'on RPS and never says at what, so this one is yours'),
+    el('span', 'bd-bar-note bd-target-note', ''),
   );
   section.append(thrBar);
 
@@ -534,6 +576,7 @@ export async function renderDeployMap(host, burst, io) {
     policy,
     el('span', 'bd-bar-note bd-policy-note', ''),
   );
+  const targetNote = thrBar.querySelector('.bd-target-note');
   const policyNote = divBar.querySelector('.bd-policy-note');
   section.append(divBar);
 
@@ -1234,10 +1277,29 @@ export async function renderDeployMap(host, burst, io) {
   const rps = () => buyers * CALLS_PER_BUYER;
   const demand = () => Math.min(1.4, rps() / PEAK_RPS);
 
-  /** Replicas needed to hold utilisation at the threshold, before the cap. */
-  const wantedFor = (service, d) => Math.max(
-    service.min, Math.ceil((d * service.max) / threshold),
-  );
+  /**
+   * **The package's calculator, per service.** derive-sizing.py:
+   *
+   *   replicas = max(floor, ceil(load_rps x share / (rps_per_replica x target)))
+   *
+   * Each service has its own cliff — 400 RPS a replica for Catalogue, 250 for
+   * Order, 600 for Identity — and its own share of the mix, so they scale
+   * independently and at different loads. Catalogue adds a replica every 240
+   * RPS of its own traffic, Order every 150, Identity every 360.
+   *
+   * The target is why one replica is sized to carry 60% of what it can rather
+   * than all of it: the headroom a scale-out needs has to exist before the
+   * scale-out starts. Dropping that term is what makes burst-scope's floors
+   * 8/5/2 where the calculator says 14/8/2.
+   *
+   * There is no ceiling to clamp against, deliberately.
+   */
+  const wantedFor = (service, loadRps) => {
+    const serviceRps = loadRps * (service.shareOfLoad / 100);
+    const effective = service.perReplica * threshold;
+    const need = effective > 0 && serviceRps > 0 ? Math.ceil(serviceRps / effective) : 0;
+    return Math.max(service.absoluteMin, need);
+  };
 
   const step = (dt) => {
     const look = lookOf(state);
@@ -1283,6 +1345,7 @@ export async function renderDeployMap(host, burst, io) {
     // fast as it followed it up flaps on every dip, and the cooldown is why
     // real autoscalers do not.
     const d = look.live ? demand() : 0;
+    const liveRps = look.live ? rps() : 0;
     let replicas = 0;
     let client = 0;
     let cpu = look.infra > 0 ? baseCpu : 0;
@@ -1291,7 +1354,11 @@ export async function renderDeployMap(host, burst, io) {
 
     for (const c of clusters) {
       const running = look.infra > 0 && (look.live || look.replay || state === 'warming');
-      const want = running ? wantedFor(c.service, running && look.live ? d : 0) : 0;
+      const want = running ? wantedFor(c.service, look.live ? liveRps : 0) : 0;
+      // Nothing clamps it down to a cap, because there is not one. The only
+      // limit is how many boxes were drawn, and that was laid out for the most
+      // the control can ask for — so this only bites if the model changes
+      // under the drawing.
       const target = Math.min(c.service.max, want);
       if (want > c.service.max) { short.push(`${c.service.short} wants ${want}`); }
       const now2 = at.get(c.service.name) ?? 0;
@@ -1303,13 +1370,26 @@ export async function renderDeployMap(host, burst, io) {
       cpu += num(c.service.cpus) * n;
       gb += gigs(c.service.memory) * n;
       c.cells.forEach((cell, k) => cell.classList.toggle('on', k < n));
+      const svcRps = Math.round(liveRps * (c.service.shareOfLoad / 100));
       c.count.textContent = look.infra > 0
-        ? `${n} of ${c.service.max}${want > c.service.max ? ` · wants ${want}` : ''}`
+        ? `${n} replica${n === 1 ? '' : 's'}`
+          + ` · ${svcRps.toLocaleString('en-GB')} rps of its own`
+          + (n <= c.service.absoluteMin && svcRps === 0 ? ' · at its floor' : '')
           + (c.service.poolMax ? ` · ${n * c.service.poolMax} conns` : '')
         : 'not running';
       c.node.classList.toggle('bd-quiet', look.infra === 0);
       c.node.classList.toggle('bd-capped', want > c.service.max);
     }
+
+    // The one number that is not a consequence: what each service adds a
+    // replica for. They are different, so they scale at different moments.
+    targetNote.textContent = `each replica sized to carry ${Math.round(threshold * 100)}% of `
+      + `its cliff, so a replica is added every `
+      + t.deployed.map((x) => `${Math.round(x.perReplica * threshold)} rps of ${x.short}`)
+        .join(', ')
+      + `. The package sets this at ${Math.round((t.deployed[0]?.target ?? 0.6) * 100)}% in `
+      + 'tools/derive-sizing.py — one replica carries that much of what it can, so the '
+      + 'headroom a scale-out needs exists before the scale-out starts.';
 
     if (short.length && look.live) {
       everCapped = true;
