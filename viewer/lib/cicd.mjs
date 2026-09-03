@@ -190,6 +190,103 @@ async function readImages(root) {
   return { images: images.map(({ text, ...rest }) => rest), recipes: [...byHash.values()] };
 }
 
+/**
+ * What each deployment configuration says the database is.
+ *
+ * **This is the one question the three folders answer differently and none of
+ * them asks.** A compose file states it in three places that can disagree with
+ * each other — the `POSTGRES_DB` the server comes up with, the
+ * `POSTGRES_MULTIPLE_DATABASES` it creates beside it, and the database at the
+ * end of every service's DSN — and nothing reads all three.
+ */
+function databaseModelOf(doc) {
+  const services = doc?.services ?? {};
+  const envOf = (svc) => {
+    const env = svc?.environment;
+    if (Array.isArray(env)) {
+      return Object.fromEntries(env.map((line) => {
+        const at = String(line).indexOf('=');
+        return at < 0 ? [String(line), ''] : [line.slice(0, at), line.slice(at + 1)];
+      }));
+    }
+    return env ?? {};
+  };
+
+  let primary = null;      // POSTGRES_DB on the server
+  let created = [];        // POSTGRES_MULTIPLE_DATABASES beside it
+  let maxConnections = null;
+  const pooler = { maxClient: null, poolSize: null };
+  const reached = new Set();   // the database at the end of each service's DSN
+
+  for (const svc of Object.values(services)) {
+    const env = envOf(svc);
+    if (env.POSTGRES_DB && primary == null) primary = env.POSTGRES_DB;
+    if (env.POSTGRES_MULTIPLE_DATABASES) {
+      created = String(env.POSTGRES_MULTIPLE_DATABASES).split(',').map((s) => s.trim()).filter(Boolean);
+    }
+    if (env.MAX_CLIENT_CONN) pooler.maxClient = Number(env.MAX_CLIENT_CONN) || null;
+    if (env.DEFAULT_POOL_SIZE) pooler.poolSize = Number(env.DEFAULT_POOL_SIZE) || null;
+    for (const value of Object.values(env)) {
+      const at = /^postgres(?:ql)?:\/\/[^/]+\/([A-Za-z0-9_-]+)/.exec(String(value ?? ''));
+      if (at) reached.add(at[1]);
+    }
+    const cmd = Array.isArray(svc?.command) ? svc.command.join(' ') : String(svc?.command ?? '');
+    const mc = /max_connections=(\d+)/.exec(cmd);
+    if (mc && maxConnections == null) maxConnections = Number(mc[1]);
+  }
+
+  const databases = created.length ? created : (primary ? [primary] : []);
+  // **Named from what the DSNs reach, not from what the server creates.** A
+  // config can create three databases and send every service to one of them,
+  // and the second half is the half that decides what the deployment is.
+  const model = reached.size > 1 ? 'one per service'
+    : databases.length > 1 ? 'several created, one reached'
+      : databases.length === 1 ? 'one database, shared'
+        : 'no database in this config';
+
+  return {
+    model,
+    primary,
+    created,
+    reached: [...reached].sort(),
+    maxConnections,
+    pooler: pooler.maxClient || pooler.poolSize ? pooler : null,
+  };
+}
+
+/**
+ * What the generated DDL actually builds.
+ *
+ * Three facts, each a grep, and each one the answer to a question a decision
+ * record has already answered differently somewhere: how many schemas, in how
+ * many databases, with what isolating one tenant's rows from another's.
+ */
+async function readStorage(root) {
+  const dir = path.join(root, 'backend');
+  const names = (await readdir(dir).catch(() => [])).filter((f) => /\.sql$/i.test(f));
+  let schemas = 0;
+  let partitions = 0;
+  let policies = 0;
+  let createsDatabase = 0;
+  let tables = 0;
+  const files = [];
+  for (const name of names) {
+    const text = await readFile(path.join(dir, name), 'utf8').catch(() => null);
+    if (text == null) continue;
+    const s = (text.match(/^\s*CREATE SCHEMA\b/gim) ?? []).length;
+    const p = (text.match(/\bPARTITION BY\b/gi) ?? []).length;
+    const r = (text.match(/\bROW LEVEL SECURITY\b|\bCREATE POLICY\b/gi) ?? []).length;
+    const d = (text.match(/^\s*CREATE DATABASE\b/gim) ?? []).length;
+    schemas += s;
+    partitions += p;
+    policies += r;
+    createsDatabase += d;
+    tables += (text.match(/^\s*CREATE TABLE\b/gim) ?? []).length;
+    if (s || p || r || d) files.push(`backend/${name}`);
+  }
+  return { schemas, tables, partitions, policies, createsDatabase, files };
+}
+
 async function readConfigs(root) {
   const out = [];
   for (const [dir, kind] of [['deploy', 'scenario'], ['deploy/variants', 'variant']]) {
@@ -219,6 +316,7 @@ async function readConfigs(root) {
         serviceNames: services,
         replicas: Object.values(doc?.services ?? {})
           .reduce((sum, s) => sum + (Number(s?.deploy?.replicas) || 0), 0),
+        db: databaseModelOf(doc),
         header: header.slice(0, 400),
       });
     }
@@ -233,7 +331,7 @@ async function readConfigs(root) {
  * is an assertion, and this viewer's whole argument is that an assertion in a
  * package is worth less than the two lines it was read from.
  */
-function findFindings({ workflows, images, recipes, configs, repos }) {
+function findFindings({ workflows, images, recipes, configs, repos, storage }) {
   const out = [];
 
   if (recipes.length === 1 && images.length > 1) {
@@ -340,6 +438,53 @@ function findFindings({ workflows, images, recipes, configs, repos }) {
     }
   }
 
+  // ---- what the deployment thinks a database is ---------------------------
+  //
+  // **The three folders answer this differently and none of them asks it.** A
+  // config states it in three places that can disagree — the server's
+  // `POSTGRES_DB`, the databases created beside it, and the database at the end
+  // of each service's DSN — and the DDL states it a fourth time by putting
+  // every schema in one file with no `CREATE DATABASE` above them.
+  const models = new Map();
+  for (const config of configs) {
+    if (!config.db || config.db.model === 'no database in this config') continue;
+    if (!models.has(config.db.model)) models.set(config.db.model, []);
+    models.get(config.db.model).push(config.name);
+  }
+  if (models.size > 1) {
+    out.push({
+      severity: 'error',
+      kind: 'database-model-split',
+      title: `The configurations do not agree what a database is (${models.size} models)`,
+      detail: [...models].map(([model, names]) => `**${model}** — ${names.join(', ')}`).join('; ')
+        + '. Each is defensible on its own and they cannot all be the shape of the platform. '
+        + 'Read from the DSNs rather than from what the server creates: a config can create three '
+        + 'databases and send every service to one of them, and the second half is the half that '
+        + 'decides what the deployment is.',
+      where: configs.filter((c) => c.db?.model !== 'no database in this config')
+        .map((c) => c.file).slice(0, 6),
+    });
+  }
+
+  // ---- what isolates one tenant's rows from another's ---------------------
+  if (storage?.tables) {
+    const shared = configs.filter((c) => c.db?.model === 'one database, shared');
+    if (!storage.partitions && !storage.policies && !storage.createsDatabase) {
+      out.push({
+        severity: 'error',
+        kind: 'no-tenant-isolation-in-ddl',
+        title: 'The DDL builds one database, and nothing in it separates one tenant from another',
+        detail: `${storage.schemas} schemas and ${storage.tables} tables, with no \`CREATE `
+          + 'DATABASE\`, no `PARTITION BY` and no row-level security anywhere in `backend/`. '
+          + `${shared.length} of the ${configs.length} configurations provision exactly one `
+          + 'database and point every service at it, so the generated artefacts implement a '
+          + 'single shared database — whatever the decision records say about a database per '
+          + 'tenant or partitioning by venue. `venue_id` and `tenant_id` are ordinary columns.',
+        where: [...storage.files.slice(0, 2), ...shared.map((c) => c.file).slice(0, 3)],
+      });
+    }
+  }
+
   return out;
 }
 
@@ -351,6 +496,7 @@ export async function buildCicd(root) {
   const workflows = (await Promise.all(repoNames.map((r) => readWorkflows(root, r)))).flat();
   const { images, recipes } = await readImages(root);
   const configs = await readConfigs(root);
+  const storage = await readStorage(root);
 
   const repos = await Promise.all(repoNames.map(async (name) => {
     const mine = workflows.filter((w) => w.repo === name);
@@ -365,7 +511,7 @@ export async function buildCicd(root) {
     };
   }));
 
-  const findings = findFindings({ workflows, images, recipes, configs, repos });
+  const findings = findFindings({ workflows, images, recipes, configs, repos, storage });
 
   return {
     repos,
@@ -373,6 +519,7 @@ export async function buildCicd(root) {
     images,
     recipes,
     configs,
+    storage,
     findings,
     stats: {
       repos: repos.length,

@@ -386,6 +386,23 @@ function renderConfigs(host, data) {
   ));
   sec.append(lead);
 
+  // What the DDL builds, said once above the cards. Every configuration below
+  // provisions a database; this is the one thing that goes inside all of them,
+  // and the count of what isolates one tenant from another is the number the
+  // cards cannot show.
+  if (data.storage?.tables) {
+    const st = data.storage;
+    const line = el('p', 'ci-lead');
+    line.append(rich(
+      `Inside every one of them, the same DDL: **${st.schemas} schemas** and `
+      + `**${st.tables} tables** from \`backend/\`, with ${st.createsDatabase} \`CREATE `
+      + `DATABASE\`, ${st.partitions} \`PARTITION BY\` and ${st.policies} row-level security `
+      + 'policies. Those last three are the ones that would separate one tenant from another, '
+      + 'and each of them is a grep rather than a reading.',
+    ));
+    sec.append(line);
+  }
+
   const grid = el('div', 'ci-configs');
   for (const config of [...scenarios, ...variants]) {
     const card = el('div', `ci-config is-${config.kind}`);
@@ -396,8 +413,34 @@ function renderConfigs(host, data) {
     const facts = el('div', 'ci-config-facts');
     facts.append(el('span', null, `${config.services} services`));
     if (config.replicas) facts.append(el('span', null, `${config.replicas} replicas`));
+    if (config.db?.maxConnections) {
+      facts.append(el('span', null, `max_connections ${config.db.maxConnections}`));
+    }
+    if (config.db?.pooler?.maxClient) {
+      facts.append(el('span', null,
+        `pool ${config.db.pooler.maxClient} → ${config.db.pooler.poolSize}`));
+    }
     card.append(facts);
-    if (config.header) card.append(el('p', 'ci-config-note', config.header));
+
+    // **What this configuration thinks a database is.** It is the question the
+    // package answers differently in different files, and it was legible in
+    // none of them: a compose file states it three times — the server's
+    // POSTGRES_DB, the databases created beside it, and the database at the end
+    // of every DSN — and only the last of those decides anything.
+    if (config.db && config.db.model !== 'no database in this config') {
+      const db = el('div', 'ci-config-db');
+      db.append(el('span', 'ci-config-db-k', 'database'));
+      db.append(el('span', 'ci-config-db-v', config.db.model));
+      if (config.db.reached.length) {
+        const list = el('div', 'ci-config-db-list');
+        for (const name of config.db.reached) list.append(el('span', 'ci-chip', name));
+        db.append(list);
+      }
+      card.append(db);
+    }
+    // The header carries the package's own `**bold**`, and rendering it as text
+    // put the asterisks on the page.
+    if (config.header) card.append(el('p', 'ci-config-note', rich(config.header)));
     card.append(el('div', 'ci-where', el('span', 'ci-file', config.file)));
     grid.append(card);
   }

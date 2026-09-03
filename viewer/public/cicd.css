@@ -329,3 +329,22 @@ body[data-mode="cicd-cell"] .app {
    page around it supplied that. The tab has no page, so it supplies it here. */
 #view-cicd-burst { padding-bottom: 60px; }
 #view-cicd-burst > .bu-col:first-child { padding-top: 22px; }
+
+/* What a configuration thinks a database is — the question the package answers
+   differently in different files. Set apart from the counts above it because it
+   is the only line on the card that is a claim rather than a measurement. */
+.ci-config-db {
+  margin-top: 10px;
+  padding-top: 9px;
+  border-top: 1px solid var(--line);
+}
+.ci-config-db-k {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+  margin-right: 8px;
+}
+.ci-config-db-v { font-size: 12px; font-weight: 600; color: var(--accent-text); }
+.ci-config-db-list { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 7px; }
