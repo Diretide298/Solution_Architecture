@@ -1,0 +1,331 @@
+/**
+ * CI/CD — the delivery layer.
+ *
+ * Tokens only, no literal colours. The three views sit inside the app shell
+ * rather than on pages of their own, so everything here is scoped to `.ci-*`
+ * or to the three modes; nothing may leak into a layer that happens to reuse a
+ * class name.
+ */
+
+/* The two shell rails go, and their grid tracks with them — `.app` is a
+   three-column grid with named areas, so hiding the asides on their own leaves
+   two tracks holding nothing. Same treatment the UI/UX views get, and for the
+   same reason: these views are a reading surface and a framed application, and
+   neither is navigated by a contract tree. */
+body[data-mode="cicd-pipeline"] #sidebar-left,
+body[data-mode="cicd-pipeline"] #sidebar-right,
+body[data-mode="cicd-burst"] #sidebar-left,
+body[data-mode="cicd-burst"] #sidebar-right,
+body[data-mode="cicd-cell"] #sidebar-left,
+body[data-mode="cicd-cell"] #sidebar-right {
+  display: none;
+}
+body[data-mode="cicd-pipeline"] .app,
+body[data-mode="cicd-burst"] .app,
+body[data-mode="cicd-cell"] .app {
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-areas:
+    "top"
+    "main";
+}
+
+.cicd-view { overflow-y: auto; }
+
+/* No measure on the view — it is on `ci-col`, which everything except a framed
+   handoff page sits in. Those pages are drawn at 1,440px by the package and a
+   column narrower than that crops them rather than scaling them. */
+.ci-col { max-width: 1120px; margin: 0 auto; padding: 22px 18px 60px; }
+
+/* ── hero ──────────────────────────────────────────────────────────────── */
+.ci-hero { padding: 6px 2px 22px; border-bottom: 1px solid var(--line); }
+.ci-eyebrow {
+  margin: 0 0 8px;
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--accent-text);
+}
+.ci-title { margin: 0; font-size: 30px; font-weight: 800; letter-spacing: -0.02em; }
+.ci-sub {
+  margin: 12px 0 0;
+  max-width: 70ch;
+  font-size: 14px;
+  line-height: 1.65;
+  color: var(--text-dim);
+}
+.ci-source {
+  margin: 14px 0 0;
+  font-family: var(--mono);
+  font-size: 11.5px;
+  line-height: 1.6;
+  color: var(--text-faint);
+}
+
+.ci-h2 {
+  margin: 0 0 4px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+}
+.ci-h3 { margin: 0 0 8px; font-size: 19px; font-weight: 700; letter-spacing: -0.01em; }
+.ci-sec { margin-top: 34px; }
+.ci-lead {
+  margin: 0 0 16px;
+  max-width: 78ch;
+  font-size: 13.5px;
+  line-height: 1.65;
+  color: var(--text-dim);
+}
+.ci-empty, .ci-error {
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 16px 18px;
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--text-dim);
+}
+.ci-error { border-color: var(--red); color: var(--red); }
+
+/* ── totals ────────────────────────────────────────────────────────────── */
+.ci-totals {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 12px;
+  margin-top: 22px;
+}
+.ci-total {
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 15px 17px;
+  background: var(--bg-card);
+}
+.ci-total-v { font-family: var(--mono); font-size: 26px; font-weight: 700; }
+.ci-total-v .of { font-size: 13px; font-weight: 400; color: var(--text-faint); }
+.ci-total-k { margin-top: 3px; font-size: 12.5px; font-weight: 600; }
+.ci-total-n { margin-top: 5px; font-size: 11.5px; line-height: 1.5; color: var(--text-faint); }
+
+/* ── the path ──────────────────────────────────────────────────────────── */
+.ci-path {
+  display: flex;
+  align-items: stretch;
+  gap: 0;
+  overflow-x: auto;
+  padding-bottom: 6px;
+}
+.ci-stage {
+  flex: 1 1 0;
+  min-width: 150px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 12px 13px;
+  background: var(--bg-card);
+}
+/* A stage nothing does is drawn as an absence rather than left off: the gap is
+   the finding, and a diagram that shows only the configured half argues that
+   everything after it is somebody else's problem. */
+.ci-stage.is-missing {
+  border-style: dashed;
+  border-color: var(--red);
+  background: transparent;
+}
+.ci-stage-name { font-size: 13.5px; font-weight: 700; }
+.ci-stage-state {
+  margin-top: 3px;
+  font-family: var(--mono);
+  font-size: 10.5px;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+}
+.ci-stage.is-missing .ci-stage-state { color: var(--red); }
+.ci-stage-note { margin: 8px 0 0; font-size: 11.5px; line-height: 1.5; color: var(--text-dim); }
+.ci-path-link {
+  flex: 0 0 22px;
+  align-self: center;
+  height: 1px;
+  background: var(--line);
+}
+.ci-path-link.is-missing { background: transparent; border-top: 1px dashed var(--red); }
+
+/* ── findings ──────────────────────────────────────────────────────────── */
+.ci-findings { display: grid; gap: 12px; }
+.ci-finding {
+  border: 1px solid var(--line);
+  border-left-width: 3px;
+  border-radius: 10px;
+  padding: 14px 16px;
+  background: var(--bg-card);
+}
+.ci-finding.is-error { border-left-color: var(--red); }
+.ci-finding.is-warn { border-left-color: var(--warning); }
+.ci-finding-head { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+.ci-sev {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  border: 1px solid currentColor;
+  border-radius: 5px;
+  padding: 1px 6px;
+}
+.ci-sev.is-error { color: var(--red); }
+.ci-sev.is-warn { color: var(--warning); }
+.ci-finding-title { font-size: 14px; font-weight: 700; }
+.ci-finding-detail { margin: 8px 0 0; font-size: 12.5px; line-height: 1.6; color: var(--text-dim); }
+.ci-where { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+.ci-file {
+  font-family: var(--mono);
+  font-size: 10.5px;
+  color: var(--text-faint);
+  border: 1px solid var(--line);
+  border-radius: 5px;
+  padding: 2px 7px;
+  word-break: break-all;
+}
+
+/* ── repositories ──────────────────────────────────────────────────────── */
+.ci-repos { display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 14px; }
+.ci-repo {
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 15px 16px;
+  background: var(--bg-card);
+}
+.ci-repo-head { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+.ci-repo-name { font-family: var(--mono); font-size: 13px; font-weight: 700; }
+.ci-lang, .ci-chip {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: .04em;
+  color: var(--text-faint);
+  border: 1px solid var(--line);
+  border-radius: 5px;
+  padding: 1px 6px;
+}
+.ci-lang { color: var(--accent-text); border-color: var(--accent-line, var(--line)); }
+.ci-repo-facts {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 6px;
+  font-size: 11.5px;
+  color: var(--text-faint);
+}
+
+.ci-wf { margin-top: 12px; border-top: 1px solid var(--line); padding-top: 11px; }
+/* The documentation gate is dimmed rather than hidden. It is a real workflow
+   and it is not a build gate, and a repository whose only workflow is this one
+   is a finding — which needs the row to be visible to be read. */
+.ci-wf.is-doc { opacity: .62; }
+.ci-wf-head { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
+.ci-wf-name { font-family: var(--mono); font-size: 12px; font-weight: 700; }
+.ci-wf-on { font-family: var(--mono); font-size: 10.5px; color: var(--text-faint); }
+.ci-job { margin-top: 9px; }
+.ci-job-head { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+.ci-job-name { font-size: 12px; font-weight: 600; }
+.ci-job-needs, .ci-job-if {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--text-faint);
+}
+.ci-job-svc { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 6px; }
+.ci-steps { margin: 7px 0 0; padding-left: 20px; display: grid; gap: 5px; }
+.ci-step { font-size: 11.5px; line-height: 1.5; color: var(--text-dim); }
+.ci-step-label { color: var(--text); }
+.ci-step-uses, .ci-step-run {
+  display: block;
+  font-family: var(--mono);
+  font-size: 10.5px;
+  color: var(--text-faint);
+  word-break: break-all;
+}
+.ci-step-note {
+  margin: 4px 0 0;
+  font-size: 11px;
+  line-height: 1.5;
+  color: var(--text-faint);
+  border-left: 2px solid var(--line);
+  padding-left: 8px;
+}
+
+/* ── images ────────────────────────────────────────────────────────────── */
+.ci-recipe {
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 15px 16px;
+  background: var(--bg-card);
+}
+.ci-recipe-head { display: flex; align-items: baseline; gap: 9px; flex-wrap: wrap; }
+.ci-recipe-from { font-family: var(--mono); font-size: 13px; font-weight: 700; }
+.ci-recipe-n { font-size: 11.5px; color: var(--text-faint); }
+.ci-recipe-cmd { margin-top: 9px; font-size: 11.5px; }
+.ci-recipe-cmd-k {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: .06em;
+  color: var(--text-faint);
+  margin-right: 7px;
+}
+.ci-recipe-cmd code { font-family: var(--mono); font-size: 11px; word-break: break-all; }
+.ci-recipe-svcs { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 11px; }
+
+/* ── configurations ────────────────────────────────────────────────────── */
+.ci-configs { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 12px; }
+.ci-config {
+  border: 1px solid var(--line);
+  border-radius: 11px;
+  padding: 14px 15px;
+  background: var(--bg-card);
+}
+/* A variant is a fork of a scenario and reads as one: same card, no fill. */
+.ci-config.is-variant { background: transparent; border-style: dashed; }
+.ci-config-head { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+.ci-config-name { font-family: var(--mono); font-size: 12.5px; font-weight: 700; }
+.ci-config-facts {
+  display: flex;
+  gap: 12px;
+  margin-top: 5px;
+  font-size: 11.5px;
+  color: var(--text-faint);
+}
+.ci-config-note {
+  margin: 9px 0 0;
+  font-size: 11.5px;
+  line-height: 1.55;
+  color: var(--text-dim);
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* ── a framed handoff page ─────────────────────────────────────────────── */
+/* Edge to edge. A border and a radius would be drawing a card around a page,
+   and the page inside has its own centred 1,440px measure — so the width it is
+   given is headroom rather than stretch. */
+.ci-frame {
+  display: block;
+  width: 100%;
+  border: 0;
+  border-bottom: 1px solid var(--line);
+  background: var(--bg-card);
+  overflow: hidden;
+}
+.ci-frame-foot {
+  max-width: 1120px;
+  margin: 9px auto 40px;
+  padding: 0 18px;
+  font-family: var(--mono);
+  font-size: 11.5px;
+  color: var(--text-faint);
+}
+.ci-frame-foot a { color: var(--accent-text); }
+
+/* ── the flash sale, inside a tab ──────────────────────────────────────── */
+/* `burst.css` gave `bu-col` a horizontal measure and no vertical rhythm — the
+   page around it supplied that. The tab has no page, so it supplies it here. */
+#view-cicd-burst { padding-bottom: 60px; }
+#view-cicd-burst > .bu-col:first-child { padding-top: 22px; }

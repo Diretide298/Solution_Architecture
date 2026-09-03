@@ -533,6 +533,9 @@ function layerCount(key) {
     // counts what has been *drawn* of it, and the two differing is the whole
     // reason there are two tabs.
     case 'uiux': return state.uiux?.stats?.boards ?? null;
+    // Workflows, not repositories. The layer is about what a change has to
+    // pass, and the number of places it can start from is not that.
+    case 'cicd': return state.cicd?.stats?.workflows ?? null;
     case 'contracts': return nodes.filter((n) => n.type === 'operation').length || null;
     case 'domain': return state.domain?.machines?.length ?? null;
     case 'backend': return state.backend?.tables?.length ?? null;
@@ -868,6 +871,10 @@ const LAYER_PARTS = {
   // The map checks its own table counts against the workbook, so it needs the
   // backend part to draw honestly rather than merely to draw.
   services: ['diagrams', 'backend'],
+  // The pipeline view fetches this itself, on the tab, and the tab strip's
+  // count reads it — so it is a part like any other rather than a fetch
+  // hidden inside a view.
+  cicd: ['cicd'],
 };
 /**
  * Parts a layer does not need to draw itself, but which its panes read.
@@ -1252,6 +1259,34 @@ function openUiux(mode) {
   });
 }
 
+/**
+ * Bring up one of the CI/CD views, the first time it is asked for.
+ *
+ * The module is fetched on the tab and not at boot, for the reason `openUiux`
+ * above gives — and one more that is specific to this layer: the flash-sale
+ * view stands up the package's own simulator in an iframe, which is a whole
+ * second application. A reader looking at contracts should not be paying for a
+ * queueing model.
+ *
+ * Unlike the UI/UX modules this one does not self-boot. It draws per view
+ * rather than per module, because opening Pipeline must not build the
+ * simulator — so it is imported once and told which tab is showing.
+ */
+let cicdModule = null;
+function openCicd(mode) {
+  if (!cicdModule) {
+    cicdModule = import('/cicd.js').catch((e) => {
+      // A view that failed to load has to say so where the view would have
+      // been. An empty panel reads as "there is nothing here", which is a
+      // different and much worse claim.
+      const box = $(`view-${mode}`);
+      if (box) box.append(el('p', 'auth-note', `Could not load this view: ${e.message}`));
+      return null;
+    });
+  }
+  cicdModule.then((m) => m?.show(mode));
+}
+
 export function setMode(mode) {
   // a keyboard shortcut can name a view another layer owns — follow it there
   if (!layerOf(state.layer).modes.some(([m]) => m === mode)) {
@@ -1281,6 +1316,7 @@ export function setMode(mode) {
   // or on its way; either way the tray and the summary want re-reading
   queueMicrotask(() => { refreshLayerCounts(); renderLayerSummary(); });
   if (mode.startsWith('uiux-')) { openUiux(mode); return; }
+  if (mode.startsWith('cicd-')) { openCicd(mode); return; }
 
   if (mode === 'graph') {
     // A galaxy scope parks its frame loop when the view goes away, so coming

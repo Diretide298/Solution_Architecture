@@ -28,6 +28,12 @@
     <link rel="stylesheet" href="/domains.css" />
     <link rel="stylesheet" href="/uiux.css" />
     <link rel="stylesheet" href="/canvas.css" />
+    <!-- The flash-sale tab is `burst.js` drawing what it always drew, so it
+         brings its own two stylesheets with it. Neither is scoped to a page
+         class, which is what made the move a move rather than a rewrite. -->
+    <link rel="stylesheet" href="/burst.css" />
+    <link rel="stylesheet" href="/burst-map.css" />
+    <link rel="stylesheet" href="/cicd.css" />
     <link rel="icon" href="/brand/adam-mark.png" />
     <script>
       // A new browser session starts at the door.
@@ -194,7 +200,7 @@
                only from the view that already answers half of it is a page
                nobody finds. Stacked boxes: the clusters, and the pooler they
                narrow into. -->
-          <a id="burst-link" class="icon-btn" href="/burst.html"
+          <a id="burst-link" class="icon-btn" href="/?layer=cicd&amp;mode=cicd-burst"
              title="Deployment map — what a flash sale runs"
              aria-label="Deployment map — what a flash sale runs">
             <svg class="icon-burst" viewBox="0 0 16 16" aria-hidden="true"
@@ -1009,6 +1015,20 @@
           </div>
         </section>
 
+        <!-- ── CI/CD ────────────────────────────────────────────────────
+             How the package is built, shipped and run. Three empty hosts: the
+             module is imported the first time one of these tabs is opened —
+             see `openCicd` in app.js — and a reader who never opens the layer
+             pays nothing for it.
+
+             The last two were `burst.html`, a page of its own with its own
+             header and its own idea of the navigation. Same argument UI/UX
+             was moved on: a section of the product needs a tab, not a second
+             application. -->
+        <section class="view cicd-view sheet" id="view-cicd-pipeline" hidden></section>
+        <section class="view cicd-view" id="view-cicd-burst" hidden></section>
+        <section class="view cicd-view" id="view-cicd-cell" hidden></section>
+
         <section class="view audit" id="view-audit" hidden>
           <div class="audit-head">
             <h2>Contract audit</h2>
@@ -1107,7 +1127,7 @@
                contains — which services, tables and operations one deployment
                scenario needs — rather than about how the package was built. A
                client asking what a flash sale costs to run is asking this. -->
-          <a class="auth-button auth-button-quiet" href="/burst.html">Flash sale — what an environment runs</a>
+          <a class="auth-button auth-button-quiet" href="/?layer=cicd&amp;mode=cicd-burst">Flash sale — what an environment runs</a>
 
           <!-- admin only: the door to everything about accounts -->
           <div id="account-admin" hidden>

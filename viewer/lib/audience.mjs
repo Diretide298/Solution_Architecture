@@ -99,9 +99,14 @@ export function layersFor(role) {
   // layer there is — the screens, drawn — and the one a client is most likely to
   // have an opinion about. Withholding it would be withholding the part of the
   // package that was made for them.
+  //
+  // `cicd` is here for both roles for the same reason. It is the delivery
+  // schedule made checkable — what a change has to pass before it reaches them,
+  // and which stages of that do not exist yet. A client who is told the second
+  // part by the page is better placed than one who is told it by a slipped date.
   return role === 'client'
-    ? ['frontend', 'uiux', 'contracts', 'domain', 'backend', 'services']
-    : ['frontend', 'uiux', 'contracts', 'domain', 'backend', 'services', 'decisions'];
+    ? ['frontend', 'uiux', 'contracts', 'domain', 'backend', 'services', 'cicd']
+    : ['frontend', 'uiux', 'contracts', 'domain', 'backend', 'services', 'cicd', 'decisions'];
 }
 
 /** null means "whatever the layer normally offers". A client gets every mode

@@ -288,7 +288,9 @@ export async function buildSearch(root, subjects = {}) {
     burst?.services?.length && {
       id: 'burst', name: 'Flash sale — what an environment runs',
       sub: `${burst.totals?.deployed ?? 0} of ${burst.totals?.services ?? 0} services deployed`,
-      href: '/burst.html',
+      // The layer, not the old page. `burst.html` still redirects here, and a
+      // search result that lands on a redirect is a result that flashes.
+      href: '/?layer=cicd&mode=cicd-burst',
       terms: 'flash sale burst scope deployment map environment clusters replicas '
         + 'scale out scaling contended inventory hold seat hold pgbouncer scenario c '
         + (burst.services ?? []).map((x) => x.name).join(' '),
@@ -304,10 +306,19 @@ export async function buildSearch(root, subjects = {}) {
     handoffFiles.has('Shared Cell.dc.html') && {
       id: 'shared-cell', name: 'Shared cell — the platform at rest',
       sub: 'what runs between sales, two venues to a cell',
-      pkgHref: '/handoff/Shared Cell.dc.html',
+      // The tab that frames it rather than the file, so a reader arrives with
+      // the rest of the layer around them. The file is still openable from
+      // there, and from the burst simulator's own header.
+      href: '/?layer=cicd&mode=cicd-cell',
       terms: 'shared cell platform at rest steady state two venues per cell '
         + 'b-shared-platform tenancy isolation cost per venue',
     },
+    { id: 'cicd', name: 'CI/CD — how this is built, shipped and run',
+      sub: 'pipelines, images and the four deployments — and what they disagree about',
+      href: '/?layer=cicd&mode=cicd-pipeline',
+      terms: 'cicd ci cd pipeline delivery build ship deploy github actions workflow job step '
+        + 'gate dockerfile image registry publish terraform runbook repos services deploy '
+        + 'compose scenario variant continuous integration deployment' },
     { id: 'uiux', name: 'UI/UX — screens, flows and boards', href: '/uiux.html',
       terms: 'uiux wireframes boards frames screens flows' },
     { id: 'domains', name: 'Domain lenses', href: '/domains.html',

@@ -65,12 +65,17 @@ const LAYOUT = {
   // being built, so the row was in the rail, the body was in the graph, and
   // clicking either opened an empty panel and killed the page's scripts.
   uiux:      { pos: [-2.30,  1.52,  0.85], flat: [-1.34, -0.95], up: true,  tier: 'satellite' },
+  // Out past Architecture on the same side, for the same reason UI/UX sits
+  // out past Frontend: it hangs off one body and reaches nothing else, and
+  // a position among the six would draw joins that are not there.
+  cicd:      { pos: [ 2.55, -1.42, -0.70], flat: [ 1.46, -1.02], up: false, tier: 'satellite' },
 };
 
 /** What the headline number counts, and where on disk it comes from. */
 const UNITS = {
   frontend:  { unit: 'screens',      from: 'screens/ · flows/ · frontend/ · wireframes/' },
   uiux:      { unit: 'design boards', from: 'wireframes/ · designs/ · ui-design/' },
+  cicd:      { unit: 'workflows',    from: 'repos/ · services/ · deploy/' },
   contracts: { unit: 'contracts',    from: 'the OpenAPI contracts' },
   // State models, not status enums. A status enum is a list of values a
   // contract declares — it is not a lifecycle, and under a layer named for
@@ -111,6 +116,11 @@ const BLURB = {
   decisions:
     'Why the shape is the shape. Everything else here is machine-readable and can be checked '
     + 'mechanically; this is prose, and prose is where the reasons live.',
+  cicd:
+    'How a commit becomes a running venue. What a pull request has to pass, what each service '
+    + 'becomes when it is built, and which of the four deployments it lands in — read off the '
+    + 'three folders that hold those answers, and compared, because none of them knows what the '
+    + 'other two say.',
   services:
     'What ships together. Sixteen deployable services in five tiers, cut where the data '
     + 'boundary falls — no service spans a schema it does not own — with every place one '
@@ -141,9 +151,13 @@ const LINKS = [
   // there.
   ['contracts', 'services'],
   ['backend', 'services'],
+  // One lane, to Architecture. Delivery is a cut through the services — what
+  // builds them, what they become, where they run — and it reaches nothing
+  // else here directly.
+  ['services', 'cicd'],
 ];
 
-const ORDER = ['frontend', 'uiux', 'contracts', 'domain', 'backend', 'services', 'decisions'];
+const ORDER = ['frontend', 'uiux', 'contracts', 'domain', 'backend', 'services', 'cicd', 'decisions'];
 
 // Six bodies in a full viewport, against thirty on a ring inside a panel.
 // Same formula, three times the scale — see `spread` in galaxy.js.

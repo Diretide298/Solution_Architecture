@@ -156,6 +156,37 @@ export const LAYERS = [
     groups: [['tiers', 'Tiers'], ['size', 'Size']],
   },
   {
+    // **CI/CD is a layer because the three folders that decide it are three
+    // folders nothing joined.** `repos/` holds what a pull request has to pass,
+    // `services/` holds what each service becomes, and `deploy/` holds what
+    // runs where — each readable on its own, and the disagreements between
+    // them readable nowhere. Every finding in this layer is two files, each
+    // fine alone.
+    //
+    // The flash sale and the shared cell moved in here from a page of their
+    // own for the reason UI/UX did: a section of the product does not need a
+    // second application to live in, it needs a tab. They are the only two
+    // views in the package that show a deployment *running* rather than
+    // configured, which is the last question this layer asks.
+    key: 'cicd',
+    label: 'CI/CD',
+    hint: 'repos/ · services/ · deploy/ — how it is built, shipped and run',
+    tip:
+      'How the package gets from a commit to a running venue. **Nothing here is stated; it is ' +
+      'all read off the files and compared** — the toolchain off the workflow steps, the runtime ' +
+      'off the `FROM` line, the gates off the steps that fail a build. Where two files cannot ' +
+      'both be true the layer says so and names them both.',
+    // Pipeline first, and so the one the layer opens on: it is the only view
+    // that describes the whole path, and the two simulations after it are one
+    // deployment each.
+    modes: [
+      ['cicd-pipeline', 'Pipeline'],
+      ['cicd-burst', 'Flash sale'],
+      ['cicd-cell', 'Shared cell'],
+    ],
+    groups: [['tiers', 'Tiers'], ['size', 'Size']],
+  },
+  {
     key: 'decisions',
     label: 'Decisions',
     hint: 'docs/ — the ADRs, the registers, and the authorisation spec',
@@ -380,6 +411,7 @@ export const MODE_TIPS = {
 export const layerOf = (key) => LAYERS.find((l) => l.key === key) ?? LAYERS[1];
 export const VIEWS = [
   'uiux-screens', 'uiux-boards', 'uiux-platforms',
+  'cicd-pipeline', 'cicd-burst', 'cicd-cell',
   'graph', 'structure', 'er', 'lineage', 'journey', 'screen', 'apps', 'waves',
   'states', 'events', 'data', 'migrations', 'routing', 'reader', 'decisions', 'audit',
   'timeline', 'supersession', 'register', 'decision',
