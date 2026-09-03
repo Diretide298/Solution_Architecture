@@ -17,7 +17,7 @@ and usually enough to predict what an ADR says.
 | [0002](0002-authorisation-is-user-driven-not-workstation-driven.md) | Authorisation is user-driven, not workstation-driven | Accepted | CF-03 |
 | [0003](0003-conditional-role-selection-at-login.md) | Conditional role selection at login | Accepted | CF-01 |
 | [0004](0004-single-session-per-user.md) | Single session per user | Accepted | CF-02, CF-28 |
-| [0005](0005-venue-isolation-by-partitioning-not-separate-databases.md) | Venue isolation by partitioning, not separate databases | Accepted | — |
+| [0005](0005-venue-isolation-by-partitioning-not-separate-databases.md) | Venue isolation by partitioning, not separate databases | Accepted — confirmed by 0038, **not yet implemented** | — |
 | [0006](0006-tiered-guest-app-distribution.md) | Tiered guest-app app distribution | Accepted | CF-13 |
 | [0007](0007-hybrid-repository-topology.md) | Hybrid repository topology | Accepted | — |
 | [0008](0008-money-carries-per-region-scale.md) | Money carries per-region scale | Accepted | — |
@@ -26,9 +26,9 @@ and usually enough to predict what an ADR says.
 | [0011](0011-hierarchy-is-binding.md) | The hierarchy is binding — seven levels confirmed | Accepted | **CF-34, CF-27** |
 | [0012](0012-queue-integration-adaptor-first.md) | Queue integration — adaptor-first, vendor deferred | Accepted (partial) | **CF-33** |
 | [0013](0013-local-first-point-of-sale.md) | Local-first point of sale — one read path, leases, local journal | Accepted | **CF-15** |
-| [0014](0014-cell-per-region.md) | **Cell per region** — supersedes the jurisdiction-only split | Accepted | **CF-32** |
+| [0014](0014-cell-per-region.md) | **Cell per region** — supersedes the jurisdiction-only split | **Superseded** by 0038 | **CF-32** |
 | [0016](0016-read-write-separation.md) | Read and write paths are separated, routing declared per operation | Accepted |
-| [0017](0017-deployment-models.md) | Deployment models — shared, dedicated, additional region, on-premise | Accepted |
+| [0017](0017-deployment-models.md) | Deployment models — shared, dedicated, additional region, on-premise | Accepted — amended by 0038 |
 | [0018](0018-configuration-scope.md) | Configuration scope — three levels, nearest ancestor wins, venue is the floor | Accepted |
 | [0019](0019-dynamic-bundle-pricing.md) | A dynamic bundle has a fixed price and a variable allocation | Proposed |
 | [0020](0020-ai-isolation-boundary.md) | Where AI runs, and what it is isolated from | Proposed |
@@ -38,6 +38,12 @@ and usually enough to predict what an ADR says.
 | [0024](0024-contract-first-delivery.md) | The contract is the deliverable, written before anything else | Accepted |
 | [0025](0025-one-audience-field.md) | One field says who may call an operation | Accepted |
 | [0015](0015-standards-first-device-drivers.md) | Standards-first device drivers — ESC/POS, UnifiedPOS, OSDP | Accepted | — |
+| [0038](0038-cell-is-a-region-database-per-tenant.md) | **A cell is a region, and a database per tenant inside it** | Accepted | **CF-161** |
+
+> **This table is twelve entries short.** 0026 to 0037 are on disk and were never added to it —
+> the index has not kept up since 24 August. 0038 is here because it supersedes two of the rows
+> above it, and a supersession that is not visible in the index is a superseded ADR somebody
+> still reads as current.
 
 ## Still needed
 

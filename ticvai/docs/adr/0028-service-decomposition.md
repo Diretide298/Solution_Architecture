@@ -1,6 +1,9 @@
 # ADR-0028: Sixteen services, and the data boundary decides where they split
 
-**Status:** Accepted — **the data topology is reopened (CF-161, 24 August)**
+**Status:** Accepted. **The data topology reopened by CF-161 on 24 August is settled by
+[ADR-0038](0038-cell-is-a-region-database-per-tenant.md):** the decomposition below is unchanged —
+no service spans a schema it does not own — and the 26 schemas now live once per tenant database
+rather than once per cell.
 **Date:** 24 August 2026
 **Related:** [ADR-0016](0016-read-write-separation.md) · [ADR-0020](0020-ai-isolation-boundary.md) · [ADR-0013](0013-local-first-point-of-sale.md) · [ADR-0010](0010-cross-jurisdiction-entitlements.md)
 
@@ -65,7 +68,7 @@ it.**
 | **Commerce** | Catalogue, Order, Access, Ledger | The sale path. Highest availability and write rate. |
 | **Operations** | Inventory, F&B, Retail, VenueOps | What a venue does with what it sold. Licensed per module. |
 | **Engagement** | Marketing, AI | **Nothing that takes money depends on these.** |
-| **Platform** | Control, WhiteLabel, Reporting, CrossCell | Provisioning, publishing, reporting, and the one cross-region path. |
+| **Platform** | Control, WhiteLabel, Reporting, CrossRegion | Provisioning, publishing, reporting, and the one cross-region path. |
 
 ---
 
@@ -119,7 +122,7 @@ first month of production traffic rather than for a design document.
 **Deploy order is the tier order.** Foundation first and alone — **a restart of Identity is an
 outage everywhere**, and twelve contracts read it.
 
-**Four services can be down without stopping a sale**: Marketing, AI, Reporting, CrossCell. That is
+**Four services can be down without stopping a sale**: Marketing, AI, Reporting, CrossRegion. That is
 a deliberate property and it should be tested rather than assumed.
 
 **Order autoscales and nothing else needs to.** A Saturday evening is ten times a Tuesday morning

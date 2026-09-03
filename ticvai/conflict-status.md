@@ -1,6 +1,6 @@
 # Conflict register — status index
 
-**163 conflicts raised — CF-01 to CF-160, plus CF-33a and one screen-level item.**
+**169 conflicts raised — CF-01 to CF-166, plus CF-33a and one screen-level item.**
 
 Generated from `conflicts.md`, which holds the full reasoning for each. This is the
 index: one line per conflict, so anything's state can be checked without reading the
@@ -8,17 +8,17 @@ register.
 
 | State | Count |
 |---|---|
-| OPEN — client | **5** |
+| OPEN — client | **10** |
 | OPEN — Softlabs | **1** |
-| CLOSED | **151** |
+| CLOSED | **152** |
 | WITHDRAWN | **6** |
-| **Total** | **163** |
+| **Total** | **169** |
 
 **Blocking: 0.** No conflict currently prevents contract, schema or build work.
-**6 open, 151 closed.**
+**11 open, 152 closed.**
 
 
-## Open — needs a client decision — 5
+## Open — needs a client decision — 10
 
 | ID | Issue | Owner |
 |---|---|---|
@@ -27,6 +27,11 @@ register.
 | **CF-127** | Cookie consent management is fifteen requirements, a regulatory obligation, and normally bought rather than built. 2.6.51–2.6.65 ask for a consent ban | Qossai |
 | **CF-133** | The platform cannot issue a tax invoice, and in the UAE that is a VAT obligation rather than a document feature. 5.7.93 requires tax invoices, simplif | Qossai + finance |
 | **CF-140** | The delivery plan prices 7,552 person-days and its priorities contradict the dependency order the walk found. `sources/planning/TAIS_Product_Planning_ | Chinmay + Qossai |
+| **CF-162** | Three deployment scenarios were requested and the package models one. The 24 August session asks Softlabs to document (a) independent tenant deploymen | Dinesh |
+| **CF-163** | `openDated` was missing from `ProductKind` and it is one of six main ticket types the client draws. The *Create Ticket Flow* board names Open Dated, G | Chinmay |
+| **CF-164** | The F&B, Retail, Procurement and Inventory workshop is outstanding in three consecutive MoMs and one session was filed under its name having covered n | Chinmay + Allam |
+| **CF-165** | Consent, retention and archival were walked in the 20 August CRM session and the package has consent only. `recordConsent` exists, CF-160 settled that | Allam |
+| **CF-166** | Seat map reuse and comparison — three of four gaps closed, and the fourth was never a gap. The 21 August decision reads: *"full and partial (section-l |  |
 
 ## Open — Softlabs to resolve — 1
 
@@ -34,7 +39,7 @@ register.
 |---|---|---|
 | **CF-21** | Three domains have no contract and no workshop scheduled — Developer & API (94), Device Management (60), Accreditation (58). 212 requirements, and the | Chinmay — schedule |
 
-## Closed — 151
+## Closed — 152
 
 | ID | Issue | Owner |
 |---|---|---|
@@ -188,6 +193,7 @@ register.
 | **CF-158** | Table ownership audit, 20 August — 18 tables written by more than one contract, and the honest answer is that most are correct. A contract writing ano | Chinmay |
 | **CF-159** | Food safety was absent from 947 operations, and it is a regulatory obligation rather than a feature. Found 20 August auditing the client F&B hi-fi boa | Chinmay |
 | **CF-160** | Two joins that did not exist, declared 24 August. (1) No screen said which module it belonged to. `LicencePosition.moduleKey` was a free string and `s | Chinmay |
+| **CF-161** | Database segregation per service was decided in a workshop and the package had already decided the opposite |  |
 | **P08-047** | Channel-based offline inventory pooling — "design not yet agreed" (2 Aug) |  |
 
 ## Withdrawn or absorbed — 6
@@ -205,7 +211,7 @@ register.
 
 ## Integrity
 
-- **Numbering:** CF-01 to CF-160, no gaps
+- **Numbering:** CF-01 to CF-166, no gaps
 - **Duplicates:** none
 - **Counts** are generated from the rows, so this file and the register's summary
   cannot disagree. Regenerate with `tools/build-cf-index.py` after editing.

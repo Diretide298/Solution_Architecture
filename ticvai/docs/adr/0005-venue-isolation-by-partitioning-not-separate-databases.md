@@ -1,6 +1,8 @@
 # ADR-0005: Venue isolation by partitioning, not separate databases
 
-**Status:** Accepted  
+**Status:** Accepted — **confirmed by [ADR-0038](0038-cell-is-a-region-database-per-tenant.md)**,
+which settles what *the tenant database* is. **Not yet implemented:** `backend/` contains no
+`PARTITION BY`, so `venue_id` is an ordinary column and this decision is owed its DDL.
 **Date:** 12 August 2026
 
 ## Context

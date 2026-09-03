@@ -3,7 +3,7 @@
 **Status:** Accepted
 **Date:** 13 August 2026
 **Closes:** CF-31
-**Constrains:** ADR-0001 (retired — see ADR-0014 and ADR-0017) cells · Product & Entitlement spine · Order & Payment spine · Finance & Ledger
+**Constrains:** ADR-0001 (retired — the split rule is now ADR-0038, which supersedes ADR-0014 and amends ADR-0017) cells · Product & Entitlement spine · Order & Payment spine · Finance & Ledger
 
 ---
 
@@ -67,7 +67,7 @@ buying a cross-border product. The consent record is the Article 23 basis and ca
 version of the notice shown.
 
 Withdrawing consent severs the link. Existing entitlements already redeemed are unaffected;
-un-redeemed cross-cell rights are revoked and refunded per policy.
+un-redeemed cross-region rights are revoked and refunded per policy.
 
 ### 3. Entitlements: issued once, replicated as redemption rights
 
@@ -155,7 +155,7 @@ opaque subject reference and stay intact.
 
 ### What does *not* change
 
-- Cells stay isolated. No shared database, no cross-cell query
+- Cells stay isolated. No shared database, no cross-region query
 - Orders stay atomic within a cell
 - Gate validation stays local and offline-capable
 - No PII crosses a border
