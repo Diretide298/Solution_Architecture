@@ -26,6 +26,10 @@ Everything a new person needs, and the answers to the questions they will ask se
 | `tooltips-README.md` | The shape of `tooltips.json` and how a viewer looks entries up |
 | `schema-deriver-note.md` | A defect the deriver had, kept so it is not reintroduced |
 | `schema-storage-only.md` | Tables that exist in storage and in no contract, with the reason for each |
+| **`Burst Simulator.dc.html`** | The flash sale solved rather than animated — queueing, lease contention, eleven configurations and a recommendation. Opens in a browser on its own |
+| `Shared Cell.dc.html` | The shared platform at rest, two venues to a cell |
+| `burst-model.js` | The model both pages load. Every figure on either comes from here, with the package line it was transcribed from |
+| `burst-simulator-README.md` | What the model is, where each figure comes from, what is *not* the package's, and three things to verify in it |
 
 ## The three to read first
 

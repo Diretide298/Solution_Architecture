@@ -1,0 +1,2131 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="crossorigin" />
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet" />
+<style>
+  html, body { margin: 0; padding: 0; background: #1a1a1a; }
+  body { font-family: "Plus Jakarta Sans", system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+  a { color: #48cfcb; text-decoration: none; }
+  a:hover { color: #2bb3b0; text-decoration: underline; }
+  input[type="range"] { -webkit-appearance: none; appearance: none; height: 4px; border-radius: 999px; background: #3a3a3a; outline: none; }
+  input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 14px; height: 14px; border-radius: 50%; background: #48cfcb; border: 2px solid #1a1a1a; cursor: pointer; }
+  input[type="range"]::-moz-range-thumb { width: 12px; height: 12px; border-radius: 50%; background: #48cfcb; border: 2px solid #1a1a1a; cursor: pointer; }
+  @keyframes bpulse { 0%, 100% { opacity: .35 } 50% { opacity: 1 } }
+  /* Flow along a connector. The dash pattern is set per path and the duration
+     carries the rate, so a fast sale visibly runs faster than a slow one and
+     an idle lane stops. */
+  @keyframes dashflow { to { stroke-dashoffset: -64; } }
+  @keyframes chipIn { from { opacity: 0; transform: translateY(-3px); } to { opacity: 1; transform: none; } }
+  @keyframes softGlow { 0%, 100% { opacity: .55 } 50% { opacity: 1 } }
+</style>
+</helmet>
+
+<div style="--bg:#1a1a1a;--panel:#1f1f1f;--card:#242424;--raised:#202020;--line:#3a3a3a;--div:#333333;--text:#ededed;--dim:#9a9a9a;--faint:#787878;--ac:#2bb3b0;--acb:#48cfcb;--acs:#123a3a;--acl:#2c7c7d;--amber:#d9a143;--red:#d96c63;--warm:#2b2418;--warmt:#d9bc7c;--mono:'JetBrains Mono',ui-monospace,monospace; background: var(--bg); color: var(--text); min-height: 100vh; font-size: 14px; line-height: 1.5;" onMouseOver="{{ onTipIn }}" onMouseOut="{{ onTipOut }}">
+
+  <div style="{{ tipStyle }}">{{ tip }}</div>
+
+  <header style="display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 10px 22px; background: #111111; border-bottom: 1px solid #3a3a3a; position: sticky; top: 0; z-index: 20;">
+    <div style="display: flex; align-items: center; gap: 12px;">
+      <img src="brand/adam-lockup-night.png" alt="Adam" style="height: 22px; display: block;" />
+      <span style="font-family: var(--mono); font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--faint);">burst scope</span>
+    </div>
+    <div style="display: flex; align-items: center; gap: 8px; font-size: 11.5px;">
+      <a href="Shared Cell.dc.html" style="font-family: var(--mono); font-size: 11px; color: var(--green, #7fbf8f); border: 1px solid #3a5a45; border-radius: 6px; padding: 3px 9px;">← the shared cell, at rest</a>
+      <span style="font-family: var(--mono); color: var(--faint); border: 1px solid #3a3a3a; border-radius: 6px; padding: 3px 9px;">scenario (c)</span>
+      <span style="font-family: var(--mono); color: var(--faint); border: 1px solid #3a3a3a; border-radius: 6px; padding: 3px 9px;">CF-162</span>
+      <span style="font-family: var(--mono); color: var(--faint); border: 1px solid #3a3a3a; border-radius: 6px; padding: 3px 9px;">ADR-0035</span>
+    </div>
+  </header>
+
+  <main style="max-width: 1440px; margin: 0 auto; padding: 26px 22px 80px;">
+
+    <section style="display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr); gap: 34px; align-items: end; padding-bottom: 20px; border-bottom: 1px solid var(--line);">
+      <div>
+        <p style="margin: 0 0 9px; font-family: var(--mono); font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--acb);">Deployment · a flash sale gets its own environment</p>
+        <h1 style="margin: 0; font-size: 34px; font-weight: 800; letter-spacing: -0.025em; line-height: 1.1; text-wrap: pretty;">Run the burst environment, and watch where it fails</h1>
+        <p style="margin: 12px 0 0; max-width: 62ch; font-size: 14px; line-height: 1.65; color: var(--dim); text-wrap: pretty;">A museum and a stadium are the same software and completely different machines. Steady state sizes nothing: every tier spends its day between 1 and 50 requests a second, and the entire question is the window. Sixty thousand seats over two hours is 1,045 requests a second; the same seats sold out in twenty minutes is 6,270. This page runs that window — queueing, autoscaling, lease contention, reconciliation and cost — and names every place it breaks.</p>
+      </div>
+      <div style="display: grid; gap: 7px; font-family: var(--mono); font-size: 11px; line-height: 1.6; color: var(--faint);">
+        <div data-tip="Three tiers, the client's own figures: 2,000 guests a day at a water park, 18,500 for Saturday's concert, 60,000 at a stadium sell-out. Requests a day run 41,200 / 482,850 / 2,094,000 — so the brief's ceiling of 250,000 a day is below one medium venue."><span style="color: var(--dim);">scale</span> TICVAI_Deployment_Technical · three venue tiers, 22 calls a buyer</div>
+        <div data-tip="Option 3 is billed by the hour and returned: $11.76 on Amazon, $9.76 on Google. A sixty-thousand-seat stadium selling out costs about twenty-four dollars in machinery."><span style="color: var(--dim);">cost</span> TICVAI_Hosting_Summary · $11.76/h, returned after</div>
+        <div data-tip="The shape of the environment: which services are deployed, the 34 operations on the burst path, the 42 tables they touch, and which two of those tables are contended. Regenerated by tools/derive-burst-scope.py on every refresh."><span style="color: var(--dim);">shape</span> handoff/burst-scope.json · 34 operations, 42 tables</div>
+        <div data-tip="The machines: Catalogue 20, Order 16, Identity 6, postgres-hot at 16 vCPU and 32GB with synchronous_commit off, pgbouncer at 5,000 client connections into 80 server ones."><span style="color: var(--dim);">machines</span> deploy/c-flash-sale.yml · replicas, cpu, pgbouncer</div>
+        <div data-tip="Nine states and twelve transitions. Four transitions are caused by an operation, two by time, the rest by the system — and decommissioned is reachable only through reconciled."><span style="color: var(--dim);">lifecycle</span> states/burst-environment.yaml · 9 states, 12 transitions</div>
+        <div data-tip="ADR-0031 contention and locking, ADR-0032 load shedding, ADR-0033 the outbox, ADR-0035 the burst environment itself — the 409 on teardown, the three price-divergence policies with no default, and the four cost points."><span style="color: var(--dim);">rules</span> ADR-0031 to 0035 · the 409, the policies, the cost</div>
+        <div data-tip="burst-scope.json now states the per-replica rate each floor was derived at — 400, 250 and 600 RPS — so the service times follow from the package rather than from a guess. Three numbers are still mine and are marked wherever they appear: the lease hold time, the container start time, and the p99 SLO." style="color: var(--warmt); border-top: 1px solid var(--line); padding-top: 7px; margin-top: 2px;">lease hold, start time and the SLO are mine — the package measures no latency</div>
+      </div>
+    </section>
+
+    <!-- ── the sizing calculator, before the run ────────────────────── -->
+    <section style="margin-top: 20px; border: 1px solid var(--acl); border-radius: 14px; background: var(--panel); padding: 16px 18px;">
+      <div style="display: flex; align-items: baseline; justify-content: space-between; gap: 6px 14px; flex-wrap: wrap;">
+        <h2 data-tip="The floors are worked out here rather than transcribed from a generated file. Set the inputs and the algorithm runs; at the package's own inputs it lands on the package's own answer, which is the only reason to trust it at any others. Whatever comes out is what the environment is stood up at when you run the sim." style="margin: 0; font-size: 15px; font-weight: 700; white-space: nowrap;">Calculate the sale floors</h2>
+        <code data-tip="{{ unmeasured }}" style="font-family: var(--mono); font-size: 11px; color: var(--acb); background: var(--acs); border: 1px solid var(--acl); border-radius: 6px; padding: 3px 9px;">{{ calcAlgorithm }}</code>
+      </div>
+      <p style="margin: 8px 0 14px; max-width: 96ch; font-size: 12.5px; line-height: 1.6; color: var(--dim); text-wrap: pretty;">A replica's rate and the target utilisation are the two inputs that matter, and neither is measured. Change either and the floors move — then run the sim and watch whether they hold.</p>
+
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(420px, 1fr)); gap: 20px;">
+        <div>
+          <div style="display: grid; gap: 12px;">
+            <sc-for list="{{ calcKnobs }}" as="k" hint-placeholder-count="5">
+              <div data-tip="{{ k.note }}" style="display: grid; grid-template-columns: 128px minmax(0, 1fr) 92px; gap: 12px; align-items: center;">
+                <span style="font-size: 11.5px; font-weight: 600; color: var(--dim);">{{ k.label }}<span style="{{ k.mineStyle }}">mine</span></span>
+                <input type="range" min="{{ k.min }}" max="{{ k.max }}" step="{{ k.step }}" value="{{ k.value }}" onInput="{{ k.on }}" style="width: 100%;" />
+                <span style="display: flex; align-items: baseline; gap: 3px; justify-content: flex-end;">
+                  <input type="number" min="{{ k.min }}" max="{{ k.max }}" step="{{ k.step }}" value="{{ k.value }}" onChange="{{ k.onType }}" style="width: 56px; background: var(--card); border: 1px solid var(--line); border-radius: 5px; color: var(--text); font-family: var(--mono); font-size: 11.5px; font-variant-numeric: tabular-nums; text-align: right; padding: 2px 4px;" />
+                  <span style="font-family: var(--mono); font-size: 9.5px; color: var(--faint);">{{ k.unit }}</span>
+                </span>
+              </div>
+            </sc-for>
+            <div data-tip="Target utilisation is the same knob the run uses, because it is the same number: what you hold a replica at when you size it is what you hold it at when it serves." style="display: grid; grid-template-columns: 128px minmax(0, 1fr) 92px; gap: 12px; align-items: center; border-top: 1px solid var(--div); padding-top: 12px;">
+              <span style="font-size: 11.5px; font-weight: 600; color: var(--dim);">target utilisation</span>
+              <input type="range" min="30" max="95" step="1" value="{{ thrValue }}" onInput="{{ thrOn }}" style="width: 100%;" />
+              <span style="font-family: var(--mono); font-size: 11.5px; text-align: right; color: var(--text);">{{ thrLabel }}</span>
+            </div>
+          </div>
+          <p style="margin: 14px 0 0; {{ calcCheckStyle }}">{{ calcCheck }}</p>
+          <p data-tip="{{ calcConflict }}" style="margin: 7px 0 0; font-family: var(--mono); font-size: 10px; line-height: 1.5; color: var(--faint); cursor: help;">two generated files disagree about these three numbers — hover</p>
+        </div>
+
+        <div>
+          <div style="display: grid; grid-template-columns: 72px 40px 58px 78px 44px 50px 38px 50px 54px; gap: 8px; padding-bottom: 6px; font-family: var(--mono); font-size: 9px; letter-spacing: .05em; text-transform: uppercase; color: var(--faint); border-bottom: 1px solid var(--line);">
+            <span>cluster</span><span>share</span><span>rps in</span><span>a replica</span><span>usable</span><span>implied</span><span>floor</span><span style="text-align: right;">stood at</span><span style="text-align: right;">driven by</span>
+          </div>
+          <sc-for list="{{ calcRows }}" as="r" hint-placeholder-count="3">
+            <div data-tip="{{ r.tip }}" style="{{ r.rowStyle }}">
+              <span style="color: var(--text); font-weight: 500;">{{ r.short }}</span>
+              <span>{{ r.share }}</span>
+              <span>{{ r.rpsAtLoad }}</span>
+              <span style="color: var(--faint);">{{ r.per }}</span>
+              <span>{{ r.capacity }}</span>
+              <span>{{ r.implied }}</span>
+              <span style="color: var(--faint);">{{ r.floor }}</span>
+              <span style="text-align: right; font-size: 12px; color: var(--acb);">{{ r.n }}</span>
+              <span style="{{ r.drivenStyle }}">{{ r.drivenBy }}</span>
+            </div>
+          </sc-for>
+          <div style="display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin-top: 12px; padding: 11px 13px; border: 1px solid var(--acl); border-radius: 9px; background: var(--acs);">
+            <span style="font-size: 12px; font-weight: 700; color: var(--acb);">stood up at</span>
+            <span style="font-family: var(--mono); font-size: 15px; color: var(--acb); white-space: nowrap;">{{ calcTotal }}</span>
+          </div>
+          <p style="margin: 8px 0 0; font-family: var(--mono); font-size: 10px; line-height: 1.5; color: var(--faint);">{{ calcPeakTotal }} — the run scales past the floor when its own peak is above the load these were sized for.</p>
+          <p data-tip="The algorithm has two terms and either can win. Catalogue and Order are driven by load — their shares are large enough that the arithmetic asks for more than the floor. Identity is 1.8% of the mix, so at any realistic load the arithmetic asks for one, and one replica is no redundancy at all: the survivability floor decides it instead. It is 1.8% of the weighted load and mandatory anyway, because nothing sells without authentication." style="margin: 9px 0 0; font-size: 11.5px; line-height: 1.55; color: var(--dim); text-wrap: pretty;">{{ drivenNote }}</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── the stage ─────────────────────────────────────────────────── -->
+    <section style="margin-top: 22px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); overflow: hidden;">
+
+      <div data-tip="The nine states of states/burst-environment.yaml, in order. The lit one is where the environment is now; hover any of them for the guard on the way in. decommissioned is reachable only through reconciled." style="display: flex; align-items: stretch; border-bottom: 1px solid var(--line); background: var(--raised); overflow: auto hidden;">
+        <sc-for list="{{ rail }}" as="st" hint-placeholder-count="9">
+          <div data-tip="{{ st.tip }}" style="{{ st.style }}">
+            <span style="font-family: var(--mono); font-size: 8.5px; letter-spacing: .09em; text-transform: uppercase; opacity: .5;">{{ st.n }}</span>
+            <span style="font-size: 11px; font-weight: 700;">{{ st.name }}</span>
+            <span style="font-family: var(--mono); font-size: 8.5px; opacity: .55;">{{ st.at }}</span>
+          </div>
+        </sc-for>
+      </div>
+
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(118px, 1fr)); border-bottom: 1px solid var(--line);">
+        <sc-for list="{{ reads }}" as="r" hint-placeholder-count="7">
+          <div data-tip="{{ r.tip }}" style="{{ r.style }}">
+            <div style="font-family: var(--mono); font-size: 16px; font-weight: 500; font-variant-numeric: tabular-nums; line-height: 1.1;">{{ r.v }}</div>
+            <div style="margin-top: 1px; font-size: 10px; font-weight: 600; color: var(--dim);">{{ r.k }}</div>
+            <div style="{{ r.noteStyle }}">{{ r.n }}</div>
+          </div>
+        </sc-for>
+      </div>
+
+      <div data-bd-stage="1" style="overflow: hidden; height: calc(986px * var(--bd-k, 1)); background: radial-gradient(110% 85% at 46% 42%, #1e2528 0%, #1a1a1a 60%, #171717 100%); {{ stageVars }}">
+        <div style="position: relative; width: 1380px; height: 986px; transform: scale(var(--bd-k, 1)); transform-origin: top left;">
+
+          <svg viewBox="0 0 1380 986" style="position: absolute; inset: 0; width: 1380px; height: 986px; pointer-events: none;" aria-hidden="true">
+            <defs>
+              <marker id="ah" viewBox="0 0 8 8" refX="6" refY="4" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#2c7c7d"></path></marker>
+              <marker id="ahw" viewBox="0 0 8 8" refX="6" refY="4" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#d9a143"></path></marker>
+              <marker id="ahr" viewBox="0 0 8 8" refX="6" refY="4" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#d96c63"></path></marker>
+            </defs>
+            <path d="M212,286 C232,286 236,302 254,302" fill="none" marker-end="url(#ah)" style="{{ dg.flowIn }}"></path>
+            <path d="M364,250 C392,250 396,190 422,190" fill="none" marker-end="url(#ah)" style="{{ dg.flowIn }}"></path>
+            <path d="M364,330 C392,330 396,344 422,344" fill="none" marker-end="url(#ah)" style="{{ dg.flowIn }}"></path>
+            <path d="M364,420 C392,420 396,498 422,498" fill="none" marker-end="url(#ah)" style="{{ dg.flowIn }}"></path>
+            <path d="M642,190 C672,190 676,278 702,278" fill="none" marker-end="url(#ah)" style="{{ dg.flowMid }}"></path>
+            <path d="M642,344 C672,344 676,310 702,310" fill="none" marker-end="url(#ah)" style="{{ dg.flowMid }}"></path>
+            <path d="M642,498 C672,498 676,342 702,342" fill="none" marker-end="url(#ah)" style="{{ dg.flowMid }}"></path>
+            <path d="M888,272 C914,272 918,214 944,214" fill="none" marker-end="url(#ah)" style="{{ dg.flowDb }}"></path>
+            <path d="M888,340 C912,340 906,474 792,474" fill="none" marker-end="url(#ah)" style="{{ dg.flowCache }}"></path>
+            <path d="M1046,312 L1046,338" fill="none" marker-end="url(#ahr)" style="{{ dg.flowLock }}"></path>
+            <path d="M1148,210 C1176,210 1180,116 1214,116" fill="none" marker-end="url(#ahw)" style="{{ dg.flowMerge }}"></path>
+            <rect x="1214" y="98" width="150" height="470" rx="14" fill="#1f1f1f" stroke="#3a3a3a" stroke-dasharray="6 5"></rect>
+
+            <!-- the normal path: concurrent, and it never enters the environment -->
+            <path d="M262,866 C700,866 900,866 1289,866 L1289,576" fill="none" marker-end="url(#ahg)" style="{{ dg.flowNormal }}"></path>
+            <!-- the three clusters pair onto one pooler, one primary, one cache -->
+            <path d="M440,570 L440,592 L620,592 L620,570" fill="none" stroke="#3a3a3a" stroke-width="1"></path>
+            <path d="M530,592 L530,612" fill="none" stroke="#3a3a3a" stroke-width="1"></path>
+            <marker id="ahg" viewBox="0 0 8 8" refX="6" refY="4" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#787878"></path></marker>
+          </svg>
+
+          <!-- what the environment is doing right now -->
+          <div style="position: absolute; left: 422px; top: 44px; width: 700px; display: flex; gap: 7px; flex-wrap: wrap;">
+            <sc-for list="{{ dg.states }}" as="st" hint-placeholder-count="1">
+              <span data-tip="{{ st.tip }}" style="{{ st.style }}">{{ st.label }}</span>
+            </sc-for>
+          </div>
+
+          <!-- demand -->
+          <div data-tip="Buyers arriving per second, and the request rate that follows. In a free run this is the slider you hold; in a scenario it is the venue's demand compressed into the sale window." style="position: absolute; left: 28px; top: 236px; width: 184px; height: 100px; box-sizing: border-box; background: #242424; border-radius: 12px; padding: 12px 16px; border: 1px solid {{ dg.liveStroke }}; transition: border-color .4s ease;">
+            <div style="font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 9px; letter-spacing: .12em; color: #787878;">ARRIVING</div>
+            <div style="font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 34px; font-weight: 500; line-height: 1.2; color: #ededed; margin-top: 4px;">{{ dg.buyers }}</div>
+            <div style="font-size: 11px; color: #9a9a9a;">buyers a second</div>
+          </div>
+          <div data-tip="A buyer costs 22 calls on the figure the deployment document uses, but only 48 of the package's 55 land on the three services deployed here. The other seven — Tenancy 2, Retail 2, Marketing 2, Access 1 — are on the burst path and answered by the permanent platform's shared cell rather than replicated into the environment. Offered and served are both counted on the environment's basis." style="position: absolute; left: 28px; top: 342px; width: 184px; font-size: 10.5px; line-height: 1.5; color: #9a9a9a; text-align: center;">× {{ dg.envCalls }} calls reach here<br /><span style="color: #787878;">= {{ dg.offered }} requests a second</span><br /><span style="color: #787878; font-size: 9.5px;">{{ dg.sharedNote }}</span></div>
+
+          <!-- the waiting queue -->
+          <div data-tip="The overflow above the ceilings you set is not refused, it waits here, drained by whatever spare capacity the clusters have. Bounded on purpose: a guest waiting in a queue does not know whether they have a ticket, so past the maximum wait they are gone — and that abandonment is the only thing counted as lost." style="position: absolute; left: 254px; top: 188px; width: 110px; height: 272px; box-sizing: border-box; background: #1f1f1f; border: 1px solid #3a3a3a; border-radius: 14px; overflow: hidden;">
+            <span style="{{ dg.queueStyle }}"></span>
+            <div style="position: relative; text-align: center; padding-top: 92px;">
+              <div style="font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 28px; font-weight: 500; color: #ededed;">{{ dg.queued }}</div>
+              <div style="font-size: 10.5px; color: #9a9a9a; margin-top: 2px;">{{ dg.wait }}</div>
+            </div>
+          </div>
+          <div style="position: absolute; left: 254px; top: 164px; width: 110px; font-size: 10.5px; line-height: 1.45; color: #9a9a9a; text-align: center; font-size: 14px; font-weight: 700; color: #ededed;">waiting queue</div>
+          <div style="position: absolute; left: 234px; top: 506px; width: 150px; font-size: 10px; line-height: 1.45; text-align: center;"><span style="color: {{ dg.abandonFill }};">{{ dg.abandon }}</span></div>
+          <div style="position: absolute; left: 254px; top: 470px; width: 110px; font-size: 9.5px; line-height: 1.4; color: #787878; text-align: center;">FIFO — drained by spare capacity</div>
+
+          <!-- the three clusters -->
+          <div style="position: absolute; left: 422px; top: 92px; width: 500px; font-size: 10.5px; line-height: 1.45; color: #9a9a9a; font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 9px; letter-spacing: .1em; color: #787878;">FLOOR IS THE EXPECTED PEAK · 14 / 8 / 2 AT 5,000 RPS · NO MAXIMUM</div>
+
+          <div style="position: absolute; left: 422px; top: 118px; width: 478px; display: grid; gap: 14px; align-content: start; justify-items: start;">
+          <div style="width: 216px; display: grid; grid-template-columns: minmax(0, 1fr); gap: 12px; align-content: start;">
+        <div data-tip="{{ dg.g0.tip }}" style="box-sizing: border-box; width: 100%; min-width: 0; overflow: hidden; background: #242424; border-radius: 12px; padding: 12px 16px; border: 1px solid {{ dg.g0.stroke }}; transition: border-color .35s ease, background-color .35s ease, box-shadow .35s ease;">
+          <div style="display: flex; align-items: baseline; justify-content: space-between; gap: 8px;">
+            <span style="font-size: 14.5px; font-weight: 700; color: #ededed; white-space: nowrap; flex: 0 0 auto;">{{ dg.g0.name }}</span>
+            <span style="font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 10px; line-height: 1.45; color: #787878; text-align: right; min-width: 0; flex: 0 1 auto;">{{ dg.g0.floor }}<br />{{ dg.g0.ceiling }}<br /><span style="color: #48cfcb;">{{ dg.g0.stoodUpAt }}</span></span>
+          </div>
+          <div style="display: flex; align-items: baseline; justify-content: space-between; gap: 8px; margin-top: 5px;">
+            <span style="font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 25px; font-weight: 500; line-height: 1; color: {{ dg.g0.rhoFill }};">{{ dg.g0.n }}</span>
+            <span style="text-align: right; white-space: nowrap;">
+              <span style="font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 10px; color: #9a9a9a; display: block;">{{ dg.g0.lambda }}</span>
+              <span style="font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 10px; color: #787878; display: block;">{{ dg.g0.p99 }}</span>
+            </span>
+          </div>
+          <div style="display: flex; align-items: center; gap: 1.6px; margin-top: 8px; height: 9px; font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 9px; color: #d9a143;">
+            <sc-for list="{{ dg.g0.dots }}" as="d" hint-placeholder-count="12">
+              <span style="{{ d.style }}"></span>
+            </sc-for><span>{{ dg.g0.pending }}</span>
+          </div>
+          <div style="display: flex; align-items: center; gap: 8px; margin-top: 8px;">
+            <span style="flex: 1 1 auto; height: 4px; border-radius: 2px; background: #2e2e2e; display: block; overflow: hidden;"><span style="{{ dg.g0.rhoStyle }}"></span></span>
+            <span style="font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 11.5px; color: #9a9a9a; white-space: nowrap;">{{ dg.g0.rho }}</span>
+          </div>
+        </div>
+
+        <div data-tip="{{ dg.g1.tip }}" style="box-sizing: border-box; width: 100%; min-width: 0; overflow: hidden; background: #242424; border-radius: 12px; padding: 12px 16px; border: 1px solid {{ dg.g1.stroke }}; transition: border-color .35s ease, background-color .35s ease, box-shadow .35s ease;">
+          <div style="display: flex; align-items: baseline; justify-content: space-between; gap: 8px;">
+            <span style="font-size: 14.5px; font-weight: 700; color: #ededed; white-space: nowrap; flex: 0 0 auto;">{{ dg.g1.name }}</span>
+            <span style="font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 10px; line-height: 1.45; color: #787878; text-align: right; min-width: 0; flex: 0 1 auto;">{{ dg.g1.floor }}<br />{{ dg.g1.ceiling }}<br /><span style="color: #48cfcb;">{{ dg.g1.stoodUpAt }}</span></span>
+          </div>
+          <div style="display: flex; align-items: baseline; justify-content: space-between; gap: 8px; margin-top: 5px;">
+            <span style="font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 25px; font-weight: 500; line-height: 1; color: {{ dg.g1.rhoFill }};">{{ dg.g1.n }}</span>
+            <span style="text-align: right; white-space: nowrap;">
+              <span style="font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 10px; color: #9a9a9a; display: block;">{{ dg.g1.lambda }}</span>
+              <span style="font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 10px; color: #787878; display: block;">{{ dg.g1.p99 }}</span>
+            </span>
+          </div>
+          <div style="display: flex; align-items: center; gap: 1.6px; margin-top: 8px; height: 9px; font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 9px; color: #d9a143;">
+            <sc-for list="{{ dg.g1.dots }}" as="d" hint-placeholder-count="12">
+              <span style="{{ d.style }}"></span>
+            </sc-for><span>{{ dg.g1.pending }}</span>
+          </div>
+          <div style="display: flex; align-items: center; gap: 8px; margin-top: 8px;">
+            <span style="flex: 1 1 auto; height: 4px; border-radius: 2px; background: #2e2e2e; display: block; overflow: hidden;"><span style="{{ dg.g1.rhoStyle }}"></span></span>
+            <span style="font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 11.5px; color: #9a9a9a; white-space: nowrap;">{{ dg.g1.rho }}</span>
+          </div>
+        </div>
+
+        <div data-tip="{{ dg.g2.tip }}" style="box-sizing: border-box; width: 100%; min-width: 0; overflow: hidden; background: #242424; border-radius: 12px; padding: 12px 16px; border: 1px solid {{ dg.g2.stroke }}; transition: border-color .35s ease, background-color .35s ease, box-shadow .35s ease;">
+          <div style="display: flex; align-items: baseline; justify-content: space-between; gap: 8px;">
+            <span style="font-size: 14.5px; font-weight: 700; color: #ededed; white-space: nowrap; flex: 0 0 auto;">{{ dg.g2.name }}</span>
+            <span style="font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 10px; line-height: 1.45; color: #787878; text-align: right; min-width: 0; flex: 0 1 auto;">{{ dg.g2.floor }}<br />{{ dg.g2.ceiling }}<br /><span style="color: #48cfcb;">{{ dg.g2.stoodUpAt }}</span></span>
+          </div>
+          <div style="display: flex; align-items: baseline; justify-content: space-between; gap: 8px; margin-top: 5px;">
+            <span style="font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 25px; font-weight: 500; line-height: 1; color: {{ dg.g2.rhoFill }};">{{ dg.g2.n }}</span>
+            <span style="text-align: right; white-space: nowrap;">
+              <span style="font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 10px; color: #9a9a9a; display: block;">{{ dg.g2.lambda }}</span>
+              <span style="font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 10px; color: #787878; display: block;">{{ dg.g2.p99 }}</span>
+            </span>
+          </div>
+          <div style="display: flex; align-items: center; gap: 1.6px; margin-top: 8px; height: 9px; font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 9px; color: #d9a143;">
+            <sc-for list="{{ dg.g2.dots }}" as="d" hint-placeholder-count="12">
+              <span style="{{ d.style }}"></span>
+            </sc-for><span>{{ dg.g2.pending }}</span>
+          </div>
+          <div style="display: flex; align-items: center; gap: 8px; margin-top: 8px;">
+            <span style="flex: 1 1 auto; height: 4px; border-radius: 2px; background: #2e2e2e; display: block; overflow: hidden;"><span style="{{ dg.g2.rhoStyle }}"></span></span>
+            <span style="font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 11.5px; color: #9a9a9a; white-space: nowrap;">{{ dg.g2.rho }}</span>
+              </div>
+            </div>
+          </div>
+
+
+          <div data-tip="{{ dg.pairTip }}" style="width: 478px; box-sizing: border-box; background: #242424; border: 1px solid #3a3a3a; border-radius: 12px; padding: 12px 16px;">
+            <div style="display: flex; align-items: baseline; justify-content: space-between; gap: 6px 14px; flex-wrap: wrap;">
+              <span style="font-size: 14px; font-weight: 700; color: #ededed; white-space: nowrap;">server instances</span>
+              <span style="font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 9px; color: #787878; white-space: nowrap;">one container a replica · one pooler for all three</span>
+            </div>
+            <div style="display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap;">
+              <sc-for list="{{ dg.instances }}" as="ins" hint-placeholder-count="3">
+                <span style="border: 1px solid #333; border-radius: 7px; padding: 5px 9px; font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 10px; color: #9a9a9a; white-space: nowrap;"><span style="color: #ededed;">{{ ins.label }}</span> · {{ ins.spec }}</span>
+              </sc-for>
+              <span style="border: 1px solid #2c7c7d; border-radius: 7px; padding: 5px 9px; font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 10px; color: #48cfcb; white-space: nowrap;">{{ dg.footprintN }} · {{ dg.footprint }}</span>
+            </div>
+          </div>
+          </div>
+
+          <div data-tip="Each replica holds a pool of 40 connections to pgbouncer, which is why the pooler matters: the three clusters at their floors are 560 + 320 + 120 client connections against MAX_CLIENT_CONN 5,000, collapsed to 80 server connections against the primary." style="position: absolute; left: 650px; top: 228px; width: 54px; font-size: 8.5px; line-height: 1.45; color: #9a9a9a; text-align: center;">40 conns<br />a replica</div>
+
+          <!-- pgbouncer, the join -->
+          <div data-tip="Transaction pooling, and it is not optional: twenty Catalogue replicas at forty connections each is eight hundred against a primary that will not want them. Without the pooler the tier stops scaling around six replicas and the bottleneck looks like the database when it is the pool. MAX_CLIENT_CONN 5,000, DEFAULT_POOL_SIZE 80." style="position: absolute; left: 706px; top: 214px; width: 182px; height: 190px; box-sizing: border-box; background: #1c2a2a; border: 1.5px solid #2c7c7d; border-radius: 16px; padding: 14px 16px; text-align: center;">
+            <div style="font-size: 17px; font-weight: 700; color: #ededed;">pgbouncer</div>
+            <div style="font-size: 10.5px; color: #9a9a9a; margin-top: 2px;">transaction pooling</div>
+            <div style="font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 26px; font-weight: 500; color: #ededed; margin-top: 12px;">{{ dg.conns }}</div>
+            <div style="font-size: 10px; color: #787878;">{{ dg.connOf }}</div>
+            <span style="display: block; height: 5px; border-radius: 3px; background: #2e2e2e; margin: 9px 0 10px; overflow: hidden;"><span style="{{ dg.connStyle }}"></span></span>
+            <div style="font-size: 10.5px; color: #9a9a9a;">{{ dg.poolInto }}</div>
+          </div>
+          <div style="position: absolute; left: 706px; top: 190px; width: 182px; font-size: 10.5px; line-height: 1.45; color: #9a9a9a; text-align: center; font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 9px; letter-spacing: .12em; color: #48cfcb;">THE JOIN</div>
+
+          <!-- postgres-hot -->
+          <div data-tip="One primary, 16 vCPU and 32GB, max_connections 800 — and synchronous_commit off, which is a decision and not a setting: a crash loses the last few milliseconds of commits, worth trading for fifty seconds of throughput and a data-loss bug if it is copied from a tuning guide. Its ceiling here is the pooler's 80 server connections divided by the mean statement time, which is mine." style="position: absolute; left: 946px; top: 120px; width: 202px; box-sizing: border-box; background: #242424; border-radius: 12px; padding: 12px 16px; border: 1px solid {{ dg.dbFill }}; transition: border-color .4s ease;">
+            <div style="font-size: 15px; font-weight: 700; color: #ededed;">postgres-hot</div>
+            <div style="font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 10.5px; color: #787878; margin-top: 3px;">16 vCPU · 32 GB · max_connections 800</div>
+            <div style="display: flex; align-items: baseline; justify-content: space-between; margin-top: 11px;">
+              <span style="font-size: 12px; color: #9a9a9a;">read</span>
+              <span style="font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 12px; color: #ededed;">{{ dg.readRps }}/s</span>
+            </div>
+            <span style="display: block; height: 5px; border-radius: 3px; background: #2e2e2e; margin-top: 4px; overflow: hidden;"><span style="{{ dg.readStyle }}"></span></span>
+            <div style="display: flex; align-items: baseline; justify-content: space-between; margin-top: 9px;">
+              <span style="font-size: 12px; color: #9a9a9a;">write</span>
+              <span style="font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 12px; color: #ededed;">{{ dg.writeRps }}/s</span>
+            </div>
+            <span style="display: block; height: 5px; border-radius: 3px; background: #2e2e2e; margin-top: 4px; overflow: hidden;"><span style="{{ dg.writeStyle }}"></span></span>
+            <div style="font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 10px; color: #787878; margin-top: 10px;">{{ dg.dbLimit }}</div>
+            <div style="font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 9px; color: #d9bc7c; margin-top: 3px;">synchronous_commit = off</div>
+            <div style="font-size: 9.5px; color: #d9a143; margin-top: 3px;">{{ dg.batchNote }}</div>
+          </div>
+          <div style="position: absolute; left: 1052px; top: 324px; width: 156px; font-size: 10px; line-height: 1.4; color: #d96c63;">and here it serialises</div>
+
+          <!-- the two contended rows -->
+          <div data-tip="Every buyer wants the same rows. acquireInventoryHold takes FOR UPDATE SKIP LOCKED and createSeatHold takes FOR UPDATE, so the lease path serialises: the ceiling is one over the lease hold time however many replicas are running. ADR-0035 calls this the number to load-test before anything else, because it is a property of the contention model rather than of instance size." style="position: absolute; left: 946px; top: 348px; width: 202px;  box-sizing: border-box; background: #242424; border-radius: 12px; padding: 12px 16px; border: 1px solid #d96c63;">
+            <div style="display: grid; gap: 2px;">
+              <span style="font-size: 14px; font-weight: 700; color: #ededed; white-space: nowrap;">the rows it converges on</span>
+              <span style="font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 9px; color: #d96c63;">{{ dg.rowsHead }}</span>
+            </div>
+            <div style="display: grid; gap: 1px; margin-top: 9px;">
+              <sc-for list="{{ dg.rows }}" as="rw" hint-placeholder-count="7">
+                <div data-tip="{{ rw.tip }}" style="display: grid; gap: 2px; padding: 4px 0;">
+                  <div style="display: grid; gap: 1px; min-width: 0;">
+                    <span style="{{ rw.nameStyle }}">{{ rw.table }}</span>
+                    <span style="{{ rw.flagStyle }}">{{ rw.flag }}</span>
+                  </div>
+                  <span style="display: flex; height: 5px; border-radius: 3px; background: #2e2e2e; overflow: hidden;"><span style="{{ rw.servedStyle }}"></span><span style="{{ rw.refusedStyle }}"></span></span>
+                  <div style="display: flex; justify-content: space-between; gap: 6px; font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 9.5px; color: #787878;">
+                    <span>{{ rw.line }}</span><span>{{ rw.pct }}</span>
+                  </div>
+                </div>
+              </sc-for>
+            </div>
+            <button type="button" onClick="{{ dg.rowsToggle }}" data-tip="Seven rows a purchase converges on. Collapsed to the three under most pressure, because the diagram has to fit on a screen." style="margin-top: 6px; border: 1px solid #333; background: transparent; color: #787878; border-radius: 6px; padding: 3px 8px; font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 8.5px; cursor: pointer; width: 100%;">{{ dg.rowsToggleLabel }}</button>
+            <div style="font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 9px; color: #787878; margin-top: 10px;">{{ dg.holdCapNote }}</div>
+            <div style="font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 9px; margin-top: 3px; color: {{ dg.lockFill }};">{{ dg.lockNote }}</div>
+            <div style="font-size: 10px; margin-top: 3px; color: {{ dg.shardFill }};">{{ dg.shardNote }}</div>
+          </div>
+
+          <!-- redis -->
+          <div data-tip="4 vCPU and 16GB. The session registry — ADR-0004 makes a session a token with a validity window rather than a row — and the cache the warming phase fills, because an environment that goes live cold serves its first thousand guests from an empty cache." style="position: absolute; left: 702px; top: 440px; width: 182px; box-sizing: border-box; background: #242424; border-radius: 12px; padding: 12px 16px; border: 1px solid #3a3a3a;">
+            <div style="font-size: 15px; font-weight: 700; color: #ededed;">redis</div>
+            <div style="font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 10.5px; color: #787878; margin-top: 3px;">4 vCPU · 16 GB</div>
+            <div style="font-size: 10.5px; margin-top: 5px; color: {{ dg.cacheFill }};">{{ dg.cacheNote }}</div>
+          </div>
+
+          <!-- the merge back -->
+          <div style="position: absolute; left: 1128px; top: 72px; width: 80px; font-size: 10px; line-height: 1.4; color: #d9a143; text-align: center;">reconciliation</div>
+                  <!-- the permanent platform -->
+          <section data-om-panel="permanent" data-tip="Where the data actually lives — scenario (b), one cell per jurisdiction holding many tenants. The burst environment is a place data passes through rather than a place it lives, which is the whole of ADR-0035: it carries a lifecycle the other cell kinds do not and a reconciliation obligation they do not. decommissioned is reachable only through reconciled." style="position: absolute; left: 1214px; top: 98px; width: 150px; box-sizing: border-box; padding: 30px 18px; text-align: center;">
+              <div style="font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 9px; letter-spacing: .1em; color: #787878;">SCENARIO (b)</div>
+              <div style="font-size: 10px; color: #787878; margin-top: 4px;">where the data lives</div>
+              <div style="font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 26px; font-weight: 500; color: #ededed; margin-top: 38px;">{{ dg.orders }}</div>
+              <div style="font-size: 10px; color: #9a9a9a; margin-top: 2px;">orders held in the burst</div>
+              <span style="display: block; height: 5px; border-radius: 3px; background: #2e2e2e; margin: 12px 0 8px; overflow: hidden;"><span style="{{ dg.replayStyle }}"></span></span>
+              <div style="font-size: 10px; color: #9a9a9a;">{{ dg.replayed }}</div>
+              <div style="font-size: 10px; color: #787878; margin-top: 2px;">{{ dg.rejected }}</div>
+              <div style="font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 9px; color: #787878; margin-top: 40px; line-height: 1.7;">{{ dg.permLines }}</div>
+            <div style="font-size: 10.5px; color: #48cfcb; margin-top: 34px; line-height: 1.5;">and only once every order has landed here may it be torn down</div>
+          </section>
+
+          <div style="position: absolute; left: 1214px; top: 72px; width: 150px; font-size: 10.5px; line-height: 1.45; color: #9a9a9a; text-align: center; font-size: 12.5px; font-weight: 700; color: #ededed;">the permanent platform</div>
+          <div style="position: absolute; left: 1152px; top: 590px; width: 226px; font-size: 10.5px; line-height: 1.45; color: #9a9a9a; font-size: 10px; color: #787878;">a monotonic sequence, idempotent replay, and sync.rejection for what will not apply</div>
+
+          <!-- the normal path — the other system, running at the same time.
+               Node and captions share one flow container so the node can grow
+               without walking over the text below it. -->
+          <div style="position: absolute; left: 28px; top: 776px; width: 1330px; display: flex; align-items: flex-start; gap: 22px;">
+            <div data-tip="{{ dg.routineTip }}" style="flex: 0 0 228px; box-sizing: border-box; background: #1f1f1f; border: 1px dashed #3a3a3a; border-radius: 12px; padding: 12px 16px;">
+              <div style="font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 9px; letter-spacing: .12em; color: #787878;">THE OTHER PATH</div>
+              <div style="font-size: 14px; font-weight: 700; color: #9a9a9a; margin-top: 5px;">routine Saturday traffic</div>
+              <div style="font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 25px; font-weight: 500; color: #9a9a9a; margin-top: 7px;">{{ dg.routineRps }}</div>
+              <div style="font-size: 10px; color: #787878;">requests a second · {{ dg.routineCell }}</div>
+              <div style="display: flex; gap: 2px; margin-top: 9px;">
+                <sc-for list="{{ dg.routineDots }}" as="d" hint-placeholder-count="16">
+                  <span style="{{ d.style }}"></span>
+                </sc-for>
+              </div>
+              <div style="font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 9px; color: #9a9a9a; margin-top: 6px;">{{ dg.routineReplicas }}</div>
+              <div style="font-size: 9.5px; color: #48cfcb; margin-top: 4px;">{{ dg.routineAlways }}</div>
+            </div>
+            <div style="flex: 1 1 auto; display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 26px; padding-top: 46px;">
+              <p style="margin: 0; font-size: 10.5px; line-height: 1.55; color: #787878;">Admission, food, retail, stock, back-office, reporting — <span style="color: #9a9a9a;">16 services, 998 operations, 373 tables</span>, all of it in the shared cell and none of it in this environment. It runs whether or not a sale is happening, so <span style="color: #9a9a9a;">the sale figures above do not include it</span>.</p>
+              <p style="margin: 0; font-size: 10.5px; line-height: 1.55; color: #787878; text-align: right;">The two paths meet once, afterwards, at <span style="color: #d9a143;">reconcileBurstEnvironment</span> — the single point they touch.</p>
+            </div>
+          </div>
+
+          <!-- the guard -->
+          <div style="position: absolute; left: 28px; top: 552px; width: 372px; font-size: 10.5px; line-height: 1.45; color: #9a9a9a; "><span style="font-size: 11px; font-weight: 700; color: #9a9a9a;">next transition</span><br /><span style="color: #787878;">{{ guardShort }}</span></div>
+        </div>
+      </div>
+
+      <!-- ── transport ─────────────────────────────────────────────────── -->
+      <div style="border-top: 1px solid var(--line); background: var(--raised); padding: 8px 20px 10px;">
+        <div style="display: flex; align-items: center; gap: 7px; flex-wrap: wrap;">
+          <button type="button" onClick="{{ toggle }}" style="{{ playStyle }}">{{ playLabel }}</button>
+          <button type="button" onClick="{{ restart }}" data-tip="Back to the beginning. In a free run this throws the environment away and starts again at requested." style="border: 1px solid var(--line); background: var(--card); color: var(--dim); border-radius: 8px; padding: 7px 12px; font-family: inherit; font-size: 11.5px; cursor: pointer;">{{ restartLabel }}</button>
+          <div style="display: flex; gap: 3px; border: 1px solid var(--line); border-radius: 8px; padding: 2px; background: var(--card);">
+            <sc-for list="{{ speeds }}" as="sp" hint-placeholder-count="4">
+              <button type="button" onClick="{{ sp.on }}" style="{{ sp.style }}">{{ sp.label }}</button>
+            </sc-for>
+          </div>
+          <button type="button" onClick="{{ fitOn }}" data-tip="Scales the picture so the lifecycle rail, the readouts, the diagram and this transport share one screen. Turn it off for the canvas at full size, which scrolls." style="{{ fitStyle }}">{{ fitLabel }}</button>
+          <button type="button" onClick="{{ prevPhase }}" style="{{ prevStyle }}">◀ phase</button>
+          <button type="button" onClick="{{ nextPhase }}" data-tip="{{ nextTip }}" style="border: 1px solid var(--line); background: var(--card); color: var(--dim); border-radius: 8px; padding: 7px 11px; font-family: var(--mono); font-size: 11px; cursor: pointer;">{{ nextLabel }}</button>
+          <span style="font-family: var(--mono); font-size: 12px; font-variant-numeric: tabular-nums; color: var(--text); margin-left: 4px;">{{ clockLabel }}</span>
+          <span style="font-family: var(--mono); font-size: 10.5px; color: var(--acb);">{{ waitingFor }}</span>
+          <span style="font-family: var(--mono); font-size: 10.5px; color: var(--faint); white-space: nowrap;">{{ speedNote }}</span>
+        </div>
+
+        <div data-tip="{{ trackTip }}" style="position: relative; margin-top: 8px; height: 30px; border: 1px solid var(--line); border-radius: 8px; background: var(--card); overflow: hidden; cursor: {{ trackCursor }};" onMouseDown="{{ scrubDown }}" onMouseMove="{{ scrubMove }}" onMouseUp="{{ scrubUp }}" onMouseLeave="{{ scrubUp }}">
+          <sc-for list="{{ bands }}" as="b" hint-placeholder-count="6">
+            <div style="{{ b.trackStyle }}"><sc-if value="{{ b.showLabel }}" hint-placeholder-val="{{ true }}"><span style="font-family: var(--mono); font-size: 9px; letter-spacing: .04em; text-transform: uppercase; color: var(--faint); padding-left: 5px; line-height: 16px; display: block; white-space: nowrap; overflow: hidden;">{{ b.label }}</span></sc-if></div>
+          </sc-for>
+          <sc-for list="{{ marks }}" as="m" hint-placeholder-count="4">
+            <div style="{{ m.style }}" title="{{ m.title }}"></div>
+          </sc-for>
+          <div style="{{ headStyle }}"></div>
+        </div>
+
+        <div style="{{ legendRowStyle }}" data-tip="The track shows three things at once: the lifecycle phase as a tinted block, the failures as marks along its bottom edge, and the playhead. Hover any swatch for what that one means.">
+          <span style="font-family: var(--mono); font-size: 9px; letter-spacing: .1em; text-transform: uppercase; color: var(--faint); margin-right: 2px; flex: 0 0 auto; white-space: nowrap;">the track</span>
+          <sc-for list="{{ legend }}" as="l" hint-placeholder-count="9">
+            <span data-tip="{{ l.tip }}" style="display: flex; align-items: center; gap: 5px; font-family: var(--mono); font-size: 9.5px; color: var(--dim); white-space: nowrap; cursor: help;">
+              <span style="{{ l.swatch }}"></span>{{ l.label }}
+            </span>
+          </sc-for>
+        </div>
+
+        <div style="display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px;">
+          <sc-for list="{{ ops }}" as="o" hint-placeholder-count="4">
+            <button type="button" onClick="{{ o.on }}" data-tip="{{ o.tip }}" style="{{ o.style }}" aria-label="{{ o.id }}">
+              <span style="font-size: 11.5px; font-weight: 700;">{{ o.label }}</span>
+              <span style="{{ o.idStyle }}">{{ o.id }}</span>
+            </button>
+          </sc-for>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── presets + controls ────────────────────────────────────────── -->
+    <section style="margin-top: 18px; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr); gap: 18px;">
+      <div style="border: 1px solid var(--line); border-radius: 14px; background: var(--panel); padding: 16px 18px;">
+        <h2 data-tip="Each scenario is a config plus a timestamped script of operations. Picking one re-solves the whole run. The first is the free run: no script, no horizon, and you drive it." style="margin: 0 0 3px; font-size: 13px; font-weight: 700;">Scenarios</h2>
+        <p style="margin: 0 0 12px; font-size: 11.5px; color: var(--faint);">Each one is a scripted run. Press it and watch.</p>
+        <div style="display: grid; gap: 7px;">
+          <sc-for list="{{ presets }}" as="p" hint-placeholder-count="8">
+            <button type="button" onClick="{{ p.on }}" data-tip="{{ p.tip }}" style="{{ p.style }}">
+              <span style="font-size: 12.5px; font-weight: 700;">{{ p.name }}</span>
+              <span style="font-size: 11px; line-height: 1.5; color: var(--faint); text-wrap: pretty;">{{ p.blurb }}</span>
+            </button>
+          </sc-for>
+        </div>
+      </div>
+
+      <div style="border: 1px solid var(--line); border-radius: 14px; background: var(--panel); padding: 16px 18px;">
+        <h2 style="margin: 0 0 3px; font-size: 13px; font-weight: 700;">The knobs</h2>
+        <p style="margin: 0 0 12px; font-size: 11.5px; line-height: 1.55; color: var(--faint);">{{ modeNote }} Three knobs are mine rather than the package's and are marked.</p>
+
+        <div data-tip="Six configurations, everything identical except the one thing each changes — anything else differing invalidates the comparison, and deploy/variants/README.md says so outright. A to D are in the package. R and P are the two instincts the README talks somebody out of, built here so the simulator can show that rather than assert it." style="border: 1px solid var(--div); border-radius: 10px; background: var(--raised); padding: 12px 14px; margin-bottom: 10px;">
+          <div style="display: grid; grid-template-columns: 92px minmax(0, 1fr); gap: 10px; align-items: center;">
+            <span style="font-size: 11.5px; font-weight: 600; color: var(--dim);">config</span>
+            <div style="display: flex; gap: 5px; flex-wrap: wrap;">
+              <sc-for list="{{ variants }}" as="v" hint-placeholder-count="6">
+                <button type="button" onClick="{{ v.on }}" data-tip="{{ v.tip }}" style="{{ v.style }}">{{ v.label }}</button>
+              </sc-for>
+            </div>
+          </div>
+          <p style="margin: 10px 0 0; font-size: 12px; font-weight: 600; color: var(--text);">{{ variantLine }}</p>
+          <p style="margin: 5px 0 0; font-size: 11.5px; line-height: 1.6; color: var(--dim); text-wrap: pretty;">{{ variantNote }}</p>
+          <p style="margin: 7px 0 0; {{ variantFileStyle }}">{{ variantFile }}</p>
+        </div>
+
+        <div data-tip="The client's own venue brackets, from TICVAI_Deployment_Technical Part 2, and the two figures the package gives for what one buying guest costs. Everything below the derivation follows from these." style="border: 1px solid var(--div); border-radius: 10px; background: var(--raised); padding: 12px 14px; margin-bottom: 14px;">
+          <div style="display: grid; grid-template-columns: 92px minmax(0, 1fr); gap: 10px; align-items: center;">
+            <span style="font-size: 11.5px; font-weight: 600; color: var(--dim);">venue</span>
+            <div style="display: flex; gap: 5px; flex-wrap: wrap;">
+              <sc-for list="{{ venues }}" as="v" hint-placeholder-count="3">
+                <button type="button" onClick="{{ v.on }}" data-tip="{{ v.tip }}" style="{{ v.style }}">{{ v.label }}</button>
+              </sc-for>
+            </div>
+            <span style="font-size: 11.5px; font-weight: 600; color: var(--dim);">calls a buyer</span>
+            <div style="display: flex; gap: 5px; flex-wrap: wrap;">
+              <sc-for list="{{ bases }}" as="b" hint-placeholder-count="2">
+                <button type="button" onClick="{{ b.on }}" data-tip="{{ b.tip }}" style="{{ b.style }}">{{ b.label }}</button>
+              </sc-for>
+            </div>
+          </div>
+          <p style="margin: 11px 0 0; padding-top: 10px; border-top: 1px solid var(--div); font-family: var(--mono); font-size: 10.5px; line-height: 1.7; color: var(--acb);">{{ derivation }}</p>
+        </div>
+
+        <div style="display: grid; gap: 13px;">
+          <sc-for list="{{ knobs }}" as="k" hint-placeholder-count="7">
+            <div data-tip="{{ k.note }}" style="display: grid; grid-template-columns: 132px minmax(0, 1fr) 74px; gap: 12px; align-items: center;">
+              <span style="font-size: 11.5px; font-weight: 600; color: var(--dim);">{{ k.label }}<span style="{{ k.mineStyle }}">mine</span></span>
+              <input type="range" min="{{ k.min }}" max="{{ k.max }}" step="{{ k.step }}" value="{{ k.value }}" onInput="{{ k.on }}" style="width: 100%;" />
+              <span style="display: flex; align-items: baseline; gap: 3px; justify-content: flex-end;">
+                <input type="number" min="{{ k.min }}" max="{{ k.max }}" step="{{ k.step }}" value="{{ k.value }}" onChange="{{ k.onType }}" style="width: 52px; background: var(--card); border: 1px solid var(--line); border-radius: 5px; color: var(--text); font-family: var(--mono); font-size: 11.5px; font-variant-numeric: tabular-nums; text-align: right; padding: 2px 4px;" />
+                <span style="font-family: var(--mono); font-size: 9.5px; color: var(--faint);">{{ k.unit }}</span>
+              </span>
+              <span style="grid-column: 2 / -1; font-family: var(--mono); font-size: 10px; line-height: 1.5; color: var(--faint); margin-top: -6px;">{{ k.note }}</span>
+            </div>
+          </sc-for>
+          <div style="display: grid; grid-template-columns: 132px minmax(0, 1fr); gap: 12px; align-items: center; border-top: 1px solid var(--div); padding-top: 12px;">
+            <span style="font-size: 11.5px; font-weight: 600; color: var(--dim);">price divergence</span>
+            <div style="display: flex; gap: 5px; flex-wrap: wrap;">
+              <sc-for list="{{ policies }}" as="pl" hint-placeholder-count="3">
+                <button type="button" onClick="{{ pl.on }}" data-tip="{{ pl.tip }}" style="{{ pl.style }}">{{ pl.label }}</button>
+              </sc-for>
+            </div>
+            <span style="grid-column: 2 / -1; font-family: var(--mono); font-size: 10px; line-height: 1.5; color: var(--warmt); margin-top: -4px;">{{ policyNote }}</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── two loads, two mixes ─────────────────────────────────────── -->
+    <section style="margin-top: 18px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); padding: 16px 18px;">
+      <div style="display: flex; align-items: baseline; justify-content: space-between; gap: 6px 14px; flex-wrap: wrap;">
+        <h2 data-tip="tools/derive-sizing.py sizes both paths with one algorithm. The interesting part is that the two loads are not the same shape, so a cell sized from the wrong mix is wrong in a way that looks reasonable." style="margin: 0; font-size: 15px; font-weight: 700; white-space: nowrap;">Two loads, two mixes</h2>
+        <code data-tip="{{ unmeasured }}" style="font-family: var(--mono); font-size: 11px; color: var(--acb); background: var(--acs); border: 1px solid var(--acl); border-radius: 6px; padding: 3px 9px; white-space: nowrap;">{{ algorithm }}</code>
+      </div>
+      <p style="margin: 8px 0 4px; max-width: 96ch; font-size: 12.5px; line-height: 1.6; color: var(--dim); text-wrap: pretty;">Under a sale Catalogue is 64% of the calls and F&amp;B is absent. Under normal operation Catalogue is 11%, F&amp;B is 13%, and Order is the largest at 15% — a venue day is mostly transactions rather than browsing.</p>
+      <p style="margin: 0 0 16px; max-width: 96ch; font-size: 12.5px; line-height: 1.6; color: var(--warmt); text-wrap: pretty;">{{ sizingFinding }}</p>
+
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 18px;">
+        <div>
+          <div style="display: flex; align-items: baseline; justify-content: space-between; gap: 6px 10px; flex-wrap: wrap; padding-bottom: 8px; border-bottom: 1px solid var(--line);">
+            <span style="font-size: 13px; font-weight: 700; white-space: nowrap;">Normal — the shared cell</span>
+            <div style="display: flex; gap: 5px; flex-wrap: wrap;">
+              <sc-for list="{{ cells }}" as="c" hint-placeholder-count="3">
+                <button type="button" onClick="{{ c.on }}" data-tip="{{ c.tip }}" style="{{ c.style }}">{{ c.label }}</button>
+              </sc-for>
+              <sc-for list="{{ normalLoads }}" as="nl" hint-placeholder-count="2">
+                <button type="button" onClick="{{ nl.on }}" data-tip="{{ nl.tip }}" style="{{ nl.style }}">{{ nl.label }}</button>
+              </sc-for>
+            </div>
+          </div>
+          <p style="margin: 7px 0 10px; font-family: var(--mono); font-size: 10.5px; color: var(--faint);">{{ normalHead }} · {{ normalSub }}</p>
+          <div style="display: grid; grid-template-columns: 78px 40px minmax(0, 1fr) 62px 44px 26px; gap: 8px; padding-bottom: 5px; font-family: var(--mono); font-size: 9px; letter-spacing: .06em; text-transform: uppercase; color: var(--faint);">
+            <span>service</span><span>share</span><span></span><span style="text-align: right;">rps</span><span style="text-align: right;">per rep</span><span style="text-align: right;">n</span>
+          </div>
+          <div style="display: grid; gap: 1px;">
+            <sc-for list="{{ normalMix }}" as="r" hint-placeholder-count="16">
+              <div data-tip="{{ r.tip }}" style="{{ r.rowStyle }}">
+                <span style="color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ r.name }}</span>
+                <span>{{ r.share }}</span>
+                <span style="height: 4px; border-radius: 2px; background: rgba(255,255,255,.06); display: block; overflow: hidden;"><span style="{{ r.barStyle }}"></span></span>
+                <span style="text-align: right;">{{ r.rps }}</span>
+                <span style="text-align: right; color: var(--faint);">{{ r.per }}</span>
+                <span style="text-align: right; color: var(--text);">{{ r.n }}</span>
+              </div>
+            </sc-for>
+          </div>
+          <p style="margin: 10px 0 0; font-size: 11.5px; line-height: 1.55; color: var(--faint); text-wrap: pretty;">{{ normalFloorNote }}</p>
+        </div>
+
+        <div>
+          <div style="padding-bottom: 8px; border-bottom: 1px solid var(--line);">
+            <span style="font-size: 13px; font-weight: 700;">Sale — the burst environment</span>
+          </div>
+          <p style="margin: 7px 0 10px; font-family: var(--mono); font-size: 10.5px; color: var(--faint);">{{ saleHead }} · {{ saleSub }}</p>
+          <div style="display: grid; grid-template-columns: 78px 40px minmax(0, 1fr) 62px 44px 26px; gap: 8px; padding-bottom: 5px; font-family: var(--mono); font-size: 9px; letter-spacing: .06em; text-transform: uppercase; color: var(--faint);">
+            <span>service</span><span>share</span><span></span><span style="text-align: right;">rps</span><span style="text-align: right;">per rep</span><span style="text-align: right;">n</span>
+          </div>
+          <div style="display: grid; gap: 1px;">
+            <sc-for list="{{ saleMix }}" as="r" hint-placeholder-count="3">
+              <div data-tip="{{ r.tip }}" style="{{ r.rowStyle }}">
+                <span style="color: var(--text); white-space: nowrap;">{{ r.name }}</span>
+                <span>{{ r.share }}</span>
+                <span style="height: 4px; border-radius: 2px; background: rgba(255,255,255,.06); display: block; overflow: hidden;"><span style="{{ r.barStyle }}"></span></span>
+                <span style="text-align: right;">{{ r.rps }}</span>
+                <span style="text-align: right; color: var(--faint);">{{ r.per }}</span>
+                <span style="text-align: right; color: var(--acb);">{{ r.n }}</span>
+              </div>
+            </sc-for>
+          </div>
+          <p style="margin: 10px 0 0; font-size: 11.5px; line-height: 1.55; color: var(--faint); text-wrap: pretty;">{{ saleFloorNote }}</p>
+          <p data-tip="Sizing reactively here would mean scaling into a peak that is already over: provisioning takes minutes and a sale takes seconds. So the algorithm is applied to the peak that is coming rather than to the load that is present, and the result is standing before the sale opens — which is also why requestBurstEnvironment is triggered by catalogue.performance.onSaleTo rather than by arriving demand." style="margin: 8px 0 0; padding: 10px 12px; border: 1px solid var(--acl); border-radius: 8px; background: var(--acs); font-size: 11.5px; line-height: 1.55; color: var(--acb); text-wrap: pretty;">{{ anticipationNote }}</p>
+          <p style="margin: 8px 0 0; font-size: 11.5px; line-height: 1.55; color: var(--dim); text-wrap: pretty;">The other thirteen services are not absent from the platform, only from this environment — they are running in the shared cell on the left throughout, before the sale is requested and after it is torn down.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── what broke ────────────────────────────────────────────────── -->
+    <section style="margin-top: 18px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); padding: 16px 18px;">
+      <div style="display: flex; align-items: baseline; justify-content: space-between; gap: 12px; flex-wrap: wrap;">
+        <h2 data-tip="Eight kinds of failure are named: shed requests, p99 over the SLO, lease contention, pooler exhaustion, the replica ceiling, scale-up lag, a refused teardown, and orders rejected at reconciliation. Each entry carries the file or ADR that says why it matters." style="margin: 0; font-size: 15px; font-weight: 700;">What broke, and what said so</h2>
+        <span style="font-family: var(--mono); font-size: 10.5px; color: var(--faint);">{{ ledgerCount }}</span>
+      </div>
+      <p style="margin: 6px 0 14px; font-size: 12px; line-height: 1.6; color: var(--faint); max-width: 84ch;">Every entry is a window on the timeline above, and clicking one takes the playhead there. A failure the model can name is a failure with a source; nothing here is a general warning.</p>
+      <div style="display: grid; gap: 8px;">
+        <sc-for list="{{ ledger }}" as="e" hint-placeholder-count="4">
+          <button type="button" onClick="{{ e.on }}" style="{{ e.style }}">
+            <span style="{{ e.dot }}"></span>
+            <span style="display: grid; gap: 3px; text-align: left;">
+              <span style="font-size: 12.5px; font-weight: 700; color: var(--text);">{{ e.title }}</span>
+              <span style="font-size: 11.5px; line-height: 1.55; color: var(--dim); text-wrap: pretty;">{{ e.detail }}</span>
+              <span style="font-family: var(--mono); font-size: 10px; color: var(--faint);">{{ e.source }}</span>
+            </span>
+            <span style="font-family: var(--mono); font-size: 10.5px; color: var(--faint); white-space: nowrap; text-align: right;">{{ e.window }}</span>
+          </button>
+        </sc-for>
+        <sc-if value="{{ clean }}" hint-placeholder-val="{{ false }}">
+          <p style="margin: 0; padding: 14px 16px; border: 1px solid var(--acl); border-radius: 10px; background: var(--acs); font-size: 12.5px; color: var(--acb);">Nothing broke on this run. That is a result about these knobs, not about the file — turn the peak up, or the lease hold, and it will.</p>
+        </sc-if>
+      </div>
+    </section>
+
+    <!-- ── what this board asserts that is not settled ──────────────── -->
+    <section style="margin-top: 18px; border: 1px solid var(--amber); border-radius: 14px; background: var(--panel); padding: 16px 18px;">
+      <h2 data-tip="A simulation is a set of assumptions running. These are the ones that are doing work here without being decided anywhere in the package — each is an answer this board is quietly asserting, and none of them should reach a client as settled." style="margin: 0 0 3px; font-size: 15px; font-weight: 700; color: var(--warmt);">What this board asserts that isn’t settled</h2>
+      <p style="margin: 0 0 14px; font-size: 11.5px; line-height: 1.55; color: var(--faint); max-width: 88ch;">Three of these are open decisions the diagram answers by drawing. Do not let them read as agreed.</p>
+      <div style="display: grid; gap: 10px;">
+        <sc-for list="{{ openItems }}" as="o" hint-placeholder-count="4">
+          <div data-tip="{{ o.tip }}" style="border-left: 2px solid {{ o.colour }}; padding: 2px 0 2px 12px;">
+            <div style="display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap;">
+              <span style="font-size: 12.5px; font-weight: 700; color: var(--text);">{{ o.name }}</span>
+              <span style="font-family: var(--mono); font-size: 9.5px; color: var(--faint);">{{ o.ref }}</span>
+            </div>
+            <p style="margin: 5px 0 0; max-width: 92ch; font-size: 11.5px; line-height: 1.6; color: var(--dim); text-wrap: pretty;">{{ o.note }}</p>
+          </div>
+        </sc-for>
+      </div>
+    </section>
+
+    <!-- ── the recommendation ───────────────────────────────────────── -->
+    <section style="margin-top: 18px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); overflow: hidden;">
+      <div style="{{ verdictStyle }}">
+        <p style="margin: 0 0 4px; font-family: var(--mono); font-size: 10.5px; letter-spacing: .09em; text-transform: uppercase; opacity: .75;">The verdict</p>
+        <h2 style="margin: 0; font-size: 19px; font-weight: 700; letter-spacing: -0.015em; text-wrap: pretty;">{{ verdict }}</h2>
+        <p style="margin: 8px 0 0; font-size: 12.5px; line-height: 1.6; max-width: 92ch; opacity: .9; text-wrap: pretty;">{{ verdictNote }}</p>
+      </div>
+
+      <div style="padding: 18px 20px;">
+        <h3 data-tip="Solved rather than estimated: the same M/M/c model at the derived peak, taking the larger of what the target utilisation needs and what the p99 SLO needs, then held against the replicas deploy/c-flash-sale.yml actually declares." style="margin: 0 0 3px; font-size: 13px; font-weight: 700;">Replicas needed, against the ceilings the file sets</h3>
+        <p style="margin: 0 0 12px; font-size: 11.5px; line-height: 1.55; color: var(--faint); max-width: 84ch;">Solved with the same M/M/c model at {{ peakLabel }}: the larger of what {{ thrLabel }} target utilisation needs and what the p99 SLO needs.</p>
+        <div style="overflow-x: auto;">
+          <table style="border-collapse: collapse; width: 100%; font-size: 12.5px;">
+            <thead>
+              <tr>
+                <th style="text-align: left; font-family: var(--mono); font-size: 9.5px; font-weight: 500; letter-spacing: .08em; text-transform: uppercase; color: var(--faint); padding: 0 14px 8px 0; border-bottom: 1px solid var(--line); white-space: nowrap;">Cluster</th>
+                <th style="text-align: right; font-family: var(--mono); font-size: 9.5px; font-weight: 500; letter-spacing: .08em; text-transform: uppercase; color: var(--faint); padding: 0 14px 8px 0; border-bottom: 1px solid var(--line); white-space: nowrap;">rps in</th>
+                <th style="text-align: right; font-family: var(--mono); font-size: 9.5px; font-weight: 500; letter-spacing: .08em; text-transform: uppercase; color: var(--faint); padding: 0 14px 8px 0; border-bottom: 1px solid var(--line); white-space: nowrap;">for target</th>
+                <th style="text-align: right; font-family: var(--mono); font-size: 9.5px; font-weight: 500; letter-spacing: .08em; text-transform: uppercase; color: var(--faint); padding: 0 14px 8px 0; border-bottom: 1px solid var(--line); white-space: nowrap;">for p99</th>
+                <th style="text-align: right; font-family: var(--mono); font-size: 9.5px; font-weight: 500; letter-spacing: .08em; text-transform: uppercase; color: var(--faint); padding: 0 14px 8px 0; border-bottom: 1px solid var(--line); white-space: nowrap;">recommend</th>
+                <th style="text-align: right; font-family: var(--mono); font-size: 9.5px; font-weight: 500; letter-spacing: .08em; text-transform: uppercase; color: var(--faint); padding: 0 14px 8px 0; border-bottom: 1px solid var(--line); white-space: nowrap;">your ceiling</th>
+                <th style="text-align: left; font-family: var(--mono); font-size: 9.5px; font-weight: 500; letter-spacing: .08em; text-transform: uppercase; color: var(--faint); padding: 0 0 8px 0; border-bottom: 1px solid var(--line); white-space: nowrap;">at the ceiling</th>
+              </tr>
+            </thead>
+            <tbody>
+              <sc-for list="{{ recRows }}" as="r" hint-placeholder-count="3">
+                <tr data-tip="{{ r.tip }}" style="{{ r.rowStyle }}">
+                  <td style="padding: 9px 14px 9px 0; border-bottom: 1px solid var(--div); font-weight: 700; color: var(--text);">{{ r.short }}</td>
+                  <td style="padding: 9px 14px 9px 0; border-bottom: 1px solid var(--div); text-align: right; font-family: var(--mono); font-variant-numeric: tabular-nums; color: var(--dim);">{{ r.lambda }}</td>
+                  <td style="padding: 9px 14px 9px 0; border-bottom: 1px solid var(--div); text-align: right; font-family: var(--mono); font-variant-numeric: tabular-nums; color: var(--dim);">{{ r.atThreshold }}</td>
+                  <td style="padding: 9px 14px 9px 0; border-bottom: 1px solid var(--div); text-align: right; font-family: var(--mono); font-variant-numeric: tabular-nums; color: var(--dim);">{{ r.forSlo }}</td>
+                  <td style="padding: 9px 14px 9px 0; border-bottom: 1px solid var(--div); text-align: right; font-family: var(--mono); font-variant-numeric: tabular-nums; font-weight: 500; color: var(--acb);">{{ r.need }}</td>
+                  <td style="padding: 9px 14px 9px 0; border-bottom: 1px solid var(--div); text-align: right; font-family: var(--mono); font-variant-numeric: tabular-nums; color: var(--faint);">{{ r.cap }}</td>
+                  <td style="padding: 9px 0; border-bottom: 1px solid var(--div); font-family: var(--mono); font-size: 11px; color: var(--dim);">{{ r.verdict }}</td>
+                </tr>
+              </sc-for>
+            </tbody>
+          </table>
+        </div>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 11px; margin-top: 18px;">
+          <sc-for list="{{ recCards }}" as="rc" hint-placeholder-count="3">
+            <div data-tip="{{ rc.n }}" style="{{ rc.box }}">
+              <div style="font-family: var(--mono); font-size: 22px; font-weight: 500; font-variant-numeric: tabular-nums; line-height: 1.1;">{{ rc.v }}</div>
+              <div style="margin-top: 5px; font-size: 11.5px; font-weight: 700; color: var(--dim);">{{ rc.k }}</div>
+              <p style="margin: 5px 0 0; font-size: 11.5px; line-height: 1.55; color: var(--faint); text-wrap: pretty;">{{ rc.n }}</p>
+            </div>
+          </sc-for>
+        </div>
+
+        <div style="margin-top: 22px;">
+          <h3 data-tip="Everything identical except the one thing each changes — anything else differing invalidates the comparison. Solved for each configuration at this peak, not asserted. Click a row to run it." style="margin: 0 0 3px; font-size: 13px; font-weight: 700;">The six, side by side</h3>
+          <p style="margin: 0 0 12px; font-size: 11.5px; line-height: 1.55; color: var(--faint); max-width: 84ch;">Nine of a buyer's calls touch a contended row. That is the wall, and it moves with none of replicas, Redis size or pooler settings — so holds a second on one hot performance is the number that decides.</p>
+          <div style="display: grid; gap: 7px;">
+            <div style="display: grid; grid-template-columns: 22px minmax(0, 1.1fr) 96px 128px 104px; gap: 10px; padding: 0 12px 6px; font-family: var(--mono); font-size: 9px; letter-spacing: .08em; text-transform: uppercase; color: var(--faint);">
+              <span></span><span>changes</span><span style="text-align: right;">holds/s</span><span style="text-align: right;">statements to pg</span><span style="text-align: right;">the number</span>
+            </div>
+            <sc-for list="{{ compare }}" as="v" hint-placeholder-count="6">
+              <button type="button" onClick="{{ v.on }}" data-tip="{{ v.tip }}" style="{{ v.rowStyle }}">
+                <span style="{{ v.keyStyle }}">{{ v.key }}</span>
+                <span style="display: grid; gap: 2px;">
+                  <span style="font-size: 12px; font-weight: 700; color: var(--text);">{{ v.name }}</span>
+                  <span style="font-size: 11px; color: var(--dim);">{{ v.changes }}</span>
+                </span>
+                <span style="font-family: var(--mono); font-size: 12px; text-align: right; color: var(--text);">{{ v.holds }}</span>
+                <span style="font-family: var(--mono); font-size: 10.5px; text-align: right; color: var(--dim);">{{ v.db }}</span>
+                <span style="{{ v.movesStyle }}">{{ v.moves }}</span>
+              </button>
+            </sc-for>
+          </div>
+        </div>
+
+        <div style="margin-top: 22px;">
+          <h3 data-tip="The comparison above answers whether each change helps. This answers what it costs not to make it, which is the question that actually has to be decided — and it is weighted, because only one of them moves the binding constraint and presenting five equal risks would be its own kind of lie." style="margin: 0 0 3px; font-size: 13px; font-weight: 700;">What declining each one costs</h3>
+          <p style="margin: 0 0 12px; font-size: 11.5px; line-height: 1.55; color: var(--faint); max-width: 88ch;">Every improvement also has a price. Both are stated, so neither reads as free.</p>
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(420px, 1fr)); gap: 10px;">
+            <sc-for list="{{ regressions }}" as="r" hint-placeholder-count="5">
+              <button type="button" onClick="{{ r.on }}" style="{{ r.rowStyle }}">
+                <span style="display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; text-align: left;">
+                  <span style="{{ r.keyStyle }}">{{ r.key }}</span>
+                  <span style="font-size: 12.5px; font-weight: 700; color: var(--text);">{{ r.name }}</span>
+                  <span style="{{ r.sevStyle }}">{{ r.severity }}</span>
+                </span>
+                <span style="font-size: 11px; color: var(--faint); text-align: left;">buys {{ r.buys }} · lease ceiling {{ r.holds }} rps · refused without it {{ r.refused }}</span>
+                <span style="font-size: 11.5px; line-height: 1.55; color: var(--dim); text-align: left; text-wrap: pretty;">{{ r.cost }}</span>
+                <span style="font-size: 11.5px; line-height: 1.55; color: var(--warmt); text-align: left; text-wrap: pretty;">And it is not free: {{ r.price }}</span>
+              </button>
+            </sc-for>
+          </div>
+        </div>
+
+        <sc-if value="{{ hasDiff }}" hint-placeholder-val="{{ true }}">
+          <div style="margin-top: 18px;">
+            <div style="display: flex; align-items: baseline; justify-content: space-between; gap: 12px;">
+              <h3 style="margin: 0; font-size: 13px; font-weight: 700; white-space: nowrap;">The change to <span style="font-family: var(--mono); font-size: 12px; font-weight: 500;">deploy/c-flash-sale.yml</span></h3>
+              <button type="button" onClick="{{ copyDiff }}" style="border: 1px solid var(--line); background: var(--card); color: var(--dim); border-radius: 7px; padding: 4px 11px; font-family: var(--mono); font-size: 10.5px; cursor: pointer;">{{ copyLabel }}</button>
+            </div>
+            <pre style="margin: 9px 0 0; padding: 14px 16px; border: 1px solid var(--div); border-radius: 10px; background: #171717; font-family: var(--mono); font-size: 11.5px; line-height: 1.75; color: var(--dim); overflow-x: auto;">{{ diffText }}</pre>
+            <p style="margin: 8px 0 0; font-size: 11.5px; line-height: 1.6; color: var(--warmt); max-width: 88ch;">Ceilings only. It does not fix the lease path, and nothing in a compose file can — that is a property of the contention model, not of instance size.</p>
+          </div>
+        </sc-if>
+      </div>
+    </section>
+
+    <!-- ── cost ─────────────────────────────────────────────────────── -->
+    <section style="margin-top: 18px; display: grid; grid-template-columns: repeat(auto-fit, minmax(360px, 1fr)); gap: 18px; align-items: start;">
+      <div style="border: 1px solid var(--line); border-radius: 14px; background: var(--panel); padding: 16px 18px;">
+        <h2 data-tip="cpu-hours and GB-hours integrated across the run, priced at the $11.76 an hour TICVAI_Hosting_Summary gives for option 3 on Amazon, apportioned across containers by the cpu limits the compose file declares. Container compute only — no managed-database premium, no storage, no egress." style="margin: 0 0 3px; font-size: 15px; font-weight: 700;">This run, priced</h2>
+        <p style="margin: 0 0 14px; font-size: 11.5px; line-height: 1.55; color: var(--faint); max-width: 60ch;">Integrated across the run and apportioned by the cpu limits the compose file declares, anchored on the ADR's month figure.</p>
+        <div style="display: grid; gap: 9px;">
+          <sc-for list="{{ runFacts }}" as="f" hint-placeholder-count="8">
+            <div data-tip="{{ f.n }}" style="display: grid; grid-template-columns: 128px 108px minmax(0, 1fr); gap: 12px; align-items: baseline; padding-bottom: 8px; border-bottom: 1px solid var(--div);">
+              <span style="font-size: 12px; font-weight: 600; color: var(--dim);">{{ f.k }}</span>
+              <span style="font-family: var(--mono); font-size: 13px; font-variant-numeric: tabular-nums; color: {{ f.color }};">{{ f.v }}</span>
+              <span style="font-size: 11.5px; line-height: 1.5; color: var(--faint); text-wrap: pretty;">{{ f.n }}</span>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+
+      <div style="border: 1px solid var(--line); border-radius: 14px; background: var(--panel); padding: 16px 18px;">
+        <div style="display: flex; align-items: baseline; justify-content: space-between; gap: 6px 12px; flex-wrap: wrap;">
+          <h2 data-tip="Two bills of different kinds. The shared cell is billed by the month and runs whether or not a sale happens; the burst environment is billed by the hour and only while it is up. Adding them without saying which is which is how a $24 sale gets blamed for a $3,485 platform." style="margin: 0; font-size: 15px; font-weight: 700; white-space: nowrap;">The monthly bill</h2>
+          <div style="display: flex; gap: 5px;">
+            <sc-for list="{{ providers }}" as="p" hint-placeholder-count="2">
+              <button type="button" onClick="{{ p.on }}" data-tip="{{ p.tip }}" style="{{ p.style }}">{{ p.label }}</button>
+            </sc-for>
+          </div>
+        </div>
+        <p style="margin: 7px 0 14px; font-size: 11.5px; line-height: 1.55; color: var(--faint); max-width: 62ch;">{{ monthHead }}. Figures from TICVAI_Hosting_Summary.</p>
+
+        <div style="display: grid; gap: 9px;">
+          <sc-for list="{{ monthRows }}" as="m" hint-placeholder-count="4">
+            <div data-tip="{{ m.tip }}" style="display: grid; grid-template-columns: 132px 92px minmax(0, 1fr); gap: 12px; align-items: baseline; padding-bottom: 9px; border-bottom: 1px solid var(--div);">
+              <span style="font-size: 12px; font-weight: 600; color: var(--dim);">{{ m.k }}</span>
+              <span style="font-family: var(--mono); font-size: 14px; font-variant-numeric: tabular-nums; color: {{ m.colour }};">{{ m.v }}</span>
+              <span style="font-size: 11.5px; line-height: 1.5; color: var(--faint); text-wrap: pretty;">{{ m.n }}</span>
+            </div>
+          </sc-for>
+        </div>
+
+        <div style="margin-top: 14px; padding: 14px 16px; border: 1px solid var(--acl); border-radius: 10px; background: var(--acs);">
+          <div style="display: flex; align-items: baseline; justify-content: space-between; gap: 12px; flex-wrap: wrap;">
+            <span style="font-size: 12.5px; font-weight: 700; color: var(--acb);">total for the month</span>
+            <span style="font-family: var(--mono); font-size: 24px; font-weight: 500; color: var(--acb);">{{ monthTotal }}</span>
+          </div>
+          <span style="display: flex; height: 8px; border-radius: 4px; overflow: hidden; background: rgba(255,255,255,.06); margin: 11px 0 9px;">
+            <sc-for list="{{ monthShare }}" as="ms" hint-placeholder-count="3">
+              <span data-tip="{{ ms.tip }}" style="{{ ms.style }}"></span>
+            </sc-for>
+          </span>
+          <div style="display: flex; gap: 14px; flex-wrap: wrap;">
+            <sc-for list="{{ monthShare }}" as="ms" hint-placeholder-count="3">
+              <span data-tip="{{ ms.tip }}" style="font-family: var(--mono); font-size: 10px; color: var(--dim); white-space: nowrap;">{{ ms.label }} {{ ms.v }} · {{ ms.pct }}</span>
+            </sc-for>
+          </div>
+          <p style="margin: 10px 0 0; font-size: 11.5px; line-height: 1.6; color: var(--warmt); text-wrap: pretty;">{{ monthNote }}</p>
+        </div>
+      </div>
+
+      <div style="border: 1px solid var(--line); border-radius: 14px; background: var(--panel); padding: 16px 18px;">
+        <h2 data-tip="A sixty-thousand-seat stadium selling out costs about twenty-four dollars in machinery. The risk is not the cost, it is forgetting: left running a month it costs $8,587, more than the platform it was protecting. So teardown is tied to catalogue.performance.onSaleTo rather than to somebody's calendar." style="margin: 0 0 3px; font-size: 15px; font-weight: 700;">Why teardown is wired to the calendar</h2>
+        <p style="margin: 0 0 14px; font-size: 11.5px; line-height: 1.6; color: var(--faint); max-width: 60ch;">The four totals are ADR-0035's, quoted. The risk it names is not the cost but forgetting — a month of it costs more than the platform the environment was protecting.</p>
+        <div style="display: grid; gap: 8px;">
+          <sc-for list="{{ ladder }}" as="l" hint-placeholder-count="4">
+            <div data-tip="{{ l.tip }}" style="display: grid; grid-template-columns: 130px 80px minmax(0, 1fr); gap: 12px; align-items: baseline;">
+              <span style="font-size: 12px; color: var(--dim);">{{ l.label }}</span>
+              <span style="font-family: var(--mono); font-size: 13px; font-variant-numeric: tabular-nums; color: var(--text);">{{ l.usd }}</span>
+              <span style="height: 6px; border-radius: 999px; background: rgba(255,255,255,.06); overflow: hidden; display: block;"><span style="{{ l.style }}"></span></span>
+            </div>
+          </sc-for>
+        </div>
+        <p style="margin: 14px 0 0; padding-top: 12px; border-top: 1px solid var(--div); font-size: 11.5px; line-height: 1.6; color: var(--dim);">So teardown is tied to <span style="font-family: var(--mono); font-size: 11px; color: var(--acb);">catalogue.performance.onSaleTo</span> rather than to somebody's calendar, and <span style="font-family: var(--mono); font-size: 11px; color: var(--acb);">listBurstEnvironments</span> exists because an environment nobody is looking at is the one left running for a month.</p>
+      </div>
+    </section>
+
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440}}">
+const M = {};
+let ready = false;
+
+class Component extends DCLogic {
+  state = {
+    cfg: null, script: [], run: null, preset: 'stadium',
+    i: 0, playing: false, speed: 10, scrubbing: false, ready: false,
+  };
+
+  componentDidMount() {
+    import('./burst-model.js').then((mod) => {
+      Object.assign(M, mod);
+      ready = true;
+      this.load('stadium');
+      this.tick = setInterval(() => this.advance(), 1000 / 30);
+      // The stage scales to the viewport, so it has to know when that changes.
+      this.onResize = () => this.forceUpdate();
+      window.addEventListener('resize', this.onResize);
+    });
+  }
+
+  componentWillUnmount() {
+    clearInterval(this.tick);
+    if (this.onResize) window.removeEventListener('resize', this.onResize);
+  }
+
+  /* ── the two modes ─────────────────────────────────────────────────────
+     A scenario is solved whole and scrubbed. A free run steps the same world
+     live and has no horizon: nothing precomputes, because there is nothing to
+     precompute — the reader is the input. Both call the same stepWorld, so
+     they cannot disagree about the model. */
+
+  load(key) {
+    const preset = M.PRESETS.find((p) => p.key === key) ?? M.PRESETS[0];
+    const cfg = M.configure(preset.cfg);
+    const script = preset.script(cfg);
+    this.freshRun();
+    if (cfg.mode === 'free') {
+      this.freeInit(cfg);
+      this.setState({ cfg, script: [], preset: key, run: null, playing: true, ready: true, speed: 60, copied: false });
+      return;
+    }
+    this.free = null;
+    this.setState({ cfg, script, preset: key, run: M.solve(cfg, script), i: 0, playing: true, ready: true, copied: false, scrubbing: false });
+  }
+
+  freeInit(cfg) {
+    this.free = { world: M.createWorld(cfg), samples: [] };
+    this.free.samples.push(M.stepWorld(this.free.world, cfg, 0));
+  }
+
+  /**
+   * **Everything a new run must forget.** Eased numbers hold the last run's
+   * values, so without this a scale-up animates from a figure that belonged to
+   * a different configuration; the derived caches key themselves but the
+   * playhead does not, and a position 80% through one horizon means nothing in
+   * another. Called wherever a run is replaced.
+   */
+  freshRun() {
+    this._tw = {};
+    this._cmpKey = null;
+    this._regKey = null;
+    this._recKey = null;
+  }
+
+  /** A knob moved. A scenario re-solves; a free run just carries on. */
+  resolve(patch, scriptPatch) {
+    let cfg = { ...this.state.cfg, ...patch };
+    if ('venue' in patch || 'windowSec' in patch || 'basis' in patch) {
+      cfg.peakRps = M.derivePeak(cfg).peak;
+    }
+    if (cfg.mode === 'free') { this.setState({ cfg }); return; }
+    const script = scriptPatch ?? this.state.script;
+    const run = M.solve(cfg, script);
+    // A changed knob is a different run, so it starts at the beginning rather
+    // than at a position that meant something in the old horizon.
+    const wasNear = this.state.i >= (this.state.run?.samples.length ?? 1) - 2;
+    this.freshRun();
+    this.setState({
+      cfg, script, run, scrubbing: false,
+      i: 0,
+      playing: this.state.playing || wasNear,
+    });
+  }
+
+  advance() {
+    const { playing, run, cfg, i, speed, scrubbing } = this.state;
+    if (!playing || !ready) return;
+    if (cfg?.mode === 'free') {
+      const f = this.free;
+      if (!f) return;
+      // One real second is `speed` simulated seconds. Stepped in slices of a
+      // second or less, so a 300× run integrates as accurately as a 1× one.
+      let left = speed / 30;
+      while (left > 0) {
+        const dt = Math.min(1, left);
+        f.samples.push(M.stepWorld(f.world, cfg, dt));
+        left -= dt;
+      }
+      // A rolling window, because there is no end to scroll to.
+      const cap = 5000;
+      if (f.samples.length > cap) f.samples.splice(0, f.samples.length - cap);
+      this.forceUpdate();
+      return;
+    }
+    if (!run || scrubbing) return;
+    const j = i + Math.max(1, (speed / 30) / run.dt);
+    if (j >= run.samples.length - 1) this.setState({ i: run.samples.length - 1, playing: false });
+    else this.setState({ i: j });
+  }
+
+  seek(frac) {
+    const { run, cfg } = this.state;
+    if (!run || cfg.mode === 'free') return;
+    const i = Math.max(0, Math.min(run.samples.length - 1, Math.round(frac * (run.samples.length - 1))));
+    this.setState({ i });
+  }
+
+  /** An operation pressed. Free mode acts on the live world; a scenario
+      appends it to the script at the playhead and re-solves from the top. */
+  press(operation) {
+    const { cfg, run, i } = this.state;
+    if (cfg.mode === 'free') {
+      M.applyOperation(this.free.world, operation);
+      this.forceUpdate();
+      return;
+    }
+    const t = run.samples[i].t;
+    const script = [...this.state.script.filter((a) => a.t < t || a.operation !== operation), { t, operation }];
+    this.resolve({}, script);
+  }
+
+  /** Free mode only: throw it away and start again from `requested`. */
+  freeReset() {
+    this.freshRun();
+    this.freeInit(this.state.cfg);
+    this.setState({ playing: true });
+  }
+
+  /* ── rendering ─────────────────────────────────────────────────────── */
+
+  renderVals() {
+    if (!ready) return {};
+    const { cfg, playing, speed } = this.state;
+    if (!cfg) return {};
+    const free = cfg.mode === 'free';
+    const run = this.state.run;
+    if (!free && !run) return {};
+    const f = this.free;
+    if (free && !f) return {};
+
+    const samples = free ? f.samples : run.samples;
+    const N = samples.length - 1;
+    // Within a percent of the horizon is the end for the play button's purposes.
+    const atEnd = N > 0 && this.state.i >= N - Math.max(2, Math.round(N * 0.01));
+    const i = free ? N : Math.min(this.state.i, N);
+    const s = samples[i];
+    const phases = free ? f.world.phases.filter((p) => p.to > p.from) : run.phases;
+    const events = free ? f.world.events : run.events;
+    const sum = free ? M.summarise(f.world, cfg) : run.summary;
+    // Free mode has no solved run to carry a recommendation, so it is computed
+    // here — but keyed, for the same reason the comparison is.
+    if (free) {
+      const rKey = JSON.stringify([cfg.peakRps, cfg.thresholdPct, cfg.sloMs, cfg.lockMs,
+        cfg.dbStatementMs, cfg.anySeatPct, cfg.basis, cfg.scaleStepPct, cfg.variant,
+        cfg.capCatalogue, cfg.capOrder, cfg.capIdentity]);
+      if (this._recKey !== rKey) { this._recKey = rKey; this._rec = M.recommend(cfg); }
+    }
+    const rec = free ? this._rec : run.recommendation;
+    const dt = free ? 1 : run.dt;
+    // A free run has no horizon, so the window is what has happened plus a
+    // little room ahead — the track scrolls rather than filling up.
+    const t0 = free ? samples[0].t : 0;
+    const T = free ? Math.max(120, s.t - t0) : (run.horizon || 1);
+    const derived = M.derivePeak(cfg);
+    const fmt = (n) => Math.round(n).toLocaleString('en-GB');
+    // The shared cell's sizing, read before the rail needs it: the steady state
+    // is drawn at the head of the lifecycle and has to know what is running.
+    const seatsFor2 = s.seats ?? M.seatsFor(cfg);
+    const cellNow = M.SIZING.cells.find((c) => c.key === cfg.cell) ?? M.SIZING.cells[1];
+    const normal = s.normal ?? M.normalSizing(cfg);
+
+    /* One hue a phase, used in all three places it appears: the rail cell, the
+       band on the track and its identifying rule, and the legend chip. The
+       first three bands are narrower than their own labels at most widths, so
+       colour is the only thing identifying them — a hue that means one phase in
+       the legend and another on the rail makes the legend worse than none. */
+    const PH_FILL = {
+      requested: '#1b2a22', provisioning: '#26262a', warming: '#2b2418',
+      live: '#123a3a', draining: '#2c2119', reconciling: '#1f2a33',
+      reconciled: '#241f33', decommissioned: '#191919',
+    };
+    const PH_INK = {
+      requested: '#7fbf8f', provisioning: '#8a8ab0', warming: '#d9bc7c',
+      live: '#48cfcb', draining: '#d98f5e', reconciling: '#6aa5f5',
+      reconciled: '#a98ae0', decommissioned: '#4a4a4a',
+    };
+    /* **The state before the state machine.** states/burst-environment.yaml
+       begins at `requested`, but the platform does not begin there: the shared
+       cell is already up, sixteen services at a floor of two, thirty-two
+       replicas across the board. Every scenario starts from that and only then
+       goes into provisioning and warming. It is drawn ahead of the nine and
+       marked as the platform's state rather than the environment's. */
+    const steadyLive = s.state === 'requested' || s.state === 'decommissioned';
+    const steadyEntry = {
+      n: '\u2014',
+      name: 'steady',
+      at: steadyLive ? 'now' : 'always',
+      tip: `The shared cell at rest, and where every scenario starts. Sixteen services at a floor of two \u2014 ${normal.replicas} replicas across the board in the ${normal.cell.key}, carrying ${fmt(normal.rps)} requests a second. Floor is survivability here rather than peak: the autoscaler has all day to react to a busy afternoon, so paying for the peak all night buys nothing. This is not one of the nine states in states/burst-environment.yaml \u2014 that machine describes the burst environment, which does not exist yet. The platform is already running.`,
+      style: `transition: background-color .35s ease, border-color .35s ease, color .3s ease, box-shadow .35s ease; flex: 1 1 0; min-width: 96px; display: grid; gap: 1px; padding: 5px 10px; border-right: 1px solid var(--line); background: ${steadyLive ? PH_FILL.requested : 'transparent'}; color: ${steadyLive ? PH_INK.requested : 'var(--faint)'}; ${steadyLive ? `box-shadow: inset 0 -2px 0 ${PH_INK.requested};` : ''}`,
+    };
+    const rail = [steadyEntry, ...M.STATES.map((name, k) => {
+      const ph = phases.find((p) => p.state === name);
+      // `requested` is the steady period, and the steady cell ahead of the row
+      // already has it lit — showing both reads as two states at once.
+      const now = s.state === name && !(name === 'requested' && steadyLive);
+      const past = ph && ph.to <= s.t && !now;
+      const into = M.MACHINE.transitions.filter((tr) => tr.to === name);
+      const out = M.MACHINE.transitions.filter((tr) => tr.from === name);
+      return {
+        n: String(k + 1).padStart(2, '0'),
+        name,
+        at: ph ? (now ? 'now' : M.clock(ph.from)) : '—',
+        tip: (into.length
+          ? `Reached from ${into.map((tr) => `${tr.from} (${tr.trigger}${tr.operation ? ` · ${tr.operation}` : ''})`).join(', ')}. ${into[0].guard}`
+          : 'The initial state — an environment asked for and not yet standing.')
+          + (out.length ? ` Leaves to ${out.map((tr) => tr.to).join(', ')}.` : ' Terminal.')
+          + (ph ? ` This run entered it at ${M.clock(ph.from)}.` : ' This run has not reached it.'),
+        style: `transition: background-color .35s ease, border-color .35s ease, color .3s ease, box-shadow .35s ease; flex: 1 1 0; min-width: 96px; display: grid; gap: 1px; padding: 5px 10px; border-right: 1px solid var(--line); background: ${now ? 'var(--acs)' : 'transparent'}; color: ${now ? 'var(--acb)' : past ? 'var(--dim)' : 'var(--faint)'}; ${now ? 'box-shadow: inset 0 -2px 0 var(--acb);' : ''}`,
+      };
+    })];
+
+    const sloBust = Number.isFinite(s.p99) ? s.p99 > cfg.sloMs : true;
+    // The note line under each readout is what makes the strip wrap to three
+    // rows, and it is the same sentence as the tile's hover. Hidden while
+    // fitting, so the diagram gets the height instead.
+    const fitting = this.state.fit === true;
+    const readTile = (v, k, n, hot, tip) => ({ v, k, n, tip: tip ?? n,
+      noteStyle: fitting
+        ? 'display: none;'
+        : 'margin-top: 1px; font-family: var(--mono); font-size: 8.5px; line-height: 1.35; color: var(--faint);',
+      style: `padding: 7px 12px; border-right: 1px solid var(--line); color: ${hot ? 'var(--red)' : 'var(--text)'};` });
+    const reads = [
+      readTile(M.clock(s.t), 'elapsed', free ? 'free run — no calendar' : `${cfg.leadSec / 60 | 0}m lead, then a ${M.clock(cfg.saleSec)} sale`,
+        false, free
+          ? 'Simulated time since the environment was asked for. A free run has no sale calendar: the clock runs while it plays and stops when you pause.'
+          : `Simulated time. The environment is requested at 00:00 and the sale opens ${cfg.leadSec / 60 | 0} minutes later, because provisioning takes minutes and a sale takes seconds — requesting it when the load appears is requesting it too late.`),
+      readTile(fmt(s.offeredRps), 'requests offered', `${fmt(s.buyers)} buyers/s × ${(s.envCalls ?? 0).toFixed(1)} calls here`,
+        false, `What buyers are asking of THIS environment, whether or not anything is up to serve it. A buyer costs ${derived.calls} calls, but only ${M.DEPLOYED_CPB} of the package's 55 land on the three deployed services — the other ${M.SHARED_CELL_CPB} (Tenancy 2, Retail 2, Marketing 2, Access 1) are on the burst path and answered from the shared cell. Offered and served are both counted on that basis, so they share a denominator. The shared cell is carrying a further ${fmt(s.sharedCellRps ?? 0)} requests a second right now.`),
+      readTile(fmt(s.servedRps), 'served here', `${fmt(s.shedRps)} not served`, s.shedRps > 1,
+        'Requests that completed. The difference from offered is not queued, it is refused — ADR-0032 sheds rather than queues, because the Bahrain failure was not that the platform was slow, it was that nobody could tell what they had bought.'),
+      readTile(Number.isFinite(s.p99) ? `${fmt(s.p99)}ms` : ((s.lockRho ?? 0) >= 1 ? 'lock saturated' : 'shed'), 'p99',
+        (() => {
+          const hot = (s.clusters ?? []).reduce((a, pc) => ((pc.p99 ?? 0) > (a?.p99 ?? -1) ? pc : a), null);
+          if (!hot || !s.buyers) return `SLO ${cfg.sloMs}ms`;
+          if (!Number.isFinite(hot.p99)) return `${hot.short} · lock ${Math.round((s.lockRho ?? 0) * 100)}%`;
+          return (hot.lockP99Ms > 1)
+            ? `${fmt(hot.cpuP99)}ms cpu + ${fmt(hot.lockP99Ms)}ms lock`
+            : `SLO ${cfg.sloMs}ms · all cpu`;
+        })(), sloBust && s.buyers > 0,
+        `The worst cluster's 99th-percentile response, and it now has two components rather than one. Cpu queueing is M/M/c on the per-replica rates. Row wait is M/D/1 on the lease — a held row is a deterministic service time — at Wq = ρD/2(1−ρ), and only the service that takes the locks carries it: acquireInventoryHold and createSeatHold are both CatalogueService. The lease is ${Math.round((s.lockRho ?? 0) * 100)}% utilised; above 100% there is no finite wait at all and the attempt returns no row under SKIP LOCKED rather than queueing, which is why the figure reads saturated rather than a number. A p99 that excluded the lock would read comfortably while every buyer convoyed on one row.`),
+      readTile(fmt(s.orders), 'orders taken', 'what reconciliation must move', false,
+        'Completed purchases held in the burst environment. Every one of them has to be replayed into the permanent platform before the environment may be torn down — which is why decommissioned is reachable only through reconciled.'),
+      readTile(String(s.containers), 'containers', `${fmt(s.conns)} of ${fmt(M.COMPOSE.pgbouncer.maxClient)} conns`, s.conns > M.COMPOSE.pgbouncer.maxClient,
+        `Replicas running across the three clusters, and the client connections they hold open against pgbouncer's MAX_CLIENT_CONN of ${fmt(M.COMPOSE.pgbouncer.maxClient)}. Transaction pooling is what makes horizontal scaling possible at all — without it the tier stops scaling around six replicas and the bottleneck looks like the database when it is the pool.`),
+      readTile(M.money(s.spent), 'spent', `${M.money(s.cpu * (M.RATE_PER_HOUR / M.PEAK_CPU))}/h`, false,
+        `Billed by the hour and returned. $${M.RATE_PER_HOUR.toFixed(2)} an hour fully expanded on Amazon, $9.76 on Google — TICVAI_Hosting_Summary. Apportioned here by the cpu limits the compose file declares: ${M.PEAK_CPU} cpu at full expansion.`),
+    ];
+
+    // chart
+    const W = 600, Hc = 190;
+    const step = Math.max(1, Math.floor(N / 600));
+    const pts = [];
+    for (let k = 0; k <= N; k += step) pts.push(samples[k]);
+    if (pts[pts.length - 1] !== samples[N]) pts.push(samples[N]);
+    const maxRps = Math.max(1, ...pts.map((p) => p.offeredRps));
+    const maxP99 = Math.max(cfg.sloMs, ...pts.map((p) => (Number.isFinite(p.p99) ? p.p99 : 0)));
+    const maxCon = Math.max(1, ...pts.map((p) => p.containers));
+    const X = (t) => (((t - t0) / T) * W);
+    const line = (get, max) => pts.map((p) => `${X(p.t).toFixed(1)},${(Hc - (Math.min(get(p), max) / max) * Hc).toFixed(1)}`).join(' ');
+    const chart = {
+      offered: line((p) => p.offeredRps, maxRps),
+      served: line((p) => p.servedRps, maxRps),
+      shed: line((p) => p.shedRps, maxRps),
+      p99: line((p) => (Number.isFinite(p.p99) ? p.p99 : maxP99), maxP99),
+      containers: line((p) => p.containers, maxCon),
+      headX: X(s.t).toFixed(1),
+      headY: (Hc - (Math.min(s.servedRps, maxRps) / maxRps) * Hc).toFixed(1),
+      mid: M.clock(t0 + T / 2),
+      end: M.clock(t0 + T),
+    };
+
+    /* Two scales, one hue per phase. The band fill has to sit quietly behind a
+       wide block; the legend chip has to be identifiable at 14×10px. Same hue,
+       different lightness — so the reader maps chip to band by colour family
+       rather than by trying to tell four near-blacks apart. */
+    const bands = phases.map((p) => ({
+      x: Math.max(0, X(p.from)).toFixed(1),
+      w: Math.max(0, X(p.to) - Math.max(X(p.from), 0)).toFixed(1),
+      fill: PH_FILL[p.state] ?? '#202020',
+      // The machine calls the opening state `requested`; on the timeline it is
+      // the period when only the shared cell is running, which is the more
+      // useful thing to read off a band.
+      label: p.state === 'requested' ? 'steady' : p.state,
+      // A band narrower than its own word gets no label rather than a stub.
+      showLabel: (X(p.to) - Math.max(X(p.from), 0)) > 74,
+      trackStyle: `position: absolute; top: 0; bottom: 0; left: ${Math.max(0, (X(p.from) / W) * 100).toFixed(2)}%; width: ${Math.max(0, (X(p.to) / W) * 100 - Math.max(0, (X(p.from) / W) * 100)).toFixed(2)}%; background: ${PH_FILL[p.state] ?? '#202020'}; border-right: 1px solid var(--line); box-sizing: border-box; box-shadow: inset 0 3px 0 ${PH_INK[p.state] ?? '#4a4a4a'};`,
+    }));
+
+    // Integrity sits above capacity: a refused buyer is a bad afternoon, a
+    // seat sold twice is a regulatory finding.
+    const SEV = { integrity: '#e07ab0', hard: 'var(--red)', soft: 'var(--amber)', refused: 'var(--red)' };
+    const marks = events.map((ev) => ({
+      title: `${M.clock(ev.from)} — ${ev.title}`,
+      style: `position: absolute; bottom: 0; height: 18px; left: ${Math.max(0, (X(ev.from) / W) * 100).toFixed(2)}%; width: ${Math.max(0.4, ((ev.to - ev.from) / T) * 100).toFixed(2)}%; min-width: 3px; background: ${SEV[ev.severity] ?? 'var(--amber)'}; opacity: .8; border-radius: 2px;`,
+    }));
+
+    const nextTr = M.MACHINE.transitions.find((tr) => tr.from === s.state);
+    const guard = nextTr ? nextTr.guard : 'Terminal. The environment is gone and its orders are in the permanent platform.';
+
+    const SPEEDS = [[1, 'real time'], [10, '10×'], [60, '60×'], [300, '300×']];
+    const speeds = SPEEDS.map(([v, label]) => ({
+      label,
+      on: () => this.setState({ speed: v }),
+      style: `border: none; border-radius: 6px; padding: 5px 10px; font-family: var(--mono); font-size: 10.5px; cursor: pointer; background: ${speed === v ? 'var(--acs)' : 'transparent'}; color: ${speed === v ? 'var(--acb)' : 'var(--faint)'};`,
+    }));
+
+    const ops = Object.entries(M.OP_LABEL).map(([id, label]) => {
+      const allowed = M.MACHINE.transitions.some((tr) => tr.from === s.state && tr.operation === id);
+      const tr = M.MACHINE.transitions.find((x) => x.operation === id);
+      return {
+        id, label,
+        idStyle: fitting ? 'display: none;' : 'font-family: var(--mono); font-size: 9.5px; opacity: .6;',
+        tip: allowed
+          ? `${id} — allowed in ${s.state}, and takes the environment to ${M.MACHINE.transitions.find((x) => x.from === s.state && x.operation === id).to}. ${tr.guard}`
+          : `${id} — not allowed in ${s.state}. ${id === 'decommissionBurstEnvironment' ? 'It returns 409: decommissioned is reachable only through reconciled, because an environment torn down before its orders reach the permanent platform has lost real money and real tickets. Press it anyway — the refusal is the point.' : `states/burst-environment.yaml declares this transition only out of ${M.MACHINE.transitions.filter((x) => x.operation === id).map((x) => x.from).join(' or ')}.`}`,
+        on: () => this.press(id),
+        style: `display: grid; gap: 2px; text-align: left; border: 1px solid ${allowed ? 'var(--acl)' : 'var(--line)'}; background: ${allowed ? 'var(--acs)' : 'var(--card)'}; color: ${allowed ? 'var(--acb)' : 'var(--faint)'}; border-radius: 8px; padding: 7px 12px; font-family: inherit; cursor: pointer;`,
+      };
+    });
+
+    const presets = M.PRESETS.map((p) => {
+      const c = M.configure(p.cfg);
+      const d = M.derivePeak(c);
+      return {
+      name: p.name, blurb: p.blurb,
+      tip: p.key === 'free'
+        ? 'No script and no horizon. The environment starts at requested and nothing happens until you press an operation; the arrival rate is a slider you hold. Every other knob applies immediately rather than re-solving, because there is no run to re-solve.'
+        : `${d.venue.label} — ${fmt(d.venue.guests)} guests at ${d.venue.buyPct}% buying, compressed into ${M.clock(c.windowSec)}: ${fmt(d.peak)} requests a second at the peak. ${p.script(c).length} scripted operations. Target utilisation ${c.thresholdPct}%, ${c.scaleStepPct}% scale step.`,
+      on: () => this.load(p.key),
+      style: `display: grid; gap: 3px; text-align: left; border: 1px solid ${this.state.preset === p.key ? 'var(--acl)' : 'var(--line)'}; background: ${this.state.preset === p.key ? 'var(--acs)' : 'var(--card)'}; color: var(--text); border-radius: 10px; padding: 10px 13px; font-family: inherit; cursor: pointer;`,
+      }; });
+
+    const pill = (on, label, tip, act) => ({
+      label, tip,
+      on: act,
+      style: `border: 1px solid ${on ? 'var(--acl)' : 'var(--line)'}; background: ${on ? 'var(--acs)' : 'var(--card)'}; color: ${on ? 'var(--acb)' : 'var(--faint)'}; border-radius: 7px; padding: 5px 10px; font-family: var(--mono); font-size: 10.5px; cursor: pointer;`,
+    });
+    /* ── the two loads ──────────────────────────────────────────────────
+       tools/derive-sizing.py sizes both paths with one algorithm and the two
+       come out different shapes. Worth showing side by side, because the
+       finding is that sizing either from the other's mix is backwards. */
+    const cells = M.SIZING.cells.map((c) => pill(
+      cfg.cell === c.key, c.key,
+      `${c.venues.small} small, ${c.venues.medium} medium and ${c.venues.large} large venues sharing one cell. ${fmt(c.meanRps)} requests a second at the mean and ${fmt(c.peakRps)} at the peak, carried by ${c.atFloor} replicas at the floor and ${c.atPeak} at the peak — sixteen services at a floor of two. Floor is survivability here, not peak: the autoscaler has all day to react to a busy afternoon, so paying for the peak all night buys nothing.`,
+      () => this.resolve({ cell: c.key }),
+    ));
+
+    // The sale side of this table has to read what the calculator produced,
+    // not the constants it was seeded from, or the page contradicts itself the
+    // moment a rate is changed.
+    const clusterByName = (name) => M.CLUSTERS.find((x) => x.name === name);
+    const mixRow = (m, loadRps, floorFallback, deployedOnly) => {
+      const floorFor = (name) => {
+        const c = deployedOnly ? clusterByName(name) : null;
+        return c ? M.saleFloorFor(cfg, c).n : floorFallback;
+      };
+      const rateFor = (x) => {
+        const c = deployedOnly ? clusterByName(x.name) : null;
+        return c ? M.replicaRpsFor(cfg, c) : x.rpsPerReplica;
+      };
+      const peak = Math.max(...m.map((x) => x.share));
+      return m.map((x) => {
+        const floor = floorFor(x.name);
+        const rate = rateFor(x);
+        const n = M.sizeFor(loadRps, x.share, rate, floor);
+        return {
+          name: x.name.replace('Service', ''),
+          share: `${x.share}%`,
+          rps: fmt(loadRps * (x.share / 100)),
+          per: String(rate),
+          n: String(n),
+          barStyle: `display: block; height: 100%; border-radius: 2px; width: ${((x.share / peak) * 100).toFixed(1)}%; background: ${deployedOnly ? '#48cfcb' : '#9a9a9a'};`,
+          rowStyle: `display: grid; grid-template-columns: 78px 40px minmax(0, 1fr) 62px 44px 26px; gap: 8px; align-items: center; font-family: var(--mono); font-size: 10.5px; color: var(--dim); padding: 2px 0;`,
+          tip: `${x.name} — ${x.share}% of the ${deployedOnly ? 'sale' : 'normal'} mix, so ${fmt(loadRps * (x.share / 100))} of the ${fmt(loadRps)} requests a second. At ${rate} RPS a replica held at ${cfg.thresholdPct}% that implies ${Math.ceil((loadRps * (x.share / 100)) / (rate * cfg.thresholdPct / 100))}, and against a floor of ${floor} it runs ${n}. The per-replica rate is ADR-0032's autoscale trigger and a hypothesis until tools/bench.py runs${deployedOnly ? ' — and it is one of the calculator\'s inputs above' : ''}.`,
+        };
+      });
+    };
+
+    const variants = M.VARIANTS.map((v) => pill(
+      cfg.variant === v.key,
+      v.key,
+      `${v.name} — changes ${v.changes}, attacks ${v.attacks}. ${v.note} Source: ${v.file}.`,
+      () => this.resolve({ variant: v.key }),
+    ));
+    const vNow = M.VARIANTS.find((v) => v.key === cfg.variant) ?? M.VARIANTS[0];
+    const variantLine = `${vNow.name} — changes ${vNow.changes}, attacks ${vNow.attacks}`;
+    const variantFile = vNow.inPackage ? vNow.file : `${vNow.file} — the README declines to build this`;
+    const variantNote = vNow.note;
+    const variantFileStyle = `font-family: var(--mono); font-size: 10px; color: ${vNow.inPackage ? 'var(--faint)' : 'var(--warmt)'};`;
+
+    const venues = M.VENUES.map((v) => pill(
+      cfg.venue === v.key, v.label,
+      `${fmt(v.guests)} guests a day at ${v.buyPct}% buying · ${fmt(v.reqDay)} requests a day · ${v.steadyRps} rps steady · the document puts the peak at ${fmt(v.docPeak)} rps, ${v.window}. TICVAI_Deployment_Technical Part 2, the client's own numbers.`,
+      () => this.resolve({ venue: v.key }),
+    ));
+    const bases = M.BASES.map((b) => pill(
+      cfg.basis === b.key, b.label, b.note, () => this.resolve({ basis: b.key }),
+    ));
+    const derivation = `${fmt(derived.venue.guests)} guests × ${derived.venue.buyPct}% buying = ${fmt(derived.buyers)} buyers · × ${derived.calls} calls = ${fmt(derived.requests)} requests · ÷ ${M.clock(cfg.windowSec)} = ${fmt(derived.mean)} rps mean · × ${M.BURST_FACTOR} burst = ${fmt(derived.peak)} rps peak`;
+
+    // Every knob is both a slider and a number you can type into, because a
+    // slider cannot land on 6,270 and somebody comparing runs needs to.
+    const knob = (key, label, min, max, st, display, note, mine) => ({
+      label, min, max, step: st, value: cfg[key], display, note,
+      unit: String(display).replace(/^[\d,.\s-]+/, '') || '',
+      mineStyle: mine ? 'margin-left: 6px; font-family: var(--mono); font-size: 9px; letter-spacing: .06em; text-transform: uppercase; color: var(--warmt); border: 1px solid var(--warmt); border-radius: 3px; padding: 0 4px;' : 'display: none;',
+      on: (e) => this.resolve({ [key]: Number(e.target.value) }),
+      onType: (e) => {
+        const raw = Number(String(e.target.value).replace(/[^\d.-]/g, ''));
+        if (!Number.isFinite(raw)) return;
+        // Typed values are clamped rather than rejected, so a stray digit
+        // cannot put the model somewhere it has no answer for.
+        this.resolve({ [key]: Math.max(min, Math.min(max, raw)) });
+      },
+    });
+    const knobs = [
+      ...(free ? [knob('freeBuyers', 'buyers arriving', 0, Math.max(400, Math.round(derived.peak / derived.calls * 2)), 1,
+        `${fmt(cfg.freeBuyers)}/s`,
+        `${fmt(cfg.freeBuyers * derived.calls)} requests a second. You hold this — nothing else drives arrivals in a free run.`, false)] : []),
+      knob('windowSec', 'sale window', 300, 14400, 300, M.clock(cfg.windowSec),
+        `${fmt(derived.buyers)} buyers × ${derived.calls} calls ÷ ${fmt(cfg.windowSec)}s × ${M.BURST_FACTOR} = ${fmt(derived.peak)} rps peak. The window is the whole variable: the same seats over two hours are 1,045 rps and over twenty minutes 6,270.`, false),
+      knob('thresholdPct', 'scale above', 40, 95, 1, `${cfg.thresholdPct}%`, 'target utilisation per replica — the package says these autoscale on RPS and never says at what', false),
+      knob('scaleStepPct', 'scale step', 1, 50, 1, `${cfg.scaleStepPct}%`, `of the ceiling a decision, one every ${M.SCALE_TICK}s`, false),
+      ...(vNow.params.leaseShards ? [knob('anySeatPct', 'take any seat', 0, 100, 1, `${cfg.anySeatPct}%`,
+        `the share a sharded lease can parallelise. A buyer choosing a specific seat still serialises — they are contending for a seat rather than for capacity — so at ${cfg.anySeatPct}% the ${vNow.params.leaseShards} shards carry ${fmt((1000 / cfg.lockMs) * (vNow.params.leaseShards * cfg.anySeatPct / 100 + (1 - cfg.anySeatPct / 100)))} holds a second rather than ${fmt((1000 / cfg.lockMs) * vNow.params.leaseShards)}.`, true)] : []),
+      ...M.CLUSTERS.map((c) => knob(c.capKey, `${c.short} ceiling`, M.saleFloorFor(cfg, c).n, M.NO_CEILING, 1,
+        M.isUncapped(cfg, c) ? 'none' : String(M.ceilingFor(cfg, c)),
+        M.isUncapped(cfg, c)
+          ? `No ceiling, which is what the package sets — “a cap is a cap on absorbing a peak nobody predicted, and the peak is the whole reason this environment exists.” The calculated floor is ${M.saleFloorFor(cfg, c).n}. Drag this down to impose one and watch the overflow queue.`
+          : `Calculated floor ${M.saleFloorFor(cfg, c).n}, driven by ${M.saleFloorFor(cfg, c).drivenBy}. At a ceiling of ${M.ceilingFor(cfg, c)} the cluster carries ${fmt(M.ceilingFor(cfg, c) * M.replicaRpsFor(cfg, c))} requests a second flat out; anything above waits in the queue. The package sets no maximum at all.`, false)),
+      ...(vNow.params.leaseShards ? [knob('fragSpreadPct', 'shard unevenness', 2, 90, 1, `${cfg.fragSpreadPct}%`,
+        `How unevenly sixteen sub-pools deplete, as a share of a shard's original depth. This curve is mine — the yml states that the last seats fragment and gives no distribution for it. At ${cfg.fragSpreadPct}% a buyer starts being told there is nothing left while seats remain in other shards once the average shard is down to about ${fmt((seatsFor2 / (vNow.params.leaseShards || 1)) * (cfg.fragSpreadPct / 100))} seats. Turn it down to model a rebalancer that C does not implement.`, true)] : []),
+      knob('holdTtlSec', 'hold TTL', 5, 300, 5, `${cfg.holdTtlSec}s`,
+        'How long a hold survives while a guest pays. The package states none at all, which makes this a correctness dependency rather than housekeeping: it has to exceed worst-case lock wait plus the gateway round trip plus margin, or the seat is released while the money is being taken.', true),
+      knob('maxWaitSec', 'max wait', 2, 180, 1, `${cfg.maxWaitSec}s`,
+        'how long a queued request waits before the buyer is gone. The queue is bounded because a guest waiting in one does not know whether they have a ticket.', true),
+      knob('dbStatementMs', 'statement time', 1, 20, 1, `${cfg.dbStatementMs}ms`,
+        `mean on postgres-hot → ${fmt((M.COMPOSE.pgbouncer.poolSize * 1000) / cfg.dbStatementMs)} statements a second through the pooler's ${M.COMPOSE.pgbouncer.poolSize} server connections`, true),
+      knob('startSec', 'start time', 2, 120, 1, `${cfg.startSec}s`, 'container cold start to ready', true),
+      knob('lockMs', 'lease hold', 1, 40, 1, `${cfg.lockMs}ms`, `on a contended row → ${fmt(1000 / cfg.lockMs)} holds a second, whatever the replica count`, true),
+      knob('sloMs', 'p99 SLO', 100, 3000, 50, `${cfg.sloMs}ms`, 'what a buyer would tolerate', true),
+      knob('divergencePct', 'price moved for', 0, 100, 1, `${cfg.divergencePct}%`, 'share of orders taken at a price that later changed', false),
+      knob('salesPerMonth', 'sales a month', 0, 30, 1, String(cfg.salesPerMonth),
+        'how many announced on-sales the month carries. The shared cell is billed monthly whether or not any happen; each sale is rented by the hour and returned.', false),
+    ];
+
+    const POL = [['honourSnapshot', 'honourSnapshot'], ['honourCurrent', 'honourCurrent'], ['reject', 'reject']];
+    /* ── the sizing calculator ──────────────────────────────────────────
+       The floors are worked out here from inputs the reader sets, not read out
+       of a generated file. At the package's own inputs it lands on the
+       package's own answer, which is the only way to trust it at others. */
+    const calcRows = M.CLUSTERS.map((c) => {
+      const f = M.saleFloorFor(cfg, c);
+      const byLoad = f.drivenBy === 'load';
+      const anticipated = M.anticipatedFor(cfg, c);
+      return {
+        short: c.short,
+        share: `${c.share}%`,
+        rpsAtLoad: fmt(f.rpsAtLoad),
+        per: `${M.replicaRpsFor(cfg, c)} × ${cfg.thresholdPct}%`,
+        capacity: fmt(M.replicaRpsFor(cfg, c) * (cfg.thresholdPct / 100)),
+        implied: String(f.implied),
+        floor: String(f.survivability),
+        n: String(f.n),
+        drivenBy: byLoad ? 'load' : 'floor',
+        drivenStyle: `font-family: var(--mono); font-size: 10px; text-align: right; color: ${byLoad ? 'var(--acb)' : 'var(--green, #7fbf8f)'};`,
+        util: `${Math.round((f.rpsAtLoad / (f.n * M.replicaRpsFor(cfg, c))) * 100)}%`,
+        atPeak: String(anticipated),
+        rowStyle: 'display: grid; grid-template-columns: 72px 40px 58px 78px 44px 50px 38px 50px 54px; gap: 8px; align-items: baseline; font-family: var(--mono); font-size: 10.5px; color: var(--dim); padding: 5px 0; border-bottom: 1px solid var(--div);',
+        tip: `${c.name}. ${c.share}% of ${fmt(f.load)} rps is ${fmt(f.rpsAtLoad)}. One replica carries ${M.replicaRpsFor(cfg, c)} rps flat out and you are holding it at ${cfg.thresholdPct}%, so ${fmt(M.replicaRpsFor(cfg, c) * (cfg.thresholdPct / 100))} usable each — ${fmt(f.rpsAtLoad)} ÷ ${fmt(M.replicaRpsFor(cfg, c) * (cfg.thresholdPct / 100))} = ${f.implied}. Against a survivability floor of ${f.survivability} the answer is ${f.n}, driven by ${f.drivenBy}. At that count each replica sits at ${Math.round((f.rpsAtLoad / (f.n * M.replicaRpsFor(cfg, c))) * 100)}% and the autoscaler adds another above ${f.scaleOutAt} rps a replica. The mean service time follows from the same rate: ${M.serviceMsFor(cfg, c).toFixed(1)}ms on ${c.cpus} cpu.`,
+      };
+    });
+
+    const calcKnobs = [
+      knob('sizingLoadRps', 'sized for', 500, 20000, 100, `${fmt(cfg.sizingLoadRps)} rps`,
+        `The load the floors are calculated for. ADR-0035 names 5,000; this run's own derived peak is ${fmt(cfg.peakRps)}, and the floors below are what the environment is stood up at before any of it arrives.`, false),
+      knob('sizingFloor', 'survivability', 1, 12, 1, String(cfg.sizingFloor),
+        'The count below which there is no redundancy at all, whatever the load says. It is what decides Identity, whose share implies one.', false),
+      knob('rpsCatalogue', 'Catalogue rps/rep', 50, 1200, 10, String(cfg.rpsCatalogue),
+        `ADR-0032's trigger for Catalogue, and a hypothesis until tools/bench.py runs. It also sets the service time: ${M.serviceMsFor(cfg, M.CLUSTERS[0]).toFixed(1)}ms on 4 cpu.`, true),
+      knob('rpsOrder', 'Order rps/rep', 50, 1200, 10, String(cfg.rpsOrder),
+        `Order writes and posts to the ledger, so its rate is lower than Catalogue's. ${M.serviceMsFor(cfg, M.CLUSTERS[1]).toFixed(1)}ms on 4 cpu.`, true),
+      knob('rpsIdentity', 'Identity rps/rep', 50, 1200, 10, String(cfg.rpsIdentity),
+        `A token check, so the rate is high and the share is small — which is why the floor decides this one rather than the load. ${M.serviceMsFor(cfg, M.CLUSTERS[2]).toFixed(1)}ms on 2 cpu.`, true),
+    ];
+
+    const calcTotal = M.CLUSTERS.reduce((a, c) => a + M.saleFloorFor(cfg, c).n, 0);
+    const calcPeakTotal = M.CLUSTERS.reduce((a, c) => a + M.anticipatedFor(cfg, c), 0);
+    const matchesPackage = M.CLUSTERS.every((c) => M.saleFloorFor(cfg, c).n === c.min);
+    // Which term of max(floor, implied) actually decided each one. Not all
+    // three are load-driven, and the exception is the interesting part.
+    const byLoad = M.CLUSTERS.filter((c) => M.saleFloorFor(cfg, c).drivenBy === 'load');
+    const byFloor = M.CLUSTERS.filter((c) => M.saleFloorFor(cfg, c).drivenBy !== 'load');
+    const drivenNote = byFloor.length === 0
+      ? `All three are driven by load at these inputs — every share is large enough that the arithmetic asks for more than the floor of ${cfg.sizingFloor}.`
+      : byLoad.length === 0
+        ? `None of them is driven by load at these inputs: every share implies fewer than the floor of ${cfg.sizingFloor}, so survivability decides all three.`
+        : `${byLoad.map((c) => c.short).join(' and ')} ${byLoad.length === 1 ? 'is' : 'are'} driven by load. ${byFloor.map((c) => c.short).join(' and ')} ${byFloor.length === 1 ? 'is' : 'are'} not — ${byFloor.map((c) => `${c.share}%`).join(' and ')} of the mix implies ${byFloor.map((c) => M.saleFloorFor(cfg, c).implied).join(' and ')}, and one replica is no redundancy, so the floor of ${cfg.sizingFloor} decides it.`;
+
+    const POL_TIP = {
+      honourSnapshot: 'Replay at the price the guest saw at snapshotTakenAt. What a guest expects, and it may undercharge.',
+      honourCurrent: 'Replay at the permanent platform’s current price. Correct in the ledger, and it charges somebody a price they never saw.',
+      reject: 'Refuse the order at reconciliation and put it in sync.rejection. Safe, and it turns a completed purchase into a support case.',
+    };
+    const policies = POL.map(([v, label]) => ({
+      label,
+      tip: `${POL_TIP[v]} ADR-0035 names all three and gives priceDivergencePolicy no default on purpose: somebody chooses per sale, because the right answer depends on how large the divergence is and who the venue would rather disappoint.`,
+      on: () => this.resolve({ policy: v }),
+      style: `border: 1px solid ${cfg.policy === v ? 'var(--acl)' : 'var(--line)'}; background: ${cfg.policy === v ? 'var(--acs)' : 'var(--card)'}; color: ${cfg.policy === v ? 'var(--acb)' : 'var(--faint)'}; border-radius: 7px; padding: 5px 10px; font-family: var(--mono); font-size: 10.5px; cursor: pointer;`,
+    }));
+    const policyNote = cfg.divergencePct === 0
+      ? 'No price moved, so the policy costs nothing. ADR-0035 gives it no default on purpose.'
+      : cfg.policy === 'reject'
+        ? `${cfg.divergencePct}% reject at reconciliation and land in sync.rejection. Safe, and it turns a completed purchase into a support case.`
+        : cfg.policy === 'honourCurrent'
+          ? `${cfg.divergencePct}% replay at the current price. Correct in the ledger, and it charges somebody a price they never saw.`
+          : `${cfg.divergencePct}% replay at the price the guest saw. What a guest expects, and it may undercharge.`;
+
+    /**
+     * In a scenario the playhead moves to the next phase boundary. **A free run
+     * has no future to move to**, so the button runs the world forward instead,
+     * until the state changes — which is what makes provisioning and warming
+     * bearable at 1× when they take 240s and 150s.
+     */
+    const phaseAt = (dir) => {
+      if (free) {
+        if (dir < 0) return;
+        const from = f.world.state;
+        let guard2 = 0;
+        while (f.world.state === from && guard2 < 4000) {
+          f.samples.push(M.stepWorld(f.world, cfg, 1));
+          guard2 += 1;
+        }
+        if (f.samples.length > 5000) f.samples.splice(0, f.samples.length - 5000);
+        this.forceUpdate();
+        return;
+      }
+      const bounds = phases.map((p) => p.from);
+      const target = dir > 0
+        ? bounds.find((b) => b > s.t + dt)
+        : [...bounds].reverse().find((b) => b < s.t - dt);
+      if (target == null) {
+        // Past the last phase or before the first: wrap, rather than sit there
+        // doing nothing.
+        this.freshRun();
+        this.setState({ i: dir > 0 ? 0 : N, playing: false });
+        return;
+      }
+      this.setState({ i: Math.round(target / dt), playing: false });
+    };
+
+    // What a free run is waiting for. Without this the 390 seconds of
+    // provisioning and warming look like a page that has stopped working.
+    const dwellLeft = M.DWELL[s.state] != null
+      ? Math.max(0, M.DWELL[s.state] - (s.t - (phases[phases.length - 1]?.from ?? 0)))
+      : null;
+    const waitingFor = !free ? '' : dwellLeft != null
+      ? `${s.state} — ${M.clock(dwellLeft)} to go`
+      : s.state === 'requested'
+        ? 'nothing is running. Press “Stand it up”.'
+        : s.state === 'live'
+          ? cfg.freeBuyers > 0 ? 'live and serving' : 'live — set the arrival rate'
+          : s.state;
+
+    const frac = (e) => {
+      const r = e.currentTarget.getBoundingClientRect();
+      return (e.clientX - r.left) / r.width;
+    };
+
+    /* ── the ledger ─────────────────────────────────────────────────── */
+    const SEV_ORDER = { integrity: 0, refused: 1, hard: 2, soft: 3 };
+    const ledger = [...events]
+      .sort((a, b) => ((SEV_ORDER[a.severity] ?? 9) - (SEV_ORDER[b.severity] ?? 9)) || a.from - b.from)
+      .map((ev) => ({
+        title: ev.title,
+        detail: ev.detail,
+        source: ev.source,
+        window: ev.presses > 1
+          ? `${M.clock(ev.from)} · ×${ev.presses}`
+          : ev.to > ev.from + dt ? `${M.clock(ev.from)} – ${M.clock(ev.to)}` : M.clock(ev.from),
+        on: () => { if (!free) this.setState({ i: Math.round(ev.from / dt), playing: false }); },
+        dot: `width: 8px; height: 8px; border-radius: 2px; margin-top: 4px; background: ${SEV[ev.severity] ?? 'var(--amber)'};`,
+        style: `display: grid; grid-template-columns: 8px minmax(0, 1fr) auto; gap: 12px; align-items: start; text-align: left; border: 1px solid ${ev.severity === 'integrity' ? '#e07ab0' : ev.severity === 'soft' ? 'var(--line)' : 'var(--red)'}; background: ${ev.severity === 'soft' ? 'var(--card)' : ev.severity === 'integrity' ? '#2b1c28' : 'var(--warm)'}; border-radius: 10px; padding: 12px 14px; font-family: inherit; cursor: pointer; width: 100%;`,
+      }));
+
+    /* ── the recommendation ─────────────────────────────────────────── */
+    const short = rec.perCluster.filter((c) => c.shortfall > 0);
+    const bindingContention = rec.contention.binding;
+    const recRows = rec.perCluster.map((c) => ({
+      short: c.short,
+      tip: `${c.name} at the derived peak: ${fmt(c.lambda)} requests a second. ${c.atThreshold} replicas to hold ${cfg.thresholdPct}% utilisation, ${c.forSlo} to hold the ${cfg.sloMs}ms p99 — the recommendation is the larger. ${M.isUncapped(cfg, c) ? 'You have set no ceiling, as the package does' : `Your ceiling is ${c.ceiling}`}; the derived floor is ${c.min} (${c.derivedFrom}) and compose is told ${c.composeReplicas} because it has no autoscaler.${c.shortfall > 0 ? ` It is ${c.shortfall} short of what it needs, and at your ceiling the p99 is ${Number.isFinite(c.p99AtCap) ? `${fmt(c.p99AtCap)}ms` : 'unbounded — it saturates and the overflow waits'}.` : ''}`,
+      lambda: fmt(c.lambda),
+      atThreshold: String(c.atThreshold),
+      forSlo: String(c.forSlo),
+      need: String(c.need),
+      cap: String(c.ceiling),
+      verdict: c.shortfall > 0
+        ? `${c.shortfall} short — ${Number.isFinite(c.p99AtCap) ? `p99 ${fmt(c.p99AtCap)}ms` : 'saturated'} at ${c.ceiling}`
+        : `${Math.round(c.rhoAtCap * 100)}% utilised, p99 ${fmt(c.p99AtCap)}ms`,
+      rowStyle: c.shortfall > 0 ? 'background: var(--warm);' : '',
+    }));
+
+    const recCards = [
+      {
+        v: rec.bestThreshold != null ? `${rec.bestThreshold}%` : 'none holds',
+        k: 'recommended target utilisation',
+        n: rec.bestThreshold != null
+          ? `The loosest target that fits inside the file's ceilings and holds ${cfg.sloMs}ms at the peak — a pool of that many workers queues far better than the ratio suggests. It buys nothing for the scale-up lag or the lease path, and it leaves no headroom for either.`
+          : `No target between 40% and 95% both fits the ceilings and holds ${cfg.sloMs}ms at this peak. Raise the ceilings or lower the peak.`,
+        box: `border: 1px solid ${rec.bestThreshold != null ? 'var(--acl)' : 'var(--red)'}; border-radius: 10px; background: ${rec.bestThreshold != null ? 'var(--acs)' : 'var(--warm)'}; padding: 14px 16px; color: ${rec.bestThreshold != null ? 'var(--acb)' : 'var(--red)'};`,
+      },
+      {
+        v: `${Math.round(rec.prewarmSec / 60)} min`,
+        k: 'recommended pre-warm lead',
+        n: `240s provisioning, 150s warming, then ${rec.scaleSec}s to scale from the resting count at ${cfg.scaleStepPct}% a step. Request it this far before on-sale, or the sale opens into a cold environment.`,
+        box: 'border: 1px solid var(--div); border-radius: 10px; background: var(--card); padding: 14px 16px;',
+      },
+      {
+        v: `${fmt(rec.contention.contentionRps)} rps`,
+        k: 'the lease ceiling',
+        n: bindingContention
+          ? `What the two contended rows can carry at a ${cfg.lockMs}ms lease — ${fmt(rec.contention.shortfall)} buyers a second short of the peak. No replica count moves this number.`
+          : `What the two contended rows can carry at a ${cfg.lockMs}ms lease. Above the peak, so containers bind first — the one case where scaling helps.`,
+        box: `border: 1px solid ${bindingContention ? 'var(--red)' : 'var(--div)'}; border-radius: 10px; background: ${bindingContention ? 'var(--warm)' : 'var(--card)'}; padding: 14px 16px; color: ${bindingContention ? 'var(--red)' : 'var(--text)'};`,
+      },
+    ];
+
+    /* ── the six, side by side ──────────────────────────────────────────
+       The README's own framing: one number decides, and it is holds a second
+       on a single hot performance. Solved for each configuration at this peak
+       rather than asserted, which is the whole reason to have a model. */
+    /* Solved once per config, not once per frame. Seven `recommend()` calls at
+       thirty frames a second was most of the render cost, and it made playback
+       run at a fraction of the speed the transport claimed. */
+    const cmpKey = [cfg.variant, cfg.peakRps, cfg.thresholdPct, cfg.sloMs, cfg.lockMs,
+      cfg.dbStatementMs, cfg.anySeatPct, cfg.basis, cfg.scaleStepPct,
+      cfg.capCatalogue, cfg.capOrder, cfg.capIdentity].join('|');
+    if (this._cmpKey !== cmpKey) {
+      this._cmpKey = cmpKey;
+      this._cmp = M.VARIANTS.map((v) => M.recommend({ ...cfg, variant: v.key }));
+      this._baseHolds = this._cmp[0].contention.contentionRps;
+    }
+    const baseHolds = this._baseHolds;
+    const compare = M.VARIANTS.map((v, vi) => {
+      const r2 = this._cmp[vi];
+      const holds = r2.contention.contentionRps;
+      const moves = holds > baseHolds * 1.05;
+      return {
+        key: v.key,
+        name: v.name.replace(/^[A-Z] · /, ''),
+        changes: v.changes,
+        holds: fmt(holds),
+        db: `${fmt(r2.store.readRps + r2.store.writeRps)} of ${fmt(r2.store.capacity)}`,
+        moves: moves ? 'moves the wall' : 'leaves it flat',
+        tip: `${v.note} At this peak it puts the lease ceiling at ${fmt(holds)} requests a second against the baseline's ${fmt(baseHolds)}, and the statements reaching Postgres at ${fmt(r2.store.readRps + r2.store.writeRps)} of ${fmt(r2.store.capacity)}. Source: ${v.file}.`,
+        rowStyle: `border: 1px solid ${v.key === cfg.variant ? 'var(--acl)' : moves ? 'var(--line)' : 'var(--div)'}; background: ${v.key === cfg.variant ? 'var(--acs)' : 'var(--card)'}; border-radius: 9px; padding: 10px 12px; display: grid; grid-template-columns: 22px minmax(0, 1.1fr) 96px 128px 104px; gap: 10px; align-items: baseline; text-align: left; font-family: inherit; cursor: pointer; width: 100%;`,
+        keyStyle: `font-family: var(--mono); font-size: 11px; font-weight: 500; color: ${v.inPackage ? 'var(--acb)' : 'var(--warmt)'};`,
+        movesStyle: `font-family: var(--mono); font-size: 10px; text-align: right; color: ${moves ? 'var(--acb)' : 'var(--faint)'};`,
+        on: () => this.resolve({ variant: v.key }),
+      };
+    });
+
+    const diffText = rec.diff.length
+      ? rec.diff.map((d) => `   ${d.service}:\n     deploy:\n-      replicas: ${d.was}\n+      replicas: ${d.now}`).join('\n')
+      : '   # no change — the ceilings already hold';
+    const verdictHot = short.length > 0 || bindingContention;
+
+    /* ── the run, priced ────────────────────────────────────────────── */
+    const runFacts = [
+      { k: 'ended in', v: sum.endState, n: sum.endState === 'decommissioned' ? 'the only state teardown is allowed from, reached through reconciled' : 'the run has not reached teardown', color: sum.endState === 'decommissioned' ? 'var(--acb)' : 'var(--amber)' },
+      { k: 'orders taken', v: fmt(sum.orders), n: `${fmt(sum.replayed)} replayed${sum.rejected >= 1 ? `, ${fmt(sum.rejected)} to sync.rejection` : ', none rejected'}`, color: 'var(--text)' },
+      { k: 'no ticket', v: fmt(sum.lostSoldOut + sum.lostServed),
+        n: `${Math.round((1 - sum.conversion) * 100)}% of everyone who arrived, and ${sum.lostSoldOut > sum.lostServed ? 'most of it is stock rather than capacity' : 'most of it is capacity rather than stock'} — the lines below account for all of it${sum.reconciles ? '' : ' (they do not currently add up, which is a bug)'}`,
+        color: sum.lostServed > 1 ? 'var(--red)' : 'var(--acb)' },
+      { k: '— sold out', v: fmt(sum.lostSoldOut),
+        n: sum.lostSoldOut > 1
+          ? `found no stock left — either after the last of ${fmt(sum.seats)} seats had gone${sum.soldOutAt != null ? `, at ${M.clock(sum.soldOutAt)}` : ''}, or in the moments when fewer remained than arrived. Not a failure of the environment: there was nothing to sell them, and a sale that sells out is the outcome the venue wanted`
+          : 'the sale did not sell out, so nobody was turned away for want of stock',
+        color: sum.lostSoldOut > 1 ? 'var(--acb)' : 'var(--text)' },
+      { k: '— the lease path', v: fmt(sum.lostLease),
+        n: sum.lostLease > 1
+          ? `could not get a hold while seats were still available. Every buyer wants the same rows and the path serialises at ${fmt(1000 / cfg.lockMs)} a second — this is the failure that no replica count fixes`
+          : 'the lease path never bound while stock remained',
+        color: sum.lostLease > 1 ? 'var(--red)' : 'var(--text)' },
+      { k: '— an empty shard', v: fmt(sum.lostFragmented),
+        n: sum.lostFragmented > 1
+          ? `were told there was nothing left while seats remained in another sub-pool. This is what sharding the lease costs: the throughput wall goes and a correctness one takes its place at the end of the sale, because nothing rebalances the shards`
+          : (s.leaseShards ?? 1) > 1 ? 'the shards never emptied unevenly enough to refuse anyone' : 'the lease is not sharded, so there are no shards to empty',
+        color: sum.lostFragmented > 1 ? 'var(--red)' : 'var(--text)' },
+      { k: '— cluster capacity', v: fmt(sum.lostCapacity),
+        n: sum.lostCapacity > 1
+          ? 'could not be served while seats were still available, because a cluster was at its ceiling. This is the one more containers would have fixed'
+          : 'no cluster ever bound while stock remained',
+        color: sum.lostCapacity > 1 ? 'var(--amber)' : 'var(--text)' },
+      { k: 'seats oversold', v: fmt(sum.oversold),
+        n: sum.oversold > 1
+          ? 'sold twice through a read-then-update race. Inventory went negative — two guests hold one seat — and if that happened through a bug rather than a configured oversale allowance, a capacity safeguard has been bypassed rather than exercised'
+          : 'none. The guard is in the WHERE clause, which is safe at any contention level',
+        color: sum.oversold > 1 ? '#e07ab0' : 'var(--text)' },
+      { k: 'paid, no seat', v: fmt(sum.moneyNoSeat),
+        n: sum.moneyNoSeat > 1
+          ? 'waited on the lock, went to the gateway, and came back to an expired hold. Money captured and the seat gone: a reconciliation break, and a guest at the gate with an invalid ticket'
+          : `the ${cfg.holdTtlSec}s hold stayed ahead of lock wait plus gateway on this run`,
+        color: sum.moneyNoSeat > 1 ? '#e07ab0' : 'var(--text)' },
+      { k: 'left the queue', v: fmt(sum.abandoned),
+        n: `requests that waited past ${cfg.maxWaitSec}s and gave up. A bounded queue is deliberate: a guest waiting in one does not know whether they have a ticket`,
+        color: sum.abandoned > 1 ? 'var(--red)' : 'var(--text)' },
+      { k: 'holds refused', v: fmt(sum.holdRefused), n: 'attempts that found no row under SKIP LOCKED, counted over the whole sale — several a buyer, so this is larger than the buyers affected', color: sum.holdRefused > 1 ? 'var(--red)' : 'var(--text)' },
+      { k: 'peak p99', v: `${fmt(sum.peakP99)}ms`, n: `against a ${cfg.sloMs}ms SLO. The service times come from ADR-0032’s per-replica triggers, which are a hypothesis until tools/bench.py runs`, color: sum.peakP99 > cfg.sloMs ? 'var(--red)' : 'var(--text)' },
+      { k: 'peak containers', v: M.CLUSTERS.every((c) => M.isUncapped(cfg, c))
+        ? `${sum.peakContainers}, uncapped`
+        : `${sum.peakContainers} of ${M.CLUSTERS.reduce((a, c) => a + M.ceilingFor(cfg, c), 0)}`,
+        n: `${fmt(sum.peakConns)} client connections against MAX_CLIENT_CONN ${fmt(M.COMPOSE.pgbouncer.maxClient)}`, color: 'var(--text)' },
+      { k: 'resources', v: `${sum.cpuHours.toFixed(1)} cpu-h`, n: `${sum.gbHours.toFixed(0)} GB-h, integrated across the run`, color: 'var(--text)' },
+      { k: 'spent', v: M.money(sum.spent), n: `at ${M.money(M.RATE_PER_HOUR)} an hour fully expanded${sum.forgotten ? ` — and ${M.money(sum.forgotten.usd)} more if it is left up the month this scenario leaves it up` : ''}`, color: sum.forgotten ? 'var(--red)' : 'var(--acb)' },
+    ];
+
+    /* ── the month ──────────────────────────────────────────────────────
+       **Two bills of different kinds.** The shared cell is billed by the month
+       and runs whether or not a sale happens; the burst environment is billed
+       by the hour and only while it is up. Adding them without saying which is
+       which is how a $24 sale gets blamed for a $3,485 platform. */
+    const prov = cfg.provider ?? 'aws';
+    const hourly = M.HOSTING.burstHourly[prov];
+    const upkeep = M.HOSTING.shared[prov];
+    const indexShare = M.HOSTING.searchIndexMonthly;
+    const runHours = Math.max(sum.cpuHours > 0 ? run?.horizon / 3600 || 0 : 0, 0) || (T / 3600);
+    const perSale = hourly * runHours;
+    const salesCost = perSale * cfg.salesPerMonth;
+    const monthTotal = upkeep + indexShare + salesCost;
+
+    const providers = M.PROVIDERS.map((p) => pill(
+      prov === p.key, p.name,
+      `${p.name} pricing from TICVAI_Hosting_Summary: $${M.HOSTING.burstHourly[p.key].toFixed(2)} an hour for the burst environment and $${fmt(M.HOSTING.shared[p.key])} a month for the shared cell. ${M.HOSTING.note}`,
+      () => this.resolve({ provider: p.key }),
+    ));
+
+    const money = M.money;
+    const monthRows = [
+      {
+        k: 'the shared cell',
+        v: money(upkeep),
+        n: `Billed by the month and always on — one cell per country holding many tenants, sixteen services at a floor of two. It runs whether or not a sale is happening, so none of it is the sale's cost.`,
+        colour: 'var(--text)',
+        tip: `${M.HOSTING.shared.name}, ${M.HOSTING.shared.billing}. ${M.HOSTING.source}. A venue's share of it is about $${M.HOSTING.venueShare.small} a month for a museum, $${M.HOSTING.venueShare.medium} for a theme park and $${fmt(M.HOSTING.venueShare.large)} for a stadium on an ordinary day. Across ${M.HOSTING.fleet.customers} customers at ${M.HOSTING.fleet.venuesEach} venues each it is $${fmt(M.HOSTING.fleet.sharedMonthly)} a month, against $${fmt(M.HOSTING.fleet.privateMonthly)} if every customer had their own.`,
+      },
+      {
+        k: 'the search index',
+        v: money(indexShare),
+        n: 'Shared across every customer, and the only part of the AI Concierge we pay for — the model runs on the customer’s own provider account, capped. The cheapest part of the system and the only one whose UAE compliance position is unsettled.',
+        colour: 'var(--text)',
+        tip: 'Roughly $1,150 a month across every customer. The same forty questions get asked thousands of times a day at a kiosk, so answers are remembered: a remembered answer is instant and free, a new one costs the customer money and takes a second.',
+      },
+      {
+        k: 'this sale, once',
+        v: money(perSale),
+        n: `${runHours.toFixed(1)} hours at ${money(hourly)} an hour, rented and returned. A sixty-thousand-seat stadium selling out costs about twenty-four dollars in machinery.`,
+        colour: 'var(--acb)',
+        tip: `Billed by the hour only while the environment is up: ${money(hourly)} an hour on ${M.PROVIDERS.find((p) => p.key === prov).name}. This run was ${runHours.toFixed(1)} hours of simulated time from request to teardown. ADR-0035's own four points are $24 for two hours, $71 for six, $282 for a day and $8,587 for a month left running.`,
+      },
+      {
+        k: `× ${cfg.salesPerMonth} sales a month`,
+        v: money(salesCost),
+        n: cfg.salesPerMonth === 0
+          ? 'No on-sales this month, so the burst environment costs nothing at all — which is the point of renting it.'
+          : `${cfg.salesPerMonth} on-sales of this shape. Still ${((salesCost / monthTotal) * 100).toFixed(1)}% of the monthly bill.`,
+        colour: 'var(--acb)',
+        tip: 'How many announced on-sales the month carries. Each one is provisioned before it opens and torn down after, so the cost is linear in the number of sales rather than in the size of the platform.',
+      },
+    ];
+
+    const monthShare = [
+      { label: 'shared cell', usd: upkeep, colour: '#48cfcb' },
+      { label: 'search index', usd: indexShare, colour: '#2c7c7d' },
+      { label: 'on-sales', usd: salesCost, colour: '#d9a143' },
+    ].map((x) => ({
+      label: x.label,
+      v: money(x.usd),
+      pct: `${((x.usd / monthTotal) * 100).toFixed(1)}%`,
+      style: `display: block; height: 100%; width: ${((x.usd / monthTotal) * 100).toFixed(2)}%; background: ${x.colour};`,
+      tip: `${money(x.usd)} of ${money(monthTotal)} — ${((x.usd / monthTotal) * 100).toFixed(1)}% of the month.`,
+    }));
+
+    const maxCost = M.COST_POINTS[M.COST_POINTS.length - 1].usd;
+    const ladder = M.COST_POINTS.map((p) => ({
+      label: p.label,
+      usd: M.money(p.usd),
+      tip: `${p.hours} hour${p.hours === 1 ? '' : 's'} at $${(p.usd / p.hours).toFixed(2)} an hour. ADR-0035's own figure, quoted. ${p.hours === 720 ? 'This is the one that matters: a month of forgetting costs more than the platform the environment was protecting, which is why switching it off has to be automatic rather than somebody’s job.' : p.hours === 2 ? 'A sixty-thousand-seat stadium selling out costs about twenty-four dollars in machinery.' : 'Rented by the hour and returned.'}`,
+      style: `display: block; height: 100%; border-radius: 999px; width: ${Math.max(1.5, (p.usd / maxCost) * 100)}%; background: ${p.hours === 720 ? 'var(--red)' : 'var(--acb)'};`,
+    }));
+
+    /* ── the diagram ────────────────────────────────────────────────────
+       Values only. Every coordinate is written in the template so the picture
+       paints before the first sample exists. */
+    const bar = (frac2, w2) => Math.max(0, Math.min(1, frac2 || 0)) * w2;
+
+    /* ── motion ─────────────────────────────────────────────────────────
+       Two kinds. Numbers ease toward their target instead of jumping, which
+       makes a scale-up read as a movement rather than a flicker; and the
+       connectors carry the rate in the speed of their dashes, so a sale that
+       is running fast looks fast and an idle lane stops. Both snap to the
+       exact value when the run is paused, so a still frame is never a lie. */
+    const tw = (key, target, rate) => {
+      if (!this._tw) this._tw = {};
+      const t0 = Number(target) || 0;
+      if (!playing || this._tw[key] == null) { this._tw[key] = t0; return t0; }
+      const next = this._tw[key] + (t0 - this._tw[key]) * (rate ?? 0.18);
+      this._tw[key] = Math.abs(t0 - next) < Math.max(0.4, Math.abs(t0) * 0.002) ? t0 : next;
+      return this._tw[key];
+    };
+    // Duration is quantised, because changing it restarts the animation and a
+    // value that changes every frame never gets to run.
+    const flow = (rps, max, colour, width) => {
+      const frac = Math.max(0, Math.min(1, (rps || 0) / (max || 1)));
+      if (frac < 0.002) {
+        return `stroke: ${colour ?? '#2c7c7d'}; stroke-width: ${width ?? 1.4}; stroke-dasharray: 3 5; opacity: .18;`;
+      }
+      const step = Math.max(1, Math.round(frac * 8));      // eight speeds, not infinite
+      const dur = (2.6 / step).toFixed(2);
+      return `stroke: ${colour ?? '#2c7c7d'}; stroke-width: ${(width ?? 1.4) + frac * 0.9}; `
+        + `stroke-dasharray: 6 10; animation: dashflow ${dur}s linear infinite; `
+        + `opacity: ${(0.32 + frac * 0.55).toFixed(2)};`;
+    };
+    const clusterNode = (pc) => {
+      const c = M.CLUSTERS.find((x) => x.name === pc.name);
+      const hot = pc.rho > 1 || pc.n >= pc.max;
+      const shown = tw(`n:${pc.name}`, pc.n, 0.22);
+      return {
+        name: c.short,
+        // Eased, and rounded to the nearest whole container: a scale-up reads
+        // as a count climbing rather than a number flickering.
+        n: String(Math.round(shown)),
+        countStyle: `transition: color .3s ease; font-family: var(--mono); font-size: 34px; font-weight: 500; font-variant-numeric: tabular-nums; line-height: 1; color: ${hot ? '#d96c63' : pc.starting > 0 ? '#d9a143' : '#48cfcb'};`,
+        ceiling: pc.uncapped ? 'no ceiling' : `of ${pc.max}`,
+        floor: `floor ${M.saleFloorFor(cfg, c).n} · peak ${M.anticipatedFor(cfg, c)}`,
+        rho: `${Math.round(tw(`rho:${pc.name}`, pc.rho * 100))}%`,
+        rhoW: bar(pc.rho, 128).toFixed(1),
+        rhoFill: pc.rho > 1 ? '#d96c63' : pc.rho > cfg.thresholdPct / 100 ? '#d9a143' : '#48cfcb',
+        lambda: `${fmt(tw(`l:${pc.name}`, pc.lambda))} rps`,
+        p99: Number.isFinite(pc.p99) ? `p99 ${fmt(pc.p99)}ms` : 'saturated',
+        stroke: hot ? '#d96c63' : pc.want > pc.n + 0.5 ? '#d9a143' : '#3a3a3a',
+        boxStyle: `transition: border-color .35s ease, background-color .35s ease, box-shadow .35s ease; border: 1px solid ${hot ? '#d96c63' : pc.want > pc.n + 0.5 ? '#d9a143' : '#3a3a3a'}; background: #242424; border-radius: 12px; padding: 12px 16px; box-sizing: border-box; width: 216px; height: 118px; position: absolute;`,
+        // One tick a replica while that is legible. Past twenty-four the strip
+        // would have to stand for several replicas a tick, which reads as
+        // "nearly full" when a cluster is at 23 of 200 — so it goes, and the
+        // count and the utilisation bar carry it instead.
+        dots: pc.max > 24 ? [] : Array.from({ length: pc.max }, (_, k) => ({
+          style: `transition: background-color .3s ease, box-shadow .3s ease; flex: 1 1 0; min-width: 0; border-radius: 1px; display: block; background: ${k < pc.n ? (hot ? '#d96c63' : '#48cfcb') : k < pc.want ? 'transparent' : '#2e2e2e'};`
+            + (k >= pc.n && k < pc.want ? ' box-shadow: inset 0 0 0 1px #d9a143; animation: bpulse 1.2s infinite;' : ''),
+        })),
+        // What the environment was stood up at, from the coming peak rather
+        // than from the load present — which is the point of the whole thing.
+        stoodUpAt: `stood up at ${M.anticipatedFor(cfg, c)}`,
+        // With no strip, the pending count has to be said in words.
+        pending: pc.max > 24 && pc.want > pc.n
+          ? `${pc.want > pc.max ? `wants ${pc.want}` : `+${Math.round(pc.want - pc.n)} starting`}`
+          : '',
+        rhoStyle: `transition: width .28s ease, background-color .3s ease; display: block; height: 100%; border-radius: 2px; width: ${Math.min(100, pc.rho * 100).toFixed(1)}%; background: ${pc.rho > 1 ? '#d96c63' : pc.rho > cfg.thresholdPct / 100 ? '#d9a143' : '#48cfcb'};`,
+        tip: `${c.name} — ${c.reason}. ${c.share}% of a buyer's calls. Its floor is calculated, not fixed: ${M.saleFloorFor(cfg, c).n} at ${fmt(cfg.sizingLoadRps)} rps, ${c.share}% of it at ${M.replicaRpsFor(cfg, c)} rps a replica held to ${cfg.thresholdPct}% — driven by ${M.saleFloorFor(cfg, c).drivenBy}. ${pc.uncapped ? 'You have set no ceiling, which is what the package does — it scales as far as the load asks.' : `You have capped it at ${pc.max}; the package sets no maximum.`} ${c.cpus} cpu and ${c.memGb}GB a replica, ${c.poolMax} pool connections each (${c.connectionsAtExpected} at the floor), and a ${M.serviceMsFor(cfg, c).toFixed(1)}ms mean service time that follows from the ${M.replicaRpsFor(cfg, c)} RPS a replica you set. Now ${fmt(pc.lambda)} requests a second in at ${Math.round(pc.rho * 100)}% utilisation.`,
+      };
+    };
+    const [g0, g1, g2] = s.clusters.map(clusterNode);
+    const totalConns = s.conns;
+    const peakRef = Math.max(cfg.peakRps, 1);
+    const dg = {
+      // the connectors, each carrying its own rate
+      flowIn: flow(s.offeredRps, peakRef),
+      flowMid: flow(s.servedRps, peakRef),
+      flowDb: flow((s.dbReadRps ?? 0) + (s.writeRps ?? 0), s.dbCapacity || 1),
+      flowCache: flow(s.cacheReadRps ?? 0, peakRef, '#2c7c7d', 1.2),
+      flowMerge: s.state === 'reconciling'
+        ? flow(1, 1, '#d9a143', 1.7)
+        : `stroke: ${s.state === 'reconciled' || s.state === 'decommissioned' ? '#d9a143' : '#3a3a3a'}; stroke-width: 1.7; stroke-dasharray: 4 5; opacity: .5;`,
+      flowNormal: flow(normal.rps, Math.max(normal.cell.peakRps, 1), '#787878', 1.4),
+      flowLock: (s.holdRefused ?? 0) > 1
+        ? flow(1, 1, '#d96c63', 1.5)
+        : 'stroke: #d96c63; stroke-width: 1.4; stroke-dasharray: 3 5; opacity: .35;',
+      buyers: fmt(tw('buyers', s.buyers)),
+      offered: fmt(tw('offered', s.offeredRps)),
+      calls: String(derived.calls),
+      envCalls: (s.envCalls ?? 0).toFixed(1),
+      sharedNote: `${fmt(s.sharedCellRps ?? 0)}/s to the shared cell`,
+      queued: fmt(tw('queued', s.queued ?? 0)),
+      wait: `${(s.waitSec ?? 0).toFixed(1)}s wait`,
+      // The tank fills from the bottom with the wait, not the depth: the depth
+      // is unbounded and the wait is what the reader capped.
+      queueStyle: `transition: height .45s ease, background-color .4s ease; position: absolute; left: 0; right: 0; bottom: 0; height: ${(bar((s.waitSec ?? 0) / cfg.maxWaitSec, 1) * 100).toFixed(1)}%; background: ${(s.waitSec ?? 0) > cfg.maxWaitSec * 0.6 ? '#d96c63' : '#d9a143'}; opacity: .24;`,
+      abandon: (s.abandoned ?? 0) > 1 ? `${fmt(s.abandoned)}/s abandoning after ${cfg.maxWaitSec}s` : `bounded at ${cfg.maxWaitSec}s`,
+      abandonFill: (s.abandoned ?? 0) > 1 ? '#d96c63' : '#787878',
+      conns: fmt(tw('conns', totalConns)),
+      connStyle: `transition: width .3s ease, background-color .3s ease; display: block; height: 100%; border-radius: 3px; width: ${(bar(totalConns / (s.maxClient || 5000), 1) * 100).toFixed(1)}%; background: ${totalConns > (s.maxClient || 5000) ? '#d96c63' : '#48cfcb'};`,
+      connOf: `client connections of ${fmt(s.maxClient ?? 5000)}`,
+      poolInto: `into ${s.poolSize ?? 80} server connections`,
+      cacheNote: (s.cacheReadRps ?? 0) > 1
+        ? `${fmt(s.cacheReadRps)}/s of reads served from Redis`
+        : 'every read reaches the database',
+      cacheFill: (s.cacheReadRps ?? 0) > 1 ? '#48cfcb' : '#787878',
+      shardNote: (s.leaseShards ?? 1) > 1
+        ? `${s.leaseShards} sub-pools · ${cfg.anySeatPct}% take any seat`
+        : 'one row a performance',
+      shardFill: (s.leaseShards ?? 1) > 1 ? '#48cfcb' : '#d96c63',
+      batchNote: (s.batchWindowMs ?? 0) > 0 ? `+${s.batchWindowMs}ms on the first write in a window` : '',
+      readRps: fmt(tw('read', s.dbReadRps ?? 0)),
+      writeRps: fmt(tw('write', s.writeRps ?? 0)),
+      readStyle: `transition: width .3s ease, background-color .3s ease; display: block; height: 100%; border-radius: 3px; width: ${(bar((s.dbReadRps ?? 0) / (s.dbCapacity || 1), 1) * 100).toFixed(1)}%; background: #48cfcb;`,
+      writeStyle: `transition: width .3s ease, background-color .3s ease; display: block; height: 100%; border-radius: 3px; width: ${(bar((s.writeRps ?? 0) / (s.dbCapacity || 1), 1) * 100).toFixed(1)}%; background: #d9a143;`,
+      dbLimit: `${fmt(s.dbCapacity ?? 0)} statements/s ceiling`,
+      holdCapNote: (s.leaseShards ?? 1) > 1
+        ? `${fmt(s.effectiveHoldCap ?? 0)}/s effective · ${fmt(s.holdCap)}/s a shard`
+        : `${fmt(s.holdCap)}/s ceiling · ${cfg.lockMs}ms lease`,
+      dbFill: (s.dbLoad ?? 0) > 1 ? '#d96c63' : '#3a3a3a',
+      // Every row a purchase converges on, worst first — the two the package
+      // flags and the five it does not.
+      rows: [...(s.rows ?? [])]
+        .map((r) => ({ ...r, load: r.ceiling > 0 ? r.demand / r.ceiling : 0 }))
+        .sort((a, b) => b.load - a.load)
+        .slice(0, this.state.rowsOpen ? 99 : 3)
+        .map((r) => ({
+          table: r.table,
+          flag: r.insert ? (r.flagged ? 'insert' : 'insert · unflagged') : (r.flagged ? 'convergent' : 'convergent · unflagged'),
+          line: `${fmt(r.served)}/${fmt(r.demand)} of ${fmt(r.ceiling)}`,
+          pct: `${Math.round(r.load * 100)}%`,
+          servedStyle: `transition: width .3s ease; display: block; height: 100%; width: ${(Math.min(1, r.served / Math.max(r.demand, r.ceiling, 1)) * 100).toFixed(1)}%; background: ${r.insert ? '#6aa5f5' : '#48cfcb'};`,
+          refusedStyle: `transition: width .3s ease; display: block; height: 100%; width: ${(Math.min(1, r.refused / Math.max(r.demand, r.ceiling, 1)) * 100).toFixed(1)}%; background: #d96c63;`,
+          nameStyle: `font-family: var(--mono); font-size: 10px; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: ${r.refused > 1 ? '#d96c63' : r.flagged ? '#ededed' : '#9a9a9a'};`,
+          flagStyle: `font-family: var(--mono); font-size: 8px; letter-spacing: .04em; text-transform: uppercase; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: ${r.flagged ? '#787878' : '#d9bc7c'};`,
+          tip: `${r.note} ${r.cpb} calls a buyer reach it, so ${fmt(r.demand)} a second at this load against a ceiling of ${fmt(r.ceiling)}${r.insert ? ` — an insert competes for an index tail rather than a row, which this model prices at ${Math.round(1 / M.INSERT_COST)}× a lease, and that multiple is mine` : ' — one row every buyer reaches, so the writes serialise'}. ${r.flagged ? 'burst-scope.json flags it contended.' : 'burst-scope.json does not flag it contended, and on this arithmetic it is.'}${r.refused > 1 ? ` Right now ${fmt(r.refused)} attempts a second find no row.` : ''}`,
+        })),
+      rowsHead: `${(s.rows ?? []).filter((r) => r.refused > 1).length} of ${(s.rows ?? []).length} refusing`,
+      rowsToggle: () => this.setState({ rowsOpen: !this.state.rowsOpen }),
+      rowsToggleLabel: this.state.rowsOpen
+        ? 'show the worst three'
+        : `+${Math.max(0, (s.rows ?? []).length - 3)} more rows`,
+
+      invStyle: `transition: width .3s ease; display: block; height: 100%; width: ${(bar((s.invServed ?? 0) / Math.max(s.invDemand || 1, s.holdCap || 1), 1) * 100).toFixed(1)}%; background: #48cfcb;`,
+      invRefStyle: `transition: width .3s ease; display: block; height: 100%; width: ${(bar(Math.max(0, (s.invDemand ?? 0) - (s.invServed ?? 0)) / Math.max(s.invDemand || 1, s.holdCap || 1), 1) * 100).toFixed(1)}%; background: #d96c63;`,
+      seatStyle: `transition: width .3s ease; display: block; height: 100%; width: ${(bar((s.seatServed ?? 0) / Math.max(s.seatDemand || 1, s.holdCap || 1), 1) * 100).toFixed(1)}%; background: #48cfcb;`,
+      seatRefStyle: `transition: width .3s ease; display: block; height: 100%; width: ${(bar(Math.max(0, (s.seatDemand ?? 0) - (s.seatServed ?? 0)) / Math.max(s.seatDemand || 1, s.holdCap || 1), 1) * 100).toFixed(1)}%; background: #d96c63;`,
+      holdCap: `${fmt(s.holdCap)}/s ceiling · ${cfg.lockMs}ms lease`,
+      lockNote: (s.lockRho ?? 0) >= 1
+        ? `${Math.round((s.lockRho ?? 0) * 100)}% utilised — no finite wait`
+        : (s.lockRho ?? 0) > 0.01
+          ? `${Math.round(s.lockRho * 100)}% utilised · ${fmt(s.lockWaitMs)}ms mean wait`
+          : 'idle',
+      lockFill: (s.lockRho ?? 0) >= 0.9 ? '#d96c63' : (s.lockRho ?? 0) > 0.6 ? '#d9a143' : '#787878',
+      orders: fmt(tw('orders', s.orders, 0.12)),
+      replayed: s.orders > 0 ? `${fmt(s.replayed)} of ${fmt(s.orders)} replayed` : 'nothing to move yet',
+      replayStyle: `transition: width .3s ease, background-color .3s ease; display: block; height: 100%; border-radius: 3px; width: ${(bar(s.orders > 0 ? (s.replayed + s.rejected) / s.orders : 0, 1) * 100).toFixed(1)}%; background: #d9a143;`,
+      rejected: s.rejected >= 1 ? `${fmt(s.rejected)} → sync.rejection` : 'none rejected',
+      mergeOn: s.state === 'reconciling' || s.state === 'reconciled' || s.state === 'decommissioned',
+      mergeStroke: s.state === 'reconciling' ? '#d9a143' : '#3a3a3a',
+      liveStroke: s.state === 'live' ? '#48cfcb' : '#3a3a3a',
+      liveOpacity: s.state === 'live' ? '0.9' : '0.25',
+      g0, g1, g2,
+
+      // What the environment is doing, said as state rather than left for the
+      // reader to infer from three bars moving.
+      states: (() => {
+        const out = [];
+        const chip = (label, colour, tip) => out.push({
+          label, tip,
+          style: `animation: chipIn .28s ease both; font-family: var(--mono); font-size: 10px; letter-spacing: .08em; text-transform: uppercase; padding: 4px 10px; border-radius: 5px; white-space: nowrap; color: #101010; background: ${colour};`,
+        });
+        if ((s.oversoldTotal ?? 0) > 1) {
+          chip(`overselling — ${fmt(s.oversoldTotal)} seats twice`, '#e07ab0',
+            `A read-then-update guard on a convergent row: ${fmt(s.oversold)} collisions a second right now. Inventory is going negative. Contention did not cause this — it detonated it, and at five buyers a second it would never have fired.`);
+        }
+        if ((s.moneyNoSeatTotal ?? 0) > 1) {
+          chip(`${fmt(s.moneyNoSeatTotal)} paid with no seat`, '#e07ab0',
+            `Lock wait plus a gateway round trip is longer than the ${cfg.holdTtlSec}s hold, so seats are released while guests are paying.`);
+        }
+        if ((s.fragmented ?? 0) > 1) {
+          chip(`${Math.round((s.fragShare ?? 0) * 100)}% hit an empty shard`, '#d96c63',
+            `${fmt(s.fragmented)} buyers a second are told there is nothing left while ${fmt(s.room)} seats remain in other sub-pools. Sixteen shards each empty separately and nothing rebalances them, so the last seats fragment — a performance that looks sold out to most buyers while it is not. This is the price of variant C, and the curve behind it is mine.`);
+        }
+        if (s.unmet > 1 && !s.soldOut) {
+          chip(`${fmt(s.unmet)} buyers/s turned away · ${s.unmetReason}`, s.bindingStage === 'lease' ? '#d96c63' : '#d9a143',
+            s.bindingStage === 'lease'
+              ? `Seats are still available and these buyers cannot get a hold: the lease path is the binding stage at ${fmt(s.holdCap)} acquisitions a second. More replicas make this worse rather than better — they are more waiters on the same row.`
+              : 'Seats are still available and a cluster is at its ceiling, so these buyers cannot be served. This is the one that more containers would fix.');
+        }
+        if (s.soldOut) {
+          chip(`sold out — ${fmt(s.seats)} seats`, '#48cfcb',
+            `Every seat the venue put on sale is taken${s.soldOutAt != null ? ` at ${M.clock(s.soldOutAt)}` : ''}. Demand after this point is refused for want of stock rather than for want of capacity — a sale that sells out and a sale that sheds look identical on a throughput chart and are not the same event.`);
+        } else if (s.state === 'live') {
+          chip(`${fmt(s.room)} seats left`, '#3a3a3a',
+            `${fmt(s.seats)} seats on sale for this venue, ${fmt(s.orders)} taken. Orders cannot exceed the stock, so the sale can end before the window does.`);
+        }
+        if ((s.abandoned ?? 0) > 1) {
+          chip(`shedding ${fmt(s.abandoned)}/s`, '#d96c63',
+            `Buyers are leaving the queue after ${cfg.maxWaitSec}s. ADR-0032 sheds guest and public first, staff and service last. This is capacity, not stock — a shed buyer would have bought.`);
+        } else if ((s.queued ?? 0) > 1) {
+          chip(`queueing — ${(s.waitSec ?? 0).toFixed(1)}s`, '#d9a143',
+            `${fmt(s.queued)} requests waiting above the ceilings you set, drained by spare capacity. Nobody has abandoned yet.`);
+        }
+        if ((s.holdRefused ?? 0) > 1) {
+          chip('lease contended', '#d96c63',
+            `${fmt(s.holdRefused)} hold attempts a second find no row. This is the wall, and no replica count moves it — variant C is the only configuration that does.`);
+        }
+        if (s.state === 'requested' || s.state === 'decommissioned') {
+          chip(`steady — ${normal.replicas} across the board`, '#7fbf8f',
+            `No burst environment exists. The shared cell is carrying everything on its own: sixteen services at a floor of two in the ${normal.cell.key}, ${fmt(normal.rps)} requests a second. This is where every scenario starts and where it returns.`);
+        }
+        if (!out.length && s.state === 'live') {
+          chip('live and holding', '#48cfcb', 'Serving everything offered, inside the target utilisation, with nothing queued and no lease refusals.');
+        }
+        return out;
+      })(),
+
+      // Instances, and how the services pair onto them.
+      instances: s.clusters.map((pc) => {
+        const c = M.CLUSTERS.find((x) => x.name === pc.name);
+        return { label: `${c.short} × ${pc.n}`, spec: `${c.cpus} cpu · ${c.memGb} GB` };
+      }),
+      footprintN: `${s.containers + 3} containers`,
+      footprint: `${s.cpu} cpu · ${fmt(s.clusters.reduce((a, pc) => {
+        const c = M.CLUSTERS.find((x) => x.name === pc.name);
+        return a + c.memGb * pc.n;
+      }, 0) + M.COMPOSE.postgres.memGb + M.COMPOSE.redis.memGb)} GB`,
+      pairTip: `One container a replica. All three services connect to the same pgbouncer, which fronts one postgres-hot and one redis — so ${s.containers} service containers plus those three are the whole environment. The pool is ${M.CLUSTERS[0].poolMax} connections a replica, which at the floors is ${M.CLUSTERS.map((c) => c.connectionsAtFloor).join(' + ')} = ${M.CLUSTERS.reduce((a, c) => a + c.connectionsAtFloor, 0)} against pgbouncer's ${fmt(M.COMPOSE.pgbouncer.maxClient)}. The compose file is told ${M.CLUSTERS.map((c) => c.composeReplicas).join(' / ')} because compose has no autoscaler and can only be given one number — the minimum.`,
+      // Through a value rather than a literal attribute: the runtime was
+      // caching a truncated compile of this one node's style and rendering the
+      // whole panel at the origin, on top of the demand card.
+      platformStyle: 'position: absolute; left: 1214px; top: 98px; width: 150px; box-sizing: border-box; padding: 30px 18px; text-align: center;',
+      // The shared cell, running. Never gated on the environment's state: it
+      // was serving before the sale was requested and it will be serving after
+      // the environment is gone.
+      routineRps: fmt(s.normal ? s.normal.rps : M.ROUTING.normal.rps),
+      routineReplicas: s.normal ? `${s.normal.replicas} replicas · 16 services` : '',
+      routineCell: s.normal ? `${s.normal.cell.key} · ${s.normal.load}` : '',
+      routineAlways: 'always on — it does not stop for the sale',
+      permLines: `one database a tenant · venues are partitions · ${normal.replicas + 3} containers in the ${normal.cell.key}`,
+      routineDots: (s.normal ? s.normal.services : []).map((x) => ({
+        style: `width: 5px; height: 5px; border-radius: 1px; display: block; background: #6a6a6a;`,
+      })),
+      routineTip: `${M.ROUTING.normal.description} ${M.ROUTING.normal.exampleLoad}. ${M.ROUTING.note}`,
+    };
+
+    /* ── hover info ─────────────────────────────────────────────────────
+       One delegated panel rather than a title attribute per node: the viewer's
+       own convention is “hover anything you do not recognise”, and a native
+       tooltip cannot hold a sentence with a source on the end of it. Fired on
+       enter and leave only — a mousemove handler would re-render the whole
+       simulation thirty times a second for a label. */
+    const tip = this.state.tip;
+    const rect = this.state.tipRect;
+    const tipStyle = tip && rect
+      ? `position: fixed; z-index: 60; left: ${Math.max(10, Math.min(rect.left, (typeof window !== 'undefined' ? window.innerWidth : 1440) - 380))}px; top: ${rect.bottom + 10}px; max-width: 360px; padding: 10px 13px; border: 1px solid var(--acl); border-radius: 9px; background: #101010; box-shadow: 0 12px 34px rgba(0,0,0,.6); font-size: 11.5px; line-height: 1.6; color: var(--text); pointer-events: none;`
+      : 'display: none;';
+
+    return {
+      rail, reads, chart, bands, marks, guard,
+      ledger, dg,
+      /* ── fit to screen ────────────────────────────────────────────────
+         The canvas keeps its 1380 × 986 geometry, because every coordinate in
+         it is hand-placed; what changes is the scale it is drawn at, so the
+         lifecycle rail, the readouts, the picture and the transport share one
+         viewport instead of three scrolls. */
+      ...(() => {
+        const CANVAS_W = 1380;
+        const CANVAS_H = 986;
+        const vh = typeof window !== 'undefined' ? window.innerHeight : 900;
+        const vw = typeof window !== 'undefined' ? window.innerWidth : 1440;
+        // **The chrome is measured, not assumed.** The readout strip wraps and
+        // the transport stacks, so a constant was wrong by 145px and reported
+        // a fit that was not one.
+        let chrome = 340;
+        if (typeof document !== 'undefined') {
+          const outer = document.querySelector('[data-bd-stage]');
+          const section = outer && outer.closest('section');
+          if (outer && section) {
+            const m = section.clientHeight - outer.clientHeight;
+            if (m > 80 && m < 900) chrome = m;
+          }
+        }
+        const fit = this.state.fit === true;
+        const byHeight = (vh - chrome - 12) / CANVAS_H;
+        const byWidth = (Math.min(vw, 1440) - 46) / CANVAS_W;
+        const k = fit ? Math.max(0.26, Math.min(1, byHeight, byWidth)) : 1;
+        return {
+          stageVars: `--bd-k: ${k.toFixed(3)};`,
+          compact: fit,
+          fitLabel: fit ? `fit · ${Math.round(k * 100)}%` : 'full size',
+          fitOn: () => this.setState({ fit: this.state.fit === false }),
+          fitStyle: `border: 1px solid ${fit ? 'var(--acl)' : 'var(--line)'}; background: ${fit ? 'var(--acs)' : 'var(--card)'}; color: ${fit ? 'var(--acb)' : 'var(--faint)'}; border-radius: 8px; padding: 7px 11px; font-family: var(--mono); font-size: 10.5px; cursor: pointer; white-space: nowrap;`,
+        };
+      })(),
+      guardShort: guard.length > 128 ? `${guard.slice(0, 126).replace(/[\s,.]+$/, '')}…` : guard,
+      tip: tip ?? '', tipStyle,
+      onTipIn: (e) => {
+        const node = e.target.closest ? e.target.closest('[data-tip]') : null;
+        const text = node ? node.getAttribute('data-tip') : null;
+        if (!text || text === this.state.tip) return;
+        const r = node.getBoundingClientRect();
+        this.setState({ tip: text, tipRect: { left: r.left, bottom: r.bottom } });
+      },
+      onTipOut: (e) => {
+        const node = e.target.closest ? e.target.closest('[data-tip]') : null;
+        const to = e.relatedTarget && e.relatedTarget.closest ? e.relatedTarget.closest('[data-tip]') : null;
+        if (node && to === node) return;
+        if (this.state.tip) this.setState({ tip: null, tipRect: null });
+      },
+      clean: ledger.length === 0,
+      ledgerCount: ledger.length
+        ? `${ledger.length} named · ${ledger.filter((e) => e.style.includes('--red')).length} hard`
+        : 'nothing broke',
+      verdict: rec.verdict,
+      verdictNote: bindingContention
+        ? `And the containers are not the binding constraint. At a ${cfg.lockMs}ms lease the two contended rows carry ${fmt(rec.contention.contentionRps)} requests a second between them — ${Math.round((rec.contention.contentionRps / cfg.peakRps) * 100)}% of the peak. acquireInventoryHold is the number to measure before anything else; it is a property of the contention model, not of instance size.`
+        : short.length
+          ? `${short.map((c) => `${c.short} needs ${c.need} and your ceiling is ${c.ceiling}`).join('; ')}. Above the ceiling the environment sheds rather than queues, because a guest waiting in a queue does not know whether they have a ticket.`
+          : `Both the ceilings and the lease path carry this peak at ${cfg.thresholdPct}% target utilisation. That is a result about these knobs — the service times behind it are mine, not the package's.`,
+      verdictStyle: `padding: 18px 20px; background: ${verdictHot ? 'var(--warm)' : 'var(--acs)'}; color: ${verdictHot ? 'var(--warmt)' : 'var(--acb)'}; border-bottom: 1px solid var(--line);`,
+      peakLabel: `${fmt(cfg.peakRps)} rps`,
+      thrLabel: `${cfg.thresholdPct}%`,
+      regressions: (() => {
+        if (this._regKey !== cmpKey) { this._regKey = cmpKey; this._regs = M.regressions(cfg); }
+        return this._regs.map((r) => ({
+          key: r.key,
+          name: r.name,
+          buys: r.buys,
+          severity: r.severity,
+          cost: r.cost,
+          price: r.price,
+          holds: fmt(r.holdsWith),
+          refused: r.refusedWithout > 0.5 ? `${fmt(r.refusedWithout)} buyers/s` : '—',
+          rowStyle: `border: 1px solid ${r.movesWall ? 'var(--red)' : 'var(--div)'}; background: ${r.movesWall ? 'var(--warm)' : 'var(--card)'}; border-radius: 10px; padding: 12px 14px; display: grid; gap: 6px;`,
+          keyStyle: `font-family: var(--mono); font-size: 11px; font-weight: 500; color: ${r.inPackage ? 'var(--acb)' : 'var(--warmt)'};`,
+          sevStyle: `font-family: var(--mono); font-size: 9.5px; letter-spacing: .05em; text-transform: uppercase; padding: 2px 7px; border-radius: 4px; white-space: nowrap; color: ${r.movesWall ? '#101010' : 'var(--faint)'}; background: ${r.movesWall ? 'var(--red)' : 'transparent'}; border: 1px solid ${r.movesWall ? 'var(--red)' : 'var(--line)'};`,
+          on: () => this.resolve({ variant: r.key }),
+        }));
+      })(),
+      recRows, recCards, compare,
+      hasDiff: rec.diff.length > 0,
+      diffText,
+      copyLabel: this.state.copied ? 'copied' : 'copy',
+      copyDiff: () => {
+        navigator.clipboard?.writeText(diffText);
+        this.setState({ copied: true });
+        setTimeout(() => this.setState({ copied: false }), 1400);
+      },
+      openItems: [
+        {
+          name: 'synchronous_commit = off on the order path',
+          ref: 'deploy/c-flash-sale.yml · a review note, not a decision',
+          colour: 'var(--red)',
+          note: `It buys write throughput this run demonstrably does not need — ${Math.round((s.dbLoad ?? 0) * 100)}% of the statement ceiling — in exchange for losing acknowledged commits on a crash. On a path where the commit IS the seat allocation and the payment capture, a confirmed seat can vanish or be sold twice. The run's own “none rejected, nothing lost” is not defensible while the flag is set for those tables.`,
+          tip: 'The file calls it a decision rather than a setting, and it is right to: for fifty seconds of throughput that reconciles afterwards the trade can be worth it. But this environment is at a fraction of its write ceiling, so it is buying nothing. Setting it per transaction — off for telemetry, on for anything touching seat_hold, inventory_hold or order finalisation — costs almost nothing here. That split is not written anywhere in the package.',
+        },
+        {
+          name: 'One postgres-hot for all three services',
+          ref: 'against ADR-0028 / ADR-0005 · segregation is open',
+          colour: 'var(--amber)',
+          note: 'The diagram draws one primary shared by Catalogue, Order and Identity. That asserts an answer to database segregation per service, which is still open. Either the burst environment is a stated exception — in which case it needs an ADR saying so — or the drawing is wrong.',
+          tip: 'A burst environment lives for minutes and reconciles into the permanent platform, which is a fair argument for one primary. But it is an argument, not a decision, and nothing in the package makes it. This board should not be the place it gets settled by omission.',
+        },
+        {
+          name: 'seating.seat_hold modelled as one row a performance',
+          ref: 'the package calls it “a temporary claim on a seat”',
+          colour: 'var(--amber)',
+          note: `Both contended rows are modelled as a single serialisation point, which is right for catalogue.inventory_hold — a claim on a performance's stock. It is probably wrong for seat_hold: a claim on a seat means one row per seat, and ${fmt(sum.seats)} seats is ${fmt(sum.seats)} independent locks, at which point the contention disappears structurally. If it really is per performance that is a data-model defect rather than a capacity problem.`,
+          tip: 'burst-scope.json marks seat_hold contended, so the model follows it rather than overruling the package on a guess — but the table note describes a per-seat claim, and the two cannot both be true. Worth resolving before the lease ceiling is quoted, because it changes which of the two rows is actually the wall.',
+        },
+        {
+          name: 'The draining window has no checkout TTL',
+          ref: 'states/burst-environment.yaml · graceMinutes',
+          colour: 'var(--faint)',
+          note: 'Draining lets a guest mid-checkout finish and tells later arrivals the sale has ended, which is right. But without a hard checkout TTL the drain window is unbounded and the environment can never be torn down — and teardown is the whole cost control.',
+          tip: 'graceMinutes bounds the period after onSaleTo, not the life of an individual checkout. Eight to ten minutes is the usual figure; the package states none.',
+        },
+      ],
+      runFacts, ladder, providers, monthRows, monthShare,
+      monthTotal: M.money(monthTotal),
+      monthHead: `${cfg.salesPerMonth} on-sale${cfg.salesPerMonth === 1 ? '' : 's'} on top of an always-on platform`,
+      monthNote: `The upkeep is ${((upkeep + indexShare) / monthTotal * 100).toFixed(1)}% of it and the sales are ${((salesCost / monthTotal) * 100).toFixed(1)}%. Sizing the permanent platform for the sale shape instead would mean paying for it all year — a stadium runs at 48 requests a second for 363 days and 6,000 for two.`,
+      /* ── the legend ─────────────────────────────────────────────────
+         The track carries three kinds of mark in the same strip — phase,
+         failure and playhead — and nothing on it says which is which. */
+      legendRowStyle: fitting
+        ? 'display: none;'
+        : 'display: flex; gap: 4px 12px; flex-wrap: wrap; align-items: center; margin-top: 7px; padding-top: 7px; border-top: 1px solid var(--div);',
+      legend: [
+        ...M.STATES.map((n) => ({
+          label: n === 'requested' ? 'steady · requested' : n,
+          swatch: `width: 14px; height: 10px; border-radius: 2px; display: block; flex: 0 0 auto; background: ${PH_INK[n]};`,
+          tip: (M.MACHINE.transitions.find((tr) => tr.to === n) ?? {}).guard
+            ?? 'The initial state — an environment asked for and not yet standing.',
+        })),
+        {
+          label: 'integrity',
+          swatch: 'width: 14px; height: 10px; border-radius: 2px; display: block; flex: 0 0 auto; background: #e07ab0;',
+          tip: 'A different class of failure from capacity. Contention refuses buyers; it does not corrupt anything — but it detonates latent bugs. A read-then-update guard oversells, and a hold that expires during a lock wait takes money without giving a seat. These only appear in the configuration that has the bug, which is why variant X exists.',
+        },
+        {
+          label: 'hard failure',
+          swatch: 'width: 14px; height: 10px; border-radius: 2px; display: block; flex: 0 0 auto; background: #d96c63;',
+          tip: 'A mark along the bottom of the track: requests shed, buyers abandoning the queue, the lease path serialising, the pooler exhausted, a replica ceiling reached, scale-up unable to keep pace, a refused teardown, or orders rejected at reconciliation. Each one is an entry in the ledger below with the file or ADR that says why it matters.',
+        },
+        {
+          label: 'soft failure',
+          swatch: 'width: 14px; height: 10px; border-radius: 2px; display: block; flex: 0 0 auto; background: #d9a143;',
+          tip: 'Worth knowing rather than broken: p99 over the SLO you set, a queue forming that nobody has abandoned yet, a sold-out sale, or a price-divergence policy charging somebody a price they did not see.',
+        },
+        {
+          label: 'playhead',
+          swatch: 'width: 2px; height: 12px; display: block; flex: 0 0 auto; background: #ededed; box-shadow: 0 0 5px rgba(255,255,255,.5);',
+          tip: 'Where the run is now. In a scenario, drag the track to move it — the whole run is solved, so any moment can be replayed. A free run has no future to scrub to, so the track is a rolling window instead.',
+        },
+      ],
+      speeds, ops, presets, knobs, policies, policyNote,
+      venues, bases, derivation,
+      variants, variantLine, variantFile, variantNote, variantFileStyle,
+      cells,
+      calcRows, calcKnobs,
+      calcAlgorithm: M.SIZING.algorithm,
+      calcTotal: `${calcTotal} replicas`,
+      calcPeakTotal: `${calcPeakTotal} at this run's ${fmt(cfg.peakRps)} rps peak`,
+      calcCheck: matchesPackage
+        ? `Matches derive-sizing.py at its own inputs — ${M.CLUSTERS.map((c) => c.min).join(' / ')}.`
+        : `Your inputs give ${M.CLUSTERS.map((c) => M.saleFloorFor(cfg, c).n).join(' / ')}; derive-sizing.py at its own gives ${M.CLUSTERS.map((c) => c.min).join(' / ')}.`,
+      calcCheckStyle: `font-size: 11.5px; line-height: 1.5; color: ${matchesPackage ? 'var(--green, #7fbf8f)' : 'var(--warmt)'};`,
+      calcConflict: M.SIZING.conflict,
+      drivenNote,
+      thrValue: cfg.thresholdPct,
+      thrOn: (e) => this.resolve({ thresholdPct: Number(e.target.value) }),
+      normalMix: mixRow(M.SIZING.normalMix, normal.rps, M.SIZING.normalFloor, false),
+      normalLoads: [['mean', 'at the mean'], ['peak', 'a busy afternoon']].map(([k, label]) => pill(
+        (cfg.normalLoad ?? 'mean') === k, label,
+        k === 'mean'
+          ? `${fmt(cellNow.meanRps)} requests a second — what the cell carries most of the time. Every tier spends its day between 1 and 50 requests a second per venue; the whole sizing question is the window.`
+          : `${fmt(cellNow.peakRps)} requests a second — the cell's own busy afternoon, which is not an on-sale. Floor is survivability here rather than peak: the autoscaler has all day to react, so paying for the peak all night buys nothing.`,
+        () => this.resolve({ normalLoad: k }),
+      )),
+      saleMix: mixRow(M.SIZING.saleMix, 5000, M.SIZING.saleFloor, true),
+      algorithm: M.SIZING.algorithm,
+      sizingFinding: M.SIZING.finding,
+      unmeasured: M.SIZING.unmeasured,
+      normalHead: `${cellNow.key} · ${fmt(normal.rps)} rps ${normal.load === 'the mean' ? 'at the mean' : 'on a busy afternoon'}`,
+      normalSub: `${cellNow.venues.small} small, ${cellNow.venues.medium} medium, ${cellNow.venues.large} large · ${normal.replicas} replicas now, ${cellNow.atFloor} at the floor and ${cellNow.atPeak} at the peak`,
+      normalFloorNote: M.SIZING.normalNote,
+      saleHead: '5,000 rps, the figure ADR-0035 names',
+      saleSub: `three services of sixteen · ${M.CLUSTERS.map((c) => M.saleFloorFor(cfg, c).n).join(' + ')} = ${M.CLUSTERS.reduce((a, c) => a + M.saleFloorFor(cfg, c).n, 0)} replicas at the calculated floor`,
+      saleFloorNote: M.SIZING.saleNote,
+      anticipationNote: `The load goes in before the peak, not after. At ${fmt(cfg.peakRps)} rps and a ${cfg.thresholdPct}% target the algorithm gives ${M.CLUSTERS.map((c) => `${c.short} ${M.anticipatedFor(cfg, c)}`).join(', ')} — ${M.CLUSTERS.reduce((a, c) => a + M.anticipatedFor(cfg, c), 0)} replicas standing and warm before the sale opens. The autoscaler only ever adds to that; it never scales back below it while the sale is live.`,
+      sizingConflict: M.SIZING.conflict,
+      free,
+      modeNote: free
+        ? 'Free run. No calendar and no horizon: you hold the arrival rate, you press the operations, and the clock only stops when you stop it.'
+        : 'A scripted scenario, solved whole. Drag the timeline to replay any moment; pressing an operation rewrites the script from the playhead.',
+      containerLine: `${s.containers} running · ceilings ${M.CLUSTERS.map((c) => M.ceilingFor(cfg, c)).join(' / ')} · the file says 20 / 16 / 6`,
+      clockLabel: free ? `${M.clock(s.t)} · free run` : `${M.clock(s.t)} / ${M.clock(T)}`,
+      speedNote: free
+        ? `1s of yours = ${speed}s of the sale · no horizon, it runs until you stop it`
+        : `1s of yours = ${speed}s of the sale`,
+      playLabel: playing ? '❙❙ Pause' : (!free && atEnd ? '↻ Play again' : '▶ Play'),
+      playStyle: 'border: 1px solid var(--acl); background: var(--acs); color: var(--acb); border-radius: 8px; padding: 7px 16px; font-family: inherit; font-size: 12px; font-weight: 700; cursor: pointer; min-width: 108px; white-space: nowrap; transition: background-color .25s ease;',
+      restartLabel: free ? 'Reset' : 'Restart',
+      trackTip: free
+        ? 'A rolling window of the last few minutes. A free run has no end to scrub to — press the operations and move the knobs instead.'
+        : 'The whole run, solved. Drag anywhere to scrub; the coloured blocks are the lifecycle phases and the marks along the bottom are the failures, which you can also click in the ledger below.'
+        ,
+      trackCursor: free ? 'default' : 'pointer',
+      // Pressing play at the end starts again rather than doing nothing: the
+      // run stops itself at the last sample, so the button's only useful
+      // meaning there is "again".
+      toggle: () => {
+        if (!playing && !free && atEnd) { this.freshRun(); this.setState({ i: 0, playing: true }); return; }
+        this.setState({ playing: !playing });
+      },
+      playLabelIsReplay: !playing && !free && atEnd,
+      restart: () => { this.freshRun(); return free ? this.freeReset() : this.setState({ i: 0, playing: true }); },
+      nextPhase: () => phaseAt(1),
+      prevPhase: () => phaseAt(-1),
+      waitingFor,
+      prevStyle: `border: 1px solid var(--line); background: var(--card); color: var(--dim); border-radius: 8px; padding: 7px 11px; font-family: var(--mono); font-size: 11px; cursor: pointer; opacity: ${free ? '0.35' : '1'};`,
+      nextLabel: free ? 'skip ahead ▶' : 'phase ▶',
+      nextTip: free
+        ? 'Runs the world forward until the state changes — provisioning is 240 seconds and warming 150, and waiting through them at 1× is not the point.'
+        : 'Move the playhead to the next lifecycle phase.',
+      scrubDown: (e) => { if (free) return; this.setState({ scrubbing: true, playing: false }); this.seek(frac(e)); },
+      scrubMove: (e) => { if (!free && this.state.scrubbing) this.seek(frac(e)); },
+      scrubUp: () => { if (this.state.scrubbing) this.setState({ scrubbing: false }); },
+      headStyle: `position: absolute; top: 0; bottom: 0; width: 2px; background: var(--text); left: ${Math.max(0, Math.min(100, ((s.t - t0) / T) * 100)).toFixed(2)}%; pointer-events: none; box-shadow: 0 0 6px rgba(255,255,255,.4);`,
+    };
+  }
+}
+</script>
+</body>
+</html>
