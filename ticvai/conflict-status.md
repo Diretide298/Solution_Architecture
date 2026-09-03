@@ -1,6 +1,6 @@
 # Conflict register — status index
 
-**169 conflicts raised — CF-01 to CF-166, plus CF-33a and one screen-level item.**
+**170 conflicts raised — CF-01 to CF-167, plus CF-33a and one screen-level item.**
 
 Generated from `conflicts.md`, which holds the full reasoning for each. This is the
 index: one line per conflict, so anything's state can be checked without reading the
@@ -8,17 +8,17 @@ register.
 
 | State | Count |
 |---|---|
-| OPEN — client | **10** |
+| OPEN — client | **11** |
 | OPEN — Softlabs | **1** |
 | CLOSED | **152** |
 | WITHDRAWN | **6** |
-| **Total** | **169** |
+| **Total** | **170** |
 
 **Blocking: 0.** No conflict currently prevents contract, schema or build work.
-**11 open, 152 closed.**
+**12 open, 152 closed.**
 
 
-## Open — needs a client decision — 10
+## Open — needs a client decision — 11
 
 | ID | Issue | Owner |
 |---|---|---|
@@ -32,6 +32,7 @@ register.
 | **CF-164** | The F&B, Retail, Procurement and Inventory workshop is outstanding in three consecutive MoMs and one session was filed under its name having covered n | Chinmay + Allam |
 | **CF-165** | Consent, retention and archival were walked in the 20 August CRM session and the package has consent only. `recordConsent` exists, CF-160 settled that | Allam |
 | **CF-166** | Seat map reuse and comparison — three of four gaps closed, and the fourth was never a gap. The 21 August decision reads: *"full and partial (section-l |  |
+| **CF-167** | The control plane holds personal data before a tenant exists, and it is also the thing that sits above every region. Two sources want it in two places | Chinmay + Dinesh |
 
 ## Open — Softlabs to resolve — 1
 
@@ -211,7 +212,7 @@ register.
 
 ## Integrity
 
-- **Numbering:** CF-01 to CF-166, no gaps
+- **Numbering:** CF-01 to CF-167, no gaps
 - **Duplicates:** none
 - **Counts** are generated from the rows, so this file and the register's summary
   cannot disagree. Regenerate with `tools/build-cf-index.py` after editing.

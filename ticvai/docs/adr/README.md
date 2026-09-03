@@ -39,6 +39,7 @@ and usually enough to predict what an ADR says.
 | [0025](0025-one-audience-field.md) | One field says who may call an operation | Accepted |
 | [0015](0015-standards-first-device-drivers.md) | Standards-first device drivers — ESC/POS, UnifiedPOS, OSDP | Accepted | — |
 | [0038](0038-cell-is-a-region-database-per-tenant.md) | **A cell is a region, and a database per tenant inside it** | Accepted | **CF-161** |
+| [0039](0039-control-plane-and-tenant-database-lifecycle.md) | The control plane is a database of its own, and a tenant database is the unit | Accepted | — raises **CF-167** |
 
 > **This table is twelve entries short.** 0026 to 0037 are on disk and were never added to it —
 > the index has not kept up since 24 August. 0038 is here because it supersedes two of the rows
