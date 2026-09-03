@@ -1,0 +1,277 @@
+/* The burst scope — what a flash-sale environment actually runs.
+
+   The page exists to show an absence, so absence gets the same weight on it as
+   presence: a service that is not deployed is a full row with its reason in it,
+   not a line in a footnote. Everything here is painted from the viewer's own
+   tokens, so it follows the day/night choice like the rest of the app. */
+
+.bu-main { max-width: 1120px; }
+
+/* ── hero ──────────────────────────────────────────────────────────────── */
+.bu-hero { padding: 6px 2px 22px; border-bottom: 1px solid var(--line); }
+.bu-eyebrow {
+  margin: 0 0 8px;
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+.bu-title { margin: 0; font-size: 30px; font-weight: 800; letter-spacing: -0.02em; line-height: 1.15; }
+.bu-sub { margin: 10px 0 0; max-width: 74ch; font-size: 14px; line-height: 1.65; color: var(--text-dim); }
+.bu-source {
+  margin: 14px 0 0;
+  font-family: var(--mono);
+  font-size: 11px;
+  line-height: 1.7;
+  color: var(--text-faint);
+}
+.bu-source strong { color: var(--text-dim); font-weight: 500; }
+
+/* ── totals ────────────────────────────────────────────────────────────── */
+.bu-totals { display: flex; flex-wrap: wrap; gap: 10px; margin: 20px 0 0; }
+.bu-total {
+  flex: 1 1 200px;
+  background: var(--bg-card);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 13px 16px;
+}
+.bu-total-v {
+  font-family: var(--mono);
+  font-size: 22px;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.1;
+  color: var(--text);
+}
+.bu-total-v .of { font-size: 13px; color: var(--text-faint); }
+.bu-total-k { margin-top: 4px; font-size: 11.5px; font-weight: 600; color: var(--text-dim); }
+.bu-total-n { margin-top: 3px; font-size: 11px; line-height: 1.5; color: var(--text-faint); }
+
+/* ── sections ──────────────────────────────────────────────────────────── */
+.bu-sec { padding-top: 38px; }
+.bu-h2 {
+  margin: 0 0 4px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+}
+.bu-h3 { margin: 0 0 8px; font-size: 19px; font-weight: 700; letter-spacing: -0.01em; }
+.bu-lead { margin: 0 0 16px; max-width: 78ch; font-size: 13.5px; line-height: 1.65; color: var(--text-dim); }
+.bu-lead strong { color: var(--text); font-weight: 600; }
+
+/* ── service groups ────────────────────────────────────────────────────── */
+.bu-group { margin-top: 22px; }
+.bu-group-head {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  flex-wrap: wrap;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--line);
+}
+.bu-group-title { font-size: 14px; font-weight: 700; }
+.bu-group-count {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--text-faint);
+  font-variant-numeric: tabular-nums;
+}
+.bu-group-note { flex: 1 1 100%; margin: 6px 0 0; font-size: 12.5px; line-height: 1.6; color: var(--text-dim); }
+
+.bu-svc {
+  display: grid;
+  grid-template-columns: minmax(180px, 1.5fr) 74px minmax(120px, 1.2fr) 86px minmax(200px, 2fr);
+  gap: 14px;
+  align-items: center;
+  padding: 11px 0;
+  border-bottom: 1px solid var(--divider);
+}
+.bu-svc-name { font-size: 13.5px; font-weight: 700; }
+.bu-svc-tier {
+  display: block;
+  margin-top: 2px;
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+}
+.bu-svc-share {
+  text-align: right;
+  font-family: var(--mono);
+  font-size: 14px;
+  font-variant-numeric: tabular-nums;
+  color: var(--text);
+}
+.bu-svc-share.is-zero { color: var(--text-faint); }
+
+/* Proportional, because the whole argument is that two services are the load
+   and the rest are merely on the path. A bar makes 63.6 against 3.6 a shape
+   rather than two numbers a reader has to divide. */
+.bu-bar { height: 8px; border-radius: 999px; background: var(--tint-2); overflow: hidden; }
+.bu-bar span { display: block; height: 100%; background: var(--accent); border-radius: 999px; }
+.bu-bar.is-shared span { background: var(--amber); }
+.bu-bar.is-off span { background: transparent; }
+
+.bu-svc-rep {
+  font-family: var(--mono);
+  font-size: 11.5px;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-dim);
+  text-align: right;
+}
+.bu-svc-rep.is-none { color: var(--text-faint); }
+.bu-svc-reason { font-size: 12.5px; line-height: 1.55; color: var(--text-dim); }
+
+/* A service can be tiny and still be mandatory. The reason field says so; this
+   makes the page say it too, next to the number that would otherwise bury it. */
+.bu-svc.is-mandatory { background: var(--accent-soft); }
+.bu-svc.is-mandatory .bu-svc-reason { color: var(--accent-text); font-weight: 500; }
+
+/* ── contended tables ──────────────────────────────────────────────────── */
+.bu-contended { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 12px; margin-bottom: 20px; }
+.bu-cont {
+  border: 1px solid var(--red);
+  border-radius: 10px;
+  padding: 15px 17px;
+  background: var(--bg-card);
+}
+.bu-cont-flag {
+  display: inline-block;
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: .09em;
+  text-transform: uppercase;
+  color: var(--ink-on-fill);
+  background: var(--red);
+  padding: 2px 7px;
+  border-radius: 4px;
+}
+.bu-cont-name { margin: 9px 0 0; font-family: var(--mono); font-size: 14px; font-weight: 500; color: var(--text); }
+.bu-cont-meta { margin: 5px 0 0; font-family: var(--mono); font-size: 11px; color: var(--text-faint); font-variant-numeric: tabular-nums; }
+.bu-cont-note { margin: 10px 0 0; font-size: 12.5px; line-height: 1.6; color: var(--text-dim); }
+.bu-cont-locks { margin-top: 12px; padding-top: 10px; border-top: 1px solid var(--line); }
+.bu-lock-row { display: flex; gap: 9px; align-items: baseline; flex-wrap: wrap; padding: 3px 0; }
+.bu-lock-op { font-family: var(--mono); font-size: 11.5px; color: var(--text); }
+.bu-lock-kw {
+  font-family: var(--mono);
+  font-size: 10.5px;
+  color: var(--red);
+  background: var(--tint-1);
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  padding: 1px 6px;
+}
+
+/* ── tables and operations ─────────────────────────────────────────────── */
+.bu-scroll { overflow-x: auto; }
+.bu-table { border-collapse: collapse; width: 100%; font-size: 12.5px; }
+.bu-table th {
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+  text-align: left;
+  padding: 0 12px 8px 0;
+  white-space: nowrap;
+  border-bottom: 1px solid var(--line);
+}
+.bu-table td {
+  padding: 8px 12px 8px 0;
+  border-bottom: 1px solid var(--divider);
+  color: var(--text-dim);
+  vertical-align: top;
+}
+.bu-table th:last-child, .bu-table td:last-child { padding-right: 0; }
+.bu-table .n { text-align: right; font-family: var(--mono); font-variant-numeric: tabular-nums; }
+.bu-table .mono { font-family: var(--mono); font-size: 11.5px; color: var(--text); }
+.bu-table tr.is-contended td { background: var(--warm-fill); }
+.bu-table tr.is-contended .mono { color: var(--red); font-weight: 500; }
+
+.bu-flag {
+  display: inline-block;
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: .05em;
+  padding: 1px 6px;
+  border-radius: 4px;
+  border: 1px solid var(--line);
+  color: var(--text-faint);
+}
+.bu-flag.is-write { color: var(--accent-text); border-color: var(--accent-line); background: var(--accent-soft); }
+.bu-flag.is-lock { color: var(--red); border-color: var(--red); }
+.bu-verb { font-family: var(--mono); font-size: 10.5px; font-weight: 500; }
+.bu-verb.get { color: var(--get); }
+.bu-verb.post { color: var(--post); }
+
+/* ── the estimate caveat ───────────────────────────────────────────────── */
+.bu-caveat {
+  margin: 0 0 16px;
+  border-left: 3px solid var(--amber);
+  background: var(--warm-fill);
+  padding: 12px 16px;
+  border-radius: 0 8px 8px 0;
+}
+.bu-caveat p { margin: 0; font-size: 12.5px; line-height: 1.6; color: var(--warm-text); }
+.bu-caveat p + p { margin-top: 7px; }
+.bu-caveat code { font-family: var(--mono); font-size: 11.5px; }
+
+/* ── related ───────────────────────────────────────────────────────────── */
+.bu-related { margin-top: 38px; padding-top: 20px; border-top: 1px solid var(--line); }
+.bu-rel-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 12px; margin-top: 12px; }
+.bu-rel {
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 13px 15px;
+  background: var(--bg-card);
+}
+.bu-rel-path { font-family: var(--mono); font-size: 11.5px; color: var(--accent-text); word-break: break-all; }
+.bu-rel-path.is-plain { color: var(--text-faint); }
+.bu-rel-note { margin: 7px 0 0; font-size: 12px; line-height: 1.55; color: var(--text-dim); }
+
+.bu-error {
+  border: 1px solid var(--red);
+  border-radius: 10px;
+  padding: 16px 18px;
+  color: var(--red);
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+@media (max-width: 860px) {
+  .bu-svc { grid-template-columns: minmax(0, 1fr) 70px; gap: 8px 12px; }
+  .bu-svc > .bu-bar { grid-column: 1 / -1; }
+  .bu-svc-rep { grid-column: 1 / -1; text-align: left; }
+  .bu-svc-reason { grid-column: 1 / -1; }
+}
+
+/* ── the package's own simulator, framed ─────────────────────────────────── */
+/* Full-bleed inside the column: the page inside has its own 1,440px measure
+   and its own padding, so a second set of margins around it would only make
+   it narrower than it was designed for. */
+.bu-sim { margin: 22px 0 0; }
+.bu-sim-frame {
+  display: block;
+  width: 100%;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--bg-card);
+  /* It reports its own height and this follows it, so nothing scrolls inside
+     a page that already scrolls. */
+  overflow: hidden;
+}
+.bu-sim-foot {
+  margin: 9px 0 0;
+  font-family: var(--mono);
+  font-size: 11.5px;
+  line-height: 1.6;
+  color: var(--text-faint);
+}
+.bu-sim-foot a { color: var(--accent-text); }

@@ -32,6 +32,8 @@ import * as auth from '/validation.js';
 import { renderDeployMap } from '/burst-map.js';
 
 const SOURCE = 'handoff/burst-scope.json';
+// The package's own simulation of the same scenario, shipped in the drop.
+const SIMULATOR = '/handoff/Burst Simulator.dc.html';
 
 const $ = (id) => document.getElementById(id);
 
@@ -339,6 +341,83 @@ const RELATED = [
 ];
 
 /**
+ * The package's own simulator, in place of the map this file draws.
+ *
+ * **It is a better answer to the same question and it is the package's.** The
+ * map below was written because nothing in the drop ran the sale; the drop now
+ * does — solved rather than animated, M/M/c per cluster, M/D/1 on the lease,
+ * eleven configurations against one another — and two answers to one question
+ * on one page is worse than either. So this wins when it is there, and
+ * `renderMap` is what happens when it is not.
+ *
+ * Framed rather than linked, because the page around it is the scope this is a
+ * simulation *of*: the totals above and the operations below are the same
+ * thirty-four operations it runs.
+ *
+ * `?embed=1` asks the server to hide the page's own header and to have it
+ * report its height — an iframe does not size to its content, and on the
+ * deployed host this is a different origin, so nothing here can measure it.
+ */
+async function renderSimulator(host) {
+  const src = auth.apiUrl(`${SIMULATOR}?embed=1`);
+  const ok = await fetch(src, { method: 'HEAD', credentials: 'include' })
+    .then((res) => res.ok)
+    .catch(() => false);
+  if (!ok) return false;
+
+  const sec = el('section', 'bu-sim');
+  const frame = document.createElement('iframe');
+  frame.className = 'bu-sim-frame';
+  frame.src = src;
+  frame.title = 'Burst simulator';
+  // It is the package's own file on the package's own origin, and it needs
+  // scripts to be anything at all. No navigation: a link inside it would
+  // otherwise replace the viewer with a page that has no way back.
+  frame.setAttribute('sandbox', 'allow-scripts allow-same-origin');
+  // Until the first height message. Tall enough that the controls and the
+  // first panel are there even if the message never comes.
+  frame.style.height = '900px';
+  sec.append(frame);
+
+  const foot = el('p', 'bu-sim-foot');
+  const open = el('a', null, 'Open it on its own');
+  open.href = auth.apiUrl(SIMULATOR);
+  open.target = '_blank';
+  open.rel = 'noopener';
+  foot.append(open);
+  foot.append(document.createTextNode(
+    ' · handoff/Burst Simulator.dc.html · every figure transcribed from the '
+    + 'package, with the line it came from, in handoff/burst-model.js'));
+  sec.append(foot);
+  host.append(sec);
+
+  window.addEventListener('message', (ev) => {
+    if (ev.source !== frame.contentWindow) return;
+    const h = Number(ev.data?.type === 'adam-handoff-height' && ev.data.height);
+    if (h > 200) frame.style.height = `${Math.ceil(h)}px`;
+  });
+  return true;
+}
+
+/** The map this file draws, for a package that has no simulator in it. */
+async function renderMap(host, data) {
+  await renderDeployMap(host, data, {
+    file: async (path) => {
+      const res = await auth.apiFetch(`/api/file?path=${encodeURIComponent(path)}`);
+      if (!res.ok) throw new Error(String(res.status));
+      return res.text();
+    },
+    // The parsed payloads the viewer already builds. /api/domain carries the
+    // state machines, so the burst lifecycle arrives read rather than reread.
+    api: async (route) => {
+      const res = await auth.apiFetch(`/api/${route}`);
+      if (!res.ok) throw new Error(String(res.status));
+      return res.json();
+    },
+  });
+}
+
+/**
  * The two handoff pages get chips in the bar as well as cards below, because
  * the bar is where a reader looks for another page and the cards are where they
  * look for a source — and these are both.
@@ -419,23 +498,11 @@ async function main() {
 
     $('bu-basis').textContent = data.basis ?? '';
     renderTotals(host, data);
-    // The map goes straight after the totals: it is the one block that answers
-    // "what does this look like running" rather than "what is in it", and a
-    // reader who stops after the first screen should have had that.
-    await renderDeployMap(host, data, {
-      file: async (path) => {
-        const res2 = await auth.apiFetch(`/api/file?path=${encodeURIComponent(path)}`);
-        if (!res2.ok) throw new Error(String(res2.status));
-        return res2.text();
-      },
-      // The parsed payloads the viewer already builds. /api/domain carries the
-      // state machines, so the burst lifecycle arrives read rather than reread.
-      api: async (route) => {
-        const res2 = await auth.apiFetch(`/api/${route}`);
-        if (!res2.ok) throw new Error(String(res2.status));
-        return res2.json();
-      },
-    });
+    // The simulation goes straight after the totals: it is the one block that
+    // answers "what does this look like running" rather than "what is in it",
+    // and a reader who stops after the first screen should have had that.
+    // The package's own page if the drop ships it, this file's map if not.
+    if (!await renderSimulator(host)) await renderMap(host, data);
     renderServices(host, data);
     renderTables(host, data);
     renderOperations(host, data);

@@ -578,6 +578,36 @@ function send(res, status, body, type = 'text/plain; charset=utf-8', req = null)
   res.end(body);
 }
 
+/**
+ * What an embedded handoff page has added to it. See the `?embed=1` branch.
+ *
+ * The height message is namespaced and the parent checks the source frame, so
+ * a page cannot resize a frame it is not in.
+ */
+// One `<header>` in each page, and it is the one being hidden. A structural
+// selector would be wrong the moment support.js renders: it replaces <x-dc>
+// with a div of its own, so the header sits one level deeper than the file
+// says it does.
+const HANDOFF_EMBED_CSS = '<style>header{display:none!important}'
+  + 'html,body{background:transparent!important}</style>';
+
+const HANDOFF_EMBED_JS = `<script>
+(function () {
+  var post = function () {
+    var h = Math.max(
+      document.documentElement.scrollHeight,
+      document.body ? document.body.scrollHeight : 0
+    );
+    try { parent.postMessage({ type: 'adam-handoff-height', height: h }, '*'); } catch (e) {}
+  };
+  // The deck renders after this runs, and it keeps changing height as the
+  // simulation draws — so this watches rather than measures once.
+  if (window.ResizeObserver) new ResizeObserver(post).observe(document.documentElement);
+  window.addEventListener('load', post);
+  setInterval(post, 1000);
+})();
+<\/script>`;
+
 /** Already-compressed formats only get bigger. */
 const COMPRESSED = /^(image\/(png|jpeg|gif|webp)|font\/woff)/;
 
@@ -1127,7 +1157,27 @@ const server = http.createServer(async (req, res) => {
       if (!file?.isFile()) return send(res, 404, 'not found');
 
       const body = await readFile(target);
-      return send(res, 200, body, MIME[path.extname(target).toLowerCase()] ?? 'application/octet-stream');
+      const ext = path.extname(target).toLowerCase();
+
+      // `?embed=1` — the same page inside another one.
+      //
+      // Two things it needs and cannot be given from outside: its own header
+      // hidden, because the viewer already drew one and two lockups down the
+      // page is not a design, and its height reported, because an iframe does
+      // not size to its content and the deployed viewer is on a different
+      // origin from this server, so the parent cannot measure it.
+      //
+      // Injected on the way out rather than written into the file: the drop is
+      // a delivery artefact and it has to keep opening from a file:// path with
+      // no viewer at all. `support.js` replaces only <x-dc>, so a style in the
+      // head and a script after it both survive the render.
+      if (ext === '.html' && url.searchParams.get('embed') === '1') {
+        const html = body.toString('utf8')
+          .replace(/<\/head>/i, `${HANDOFF_EMBED_CSS}</head>`)
+          .replace(/<\/body>/i, `${HANDOFF_EMBED_JS}</body>`);
+        return send(res, 200, html, MIME['.html'], req);
+      }
+      return send(res, 200, body, MIME[ext] ?? 'application/octet-stream');
     }
 
     // --- static ------------------------------------------------------------
