@@ -11313,6 +11313,11 @@ async function openResult(result) {
     landOnMatch(needle);
     return;
   }
+  // A page inside the package — the handoff simulator and the shared cell.
+  // The project goes on here and not in the payload, for the reason pkgAsset
+  // gives: the builder that emitted the entry has no idea which project it is
+  // being built for, and this is the one place that does.
+  if (result.pkgHref) { location.href = auth.pkgAsset(result.pkgHref); return; }
   if (result.href) { location.href = result.href; return; }
   if (result.file) { openSourceAt(result.file, result.line, result.name ?? result.id); return; }
   toast(`Nothing in the viewer draws ${result.name ?? result.id} yet`);

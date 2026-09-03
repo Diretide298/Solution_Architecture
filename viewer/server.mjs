@@ -725,7 +725,7 @@ const server = http.createServer(async (req, res) => {
     // handler, which would answer a mistyped project with index.html and a
     // reader with a viewer that never loads and never says why.
     if (!pkg && (route || rest.startsWith('/wireframes/') || rest.startsWith('/designs/')
-                 || rest.startsWith('/ui-design/'))) {
+                 || rest.startsWith('/ui-design/') || rest.startsWith('/handoff/'))) {
       return send(res, 404, JSON.stringify({
         error: projectId ? `no project called "${projectId}"` : 'no projects are registered',
         projects: [...packages.keys()],
@@ -1090,6 +1090,38 @@ const server = http.createServer(async (req, res) => {
         decodeURIComponent(rest.slice('/wireframes/'.length))
       );
       if (!target.startsWith(wireframeRoot + path.sep)) return send(res, 403, 'refused');
+
+      const file = await stat(target).catch(() => null);
+      if (!file?.isFile()) return send(res, 404, 'not found');
+
+      const body = await readFile(target);
+      return send(res, 200, body, MIME[path.extname(target).toLowerCase()] ?? 'application/octet-stream');
+    }
+
+    // --- handoff -----------------------------------------------------------
+    // The handoff pages the package ships as standalone HTML — the burst
+    // simulator and the shared cell — and the model and runtime they load.
+    //
+    // **Served as files rather than through /api/file**, which allows only
+    // yaml, md, json, csv and sql: these are html, js and a png, and they
+    // `import('./burst-model.js')` relative to themselves, so they need real
+    // addresses at the paths they were written against and not a payload.
+    //
+    // A prefix of its own needs no nginx change — `/pkg/` proxies everything
+    // under it and the route list on the `/api/` block is only for the old
+    // spelling.
+    //
+    // It is behind the same gate as everything else, and a client may read it:
+    // these are delivery artefacts, and /api/file already answers for the json
+    // and markdown beside them. The decisions are refused where they are
+    // refused — in `decisionFiles`, on `.md` — and nothing here reaches them.
+    if (rest.startsWith('/handoff/')) {
+      const handoffRoot = path.join(pkg.root, 'handoff');
+      const target = path.resolve(
+        handoffRoot,
+        decodeURIComponent(rest.slice('/handoff/'.length))
+      );
+      if (!target.startsWith(handoffRoot + path.sep)) return send(res, 403, 'refused');
 
       const file = await stat(target).catch(() => null);
       if (!file?.isFile()) return send(res, 404, 'not found');

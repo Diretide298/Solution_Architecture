@@ -277,6 +277,13 @@ export async function buildSearch(root, subjects = {}) {
   //
   // Gated on the subject actually being in the package: a scenario with no
   // burst scope should not offer a page that opens on nothing.
+  // The handoff pages ship as standalone HTML inside the package rather than
+  // as viewer routes, so they are listed only when the package actually holds
+  // them: a drop without the simulator should not offer to open it. Named
+  // rather than globbed — `handoff/` is full of `.dc.html` boards elsewhere in
+  // the tree and these two are the ones that are pages in their own right.
+  const handoffFiles = new Set(await readdir(path.join(root, 'handoff')).catch(() => []));
+
   const pages = [
     burst?.services?.length && {
       id: 'burst', name: 'Flash sale — what an environment runs',
@@ -285,6 +292,21 @@ export async function buildSearch(root, subjects = {}) {
       terms: 'flash sale burst scope deployment map environment clusters replicas '
         + 'scale out scaling contended inventory hold seat hold pgbouncer scenario c '
         + (burst.services ?? []).map((x) => x.name).join(' '),
+    },
+    handoffFiles.has('Burst Simulator.dc.html') && {
+      id: 'burst-simulator', name: 'Burst simulator — a flash sale solved',
+      sub: 'the package’s own model: queueing, contention and eleven configurations',
+      pkgHref: '/handoff/Burst Simulator.dc.html',
+      terms: 'burst simulator flash sale model queueing mmc m/m/c lease contention '
+        + 'p99 latency shed oversell sharding coalescing idempotency scenario '
+        + 'configurations variants recommendation timeline scrub free run',
+    },
+    handoffFiles.has('Shared Cell.dc.html') && {
+      id: 'shared-cell', name: 'Shared cell — the platform at rest',
+      sub: 'what runs between sales, two venues to a cell',
+      pkgHref: '/handoff/Shared Cell.dc.html',
+      terms: 'shared cell platform at rest steady state two venues per cell '
+        + 'b-shared-platform tenancy isolation cost per venue',
     },
     { id: 'uiux', name: 'UI/UX — screens, flows and boards', href: '/uiux.html',
       terms: 'uiux wireframes boards frames screens flows' },
@@ -303,7 +325,12 @@ export async function buildSearch(root, subjects = {}) {
       sub: page.sub ?? 'a page of its own',
       file: null, line: null,
       hash: null, layer: null,
-      href: page.href,
+      href: page.href ?? null,
+      // A page inside the package rather than a viewer route. Kept apart from
+      // `href` because it is not an address yet — the project prefix goes on
+      // in the client, which is the only place that knows which project the
+      // reader has open.
+      pkgHref: page.pkgHref ?? null,
       terms: `${page.name} ${page.terms}`,
     });
   }
